@@ -85,3 +85,11 @@
 `node scripts/prepare_local_pdfs.mjs --source-dir <抽出作業ディレクトリ>`
 
 `local_assets/` は `.gitignore` 対象です。確認用HTMLはこのフォルダのPDFを相対パスで表示します。
+
+## 確認用HTMLの使い方
+
+プロジェクトディレクトリでローカルHTTPサーバーを起動します。
+
+`python -m http.server 8000`
+
+ブラウザで `http://localhost:8000/html/qa.html` を開いてください。検索欄はスペース区切りのAND検索です。例えば `半導体 2029年 売上` と入力すると、すべての語を案件内に含む企業だけを表示します。確認状態とメモはブラウザのローカルストレージに保存され、［確認結果CSV］から書き出せます。
