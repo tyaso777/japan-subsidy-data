@@ -1,0 +1,8 @@
+node_modules/
+**/raw_pdfs/
+**/page_images/
+**/local_assets/
+**/tmp/
+**/~$*.xlsx
+.DS_Store
+Thumbs.db

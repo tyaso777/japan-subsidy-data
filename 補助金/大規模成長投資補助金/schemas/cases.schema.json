@@ -1,0 +1,399 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "大規模成長投資補助金・案件マスタ",
+  "type": "object",
+  "required": [
+    "case_id",
+    "round",
+    "company",
+    "pdf_url"
+  ],
+  "properties": {
+    "case_id": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ],
+      "description": "抽出系内で一意の案件ID"
+    },
+    "round": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "company": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "target_entity": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "scope": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "other_participants": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "page_count": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "vision_page_count": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "project_page_count": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "additional_page_count": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "project_cost_million_yen": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "subsidy_million_yen": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "subsidy_rate_pct": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "cost_page": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "cost_source_method": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "cost_validation": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "cost_box_transcription": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_baseline_year": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_baseline_oku_yen": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_target_year": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_target_oku_yen": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_increase_oku_yen": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_growth_pct": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_cagr_pct": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_multiple": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_validation": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "labor_base_year": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "labor_base_value": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "labor_target_year": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "labor_target_value": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "labor_unit": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "labor_annual_rate_pct": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "labor_validation": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "employee_pay_base_year": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "employee_pay_base_value": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "employee_pay_target_year": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "employee_pay_target_value": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "employee_pay_unit": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "employee_pay_annual_rate_pct": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "employee_pay_validation": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "officer_pay_base_year": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "officer_pay_base_value": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "officer_pay_target_year": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "officer_pay_target_value": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "officer_pay_unit": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "officer_pay_annual_rate_pct": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "officer_pay_validation": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "employees_base_year": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "employees_base_value": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "employees_target_year": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "employees_target_value": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "employees_unit": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "employees_annual_rate_pct": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "employees_validation": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "pdf_url": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    }
+  }
+}
