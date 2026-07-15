@@ -94,7 +94,7 @@
 
 `python scripts/extract_box_sections.py --project-root .`
 
-`local_assets/` は `.gitignore` 対象です。確認用HTMLはこのフォルダのPDFを相対パスで表示します。
+`local_assets/` は `.gitignore` 対象で、GitHubのZIPにはPDF本体が含まれません。ZIPから `qa.html` を開いた場合は右側に案内が表示されるため、［公式PDFを開く］を使用してください。ローカルPDFを準備した環境では、このフォルダのPDFを相対パスで表示します。`s1_outline__179` のような二重アンダーバーは元の公式ファイル名 `outline__179.pdf` を保持した正常な案件IDです。
 
 ## 確認用HTMLの使い方
 
