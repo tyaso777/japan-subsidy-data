@@ -243,7 +243,9 @@ for (const audit of audits) {
   row.sales_series = series;
   row.sales_representative_series_id = representative?.series_id ?? "";
   row.sales_representative_scope = representative?.series_label ?? "";
-  row.sales_representative_reason = representative ? "AI画像目視で申請企業系列と確認" : "申請企業単体系列の記載なし";
+  row.sales_representative_reason = representative
+    ? "AI画像目視で申請企業系列と確認"
+    : "売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）";
   row.sales_representative_review_required = !representative || audit.confidence !== "high";
   row.sales_baseline_period_label = representative?.baseline_period_label ?? null;
   row.sales_baseline_year_before_correction = representative?.baseline_year_before_correction ?? null;
@@ -426,10 +428,12 @@ qaIntegrated = qaIntegrated.replace(
   `function salesSeriesTable(rows){return '<table><thead><tr><th>系列</th><th>基準期（原文／補正前→補正後）</th><th>基準売上</th><th>目標期（原文／補正前→補正後）</th><th>目標売上</th><th>増加額</th><th>成長率 / CAGR</th><th>検証</th></tr></thead><tbody>'+rows.map(s=>'<tr><td><span class="pill '+(s.is_applicant_representative?'ok':'')+'">'+esc(s.series_role)+'</span><br><b>'+esc(s.series_label)+'</b><br><small>'+esc(s.extraction_method)+'</small></td><td>'+esc(s.baseline_period_label||'記載なし')+'<br><small>'+val(s.baseline_year_before_correction)+' → '+val(s.baseline_year_after_correction)+(s.baseline_month_after_correction?'/'+s.baseline_month_after_correction:'')+'</small><br><small>'+esc(s.baseline_year_correction_method||'')+'</small></td><td class="num">'+num(s.baseline_sales_oku)+'億円</td><td>'+esc(s.target_period_label||'記載なし')+'<br><small>'+val(s.target_year_before_correction)+' → '+val(s.target_year_after_correction)+(s.target_month_after_correction?'/'+s.target_month_after_correction:'')+'</small><br><small>'+esc(s.target_year_correction_method||'')+'</small></td><td class="num">'+num(s.target_sales_oku)+'億円</td><td class="num">'+num(s.increase_oku)+'億円</td><td class="num">'+num(s.growth_rate_pct)+'%<br><small>CAGR '+num(s.cagr_pct)+'%</small></td><td><span class="pill '+(s.review_required?'issue':'ok')+'">'+(s.review_required?'要確認':esc(s.arithmetic_status))+'</span><br><button class="source" data-page="'+(s.page||1)+'">p.'+(s.page||1)+'</button><details><summary>系列原文</summary><div class="raw">'+esc(s.raw_fragment)+'</div></details></td></tr>').join('')+'</tbody></table>'}
 function salesSeriesHtml`,
 );
+if (!qaIntegrated.includes("section('生成AI画像目視監査'")) {
 qaIntegrated = qaIntegrated.replace(
   "+section('事業費・補助額'",
   "+section('生成AI画像目視監査','<div class=\"grid\"><div class=\"kv\"><label>信頼度</label><b>'+esc(r.manual_audit_confidence)+'</b></div><div class=\"kv\"><label>確認ページ</label><b>'+esc((r.manual_audit_pages||[]).join(', '))+'</b></div><div class=\"kv\"><label>修正・注記</label><b>'+num(r.manual_audit_correction_count)+'件</b></div></div><div class=\"raw\">'+esc(r.manual_audit_notes||'')+'</div>'+(r.manual_audit_corrections?.length?'<details><summary>修正・不整合の内訳</summary><div class=\"raw\">'+esc(JSON.stringify(r.manual_audit_corrections,null,2))+'</div></details>':'') )+section('事業費・補助額'",
 );
+}
 await fs.writeFile(path.join(stageDir, "html", "qa.html"), qaIntegrated, "utf8");
 
 for (const name of ["schema.json", "cross_batch_validation.md", "sales_numeric_validation.md", "recheck_A1.md", "recheck_A2.md", "recheck_B.md"]) {

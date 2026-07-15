@@ -34,7 +34,7 @@
 ## 収録範囲
 
 - 交付決定企業の取組概要PDF：381件・887ページ
-- ページ内Box：1,995件
+- ページ内Box：3,055件（既存Boxに加え、左見出し付きセクションを復元）
 - 主要4指標：1,524行（381案件 × 4指標）
 - 長期成長ビジョン、外発的動機、内発的動機、会社概要、その他Box等の原文
 - 事業費、補助額、売上成長目標、労働生産性、従業員給与、役員給与、従業員数
@@ -48,7 +48,7 @@
 - `data/processed/sales_annual.csv`: PDFに明記された年次売上高の縦持ちデータ
 - `data/processed/sales_series.csv`: 単体・連結、会社全体・補助事業等を分離した売上系列
 - `data/processed/sales_series_annual.csv`: 売上系列ごとの基準・中間・目標時点
-- `data/processed/boxes.csv`: ページ内Boxごとの文章・座標・分類
+- `data/processed/boxes.csv`: ページ内Boxごとの枠テーマ・枠内容・座標・分類
 - `data/processed/pdf_manifest.csv`: 公式PDF URL、元ファイル名、ページ数の台帳
 - `data/text/narratives.jsonl`: 文章セクションごとの原文
 - `data/text/pages.jsonl`: PDF 1ページ1行の全文データ
@@ -63,6 +63,7 @@
 1. 公式公表ページから個別PDF URLを収集。
 2. PDFをページ単位で解析し、テキスト、表セル、図形・矩形座標を取得。
 3. ページ内の座標を使って文章をBoxごとに分離し、会社名ヘッダーの混入を除外。
+   左側に見出しセル、右側に本文がある「補助事業の背景・目的」「設備投資の内容」「目標値」等は、横方向の同一セクションとして復元し、`box_theme` と `box_content` に分離。
 4. 事業費・補助額、売上成長目標、主要4指標を構造化。
 5. 単位変換、成長率・CAGR・補助率の再計算、年度順序の確認、一部案件の目視確認を実施。
 6. 個々のレコードに検証状態、根拠原文、出典ページ、公式PDF URLを保持。
@@ -88,6 +89,10 @@
 ## ローカルPDFの準備
 
 `node scripts/prepare_local_pdfs.mjs --source-dir <抽出作業ディレクトリ>`
+
+ローカルPDFから左見出し付きセクションを復元し、`boxes.csv`・QA HTMLへ反映する場合：
+
+`python scripts/extract_box_sections.py --project-root .`
 
 `local_assets/` は `.gitignore` 対象です。確認用HTMLはこのフォルダのPDFを相対パスで表示します。
 

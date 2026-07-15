@@ -1,7 +1,7 @@
 {
   "cases": 381,
   "pages": 887,
-  "boxes": 1995,
+  "boxes": 3055,
   "metrics": 1548,
   "primary_metrics": 1524,
   "sales_targets": 381,
@@ -11,5 +11,8 @@
   "officer_rate_only": 216,
   "manual_corrections": 385,
   "narratives": 2999,
-  "generated_at": "2026-07-15T01:00:23.350Z"
+  "generated_at": "2026-07-15T01:00:23.350Z",
+  "box_project_background": 337,
+  "box_investment_content": 369,
+  "box_project_targets": 316
 }

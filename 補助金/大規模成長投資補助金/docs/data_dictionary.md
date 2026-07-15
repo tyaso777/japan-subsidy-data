@@ -26,6 +26,17 @@
 - `narratives.jsonl`: 1案件×1文章セクション1行。
 - `pages.jsonl`: PDF 1ページ1行。
 
+## Box列
+
+- `box_type`: 分析用の分類。例：`project_background`、`investment_content`、`project_targets`、`other`。
+- `box_label`: 表示用の標準ラベル。
+- `box_title`: 従来互換のBox見出し。
+- `box_theme`: PDF上の枠テーマ・見出し。独自見出しは原文のまま保持する。
+- `box_content`: 見出しを除いた枠本文。全文検索やテーマ別比較にはこの列を使う。
+- `text`: 従来互換の「テーマ＋本文」。新規分析では `box_theme` と `box_content` を優先する。
+- `source_method=template_labeled_section`: 左側の色付き見出しセルと右側の本文領域を、座標から一つのセクションとして復元した行。
+- `補助事業の背景・目的`、`設備投資の内容`、`目標値`は、標準テンプレート上で検出できる場合にそれぞれ独立Boxとして保持する。変則レイアウトや見出し自体がないPDFでは存在しない場合がある。
+
 ## 案件代表値
 
 - 事業費・補助額は、同一申請に含まれる複数投資案件の合計額を代表値とする。

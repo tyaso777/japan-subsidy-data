@@ -31,7 +31,7 @@ const expected = {
   "sales_annual.csv": 445,
   "sales_series.csv": 508,
   "sales_series_annual.csv": 445,
-  "boxes.csv": 1995,
+  "boxes.csv": 3055,
   "validations.csv": 1548,
   "cost_validations.csv": 381,
   "pdf_manifest.csv": 381,
@@ -70,6 +70,7 @@ assert(qaHtml.includes("pdfOfficial"), "QA HTML must retain official PDF links")
 assert(qaHtml.includes("売上系列（"), "QA HTML must display normalized sales series");
 assert(qaHtml.includes("申請企業自身の代表系列"), "QA HTML must separate applicant representative series");
 assert(qaHtml.includes("PDF上の主系列"), "QA HTML must separate reported primary series");
+assert(qaHtml.includes("枠テーマ：") && qaHtml.includes("枠内容："), "QA HTML must separate box theme and content");
 assert(qaHtml.includes('"sales_series":['), "QA HTML must embed sales series data");
 assert(qaHtml.includes("21/3期") && qaHtml.includes("30/3期"), "QA HTML must retain two-digit fiscal period labels");
 for (const [name, document] of [["index.html", html], ["qa.html", qaHtml]]) {
@@ -83,6 +84,10 @@ assert(caseCsv.includes("sales_representative_series_id"), "cases.csv must ident
 assert(caseCsv.includes("sales_reported_primary_series_id"), "cases.csv must retain the PDF-reported primary series");
 assert(caseCsv.includes("AI画像目視で申請企業系列と確認"), "cases.csv must document representative selection reasons");
 assert(caseCsv.includes("manual_audit_confidence"), "cases.csv must include manual audit metadata");
+
+const boxCsv = await fs.readFile(path.join(projectDir, "data", "processed", "boxes.csv"), "utf8");
+assert(boxCsv.includes("box_theme") && boxCsv.includes("box_content"), "boxes.csv must include theme/content columns");
+assert(boxCsv.includes("補助事業の背景・目的"), "boxes.csv must include project background-purpose sections");
 
 const textFiles = [
   "README.md", "dataset_stats.json", "docs/methodology.md", "docs/data_dictionary.md",
