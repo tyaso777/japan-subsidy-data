@@ -1,0 +1,58 @@
+{
+  "dataset_id": "other_extraction",
+  "dataset_label": "別抽出データ",
+  "comparison_file": "other_extraction.csv",
+  "encoding": "utf-8-sig",
+  "external_company_column": "企業名",
+  "include_current_only": true,
+  "record_keys": [
+    {
+      "current": ["case_id"],
+      "external": ["案件ID"],
+      "normalizers": ["text"]
+    },
+    {
+      "current": ["round", "company"],
+      "external": ["採択回", "企業名"],
+      "normalizers": ["round", "company"]
+    }
+  ],
+  "columns": [
+    {
+      "current": "project_cost_million_yen",
+      "external": "事業費_百万円",
+      "label": "事業費",
+      "type": "number",
+      "absolute_tolerance": 0.1
+    },
+    {
+      "current": "subsidy_million_yen",
+      "external": "補助額_億円",
+      "label": "補助額",
+      "type": "number",
+      "external_multiplier": 100,
+      "absolute_tolerance": 0.1
+    },
+    {
+      "current": "sales_growth_pct",
+      "external": "売上高成長率",
+      "label": "売上高成長率",
+      "type": "percentage",
+      "absolute_tolerance": 0.05
+    },
+    {
+      "current": "labor_base_year_after_correction",
+      "external": "労働生産性基準年度",
+      "label": "労働生産性・基準年度",
+      "type": "year"
+    },
+    {
+      "current": "labor_base_value",
+      "external": "労働生産性基準値",
+      "label": "労働生産性・基準値",
+      "type": "number",
+      "absolute_tolerance": 0.01,
+      "null_values": ["記載なし", "不明", "-"]
+    }
+  ]
+}

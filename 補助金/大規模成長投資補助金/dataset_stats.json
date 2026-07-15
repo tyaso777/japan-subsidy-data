@@ -2,9 +2,14 @@
   "cases": 381,
   "pages": 887,
   "boxes": 1995,
-  "metrics": 1524,
+  "metrics": 1548,
+  "primary_metrics": 1524,
   "sales_targets": 381,
-  "sales_annual": 232,
+  "sales_series": 508,
+  "sales_series_annual": 445,
+  "sales_applicant_representatives": 367,
+  "officer_rate_only": 216,
+  "manual_corrections": 385,
   "narratives": 2999,
-  "generated_at": "2026-07-14T11:21:51.171Z"
+  "generated_at": "2026-07-15T01:00:23.350Z"
 }

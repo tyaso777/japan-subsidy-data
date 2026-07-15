@@ -108,6 +108,13 @@
         "null"
       ]
     },
+    "investment_representative_basis": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
     "cost_source_method": {
       "type": [
         "string",
@@ -186,6 +193,97 @@
       ]
     },
     "sales_validation": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_representative_series_id": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_representative_scope": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_representative_reason": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_representative_review_required": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_reported_primary_series_id": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_reported_scope": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_reported_baseline_year": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_reported_baseline_oku_yen": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_reported_target_year": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_reported_target_oku_yen": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_reported_increase_oku_yen": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_reported_growth_pct": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "sales_reported_cagr_pct": {
       "type": [
         "string",
         "number",

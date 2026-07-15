@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "大規模成長投資補助金 AI案件監査",
+  "type": "object",
+  "required": ["case_id", "company", "pages_visually_checked", "investment", "sales_series", "metrics", "confidence"],
+  "properties": {
+    "case_id": {"type": "string"},
+    "company": {"type": "string"},
+    "pages_visually_checked": {"type": "array", "items": {"type": "integer"}, "minItems": 1},
+    "investment": {
+      "type": "object",
+      "properties": {
+        "total_cost_million_yen": {"type": ["number", "null"]},
+        "total_subsidy_million_yen": {"type": ["number", "null"]},
+        "components": {"type": "array", "items": {"type": "object"}},
+        "page": {"type": ["integer", "null"]},
+        "raw_evidence": {"type": "string"}
+      }
+    },
+    "sales_series": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "entity_relation", "is_applicant_representative", "is_pdf_primary", "raw_evidence"],
+        "properties": {
+          "label": {"type": "string"},
+          "entity_relation": {"enum": ["applicant", "group", "parent", "subsidiary", "affiliate", "project", "existing_business", "unknown"]},
+          "is_applicant_representative": {"type": "boolean"},
+          "is_pdf_primary": {"type": "boolean"},
+          "baseline_period_label": {"type": ["string", "null"]},
+          "baseline_year": {"type": ["integer", "null"]},
+          "baseline_month": {"type": ["integer", "null"]},
+          "baseline_sales_oku": {"type": ["number", "null"]},
+          "target_period_label": {"type": ["string", "null"]},
+          "target_year": {"type": ["integer", "null"]},
+          "target_month": {"type": ["integer", "null"]},
+          "target_sales_oku": {"type": ["number", "null"]},
+          "increase_oku": {"type": ["number", "null"]},
+          "growth_rate_pct": {"type": ["number", "null"]},
+          "growth_rate_definition": {"enum": ["cumulative_increase", "target_base_ratio", "cagr", "stated_undefined", "not_stated"]},
+          "page": {"type": ["integer", "null"]},
+          "raw_evidence": {"type": "string"}
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["labor", "employee_pay", "officer_pay", "employees"],
+      "additionalProperties": {"$ref": "#/$defs/metric"}
+    },
+    "corrections": {"type": "array", "items": {"type": "object"}},
+    "confidence": {"enum": ["high", "medium", "low"]},
+    "notes": {"type": "string"}
+  },
+  "$defs": {
+    "metric": {
+      "type": "object",
+      "required": ["status", "raw_evidence"],
+      "properties": {
+        "status": {"enum": ["full_values", "rate_only", "values_without_rate", "not_stated", "unreadable", "not_applicable"]},
+        "base_period_label": {"type": ["string", "null"]},
+        "base_year": {"type": ["integer", "null"]},
+        "base_value": {"type": ["number", "null"]},
+        "target_period_label": {"type": ["string", "null"]},
+        "target_year": {"type": ["integer", "null"]},
+        "target_value": {"type": ["number", "null"]},
+        "unit": {"type": ["string", "null"]},
+        "listed_rate_pct": {"type": ["number", "null"]},
+        "page": {"type": ["integer", "null"]},
+        "raw_evidence": {"type": "string"}
+      }
+    }
+  }
+}

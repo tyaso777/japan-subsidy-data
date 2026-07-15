@@ -1,763 +1,382 @@
-﻿case_id,round,company,page,source_method,box_transcription,cost_million,subsidy_million,cost_unit,subsidy_unit,subsidy_rate_pct,validation,candidate_count,pdf_url
-s1_outline_1,1次,株式会社岩崎電機製作所,2,coordinate_cost_box_char_reconstruction,"事業費 24億円
-（補助額） （7.6億円）",2400,760,億円,億円,31.6667,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_1.pdf
-s1_outline_10,1次,株式会社プレジィール,2,coordinate_cost_box_char_reconstruction,"事業費 80億円
-（補助額） （25億円）",8000,2500,億円,億円,31.25,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_10.pdf
-s1_outline_100,1次,マリンフード株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 46億円
-（補助額） （14億円）",4600,1400,億円,億円,30.4348,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_100.pdf
-s1_outline_101,1次,株式会社正興電機製作所,2,coordinate_cost_box_char_reconstruction,"事業費 39億円
-（補助額） （12億円）",3900,1200,億円,億円,30.7692,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_101.pdf
-s1_outline_102,1次,冬木工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 69億円
-（補助額） （22億円）",6900,2200,億円,億円,31.8841,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_102.pdf
-s1_outline_103,1次,オーケー化成株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 29億円
-（補助額） （9.6億円）",2900,960,億円,億円,33.1034,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_103.pdf
-s1_outline_104,1次,ヤマダイ株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 34億円
-（補助額） （11億円）",3400,1100,億円,億円,32.3529,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_104.pdf
-s1_outline_105,1次,中外医薬生産株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 65億円
-（補助額） （20億円）",6500,2000,億円,億円,30.7692,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_105.pdf
-s1_outline_106,1次,株式会社シーエル,2,coordinate_cost_box_char_reconstruction,"事業費 21億円
-（補助額） （6.3億円）",2100,630,億円,億円,30,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_106.pdf
-s1_outline_107,1次,株式会社ササキ,2,coordinate_cost_box_char_reconstruction,"事業費 39億円
-（補助額） （13億円）",3900,1300,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_107.pdf
-s1_outline_108,1次,株式会社ミラプロ,4,coordinate_cost_box_char_reconstruction,"事業費 13億円
-（補助額） （4.4億円）",1300,440,億円,億円,33.8462,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_108.pdf
-s1_outline_109,1次,マイクロカット株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 14.9億円
-（補助額） （4.9億円）",1490,490,億円,億円,32.8859,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_109.pdf
-s1_outline_11,1次,大峰堂薬品工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 113 億円
-（補助額） （36 億円）",11300,3600,億円,億円,31.8584,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_11.pdf
-s1_outline_110,1次,株式会社菰下鎔断,2,coordinate_cost_box_char_reconstruction,"事業費 16億円
-（補助額） （5.1億円）",1600,510,億円,億円,31.875,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_110.pdf
-s1_outline_111,1次,株式会社向山工場,2,coordinate_cost_box_char_reconstruction,"事業費 40億円
-（補助額） （13億円）",4000,1300,億円,億円,32.5,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_111.pdf
-s1_outline_112,1次,株式会社八芳園,2,coordinate_cost_box_char_reconstruction,"事業費 68億円
-（補助額） （20億円）",6800,2000,億円,億円,29.4118,Box内補足金額あり,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_112.pdf
-s1_outline_113,1次,トーアス株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 14億円
-（補助額） （4.6億円）",1400,460,億円,億円,32.8571,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_113.pdf
-s1_outline_114,1次,株式会社中西製作所,2,coordinate_cost_box_char_reconstruction,"事業費 36億円
-（補助額） （5.4億円）",3600,540,億円,億円,15,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_114.pdf
-s1_outline_115,1次,株式会社国際エキスプレス,2,coordinate_cost_box_char_reconstruction,"事業費 47億円
-（補助額） （16億円）",4700,1600,億円,億円,34.0426,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_115.pdf
-s1_outline_116,1次,株式会社かねふくめんたいパーク,2,coordinate_cost_box_char_reconstruction,"事業費 12億円
-（補助額） （1.4億円）",1200,140,億円,億円,11.6667,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_116.pdf
-s1_outline_117,1次,信越理研株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 44億円
-（補助額） （12億円）",4400,1200,億円,億円,27.2727,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_117.pdf
-s1_outline_118,1次,クリエイトワン株式会社,3,coordinate_cost_box_char_reconstruction,"事業費 12億円
-（補助額） （0.74億円）",1200,74,億円,億円,6.1667,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_118.pdf
-s1_outline_119,1次,株式会社フルヤ金属,2,coordinate_cost_box_char_reconstruction,"事業費 41億円
-（補助額） （12億円）",4100,1200,億円,億円,29.2683,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_119.pdf
-s1_outline_12,1次,株式会社松岡,2,coordinate_cost_box_char_reconstruction,"事業費 131億円
-（補助額） （42億円）",13100,4200,億円,億円,32.0611,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_12.pdf
-s1_outline_120,1次,旭陽電気株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 31億円
-（補助額） （3.2億円）",3100,320,億円,億円,10.3226,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_120.pdf
-s1_outline_121,1次,土佐鶴酒造株式会社,2,rendered_cost_box_visual_verification,"事業費 12.7億円
-（補助額） （3.7億円）",1270,370,億円,億円,29.1339,目視検証済,0,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_121.pdf
-s1_outline_122,1次,岸和田製鋼株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 45億円
-（補助額） （2.3億円）",4500,230,億円,億円,5.1111,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_122.pdf
-s1_outline_123,1次,株式会社タケエイ,2,coordinate_cost_box_char_reconstruction,"事業費 95億円
-（補助額） （19億円）",9500,1900,億円,億円,20,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_123.pdf
-s1_outline_124,1次,株式会社シロ,3,coordinate_cost_box_char_reconstruction,"事業費 27億円
-（補助額） （7.8億円）",2700,780,億円,億円,28.8889,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_124.pdf
-s1_outline_125,1次,株式会社ミダック,2,coordinate_cost_box_char_reconstruction,"事業費 27億円
-（補助額） （2.1億円）",2700,210,億円,億円,7.7778,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_125.pdf
-s1_outline_126,1次,高末株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 75億円
-（補助額） （4.4億円）",7500,440,億円,億円,5.8667,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_126.pdf
-s1_outline_127,1次,株式会社ユニワールド,2,coordinate_cost_box_char_reconstruction,"事業費 17億円
-（補助額） （5.7億円）",1700,570,億円,億円,33.5294,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_127.pdf
-s1_outline_128,1次,株式会社ただおザウルス,2,coordinate_cost_box_char_reconstruction,"事業費 15億円
-（補助額） （4.7億円）",1500,470,億円,億円,31.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_128.pdf
-s1_outline_129,1次,株式会社浜屋,2,coordinate_cost_box_char_reconstruction,"事業費 15億円
-（補助額） （4.3億円）",1500,430,億円,億円,28.6667,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_129.pdf
-s1_outline_13,1次,株式会社アロン社,2,coordinate_cost_box_char_reconstruction,"事業費 18億円
-（補助額） （6.0億円）",1800,600,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_13.pdf
-s1_outline_130,1次,小林酒造株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 12.6億円
-（補助額） （4.2億円）",1260,420,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_130.pdf
-s1_outline_131,1次,株式会社遠藤写真工芸所,2,coordinate_cost_box_char_reconstruction,"事業費 38億円
-（補助額） （10億円）",3800,1000,億円,億円,26.3158,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_131.pdf
-s1_outline_132,1次,株式会社ヨシノ自動車,2,coordinate_cost_box_char_reconstruction,"事業費 26億円
-（補助額） （7.3億円）",2600,730,億円,億円,28.0769,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_132.pdf
-s1_outline_134,1次,株式会社コンメックス,2,coordinate_cost_box_char_reconstruction,"事業費 28億円
-（補助額） （2.9億円）",2800,290,億円,億円,10.3571,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_134.pdf
-s1_outline_135,1次,株式会社永井運送,2,rendered_cost_box_visual_verification,"事業費 22億円
-（補助額） （2.1億円）",2200,210,億円,億円,9.5455,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_135.pdf
-s1_outline_136,1次,まねき食品株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 33億円
-（補助額） （9.3億円）",3300,930,億円,億円,28.1818,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_136.pdf
-s1_outline_137,1次,総武機械株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 20億円
-（補助額） （5.7億円）",2000,570,億円,億円,28.5,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_137.pdf
-s1_outline_138,1次,菅野包装資材株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 48億円
-（補助額） （16億円）",4800,1600,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_138.pdf
-s1_outline_139,1次,川﨑工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 54億円
-（補助額） （16億円）",5400,1600,億円,億円,29.6296,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_139.pdf
-s1_outline_14,1次,日華化学株式会社,2,rendered_cost_box_visual_verification,"事業費 166億円
-（補助額） （50億円）",16600,5000,億円,億円,30.1205,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_14.pdf
-s1_outline_140,1次,新生電子株式会社,3,coordinate_cost_box_char_reconstruction,"事業費 23億円
-（補助額） （7.6億円）",2300,760,億円,億円,33.0435,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_140.pdf
-s1_outline_141,1次,共栄フード株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 98億円
-（補助額） （30億円）",9800,3000,億円,億円,30.6122,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_141.pdf
-s1_outline_143,1次,株式会社ロッキー,2,coordinate_cost_box_char_reconstruction,"事業費 29億円
-（補助額） （9.4億円）",2900,940,億円,億円,32.4138,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_143.pdf
-s1_outline_145,1次,株式会社小松電業所,2,coordinate_cost_box_char_reconstruction,"事業費 43億円
-（補助額） （14億円）",4300,1400,億円,億円,32.5581,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_145.pdf
-s1_outline_146,1次,アオイ電子株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 254億円
-（補助額） （50億円）",25400,5000,億円,億円,19.685,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_146.pdf
-s1_outline_147,1次,株式会社ｂｕｄ梱包出荷サポート,2,coordinate_cost_box_char_reconstruction,"事業費 26億円
-（補助額） （8.0億円）",2600,800,億円,億円,30.7692,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_147.pdf
-s1_outline_148,1次,株式会社しばた工芸,2,coordinate_cost_box_char_reconstruction,"事業費 15億円
-（補助額） （4.8億円）",1500,480,億円,億円,32,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_148.pdf
-s1_outline_149,1次,株式会社共同物流サービス,2,coordinate_cost_box_char_reconstruction,"事業費 34億円
-（補助額） （11億円）",3400,1100,億円,億円,32.3529,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_149.pdf
-s1_outline_150,1次,三笠産業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 122億円
-（補助額） （34億円）",12200,3400,億円,億円,27.8689,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_150.pdf
-s1_outline_151,1次,四国医療サービス株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 45億円
-（補助額） （13億円）",4500,1300,億円,億円,28.8889,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_151.pdf
-s1_outline_152,1次,ヤマトミシン製造株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 19億円
-（補助額） （4億円）",1900,400,億円,億円,21.0526,Box内補足金額あり,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_152.pdf
-s1_outline_153,1次,株式会社越後屋,2,coordinate_cost_box_char_reconstruction,"事業費 25億円
-（補助額） （8.4億円）",2500,840,億円,億円,33.6,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_153.pdf
-s1_outline_154,1次,中央観光株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 26億円
-（補助額） （6.8億円）",2600,680,億円,億円,26.1538,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_154.pdf
-s1_outline_155,1次,株式会社スギノマシン,2,coordinate_cost_box_char_reconstruction,"事業費 17億円
-（補助額） （5.6億円）",1700,560,億円,億円,32.9412,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_155.pdf
-s1_outline_156,1次,株式会社ダイセイ,2,coordinate_cost_box_char_reconstruction,"事業費 12億円
-（補助額） （4.0億円）",1200,400,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_156.pdf
-s1_outline_157,1次,ハマダコンフェクト株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 186億円
-（補助額） （28億円）",18600,2800,億円,億円,15.0538,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_157.pdf
-s1_outline_158,1次,平和食品工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 10億円
-（補助額） （1.7億円）",1000,170,億円,億円,17,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_158.pdf
-s1_outline_159,1次,浦島観光ホテル株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 69億円
-（補助額） （12億円）",6900,1200,億円,億円,17.3913,整合,3,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_159.pdf
-s1_outline_16,1次,株式会社旭ウエルテック,2,rendered_cost_box_visual_verification,"事業費 33億円
-（補助額） （10億円）",3300,1000,億円,億円,30.303,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_16.pdf
-s1_outline_162,1次,信光陸運株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 22億円
-（補助額） （7.3億円）",2200,730,億円,億円,33.1818,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_162.pdf
-s1_outline_164,1次,株式会社福砂屋グループ,2,coordinate_cost_box_char_reconstruction,"事業費 55億円
-（補助額） （17億円）",5500,1700,億円,億円,30.9091,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_164.pdf
-s1_outline_166,1次,株式会社福地建設,2,coordinate_cost_box_char_reconstruction,"事業費 22億円
-（補助額） （7.2億円）",2200,720,億円,億円,32.7273,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_166.pdf
-s1_outline_167,1次,銘建工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 62億円
-（補助額） （20億円）",6200,2000,億円,億円,32.2581,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_167.pdf
-s1_outline_168,1次,株式会社大真空,2,coordinate_cost_box_char_reconstruction,"事業費 79億円
-（補助額） （26億円）",7900,2600,億円,億円,32.9114,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_168.pdf
-s1_outline_169,1次,サトウ食品株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 96億円
-（補助額） （27億円）",9600,2700,億円,億円,28.125,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_169.pdf
-s1_outline_17,1次,進工業株式会社,2,rendered_cost_box_visual_verification,"事業費 94億円
-（補助額） （29億円）",9400,2900,億円,億円,30.8511,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_17.pdf
-s1_outline_170,1次,株式会社光製作所,2,coordinate_cost_box_char_reconstruction,"事業費 17億円
-（補助額） （5.2億円）",1700,520,億円,億円,30.5882,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_170.pdf
-s1_outline_171,1次,昭和産業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 25億円
-（補助額） （7.8億円）",2500,780,億円,億円,31.2,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_171.pdf
-s1_outline_173,1次,中央紙通商株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 21億円
-（補助額） （2.0億円）",2100,200,億円,億円,9.5238,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_173.pdf
-s1_outline_174,1次,株式会社Ｐｌａｎ・Ｄｏ・Ｓｅｅ琉球,3,coordinate_cost_box_char_reconstruction,"事業費 39億円
-（補助額） （4.2億円）",3900,420,億円,億円,10.7692,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_174.pdf
-s1_outline_177,1次,さいほく鉄工株式会社,2,rendered_cost_box_visual_verification,"事業費 25億円
-（補助額） （3.0億円）",2500,300,億円,億円,12,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_177.pdf
-s1_outline_19,1次,株式会社XEN GROUP,2,coordinate_cost_box_char_reconstruction,"事業費 29億円
-（補助額） （9.5億円）",2900,950,億円,億円,32.7586,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_19.pdf
-s1_outline_2,1次,株式会社アイ・テック,2,coordinate_cost_box_char_reconstruction,"事業費 74億円
-（補助額） （5.6億円）",7400,560,億円,億円,7.5676,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_2.pdf
-s1_outline_20,1次,エスティケイテクノロジー株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 21億円
-（補助額） （6.7億円）",2100,670,億円,億円,31.9048,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_20.pdf
-s1_outline_21,1次,株式会社くまさんメディクス,2,rendered_cost_box_visual_verification,"事業費 27億円
-（補助額） （8.6億円）",2700,860,億円,億円,31.8519,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_21.pdf
-s1_outline_22,1次,BBSジャパン株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 48億円
-（補助額） （16億円）",4800,1600,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_22.pdf
-s1_outline_23,1次,株式会社ジェーイーエル,2,coordinate_cost_box_char_reconstruction,"事業費 52億円
-（補助額） （16億円）",5200,1600,億円,億円,30.7692,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_23.pdf
-s1_outline_24,1次,株式会社フジキン,2,coordinate_cost_box_char_reconstruction,"事業費 42億円
-（補助額） （13億円）",4200,1300,億円,億円,30.9524,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_24.pdf
-s1_outline_25,1次,日本リファイン株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 40億円
-（補助額） （8.6億円）",4000,860,億円,億円,21.5,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_25.pdf
-s1_outline_26,1次,日星電気株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 95億円
-（補助額） （28億円）",9500,2800,億円,億円,29.4737,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_26.pdf
-s1_outline_27,1次,株式会社クラタ,2,coordinate_cost_box_char_reconstruction,"事業費 19億円
-（補助額） （6.4億円）",1900,640,億円,億円,33.6842,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_27.pdf
-s1_outline_28,1次,広陵化学工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 17億円
-（補助額） （5.3億円）",1700,530,億円,億円,31.1765,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_28.pdf
-s1_outline_29,1次,株式会社三和テスコ,2,coordinate_cost_box_char_reconstruction,"事業費 18億円
-（補助額） （5.5億円）",1800,550,億円,億円,30.5556,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_29.pdf
-s1_outline_3,1次,株式会社堀場エステック,2,coordinate_cost_box_char_reconstruction,"事業費 130億円
-（補助額） （38億円）",13000,3800,億円,億円,29.2308,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_3.pdf
-s1_outline_30,1次,株式会社メイドー,2,coordinate_cost_box_char_reconstruction,"事業費 58億円
-（補助額） （19億円）",5800,1900,億円,億円,32.7586,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_30.pdf
-s1_outline_31,1次,鎌長製衡株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 16億円
-（補助額） （4.6億円）",1600,460,億円,億円,28.75,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_31.pdf
-s1_outline_32,1次,オリヒロエンジニアリング株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 61億円
-（補助額） （19億円）",6100,1900,億円,億円,31.1475,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_32.pdf
-s1_outline_33,1次,株式会社石井機械製作所,2,rendered_cost_box_visual_verification,"事業費 11億円
-（補助額） （3.5億円）",1100,350,億円,億円,31.8182,目視検証済,0,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_33.pdf
-s1_outline_34,1次,株式会社柴田合成,2,coordinate_cost_box_char_reconstruction,"事業費 19億円
-（補助額） （5.2億円）",1900,520,億円,億円,27.3684,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_34.pdf
-s1_outline_35,1次,イグス株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 34億円
-（補助額） （8.9億円）",3400,890,億円,億円,26.1765,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_35.pdf
-s1_outline_36,1次,株式会社廣澤精機製作所,2,coordinate_cost_box_char_reconstruction,"事業費 71億円
-（補助額） （24億円）",7100,2400,億円,億円,33.8028,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_36.pdf
-s1_outline_37,1次,大日工業株式会社,2,rendered_cost_box_visual_verification,"事業費 18億円
-（補助額） （5.9億円）",1800,590,億円,億円,32.7778,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_37.pdf
-s1_outline_38,1次,テラル株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 27億円
-（補助額） （8.6億円）",2700,860,億円,億円,31.8519,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_38.pdf
-s1_outline_39,1次,株式会社ハウゼコ,2,coordinate_cost_box_char_reconstruction,"事業費 19億円
-（補助額） （6.1億円）",1900,610,億円,億円,32.1053,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_39.pdf
-s1_outline_4,1次,株式会社インターオフィス,2,coordinate_cost_box_char_reconstruction,"事業費 15億円
-（補助額） （4.3億円）",1500,430,億円,億円,28.6667,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_4.pdf
-s1_outline_40,1次,千代田鋼鉄工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 43億円
-（補助額） （6.5億円）",4300,650,億円,億円,15.1163,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_40.pdf
-s1_outline_41,1次,株式会社ビッグハウス,2,coordinate_cost_box_char_reconstruction,"事業費 12億円
-（補助額） （3.8億円）",1200,380,億円,億円,31.6667,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_41.pdf
-s1_outline_42,1次,株式会社山田ドビー,2,coordinate_cost_box_char_reconstruction,"事業費 59億円
-（補助額） （18億円）",5900,1800,億円,億円,30.5085,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_42.pdf
-s1_outline_43,1次,丸井産業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 102億円
-（補助額） （30億円）",10200,3000,億円,億円,29.4118,Box内補足金額あり,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_43.pdf
-s1_outline_45,1次,山本ビニター株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 26億円
-（補助額） （8.2億円）",2600,820,億円,億円,31.5385,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_45.pdf
-s1_outline_46,1次,株式会社アイスコ,2,coordinate_cost_box_char_reconstruction,"事業費 35億円
-（補助額） （11億円）",3500,1100,億円,億円,31.4286,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_46.pdf
-s1_outline_47,1次,ポーライト株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 31億円
-（補助額） （8.2億円）",3100,820,億円,億円,26.4516,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_47.pdf
-s1_outline_48,1次,SINGS株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 31億円
-（補助額） （9.6億円）",3100,960,億円,億円,30.9677,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_48.pdf
-s1_outline_49,1次,株式会社ＡＫシステム,2,coordinate_cost_box_char_reconstruction,"事業費 11億円
-（補助額） （3.5億円）",1100,350,億円,億円,31.8182,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_49.pdf
-s1_outline_5,1次,大森機械工業株式会社,2,rendered_cost_box_visual_verification,"事業費 36億円
-（補助額） （11億円）",3600,1100,億円,億円,30.5556,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_5.pdf
-s1_outline_50,1次,株式会社松尾製作所,2,coordinate_cost_box_char_reconstruction,"事業費 109億円
-（補助額） （35億円）",10900,3500,億円,億円,32.1101,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_50.pdf
-s1_outline_51,1次,株式会社西部技研,2,coordinate_cost_box_char_reconstruction,"事業費 34億円
-（補助額） （10億円）",3400,1000,億円,億円,29.4118,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_51.pdf
-s1_outline_52,1次,株式会社平島,2,coordinate_cost_box_char_reconstruction,"事業費 43億円
-（補助額） （13億円）",4300,1300,億円,億円,30.2326,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_52.pdf
-s1_outline_53,1次,マルコーフーズ株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 41億円
-（補助額） （13億円）",4100,1300,億円,億円,31.7073,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_53.pdf
-s1_outline_55,1次,株式会社コーヨークリエイト,2,coordinate_cost_box_char_reconstruction,"事業費 15億円
-（補助額） （4.8億円）",1500,480,億円,億円,32,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_55.pdf
-s1_outline_56,1次,高知通運株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 36億円
-（補助額） （11億円）",3600,1100,億円,億円,30.5556,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_56.pdf
-s1_outline_58,1次,三晶エムイーシー株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 33億円
-（補助額） （11億円）",3300,1100,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_58.pdf
-s1_outline_61,1次,三恵工業株式会社,2,rendered_cost_box_visual_verification,"事業費 117億円
-（補助額） （37億円）",11700,3700,億円,億円,31.6239,目視検証済,0,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_61.pdf
-s1_outline_62,1次,サーパス工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 200億円
-（補助額） （50億円）",20000,5000,億円,億円,25,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_62.pdf
-s1_outline_63,1次,株式会社オティックスホールディングス,2,coordinate_cost_box_char_reconstruction,"事業費 166億円
-（補助額） （50億円）",16600,5000,億円,億円,30.1205,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_63.pdf
-s1_outline_65,1次,株式会社松風,2,coordinate_cost_box_char_reconstruction,"事業費 22億円
-（補助額） （6.6億円）",2200,660,億円,億円,30,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_65.pdf
-s1_outline_66,1次,株式会社アルプスツール,2,coordinate_cost_box_char_reconstruction,"事業費 21億円
-（補助額） （6.6億円）",2100,660,億円,億円,31.4286,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_66.pdf
-s1_outline_67,1次,アドバンス電気工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 32億円
-（補助額） （8.9億円）",3200,890,億円,億円,27.8125,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_67.pdf
-s1_outline_68,1次,株式会社ミマキエンジニアリング,2,coordinate_cost_box_char_reconstruction,"事業費 16億円
-（補助額） （4.2億円）",1600,420,億円,億円,26.25,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_68.pdf
-s1_outline_69,1次,NAX JAPAN株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 14億円
-（補助額） （4.7億円）",1400,470,億円,億円,33.5714,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_69.pdf
-s1_outline_7,1次,株式会社ＭＡＲＵＷＡ,2,coordinate_cost_box_char_reconstruction,"事業費 127億円
-（補助額） （35億円）",12700,3500,億円,億円,27.5591,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_7.pdf
-s1_outline_70,1次,協和工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 22億円
-（補助額） （7.3億円）",2200,730,億円,億円,33.1818,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_70.pdf
-s1_outline_71,1次,株式会社北四国グラビア印刷,2,coordinate_cost_box_char_reconstruction,"事業費 29億円
-（補助額） （8.7億円）",2900,870,億円,億円,30,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_71.pdf
-s1_outline_72,1次,ヤマセ電気株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 29億円
-（補助額） （7.2億円）",2900,720,億円,億円,24.8276,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_72.pdf
-s1_outline_73,1次,株式会社大昌鉄工所,2,coordinate_cost_box_char_reconstruction,"事業費 23億円
-（補助額） （7.5億円）",2300,750,億円,億円,32.6087,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_73.pdf
-s1_outline_74,1次,株式会社ユニシス,2,coordinate_cost_box_char_reconstruction,"事業費 16億円
-（補助額） （5.1億円）",1600,510,億円,億円,31.875,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_74.pdf
-s1_outline_75,1次,株式会社伝食,2,coordinate_cost_box_char_reconstruction,"事業費 40億円
-（補助額） （11.8億円）",4000,1180,億円,億円,29.5,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_75.pdf
-s1_outline_76,1次,安田工業株式会社,4,rendered_cost_box_visual_verification,"事業費 20億円
-（補助額） （6.2億円）",2000,620,億円,億円,31,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_76.pdf
-s1_outline_77,1次,千寿製薬株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 103億円
-（補助額） （32億円）",10300,3200,億円,億円,31.068,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_77.pdf
-s1_outline_78,1次,環境のミカタ株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 28億円
-（補助額） （9.0億円）",2800,900,億円,億円,32.1429,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_78.pdf
-s1_outline_79,1次,スーパー工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 19億円
-（補助額） （6.2億円）",1900,620,億円,億円,32.6316,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_79.pdf
-s1_outline_8,1次,サムテック株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 77億円
-（補助額） （22億円）",7700,2200,億円,億円,28.5714,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_8.pdf
-s1_outline_80,1次,寧薬化学工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 38億円
-（補助額） （12億円）",3800,1200,億円,億円,31.5789,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_80.pdf
-s1_outline_81,1次,デーバー加工サービス㈱,2,coordinate_cost_box_char_reconstruction,"事業費 21億円
-（補助額） （6.7億円）",2100,670,億円,億円,31.9048,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_81.pdf
-s1_outline_82,1次,サン工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 39億円
-（補助額） （13億円）",3900,1300,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_82.pdf
-s1_outline_83,1次,株式会社ヒサダ,2,coordinate_cost_box_char_reconstruction,"事業費 19億円
-（補助額） （4.4億円）",1900,440,億円,億円,23.1579,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_83.pdf
-s1_outline_84,1次,株式会社マグナ・ワイヤレス,2,coordinate_cost_box_char_reconstruction,"事業費 21億円
-（補助額） （5.9億円）",2100,590,億円,億円,28.0952,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_84.pdf
-s1_outline_85,1次,マルコ工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 37億円
-（補助額） （12億円）",3700,1200,億円,億円,32.4324,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_85.pdf
-s1_outline_86,1次,グローバル・テック株式会社,2,rendered_cost_box_visual_verification,"事業費 41億円
-（補助額） （13億円）",4100,1300,億円,億円,31.7073,目視検証済,0,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_86.pdf
-s1_outline_87,1次,トーカロ株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 112億円
-（補助額） （34億円）",11200,3400,億円,億円,30.3571,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_87.pdf
-s1_outline_88,1次,株式会社創味食品,2,coordinate_cost_box_char_reconstruction,"事業費 134億円
-（補助額） （41億円）",13400,4100,億円,億円,30.597,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_88.pdf
-s1_outline_89,1次,京西テクノス株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 25億円
-（補助額） （7.9億円）",2500,790,億円,億円,31.6,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_89.pdf
-s1_outline_9,1次,株式会社Pale Blue,2,coordinate_cost_box_char_reconstruction,"事業費 13億円
-（補助額） （3.4億円）",1300,340,億円,億円,26.1538,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_9.pdf
-s1_outline_91,1次,矢田工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 20億円
-（補助額） （6.7億円）",2000,670,億円,億円,33.5,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_91.pdf
-s1_outline_92,1次,アサヒフォージ株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 168億円
-（補助額） （50億円）",16800,5000,億円,億円,29.7619,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_92.pdf
-s1_outline_93,1次,ウイング株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 21億円
-（補助額） （6.6億円）",2100,660,億円,億円,31.4286,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_93.pdf
-s1_outline_94,1次,株式会社友和環境,2,coordinate_cost_box_char_reconstruction,"事業費 16億円
-（補助額） （5.3億円）",1600,530,億円,億円,33.125,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_94.pdf
-s1_outline_95,1次,ナミックス株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 229億円
-（補助額） （50億円）",22900,5000,億円,億円,21.8341,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_95.pdf
-s1_outline_96,1次,大岡技研株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 52億円
-（補助額） （15億円）",5200,1500,億円,億円,28.8462,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_96.pdf
-s1_outline_97,1次,フクシマガリレイ株式会社,5,coordinate_cost_box_char_reconstruction,"事業費 137億円
-（補助額） （28億円）",13700,2800,億円,億円,20.438,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_97.pdf
-s1_outline_99,1次,株式会社オーレック,2,coordinate_cost_box_char_reconstruction,"事業費 54億円
-（補助額） （16億円）",5400,1600,億円,億円,29.6296,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_99.pdf
-s1_outline__179,2次,アサヒセイレン中部株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 188億円
-（補助額） （50億円）",18800,5000,億円,億円,26.5957,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__179.pdf
-s1_outline__181,2次,株式会社ホテルニューアワジ,6,coordinate_cost_box_char_reconstruction,"事業費 82億円
-（補助額） （26億円）",8200,2600,億円,億円,31.7073,Box内補足金額あり,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__181.pdf
-s1_outline__182,2次,埼玉機器株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 91億円
-（補助額） （25億円）",9100,2500,億円,億円,27.4725,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__182.pdf
-s1_outline__183,2次,スズキハイテック株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 33億円
-（補助額） （8.9億円）",3300,890,億円,億円,26.9697,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__183.pdf
-s1_outline__184,2次,泉南乳業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 12億円
-（補助額） （1.3億円）",1200,130,億円,億円,10.8333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__184.pdf
-s1_outline__188,2次,山城金属株式会社,2,rendered_cost_box_visual_verification,"事業費 15億円
-（補助額） （5.0億円）",1500,500,億円,億円,33.3333,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__188.pdf
-s1_outline__189,2次,長﨑ジャッキ株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 22億円
-（補助額） （6.3億円）",2200,630,億円,億円,28.6364,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__189.pdf
-s1_outline__190,2次,株式会社GOTENリゾート,2,coordinate_cost_box_char_reconstruction,"事業費 ２8億円
-（補助額） （８.0億円）",2800,800,億円,億円,28.5714,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__190.pdf
-s1_outline__191,2次,株式会社カナイ,2,coordinate_cost_box_char_reconstruction,"事業費 45億円
-（補助額） （6.9億円）",4500,690,億円,億円,15.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__191.pdf
-s1_outline__192,2次,池田糖化工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 162億円
-（補助額） （50億円）",16200,5000,億円,億円,30.8642,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__192.pdf
-s1_outline__194,2次,ZACROS株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 129億円
-（補助額） （41億円）",12900,4100,億円,億円,31.7829,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__194.pdf
-s1_outline__195,2次,アシザワ・ファインテック株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 25億円
-（補助額） （8.1億円）",2500,810,億円,億円,32.4,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__195.pdf
-s1_outline__196,2次,株式会社八立製作所,2,coordinate_cost_box_char_reconstruction,"事業費 13億円
-（補助額） （4.2億円）",1300,420,億円,億円,32.3077,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__196.pdf
-s1_outline__197,2次,株式会社福山臨床検査センター,2,coordinate_cost_box_char_reconstruction,"事業費 17億円
-（補助額） （4.4億円）",1700,440,億円,億円,25.8824,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__197.pdf
-s1_outline__198,2次,ユニコム株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 18億円
-（補助額） （5.0億円）",1800,500,億円,億円,27.7778,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__198.pdf
-s1_outline__199,2次,株式会社ティー・シー・ピー,3,coordinate_cost_box_char_reconstruction,"事業費 21億円
-（補助額） （7.0億円）",2100,700,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__199.pdf
-s1_outline__200,2次,株式会社イズミテクノ,2,coordinate_cost_box_char_reconstruction,"事業費 17億円
-（補助額） （5.3億円）",1700,530,億円,億円,31.1765,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__200.pdf
-s1_outline__201,2次,株式会社イートアンドフーズ,2,coordinate_cost_box_char_reconstruction,"事業費 67億円
-（補助額） （21億円）",6700,2100,億円,億円,31.3433,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__201.pdf
-s1_outline__202,2次,アライドコーヒーロースターズ株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 54億円
-（補助額） （16億円）",5400,1600,億円,億円,29.6296,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__202.pdf
-s1_outline__203,2次,株式会社東映京都スタジオ,2,coordinate_cost_box_char_reconstruction,"事業費 35億円
-（補助額） （9.5億円）",3500,950,億円,億円,27.1429,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__203.pdf
-s1_outline__204,2次,メック株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 23億円
-（補助額） （5.5億円）",2300,550,億円,億円,23.913,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__204.pdf
-s1_outline__205,2次,ヤマシンスチール株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 29億円
-（補助額） （8.3億円）",2900,830,億円,億円,28.6207,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__205.pdf
-s1_outline__206,2次,上山製紙株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 30億円
-（補助額） （9.9億円）",3000,990,億円,億円,33,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__206.pdf
-s1_outline__207,2次,株式会社ジェイ・イー・ティ,2,rendered_cost_box_visual_verification,"事業費 115億円
-（補助額） （38億円）",11500,3800,億円,億円,33.0435,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__207.pdf
-s1_outline__208,2次,日本電波工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 10４億円
-（補助額） （31億円）",10400,3100,億円,億円,29.8077,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__208.pdf
-s2_outline_1,3次,株式会社角藤,2,coordinate_cost_box_char_reconstruction,"事業費 21億円
-（補助額） （5.3億円）",2100,530,億円,億円,25.2381,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_1.pdf
-s2_outline_101,3次,安藤パラケミー株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 40億円
-（補助額） （13億円）",4000,1300,億円,億円,32.5,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_101.pdf
-s2_outline_103,3次,ベストアメニティ株式会社,2,rendered_cost_box_visual_verification,"事業費 51億円
-（補助額） （17億円）",5100,1700,億円,億円,33.3333,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_103.pdf
-s2_outline_104,3次,アイサービス株式会社,3,coordinate_cost_box_char_reconstruction,"事業費 82億円
-（補助額） （21億円）",8200,2100,億円,億円,25.6098,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_104.pdf
-s2_outline_105,3次,株式会社シード,2,coordinate_cost_box_char_reconstruction,"事業費 127億円
-（補助額） （41億円）",12700,4100,億円,億円,32.2835,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_105.pdf
-s2_outline_106,3次,河淳株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 85億円
-（補助額） （23億円）",8500,2300,億円,億円,27.0588,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_106.pdf
-s2_outline_108,3次,株式会社丸杉,2,coordinate_cost_box_char_reconstruction,"事業費 12億円
-（補助額） （3.9億円）",1200,390,億円,億円,32.5,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_108.pdf
-s2_outline_109,3次,株式会社ヤマイシ,2,coordinate_cost_box_char_reconstruction,"事業費 26億円
-（補助額） （7.7億円）",2600,770,億円,億円,29.6154,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_109.pdf
-s2_outline_11,3次,たまご＆ファーマーズ株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 75億円
-（補助額） （25億円）",7500,2500,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_11.pdf
-s2_outline_110,3次,学校法人花沢学園,2,coordinate_cost_box_char_reconstruction,"事業費 29億円
-（補助額） （6.8億円）",2900,680,億円,億円,23.4483,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_110.pdf
-s2_outline_12,3次,株式会社フルサワ,2,coordinate_cost_box_char_reconstruction,"事業費 43億円
-（補助額） （14億円）",4300,1400,億円,億円,32.5581,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_12.pdf
-s2_outline_123,3次,東洋ケアサービス株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 22億円
-（補助額） （6.7億円）",2200,670,億円,億円,30.4545,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_123.pdf
-s2_outline_128,3次,株式会社タカラ倉庫運輸サービス,2,coordinate_cost_box_char_reconstruction,"事業費 46億円
-（補助額） （14億円）",4600,1400,億円,億円,30.4348,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_128.pdf
-s2_outline_13,3次,フジセイコー株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 16億円
-（補助額） （5.0億円）",1600,500,億円,億円,31.25,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_13.pdf
-s2_outline_14,3次,スギムラ化学工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 47億円
-（補助額） （12億円）",4700,1200,億円,億円,25.5319,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_14.pdf
-s2_outline_140,3次,都吹株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 32億円
-（補助額） （10億円）",3200,1000,億円,億円,31.25,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_140.pdf
-s2_outline_15,3次,賀谷セロファン株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 31億円
-（補助額） （7.5億円）",3100,750,億円,億円,24.1935,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_15.pdf
-s2_outline_151,3次,株式会社清水インダストリ－,2,coordinate_cost_box_char_reconstruction,"事業費 15億円
-（補助額） （4.8億円）",1500,480,億円,億円,32,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_151.pdf
-s2_outline_16,3次,株式会社ヤマキ,2,coordinate_cost_box_char_reconstruction,"事業費 41億円
-（補助額） （13億円）",4100,1300,億円,億円,31.7073,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_16.pdf
-s2_outline_17,3次,日生流通運輸倉庫株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 81億円
-（補助額） （17億円）",8100,1700,億円,億円,20.9877,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_17.pdf
-s2_outline_173,3次,栄屋乳業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 61億円
-（補助額） （20億円）",6100,2000,億円,億円,32.7869,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_173.pdf
-s2_outline_18,3次,DOWAパワーデバイス株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 46億円
-（補助額） （14億円）",4600,1400,億円,億円,30.4348,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_18.pdf
-s2_outline_185,3次,三日月興業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 11億円
-（補助額） （2.8億円）",1100,280,億円,億円,25.4545,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_185.pdf
-s2_outline_186,3次,株式会社PXP,2,coordinate_cost_box_char_reconstruction,"事業費 37億円
-（補助額） （9.6億円）",3700,960,億円,億円,25.9459,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_186.pdf
-s2_outline_188,3次,株式会社ユビタス,2,coordinate_cost_box_char_reconstruction,"事業費 176億円
-（補助額） （50億円）",17600,5000,億円,億円,28.4091,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_188.pdf
-s2_outline_19,3次,株式会社高木製作所,2,coordinate_cost_box_char_reconstruction,"事業費 94億円
-（補助額） （23億円）",9400,2300,億円,億円,24.4681,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_19.pdf
-s2_outline_190,3次,伊藤光学工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 47億円
-（補助額） （15億円）",4700,1500,億円,億円,31.9149,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_190.pdf
-s2_outline_197,3次,株式会社ファイン,2,coordinate_cost_box_char_reconstruction,"事業費 36億円
-（補助額） （11億円）",3600,1100,億円,億円,30.5556,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_197.pdf
-s2_outline_2,3次,ガイア株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 50億円
-（補助額） （17億円）",5000,1700,億円,億円,34,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_2.pdf
-s2_outline_205,3次,八戸酒造株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 26億円
-（補助額） （6.5億円）",2600,650,億円,億円,25,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_205.pdf
-s2_outline_209,3次,株式会社ファーストダウン,2,coordinate_cost_box_char_reconstruction,"事業費 31億円
-（補助額） （10億円）",3100,1000,億円,億円,32.2581,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_209.pdf
-s2_outline_21,3次,健栄製薬株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 117億円
-（補助額） （35億円）",11700,3500,億円,億円,29.9145,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_21.pdf
-s2_outline_212,3次,キングパーツ株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 34億円
-（補助額） （11億円）",3400,1100,億円,億円,32.3529,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_212.pdf
-s2_outline_214,3次,株式会社 八天堂,2,coordinate_cost_box_char_reconstruction,"事業費 26億円
-（補助額） （8.3億円）",2600,830,億円,億円,31.9231,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_214.pdf
-s2_outline_215,3次,昭和化工株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 112億円
-（補助額） （18億円）",11200,1800,億円,億円,16.0714,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_215.pdf
-s2_outline_216,3次,中本Fine Pack株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 35億円
-（補助額） （9.7億円）",3500,970,億円,億円,27.7143,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_216.pdf
-s2_outline_22,3次,味覚糖株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 117億円
-（補助額） （39億円）",11700,3900,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_22.pdf
-s2_outline_229,3次,オーディエー株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 31億円
-（補助額） （10億円）",3100,1000,億円,億円,32.2581,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_229.pdf
-s2_outline_23,3次,大和鋼業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 39億円
-（補助額） （12億円）",3900,1200,億円,億円,30.7692,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_23.pdf
-s2_outline_232,3次,株式会社モリシタ,2,coordinate_cost_box_char_reconstruction,"事業費 18億円
-（補助額） （4.4億円）",1800,440,億円,億円,24.4444,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_232.pdf
-s2_outline_234,3次,日本エア・リキード合同会社,2,coordinate_cost_box_char_reconstruction,"事業費 203億円
-（補助額） （50億円）",20300,5000,億円,億円,24.6305,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_234.pdf
-s2_outline_24,3次,高知食糧株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 17億円
-（補助額） （5.4億円）",1700,540,億円,億円,31.7647,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_24.pdf
-s2_outline_25,3次,有限会社ホテル十勝屋,4,coordinate_cost_box_char_reconstruction,"事業費 45億円
-（補助額） （13億円）",4500,1300,億円,億円,28.8889,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_25.pdf
-s2_outline_26,3次,株式会社ティーケーシン,2,coordinate_cost_box_char_reconstruction,"事業費 21億円
-（補助額） （5.0億円）",2100,500,億円,億円,23.8095,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_26.pdf
-s2_outline_27,3次,株式会社ライト製作所,2,coordinate_cost_box_char_reconstruction,"事業費 66億円
-（補助額） （16億円）",6600,1600,億円,億円,24.2424,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_27.pdf
-s2_outline_3,3次,さくら不動産株式会社,3,coordinate_cost_box_char_reconstruction,"事業費 11億円
-（補助額） （2.7億円）",1100,270,億円,億円,24.5455,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_3.pdf
-s2_outline_30,3次,東洋スクリーン工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 33億円
-（補助額） （9.1億円）",3300,910,億円,億円,27.5758,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_30.pdf
-s2_outline_31,3次,アトム株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 42億円
-（補助額） （12億円）",4200,1200,億円,億円,28.5714,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_31.pdf
-s2_outline_32,3次,第一物産株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 17億円
-（補助額） （5.5億円）",1700,550,億円,億円,32.3529,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_32.pdf
-s2_outline_33,3次,株式会社浪速ポンプ製作所,2,coordinate_cost_box_char_reconstruction,"事業費 38億円
-（補助額） （8.8億円）",3800,880,億円,億円,23.1579,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_33.pdf
-s2_outline_34,3次,フタバ食品株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 168億円
-（補助額） （50億円）",16800,5000,億円,億円,29.7619,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_34.pdf
-s2_outline_35,3次,株式会社北海道ちぬやファーム,2,coordinate_cost_box_char_reconstruction,"事業費 41億円
-（補助額） （11億円）",4100,1100,億円,億円,26.8293,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_35.pdf
-s2_outline_37,3次,ノーラエンジニアリング株式会社,2,rendered_cost_box_visual_verification,"事業費 17億円
-（補助額） （4.8億円）",1700,480,億円,億円,28.2353,目視検証済,0,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_37.pdf
-s2_outline_39,3次,名古屋東部陸運株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 65億円
-（補助額） （21億円）",6500,2100,億円,億円,32.3077,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_39.pdf
-s2_outline_40,3次,株式会社英楽,2,coordinate_cost_box_char_reconstruction,"事業費 19億円
-（補助額） （6.3億円）",1900,630,億円,億円,33.1579,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_40.pdf
-s2_outline_41,3次,藤本化学製品株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 142億円
-（補助額） （46億円）",14200,4600,億円,億円,32.3944,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_41.pdf
-s2_outline_42,3次,中央製乳株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 66億円
-（補助額） （15億円）",6600,1500,億円,億円,22.7273,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_42.pdf
-s2_outline_43,3次,近江鍛工株式会社,5,coordinate_cost_box_char_reconstruction,"事業費 24億円
-（補助額） （5.9億円）",2400,590,億円,億円,24.5833,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_43.pdf
-s2_outline_44,3次,株式会社アヤボ,2,coordinate_cost_box_char_reconstruction,"事業費 18億円
-（補助額） （3.4億円）",1800,340,億円,億円,18.8889,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_44.pdf
-s2_outline_45,3次,株式会社田中食品興業所,2,coordinate_cost_box_char_reconstruction,"事業費 20億円
-（補助額） （6.6億円）",2000,660,億円,億円,33,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_45.pdf
-s2_outline_46,3次,カンケンテクノ株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 28億円
-（補助額） （8.4億円）",2800,840,億円,億円,30,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_46.pdf
-s2_outline_47,3次,INTLOOP株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 15億円
-（補助額） （5.1億円）",1500,510,億円,億円,34,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_47.pdf
-s2_outline_48,3次,株式会社サンワ,2,coordinate_cost_box_char_reconstruction,"事業費 24億円
-（補助額） （7.3億円）",2400,730,億円,億円,30.4167,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_48.pdf
-s2_outline_49,3次,白鷺特殊鋼株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 36億円
-（補助額） （8.5億円）",3600,850,億円,億円,23.6111,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_49.pdf
-s2_outline_5,3次,奥長良川名水株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 13億円
-（補助額） （3.0億円）",1300,300,億円,億円,23.0769,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_5.pdf
-s2_outline_51,3次,有楽製菓株式会社,3,coordinate_cost_box_char_reconstruction,"事業費 25億円
-（補助額） （8.3億円）",2500,830,億円,億円,33.2,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_51.pdf
-s2_outline_52,3次,株式会社GYXUS,2,coordinate_cost_box_char_reconstruction,"事業費 98億円
-（補助額） （26億円）",9800,2600,億円,億円,26.5306,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_52.pdf
-s2_outline_58,3次,巴工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 52億円
-（補助額） （13億円）",5200,1300,億円,億円,25,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_58.pdf
-s2_outline_6,3次,株式会社上野凮月堂,2,coordinate_cost_box_char_reconstruction,"事業費 63億円
-（補助額） （18億円）",6300,1800,億円,億円,28.5714,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_6.pdf
-s2_outline_60,3次,株式会社トッカコーポレーション,4,coordinate_cost_box_char_reconstruction,"事業費 17億円
-（補助額） （5.5億円）",1700,550,億円,億円,32.3529,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_60.pdf
-s2_outline_61,3次,株式会社川金コアテック,2,coordinate_cost_box_char_reconstruction,"事業費 40億円
-（補助額） （11億円）",4000,1100,億円,億円,27.5,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_61.pdf
-s2_outline_62,3次,株式会社エネルギーギャップ,2,coordinate_cost_box_char_reconstruction,"事業費 87億円
-（補助額） （26億円）",8700,2600,億円,億円,29.8851,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_62.pdf
-s2_outline_63,3次,エックスサーバー株式会社,3,coordinate_cost_box_char_reconstruction,"事業費 35億円
-（補助額） （6.8億円）",3500,680,億円,億円,19.4286,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_63.pdf
-s2_outline_65,3次,ハビックス株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 36億円
-（補助額） （9.8億円）",3600,980,億円,億円,27.2222,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_65.pdf
-s2_outline_66,3次,トクセン工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 45億円
-（補助額） （9.9億円）",4500,990,億円,億円,22,Box内補足金額あり,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_66.pdf
-s2_outline_67,3次,千代田空調機器株式会社,5,coordinate_cost_box_char_reconstruction,"事業費 15億円
-（補助額） （4.6億円）",1500,460,億円,億円,30.6667,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_67.pdf
-s2_outline_68,3次,三友プラントサービス株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 64億円
-（補助額） （19億円）",6400,1900,億円,億円,29.6875,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_68.pdf
-s2_outline_69,3次,松村フーズ株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 50億円
-（補助額） （12億円）",5000,1200,億円,億円,24,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_69.pdf
-s2_outline_70,3次,株式会社光製作所,2,coordinate_cost_box_char_reconstruction,"事業費 48億円
-（補助額） （12億円）",4800,1200,億円,億円,25,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_70.pdf
-s2_outline_71,3次,至誠堂製薬株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 58億円
-（補助額） （16億円）",5800,1600,億円,億円,27.5862,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_71.pdf
-s2_outline_72,3次,ときわ製作所株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 10億円
-（補助額） （2.5億円）",1000,250,億円,億円,25,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_72.pdf
-s2_outline_73,3次,株式会社ライジング,3,coordinate_cost_box_char_reconstruction,"事業費 33億円
-（補助額） （11億円）",3300,1100,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_73.pdf
-s2_outline_74,3次,株式会社山福,3,coordinate_cost_box_char_reconstruction,"事業費 51億円
-（補助額） （16億円）",5100,1600,億円,億円,31.3725,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_74.pdf
-s2_outline_77,3次,株式会社やまみ,2,coordinate_cost_box_char_reconstruction,"事業費 56億円
-（補助額） （18億円）",5600,1800,億円,億円,32.1429,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_77.pdf
-s2_outline_78,3次,株式会社宮古島の雪塩,2,coordinate_cost_box_char_reconstruction,"事業費 25億円
-（補助額） （8.0億円）",2500,800,億円,億円,32,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_78.pdf
-s2_outline_79,3次,大京株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 61億円
-（補助額） （20億円）",6100,2000,億円,億円,32.7869,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_79.pdf
-s2_outline_8,3次,牛乳石鹸共進社株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 145億円
-（補助額） （46億円）",14500,4600,億円,億円,31.7241,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_8.pdf
-s2_outline_80,3次,株式会社レイズ,2,coordinate_cost_box_char_reconstruction,"事業費 37億円
-（補助額） （12億円）",3700,1200,億円,億円,32.4324,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_80.pdf
-s2_outline_81,3次,東亜薬品株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 190億円
-（補助額） （46億円）",19000,4600,億円,億円,24.2105,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_81.pdf
-s2_outline_82,3次,ハマダレクテック株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 106億円
-（補助額） （35億円）",10600,3500,億円,億円,33.0189,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_82.pdf
-s2_outline_83,3次,株式会社キド,2,coordinate_cost_box_char_reconstruction,"事業費 26億円
-（補助額） （5.7億円）",2600,570,億円,億円,21.9231,整合,2,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_83.pdf
-s2_outline_84,3次,株式会社ジョヴィ,3,coordinate_cost_box_char_reconstruction,"事業費 165億円
-（補助額） （30億円）",16500,3000,億円,億円,18.1818,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_84.pdf
-s2_outline_85,3次,Ｌ物流株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 46億円
-（補助額） （14億円）",4600,1400,億円,億円,30.4348,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_85.pdf
-s2_outline_86,3次,ヤマトスチール株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 133億円
-（補助額） （41億円）",13300,4100,億円,億円,30.8271,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_86.pdf
-s2_outline_87,3次,長野牛乳株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 89億円
-（補助額） （22億円）",8900,2200,億円,億円,24.7191,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_87.pdf
-s2_outline_88,3次,モルツウェル株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 18億円
-（補助額） （5.9億円）",1800,590,億円,億円,32.7778,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_88.pdf
-s2_outline_89,3次,北海道乳業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 97億円
-（補助額） （29億円）",9700,2900,億円,億円,29.8969,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_89.pdf
-s2_outline_9,3次,株式会社マルト水谷,2,coordinate_cost_box_char_reconstruction,"事業費 45億円
-（補助額） （15億円）",4500,1500,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_9.pdf
-s2_outline_90,3次,有価物回収協業組合　石坂グループ,2,coordinate_cost_box_char_reconstruction,"事業費 42億円
-（補助額） （12億円）",4200,1200,億円,億円,28.5714,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_90.pdf
-s2_outline_91,3次,ＫＩＤＯ　ＰＡＣＫＡＧＩＮＧ株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 46億円
-（補助額） （15億円）",4600,1500,億円,億円,32.6087,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_91.pdf
-s2_outline_93,3次,東亜工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 57億円
-（補助額） （19億円）",5700,1900,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_93.pdf
-s2_outline_94,3次,株式会社富士カーボン製造所,2,coordinate_cost_box_char_reconstruction,"事業費 52億円
-（補助額） （15億円）",5200,1500,億円,億円,28.8462,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_94.pdf
-s2_outline_95,3次,山崎商事運輸株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 26億円
-（補助額） （8.5億円）",2600,850,億円,億円,32.6923,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_95.pdf
-s2_outline_96,3次,株式会社フォース,2,coordinate_cost_box_char_reconstruction,"事業費 36億円
-（補助額） （7.3億円）",3600,730,億円,億円,20.2778,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_96.pdf
-s2_outline_97,3次,中村土建株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 20億円
-（補助額） （4.7億円）",2000,470,億円,億円,23.5,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_97.pdf
-s2_outline_98,3次,ホーコス株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 30億円
-（補助額） （7.1億円）",3000,710,億円,億円,23.6667,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_98.pdf
-s2_outline_99,3次,株式会社シュゼット・ホールディングス,4,coordinate_cost_box_char_reconstruction,"事業費 104億円
-（補助額） （34億円）",10400,3400,億円,億円,32.6923,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_99.pdf
-s2_outline_113,4次,株式会社アダチ,2,coordinate_cost_box_char_reconstruction,"事業費 1,736百万円
-（補助額） （409百万円）",1736,409,百万円,百万円,23.5599,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_113.pdf
-s2_outline_115,4次,株式会社コスモス食品,2,coordinate_cost_box_char_reconstruction,"事業費 1,684百万円
-（補助額） （392百万円）",1684,392,百万円,百万円,23.2779,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_115.pdf
-s2_outline_116,4次,奥伊吹観光株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 2,094百万円
-（補助額） （670百万円）",2094,670,百万円,百万円,31.9962,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_116.pdf
-s2_outline_117,4次,瀬戸内海印刷株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 4,380百万円
-（補助額） （1,360百万円）",4380,1360,百万円,百万円,31.0502,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_117.pdf
-s2_outline_118,4次,株式会社光洋,2,coordinate_cost_box_char_reconstruction,"事業費 5,191百万円
-（補助額） （1,134百万円）",5191,1134,百万円,百万円,21.8455,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_118.pdf
-s2_outline_119,4次,株式会社群馬コイケ,2,coordinate_cost_box_char_reconstruction,"事業費 1612百万円
-（補助額） （403百万円）",1612,403,百万円,百万円,25,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_119.pdf
-s2_outline_120,4次,株式会社クボテック,2,coordinate_cost_box_char_reconstruction,"事業費 1,387百万円
-（補助額） （338百万円）",1387,338,百万円,百万円,24.3691,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_120.pdf
-s2_outline_121,4次,株式会社ヤマキ食品,2,coordinate_cost_box_char_reconstruction,"事業費 2,994百万円
-（補助額） （736百万円）",2994,736,百万円,百万円,24.5825,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_121.pdf
-s2_outline_122,4次,杉プラスチック工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 20億円
-（補助額） （4.9億円）",2000,490,億円,億円,24.5,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_122.pdf
-s2_outline_125,4次,株式会社タンケンシールセーコウ,2,coordinate_cost_box_char_reconstruction,"事業費 4,181百万円
-（補助額） （1,269百万円）",4181,1269,百万円,百万円,30.3516,Box内補足金額あり,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_125.pdf
-s2_outline_127,4次,株式会社キィポーション,2,rendered_cost_box_visual_verification,"事業費 37億円
-（補助額） （9.1億円）",3700,910,億円,億円,24.5946,目視検証済,0,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_127.pdf
-s2_outline_130,4次,株式会社ピカソナチュラルズ,2,coordinate_cost_box_char_reconstruction,"事業費 59億円
-（補助額） （19億円）",5900,1900,億円,億円,32.2034,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_130.pdf
-s2_outline_131,4次,株式会社中村畜産,2,coordinate_cost_box_char_reconstruction,"事業費 2,138百万円
-（補助額） （712百万円）",2138,712,百万円,百万円,33.3022,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_131.pdf
-s2_outline_132,4次,株式会社コハラ,2,coordinate_cost_box_char_reconstruction,"事業費 1,618百万円
-（補助額） （488百万円）",1618,488,百万円,百万円,30.1607,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_132.pdf
-s2_outline_133,4次,株式会社ユタカ,2,coordinate_cost_box_char_reconstruction,"事業費 1,613百万円
-（補助額） （536百万円）",1613,536,百万円,百万円,33.23,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_133.pdf
-s2_outline_134,4次,池田薬品工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 30億円
-（補助額） （7.5億円）",3000,750,億円,億円,25,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_134.pdf
-s2_outline_135,4次,株式会社リバイト,2,coordinate_cost_box_char_reconstruction,"事業費 ４9億円
-（補助額） （1４億円）",4900,1400,億円,億円,28.5714,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_135.pdf
-s2_outline_136,4次,木本製菓株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 49億円
-（補助額） （7.5億円）",4900,750,億円,億円,15.3061,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_136.pdf
-s2_outline_137,4次,株式会社　博多屋,2,coordinate_cost_box_char_reconstruction,"事業費 12億円
-（補助額） （4.0億円）",1200,400,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_137.pdf
-s2_outline_138,4次,株式会社ジーケーエス,3,coordinate_cost_box_char_reconstruction,"事業費 2,495百万円
-（補助額） （832百万円）",2495,832,百万円,百万円,33.3467,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_138.pdf
-s2_outline_139,4次,株式会社エルス,2,coordinate_cost_box_char_reconstruction,"事業費 2,151百万円
-（補助額） （640百万円）",2151,640,百万円,百万円,29.7536,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_139.pdf
-s2_outline_141,4次,古川電気工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 2,131百万円
-（補助額） （596百万円）",2131,596,百万円,百万円,27.9681,整合,2,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_141.pdf
-s2_outline_143,4次,株式会社ライズクリエイション,2,coordinate_cost_box_char_reconstruction,"事業費 2,630百万円
-（補助額） （859百万円）",2630,859,百万円,百万円,32.6616,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_143.pdf
-s2_outline_144,4次,株式会社シー・エス・ケイ,2,coordinate_cost_box_char_reconstruction,"事業費 1,769百万円
-（補助額） （590百万円）",1769,590,百万円,百万円,33.3522,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_144.pdf
-s2_outline_145,4次,株式会社シャノワール,2,coordinate_cost_box_char_reconstruction,"事業費 31億円
-（補助額） （9.8億円）",3100,980,億円,億円,31.6129,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_145.pdf
-s2_outline_146,4次,セーレンアドバンストマテリアルズ株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 4,353百万円
-（補助額） （1,411百万円）",4353,1411,百万円,百万円,32.4144,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_146.pdf
-s2_outline_147,4次,株式会社　進和,2,coordinate_cost_box_char_reconstruction,"事業費 3,473百万円
-（補助額） （699百万円）",3473,699,百万円,百万円,20.1267,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_147.pdf
-s2_outline_148,4次,丹羽鋳造株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 1,300百万円
-（補助額） （372百万円）",1300,372,百万円,百万円,28.6154,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_148.pdf
-s2_outline_149,4次,株式会社サン海苔,2,coordinate_cost_box_char_reconstruction,"事業費 1,388百万円
-（補助額） （426百万円）",1388,426,百万円,百万円,30.6916,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_149.pdf
-s2_outline_150,4次,株式会社玉子屋,2,coordinate_cost_box_char_reconstruction,"事業費 34億円
-（補助額） （10億円）",3400,1000,億円,億円,29.4118,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_150.pdf
-s2_outline_152,4次,株式会社大熊製作所,2,coordinate_cost_box_char_reconstruction,"事業費 4,775百万円
-（補助額） （1,533百万円）",4775,1533,百万円,百万円,32.1047,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_152.pdf
-s2_outline_153,4次,コモライフ株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 3,200百万円
-（補助額） （1,060百万円）",3200,1060,百万円,百万円,33.125,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_153.pdf
-s2_outline_154,4次,アルフレッド株式会社,4,coordinate_cost_box_char_reconstruction,"事業費 1,635百万円
-（補助額） （516百万円）",1635,516,百万円,百万円,31.5596,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_154.pdf
-s2_outline_155,4次,信和化工株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 1,510百万円
-（補助額） （429百万円）",1510,429,百万円,百万円,28.4106,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_155.pdf
-s2_outline_156,4次,上野ロジケム株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 3,541百万円
-（補助額） （943百万円）",3541,943,百万円,百万円,26.6309,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_156.pdf
-s2_outline_157,4次,株式会社ワイズマート,2,coordinate_cost_box_char_reconstruction,"事業費 5,818百万円
-（補助額） （1,917百万円）",5818,1917,百万円,百万円,32.9495,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_157.pdf
-s2_outline_158,4次,株式会社セントラルフード,2,coordinate_cost_box_char_reconstruction,"事業費 3,023百万円
-（補助額） （625百万円）",3023,625,百万円,百万円,20.6748,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_158.pdf
-s2_outline_159,4次,株式会社　ファーストライン,2,coordinate_cost_box_char_reconstruction,"事業費 1,624百万円
-（補助額） （397百万円）",1624,397,百万円,百万円,24.4458,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_159.pdf
-s2_outline_160,4次,株式会社ダイドー,2,coordinate_cost_box_char_reconstruction,"事業費 1,569百万円
-（補助額） （371百万円）",1569,371,百万円,百万円,23.6456,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_160.pdf
-s2_outline_161,4次,株式会社デイリーエッグ,2,coordinate_cost_box_char_reconstruction,"事業費 3,042百万円
-（補助額） （974百万円）",3042,974,百万円,百万円,32.0184,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_161.pdf
-s2_outline_162,4次,三恵株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 4,764百万円
-（補助額） （1,170百万円）",4764,1170,百万円,百万円,24.5592,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_162.pdf
-s2_outline_163,4次,MHT株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 1,524百万円
-（補助額） （375百万円）",1524,375,百万円,百万円,24.6063,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_163.pdf
-s2_outline_164,4次,株式会社東豊精工,2,coordinate_cost_box_char_reconstruction,"事業費 2,331百万円
-（補助額） （550百万円）",2331,550,百万円,百万円,23.595,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_164.pdf
-s2_outline_165,4次,株式会社南鐵建,2,coordinate_cost_box_char_reconstruction,"事業費 2,214百万円
-（補助額） （648百万円）",2214,648,百万円,百万円,29.2683,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_165.pdf
-s2_outline_166,4次,株式会社新潟食品運輸,2,coordinate_cost_box_char_reconstruction,"事業費 3,109百万円
-（補助額） （1,015百万円）",3109,1015,百万円,百万円,32.6472,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_166.pdf
-s2_outline_167,4次,株式会社カネヒロ,2,coordinate_cost_box_char_reconstruction,"事業費 1,243百万円
-（補助額） （309百万円）",1243,309,百万円,百万円,24.8592,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_167.pdf
-s2_outline_168,4次,明和工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 2,195百万円
-（補助額） （712百万円）",2195,712,百万円,百万円,32.4374,整合,2,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_168.pdf
-s2_outline_170,4次,鈴木鉄工株式会社,2,rendered_cost_box_visual_verification,"事業費 2,535百万円
-（補助額） （843百万円）",2535,843,百万円,百万円,33.2544,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_170.pdf
-s2_outline_171,4次,オギハラ食品株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 4,192百万円
-（補助額） （1,171百万円）",4192,1171,百万円,百万円,27.9342,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_171.pdf
-s2_outline_172,4次,株式会社環境整備産業,2,coordinate_cost_box_char_reconstruction,"事業費 1,777百万円
-（補助額） （557百万円）",1777,557,百万円,百万円,31.345,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_172.pdf
-s2_outline_174,4次,ナカネ新建材株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 2,268百万円
-（補助額） （709百万円）",2268,709,百万円,百万円,31.261,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_174.pdf
-s2_outline_175,4次,化成工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 1,702百万円
-（補助額） （398百万円）",1702,398,百万円,百万円,23.3843,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_175.pdf
-s2_outline_176,4次,北アルプス飲料株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 132億円
-（補助額） （40億円）",13200,4000,億円,億円,30.303,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_176.pdf
-s2_outline_177,4次,八光エルアール株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 9,544百万円
-（補助額） （2,333百万円）",9544,2333,百万円,百万円,24.4447,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_177.pdf
-s2_outline_178,4次,株式会社メタルテック,2,coordinate_cost_box_char_reconstruction,"事業費 2,369百万円
-（補助額） （581百万円）",2369,581,百万円,百万円,24.5251,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_178.pdf
-s2_outline_179,4次,株式会社クラスコ,2,coordinate_cost_box_char_reconstruction,"事業費 2,499百万円
-（補助額） （590百万円）",2499,590,百万円,百万円,23.6094,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_179.pdf
-s2_outline_180,4次,株式会社森田あられ,2,coordinate_cost_box_char_reconstruction,"事業費 5,315百万円
-（補助額） （1,271百万円）",5315,1271,百万円,百万円,23.9135,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_180.pdf
-s2_outline_181,4次,株式会社手原産業倉庫,2,coordinate_cost_box_char_reconstruction,"事業費 1,789百万円
-（補助額） （418百万円）",1789,418,百万円,百万円,23.365,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_181.pdf
-s2_outline_182,4次,株式会社北十,2,coordinate_cost_box_char_reconstruction,"事業費 10億円
-（補助額） （2.5億円）",1000,250,億円,億円,25,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_182.pdf
-s2_outline_183,4次,ナカシマヘルスフォース株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 9,804百万円
-（補助額） （2,680百万円）",9804,2680,百万円,百万円,27.3358,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_183.pdf
-s2_outline_184,4次,日電精密工業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 3,717百万円
-（補助額） （1,184百万円）",3717,1184,百万円,百万円,31.8536,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_184.pdf
-s2_outline_187,4次,石坂産業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 4,922百万円
-（補助額） （1,641百万円）",4922,1641,百万円,百万円,33.3401,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_187.pdf
-s2_outline_189,4次,吉田海運ロジソリューションズ株式会社,2,rendered_cost_box_visual_verification,"事業費 2,284百万円
-（補助額） （761百万円）",2284,761,百万円,百万円,33.3187,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_189.pdf
-s2_outline_191,4次,株式会社ビクトリー,2,coordinate_cost_box_char_reconstruction,"事業費 16,500百万円
-（補助額） （4,999百万円）",16500,4999,百万円,百万円,30.297,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_191.pdf
-s2_outline_192,4次,フクビ岡山株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 3,652百万円
-（補助額） （900百万円）",3652,900,百万円,百万円,24.644,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_192.pdf
-s2_outline_193,4次,ソントン食品株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 13,005百万円
-（補助額） （3,909百万円）",13005,3909,百万円,百万円,30.0577,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_193.pdf
-s2_outline_194,4次,リバードコーポレーション株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 5,918百万円
-（補助額） （1,860百万円）",5918,1860,百万円,百万円,31.4295,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_194.pdf
-s2_outline_195,4次,株式会社レクザム,2,coordinate_cost_box_char_reconstruction,"事業費 19億円
-（補助額） （4.5億円）",1900,450,億円,億円,23.6842,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_195.pdf
-s2_outline_196,4次,岩手雪運株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 8,569百万円
-（補助額） （1,975百万円）",8569,1975,百万円,百万円,23.0482,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_196.pdf
-s2_outline_199,4次,日本毛織株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 26億円
-（補助額） （4.8億円）",2600,480,億円,億円,18.4615,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_199.pdf
-s2_outline_200,4次,有限会社ワンプラスワン,2,coordinate_cost_box_char_reconstruction,"事業費 3,831百万円
-（補助額） （1,112百万円）",3831,1112,百万円,百万円,29.0264,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_200.pdf
-s2_outline_201,4次,ハムリー株式会社,3,coordinate_cost_box_char_reconstruction,"事業費 2,367百万円
-（補助額） （729百万円）",2367,729,百万円,百万円,30.7985,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_201.pdf
-s2_outline_202,4次,東海デキストリン株式会社,2,rendered_cost_box_visual_verification,"事業費 2,744百万円
-（補助額） （431百万円）",2744,431,百万円,百万円,15.707,目視検証済,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_202.pdf
-s2_outline_204,4次,新日本電工株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 10,951百万円
-（補助額） （3,381百万円）",10951,3381,百万円,百万円,30.8739,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_204.pdf
-s2_outline_206,4次,能勢酒造株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 1885百万円
-（補助額） （507百万円）",1885,507,百万円,百万円,26.8966,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_206.pdf
-s2_outline_207,4次,ロートニッテン株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 3,304百万円
-（補助額） （809百万円）",3304,809,百万円,百万円,24.4855,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_207.pdf
-s2_outline_208,4次,NICHIRO株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 33億円
-（補助額） （11億円）",3300,1100,億円,億円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_208.pdf
-s2_outline_210,4次,南島酒販株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 1,071百万円
-（補助額） （357百万円）",1071,357,百万円,百万円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_210.pdf
-s2_outline_211,4次,アサヒプリテック株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 6,167百万円
-（補助額） （1,911百万円）",6167,1911,百万円,百万円,30.9875,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_211.pdf
-s2_outline_213,4次,ファインプラス株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 2,804百万円
-（補助額） （697百万円）",2804,697,百万円,百万円,24.8573,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_213.pdf
-s2_outline_217,4次,院庄林業株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 4,191百万円
-（補助額） （1,397百万円）",4191,1397,百万円,百万円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_217.pdf
-s2_outline_218,4次,株式会社エム・ケー・ケー,3,coordinate_cost_box_char_reconstruction,"事業費 2,310百万円
-（補助額） （563百万円）",2310,563,百万円,百万円,24.3723,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_218.pdf
-s2_outline_219,4次,株式会社ナリコマフード,2,coordinate_cost_box_char_reconstruction,"事業費 15,078百万円
-（補助額） （3,737百万円）",15078,3737,百万円,百万円,24.7845,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_219.pdf
-s2_outline_220,4次,富田薬品株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 4,199百万円
-（補助額） （1,327百万円）",4199,1327,百万円,百万円,31.6028,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_220.pdf
-s2_outline_221,4次,株式会社ニシムタ,2,coordinate_cost_box_char_reconstruction,"事業費 13,439百万円
-（補助額） （3,263百万円）",13439,3263,百万円,百万円,24.2801,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_221.pdf
-s2_outline_222,4次,株式会社 日本橋冷凍手島商店,2,coordinate_cost_box_char_reconstruction,"事業費 3,435百万円
-（補助額） （1,117百万円）",3435,1117,百万円,百万円,32.5182,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_222.pdf
-s2_outline_223,4次,三ッ和商事株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 2,686百万円
-（補助額） （766百万円）",2686,766,百万円,百万円,28.5182,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_223.pdf
-s2_outline_225,4次,株式会社山本製作所,2,coordinate_cost_box_char_reconstruction,"事業費 1,962百万円
-（補助額） （640百万円）",1962,640,百万円,百万円,32.6198,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_225.pdf
-s2_outline_226,4次,日本海精錬株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 1,515百万円
-（補助額） （499百万円）",1515,499,百万円,百万円,32.9373,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_226.pdf
-s2_outline_227,4次,株式会社トノックス,2,coordinate_cost_box_char_reconstruction,"事業費 1,641百万円
-（補助額） （473百万円）",1641,473,百万円,百万円,28.8239,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_227.pdf
-s2_outline_228,4次,株式会社ベネフル,2,coordinate_cost_box_char_reconstruction,"事業費 1,885百万円
-（補助額） （333百万円）",1885,333,百万円,百万円,17.6658,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_228.pdf
-s2_outline_230,4次,株式会社アイ・グラン・ソリューション,2,coordinate_cost_box_char_reconstruction,"事業費 58億円
-（補助額） （19億円）",5800,1900,億円,億円,32.7586,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_230.pdf
-s2_outline_231,4次,創建ホーム株式会社,2,coordinate_cost_box_char_reconstruction,"事業費 1,560百万円
-（補助額） （520百万円）",1560,520,百万円,百万円,33.3333,整合,1,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_231.pdf
+﻿case_id,round,company,page,source_method,box_transcription,cost_million,subsidy_million,subsidy_rate_pct,validation,components,pdf_url
+s1_outline__179,2次,アサヒセイレン中部株式会社,2,ai_visual_manual_audit,事業費188億円（補助額50億円）。溶解炉、保持炉、回転炉、選別・分析・乾燥・梱包設備等。,18800,5000,26.5957,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__179.pdf
+s1_outline__181,2次,株式会社ホテルニューアワジ,6,ai_visual_manual_audit,2社計82億円（26億円）。株式会社ホテルニューアワジ41億円（13億円）、株式会社あわじ浜離宮41億円（13億円）。,8200,2600,31.7073,AI画像目視確認済み,"[{""label"":""株式会社ホテルニューアワジ"",""cost_million_yen"":4100,""subsidy_million_yen"":1300},{""label"":""株式会社あわじ浜離宮"",""cost_million_yen"":4100,""subsidy_million_yen"":1300}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__181.pdf
+s1_outline__182,2次,埼玉機器株式会社,2,ai_visual_manual_audit,事業費91億円（補助額25億円）,9100,2500,27.4725,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__182.pdf
+s1_outline__183,2次,スズキハイテック株式会社,2,ai_visual_manual_audit,"事業費33億円（補助額8.9億円）。明細は1,053+2,191+86=3,330百万円で、本文では約33.3億円とも記載。",3330,890,26.7267,AI画像目視確認済み,"[{""label"":""建屋増築・改修"",""cost_million_yen"":1053},{""label"":""機械装置費"",""cost_million_yen"":2191},{""label"":""ソフトウェア・外注費他"",""cost_million_yen"":86}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__183.pdf
+s1_outline__184,2次,泉南乳業株式会社,2,ai_visual_manual_audit,事業費12億円（補助額1.3億円）,1200,130,10.8333,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__184.pdf
+s1_outline__188,2次,山城金属株式会社,2,ai_visual_manual_audit,事業費15億円（補助額5.0億円）,1500,500,33.3333,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__188.pdf
+s1_outline__189,2次,長﨑ジャッキ株式会社,2,ai_visual_manual_audit,事業費22億円（補助額6.3億円）,2200,630,28.6364,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__189.pdf
+s1_outline__190,2次,株式会社GOTENリゾート,2,ai_visual_manual_audit,事業費28億円、補助額8.0億円,2800,800,28.5714,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__190.pdf
+s1_outline__191,2次,株式会社カナイ,2,ai_visual_manual_audit,事業費45億円（補助額6.9億円）,4500,690,15.3333,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__191.pdf
+s1_outline__192,2次,池田糖化工業株式会社,2,ai_visual_manual_audit,"表示は事業費162億円（補助額50億円）。税抜事業経費合計16,191,253千円、補助対象経費15,000,000千円、交付申請額5,000,000千円。",16191.253,5000,30.8809,AI画像目視確認済み,"[{""label"":""建物費（事業経費）"",""cost_million_yen"":10267},{""label"":""機械装置費（事業経費）"",""cost_million_yen"":5924.253},{""label"":""補助対象経費合計"",""cost_million_yen"":15000}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__192.pdf
+s1_outline__194,2次,ZACROS株式会社,2,ai_visual_manual_audit,事業費129億円（補助額41億円）,12900,4100,31.7829,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__194.pdf
+s1_outline__195,2次,アシザワ・ファインテック株式会社,2,ai_visual_manual_audit,事業費25億円（補助額8.1億円）,2500,810,32.4,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__195.pdf
+s1_outline__196,2次,株式会社八立製作所,2,ai_visual_manual_audit,頁上部に総額13.4億円の建物・設備投資。概要欄は事業費13億円（補助額4.2億円）と丸め表示。,1340,420,31.3433,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__196.pdf
+s1_outline__197,2次,株式会社福山臨床検査センター,2,ai_visual_manual_audit,見出し17億円（4.4億円）。詳細15億円+9.5億円=24.5億円。,1700,440,25.8824,AI画像目視確認済み,"[{""label"":""新検査棟"",""million_yen"":1500},{""label"":""検査装置等"",""million_yen"":950}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__197.pdf
+s1_outline__198,2次,ユニコム株式会社,2,ai_visual_manual_audit,18億円（5.0億円）,1800,500,27.7778,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__198.pdf
+s1_outline__199,2次,株式会社ティー・シー・ピー,3,ai_visual_manual_audit,"見出し21億円（7億円）。対象設備2,175,620千円、土地570,060千円。",2100,700,33.3333,AI画像目視確認済み,"[{""label"":""補助対象設備投資"",""million_yen"":2175.62},{""label"":""土地"",""million_yen"":570.06}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__199.pdf
+s1_outline__200,2次,株式会社イズミテクノ,2,ai_visual_manual_audit,17億円（5.3億円）,1700,530,31.1765,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__200.pdf
+s1_outline__201,2次,株式会社イートアンドフーズ,2,ai_visual_manual_audit,67億円（21億円）,6700,2100,31.3433,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__201.pdf
+s1_outline__202,2次,アライドコーヒーロースターズ株式会社,2,ai_visual_manual_audit,54億円（16億円）,5400,1600,29.6296,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__202.pdf
+s1_outline__203,2次,株式会社東映京都スタジオ,2,ai_visual_manual_audit,35億円（9.5億円）,3500,950,27.1429,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__203.pdf
+s1_outline__204,2次,メック株式会社,2,ai_visual_manual_audit,見出し23億円（5.5億円）。投資欄1.7+38.8=40.5億円。,2300,550,23.913,AI画像目視確認済み,"[{""label"":""既存工場"",""million_yen"":170},{""label"":""北九州新工場"",""million_yen"":3880}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__204.pdf
+s1_outline__205,2次,ヤマシンスチール株式会社,2,ai_visual_manual_audit,見出し29億円（8.3億円）、明細29.7億円。,2900,830,28.6207,AI画像目視確認済み,"[{""label"":""補助対象"",""million_yen"":2700},{""label"":""対象外"",""million_yen"":270}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__205.pdf
+s1_outline__206,2次,上山製紙株式会社,2,ai_visual_manual_audit,30億円（9.9億円）,3000,990,33,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__206.pdf
+s1_outline__207,2次,株式会社ジェイ・イー・ティ,2,ai_visual_manual_audit,115億円（38億円）,11500,3800,33.0435,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__207.pdf
+s1_outline__208,2次,日本電波工業株式会社,2,ai_visual_manual_audit,104億円（31億円）、明細103.96億円。,10400,3100,29.8077,AI画像目視確認済み,"[{""label"":""スマートファクトリー"",""million_yen"":8380},{""label"":""顧客PF"",""million_yen"":700},{""label"":""データインフラ"",""million_yen"":1316}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__208.pdf
+s1_outline_1,1次,株式会社岩崎電機製作所,2,ai_visual_manual_audit,事業費24億円（補助額7.6億円）。明細20.44億円、3.69億円、0.15億円（明細計24.28億円で総額は丸め表示）。,2400,760,31.6667,AI画像目視確認済み,"[{""label"":""新工場建築"",""amount_oku"":20.44},{""label"":""製造・検査ライン導入"",""amount_oku"":3.69},{""label"":""システム導入"",""amount_oku"":0.15}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_1.pdf
+s1_outline_2,1次,株式会社アイ・テック,2,ai_visual_manual_audit,"総事業費7,419,100千円（右上は総事業費7.4億円表記だが、千円明細は74.191億円に相当）、補助額5.6億円。建物5,733,000千円、機械1,686,100千円。",7400,560,7.5676,AI画像目視確認済み（信頼度medium）,"[{""label"":""建物装置費"",""amount_thousand_yen"":5733000},{""label"":""機械装置費"",""amount_thousand_yen"":1686100}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_2.pdf
+s1_outline_3,1次,株式会社堀場エステック,2,ai_visual_manual_audit,事業費130億円（補助額38億円）。,13000,3800,29.2308,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_3.pdf
+s1_outline_4,1次,株式会社インターオフィス,2,ai_visual_manual_audit,右上は事業費15億円（補助額4.3億円）。明細表は建物15.5億円、機械0.5億円で計16.0億円となり不一致。,1500,430,28.6667,AI画像目視確認済み（信頼度medium）,"[{""label"":""建物費（加工・物流センター建設費）"",""amount_oku"":15.5},{""label"":""機械装置費"",""amount_oku"":0.5}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_4.pdf
+s1_outline_5,1次,大森機械工業株式会社,2,ai_visual_manual_audit,事業費36億円（補助額11億円）。大森ホールディングス約30.5億円、大森機械工業約6.5億円（内訳表記は概数で約37億円）。,3600,1100,30.5556,AI画像目視確認済み,"[{""label"":""大森ホールディングスの投資"",""amount_oku"":30.5},{""label"":""大森機械工業の投資"",""amount_oku"":6.5}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_5.pdf
+s1_outline_7,1次,株式会社ＭＡＲＵＷＡ,2,ai_visual_manual_audit,"事業費127億円（補助額35億円）。表の投資額合計①10,549百万円、補助額3,516百万円。",12700,3500,27.5591,AI画像目視確認済み,"[{""label"":""福島県・岐阜県の建物設備等9明細"",""amount_million_yen"":10549}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_7.pdf
+s1_outline_8,1次,サムテック株式会社,2,ai_visual_manual_audit,事業費77億円（補助額22億円）。,7700,2200,28.5714,AI画像目視確認済み,"[{""label"":""建物費・機械装置費（新工場、ブレーキ部品・ハブ旋削設備）""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_8.pdf
+s1_outline_9,1次,株式会社Pale Blue,2,ai_visual_manual_audit,事業費13億円（補助額3.4億円）。,1300,340,26.1538,AI画像目視確認済み,"[{""label"":""つくば生産技術開発拠点・設備・システム""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_9.pdf
+s1_outline_10,1次,株式会社プレジィール,2,ai_visual_manual_audit,事業費80億円（補助額25億円）。,8000,2500,31.25,AI画像目視確認済み,"[{""label"":""桑名工場増築・成形機等・ERP/MES/POS""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_10.pdf
+s1_outline_11,1次,大峰堂薬品工業株式会社,2,ai_visual_manual_audit,事業費113億円（補助額36億円）。,11300,3600,31.8584,AI画像目視確認済み,"[{""label"":""スマートファクトリー新工場・自動化設備・SCADA等""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_11.pdf
+s1_outline_12,1次,株式会社松岡,2,ai_visual_manual_audit,事業費131億円（補助額42億円）。,13100,4200,32.0611,AI画像目視確認済み,"[{""label"":""大阪堺市の大規模冷蔵倉庫（冷蔵トン53,122トン）""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_12.pdf
+s1_outline_13,1次,株式会社アロン社,2,ai_visual_manual_audit,税抜事業費18億円（補助額6.0億円）。,1800,600,33.3333,AI画像目視確認済み,"[{""label"":""一関工場への機能集約・新工場・生産設備刷新""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_13.pdf
+s1_outline_14,1次,日華化学株式会社,2,ai_visual_manual_audit,事業費166億円（補助額50億円）。画像ではフォント欠落があるが既存座標復元値と目視形状を照合。,16600,5000,30.1205,AI画像目視確認済み（信頼度medium）,"[{""label"":""福井スマートファクトリー""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_14.pdf
+s1_outline_16,1次,株式会社旭ウエルテック,2,ai_visual_manual_audit,事業費33億円（補助額10億円）。PSG3社の投資案件を合算した申請総額。,3300,1000,30.303,AI画像目視確認済み,"[{""label"":""PSG3社の専用工場・設備・3次元CAD共有""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_16.pdf
+s1_outline_17,1次,進工業株式会社,2,ai_visual_manual_audit,事業費94億円（補助額29億円）。2024年4月竣工の新棟に約47億円を投資し、補助事業で増産設備等を導入。,9400,2900,30.8511,AI画像目視確認済み,"[{""label"":""新棟（2024年4月竣工、約47億円）と増産設備""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_17.pdf
+s1_outline_19,1次,株式会社XEN GROUP,2,ai_visual_manual_audit,事業費約29億円（補助額約9.5億円）。,2900,950,32.7586,AI画像目視確認済み,"[{""label"":""大型自動化工場・LAB棟・省エネ設備""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_19.pdf
+s1_outline_20,1次,エスティケイテクノロジー株式会社,2,ai_visual_manual_audit,事業費21億円（補助額6.7億円）。建物15.9億円、機械装置4.9億円（計20.8億円。設備4.9億円のうち省力化設備4億円は内数）。,2100,670,31.9048,AI画像目視確認済み,"[{""label"":""新工場建設"",""amount_oku"":15.9},{""label"":""板金・溶接加工用設備・システム"",""amount_oku"":4.9}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_20.pdf
+s1_outline_21,1次,株式会社くまさんメディクス,2,ai_visual_manual_audit,事業費27億円、補助額8.6億円,2700,860,31.8519,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_21.pdf
+s1_outline_22,1次,BBSジャパン株式会社,2,ai_visual_manual_audit,事業費48億円、補助額16億円,4800,1600,33.3333,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_22.pdf
+s1_outline_23,1次,株式会社ジェーイーエル,2,ai_visual_manual_audit,事業費52億円、補助額16億円,5200,1600,30.7692,AI画像目視確認済み（信頼度medium）,"[{""label"":""尾道工場の新設"",""amount_million_yen"":null,""raw_evidence"":""尾道工場の新設""},{""label"":""自動倉庫・三次元測定器・生産管理システム"",""amount_million_yen"":null,""raw_evidence"":""自動倉庫・三次元測定器・生産管理システム""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_23.pdf
+s1_outline_24,1次,株式会社フジキン,2,ai_visual_manual_audit,事業費42億円、補助額13億円,4200,1300,30.9524,AI画像目視確認済み,"[{""label"":""建屋建設"",""amount_million_yen"":2200,""raw_evidence"":""建屋建設22億円""},{""label"":""クリーンルーム"",""amount_million_yen"":400,""raw_evidence"":""クリーンルーム4億円""},{""label"":""生産設備等"",""amount_million_yen"":1600,""raw_evidence"":""生産設備等16億円""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_24.pdf
+s1_outline_25,1次,日本リファイン株式会社,2,ai_visual_manual_audit,事業費40億円、補助額8.6億円,4000,860,21.5,AI画像目視確認済み,"[{""label"":""全自動蒸留精製塔・タンク増設"",""amount_million_yen"":null,""raw_evidence"":""全自動蒸留精製塔・タンク増設""},{""label"":""NMP分散液向け生産設備・建物"",""amount_million_yen"":null,""raw_evidence"":""NMP分散液向け生産設備・建物""},{""label"":""工場管理棟・クリーンルーム等"",""amount_million_yen"":null,""raw_evidence"":""工場管理棟・クリーンルーム等""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_25.pdf
+s1_outline_26,1次,日星電気株式会社,2,ai_visual_manual_audit,事業費95億円、補助額28億円,9500,2800,29.4737,AI画像目視確認済み,"[{""label"":""三方原工場建屋"",""amount_million_yen"":null,""raw_evidence"":""三方原工場建屋""},{""label"":""通信ケーブル長尺製造設備"",""amount_million_yen"":null,""raw_evidence"":""通信ケーブル長尺製造設備""},{""label"":""通信ケーブル評価・開発設備"",""amount_million_yen"":null,""raw_evidence"":""通信ケーブル評価・開発設備""},{""label"":""医療用チューブ長尺設備"",""amount_million_yen"":null,""raw_evidence"":""医療用チューブ長尺設備""},{""label"":""医療用チューブ加工設備"",""amount_million_yen"":null,""raw_evidence"":""医療用チューブ加工設備""},{""label"":""ふっ素チューブ長尺製造設備"",""amount_million_yen"":null,""raw_evidence"":""ふっ素チューブ長尺製造設備""},{""label"":""ふっ素チューブ製品評価設備"",""amount_million_yen"":null,""raw_evidence"":""ふっ素チューブ製品評価設備""},{""label"":""全製品対象製品評価設備"",""amount_million_yen"":null,""raw_evidence"":""全製品対象製品評価設備""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_26.pdf
+s1_outline_27,1次,株式会社クラタ,2,ai_visual_manual_audit,事業費19億円、補助額6.4億円,1900,640,33.6842,AI画像目視確認済み,"[{""label"":""工場修繕"",""amount_million_yen"":null,""raw_evidence"":""工場修繕""},{""label"":""工場インフラ"",""amount_million_yen"":null,""raw_evidence"":""工場インフラ""},{""label"":""生産設備"",""amount_million_yen"":null,""raw_evidence"":""生産設備""},{""label"":""検査設備"",""amount_million_yen"":null,""raw_evidence"":""検査設備""},{""label"":""ソフトウェア"",""amount_million_yen"":null,""raw_evidence"":""ソフトウェア""},{""label"":""省力化設備"",""amount_million_yen"":null,""raw_evidence"":""省力化設備""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_27.pdf
+s1_outline_28,1次,広陵化学工業株式会社,2,ai_visual_manual_audit,事業費17億円、補助額5.3億円,1700,530,31.1765,AI画像目視確認済み,"[{""label"":""医療専門の新工場"",""amount_million_yen"":null,""raw_evidence"":""医療専門の新工場""},{""label"":""クリーンルーム"",""amount_million_yen"":null,""raw_evidence"":""クリーンルーム""},{""label"":""射出成形機・一次加工設備"",""amount_million_yen"":null,""raw_evidence"":""射出成形機・一次加工設備""},{""label"":""自動検品装置"",""amount_million_yen"":null,""raw_evidence"":""自動検品装置""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_28.pdf
+s1_outline_29,1次,株式会社三和テスコ,2,ai_visual_manual_audit,"概要欄18億円（5.5億円）に対し、詳細欄は事業に要する経費2,098,800千円・補助金交付申請額699,600千円",2098.8,699.6,33.3333,AI画像目視確認済み（信頼度medium）,"[{""label"":""郷東工場改修"",""amount_million_yen"":null,""raw_evidence"":""郷東工場改修""},{""label"":""新工場"",""amount_million_yen"":null,""raw_evidence"":""新工場""},{""label"":""亜臨界水処理装置デモ機"",""amount_million_yen"":null,""raw_evidence"":""亜臨界水処理装置デモ機""},{""label"":""ファイバーレーザー切断機"",""amount_million_yen"":null,""raw_evidence"":""ファイバーレーザー切断機""},{""label"":""開先加工機"",""amount_million_yen"":null,""raw_evidence"":""開先加工機""},{""label"":""ベンディングロール"",""amount_million_yen"":null,""raw_evidence"":""ベンディングロール""},{""label"":""マニピュレーター・サブマージ溶接機"",""amount_million_yen"":null,""raw_evidence"":""マニピュレーター・サブマージ溶接機""},{""label"":""ターニングロール"",""amount_million_yen"":null,""raw_evidence"":""ターニングロール""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_29.pdf
+s1_outline_30,1次,株式会社メイドー,2,ai_visual_manual_audit,事業費58億円、補助額19億円,5800,1900,32.7586,AI画像目視確認済み,"[{""label"":""冷間鍛造"",""amount_million_yen"":null,""raw_evidence"":""冷間鍛造""},{""label"":""ねじ転造"",""amount_million_yen"":null,""raw_evidence"":""ねじ転造""},{""label"":""機械加工"",""amount_million_yen"":null,""raw_evidence"":""機械加工""},{""label"":""熱処理"",""amount_million_yen"":null,""raw_evidence"":""熱処理""},{""label"":""表面処理"",""amount_million_yen"":null,""raw_evidence"":""表面処理""},{""label"":""研究所改修・試験研究機器"",""amount_million_yen"":null,""raw_evidence"":""研究所改修・試験研究機器""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_30.pdf
+s1_outline_31,1次,鎌長製衡株式会社,2,ai_visual_manual_audit,事業費16億円、補助額4.6億円,1600,460,28.75,AI画像目視確認済み,"[{""label"":""製造棟"",""amount_million_yen"":null,""raw_evidence"":""製造棟""},{""label"":""設計棟"",""amount_million_yen"":null,""raw_evidence"":""設計棟""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_31.pdf
+s1_outline_32,1次,オリヒロエンジニアリング株式会社,2,ai_visual_manual_audit,事業費61億円、補助額19億円,6100,1900,31.1475,AI画像目視確認済み,"[{""label"":""建物費"",""amount_million_yen"":5082.78,""raw_evidence"":""5,082,780千円""},{""label"":""機械装置費"",""amount_million_yen"":1060.301,""raw_evidence"":""1,060,301千円""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_32.pdf
+s1_outline_33,1次,株式会社石井機械製作所,2,ai_visual_manual_audit,事業費11億円、補助額3.5億円,1100,350,31.8182,AI画像目視確認済み,"[{""label"":""大規模工場"",""amount_million_yen"":null,""raw_evidence"":""大規模工場""},{""label"":""天井クレーン30t・15t・5t"",""amount_million_yen"":null,""raw_evidence"":""天井クレーン30t・15t・5t""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_33.pdf
+s1_outline_34,1次,株式会社柴田合成,2,ai_visual_manual_audit,3年間の補助対象事業費18.9億円、概要欄の事業費19億円・補助額5.2億円,1894,520,27.4551,AI画像目視確認済み,"[{""label"":""工場・倉庫I期"",""amount_million_yen"":824,""raw_evidence"":""557+267=824百万円""},{""label"":""倉庫II期"",""amount_million_yen"":373,""raw_evidence"":""373百万円""},{""label"":""生産設備一式"",""amount_million_yen"":697,""raw_evidence"":""510+187=697百万円""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_34.pdf
+s1_outline_35,1次,イグス株式会社,2,ai_visual_manual_audit,事業費34億円、補助額8.9億円,3400,890,26.1765,AI画像目視確認済み,"[{""label"":""新工場建屋"",""amount_million_yen"":null,""raw_evidence"":""新工場建屋""},{""label"":""高収納効率ラック・ラックフォーク"",""amount_million_yen"":null,""raw_evidence"":""高収納効率ラック・ラックフォーク""},{""label"":""自動化・省力化設備群"",""amount_million_yen"":null,""raw_evidence"":""自動化・省力化設備群""},{""label"":""ITクラウドシステム"",""amount_million_yen"":null,""raw_evidence"":""ITクラウドシステム""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_35.pdf
+s1_outline_36,1次,株式会社廣澤精機製作所,2,ai_visual_manual_audit,事業費71億円、補助額24億円,7100,2400,33.8028,AI画像目視確認済み,"[{""label"":""金属プレス板金加工工程"",""amount_million_yen"":null,""raw_evidence"":""金属プレス板金加工工程""},{""label"":""曲げ加工工程"",""amount_million_yen"":null,""raw_evidence"":""曲げ加工工程""},{""label"":""溶接工程"",""amount_million_yen"":null,""raw_evidence"":""溶接工程""},{""label"":""塗装工程"",""amount_million_yen"":null,""raw_evidence"":""塗装工程""},{""label"":""自律型搬送ロボット"",""amount_million_yen"":null,""raw_evidence"":""自律型搬送ロボット""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_36.pdf
+s1_outline_37,1次,大日工業株式会社,2,ai_visual_manual_audit,補助事業18億円、補助額5.9億円,1800,590,32.7778,AI画像目視確認済み,"[{""label"":""建築設備費・開発申請料等"",""amount_million_yen"":1639,""raw_evidence"":""16億3900万円""},{""label"":""導入設備2ライン"",""amount_million_yen"":249.6,""raw_evidence"":""2億4960万円""},{""label"":""土地購入・造成・登記等（対象外）"",""amount_million_yen"":820.97,""raw_evidence"":""8億2097万円、対象外""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_37.pdf
+s1_outline_38,1次,テラル株式会社,2,ai_visual_manual_audit,事業費27億円、補助額8.6億円,2700,860,31.8519,AI画像目視確認済み,"[{""label"":""本社第二工場・自動倉庫"",""amount_million_yen"":null,""raw_evidence"":""本社第二工場・自動倉庫""},{""label"":""無人搬送設備・垂直搬送装置"",""amount_million_yen"":null,""raw_evidence"":""無人搬送設備・垂直搬送装置""},{""label"":""統合基幹業務システムERP"",""amount_million_yen"":null,""raw_evidence"":""統合基幹業務システムERP""},{""label"":""研究開発部門"",""amount_million_yen"":null,""raw_evidence"":""研究開発部門""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_38.pdf
+s1_outline_39,1次,株式会社ハウゼコ,2,ai_visual_manual_audit,事業費19億円、補助額6.1億円,1900,610,32.1053,AI画像目視確認済み,"[{""label"":""加西工場の増改築"",""amount_million_yen"":null,""raw_evidence"":""加西工場の増改築""},{""label"":""自動化製造ライン"",""amount_million_yen"":null,""raw_evidence"":""自動化製造ライン""},{""label"":""多品種少量製造ライン"",""amount_million_yen"":null,""raw_evidence"":""多品種少量製造ライン""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_39.pdf
+s1_outline_40,1次,千代田鋼鉄工業株式会社,2,ai_visual_manual_audit,事業費43億円、補助額6.5億円,4300,650,15.1163,AI画像目視確認済み,"[{""label"":""二次精錬設備用建屋（対象）"",""amount_million_yen"":null,""raw_evidence"":""二次精錬設備用建屋（対象）""},{""label"":""二次精錬設備（対象外）"",""amount_million_yen"":null,""raw_evidence"":""二次精錬設備（対象外）""},{""label"":""大物圧延用設備（対象）"",""amount_million_yen"":null,""raw_evidence"":""大物圧延用設備（対象）""},{""label"":""積込・保管用建屋（対象外）"",""amount_million_yen"":null,""raw_evidence"":""積込・保管用建屋（対象外）""},{""label"":""鉄筋ラック工事（対象）"",""amount_million_yen"":null,""raw_evidence"":""鉄筋ラック工事（対象）""},{""label"":""保管用建屋（対象）"",""amount_million_yen"":null,""raw_evidence"":""保管用建屋（対象）""},{""label"":""スライドアームラック（対象）"",""amount_million_yen"":null,""raw_evidence"":""スライドアームラック（対象）""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_40.pdf
+s1_outline_41,1次,株式会社ビッグハウス,2,ai_visual_manual_audit,事業費12億円（補助額3.8億円）。明細7項目の表示額合計は11.5億円で、総額とは0.5億円差がある。,1200,380,31.6667,AI画像目視確認済み,"[{""label"":""三股新工場造成本・新工場・新事務所"",""amount_million_yen"":370},{""label"":""ツーバイ・フォー壁・合板組立システム"",""amount_million_yen"":200},{""label"":""カット機自動投入システム"",""amount_million_yen"":120},{""label"":""トラス組立システム"",""amount_million_yen"":220},{""label"":""床・金具組立システム"",""amount_million_yen"":100},{""label"":""木材そり量検査システム"",""amount_million_yen"":40},{""label"":""搬送機械"",""amount_million_yen"":100}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_41.pdf
+s1_outline_42,1次,株式会社山田ドビー,2,ai_visual_manual_audit,"事業費59億円（補助額18億円）。設備表の合計は5,482,504,500円。",5900,1800,30.5085,AI画像目視確認済み,"[{""label"":""設備投資表の25点合計"",""amount_million_yen"":5482.5045}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_42.pdf
+s1_outline_43,1次,丸井産業株式会社,2,ai_visual_manual_audit,事業費102億円（補助額30億円、支払済みと対象外費用2.8億円を含む）。表の2明細は90.2億円と22.7億円。,10200,3000,29.4118,AI画像目視確認済み,"[{""label"":""新工場の建設（丸井産業）"",""amount_million_yen"":9020},{""label"":""自社製品の製造・自動化等設備（イムロ）"",""amount_million_yen"":2270}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_43.pdf
+s1_outline_45,1次,山本ビニター株式会社,2,ai_visual_manual_audit,事業費26億円（補助額8.2億円）。工場全面リニューアル、新工場建設、R&Dセンター新設、AGV・三次元測定機等。,2600,820,31.5385,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_45.pdf
+s1_outline_46,1次,株式会社アイスコ,2,ai_visual_manual_audit,事業費35億円（補助額11億円）。埼玉県に冷凍物流倉庫を新設し、自動倉庫物流システムを導入。,3500,1100,31.4286,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_46.pdf
+s1_outline_47,1次,ポーライト株式会社,2,ai_visual_manual_audit,事業費31億円（補助額8.2億円）。銅コーティング粉工場新設と軸受製造工程の自動化。,3100,820,26.4516,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_47.pdf
+s1_outline_48,1次,SINGS株式会社,2,ai_visual_manual_audit,"事業費31億円（補助額9.6億円）。表示明細は工場建屋2,182百万円、輸入機械4,090千ドル、国内400百万円。",3100,960,30.9677,AI画像目視確認済み,"[{""label"":""工場建屋"",""amount_million_yen"":2182},{""label"":""輸入機械設備4,090千ドル（1ドル155円想定）"",""amount_million_yen"":633.95},{""label"":""国内機械設備"",""amount_million_yen"":400}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_48.pdf
+s1_outline_49,1次,株式会社ＡＫシステム,2,ai_visual_manual_audit,事業費11億円（補助額3.5億円）。表示明細は8.1、1.5、2.8、0.4億円で合計12.8億円となり総額と一致しない。,1100,350,31.8182,AI画像目視確認済み,"[{""label"":""新工場建設"",""amount_million_yen"":810},{""label"":""既存本社工場改修・倉庫建設"",""amount_million_yen"":150},{""label"":""機械装置・ソフトウェア"",""amount_million_yen"":280},{""label"":""生産管理システム等"",""amount_million_yen"":40}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_49.pdf
+s1_outline_50,1次,株式会社松尾製作所,2,ai_visual_manual_audit,事業費109億円（補助額35億円）。59品番それぞれに専用工程・自動機・検査設備を導入。,10900,3500,32.1101,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_50.pdf
+s1_outline_51,1次,株式会社西部技研,2,ai_visual_manual_audit,"事業費34億円（補助額10億円）。設備表合計3,451百万円。p3-5は工程・設備イメージと図面。",3400,1000,29.4118,AI画像目視確認済み（信頼度medium）,"[{""label"":""工場建屋一式"",""amount_million_yen"":1619},{""label"":""成形工程設備一式"",""amount_million_yen"":134},{""label"":""巻付工程設備一式"",""amount_million_yen"":71},{""label"":""化学処理システム設備一式"",""amount_million_yen"":918},{""label"":""加工機設備一式"",""amount_million_yen"":236},{""label"":""端面処理関連改造移設"",""amount_million_yen"":5},{""label"":""作業環境設備一式"",""amount_million_yen"":388},{""label"":""IOT関連"",""amount_million_yen"":80}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_51.pdf
+s1_outline_52,1次,株式会社平島,2,ai_visual_manual_audit,"事業費43億円（補助額13億円）。本文明細は4,465百万円、121百万円、144百万円。",4300,1300,30.2326,AI画像目視確認済み,"[{""label"":""御船工場新設・福岡工場増設"",""amount_million_yen"":4465,""eligible_million_yen"":3616},{""label"":""研究所の新設"",""amount_million_yen"":121,""eligible_million_yen"":92},{""label"":""システムの構築"",""amount_million_yen"":144,""eligible_million_yen"":131}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_52.pdf
+s1_outline_53,1次,マルコーフーズ株式会社,2,ai_visual_manual_audit,事業費41億円（補助額13億円）。青森工場新設・製造ライン設備。,4100,1300,31.7073,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_53.pdf
+s1_outline_55,1次,株式会社コーヨークリエイト,2,ai_visual_manual_audit,事業費15億円（補助額4.8億円）。新工場建設、K型フレーム自動溶接システム2機、単柱自動溶接3機、天井クレーン10基。,1500,480,32,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_55.pdf
+s1_outline_56,1次,高知通運株式会社,2,ai_visual_manual_audit,事業費36億円（補助額11億円、税込かつ土地取得費用を含む）。倉庫A・倉庫B、モーダルシフト促進設備、運送・倉庫管理システム。,3600,1100,30.5556,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_56.pdf
+s1_outline_58,1次,三晶エムイーシー株式会社,2,ai_visual_manual_audit,事業費33億円（補助額11億円）。受注先別専用工場、既存工場増床、専用自動化ライン。,3300,1100,33.3333,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_58.pdf
+s1_outline_61,1次,三恵工業株式会社,2,ai_visual_manual_audit,事業費117億円、補助額33億円。,11700,3300,28.2051,AI画像目視確認済み,"[{""label"":""竜王工場新設・生産設備""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_61.pdf
+s1_outline_62,1次,サーパス工業株式会社,2,ai_visual_manual_audit,事業費200億円、補助額50億円。,20000,5000,25,AI画像目視確認済み,"[{""label"":""新拠点PJブルーム（本社・開発・生産機能統合）""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_62.pdf
+s1_outline_63,1次,株式会社オティックスホールディングス,2,ai_visual_manual_audit,事業費166億円、補助額50億円。,16600,5000,30.1205,AI画像目視確認済み,"[{""label"":""西浅井第2工場・生産ライン・研究開発設備""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_63.pdf
+s1_outline_65,1次,株式会社松風,2,ai_visual_manual_audit,事業費22億円、補助額6.6億円。,2200,660,30,AI画像目視確認済み,"[{""label"":""化工品新工場第1期""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_65.pdf
+s1_outline_66,1次,株式会社アルプスツール,2,ai_visual_manual_audit,事業費21億円、補助額6.6億円。,2100,660,31.4286,AI画像目視確認済み,"[{""label"":""南条工場・ツーリング高度化設備""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_66.pdf
+s1_outline_67,1次,アドバンス電気工業株式会社,2,ai_visual_manual_audit,事業費32億円、補助額8.9億円。本文に総投資額34億円の記載もあり、補助対象事業費と総投資額を区別。,3200,890,27.8125,AI画像目視確認済み,"[{""label"":""本社第二工場2期棟・モーター生産能力倍増""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_67.pdf
+s1_outline_68,1次,株式会社ミマキエンジニアリング,2,ai_visual_manual_audit,事業費16億円、補助額4.2億円。,1600,420,26.25,AI画像目視確認済み,"[{""label"":""加沢工場F棟・試作機試験機設備""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_68.pdf
+s1_outline_69,1次,NAX JAPAN株式会社,2,ai_visual_manual_audit,"事業費14億円、補助額4.7億円。明細1,600,000,000+100,000,000+300,000,000+100,000,000円=21億円で総額欄と不一致。",1400,470,33.5714,AI画像目視確認済み（信頼度medium）,"[{""label"":""冷凍冷蔵庫造作"",""amount_yen"":1600000000},{""label"":""移動ラック"",""amount_yen"":100000000},{""label"":""WMS等"",""amount_yen"":300000000},{""label"":""商社機能受発注システム連携"",""amount_yen"":100000000}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_69.pdf
+s1_outline_70,1次,協和工業株式会社,2,ai_visual_manual_audit,事業費22億円、補助額7.3億円。,2200,730,33.1818,AI画像目視確認済み,"[{""label"":""新工場・溶接設備・800トンプレス・自動搬送""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_70.pdf
+s1_outline_71,1次,株式会社北四国グラビア印刷,2,ai_visual_manual_audit,事業費29億円、補助額8.7億円。,2900,870,30,AI画像目視確認済み,"[{""label"":""新工場・スリット機・自動梱包・自動倉庫等""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_71.pdf
+s1_outline_72,1次,ヤマセ電気株式会社,2,ai_visual_manual_audit,事業費29億円、補助額7.2億円。,2900,720,24.8276,AI画像目視確認済み,"[{""label"":""新工場・成形/金型設備・DX""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_72.pdf
+s1_outline_73,1次,株式会社大昌鉄工所,2,ai_visual_manual_audit,事業費23億円、補助額7.5億円。,2300,750,32.6087,AI画像目視確認済み,"[{""label"":""幅広対応第15工場・クレーン・マシニング・研削盤""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_73.pdf
+s1_outline_74,1次,株式会社ユニシス,2,ai_visual_manual_audit,事業費16億円、補助額5.1億円。,1600,510,31.875,AI画像目視確認済み,"[{""label"":""糸島市新工場・大型自動組立装置""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_74.pdf
+s1_outline_75,1次,株式会社伝食,2,ai_visual_manual_audit,事業費40億円、補助額11.8億円。,4000,1180,29.5,AI画像目視確認済み,"[{""label"":""水産加工場増設・物流スマートファクトリー""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_75.pdf
+s1_outline_76,1次,安田工業株式会社,4,ai_visual_manual_audit,事業費20億円、補助額6.2億円。,2000,620,31,AI画像目視確認済み（信頼度medium）,"[{""label"":""専用研究棟YASDAエクセレンスラボ""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_76.pdf
+s1_outline_77,1次,千寿製薬株式会社,2,ai_visual_manual_audit,事業費103億円、補助額32億円。主内訳43.2+54.0+5.9=103.1億円。,10300,3200,31.068,AI画像目視確認済み,"[{""label"":""建物費"",""amount_oku"":43.2},{""label"":""機械装置費"",""amount_oku"":54},{""label"":""ソフトウェア費"",""amount_oku"":5.9}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_77.pdf
+s1_outline_78,1次,環境のミカタ株式会社,2,ai_visual_manual_audit,右上は事業費28億円、補助額9.0億円。投資概要本文は合計27億円（建物10億、機械17億、全て税抜）で1億円差。,2800,900,32.1429,AI画像目視確認済み（信頼度medium）,"[{""label"":""建物"",""amount_oku"":10},{""label"":""機械"",""amount_oku"":17}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_78.pdf
+s1_outline_79,1次,スーパー工業株式会社,2,ai_visual_manual_audit,事業費19億円、補助額6.2億円。明細計18.89億円で概ね総額と整合。,1900,620,32.6316,AI画像目視確認済み,"[{""label"":""新工場"",""amount_oku"":17.33},{""label"":""組立設備"",""amount_oku"":0.61},{""label"":""試験室設備"",""amount_oku"":0.3},{""label"":""倉庫設備"",""amount_oku"":0.65}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_79.pdf
+s1_outline_80,1次,寧薬化学工業株式会社,2,ai_visual_manual_audit,事業費38億円、補助額12億円。,3800,1200,31.5789,AI画像目視確認済み,"[{""label"":""新工場・高性能製造設備・既存工場改修""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_80.pdf
+s1_outline_81,1次,デーバー加工サービス㈱,2,ai_visual_manual_audit,事業費21億円（補助額6.7億円）。第2工場建設と自動化・IoT設備。,2100,670,31.9048,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_81.pdf
+s1_outline_82,1次,サン工業株式会社,2,ai_visual_manual_audit,事業費39億円（補助額13億円）。新工場と次世代めっきライン。,3900,1300,33.3333,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_82.pdf
+s1_outline_83,1次,株式会社ヒサダ,2,ai_visual_manual_audit,事業費19億円（補助額4.4億円）。九州新工場、EV部品・シートフレーム設備。,1900,440,23.1579,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_83.pdf
+s1_outline_84,1次,株式会社マグナ・ワイヤレス,2,ai_visual_manual_audit,事業費21億円（補助額5.9億円）。ローカル5G向け半導体・基地局・端末開発量産。,2100,590,28.0952,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_84.pdf
+s1_outline_85,1次,マルコ工業株式会社,2,ai_visual_manual_audit,総額35.98億円の設備投資との本文に対し、Boxは事業費37億円（補助額12億円）。,3700,1200,32.4324,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_85.pdf
+s1_outline_86,1次,グローバル・テック株式会社,2,ai_visual_manual_audit,事業費41億円（補助額13億円）。LiB試験棟改修・新築・評価設備。,4100,1300,31.7073,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_86.pdf
+s1_outline_87,1次,トーカロ株式会社,2,ai_visual_manual_audit,事業費112億円（補助額34億円）。新工場2件、既存工場設備、研究設備。,11200,3400,30.3571,AI画像目視確認済み,"[{""label"":""鈴身事業所新工場"",""amount_million_yen"":5600},{""label"":""北九州工場新工場"",""amount_million_yen"":3100}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_87.pdf
+s1_outline_88,1次,株式会社創味食品,2,ai_visual_manual_audit,事業費134億円（補助額41億円）。明細82億円+40億円=122億円で総額と差。,13400,4100,30.597,AI画像目視確認済み,"[{""label"":""工場建屋等の新設"",""amount_million_yen"":8200},{""label"":""生産設備等の導入"",""amount_million_yen"":4000}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_88.pdf
+s1_outline_89,1次,京西テクノス株式会社,2,ai_visual_manual_audit,事業費25億円（補助額7.9億円）。京都第2本社。,2500,790,31.6,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_89.pdf
+s1_outline_91,1次,矢田工業株式会社,2,ai_visual_manual_audit,事業費20億円（補助額6.7億円）。四国工場と省力設備。,2000,670,33.5,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_91.pdf
+s1_outline_92,1次,アサヒフォージ株式会社,2,ai_visual_manual_audit,事業費168億円（補助額50億円）。旗艦工場・鍛造ライン。,16800,5000,29.7619,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_92.pdf
+s1_outline_93,1次,ウイング株式会社,2,ai_visual_manual_audit,事業費21億円（補助額6.6億円）。2x4コンポーネント工場。,2100,660,31.4286,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_93.pdf
+s1_outline_94,1次,株式会社友和環境,2,ai_visual_manual_audit,事業費16億円（補助額5.3億円）。新工場・選別フラフ製造ライン。,1600,530,33.125,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_94.pdf
+s1_outline_95,1次,ナミックス株式会社,2,ai_visual_manual_audit,Boxは事業費229億円（補助額50億円）。本文は総額約250億円、建設費約200億円のうち50億円を補助金で充当。,22900,5000,21.8341,AI画像目視確認済み,"[{""label"":""工場上屋・設備導入計画"",""amount_million_yen"":25000},{""label"":""建設費総額"",""amount_million_yen"":20000}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_95.pdf
+s1_outline_96,1次,大岡技研株式会社,2,ai_visual_manual_audit,事業費52億円（補助額15億円）。EV関連新工場・各工場IoT。,5200,1500,28.8462,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_96.pdf
+s1_outline_97,1次,フクシマガリレイ株式会社,5,ai_visual_manual_audit,事業費137億円（補助額28億円）。滋賀湖南新工場。,13700,2800,20.438,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_97.pdf
+s1_outline_99,1次,株式会社オーレック,2,ai_visual_manual_audit,Boxは事業費54億円（補助額16億円）。本文は総額48.1億円の設備投資。,5400,1600,29.6296,AI画像目視確認済み,"[{""label"":""設備投資総額（本文）"",""amount_million_yen"":4810}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_99.pdf
+s1_outline_100,1次,マリンフード株式会社,2,ai_visual_manual_audit,"事業費46億円（補助額14億円）。明細表合計4,586,156千円=45.86156億円。",4600,1400,30.4348,AI画像目視確認済み（信頼度medium）,"[{""label"":""ライン増設関連合計"",""amount_million_yen"":4586.156}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_100.pdf
+s1_outline_101,1次,株式会社正興電機製作所,2,ai_visual_manual_audit,事業費39億円（補助額12億円）,3900,1200,30.7692,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_101.pdf
+s1_outline_102,1次,冬木工業株式会社,2,ai_visual_manual_audit,"事業費69億円（22億円）。明細合計6,916百万円。",6900,2200,31.8841,AI画像目視確認済み,"[{""label"":""新工場・事務所"",""million_yen"":4849},{""label"":""機械設備"",""million_yen"":1750},{""label"":""太陽光・蓄電池"",""million_yen"":268},{""label"":""見える化"",""million_yen"":49}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_102.pdf
+s1_outline_103,1次,オーケー化成株式会社,2,ai_visual_manual_audit,事業費29億円（9.6億円）、明細合計29.07億円,2900,960,33.1034,AI画像目視確認済み,"[{""label"":""工場"",""million_yen"":1800},{""label"":""機械"",""million_yen"":1080},{""label"":""その他・ソフトウェア"",""million_yen"":27}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_103.pdf
+s1_outline_104,1次,ヤマダイ株式会社,2,ai_visual_manual_audit,事業費34億円（11億円）,3400,1100,32.3529,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_104.pdf
+s1_outline_105,1次,中外医薬生産株式会社,2,ai_visual_manual_audit,事業費65億円（20億円）,6500,2000,30.7692,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_105.pdf
+s1_outline_106,1次,株式会社シーエル,2,ai_visual_manual_audit,事業費21億円（6.3億円）,2100,630,30,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_106.pdf
+s1_outline_107,1次,株式会社ササキ,2,ai_visual_manual_audit,事業費39億円（13億円）,3900,1300,33.3333,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_107.pdf
+s1_outline_108,1次,株式会社ミラプロ,4,ai_visual_manual_audit,事業費13億円（4.4億円）,1300,440,33.8462,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_108.pdf
+s1_outline_109,1次,マイクロカット株式会社,2,ai_visual_manual_audit,事業費14.9億円（4.9億円）,1490,490,32.8859,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_109.pdf
+s1_outline_110,1次,株式会社菰下鎔断,2,ai_visual_manual_audit,事業費16億円（5.1億円）,1600,510,31.875,AI画像目視確認済み,"[{""label"":""増設"",""million_yen"":620},{""label"":""クレーン"",""million_yen"":100},{""label"":""切断機"",""million_yen"":60},{""label"":""ベンディングロール"",""million_yen"":680},{""label"":""溶接装置"",""million_yen"":20},{""label"":""ターニングロール"",""million_yen"":60}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_110.pdf
+s1_outline_111,1次,株式会社向山工場,2,ai_visual_manual_audit,事業費40億円（13億円）,4000,1300,32.5,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_111.pdf
+s1_outline_112,1次,株式会社八芳園,2,ai_visual_manual_audit,事業費68億円（20億円）,6800,2000,29.4118,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_112.pdf
+s1_outline_113,1次,トーアス株式会社,2,ai_visual_manual_audit,事業費14億円（4.6億円）,1400,460,32.8571,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_113.pdf
+s1_outline_114,1次,株式会社中西製作所,2,ai_visual_manual_audit,事業費36億円（5.4億円）,3600,540,15,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_114.pdf
+s1_outline_115,1次,株式会社国際エキスプレス,2,ai_visual_manual_audit,見出し事業費47億円（16億円）。拠点別記載合計51.8億円で差異あり。,4700,1600,34.0426,AI画像目視確認済み,"[{""label"":""東京支店・投資額"",""million_yen"":550},{""label"":""横浜支店・投資額"",""million_yen"":4560},{""label"":""博多支店・投資額"",""million_yen"":70}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_115.pdf
+s1_outline_116,1次,株式会社かねふくめんたいパーク,2,ai_visual_manual_audit,見出し事業費12億円（1.4億円）。設備明細は合計14.0億円と明記。,1200,140,11.6667,AI画像目視確認済み,"[{""label"":""工場建設費"",""million_yen"":920},{""label"":""機械設備費"",""million_yen"":468}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_116.pdf
+s1_outline_117,1次,信越理研株式会社,2,ai_visual_manual_audit,見出し44億円（12億円）。本文には事業費45億円との記載もあり。,4400,1200,27.2727,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_117.pdf
+s1_outline_118,1次,クリエイトワン株式会社,3,ai_visual_manual_audit,"見出し12億円（0.74億円）。記載明細は43+1,287百万円。",1200,74,6.1667,AI画像目視確認済み,"[{""label"":""システム開発"",""million_yen"":43},{""label"":""社屋建設"",""million_yen"":1287}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_118.pdf
+s1_outline_119,1次,株式会社フルヤ金属,2,ai_visual_manual_audit,事業費41億円（12億円）,4100,1200,29.2683,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_119.pdf
+s1_outline_120,1次,旭陽電気株式会社,2,ai_visual_manual_audit,事業費31億円（3.2億円）,3100,320,10.3226,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_120.pdf
+s1_outline_121,1次,土佐鶴酒造株式会社,2,ai_visual_manual_audit,事業費12.7億円（補助額3.7億円）,1270,370,29.1339,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_121.pdf
+s1_outline_122,1次,岸和田製鋼株式会社,2,ai_visual_manual_audit,事業費45億円（補助額2.3億円）。明細は約5億円、約45億円、約4億円と記載され、概要総額との範囲関係が不明。,4500,230,5.1111,AI画像目視確認済み,"[{""label"":""電気炉への高効率酸素バーナ導入"",""cost_million_yen"":500},{""label"":""粗列圧延機の2Hiスタンド化更新"",""cost_million_yen"":4500},{""label"":""圧延制御装置更新"",""cost_million_yen"":400}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_122.pdf
+s1_outline_123,1次,株式会社タケエイ,2,ai_visual_manual_audit,事業費95億円（補助額19億円）。プラント設備工事56億円、土木建築工事39億円。,9500,1900,20,AI画像目視確認済み,"[{""label"":""プラント設備工事"",""cost_million_yen"":5600},{""label"":""土木建築工事"",""cost_million_yen"":3900}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_123.pdf
+s1_outline_124,1次,株式会社シロ,3,ai_visual_manual_audit,事業費27億円（補助額7.8億円）,2700,780,28.8889,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_124.pdf
+s1_outline_125,1次,株式会社ミダック,2,ai_visual_manual_audit,事業費27億円、補助額2.1億円,2700,210,7.7778,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_125.pdf
+s1_outline_126,1次,高末株式会社,2,ai_visual_manual_audit,事業費75億円（補助額4.4億円）,7500,440,5.8667,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_126.pdf
+s1_outline_127,1次,株式会社ユニワールド,2,ai_visual_manual_audit,事業費17億円（補助額5.7億円）,1700,570,33.5294,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_127.pdf
+s1_outline_128,1次,株式会社ただおザウルス,2,ai_visual_manual_audit,事業費15億円（補助額4.7億円）,1500,470,31.3333,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_128.pdf
+s1_outline_129,1次,株式会社浜屋,2,ai_visual_manual_audit,事業費15億円（補助額4.3億円）,1500,430,28.6667,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_129.pdf
+s1_outline_130,1次,小林酒造株式会社,2,ai_visual_manual_audit,"概要: 事業費12.6億円（補助額4.2億円）。明細: 894,349,500円+491,650,500円=1,386,000,000円、補助額は271,015,000円+148,985,000円=420,000,000円。",1260,420,33.3333,AI画像目視確認済み,"[{""label"":""ウイスキー貯蔵樽倉庫建設"",""cost_million_yen"":894.3495,""subsidy_million_yen"":271.015},{""label"":""ウイスキー生産設備拡充"",""cost_million_yen"":491.6505,""subsidy_million_yen"":148.985}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_130.pdf
+s1_outline_131,1次,株式会社遠藤写真工芸所,2,ai_visual_manual_audit,事業費38億円（補助額10億円）,3800,1000,26.3158,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_131.pdf
+s1_outline_132,1次,株式会社ヨシノ自動車,2,ai_visual_manual_audit,概要:事業費26億円（補助額7.3億円）。本文:事業費21.8億円のうち建物20億円、機械設備1.8億円。,2600,730,28.0769,AI画像目視確認済み,"[{""label"":""建物"",""cost_million_yen"":2000},{""label"":""機械設備（リフト等）"",""cost_million_yen"":180}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_132.pdf
+s1_outline_134,1次,株式会社コンメックス,2,ai_visual_manual_audit,事業費28億円（補助額2.9億円）,2800,290,10.3571,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_134.pdf
+s1_outline_135,1次,株式会社永井運送,2,ai_visual_manual_audit,事業費22億円（補助額2.1億円）,2200,210,9.5455,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_135.pdf
+s1_outline_136,1次,まねき食品株式会社,2,ai_visual_manual_audit,事業費33億円（補助額9.3億円）,3300,930,28.1818,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_136.pdf
+s1_outline_137,1次,総武機械株式会社,2,ai_visual_manual_audit,事業費20億円（補助額5.7億円）,2000,570,28.5,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_137.pdf
+s1_outline_138,1次,菅野包装資材株式会社,2,ai_visual_manual_audit,事業費48億円（補助額16億円）,4800,1600,33.3333,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_138.pdf
+s1_outline_139,1次,川﨑工業株式会社,2,ai_visual_manual_audit,"事業費54億円（補助額16億円）。機械装置費の内訳として合計5,014百万円。",5400,1600,29.6296,AI画像目視確認済み,"[{""label"":""機械装置費（内訳合計）"",""cost_million_yen"":5014}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_139.pdf
+s1_outline_140,1次,新生電子株式会社,3,ai_visual_manual_audit,事業費23億円（補助額7.6億円）,2300,760,33.0435,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_140.pdf
+s1_outline_141,1次,共栄フード株式会社,2,ai_visual_manual_audit,事業費98億円（30億円）。明細53.0+37.1+0.3=90.4億円で見出しと差。,9800,3000,30.6122,AI画像目視確認済み,"[{""label"":""建物"",""million_yen"":5300},{""label"":""機械装置"",""million_yen"":3710},{""label"":""専門家経費"",""million_yen"":30}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_141.pdf
+s1_outline_143,1次,株式会社ロッキー,2,ai_visual_manual_audit,事業費29億円（9.4億円）、コンソーシアム全体の投資額。,2900,940,32.4138,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_143.pdf
+s1_outline_145,1次,株式会社小松電業所,2,ai_visual_manual_audit,事業費43億円（14億円）,4300,1400,32.5581,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_145.pdf
+s1_outline_146,1次,アオイ電子株式会社,2,ai_visual_manual_audit,事業費254億円（50億円）,25400,5000,19.685,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_146.pdf
+s1_outline_147,1次,株式会社ｂｕｄ梱包出荷サポート,2,ai_visual_manual_audit,事業費26億円（8.0億円）、新倉庫17.24億円ほか自動倉庫。,2600,800,30.7692,AI画像目視確認済み,"[{""label"":""新倉庫建設"",""million_yen"":1724}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_147.pdf
+s1_outline_148,1次,株式会社しばた工芸,2,ai_visual_manual_audit,事業費15億円（4.8億円）,1500,480,32,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_148.pdf
+s1_outline_149,1次,株式会社共同物流サービス,2,ai_visual_manual_audit,事業費34億円（11億円）,3400,1100,32.3529,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_149.pdf
+s1_outline_150,1次,三笠産業株式会社,2,ai_visual_manual_audit,事業費122億円（34億円）,12200,3400,27.8689,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_150.pdf
+s1_outline_151,1次,四国医療サービス株式会社,2,ai_visual_manual_audit,事業費45億円（13億円）,4500,1300,28.8889,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_151.pdf
+s1_outline_152,1次,ヤマトミシン製造株式会社,2,ai_visual_manual_audit,事業費19億円（4億円）。別途土地取得費6億円。,1900,400,21.0526,AI画像目視確認済み,"[{""label"":""土地取得（補助対象外）"",""million_yen"":600}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_152.pdf
+s1_outline_153,1次,株式会社越後屋,2,ai_visual_manual_audit,事業費25億円（8.4億円）,2500,840,33.6,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_153.pdf
+s1_outline_154,1次,中央観光株式会社,2,ai_visual_manual_audit,事業費26億円（6.8億円）、建築21億円ほか。,2600,680,26.1538,AI画像目視確認済み（信頼度medium）,"[{""label"":""6棟18部屋建築"",""million_yen"":2100}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_154.pdf
+s1_outline_155,1次,株式会社スギノマシン,2,ai_visual_manual_audit,事業費17億円（5.6億円）,1700,560,32.9412,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_155.pdf
+s1_outline_156,1次,株式会社ダイセイ,2,ai_visual_manual_audit,事業費12億円（4.0億円）,1200,400,33.3333,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_156.pdf
+s1_outline_157,1次,ハマダコンフェクト株式会社,2,ai_visual_manual_audit,事業費186億円（28億円）,18600,2800,15.0538,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_157.pdf
+s1_outline_158,1次,平和食品工業株式会社,2,ai_visual_manual_audit,事業費10億円（1.7億円）,1000,170,17,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_158.pdf
+s1_outline_159,1次,浦島観光ホテル株式会社,2,ai_visual_manual_audit,浦島観光ホテル69億円（12億円）。別頁に丸峰5.2億円（1.7億円）、みちの1.7億円（0.6億円）。,6900,1200,17.3913,AI画像目視確認済み,"[{""label"":""浦島観光ホテル"",""million_yen"":6900},{""label"":""丸峰観光ホテル"",""million_yen"":520},{""label"":""みちのホテルズ"",""million_yen"":170}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_159.pdf
+s1_outline_162,1次,信光陸運株式会社,2,ai_visual_manual_audit,事業費22億円（補助額7.3億円）。一宮物流センター新築工事。,2200,730,33.1818,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_162.pdf
+s1_outline_164,1次,株式会社福砂屋グループ,2,ai_visual_manual_audit,右上見出しは事業費55億円（補助額17億円）。一方、本文見出しに総額50.3億円、明細合計は52.7億円。,5500,1700,30.9091,AI画像目視確認済み（信頼度medium）,"[{""label"":""建物"",""amount_million_yen"":3400},{""label"":""機械設備"",""amount_million_yen"":1480},{""label"":""新商品製造ライン"",""amount_million_yen"":140},{""label"":""海外市場構築設備"",""amount_million_yen"":100},{""label"":""新システム等"",""amount_million_yen"":150}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_164.pdf
+s1_outline_166,1次,株式会社福地建設,2,ai_visual_manual_audit,事業費22億円（補助額7.2億円）。明細：工場12.3、設備8.7、ソフトウェア0.4、外注0.6億円。,2200,720,32.7273,AI画像目視確認済み,"[{""label"":""工場"",""amount_million_yen"":1230},{""label"":""設備"",""amount_million_yen"":870},{""label"":""ソフトウェア"",""amount_million_yen"":40},{""label"":""外注"",""amount_million_yen"":60}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_166.pdf
+s1_outline_167,1次,銘建工業株式会社,2,ai_visual_manual_audit,事業費62億円（補助額20億円）。工場建物費25億円、工場内製造ライン設備39億円。,6200,2000,32.2581,AI画像目視確認済み（信頼度medium）,"[{""label"":""工場建物費"",""amount_million_yen"":2500},{""label"":""工場内製造ライン設備"",""amount_million_yen"":3900}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_167.pdf
+s1_outline_168,1次,株式会社大真空,2,ai_visual_manual_audit,事業費79億円（補助額26億円）。フォトリソグラフィ、Arkh.3Gアセンブリ、発振器組立関連装置。,7900,2600,32.9114,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_168.pdf
+s1_outline_169,1次,サトウ食品株式会社,2,ai_visual_manual_audit,"事業費96億円（補助額27億円）。設備投資一覧の合計は8,067,090千円。",9600,2700,28.125,AI画像目視確認済み,"[{""label"":""機械装置費"",""amount_million_yen"":4829.1},{""label"":""建物費"",""amount_million_yen"":3175.56},{""label"":""外注費"",""amount_million_yen"":62.43}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_169.pdf
+s1_outline_170,1次,株式会社光製作所,2,ai_visual_manual_audit,事業費17億円（補助額5.2億円）。レーザー切断機、溶接ロボット、自動倉庫、基幹システム、工場建設。,1700,520,30.5882,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_170.pdf
+s1_outline_171,1次,昭和産業株式会社,2,ai_visual_manual_audit,事業費25億円（補助額7.8億円）。明細合計23.6億円。,2500,780,31.2,AI画像目視確認済み,"[{""label"":""新工場建設"",""amount_million_yen"":710},{""label"":""メカニカルディスケーラー"",""amount_million_yen"":50},{""label"":""金網溶接ライン"",""amount_million_yen"":680},{""label"":""トラス機ライン"",""amount_million_yen"":300},{""label"":""鉄筋加工ライン"",""amount_million_yen"":320},{""label"":""溶接ロボット"",""amount_million_yen"":150},{""label"":""鉄筋自動曲げロボット"",""amount_million_yen"":150}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_171.pdf
+s1_outline_173,1次,中央紙通商株式会社,2,ai_visual_manual_audit,事業費21億円（補助額2.0億円）。既存2拠点を集約した新物流センターの建設投資。,2100,200,9.5238,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_173.pdf
+s1_outline_174,1次,株式会社Ｐｌａｎ・Ｄｏ・Ｓｅｅ琉球,4,ai_visual_manual_audit,詳細内訳頁は合計50.5億円（補助金額16.8億円）。概要頁は事業費39億円（補助額4.2億円）で不整合。,5050,1680,33.2673,AI画像目視確認済み（信頼度medium）,"[{""label"":""建物費"",""amount_million_yen"":3690},{""label"":""機械装置費"",""amount_million_yen"":1310},{""label"":""ソフトウェア費"",""amount_million_yen"":26.34},{""label"":""外注費"",""amount_million_yen"":20.85}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_174.pdf
+s1_outline_177,1次,さいほく鉄工株式会社,2,ai_visual_manual_audit,"事業費25億円（補助額3.0億円）。工場建屋2,364百万円、機械設備122百万円。",2500,300,12,AI画像目視確認済み,"[{""label"":""工場建屋"",""amount_million_yen"":2364},{""label"":""機械設備"",""amount_million_yen"":122}]",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_177.pdf
+s2_outline_1,3次,株式会社角藤,2,ai_visual_manual_audit,事業費21億円（補助額5.3億円）,2100,530,25.2381,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_1.pdf
+s2_outline_2,3次,ガイア株式会社,2,ai_visual_manual_audit,事業費50億円（補助額17億円）,5000,1700,34,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_2.pdf
+s2_outline_3,3次,さくら不動産株式会社,3,ai_visual_manual_audit,見出しは事業費11億円（補助額2.7億円）。詳細は14億円+1億円+0.1億円で不一致,1100,270,24.5455,AI画像目視確認済み（信頼度medium）,"[{""label"":""さくら不動産・長期滞在型コンドミニアム"",""amount_million_yen"":1400},{""label"":""The Hakuba Company・デジタル/AI投資"",""amount_million_yen"":100},{""label"":""AIチェックイン・清掃ロボット"",""amount_million_yen"":10}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_3.pdf
+s2_outline_5,3次,奥長良川名水株式会社,2,ai_visual_manual_audit,事業費13億円（補助額3.0億円）、建物634.635百万円、機械580.030百万円,1300,300,23.0769,AI画像目視確認済み,"[{""label"":""建物"",""amount_million_yen"":634.635},{""label"":""機械装置"",""amount_million_yen"":580.03}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_5.pdf
+s2_outline_6,3次,株式会社上野凮月堂,2,ai_visual_manual_audit,事業費63億円（補助額18億円）,6300,1800,28.5714,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_6.pdf
+s2_outline_8,3次,牛乳石鹸共進社株式会社,2,ai_visual_manual_audit,事業費145億円（補助額46億円）,14500,4600,31.7241,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_8.pdf
+s2_outline_9,3次,株式会社マルト水谷,2,ai_visual_manual_audit,事業費45億円（補助額15億円）、建物25.3億円、機械17.6億円、ソフト2.1億円,4500,1500,33.3333,AI画像目視確認済み,"[{""label"":""建物"",""amount_million_yen"":2530},{""label"":""機械"",""amount_million_yen"":1760},{""label"":""ソフトウェア"",""amount_million_yen"":210}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_9.pdf
+s2_outline_11,3次,たまご＆ファーマーズ株式会社,2,ai_visual_manual_audit,事業費75億円（補助額25億円）,7500,2500,33.3333,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_11.pdf
+s2_outline_12,3次,株式会社フルサワ,2,ai_visual_manual_audit,事業費43億円（補助額14億円）。内訳合計43.2億円,4300,1400,32.5581,AI画像目視確認済み（信頼度medium）,"[{""label"":""1350tクローラクレーン"",""amount_million_yen"":2768},{""label"":""200tクローラクレーン"",""amount_million_yen"":490},{""label"":""バックホー"",""amount_million_yen"":642},{""label"":""2000tプレシャー"",""amount_million_yen"":360},{""label"":""ナゲット設備"",""amount_million_yen"":60}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_12.pdf
+s2_outline_13,3次,フジセイコー株式会社,2,ai_visual_manual_audit,"事業費16億円（補助額5.0億円）、内訳合計1,197.914百万円",1600,500,31.25,AI画像目視確認済み（信頼度medium）,"[{""label"":""第二工場建物"",""amount_million_yen"":664.22},{""label"":""排水処理設備"",""amount_million_yen"":175.75},{""label"":""機械装置"",""amount_million_yen"":357.944}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_13.pdf
+s2_outline_14,3次,スギムラ化学工業株式会社,2,ai_visual_manual_audit,事業費47億円（補助額12億円）,4700,1200,25.5319,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_14.pdf
+s2_outline_15,3次,賀谷セロファン株式会社,2,ai_visual_manual_audit,事業費31億円（補助額7.5億円）、建物18億円、機械10億円、システム2億円,3100,750,24.1935,AI画像目視確認済み,"[{""label"":""建物"",""amount_million_yen"":1800},{""label"":""機械"",""amount_million_yen"":1000},{""label"":""システム"",""amount_million_yen"":200}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_15.pdf
+s2_outline_16,3次,株式会社ヤマキ,2,ai_visual_manual_audit,事業費41億円（補助額13億円）,4100,1300,31.7073,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_16.pdf
+s2_outline_17,3次,日生流通運輸倉庫株式会社,2,ai_visual_manual_audit,事業費81億円（補助額17億円）。設備名称は記載、金額内訳なし,8100,1700,20.9877,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_17.pdf
+s2_outline_18,3次,DOWAパワーデバイス株式会社,2,ai_visual_manual_audit,事業費46億円（補助額14億円）。建物・機械装置・システムの内容記載、金額内訳なし,4600,1400,30.4348,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_18.pdf
+s2_outline_19,3次,株式会社高木製作所,2,ai_visual_manual_audit,事業費94億円（補助額23億円）。設備項目は記載、金額内訳なし,9400,2300,24.4681,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_19.pdf
+s2_outline_21,3次,健栄製薬株式会社,2,ai_visual_manual_audit,事業費117億円（補助額35億円）,11700,3500,29.9145,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_21.pdf
+s2_outline_22,3次,味覚糖株式会社,2,ai_visual_manual_audit,事業費117億円（補助額39億円）。内訳合計115.8億円。,11700,3900,33.3333,AI画像目視確認済み,"[{""label"":""福島工場新設"",""amount_million_yen"":5460},{""label"":""福島工場増築"",""amount_million_yen"":200},{""label"":""グミ製造設備"",""amount_million_yen"":5350},{""label"":""奈良工場排水処理設備"",""amount_million_yen"":570}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_22.pdf
+s2_outline_23,3次,大和鋼業株式会社,2,ai_visual_manual_audit,事業費39億円（補助額12億円）,3900,1200,30.7692,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_23.pdf
+s2_outline_24,3次,高知食糧株式会社,2,ai_visual_manual_audit,事業費17億円（補助額5.4億円）。精米工場・倉庫16.1億円、補助対象外3.8億円。,1700,540,31.7647,AI画像目視確認済み,"[{""label"":""精米工場・倉庫"",""amount_million_yen"":1610},{""label"":""物流効率化設備・新規事業"",""amount_million_yen"":380,""eligible"":false}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_24.pdf
+s2_outline_25,3次,有限会社ホテル十勝屋,4,ai_visual_manual_audit,事業費45億円（補助額13億円）,4500,1300,28.8889,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_25.pdf
+s2_outline_26,3次,株式会社ティーケーシン,2,ai_visual_manual_audit,事業費21億円（補助額5.0億円）。記載内訳は建物5.1億円、設備9.9億円。,2100,500,23.8095,AI画像目視確認済み,"[{""label"":""建物"",""amount_million_yen"":510},{""label"":""製造設備"",""amount_million_yen"":990}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_26.pdf
+s2_outline_27,3次,株式会社ライト製作所,2,ai_visual_manual_audit,事業費66億円（補助額16億円）,6600,1600,24.2424,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_27.pdf
+s2_outline_30,3次,東洋スクリーン工業株式会社,2,ai_visual_manual_audit,事業費33億円（補助額9.1億円）。記載内訳合計27.41億円。,3300,910,27.5758,AI画像目視確認済み,"[{""label"":""新工場"",""amount_million_yen"":2400},{""label"":""移転"",""amount_million_yen"":100},{""label"":""設備"",""amount_million_yen"":241}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_30.pdf
+s2_outline_31,3次,アトム株式会社,2,ai_visual_manual_audit,事業費42億円（補助額12億円）,4200,1200,28.5714,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_31.pdf
+s2_outline_32,3次,第一物産株式会社,2,ai_visual_manual_audit,事業費17億円（補助額5.5億円）,1700,550,32.3529,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_32.pdf
+s2_outline_33,3次,株式会社浪速ポンプ製作所,2,ai_visual_manual_audit,事業費38億円（補助額8.8億円）,3800,880,23.1579,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_33.pdf
+s2_outline_34,3次,フタバ食品株式会社,2,ai_visual_manual_audit,事業費168億円（補助額50億円）。建物105億円、機械設備63億円。,16800,5000,29.7619,AI画像目視確認済み,"[{""label"":""建物"",""amount_million_yen"":10500},{""label"":""機械設備"",""amount_million_yen"":6300}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_34.pdf
+s2_outline_35,3次,株式会社北海道ちぬやファーム,2,ai_visual_manual_audit,事業費41億円（補助額11億円）。内訳合計39.0億円。,4100,1100,26.8293,AI画像目視確認済み,"[{""label"":""冷凍倉庫"",""amount_million_yen"":3270},{""label"":""スパイラルフリーザー"",""amount_million_yen"":350},{""label"":""遠赤外線フライヤー"",""amount_million_yen"":60},{""label"":""スチームピーラー"",""amount_million_yen"":90},{""label"":""逆ピロー包装機"",""amount_million_yen"":130}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_35.pdf
+s2_outline_37,3次,ノーラエンジニアリング株式会社,2,ai_visual_manual_audit,事業費17億円（補助額4.8億円）。詳細表は総額16億円、補助対象15億円。,1700,480,28.2353,AI画像目視確認済み,"[{""label"":""記載総額"",""amount_million_yen"":1600},{""label"":""補助対象経費"",""amount_million_yen"":1500}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_37.pdf
+s2_outline_39,3次,名古屋東部陸運株式会社,2,ai_visual_manual_audit,事業費65億円（補助額21億円）,6500,2100,32.3077,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_39.pdf
+s2_outline_40,3次,株式会社英楽,2,ai_visual_manual_audit,事業費19億円（補助額6.3億円）。工場9.0億円、機械10.0億円。,1900,630,33.1579,AI画像目視確認済み,"[{""label"":""工場新設"",""amount_million_yen"":900},{""label"":""機械装置"",""amount_million_yen"":1000}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_40.pdf
+s2_outline_41,3次,藤本化学製品株式会社,2,ai_visual_manual_audit,事業費142億円（補助額46億円）,14200,4600,32.3944,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_41.pdf
+s2_outline_42,3次,中央製乳株式会社,2,ai_visual_manual_audit,事業費66億円（補助額15億円）,6600,1500,22.7273,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_42.pdf
+s2_outline_43,3次,近江鍛工株式会社,5,ai_visual_manual_audit,事業費24億円（補助額5.9億円）。記載内訳8.8+6.4+9.8=25.0億円。,2400,590,24.5833,AI画像目視確認済み,"[{""label"":""本社工場・工場倉庫新築"",""amount_million_yen"":880},{""label"":""本社工場・旋盤切断機等"",""amount_million_yen"":640},{""label"":""信楽・長崎工場・旋盤切断機等"",""amount_million_yen"":980}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_43.pdf
+s2_outline_44,3次,株式会社アヤボ,2,ai_visual_manual_audit,事業費18億円（補助額3.4億円）,1800,340,18.8889,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_44.pdf
+s2_outline_45,3次,株式会社田中食品興業所,2,ai_visual_manual_audit,事業費20億円（補助額6.6億円）,2000,660,33,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_45.pdf
+s2_outline_46,3次,カンケンテクノ株式会社,2,ai_visual_manual_audit,事業費28億円（補助額8.4億円）,2800,840,30,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_46.pdf
+s2_outline_47,3次,INTLOOP株式会社,2,ai_visual_manual_audit,事業費15億円（補助額5.1億円）,1500,510,34,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_47.pdf
+s2_outline_48,3次,株式会社サンワ,2,ai_visual_manual_audit,事業費24億円（補助額7.3億円）。内訳21億円+3億円=24億円。,2400,730,30.4167,AI画像目視確認済み,"[{""label"":""安城DEPO建設"",""amount_million_yen"":2100},{""label"":""自動倉庫・ピッキングロボット"",""amount_million_yen"":300}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_48.pdf
+s2_outline_49,3次,白鷺特殊鋼株式会社,2,ai_visual_manual_audit,事業費36億円（補助額8.5億円）,3600,850,23.6111,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_49.pdf
+s2_outline_51,3次,有楽製菓株式会社,3,ai_visual_manual_audit,事業費25億円（補助額8.3億円）,2500,830,33.2,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_51.pdf
+s2_outline_52,3次,株式会社GYXUS,2,ai_visual_manual_audit,事業費98億円（補助額26億円）。設備表合計77.2億円。,9800,2600,26.5306,AI画像目視確認済み,"[{""label"":""破砕ライン"",""amount_million_yen"":650},{""label"":""焼成ライン"",""amount_million_yen"":890},{""label"":""成型ライン"",""amount_million_yen"":960},{""label"":""乾燥ライン"",""amount_million_yen"":1050},{""label"":""切断ライン"",""amount_million_yen"":810},{""label"":""工場建物"",""amount_million_yen"":3360}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_52.pdf
+s2_outline_58,3次,巴工業株式会社,2,ai_visual_manual_audit,事業費52億円（補助額13億円）,5200,1300,25,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_58.pdf
+s2_outline_60,3次,株式会社トッカコーポレーション,4,ai_visual_manual_audit,事業費17億円（補助額5.5億円）,1700,550,32.3529,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_60.pdf
+s2_outline_61,3次,株式会社川金コアテック,2,ai_visual_manual_audit,事業費40億円（補助額11億円）,4000,1100,27.5,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_61.pdf
+s2_outline_62,3次,株式会社エネルギーギャップ,2,ai_visual_manual_audit,事業費87億円（補助額26億円）,8700,2600,29.8851,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_62.pdf
+s2_outline_63,3次,エックスサーバー株式会社,3,ai_visual_manual_audit,設備投資総額35億円、うち補助金6.8億円,3500,680,19.4286,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_63.pdf
+s2_outline_65,3次,ハビックス株式会社,2,ai_visual_manual_audit,事業費36億円（補助額9.8億円）,3600,980,27.2222,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_65.pdf
+s2_outline_66,3次,トクセン工業株式会社,2,ai_visual_manual_audit,事業費45億円（補助額9.9億円）。44.9億円の内訳：建物30.6億円、設備14.3億円,4500,990,22,AI画像目視確認済み,"[{""label"":""建物"",""amount_million_yen"":3060},{""label"":""設備"",""amount_million_yen"":1430}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_66.pdf
+s2_outline_67,3次,千代田空調機器株式会社,5,ai_visual_manual_audit,事業費15億円（補助額4.6億円）。配管加工機・ロボット・生産管理システム等,1500,460,30.6667,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_67.pdf
+s2_outline_68,3次,三友プラントサービス株式会社,2,ai_visual_manual_audit,事業費64億円（補助額19億円）,6400,1900,29.6875,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_68.pdf
+s2_outline_69,3次,松村フーズ株式会社,2,ai_visual_manual_audit,見出し事業費50億円（補助額12億円）。設備投資内訳合計43.4億円（補助対象経費38.9億円）,5000,1200,24,AI画像目視確認済み（信頼度medium）,"[{""label"":""土地"",""amount_million_yen"":450},{""label"":""建物（自動倉庫含む）"",""amount_million_yen"":2300},{""label"":""自動搬送機等"",""amount_million_yen"":1590}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_69.pdf
+s2_outline_70,3次,株式会社光製作所,2,ai_visual_manual_audit,事業費48億円（補助額12億円）,4800,1200,25,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_70.pdf
+s2_outline_71,3次,至誠堂製薬株式会社,2,ai_visual_manual_audit,事業費58億円（補助額16億円）,5800,1600,27.5862,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_71.pdf
+s2_outline_72,3次,ときわ製作所株式会社,2,ai_visual_manual_audit,事業費10億円（補助額2.5億円）、設備950百万円、システム50百万円,1000,250,25,AI画像目視確認済み,"[{""label"":""設備導入"",""amount_million_yen"":950},{""label"":""システム構築"",""amount_million_yen"":50}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_72.pdf
+s2_outline_73,3次,株式会社ライジング,4,ai_visual_manual_audit,事業費33億円（補助額11億円）。列挙された設備内訳は計2.9億円で、建物等は別,3300,1100,33.3333,AI画像目視確認済み,"[{""label"":""SMTマウンターライン"",""amount_million_yen"":180},{""label"":""屋内無人搬送車"",""amount_million_yen"":40},{""label"":""搬送物自動積替システム"",""amount_million_yen"":20},{""label"":""X線検査装置"",""amount_million_yen"":20},{""label"":""生産管理システム"",""amount_million_yen"":10},{""label"":""AI判定装置"",""amount_million_yen"":20}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_73.pdf
+s2_outline_74,3次,株式会社山福,3,ai_visual_manual_audit,事業費51億円（補助額16億円）。本文の投資総額48.7億円＝建屋40.3億円+自動化設備8.4億円,5100,1600,31.3725,AI画像目視確認済み（信頼度medium）,"[{""label"":""建屋"",""amount_million_yen"":4030},{""label"":""自動化設備"",""amount_million_yen"":840}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_74.pdf
+s2_outline_77,3次,株式会社やまみ,2,ai_visual_manual_audit,事業費56億円（補助額18億円）。内訳20.1+35.9+0.1=56.1億円,5600,1800,32.1429,AI画像目視確認済み（信頼度medium）,"[{""label"":""工場建設費"",""amount_million_yen"":2010},{""label"":""機械設備費"",""amount_million_yen"":3590},{""label"":""ソフトウェア費"",""amount_million_yen"":10}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_77.pdf
+s2_outline_78,3次,株式会社宮古島の雪塩,2,ai_visual_manual_audit,事業費25億円（補助額8.0億円）。建物23.4億円、機械0.6億円,2500,800,32,AI画像目視確認済み,"[{""label"":""建物"",""amount_million_yen"":2340},{""label"":""機械装置"",""amount_million_yen"":60}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_78.pdf
+s2_outline_79,3次,大京株式会社,2,ai_visual_manual_audit,事業費61億円（補助額20億円）,6100,2000,32.7869,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_79.pdf
+s2_outline_80,3次,株式会社レイズ,2,ai_visual_manual_audit,見出し事業費37億円（補助額12億円）。本文に『上記の投資額43.2億円』と別値,3700,1200,32.4324,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_80.pdf
+s2_outline_81,3次,東亜薬品株式会社,2,ai_visual_manual_audit,事業費190億円（補助額46億円）。建屋174億円+設備15億円=189億円。,19000,4600,24.2105,AI画像目視確認済み,"[{""label"":""新製剤棟建屋"",""amount_million_yen"":17400},{""label"":""初年度設備"",""amount_million_yen"":1500}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_81.pdf
+s2_outline_82,3次,ハマダレクテック株式会社,2,ai_visual_manual_audit,事業費106億円（補助額35億円）,10600,3500,33.0189,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_82.pdf
+s2_outline_83,3次,株式会社キド,2,ai_visual_manual_audit,事業費26億円（補助額5.7億円）。明細18.92+6.13=25.05億円。,2600,570,21.9231,AI画像目視確認済み,"[{""label"":""新工場建設"",""amount_million_yen"":1892},{""label"":""圧力容器タンク組立・溶接自動化設備"",""amount_million_yen"":613}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_83.pdf
+s2_outline_84,3次,株式会社ジョヴィ,3,ai_visual_manual_audit,事業費165億円（補助額30億円）,16500,3000,18.1818,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_84.pdf
+s2_outline_85,3次,Ｌ物流株式会社,2,ai_visual_manual_audit,"事業費46億円（補助額14億円）。補助対象経費概要の総額4,319百万円。",4600,1400,30.4348,AI画像目視確認済み,"[{""label"":""補助対象経費総額"",""amount_million_yen"":4319}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_85.pdf
+s2_outline_86,3次,ヤマトスチール株式会社,2,ai_visual_manual_audit,事業費133億円（補助額41億円）。本文に補助事業期間中の事業費126億円。,13300,4100,30.8271,AI画像目視確認済み,"[{""label"":""補助事業期間中の事業費"",""amount_million_yen"":12600}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_86.pdf
+s2_outline_87,3次,長野牛乳株式会社,2,ai_visual_manual_audit,事業費89億円（補助額22億円）。明細合計91.5億円。,8900,2200,24.7191,AI画像目視確認済み,"[{""label"":""新工場・本社"",""amount_million_yen"":2750},{""label"":""調合殺菌設備"",""amount_million_yen"":2400},{""label"":""充填機"",""amount_million_yen"":1500},{""label"":""ユーティリティ設備"",""amount_million_yen"":2500}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_87.pdf
+s2_outline_88,3次,モルツウェル株式会社,2,ai_visual_manual_audit,事業費18億円（補助額5.9億円）。明細税抜合計約17.93億円。,1800,590,32.7778,AI画像目視確認済み,"[{""label"":""建物費"",""amount_million_yen"":1020},{""label"":""機械装置費"",""amount_million_yen"":751.997},{""label"":""ソフトウェア費"",""amount_million_yen"":21}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_88.pdf
+s2_outline_89,3次,北海道乳業株式会社,2,ai_visual_manual_audit,事業費97億円（補助額29億円）。本文に総額89.5億円の設備投資。,9700,2900,29.8969,AI画像目視確認済み,"[{""label"":""設備投資総額（本文）"",""amount_million_yen"":8950}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_89.pdf
+s2_outline_90,3次,有価物回収協業組合　石坂グループ,2,ai_visual_manual_audit,事業費42億円（補助額12億円）,4200,1200,28.5714,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_90.pdf
+s2_outline_91,3次,ＫＩＤＯ　ＰＡＣＫＡＧＩＮＧ株式会社,2,ai_visual_manual_audit,事業費46億円（補助額15億円）。投資会社別明細合計52.2億円。,4600,1500,32.6087,AI画像目視確認済み,"[{""label"":""KIDO PACKAGING生産設備"",""amount_million_yen"":1150},{""label"":""KIDOホールディングス工場建設"",""amount_million_yen"":4070}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_91.pdf
+s2_outline_93,3次,東亜工業株式会社,2,ai_visual_manual_audit,事業費57億円（補助額19億円）。長期ビジョン・概要本文は総額約123億円の大型設備投資。,5700,1900,33.3333,AI画像目視確認済み,"[{""label"":""BEV向け大型設備投資総額"",""amount_million_yen"":12300}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_93.pdf
+s2_outline_94,3次,株式会社富士カーボン製造所,2,ai_visual_manual_audit,事業費52億円（補助額15億円）,5200,1500,28.8462,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_94.pdf
+s2_outline_95,3次,山崎商事運輸株式会社,2,ai_visual_manual_audit,事業費26億円（補助額8.5億円）,2600,850,32.6923,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_95.pdf
+s2_outline_96,3次,株式会社フォース,2,ai_visual_manual_audit,事業費36億円（補助額7.3億円）。記載3区分合計30億円。,3600,730,20.2778,AI画像目視確認済み,"[{""label"":""建設資材中間処理施設"",""amount_million_yen"":1625},{""label"":""産廃処理施設建築費"",""amount_million_yen"":1143},{""label"":""建機類設備"",""amount_million_yen"":232}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_96.pdf
+s2_outline_97,3次,中村土建株式会社,2,ai_visual_manual_audit,事業費20億円（補助額4.7億円）。総投資額19億円。,2000,470,23.5,AI画像目視確認済み,"[{""label"":""建物"",""amount_million_yen"":1650},{""label"":""設備"",""amount_million_yen"":170},{""label"":""ソフトウェア"",""amount_million_yen"":50},{""label"":""外注"",""amount_million_yen"":30}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_97.pdf
+s2_outline_98,3次,ホーコス株式会社,2,ai_visual_manual_audit,事業費30億円（補助額7.1億円）,3000,710,23.6667,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_98.pdf
+s2_outline_99,3次,株式会社シュゼット・ホールディングス,4,ai_visual_manual_audit,事業費104億円（補助額34億円）。表の投資額95.9+5.1=101.0億円（別ページに合計100.9億円表記もあり）。,10400,3400,32.6923,AI画像目視確認済み,"[{""label"":""西宮浜・今津工場建設"",""amount_million_yen"":9590},{""label"":""オリジナル最新型製造設備"",""amount_million_yen"":510}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_99.pdf
+s2_outline_101,3次,安藤パラケミー株式会社,2,ai_visual_manual_audit,事業費40億円（補助額13億円）,4000,1300,32.5,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_101.pdf
+s2_outline_103,3次,ベストアメニティ株式会社,2,ai_visual_manual_audit,事業費51億円（補助額17億円）。表合計49.51億円で概要との差1.49億円。,5100,1700,33.3333,AI画像目視確認済み,"[{""label"":""第2工場ライン増設改修"",""building_million_yen"":160,""machinery_million_yen"":882},{""label"":""第3工場新築"",""building_million_yen"":1000,""machinery_million_yen"":882},{""label"":""第4工場新築"",""building_million_yen"":800,""machinery_million_yen"":400},{""label"":""物流センター新築"",""building_million_yen"":827,""machinery_million_yen"":0}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_103.pdf
+s2_outline_104,3次,アイサービス株式会社,3,ai_visual_manual_audit,事業費82億円（補助額21億円）。記載明細は少なくとも48.27億円。,8200,2100,25.6098,AI画像目視確認済み（信頼度medium）,"[{""label"":""建物"",""amount_million_yen"":4407},{""label"":""自動倉庫"",""amount_million_yen"":300},{""label"":""ピッキング設備"",""amount_million_yen"":120}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_104.pdf
+s2_outline_105,3次,株式会社シード,2,ai_visual_manual_audit,事業費127億円（補助額41億円）。本文に工場建設159.4億円、製造設備130億円の別スコープ記載。,12700,4100,32.2835,AI画像目視確認済み,"[{""label"":""コンタクトレンズ工場建設"",""amount_million_yen"":15940,""scope"":""補助対象外を含む記載""},{""label"":""製造設備"",""amount_million_yen"":13000,""scope"":""補助対象""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_105.pdf
+s2_outline_106,3次,河淳株式会社,2,ai_visual_manual_audit,事業費85億円（補助額23億円）,8500,2300,27.0588,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_106.pdf
+s2_outline_108,3次,株式会社丸杉,2,ai_visual_manual_audit,事業費12億円（補助額3.9億円）。本文概算17.1億円+1.6億円は概要を超える。,1200,390,32.5,AI画像目視確認済み,"[{""label"":""ハードウェア"",""amount_million_yen"":1710},{""label"":""ソフトウェア"",""amount_million_yen"":160}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_108.pdf
+s2_outline_109,3次,株式会社ヤマイシ,2,ai_visual_manual_audit,事業費26億円（補助額7.7億円）,2600,770,29.6154,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_109.pdf
+s2_outline_110,3次,学校法人花沢学園,2,ai_visual_manual_audit,事業費29億円（補助額6.8億円）。明細事業費合計28億円、括弧内合計9.33億円で概要と不一致。,2900,680,23.4483,AI画像目視確認済み,"[{""label"":""6階建て校舎"",""amount_million_yen"":2500,""parenthetical_subsidy_million_yen"":833},{""label"":""メタバースキャンパス"",""amount_million_yen"":150,""parenthetical_subsidy_million_yen"":50},{""label"":""AIカウンセラー"",""amount_million_yen"":100,""parenthetical_subsidy_million_yen"":33},{""label"":""地域コミュニティプラットフォーム"",""amount_million_yen"":50,""parenthetical_subsidy_million_yen"":17}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_110.pdf
+s2_outline_113,4次,株式会社アダチ,2,ai_visual_manual_audit,"事業費1,736百万円（補助額409百万円）",1736,409,23.5599,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_113.pdf
+s2_outline_115,4次,株式会社コスモス食品,2,ai_visual_manual_audit,"事業費1,684百万円（補助額392百万円）",1684,392,23.2779,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_115.pdf
+s2_outline_116,4次,奥伊吹観光株式会社,2,ai_visual_manual_audit,"事業費2,094百万円（補助額670百万円）。記載明細20億円+1千万円=2,010百万円。",2094,670,31.9962,AI画像目視確認済み,"[{""label"":""ホテル建設"",""amount_million_yen"":2000},{""label"":""自動チェックインシステム"",""amount_million_yen"":10}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_116.pdf
+s2_outline_117,4次,瀬戸内海印刷株式会社,2,ai_visual_manual_audit,"事業費4,380百万円（補助額1,360百万円）。明細合計4,371百万円で9百万円差。",4380,1360,31.0502,AI画像目視確認済み,"[{""label"":""建物"",""amount_million_yen"":2118},{""label"":""機械装置"",""amount_million_yen"":2253}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_117.pdf
+s2_outline_118,4次,株式会社光洋,2,ai_visual_manual_audit,"事業費5,191百万円（補助額1,134百万円）。明細合計4,880百万円で311百万円差。",5191,1134,21.8455,AI画像目視確認済み,"[{""label"":""新工場"",""amount_million_yen"":1880},{""label"":""効率化設備"",""amount_million_yen"":3000}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_118.pdf
+s2_outline_119,4次,株式会社群馬コイケ,2,ai_visual_manual_audit,"事業費1,612百万円（補助額403百万円）。明細10.8億円+5.3億円=1,610百万円で2百万円差。",1612,403,25,AI画像目視確認済み,"[{""label"":""新規プラント建設（土気工場）"",""amount_million_yen"":1080},{""label"":""自動旋盤等一式"",""amount_million_yen"":530}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_119.pdf
+s2_outline_120,4次,株式会社クボテック,2,ai_visual_manual_audit,"事業費1,387百万円（補助額338百万円）",1387,338,24.3691,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_120.pdf
+s2_outline_121,4次,株式会社ヤマキ食品,2,ai_visual_manual_audit,"事業費2,994百万円（補助額736百万円）。新工場内訳2,953.970百万円",2994,736,24.5825,AI画像目視確認済み,"[{""label"":""設計費・監理費"",""amount_million_yen"":2800},{""label"":""設置工事"",""amount_million_yen"":153.97}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_121.pdf
+s2_outline_122,4次,杉プラスチック工業株式会社,2,ai_visual_manual_audit,見出し事業費20億円（補助額4.9億円）、本文は設備投資総額14.7億円,2000,490,24.5,AI画像目視確認済み（信頼度medium）,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_122.pdf
+s2_outline_123,3次,東洋ケアサービス株式会社,2,ai_visual_manual_audit,事業費22億円（補助額6.7億円）,2200,670,30.4545,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_123.pdf
+s2_outline_125,4次,株式会社タンケンシールセーコウ,2,ai_visual_manual_audit,"事業費4,181百万円（補助額1,269百万円）、内訳3,644+628百万円",4181,1269,30.3516,AI画像目視確認済み,"[{""label"":""伊那新工場"",""amount_million_yen"":3644},{""label"":""カーボン材生産設備"",""amount_million_yen"":628}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_125.pdf
+s2_outline_127,4次,株式会社キィポーション,2,ai_visual_manual_audit,事業費37億円（補助額9.1億円）,3700,910,24.5946,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_127.pdf
+s2_outline_128,3次,株式会社タカラ倉庫運輸サービス,2,ai_visual_manual_audit,"事業費46億円（補助額14億円）。倉庫4,600百万円、その他付随設備325百万円",4600,1400,30.4348,AI画像目視確認済み（信頼度medium）,"[{""label"":""倉庫建設"",""amount_million_yen"":4600},{""label"":""付随設備"",""amount_million_yen"":325}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_128.pdf
+s2_outline_130,4次,株式会社ピカソナチュラルズ,2,ai_visual_manual_audit,事業費59億円（補助額19億円）。工場41億円、機械23億円,5900,1900,32.2034,AI画像目視確認済み（信頼度medium）,"[{""label"":""工場建設"",""amount_million_yen"":4100},{""label"":""機械設備"",""amount_million_yen"":2300}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_130.pdf
+s2_outline_131,4次,株式会社中村畜産,2,ai_visual_manual_audit,"見出し事業費2,138百万円（補助額712百万円）、投資内訳26.8億円+3.2億円",2138,712,33.3022,AI画像目視確認済み（信頼度medium）,"[{""label"":""食肉倉庫兼工場"",""amount_million_yen"":2680},{""label"":""自動化設備・システム"",""amount_million_yen"":320}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_131.pdf
+s2_outline_132,4次,株式会社コハラ,2,ai_visual_manual_audit,"事業費1,618百万円（補助額488百万円）",1618,488,30.1607,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_132.pdf
+s2_outline_133,4次,株式会社ユタカ,2,ai_visual_manual_audit,"事業費1,613百万円（補助額536百万円）",1613,536,33.23,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_133.pdf
+s2_outline_134,4次,池田薬品工業株式会社,2,ai_visual_manual_audit,事業費30億円（補助額7.5億円）,3000,750,25,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_134.pdf
+s2_outline_135,4次,株式会社リバイト,2,ai_visual_manual_audit,見出し事業費49億円（補助額14億円）、本文総工費45億円・補助対象42億円,4900,1400,28.5714,AI画像目視確認済み（信頼度medium）,"[{""label"":""建物費"",""amount_million_yen"":3300},{""label"":""建物付属設備"",""amount_million_yen"":900},{""label"":""器具備品（対象外）"",""amount_million_yen"":200},{""label"":""構築物（対象外）"",""amount_million_yen"":100}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_135.pdf
+s2_outline_136,4次,木本製菓株式会社,2,ai_visual_manual_audit,事業費49億円（補助額7.5億円）,4900,750,15.3061,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_136.pdf
+s2_outline_137,4次,株式会社　博多屋,2,ai_visual_manual_audit,事業費12億円（補助額4.0億円）,1200,400,33.3333,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_137.pdf
+s2_outline_138,4次,株式会社ジーケーエス,3,ai_visual_manual_audit,"事業費2,495百万円（補助額832百万円）、記載内訳27.3億+1億+0.05億円",2495,832,33.3467,AI画像目視確認済み（信頼度medium）,"[{""label"":""建物建設費"",""amount_million_yen"":2730},{""label"":""自動ラック・自動倉庫"",""amount_million_yen"":100},{""label"":""ソーティングロボット"",""amount_million_yen"":5}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_138.pdf
+s2_outline_139,4次,株式会社エルス,2,ai_visual_manual_audit,"事業費2,151百万円（補助額640百万円）",2151,640,29.7536,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_139.pdf
+s2_outline_140,3次,都吹株式会社,2,ai_visual_manual_audit,事業費32億円（補助額10億円）,3200,1000,31.25,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_140.pdf
+s2_outline_141,4次,古川電気工業株式会社,2,ai_visual_manual_audit,"申請者分：事業費2,131百万円、補助額596百万円。記載内訳7.87億円＋10億円。3頁に古川工業の別案件14億円（補助4.3億円）あり。",2131,596,27.9681,AI画像目視確認済み（信頼度medium）,"[{""label"":""最新鋭設備"",""amount_million_yen"":787},{""label"":""工場拡張"",""amount_million_yen"":1000}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_141.pdf
+s2_outline_143,4次,株式会社ライズクリエイション,2,ai_visual_manual_audit,"事業費2,630百万円、補助額859百万円。本文の計画投資額は2,578百万円。",2630,859,32.6616,AI画像目視確認済み,"[{""label"":""計画投資額（本文）"",""amount_million_yen"":2578}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_143.pdf
+s2_outline_144,4次,株式会社シー・エス・ケイ,2,ai_visual_manual_audit,"事業費1,769百万円、補助額590百万円。",1769,590,33.3522,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_144.pdf
+s2_outline_145,4次,株式会社シャノワール,2,ai_visual_manual_audit,事業費31億円、補助額9.8億円。,3100,980,31.6129,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_145.pdf
+s2_outline_146,4次,セーレンアドバンストマテリアルズ株式会社,2,ai_visual_manual_audit,"事業費4,353百万円、補助額1,411百万円。記載内訳合計4,380百万円。",4353,1411,32.4144,AI画像目視確認済み,"[{""label"":""工場"",""amount_million_yen"":3000},{""label"":""酸化膜設備"",""amount_million_yen"":660},{""label"":""SOI設備"",""amount_million_yen"":720}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_146.pdf
+s2_outline_147,4次,株式会社　進和,2,ai_visual_manual_audit,"事業費3,473百万円、補助額699百万円。本文総投資額5,478百万円、対象内訳2,985百万円。",3473,699,20.1267,AI画像目視確認済み,"[{""label"":""総投資額"",""amount_million_yen"":5478},{""label"":""建物（対象内訳）"",""amount_million_yen"":2885},{""label"":""機械（対象内訳）"",""amount_million_yen"":60},{""label"":""ソフトウェア（対象内訳）"",""amount_million_yen"":40}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_147.pdf
+s2_outline_148,4次,丹羽鋳造株式会社,2,ai_visual_manual_audit,"事業費1,300百万円、補助額372百万円。",1300,372,28.6154,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_148.pdf
+s2_outline_149,4次,株式会社サン海苔,2,ai_visual_manual_audit,"事業費1,388百万円、補助額426百万円。",1388,426,30.6916,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_149.pdf
+s2_outline_150,4次,株式会社玉子屋,2,ai_visual_manual_audit,事業費34億円、補助額10億円。,3400,1000,29.4118,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_150.pdf
+s2_outline_151,3次,株式会社清水インダストリ－,2,ai_visual_manual_audit,"事業費15億円、補助額4.8億円。内訳790＋712＝1,502百万円。",1500,480,32,AI画像目視確認済み（信頼度medium）,"[{""label"":""建物"",""amount_million_yen"":790},{""label"":""機械"",""amount_million_yen"":712}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_151.pdf
+s2_outline_152,4次,株式会社大熊製作所,2,ai_visual_manual_audit,"事業費4,775百万円、補助額1,533百万円。",4775,1533,32.1047,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_152.pdf
+s2_outline_153,4次,コモライフ株式会社,2,ai_visual_manual_audit,"事業費3,200百万円、補助額1,060百万円。本文では建物35億円＋設備10億円。",3200,1060,33.125,AI画像目視確認済み,"[{""label"":""建物（本文）"",""amount_million_yen"":3500},{""label"":""設備（本文）"",""amount_million_yen"":1000}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_153.pdf
+s2_outline_154,4次,アルフレッド株式会社,4,ai_visual_manual_audit,"事業費1,635百万円、補助額516百万円。",1635,516,31.5596,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_154.pdf
+s2_outline_155,4次,信和化工株式会社,2,ai_visual_manual_audit,"事業費1,510百万円、補助額429百万円。本文内訳1,379百万円。",1510,429,28.4106,AI画像目視確認済み,"[{""label"":""工場建物"",""amount_million_yen"":1288},{""label"":""原料製造機械"",""amount_million_yen"":91}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_155.pdf
+s2_outline_156,4次,上野ロジケム株式会社,2,ai_visual_manual_audit,"事業費3,541百万円、補助額943百万円。",3541,943,26.6309,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_156.pdf
+s2_outline_157,4次,株式会社ワイズマート,2,ai_visual_manual_audit,"事業費5,818百万円、補助額1,917百万円。",5818,1917,32.9495,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_157.pdf
+s2_outline_158,4次,株式会社セントラルフード,2,ai_visual_manual_audit,"事業費3,023百万円、補助額625百万円。",3023,625,20.6748,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_158.pdf
+s2_outline_159,4次,株式会社　ファーストライン,2,ai_visual_manual_audit,"事業費1,624百万円、補助額397百万円。",1624,397,24.4458,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_159.pdf
+s2_outline_160,4次,株式会社ダイドー,2,ai_visual_manual_audit,"事業費1,569百万円、補助額371百万円。",1569,371,23.6456,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_160.pdf
+s2_outline_161,4次,株式会社デイリーエッグ,2,ai_visual_manual_audit,"事業費3,042百万円（補助額974百万円）。設備内訳合計3,042百万円、補助対象経費2,922百万円。",3042,974,32.0184,AI画像目視確認済み,"[{""label"":""工場建設"",""amount_million_yen"":1950},{""label"":""割卵機等"",""amount_million_yen"":218},{""label"":""CIPフィルター"",""amount_million_yen"":20},{""label"":""殺菌機"",""amount_million_yen"":130},{""label"":""自動ピロー充填機"",""amount_million_yen"":45},{""label"":""自動ラック等"",""amount_million_yen"":117},{""label"":""容器洗浄機"",""amount_million_yen"":30},{""label"":""液卵製造CIP"",""amount_million_yen"":350},{""label"":""冷水・ボイラー等"",""amount_million_yen"":62},{""label"":""構築物"",""amount_million_yen"":120}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_161.pdf
+s2_outline_162,4次,三恵株式会社,2,ai_visual_manual_audit,"事業費4,764百万円（補助額1,170百万円）。新工場23.8億円、生産設備23.0億円。",4764,1170,24.5592,AI画像目視確認済み,"[{""label"":""新工場"",""amount_million_yen"":2380},{""label"":""生産設備"",""amount_million_yen"":2300}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_162.pdf
+s2_outline_163,4次,MHT株式会社,3,ai_visual_manual_audit,"事業費1,524百万円（補助額375百万円）。3頁に設備ごとの円単位明細あり。",1524,375,24.6063,AI画像目視確認済み,"[{""label"":""倉庫建設"",""amount_million_yen"":889.012532},{""label"":""オークマ複合加工機"",""amount_million_yen"":200.526068},{""label"":""ニデック横中ぐり盤"",""amount_million_yen"":148},{""label"":""テストスタンド"",""amount_million_yen"":50}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_163.pdf
+s2_outline_164,4次,株式会社東豊精工,2,ai_visual_manual_audit,"事業費2,331百万円（補助額550百万円）。表の明細合計2,296百万円。",2331,550,23.595,AI画像目視確認済み,"[{""label"":""新工場"",""amount_million_yen"":1916},{""label"":""製造・検査自動化設備"",""amount_million_yen"":258.7},{""label"":""倉庫移動設備"",""amount_million_yen"":68},{""label"":""3D CAD/CAM"",""amount_million_yen"":20.8},{""label"":""太陽光発電"",""amount_million_yen"":32.5}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_164.pdf
+s2_outline_165,4次,株式会社南鐵建,2,ai_visual_manual_audit,"事業費2,214百万円（補助額648百万円）。設備表は新工場1,548百万円、既存工場395百万円。",2214,648,29.2683,AI画像目視確認済み,"[{""label"":""新工場ライン"",""amount_million_yen"":1548},{""label"":""既存工場設備"",""amount_million_yen"":395}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_165.pdf
+s2_outline_166,4次,株式会社新潟食品運輸,2,ai_visual_manual_audit,"事業費3,109百万円（補助額1,015百万円）。内訳表は3,177+122+1=3,300百万円。",3109,1015,32.6472,AI画像目視確認済み,"[{""label"":""建物・冷蔵倉庫"",""amount_million_yen"":3177},{""label"":""機械装置"",""amount_million_yen"":122},{""label"":""ソフトウェア"",""amount_million_yen"":1}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_166.pdf
+s2_outline_167,4次,株式会社カネヒロ,2,ai_visual_manual_audit,"見出しは事業費1,243百万円（補助額309百万円）。本文は事業費1,684百万円、内訳1,562+109+13=1,684百万円。",1243,309,24.8592,AI画像目視確認済み,"[{""label"":""建物"",""amount_million_yen"":1562},{""label"":""機械装置"",""amount_million_yen"":109},{""label"":""ソフトウェア"",""amount_million_yen"":13}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_167.pdf
+s2_outline_168,4次,明和工業株式会社,2,ai_visual_manual_audit,"連携体合計2,195百万円（補助712百万円）。明和工業1,718/555、ヨシカワ機械477/157百万円。",2195,712,32.4374,AI画像目視確認済み,"[{""label"":""明和工業配分"",""amount_million_yen"":1718,""subsidy_million_yen"":555},{""label"":""ヨシカワ機械配分"",""amount_million_yen"":477,""subsidy_million_yen"":157}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_168.pdf
+s2_outline_170,4次,鈴木鉄工株式会社,2,ai_visual_manual_audit,"事業費2,535百万円（補助額843百万円）。",2535,843,33.2544,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_170.pdf
+s2_outline_171,4次,オギハラ食品株式会社,2,ai_visual_manual_audit,"事業費4,192百万円（補助額1,171百万円）。",4192,1171,27.9342,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_171.pdf
+s2_outline_172,4次,株式会社環境整備産業,2,ai_visual_manual_audit,"事業費1,777百万円（補助額557百万円）。明細7.6+7.0+1.8+0.8+0.2億円。",1777,557,31.345,AI画像目視確認済み,"[{""label"":""施設建設"",""amount_million_yen"":760},{""label"":""廃棄物前処理設備"",""amount_million_yen"":700},{""label"":""排水処理設備"",""amount_million_yen"":180},{""label"":""有害汚泥処理設備"",""amount_million_yen"":80},{""label"":""太陽光発電"",""amount_million_yen"":20}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_172.pdf
+s2_outline_173,3次,栄屋乳業株式会社,2,ai_visual_manual_audit,事業費61億円（補助額20億円）。,6100,2000,32.7869,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_173.pdf
+s2_outline_174,4次,ナカネ新建材株式会社,2,ai_visual_manual_audit,"事業費2,268百万円（補助額709百万円）。新倉庫、移動ラック、基幹システムを導入。",2268,709,31.261,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_174.pdf
+s2_outline_175,4次,化成工業株式会社,2,ai_visual_manual_audit,"見出しは事業費1,702百万円（補助398百万円）。設備表計は2,085百万円（補助695百万円）。",1702,398,23.3843,AI画像目視確認済み,"[{""label"":""新建屋"",""amount_million_yen"":1550,""subsidy_million_yen"":517},{""label"":""大型成形機等"",""amount_million_yen"":160,""subsidy_million_yen"":53},{""label"":""自動倉庫等"",""amount_million_yen"":375,""subsidy_million_yen"":125}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_175.pdf
+s2_outline_176,4次,北アルプス飲料株式会社,2,ai_visual_manual_audit,事業費132億円（補助額40億円）。概算内訳35+35+35+15=120億円。,13200,4000,30.303,AI画像目視確認済み,"[{""label"":""充填機（SIG社製）"",""amount_million_yen"":3500},{""label"":""関連設備（包装・検査・保管）"",""amount_million_yen"":3500},{""label"":""建屋建設"",""amount_million_yen"":3500},{""label"":""その他（インフラ・予備費）"",""amount_million_yen"":1500}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_176.pdf
+s2_outline_177,4次,八光エルアール株式会社,2,ai_visual_manual_audit,"事業費9,544百万円（補助額2,333百万円）。中高等学校校舎、寄宿舎、体育館・グラウンド等。",9544,2333,24.4447,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_177.pdf
+s2_outline_178,4次,株式会社メタルテック,2,ai_visual_manual_audit,"見出し事業費2,369百万円（補助581百万円）。本文に大型設備30億円。",2369,581,24.5251,AI画像目視確認済み,"[{""label"":""大型トランスファプレス・ブランキングプレス"",""amount_million_yen"":3000}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_178.pdf
+s2_outline_179,4次,株式会社クラスコ,2,ai_visual_manual_audit,"事業費2,499百万円（補助額590百万円）。2ホテル計画。",2499,590,23.6094,AI画像目視確認済み,"[{""label"":""本町1丁目GO HOTELプロジェクト""},{""label"":""本町2丁目GO HOTELプロジェクト""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_179.pdf
+s2_outline_180,4次,株式会社森田あられ,2,ai_visual_manual_audit,"事業費5,315百万円（補助額1,271百万円）。新工場建設、設備集約、密封包装設備。",5315,1271,23.9135,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_180.pdf
+s2_outline_181,4次,株式会社手原産業倉庫,2,ai_visual_manual_audit,"事業費1,789百万円、補助額418百万円。",1789,418,23.365,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_181.pdf
+s2_outline_182,4次,株式会社北十,2,ai_visual_manual_audit,事業費10億円、補助額2.5億円。,1000,250,25,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_182.pdf
+s2_outline_183,4次,ナカシマヘルスフォース株式会社,2,ai_visual_manual_audit,"事業費9,804百万円、補助額2,680百万円。本文に新工場総投資額81.2億円、機械設備10.5億円・7.1億円。",9804,2680,27.3358,AI画像目視確認済み,"[{""label"":""新工場総投資額（本文・税抜）"",""amount_million_yen"":8120},{""label"":""機械加工設備（本文）"",""amount_million_yen"":1050},{""label"":""導入設備（本文）"",""amount_million_yen"":710}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_183.pdf
+s2_outline_184,4次,日電精密工業株式会社,2,ai_visual_manual_audit,"見出し事業費3,717百万円、補助額1,184百万円。本文表の総事業費予定4,044百万円。",3717,1184,31.8536,AI画像目視確認済み,"[{""label"":""総事業費予定"",""amount_million_yen"":4044},{""label"":""土地代等"",""amount_million_yen"":450},{""label"":""設計費"",""amount_million_yen"":310},{""label"":""建築費"",""amount_million_yen"":2200},{""label"":""DX用設備"",""amount_million_yen"":300},{""label"":""生産稼働監視"",""amount_million_yen"":50},{""label"":""生産設備"",""amount_million_yen"":394},{""label"":""クーラント再生設備"",""amount_million_yen"":10},{""label"":""安八工場設備"",""amount_million_yen"":290},{""label"":""神戸工場設備"",""amount_million_yen"":40}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_184.pdf
+s2_outline_185,3次,三日月興業株式会社,2,ai_visual_manual_audit,事業費11億円、補助額2.8億円。,1100,280,25.4545,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_185.pdf
+s2_outline_186,3次,株式会社PXP,2,ai_visual_manual_audit,事業費37億円、補助額9.6億円。,3700,960,25.9459,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_186.pdf
+s2_outline_187,4次,石坂産業株式会社,2,ai_visual_manual_audit,"事業費4,922百万円、補助額1,641百万円。明細18.4億円＋30.1億円＋0.73億円＝49.23億円。",4922,1641,33.3401,AI画像目視確認済み,"[{""label"":""建物費"",""amount_million_yen"":1840},{""label"":""機械装置費"",""amount_million_yen"":3010},{""label"":""ソフトウェア費"",""amount_million_yen"":73}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_187.pdf
+s2_outline_188,3次,株式会社ユビタス,2,ai_visual_manual_audit,事業費176億円、補助額50億円。本文：補助対象20億円＋160億円、補助対象外320億円。,17600,5000,28.4091,AI画像目視確認済み,"[{""label"":""データセンター建屋（補助対象）"",""amount_million_yen"":2000},{""label"":""GPU等機器（補助対象）"",""amount_million_yen"":16000},{""label"":""GPU等機器（補助対象外）"",""amount_million_yen"":32000}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_188.pdf
+s2_outline_189,4次,吉田海運ロジソリューションズ株式会社,2,ai_visual_manual_audit,"事業費2,284百万円、補助額761百万円。",2284,761,33.3187,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_189.pdf
+s2_outline_190,3次,伊藤光学工業株式会社,2,ai_visual_manual_audit,事業費47億円、補助額15億円。,4700,1500,31.9149,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_190.pdf
+s2_outline_191,4次,株式会社ビクトリー,2,ai_visual_manual_audit,"事業費16,500百万円、補助額4,999百万円。",16500,4999,30.297,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_191.pdf
+s2_outline_192,4次,フクビ岡山株式会社,2,ai_visual_manual_audit,"事業費3,652百万円、補助額900百万円。記載明細合計4,289百万円。",3652,900,24.644,AI画像目視確認済み,"[{""label"":""新工場建設費"",""amount_million_yen"":1693},{""label"":""生産装置設備"",""amount_million_yen"":2460},{""label"":""省人・省力設備"",""amount_million_yen"":136}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_192.pdf
+s2_outline_193,4次,ソントン食品株式会社,2,ai_visual_manual_audit,"事業費13,005百万円、補助額3,909百万円。記載内訳86億円＋35.6億円＝121.6億円。",13005,3909,30.0577,AI画像目視確認済み,"[{""label"":""茨城中央工場建設"",""amount_million_yen"":8600},{""label"":""自動化・省人化設備"",""amount_million_yen"":3560}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_193.pdf
+s2_outline_194,4次,リバードコーポレーション株式会社,2,ai_visual_manual_audit,"事業費5,918百万円、補助額1,860百万円。",5918,1860,31.4295,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_194.pdf
+s2_outline_195,4次,株式会社レクザム,2,ai_visual_manual_audit,事業費19億円、補助額4.5億円。,1900,450,23.6842,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_195.pdf
+s2_outline_196,4次,岩手雪運株式会社,2,ai_visual_manual_audit,"事業費8,569百万円、補助額1,975百万円。",8569,1975,23.0482,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_196.pdf
+s2_outline_197,3次,株式会社ファイン,2,ai_visual_manual_audit,"2社合計：事業費36億円、補助額11億円。ファイン工場1,886百万円・設備1,541百万円、オール薬品工業設備14億円。",3600,1100,30.5556,AI画像目視確認済み,"[{""label"":""ファイン工場"",""amount_million_yen"":1886},{""label"":""ファイン設備"",""amount_million_yen"":1541},{""label"":""オール薬品工業設備"",""amount_million_yen"":1400}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_197.pdf
+s2_outline_199,4次,日本毛織株式会社,2,ai_visual_manual_audit,"事業費26億円、補助額4.8億円。本文投資：建屋640百万円、インフラ56百万円、機械1,180百万円。",2600,480,18.4615,AI画像目視確認済み,"[{""label"":""建屋"",""amount_million_yen"":640},{""label"":""インフラ"",""amount_million_yen"":56},{""label"":""機械"",""amount_million_yen"":1180}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_199.pdf
+s2_outline_200,4次,有限会社ワンプラスワン,2,ai_visual_manual_audit,"事業費3,831百万円、補助額1,112百万円。",3831,1112,29.0264,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_200.pdf
+s2_outline_201,4次,ハムリー株式会社,3,ai_visual_manual_audit,"事業費2,367百万円、補助額729百万円。主要内訳19.16億円＋4.8億円。",2367,729,30.7985,AI画像目視確認済み,"[{""label"":""動物実験・飼育施設 新築工事"",""amount_million_yen"":1916},{""label"":""試験機器一式"",""amount_million_yen"":480}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_201.pdf
+s2_outline_202,4次,東海デキストリン株式会社,2,ai_visual_manual_audit,"事業費2,744百万円、補助額431百万円。",2744,431,15.707,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_202.pdf
+s2_outline_204,4次,新日本電工株式会社,2,ai_visual_manual_audit,"事業費10,951百万円、補助額3,381百万円。",10951,3381,30.8739,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_204.pdf
+s2_outline_205,3次,八戸酒造株式会社,2,ai_visual_manual_audit,"事業費26億円、補助額6.5億円。土地取得692,138千円の記載あり。",2600,650,25,AI画像目視確認済み,"[{""label"":""土地取得"",""amount_million_yen"":692.138}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_205.pdf
+s2_outline_206,4次,能勢酒造株式会社,2,ai_visual_manual_audit,"事業費1,885百万円、補助額507百万円。主要内訳6億円＋10.55億円。",1885,507,26.8966,AI画像目視確認済み,"[{""label"":""新工場建設"",""amount_million_yen"":600},{""label"":""新規設備導入・旧設備移設"",""amount_million_yen"":1055}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_206.pdf
+s2_outline_207,4次,ロートニッテン株式会社,2,ai_visual_manual_audit,"事業費3,304百万円、補助額809百万円。内訳26.5億円＋5.9億円。",3304,809,24.4855,AI画像目視確認済み,"[{""label"":""長野工場新製造ライン"",""amount_million_yen"":2650},{""label"":""名古屋工場リノベーション・新ライン"",""amount_million_yen"":590}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_207.pdf
+s2_outline_208,4次,NICHIRO株式会社,2,ai_visual_manual_audit,事業費33億円、補助額11億円。,3300,1100,33.3333,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_208.pdf
+s2_outline_209,3次,株式会社ファーストダウン,2,ai_visual_manual_audit,事業費31億円、補助額10億円。,3100,1000,32.2581,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_209.pdf
+s2_outline_210,4次,南島酒販株式会社,2,ai_visual_manual_audit,"事業費1,071百万円、補助額357百万円。主要内訳約5億円＋約6.5億円。",1071,357,33.3333,AI画像目視確認済み,"[{""label"":""酒蔵建屋"",""amount_million_yen"":500},{""label"":""日本酒製造設備"",""amount_million_yen"":650}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_210.pdf
+s2_outline_211,4次,アサヒプリテック株式会社,2,ai_visual_manual_audit,"事業費6,167百万円、補助額1,911百万円。表の拠点別投資額合計8,033百万円。",6167,1911,30.9875,AI画像目視確認済み,"[{""label"":""茨城県坂東工場"",""amount_million_yen"":4855},{""label"":""兵庫県テクノセンター"",""amount_million_yen"":441},{""label"":""兵庫県尼崎工場"",""amount_million_yen"":300},{""label"":""長野工場"",""amount_million_yen"":150},{""label"":""福岡工場"",""amount_million_yen"":450},{""label"":""各拠点システム"",""amount_million_yen"":1837}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_211.pdf
+s2_outline_212,3次,キングパーツ株式会社,2,ai_visual_manual_audit,事業費34億円、補助額11億円。,3400,1100,32.3529,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_212.pdf
+s2_outline_213,4次,ファインプラス株式会社,2,ai_visual_manual_audit,"事業費2,804百万円、補助額697百万円。本文に補助事業全体経費3,410百万円。",2804,697,24.8573,AI画像目視確認済み,"[{""label"":""補助事業全体経費"",""amount_million_yen"":3410}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_213.pdf
+s2_outline_214,3次,株式会社 八天堂,2,ai_visual_manual_audit,事業費26億円、補助額8.3億円。内訳15.0億円＋9.9億円。,2600,830,31.9231,AI画像目視確認済み,"[{""label"":""新工場建設"",""amount_million_yen"":1500},{""label"":""製造設備一式"",""amount_million_yen"":990}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_214.pdf
+s2_outline_215,3次,昭和化工株式会社,2,ai_visual_manual_audit,事業費112億円、補助額18億円。本文主要事業費30億円＋25億円。,11200,1800,16.0714,AI画像目視確認済み,"[{""label"":""新クロライド工場増設"",""amount_million_yen"":3000},{""label"":""無機錫工場改築"",""amount_million_yen"":2500}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_215.pdf
+s2_outline_216,3次,中本Fine Pack株式会社,2,ai_visual_manual_audit,事業費35億円、補助額9.7億円。,3500,970,27.7143,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_216.pdf
+s2_outline_217,4次,院庄林業株式会社,2,ai_visual_manual_audit,"事業費4,191百万円、補助額1,397百万円。申請対象外の撤去工事24億円・1期工事1,795百万円も記載。",4191,1397,33.3333,AI画像目視確認済み,"[{""label"":""撤去工事等（申請対象外）"",""amount_million_yen"":2400},{""label"":""1期工事（申請対象外）"",""amount_million_yen"":1795},{""label"":""2期工事"",""amount_million_yen"":4191}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_217.pdf
+s2_outline_218,4次,株式会社エム・ケー・ケー,3,ai_visual_manual_audit,"事業費2,310百万円、補助額563百万円。",2310,563,24.3723,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_218.pdf
+s2_outline_219,4次,株式会社ナリコマフード,2,ai_visual_manual_audit,"事業費15,078百万円、補助額3,737百万円。記載明細合計15,116百万円。",15078,3737,24.7845,AI画像目視確認済み,"[{""label"":""建屋建設"",""amount_million_yen"":11893},{""label"":""生産設備"",""amount_million_yen"":3117},{""label"":""ソフトウェア"",""amount_million_yen"":51},{""label"":""外注費"",""amount_million_yen"":55}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_219.pdf
+s2_outline_220,4次,富田薬品株式会社,2,ai_visual_manual_audit,"事業費4,199百万円、補助額1,327百万円。記載内訳33.3億円＋14.2億円＋0.5億円。",4199,1327,31.6028,AI画像目視確認済み,"[{""label"":""建屋・自動倉庫等"",""amount_million_yen"":3330},{""label"":""管理システム刷新"",""amount_million_yen"":1420},{""label"":""物流ネットワーク計画"",""amount_million_yen"":50}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_220.pdf
+s2_outline_221,4次,株式会社ニシムタ,2,ai_visual_manual_audit,"見出しは事業費13,439百万円（補助額3,263百万円）。投資内訳表の投資合計は139.9億円（建物120.1、設備16.7、造成等3.1億円）。",13439,3263,24.2801,AI画像目視確認済み,"[{""label"":""建物"",""amount_million_yen"":12010},{""label"":""設備"",""amount_million_yen"":1670},{""label"":""造成費用他"",""amount_million_yen"":310}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_221.pdf
+s2_outline_222,4次,株式会社 日本橋冷凍手島商店,2,ai_visual_manual_audit,"見出しは事業費3,435百万円（補助額1,117百万円）。投資内容表の合計は3,350,000千円。",3435,1117,32.5182,AI画像目視確認済み,"[{""label"":""建物費"",""amount_million_yen"":800},{""label"":""洗浄・製氷・冷凍機器"",""amount_million_yen"":1950},{""label"":""砕氷・選別・搬送ライン"",""amount_million_yen"":230},{""label"":""計量・充填・包装"",""amount_million_yen"":160},{""label"":""カート・包装・パレット積載"",""amount_million_yen"":160},{""label"":""設計・申請・諸雑費"",""amount_million_yen"":50}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_222.pdf
+s2_outline_223,4次,三ッ和商事株式会社,2,ai_visual_manual_audit,"事業費2,686百万円（補助額766百万円）。矢板第2工場建設とチョコレート製造設備一式。",2686,766,28.5182,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_223.pdf
+s2_outline_225,4次,株式会社山本製作所,2,ai_visual_manual_audit,"事業費1,962百万円（補助額640百万円）。本社工場・山波工場に機械装置とソフトウェアを導入。",1962,640,32.6198,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_225.pdf
+s2_outline_226,4次,日本海精錬株式会社,2,ai_visual_manual_audit,"事業費1,515百万円（補助額499百万円）。2～4頁に再資源化設備と鉛処理能力増強の詳細。",1515,499,32.9373,AI画像目視確認済み,"[{""label"":""再資源化ライン設備""},{""label"":""解体から製品化までの一貫処理設備""},{""label"":""PP収益化設備""},{""label"":""キュポラ増設・環境対応設備""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_226.pdf
+s2_outline_227,4次,株式会社トノックス,2,ai_visual_manual_audit,"事業費1,641百万円（補助額473百万円）。2頁が建屋、3頁が主な機械設備。",1641,473,28.8239,AI画像目視確認済み,"[{""label"":""新工場建屋""},{""label"":""自動運転車両架装ライン・超小型モビリティ製造ライン""},{""label"":""車両リフター・高所作業車・レーザーマシン・ベンダー""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_227.pdf
+s2_outline_228,4次,株式会社ベネフル,2,ai_visual_manual_audit,"事業費1,885百万円（補助額333百万円）。再生車両販売・整備拠点2店舗、ショールーム、再生ライン、AI診断等。",1885,333,17.6658,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_228.pdf
+s2_outline_229,3次,オーディエー株式会社,2,ai_visual_manual_audit,事業費31億円（補助額10億円）。横浜物流センターと大阪本社の自動倉庫等。,3100,1000,32.2581,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_229.pdf
+s2_outline_230,4次,株式会社アイ・グラン・ソリューション,2,ai_visual_manual_audit,事業費58億円（補助額19億円）。2027年12月までに27施設開店予定。,5800,1900,32.7586,AI画像目視確認済み,[],https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_230.pdf
+s2_outline_231,4次,創建ホーム株式会社,2,ai_visual_manual_audit,"事業費1,560百万円（補助額520百万円）。投資額936+102+522=1,560百万円。",1560,520,33.3333,AI画像目視確認済み,"[{""label"":""大型施設の建築"",""amount_million_yen"":936},{""label"":""住宅展示場の建築"",""amount_million_yen"":102},{""label"":""テナント等ビルの建築"",""amount_million_yen"":522}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_231.pdf
+s2_outline_232,3次,株式会社モリシタ,2,ai_visual_manual_audit,事業費18億円（補助額4.4億円）。1階モリシタ、2階ホワイトフォックス、3階グループ本社機能。,1800,440,24.4444,AI画像目視確認済み,"[{""label"":""本社・自動物流倉庫（モリシタ）""},{""label"":""ペットフード製造工場（ホワイトフォックス）""},{""label"":""本社機能（グループ全体）""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_232.pdf
+s2_outline_234,3次,日本エア・リキード合同会社,2,ai_visual_manual_audit,事業費203億円（補助額50億円）。熊本・広島の複数拠点設備。,20300,5000,24.6305,AI画像目視確認済み,"[{""label"":""熊本・広島：空気分離装置、タンク・供給設備、機械室・事務所等""},{""label"":""熊本：水素製造装置・水素充填供給設備""},{""label"":""広島：液化設備""}]",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_234.pdf

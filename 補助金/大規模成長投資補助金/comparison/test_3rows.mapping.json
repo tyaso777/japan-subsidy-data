@@ -1,0 +1,81 @@
+{
+  "dataset_id": "test_3rows",
+  "dataset_label": "3行テストデータ",
+  "comparison_file": "test_3rows.csv",
+  "encoding": "utf-8-sig",
+  "external_company_column": "企業名",
+  "include_current_only": false,
+  "record_keys": [
+    {
+      "current": ["case_id"],
+      "external": ["案件ID"],
+      "normalizers": ["text"]
+    },
+    {
+      "current": ["round", "company"],
+      "external": ["採択回", "企業名"],
+      "normalizers": ["round", "company"]
+    }
+  ],
+  "columns": [
+    {
+      "current": "project_cost_million_yen",
+      "external": "事業費_億円",
+      "label": "事業費",
+      "type": "number",
+      "current_unit": "百万円",
+      "external_unit": "億円",
+      "external_multiplier": 100,
+      "conversion_note": "億円×100＝百万円",
+      "absolute_tolerance": 0.1
+    },
+    {
+      "current": "subsidy_million_yen",
+      "external": "補助額_億円",
+      "label": "補助額",
+      "type": "number",
+      "current_unit": "百万円",
+      "external_unit": "億円",
+      "external_multiplier": 100,
+      "conversion_note": "億円×100＝百万円",
+      "absolute_tolerance": 0.1
+    },
+    {
+      "current": "sales_growth_pct",
+      "external": "売上高成長率",
+      "label": "売上高成長率",
+      "type": "percentage",
+      "current_unit": "%",
+      "external_unit": "%",
+      "absolute_tolerance": 0.05
+    },
+    {
+      "current": "labor_base_year_after_correction",
+      "external": "労働生産性基準年度",
+      "label": "労働生産性・基準年度",
+      "type": "year",
+      "current_unit": "西暦年",
+      "external_unit": "原文年度"
+    },
+    {
+      "current": "labor_base_value",
+      "external": "労働生産性基準値_千円人",
+      "label": "労働生産性・基準値",
+      "type": "number",
+      "current_unit": "万円/人",
+      "external_unit": "千円/人",
+      "external_multiplier": 0.1,
+      "conversion_note": "千円/人×0.1＝万円/人",
+      "absolute_tolerance": 0.01
+    },
+    {
+      "current": "employee_pay_annual_rate_pct",
+      "external": "給与年平均上昇率",
+      "label": "従業員給与・年平均上昇率",
+      "type": "percentage",
+      "current_unit": "%",
+      "external_unit": "%",
+      "absolute_tolerance": 0.01
+    }
+  ]
+}
