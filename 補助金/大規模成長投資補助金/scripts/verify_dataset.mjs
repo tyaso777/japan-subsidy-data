@@ -120,6 +120,11 @@ assert(dashboardHtml.includes("drawInteractiveScatter") && dashboardHtml.include
 assert(dashboardHtml.includes("e.target.classList?.contains('pt')"), "scatter point clicks must not be captured by drag handling");
 assert(dashboardHtml.includes("ダブルクリック：全体表示"), "analysis dashboard must explain viewport reset");
 assert(dashboardHtml.includes('id="xlog" type="checkbox">') && dashboardHtml.includes("xlog.checked=false;ylog.checked=false"), "linear scales must be the default initially and after reset");
+assert(dashboardHtml.includes('id="sizeMetric"') && dashboardHtml.includes("const SIZE_METRICS={") && dashboardHtml.includes("sizeMetric.value='project_cost_million_yen_normalized'"), "scatter point-size selector must default to project cost");
+assert(dashboardHtml.includes("new Option(`${v[0]}（${total}件）`,k)"), "point-size selector options must show numeric coverage counts");
+assert(dashboardHtml.includes("Math.sqrt(4**2+t*(14**2-4**2))") && dashboardHtml.includes("p05:q(.05)") && dashboardHtml.includes("p95:q(.95)"), "point sizes must use area scaling capped at the 5th and 95th percentiles");
+assert(dashboardHtml.includes('id="sizeLegend"') && dashboardHtml.includes("全${s.n}件／表示${shown}件") && dashboardHtml.includes("欠損は小さい薄色点"), "point-size legend must show total and currently displayed coverage");
+assert(dashboardHtml.includes("点サイズ・${esc(sm[0])}") && dashboardHtml.includes("size-missing"), "point tooltips and missing-value styling must explain the size encoding");
 assert(dashboardHtml.includes('id="officialRounds"') && dashboardHtml.includes("officialRoundsSelected()"), "analysis dashboard must provide in-plot round checkboxes for official medians");
 assert(dashboardHtml.includes("上の1〜4次をチェック") && dashboardHtml.includes("線をクリックすると公式資料"), "official median overlays must explain selection and source links");
 assert((dashboardHtml.match(/data-check-all=/g) || []).length === 6, "round, exclusion, and official-median checkbox groups must each provide All ON/OFF controls");
