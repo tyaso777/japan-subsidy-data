@@ -1,0 +1,741 @@
+﻿case_id,round,company,subject_table,subject_id,metric_key,flag_code,severity,status,value_raw,value_normalized,alternative_value,source_page,source_box_label,evidence,resolution_note
+s1_outline_1,1次,株式会社岩崎電機製作所,cases,s1_outline_1,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_10,1次,株式会社プレジィール,cases,s1_outline_10,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_100,1次,マリンフード株式会社,metrics,labor,labor,RATE_ARITHMETIC_MISMATCH,critical,unresolved,9.1,,3.5686,2,長期成長ビジョン（目指す姿・ビジネスモデル）,"労働生産性1,776→1,973（+9.1%。値との算術は原本内不整合）",PDF記載率と基準値・目標値・期間からの計算率が1ポイント超相違
+s1_outline_100,1次,マリンフード株式会社,metrics,labor,labor,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,9.1%,,,2,長期成長ビジョン（目指す姿・ビジネスモデル）,"労働生産性1,776→1,973（+9.1%。値との算術は原本内不整合）",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s1_outline_100,1次,マリンフード株式会社,cases,s1_outline_100,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_100_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_100,1次,マリンフード株式会社,cases,s1_outline_100,,COST_TEXT_NUMERIC_ROUNDING_DIFFERENCE,warning,resolved_with_tolerance,,4600.0,project_cost=4600.0; subsidy=1400.0; project_cost=4586.156; project_cost=4586.156,2,,"事業費46億円（補助額14億円）。明細表合計4,586,156千円=45.86156億円。",差は代表値の1%または50百万円以内。丸め・精度差として保持
+s1_outline_100,1次,マリンフード株式会社,cases,s1_outline_100,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[4586.156, 4600.0]",総投資額・補助対象経費・内訳の概念差を確認
+s1_outline_101,1次,株式会社正興電機製作所,cases,s1_outline_101,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_101,1次,株式会社正興電機製作所,cases,s1_outline_101,,MULTIPLE_SALES_SERIES,warning,resolved,,3,,,,s1_outline_101_sales_01:group; s1_outline_101_sales_02:group; s1_outline_101_sales_03:applicant,代表系列=s1_outline_101_sales_03
+s1_outline_102,1次,冬木工業株式会社,metrics,labor,labor,RATE_ARITHMETIC_MISMATCH,critical,unresolved,14.5,,17.8306,2,目標値,"912→1,492、14.5%",PDF記載率と基準値・目標値・期間からの計算率が1ポイント超相違
+s1_outline_102,1次,冬木工業株式会社,sales_series,s1_outline_102_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,136,,increase_rate / target_base_ratio / cagr,1,,2029年までに会社全体の売上高成長率136%、売上高増加額65億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_102,1次,冬木工業株式会社,cases,s1_outline_102,,COST_TEXT_NUMERIC_ROUNDING_DIFFERENCE,warning,resolved_with_tolerance,,6900.0,project_cost=6900.0; subsidy=2200.0; project_cost=6916.0,2,,"事業費69億円（22億円）。明細合計6,916百万円。",差は代表値の1%または50百万円以内。丸め・精度差として保持
+s1_outline_102,1次,冬木工業株式会社,cases,s1_outline_102,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[6900.0, 6916.0]",総投資額・補助対象経費・内訳の概念差を確認
+s1_outline_103,1次,オーケー化成株式会社,sales_series,s1_outline_103_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,198,,increase_rate / target_base_ratio / cagr,1,,会社全体の成長率198.0%、増加額44.7億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_103,1次,オーケー化成株式会社,cases,s1_outline_103,,COST_TEXT_NUMERIC_ROUNDING_DIFFERENCE,warning,resolved_with_tolerance,,2900.0,project_cost=2900.0; subsidy=960.0; project_cost=2907.0,2,,事業費29億円（9.6億円）、明細合計29.07億円,差は代表値の1%または50百万円以内。丸め・精度差として保持
+s1_outline_103,1次,オーケー化成株式会社,cases,s1_outline_103,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s1_outline_103,1次,オーケー化成株式会社,cases,s1_outline_103,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[2900.0, 2907.0]",総投資額・補助対象経費・内訳の概念差を確認
+s1_outline_103,1次,オーケー化成株式会社,cases,s1_outline_103,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_103_sales_01:applicant; s1_outline_103_sales_02:project,代表系列=s1_outline_103_sales_01
+s1_outline_104,1次,ヤマダイ株式会社,sales_series,s1_outline_104_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,42,,increase_rate / target_base_ratio / cagr,1,,会社全体の売上高成長率42%、増加額47億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_105,1次,中外医薬生産株式会社,sales_series,s1_outline_105_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,170,,increase_rate / target_base_ratio / cagr,1,,2030年売上高120億円、成長率170%。付加価値額52億円は売上増加額ではない。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_106,1次,株式会社シーエル,cases,s1_outline_106,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_106,1次,株式会社シーエル,cases,s1_outline_106,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_106_sales_01:applicant; s1_outline_106_sales_02:group,代表系列=s1_outline_106_sales_01
+s1_outline_107,1次,株式会社ササキ,cases,s1_outline_107,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_107_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_107,1次,株式会社ササキ,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,20xx年度（基準年度） -> 20xx年度（基準年度+3年後）, -> ,,2,,312→356、4.5%,
+s1_outline_107,1次,株式会社ササキ,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,20xx年度（基準年度） -> 20xx年度（基準年度+3年後）, -> ,,2,,54→95,
+s1_outline_107,1次,株式会社ササキ,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,20xx年度（基準年度） -> 20xx年度（基準年度+3年後）, -> ,,2,,"1,375→1,431、1.3%。年度は20xx表記。",
+s1_outline_109,1次,マイクロカット株式会社,cases,s1_outline_109,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_109_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_109,1次,マイクロカット株式会社,cases,s1_outline_109,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,"applicant, existing_business, project",
+s1_outline_109,1次,マイクロカット株式会社,cases,s1_outline_109,,MULTIPLE_SALES_SERIES,warning,unresolved,,3,,,,s1_outline_109_sales_01:applicant; s1_outline_109_sales_02:existing_business; s1_outline_109_sales_03:project,代表系列=s1_outline_109_sales_01
+s1_outline_11,1次,大峰堂薬品工業株式会社,cases,s1_outline_11,,MULTIPLE_SALES_SERIES,warning,resolved,,4,,,,s1_outline_11_sales_01:applicant; s1_outline_11_sales_02:applicant; s1_outline_11_sales_03:applicant; s1_outline_11_sales_04:applicant,代表系列=s1_outline_11_sales_01
+s1_outline_111,1次,株式会社向山工場,sales_series,s1_outline_111_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,48,,increase_rate / target_base_ratio / cagr,1,,2030年3月までの売上高成長率48%、増加額146億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_113,1次,トーアス株式会社,sales_series,s1_outline_113_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,77.6,,increase_rate / target_base_ratio / cagr,1,,"2028年3月期までの成長率77.6%、増加額3,428百万円",記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_113,1次,トーアス株式会社,cases,s1_outline_113,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s1_outline_113,1次,トーアス株式会社,cases,s1_outline_113,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_113_sales_01:applicant; s1_outline_113_sales_02:project,代表系列=s1_outline_113_sales_01
+s1_outline_115,1次,株式会社国際エキスプレス,cases,s1_outline_115,,COST_TEXT_NUMERIC_MISMATCH,critical,unresolved,,4700.0,project_cost=4700.0; subsidy=1600.0; project_cost=5180.0,2,,見出し事業費47億円（16億円）。拠点別記載合計51.8億円で差異あり。,本文・Box候補と代表値を併存。分析前にcost_amount_candidates.csvで確認
+s1_outline_115,1次,株式会社国際エキスプレス,cases,s1_outline_115,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[4700.0, 5180.0]",総投資額・補助対象経費・内訳の概念差を確認
+s1_outline_115,1次,株式会社国際エキスプレス,cases,s1_outline_115,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_116,1次,株式会社かねふくめんたいパーク,cases,s1_outline_116,,COST_TEXT_NUMERIC_MISMATCH,critical,unresolved,,1200.0,project_cost=1200.0; subsidy=140.0; project_cost=1400.0,2,,見出し事業費12億円（1.4億円）。設備明細は合計14.0億円と明記。,本文・Box候補と代表値を併存。分析前にcost_amount_candidates.csvで確認
+s1_outline_116,1次,株式会社かねふくめんたいパーク,sales_series,s1_outline_116_sales_02,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,128,,increase_rate / target_base_ratio / cagr,1,,2028年7月度までに（対2023年7月度比）グループ全体の売上高成長率128%、増加額+67億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_116,1次,株式会社かねふくめんたいパーク,cases,s1_outline_116,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_116,1次,株式会社かねふくめんたいパーク,cases,s1_outline_116,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[1200.0, 1400.0]",総投資額・補助対象経費・内訳の概念差を確認
+s1_outline_116,1次,株式会社かねふくめんたいパーク,cases,s1_outline_116,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_116_sales_01:applicant; s1_outline_116_sales_02:group,代表系列=s1_outline_116_sales_01
+s1_outline_117,1次,信越理研株式会社,cases,s1_outline_117,,COST_TEXT_NUMERIC_MISMATCH,critical,unresolved,,4400.0,project_cost=4500.0,2,,見出し44億円（12億円）。本文には事業費45億円との記載もあり。,本文・Box候補と代表値を併存。分析前にcost_amount_candidates.csvで確認
+s1_outline_117,1次,信越理研株式会社,cases,s1_outline_117,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_118,1次,クリエイトワン株式会社,cases,s1_outline_118,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_119,1次,株式会社フルヤ金属,cases,s1_outline_119,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,group,
+s1_outline_120,1次,旭陽電気株式会社,sales_series,s1_outline_120_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,現状 -> 2029年3月期, -> 2029,,1,,2029年3月期売上140億円、増加額80億円、年平均成長率18%。現状の倍以上。,
+s1_outline_123,1次,株式会社タケエイ,cases,s1_outline_123,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_123,1次,株式会社タケエイ,cases,s1_outline_123,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_123_sales_01:applicant; s1_outline_123_sales_02:group,代表系列=s1_outline_123_sales_01
+s1_outline_125,1次,株式会社ミダック,cases,s1_outline_125,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_125_sales_01:applicant; s1_outline_125_sales_02:applicant,代表系列=s1_outline_125_sales_01
+s1_outline_126,1次,高末株式会社,cases,s1_outline_126,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_127,1次,株式会社ユニワールド,cases,s1_outline_127,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, existing_business",
+s1_outline_127,1次,株式会社ユニワールド,cases,s1_outline_127,,MULTIPLE_SALES_SERIES,warning,resolved,,4,,,,s1_outline_127_sales_01:applicant; s1_outline_127_sales_02:existing_business; s1_outline_127_sales_03:existing_business; s1_outline_127_sales_04:applicant,代表系列=s1_outline_127_sales_01
+s1_outline_130,1次,小林酒造株式会社,cases,s1_outline_130,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"subsidy:[148.985, 271.015, 420.0]",総投資額・補助対象経費・内訳の概念差を確認
+s1_outline_131,1次,株式会社遠藤写真工芸所,cases,s1_outline_131,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_131_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_132,1次,株式会社ヨシノ自動車,cases,s1_outline_132,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[2180.0, 2600.0]",総投資額・補助対象経費・内訳の概念差を確認
+s1_outline_132,1次,株式会社ヨシノ自動車,cases,s1_outline_132,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_134,1次,株式会社コンメックス,cases,s1_outline_134,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_134,1次,株式会社コンメックス,cases,s1_outline_134,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_134_sales_01:applicant; s1_outline_134_sales_02:group,代表系列=s1_outline_134_sales_01
+s1_outline_136,1次,まねき食品株式会社,cases,s1_outline_136,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_136_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_136,1次,まねき食品株式会社,sales_series,s1_outline_136_sales_01,sales,SALES_ARITHMETIC_MISMATCH,critical,unresolved,120,120,,1,,"2030年8月までに売上高100億円超。直近2023年8月期の全社売上高は47億8,900万円。2030年8月期までの売上高成長率120%、売上高増加額60億円。target_sales_oku=100は「100億円超」の閾値。",
+s1_outline_137,1次,総武機械株式会社,cases,s1_outline_137,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_139,1次,川﨑工業株式会社,cases,s1_outline_139,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_139_sales_01:applicant; s1_outline_139_sales_02:applicant,代表系列=s1_outline_139_sales_01
+s1_outline_14,1次,日華化学株式会社,cases,s1_outline_14,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_14_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_14,1次,日華化学株式会社,sales_series,s1_outline_14_sales_02,sales,SALES_ARITHMETIC_MISMATCH,critical,unresolved,,,,1,,化学品事業450億円（+88億円/2030年）。円グラフは2023年361億円、2030年450億円。,
+s1_outline_14,1次,日華化学株式会社,cases,s1_outline_14,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s1_outline_14,1次,日華化学株式会社,cases,s1_outline_14,,MULTIPLE_SALES_SERIES,warning,unresolved,,3,,,,s1_outline_14_sales_01:group; s1_outline_14_sales_02:group; s1_outline_14_sales_03:group,代表系列=s1_outline_14_sales_01
+s1_outline_140,1次,新生電子株式会社,cases,s1_outline_140,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_140_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_140,1次,新生電子株式会社,cases,s1_outline_140,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_140,1次,新生電子株式会社,sales_series,s1_outline_140_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,2023年3月期（直前期） -> 2030年3月期（2029年度）, -> 2030,,2,,2030年3月期（2029年度）売上300億円。本文に「コロナ禍や2023年3月期（前期）の業績は回復したものの、売上160億円」と記載。期間の係り方が曖昧なためbaseline_yearは未設定。,
+s1_outline_143,1次,株式会社ロッキー,metrics,labor,labor,RATE_ARITHMETIC_MISMATCH,critical,unresolved,22.8,,19.7973,2,目標値,株式会社ロッキー470→869万円/人（+22.8%）,PDF記載率と基準値・目標値・期間からの計算率が1ポイント超相違
+s1_outline_143,1次,株式会社ロッキー,cases,s1_outline_143,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,,,,,,売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）,申請企業自身の比較系列をPDFで再確認
+s1_outline_143,1次,株式会社ロッキー,cases,s1_outline_143,,CONSORTIUM_APPLICATION,info,resolved,,2,,,,"株式会社ザ．キッチン
+株式会社アールミート",
+s1_outline_143,1次,株式会社ロッキー,cases,s1_outline_143,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s1_outline_145,1次,株式会社小松電業所,cases,s1_outline_145,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_145,1次,株式会社小松電業所,cases,s1_outline_145,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_145_sales_01:applicant; s1_outline_145_sales_02:group,代表系列=s1_outline_145_sales_01
+s1_outline_148,1次,株式会社しばた工芸,sales_series,s1_outline_148_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,補助事業前 -> 2031年2月期, -> 2031,,1,,2031年2月期70億円。補助事業完了後5年間で+45億円、成長率280%以上。別途2029年2月期50億円。,
+s1_outline_150,1次,三笠産業株式会社,cases,s1_outline_150,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_150,1次,三笠産業株式会社,cases,s1_outline_150,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_150,1次,三笠産業株式会社,cases,s1_outline_150,,MULTIPLE_SALES_SERIES,warning,resolved,,4,,,,s1_outline_150_sales_01:applicant; s1_outline_150_sales_02:group; s1_outline_150_sales_03:applicant; s1_outline_150_sales_04:group,代表系列=s1_outline_150_sales_01
+s1_outline_151,1次,四国医療サービス株式会社,cases,s1_outline_151,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s1_outline_151,1次,四国医療サービス株式会社,cases,s1_outline_151,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_151_sales_01:applicant; s1_outline_151_sales_02:project,代表系列=s1_outline_151_sales_01
+s1_outline_153,1次,株式会社越後屋,sales_series,s1_outline_153_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,2741,,increase_rate / target_base_ratio / cagr,1,,"2040年10月期1,000億円、店舗800、成長率2741%、増加965億円",記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_154,1次,中央観光株式会社,sales_series,s1_outline_154_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,231,,increase_rate / target_base_ratio / cagr,1,,2030年単体売上100億円。2023/7月期比成長率231%、増加50億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_154,1次,中央観光株式会社,cases,s1_outline_154,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_154_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_155,1次,株式会社スギノマシン,sales_series,s1_outline_155_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,現状 -> 2029, -> 2029,,1,,2029年売上365億円、現状の約170%、年平均成長率9%,
+s1_outline_157,1次,ハマダコンフェクト株式会社,sales_series,s1_outline_157_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,35,,increase_rate / target_base_ratio / cagr,1,,2029年度まで売上高成長率35%、増加額52億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_159,1次,浦島観光ホテル株式会社,cases,s1_outline_159,,CONSORTIUM_APPLICATION,info,resolved,,2,,,,"株式会社みちのりホテルズ
+株式会社丸峰観光ホテル",
+s1_outline_159,1次,浦島観光ホテル株式会社,cases,s1_outline_159,,MULTIPLE_INVESTMENT_COMPONENTS,info,resolved,,3,,,,浦島観光ホテル; 丸峰観光ホテル; みちのホテルズ,代表事業費は同一申請内の合計値を使用
+s1_outline_159,1次,浦島観光ホテル株式会社,cases,s1_outline_159,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"affiliate, applicant, group",
+s1_outline_159,1次,浦島観光ホテル株式会社,cases,s1_outline_159,,MULTIPLE_SALES_SERIES,warning,resolved,,4,,,,s1_outline_159_sales_01:group; s1_outline_159_sales_02:applicant; s1_outline_159_sales_03:affiliate; s1_outline_159_sales_04:affiliate,代表系列=s1_outline_159_sales_02
+s1_outline_16,1次,株式会社旭ウエルテック,sales_series,s1_outline_16_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,240,,increase_rate / target_base_ratio / cagr,1,,2029年までのコンソーシアム全体の売上高成長率240%、売上高増加額29.9億円、付加価値額23.4億円（2.49倍UP）。申請企業単独の売上目標は記載なし。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_16,1次,株式会社旭ウエルテック,cases,s1_outline_16,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,,,,,,売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）,申請企業自身の比較系列をPDFで再確認
+s1_outline_16,1次,株式会社旭ウエルテック,cases,s1_outline_16,,CONSORTIUM_APPLICATION,info,resolved,,2,,,,"株式会社朝日電機製作所
+株式会社石川プレート",
+s1_outline_16,1次,株式会社旭ウエルテック,cases,s1_outline_16,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s1_outline_162,1次,信光陸運株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,20xx年度（基準年度） -> 20xx年度（基準年度＋3年後）, -> ,,2,,530→685、年平均上昇率8.9%,
+s1_outline_162,1次,信光陸運株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,20xx年度（基準年度） -> 20xx年度（基準年度＋3年後）, -> ,,2,,136→141,
+s1_outline_162,1次,信光陸運株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,20xx年度（基準年度） -> 20xx年度（基準年度＋3年後）, -> ,,2,,"897→1,332、年平均上昇率14.1%",
+s1_outline_162,1次,信光陸運株式会社,metrics,officer_pay,officer_pay,PERIOD_AMBIGUOUS,warning,unresolved,20xx年度（基準年度） -> 20xx年度（基準年度＋3年後）, -> ,,2,,"1,753→2,033、年平均上昇率5.1%",
+s1_outline_164,1次,株式会社福砂屋グループ,cases,s1_outline_164,,COST_TEXT_NUMERIC_MISMATCH,critical,unresolved,,5500.0,project_cost=5500.0; subsidy=1700.0; project_cost=5270.0,2,,右上見出しは事業費55億円（補助額17億円）。一方、本文見出しに総額50.3億円、明細合計は52.7億円。,本文・Box候補と代表値を併存。分析前にcost_amount_candidates.csvで確認
+s1_outline_164,1次,株式会社福砂屋グループ,cases,s1_outline_164,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_164_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_164,1次,株式会社福砂屋グループ,cases,s1_outline_164,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,"group, subsidiary",
+s1_outline_164,1次,株式会社福砂屋グループ,cases,s1_outline_164,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[5270.0, 5500.0]",総投資額・補助対象経費・内訳の概念差を確認
+s1_outline_164,1次,株式会社福砂屋グループ,cases,s1_outline_164,,MULTIPLE_SALES_SERIES,warning,unresolved,,2,,,,s1_outline_164_sales_01:group; s1_outline_164_sales_02:subsidiary,代表系列=s1_outline_164_sales_01
+s1_outline_166,1次,株式会社福地建設,sales_series,s1_outline_166_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,636,,increase_rate / target_base_ratio / cagr,1,,2023年決算比、2030年までに売上高成長636%、売上高増加495億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_167,1次,銘建工業株式会社,cases,s1_outline_167,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_167_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_167,1次,銘建工業株式会社,sales_series,s1_outline_167_sales_01,sales,SALES_ARITHMETIC_MISMATCH,critical,unresolved,44.1,44.1,,1,,2023年12月期実績約300億円。2029年売上436億円、増加133億円、成長44.1%。,
+s1_outline_168,1次,株式会社大真空,sales_series,s1_outline_168_sales_02,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,72,,increase_rate / target_base_ratio / cagr,1,,連結：2030年3月期までに売上高成長率72%、増加額380億円（基準年2027年3月期）。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_168,1次,株式会社大真空,cases,s1_outline_168,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_168,1次,株式会社大真空,cases,s1_outline_168,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_168_sales_01:applicant; s1_outline_168_sales_02:group,代表系列=s1_outline_168_sales_01
+s1_outline_169,1次,サトウ食品株式会社,sales_series,s1_outline_169_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,100,,increase_rate / target_base_ratio / cagr,1,,10年前と比較して当社売上高・生産量は約2倍。将来の定量売上目標は記載なし。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_169,1次,サトウ食品株式会社,cases,s1_outline_169,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_169_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_170,1次,株式会社光製作所,sales_series,s1_outline_170_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,272,,increase_rate / target_base_ratio / cagr,1,,2029年までの会社全体の売上高成長率272%、売上高増加額26億円。基準年度は記載なし。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_171,1次,昭和産業株式会社,cases,s1_outline_171,,COST_TEXT_NUMERIC_MISMATCH,critical,unresolved,,2500.0,project_cost=2500.0; subsidy=780.0; project_cost=2360.0,2,,事業費25億円（補助額7.8億円）。明細合計23.6億円。,本文・Box候補と代表値を併存。分析前にcost_amount_candidates.csvで確認
+s1_outline_171,1次,昭和産業株式会社,cases,s1_outline_171,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[2360.0, 2500.0]",総投資額・補助対象経費・内訳の概念差を確認
+s1_outline_173,1次,中央紙通商株式会社,cases,s1_outline_173,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_173,1次,中央紙通商株式会社,cases,s1_outline_173,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_173,1次,中央紙通商株式会社,cases,s1_outline_173,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_173_sales_01:group; s1_outline_173_sales_02:applicant,代表系列=s1_outline_173_sales_02
+s1_outline_174,1次,株式会社Ｐｌａｎ・Ｄｏ・Ｓｅｅ琉球,cases,s1_outline_174,,COST_TEXT_NUMERIC_MISMATCH,critical,unresolved,,5050.0,subsidy=1680.0; project_cost=3900.0; subsidy=420.0,4,,詳細内訳頁は合計50.5億円（補助金額16.8億円）。概要頁は事業費39億円（補助額4.2億円）で不整合。,本文・Box候補と代表値を併存。分析前にcost_amount_candidates.csvで確認
+s1_outline_174,1次,株式会社Ｐｌａｎ・Ｄｏ・Ｓｅｅ琉球,sales_series,s1_outline_174_sales_02,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,104,,increase_rate / target_base_ratio / cagr,1,,Plan・Do・See：2029年3月期迄に売上高成長率104%、増加額40億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_174,1次,株式会社Ｐｌａｎ・Ｄｏ・Ｓｅｅ琉球,cases,s1_outline_174,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_174_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_174,1次,株式会社Ｐｌａｎ・Ｄｏ・Ｓｅｅ琉球,cases,s1_outline_174,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,"affiliate, applicant",
+s1_outline_174,1次,株式会社Ｐｌａｎ・Ｄｏ・Ｓｅｅ琉球,cases,s1_outline_174,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"subsidy:[420.0, 1680.0]",総投資額・補助対象経費・内訳の概念差を確認
+s1_outline_174,1次,株式会社Ｐｌａｎ・Ｄｏ・Ｓｅｅ琉球,cases,s1_outline_174,,MULTIPLE_SALES_SERIES,warning,unresolved,,2,,,,s1_outline_174_sales_01:applicant; s1_outline_174_sales_02:affiliate,代表系列=s1_outline_174_sales_01
+s1_outline_177,1次,さいほく鉄工株式会社,sales_series,s1_outline_177_sales_02,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,349.69,,increase_rate / target_base_ratio / cagr,1,,2033年までの売上高成長率連結349.69%、増加額58.4億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_177,1次,さいほく鉄工株式会社,cases,s1_outline_177,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_177,1次,さいほく鉄工株式会社,cases,s1_outline_177,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_177_sales_01:applicant; s1_outline_177_sales_02:group,代表系列=s1_outline_177_sales_01
+s1_outline_19,1次,株式会社XEN GROUP,sales_series,s1_outline_19_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,308,,increase_rate / target_base_ratio / cagr,1,,会社全体：2022年度→2029年度までの売上高成長率308%、売上高増加額28億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_19,1次,株式会社XEN GROUP,sales_series,s1_outline_19_sales_02,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,3600,,increase_rate / target_base_ratio / cagr,1,,補助事業：2022年度→2029年度までの売上高成長率3600%、売上高増加額64億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_19,1次,株式会社XEN GROUP,cases,s1_outline_19,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s1_outline_19,1次,株式会社XEN GROUP,cases,s1_outline_19,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_19_sales_01:applicant; s1_outline_19_sales_02:project,代表系列=s1_outline_19_sales_01
+s1_outline_2,1次,株式会社アイ・テック,cases,s1_outline_2,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_2_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_2,1次,株式会社アイ・テック,cases,s1_outline_2,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[740.0, 7419.1]",総投資額・補助対象経費・内訳の概念差を確認
+s1_outline_20,1次,エスティケイテクノロジー株式会社,sales_series,s1_outline_20_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,4,,increase_rate / target_base_ratio / cagr,1,,2029年3月期までの目標：会社全体 売上高成長率4.0%、売上高増加額45億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_20,1次,エスティケイテクノロジー株式会社,sales_series,s1_outline_20_sales_02,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,5.6,,increase_rate / target_base_ratio / cagr,1,,2029年3月期までの目標：補助事業 売上高成長率5.6%、売上高増加額19億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_20,1次,エスティケイテクノロジー株式会社,cases,s1_outline_20,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s1_outline_20,1次,エスティケイテクノロジー株式会社,cases,s1_outline_20,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_20_sales_01:applicant; s1_outline_20_sales_02:project,代表系列=s1_outline_20_sales_01
+s1_outline_23,1次,株式会社ジェーイーエル,cases,s1_outline_23,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_23_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_23,1次,株式会社ジェーイーエル,cases,s1_outline_23,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,"applicant, project",
+s1_outline_23,1次,株式会社ジェーイーエル,cases,s1_outline_23,,MULTIPLE_SALES_SERIES,warning,unresolved,,2,,,,s1_outline_23_sales_01:applicant; s1_outline_23_sales_02:project,代表系列=s1_outline_23_sales_01
+s1_outline_24,1次,株式会社フジキン,cases,s1_outline_24,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_24,1次,株式会社フジキン,cases,s1_outline_24,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_24,1次,株式会社フジキン,cases,s1_outline_24,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_24_sales_01:group; s1_outline_24_sales_02:applicant,代表系列=s1_outline_24_sales_02
+s1_outline_25,1次,日本リファイン株式会社,cases,s1_outline_25,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_25,1次,日本リファイン株式会社,cases,s1_outline_25,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_25_sales_01:group; s1_outline_25_sales_02:applicant,代表系列=s1_outline_25_sales_02
+s1_outline_29,1次,株式会社三和テスコ,cases,s1_outline_29,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_29_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_29,1次,株式会社三和テスコ,cases,s1_outline_29,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,"applicant, project",
+s1_outline_29,1次,株式会社三和テスコ,cases,s1_outline_29,,MULTIPLE_SALES_SERIES,warning,unresolved,,3,,,,s1_outline_29_sales_01:applicant; s1_outline_29_sales_02:project; s1_outline_29_sales_03:project,代表系列=s1_outline_29_sales_01
+s1_outline_3,1次,株式会社堀場エステック,cases,s1_outline_3,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_3,1次,株式会社堀場エステック,cases,s1_outline_3,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_3_sales_01:group; s1_outline_3_sales_02:applicant,代表系列=s1_outline_3_sales_02
+s1_outline_30,1次,株式会社メイドー,cases,s1_outline_30,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_31,1次,鎌長製衡株式会社,cases,s1_outline_31,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, existing_business",
+s1_outline_31,1次,鎌長製衡株式会社,cases,s1_outline_31,,MULTIPLE_SALES_SERIES,warning,resolved,,3,,,,s1_outline_31_sales_01:applicant; s1_outline_31_sales_02:existing_business; s1_outline_31_sales_03:existing_business,代表系列=s1_outline_31_sales_01
+s1_outline_32,1次,オリヒロエンジニアリング株式会社,metrics,employee_pay,employee_pay,RATE_ARITHMETIC_MISMATCH,critical,unresolved,4.51,,3.3326,2,目標値,521→594、年平均+4.51%,PDF記載率と基準値・目標値・期間からの計算率が1ポイント超相違
+s1_outline_32,1次,オリヒロエンジニアリング株式会社,metrics,labor,labor,RATE_ARITHMETIC_MISMATCH,critical,unresolved,21,,15.363,2,目標値,"1,097→1,943、年平均+21.0%",PDF記載率と基準値・目標値・期間からの計算率が1ポイント超相違
+s1_outline_32,1次,オリヒロエンジニアリング株式会社,cases,s1_outline_32,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_32,1次,オリヒロエンジニアリング株式会社,cases,s1_outline_32,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_32,1次,オリヒロエンジニアリング株式会社,cases,s1_outline_32,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_32_sales_01:applicant; s1_outline_32_sales_02:group,代表系列=s1_outline_32_sales_01
+s1_outline_33,1次,株式会社石井機械製作所,sales_series,s1_outline_33_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,140,,increase_rate / target_base_ratio / cagr,1,,2025年をリスタート年度として売上高成長率140%、2033年までに増加額3.0億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_34,1次,株式会社柴田合成,cases,s1_outline_34,,COST_TEXT_NUMERIC_ROUNDING_DIFFERENCE,warning,resolved_with_tolerance,,1894.0,project_cost=1889.9999999999998; project_cost=1900.0; subsidy=520.0,2,,3年間の補助対象事業費18.9億円、概要欄の事業費19億円・補助額5.2億円,差は代表値の1%または50百万円以内。丸め・精度差として保持
+s1_outline_34,1次,株式会社柴田合成,cases,s1_outline_34,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s1_outline_34,1次,株式会社柴田合成,cases,s1_outline_34,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[1890.0, 1900.0]",総投資額・補助対象経費・内訳の概念差を確認
+s1_outline_34,1次,株式会社柴田合成,cases,s1_outline_34,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_34_sales_01:applicant; s1_outline_34_sales_02:project,代表系列=s1_outline_34_sales_01
+s1_outline_35,1次,イグス株式会社,cases,s1_outline_35,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_37,1次,大日工業株式会社,cases,s1_outline_37,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_38,1次,テラル株式会社,cases,s1_outline_38,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_38,1次,テラル株式会社,cases,s1_outline_38,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_38,1次,テラル株式会社,cases,s1_outline_38,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_38_sales_01:applicant; s1_outline_38_sales_02:group,代表系列=s1_outline_38_sales_01
+s1_outline_4,1次,株式会社インターオフィス,sales_series,s1_outline_4_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,161.5,,increase_rate / target_base_ratio / cagr,1,,2023年8月期までに会社全体の売上高成長率（直近決算比）161.5%、売上高増加額（直近決算比）49.3億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_4,1次,株式会社インターオフィス,cases,s1_outline_4,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_4_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_41,1次,株式会社ビッグハウス,sales_series,s1_outline_41_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,161,,increase_rate / target_base_ratio / cagr,1,,2023年：8億⇒2029年：22億へ。2029年までの会社全体の売上高成長率161%、売上高増加額14億円。丸め値同士では算術が一致しないため原文値を保持。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_42,1次,株式会社山田ドビー,sales_series,s1_outline_42_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,82.3,,increase_rate / target_base_ratio / cagr,1,,2029年までの会社全体の売上高成長率82.3%、売上高増加額77.9億円。基準売上・目標売上の絶対値はページに記載なし。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_45,1次,山本ビニター株式会社,sales_series,s1_outline_45_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,160,,increase_rate / target_base_ratio / cagr,1,,2030年までに会社全体の売上高成長率160%、売上高増加額25億円。本文には2034年に売上高100億円との中期目標も記載。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_46,1次,株式会社アイスコ,sales_series,s1_outline_46_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,122,,increase_rate / target_base_ratio / cagr,1,,"2030年3月期までの会社全体のKGI：売上1,000億円、営業利益25億円、売上高成長率122%、増加額551億円（直近期末比）。基準売上449億円は直接記載されず逆算値のため確定値にしない。",記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_46,1次,株式会社アイスコ,sales_series,s1_outline_46_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近期末比 -> 2030年3月期, -> 2030,,1,,"2030年3月期までの会社全体のKGI：売上1,000億円、営業利益25億円、売上高成長率122%、増加額551億円（直近期末比）。基準売上449億円は直接記載されず逆算値のため確定値にしない。",
+s1_outline_47,1次,ポーライト株式会社,sales_series,s1_outline_47_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,66,,increase_rate / target_base_ratio / cagr,1,,28年までの会社全体の売上高成長率66%（22年比）、売上高増加額82億円（22年比）。絶対売上高は記載なし。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_49,1次,株式会社ＡＫシステム,cases,s1_outline_49,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_5,1次,大森機械工業株式会社,cases,s1_outline_5,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_5,1次,大森機械工業株式会社,cases,s1_outline_5,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_5_sales_01:group; s1_outline_5_sales_02:applicant,代表系列=s1_outline_5_sales_02
+s1_outline_50,1次,株式会社松尾製作所,cases,s1_outline_50,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_50,1次,株式会社松尾製作所,cases,s1_outline_50,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_50_sales_01:group; s1_outline_50_sales_02:applicant,代表系列=s1_outline_50_sales_02
+s1_outline_51,1次,株式会社西部技研,cases,s1_outline_51,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_51_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_51,1次,株式会社西部技研,cases,s1_outline_51,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,"applicant, group",
+s1_outline_51,1次,株式会社西部技研,cases,s1_outline_51,,MULTIPLE_SALES_SERIES,warning,unresolved,,2,,,,s1_outline_51_sales_01:applicant; s1_outline_51_sales_02:group,代表系列=s1_outline_51_sales_01
+s1_outline_52,1次,株式会社平島,sales_series,s1_outline_52_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,139,,increase_rate / target_base_ratio / cagr,1,,2030年までの会社全体の売上高成長率139%、売上高増加額45億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_52,1次,株式会社平島,sales_series,s1_outline_52_sales_02,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,49.3,,increase_rate / target_base_ratio / cagr,1,,2030年売上目標（売上比率）：製品製造・販売事業109.0億円（+49.3%）。括弧率の意味は明確でない。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_52,1次,株式会社平島,sales_series,s1_outline_52_sales_03,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,6.1,,increase_rate / target_base_ratio / cagr,1,,2030年売上目標（売上比率）：施工・研究開発事業8.1億円（+6.1%）。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_52,1次,株式会社平島,sales_series,s1_outline_52_sales_04,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,46.6,,increase_rate / target_base_ratio / cagr,1,,2030年売上目標（売上比率）：原料製造・販売事業23.0億円（+46.6%）。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_52,1次,株式会社平島,cases,s1_outline_52,,MULTIPLE_INVESTMENT_COMPONENTS,info,resolved,,2,,,,御船工場新設・福岡工場増設; 研究所の新設,代表事業費は同一申請内の合計値を使用
+s1_outline_52,1次,株式会社平島,cases,s1_outline_52,,MULTIPLE_SALES_SERIES,warning,resolved,,4,,,,s1_outline_52_sales_01:applicant; s1_outline_52_sales_02:applicant; s1_outline_52_sales_03:applicant; s1_outline_52_sales_04:applicant,代表系列=s1_outline_52_sales_01
+s1_outline_53,1次,マルコーフーズ株式会社,sales_series,s1_outline_53_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,43,,increase_rate / target_base_ratio / cagr,1,,売上成長目標（2023年10月比）：2030年までの会社全体の売上高成長率43%、売上高増加額30億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_55,1次,株式会社コーヨークリエイト,cases,s1_outline_55,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_55_sales_01:applicant; s1_outline_55_sales_02:applicant,代表系列=s1_outline_55_sales_01
+s1_outline_55,1次,株式会社コーヨークリエイト,sales_series,s1_outline_55_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近決算 -> 2034年6月期（原文括弧は2023年度）, -> 2034,,1,,売上成長目標（直近決算 約30億円）：2034年6月期（2023年度）までに売上高100億円、増加額70億円。括弧年度は原本上の表記をそのまま保持し、整合しないため要確認。,
+s1_outline_55,1次,株式会社コーヨークリエイト,sales_series,s1_outline_55_sales_02,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近決算 -> 2029年6月期（2028年度）, -> 2029,,1,,2029年6月期（2028年度）までに売上高70億円、成長率233%。基準は直近決算約30億円。,
+s1_outline_56,1次,高知通運株式会社,metrics,employee_pay,employee_pay,RATE_ARITHMETIC_MISMATCH,critical,unresolved,6.2,,3.4394,3,その他Box,申請企業・高知通運350→419万円/人（+6.2%）,PDF記載率と基準値・目標値・期間からの計算率が1ポイント超相違
+s1_outline_56,1次,高知通運株式会社,metrics,employee_pay,employee_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,6.2%,,,3,その他Box,申請企業・高知通運350→419万円/人（+6.2%）,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s1_outline_56,1次,高知通運株式会社,sales_series,s1_outline_56_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,21,,increase_rate / target_base_ratio / cagr,1,,2030年までに会社全体の売上高成長率21%、売上高増加額31億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_56,1次,高知通運株式会社,cases,s1_outline_56,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s1_outline_56,1次,高知通運株式会社,cases,s1_outline_56,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_56_sales_01:applicant; s1_outline_56_sales_02:project,代表系列=s1_outline_56_sales_01
+s1_outline_58,1次,三晶エムイーシー株式会社,cases,s1_outline_58,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s1_outline_58,1次,三晶エムイーシー株式会社,cases,s1_outline_58,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_58_sales_01:applicant; s1_outline_58_sales_02:project,代表系列=s1_outline_58_sales_01
+s1_outline_58,1次,三晶エムイーシー株式会社,sales_series,s1_outline_58_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,基準年 -> 2028年11月期（基準年度2025年11月期+3年度）, -> 2028,,1,,"【2028年11月期（基準年度2025年11月期+3年度）における売上目標】会社全体での売上目標4,762,844,105円（基準年より26.7%UP）。基準売上高の絶対値は記載なし。",
+s1_outline_58,1次,三晶エムイーシー株式会社,sales_series,s1_outline_58_sales_02,sales,PERIOD_AMBIGUOUS,warning,unresolved,基準年 -> 2028年11月期（基準年度2025年11月期+3年度）, -> 2028,,1,,"【当社全体目標達成のための今回の補助事業売上・利益目標】補助事業での売上目標3,867,530,338円（基準年より281.7%UP）。基準売上高の絶対値は記載なし。",
+s1_outline_61,1次,三恵工業株式会社,sales_series,s1_outline_61_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,284,,increase_rate / target_base_ratio / cagr,1,,2030年度売上目標約500億円、2030年度までの売上高成長率284%、売上高増加額320億円（2022年度比）。500-320=180億円だが284%との算術は一致しない。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_62,1次,サーパス工業株式会社,sales_series,s1_outline_62_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,165,,increase_rate / target_base_ratio / cagr,1,,2030年までの全社売上高成長率165%。従業員規模成長率150%。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_62,1次,サーパス工業株式会社,sales_series,s1_outline_62_sales_02,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,200,,increase_rate / target_base_ratio / cagr,1,,2033年までの会社全体の売上高成長率200%。従業員規模200%。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_62,1次,サーパス工業株式会社,cases,s1_outline_62,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_62_sales_01:applicant; s1_outline_62_sales_02:applicant,代表系列=s1_outline_62_sales_01
+s1_outline_63,1次,株式会社オティックスホールディングス,cases,s1_outline_63,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,group,
+s1_outline_63,1次,株式会社オティックスホールディングス,cases,s1_outline_63,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_63,1次,株式会社オティックスホールディングス,cases,s1_outline_63,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_63_sales_01:group; s1_outline_63_sales_02:group,代表系列=s1_outline_63_sales_01
+s1_outline_65,1次,株式会社松風,cases,s1_outline_65,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_65,1次,株式会社松風,cases,s1_outline_65,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_65_sales_01:applicant; s1_outline_65_sales_02:group,代表系列=s1_outline_65_sales_01
+s1_outline_66,1次,株式会社アルプスツール,cases,s1_outline_66,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s1_outline_66,1次,株式会社アルプスツール,cases,s1_outline_66,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_66_sales_01:applicant; s1_outline_66_sales_02:project,代表系列=s1_outline_66_sales_01
+s1_outline_67,1次,アドバンス電気工業株式会社,sales_series,s1_outline_67_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,130,,increase_rate / target_base_ratio / cagr,1,,2032年までに会社全体の売上高成長率130%。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_67,1次,アドバンス電気工業株式会社,cases,s1_outline_67,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[3200.0, 3400.0]",総投資額・補助対象経費・内訳の概念差を確認
+s1_outline_67,1次,アドバンス電気工業株式会社,cases,s1_outline_67,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_68,1次,株式会社ミマキエンジニアリング,sales_series,s1_outline_68_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,172,,increase_rate / target_base_ratio / cagr,1,,2028年度、会社全体の売上高増加額単体372億円、売上高成長率単体172%。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_68,1次,株式会社ミマキエンジニアリング,sales_series,s1_outline_68_sales_02,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,172,,increase_rate / target_base_ratio / cagr,1,,2028年度、会社全体の売上高増加額連結508億円、売上高成長率連結172%。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_68,1次,株式会社ミマキエンジニアリング,cases,s1_outline_68,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_68,1次,株式会社ミマキエンジニアリング,cases,s1_outline_68,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_68_sales_01:applicant; s1_outline_68_sales_02:group,代表系列=s1_outline_68_sales_01
+s1_outline_69,1次,NAX JAPAN株式会社,sales_series,s1_outline_69_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,200,,increase_rate / target_base_ratio / cagr,1,,2030年までの売上高成長率200%、増加額100億円。2023年度実績102億円。今年度より毎年10%増を目標。目標202億円は102+100の推計で明記値ではない。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_69,1次,NAX JAPAN株式会社,cases,s1_outline_69,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_69_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_7,1次,株式会社ＭＡＲＵＷＡ,cases,s1_outline_7,,COST_TEXT_NUMERIC_ROUNDING_DIFFERENCE,warning,resolved_with_tolerance,,12700.0,project_cost=12700.0; subsidy=3500.0; subsidy=3516.0,2,,"事業費127億円（補助額35億円）。表の投資額合計①10,549百万円、補助額3,516百万円。",差は代表値の1%または50百万円以内。丸め・精度差として保持
+s1_outline_7,1次,株式会社ＭＡＲＵＷＡ,cases,s1_outline_7,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"subsidy:[3500.0, 3516.0]",総投資額・補助対象経費・内訳の概念差を確認
+s1_outline_7,1次,株式会社ＭＡＲＵＷＡ,cases,s1_outline_7,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_7_sales_01:applicant; s1_outline_7_sales_02:applicant,代表系列=s1_outline_7_sales_01
+s1_outline_72,1次,ヤマセ電気株式会社,cases,s1_outline_72,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,,,,,,売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）,申請企業自身の比較系列をPDFで再確認
+s1_outline_72,1次,ヤマセ電気株式会社,cases,s1_outline_72,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s1_outline_72,1次,ヤマセ電気株式会社,sales_series,s1_outline_72_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,基準年不記載 -> 2028年, -> 2028,,1,,2028年売上約380億円。2028年までのグループ全体の売上高成長率35%、増加額98億円。基準売上282億円は380-98の逆算。申請企業単独売上は記載なし。,
+s1_outline_73,1次,株式会社大昌鉄工所,cases,s1_outline_73,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_76,1次,安田工業株式会社,cases,s1_outline_76,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_76_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_76,1次,安田工業株式会社,cases,s1_outline_76,,MULTIPLE_SALES_SERIES,warning,unresolved,,2,,,,s1_outline_76_sales_01:applicant; s1_outline_76_sales_02:applicant,代表系列=s1_outline_76_sales_01
+s1_outline_77,1次,千寿製薬株式会社,cases,s1_outline_77,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s1_outline_77,1次,千寿製薬株式会社,cases,s1_outline_77,,MULTIPLE_SALES_SERIES,warning,resolved,,3,,,,s1_outline_77_sales_01:group; s1_outline_77_sales_02:applicant; s1_outline_77_sales_03:applicant,代表系列=s1_outline_77_sales_02
+s1_outline_78,1次,環境のミカタ株式会社,cases,s1_outline_78,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_78_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_80,1次,寧薬化学工業株式会社,sales_series,s1_outline_80_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,基準年不記載 -> 2029年度まで, -> 2029,,1,,2029年度までの売上高成長率100%、増加額20億円。上段に2029年度目途に全社40億円目標。基準20億円は40-20の逆算。,
+s1_outline_81,1次,デーバー加工サービス㈱,sales_series,s1_outline_81_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,40,,increase_rate / target_base_ratio / cagr,1,,2030年8月期までの会社全体の売上高成長率40%超、売上高増加額16億円超。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_81,1次,デーバー加工サービス㈱,cases,s1_outline_81,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline_82,1次,サン工業株式会社,sales_series,s1_outline_82_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,196,,increase_rate / target_base_ratio / cagr,1,,30年までの会社全体の売上高成長率196%、売上高増加額34.4億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_83,1次,株式会社ヒサダ,metrics,labor,labor,RATE_ARITHMETIC_MISMATCH,critical,unresolved,94,,61.5186,2,目標値,"労働生産性393→1,656（年平均94%、+421%も併記）",PDF記載率と基準値・目標値・期間からの計算率が1ポイント超相違
+s1_outline_83,1次,株式会社ヒサダ,sales_series,s1_outline_83_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,260,,increase_rate / target_base_ratio / cagr,1,,28年までの九州生産製品の売上成長率260%。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_83,1次,株式会社ヒサダ,cases,s1_outline_83,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s1_outline_83,1次,株式会社ヒサダ,cases,s1_outline_83,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_83_sales_01:project; s1_outline_83_sales_02:applicant,代表系列=s1_outline_83_sales_02
+s1_outline_86,1次,グローバル・テック株式会社,sales_series,s1_outline_86_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,90,,increase_rate / target_base_ratio / cagr,1,,2029年度までの会社全体の売上高成長率90%、売上高増加額34.5億円（2023年度比）。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_87,1次,トーカロ株式会社,cases,s1_outline_87,,MULTIPLE_INVESTMENT_COMPONENTS,info,resolved,,2,,,,鈴身事業所新工場; 北九州工場新工場,代表事業費は同一申請内の合計値を使用
+s1_outline_89,1次,京西テクノス株式会社,sales_series,s1_outline_89_sales_02,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,38.3,,increase_rate / target_base_ratio / cagr,1,,"売上成長目標：2030年に向けて売上5,542百万円増加、成長率38.3%。年度表とは基準が異なるか原本内不整合。",記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_89,1次,京西テクノス株式会社,cases,s1_outline_89,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_89_sales_01:applicant; s1_outline_89_sales_02:applicant,代表系列=s1_outline_89_sales_01
+s1_outline_91,1次,矢田工業株式会社,metrics,labor,labor,RATE_ARITHMETIC_MISMATCH,critical,unresolved,15,,20.311,2,目標値,"労働生産性762→1,327（+15%）",PDF記載率と基準値・目標値・期間からの計算率が1ポイント超相違
+s1_outline_91,1次,矢田工業株式会社,cases,s1_outline_91,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline_91_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline_91,1次,矢田工業株式会社,cases,s1_outline_91,,MULTIPLE_SALES_SERIES,warning,unresolved,,2,,,,s1_outline_91_sales_01:applicant; s1_outline_91_sales_02:applicant,代表系列=s1_outline_91_sales_01
+s1_outline_93,1次,ウイング株式会社,cases,s1_outline_93,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_93_sales_01:applicant; s1_outline_93_sales_02:applicant,代表系列=s1_outline_93_sales_02
+s1_outline_94,1次,株式会社友和環境,sales_series,s1_outline_94_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,145,,increase_rate / target_base_ratio / cagr,1,,2030年までに会社全体の売上高成長率145%、売上高増加額7.1億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_95,1次,ナミックス株式会社,metrics,labor,labor,RATE_ARITHMETIC_MISMATCH,critical,unresolved,2.4,,0.8593,2,目標値,"労働生産性3,192→3,275（+2.4%）",PDF記載率と基準値・目標値・期間からの計算率が1ポイント超相違
+s1_outline_96,1次,大岡技研株式会社,sales_series,s1_outline_96_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,18,,increase_rate / target_base_ratio / cagr,1,,2029年、全社売上高260億円（売上高成長率18%）。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_96,1次,大岡技研株式会社,sales_series,s1_outline_96_sales_02,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,1476,,increase_rate / target_base_ratio / cagr,1,,"2029年、EV関連・非自動車事業で売上80億円（成長率1,476%）。",記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline_96,1次,大岡技研株式会社,cases,s1_outline_96,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s1_outline_96,1次,大岡技研株式会社,cases,s1_outline_96,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline_96_sales_01:applicant; s1_outline_96_sales_02:project,代表系列=s1_outline_96_sales_01
+s1_outline_97,1次,フクシマガリレイ株式会社,cases,s1_outline_97,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,,,,,,売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）,申請企業自身の比較系列をPDFで再確認
+s1_outline_97,1次,フクシマガリレイ株式会社,cases,s1_outline_97,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s1_outline_99,1次,株式会社オーレック,sales_series,s1_outline_99_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,50,,increase_rate / target_base_ratio / cagr,1,,2029年までの会社全体の売上高成長率50%、売上高増加額100億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline__179,2次,アサヒセイレン中部株式会社,sales_series,s1_outline__179_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,18,,increase_rate / target_base_ratio / cagr,1,,2026年までの会社全体の売上高成長率18%、売上高増加額151億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline__181,2次,株式会社ホテルニューアワジ,cases,s1_outline__181,,CONSORTIUM_APPLICATION,info,resolved,,2,,,,株式会社あわじ浜離宮,
+s1_outline__181,2次,株式会社ホテルニューアワジ,cases,s1_outline__181,,MULTIPLE_INVESTMENT_COMPONENTS,info,resolved,,2,,,,株式会社ホテルニューアワジ; 株式会社あわじ浜離宮,代表事業費は同一申請内の合計値を使用
+s1_outline__181,2次,株式会社ホテルニューアワジ,cases,s1_outline__181,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"affiliate, applicant, project",
+s1_outline__181,2次,株式会社ホテルニューアワジ,cases,s1_outline__181,,MULTIPLE_SALES_SERIES,warning,resolved,,4,,,,s1_outline__181_sales_01:applicant; s1_outline__181_sales_02:affiliate; s1_outline__181_sales_03:project; s1_outline__181_sales_04:project,代表系列=s1_outline__181_sales_01
+s1_outline__181,2次,株式会社ホテルニューアワジ,sales_series,s1_outline__181_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,基準年はPDFに明記なし -> 2029年まで, -> 2029,,1,,2029年までに売上高100.7億円、売上高成長率148.6%UP、売上高増加額32.9億円。基準売上67.8億円は100.7-32.9の導出値。,
+s1_outline__181,2次,株式会社ホテルニューアワジ,sales_series,s1_outline__181_sales_02,sales,PERIOD_AMBIGUOUS,warning,unresolved,基準年はPDFに明記なし -> 2029年まで, -> 2029,,1,,2029年までに売上高25.3億円、売上高成長率218.7%UP、売上高増加額13.7億円。基準売上11.6億円は25.3-13.7の導出値。,
+s1_outline__181,2次,株式会社ホテルニューアワジ,sales_series,s1_outline__181_sales_03,sales,PERIOD_AMBIGUOUS,warning,unresolved, -> 稼働時試算, -> ,,6,,平均客室単価300千円×25室×365日×稼働率90%=24.6億円,
+s1_outline__181,2次,株式会社ホテルニューアワジ,sales_series,s1_outline__181_sales_04,sales,PERIOD_AMBIGUOUS,warning,unresolved, -> 稼働時試算, -> ,,6,,平均客室単価89千円×40室×365日×稼働率90%=11.7億円,
+s1_outline__182,2次,埼玉機器株式会社,cases,s1_outline__182,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s1_outline__182,2次,埼玉機器株式会社,cases,s1_outline__182,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline__182_sales_01:applicant; s1_outline__182_sales_02:project,代表系列=s1_outline__182_sales_01
+s1_outline__183,2次,スズキハイテック株式会社,cases,s1_outline__183,,COST_TEXT_NUMERIC_ROUNDING_DIFFERENCE,warning,resolved_with_tolerance,,3330.0,project_cost=3300.0; subsidy=890.0,2,,"事業費33億円（補助額8.9億円）。明細は1,053+2,191+86=3,330百万円で、本文では約33.3億円とも記載。",差は代表値の1%または50百万円以内。丸め・精度差として保持
+s1_outline__183,2次,スズキハイテック株式会社,cases,s1_outline__183,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s1_outline__183,2次,スズキハイテック株式会社,cases,s1_outline__183,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline__183_sales_01:applicant; s1_outline__183_sales_02:project,代表系列=s1_outline__183_sales_01
+s1_outline__184,2次,泉南乳業株式会社,cases,s1_outline__184,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline__184_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline__184,2次,泉南乳業株式会社,sales_series,s1_outline__184_sales_01,sales,SALES_ARITHMETIC_MISMATCH,critical,unresolved,185,185,,1,,頁上部:2030年度に売上高200億円。売上成長目標:2030年までに売上高成長率185%、売上高増加額96億円、2023年度比較（2024年3月期売上高113億円）。,
+s1_outline__188,2次,山城金属株式会社,cases,s1_outline__188,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline__188_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline__188,2次,山城金属株式会社,cases,s1_outline__188,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline__189,2次,長﨑ジャッキ株式会社,cases,s1_outline__189,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s1_outline__189_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s1_outline__189,2次,長﨑ジャッキ株式会社,sales_series,s1_outline__189_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,基準年は明記なし -> 2030年まで, -> 2030,,1,,2030年までに会社全体の売上高16.8億円（+134.1%）増、売上29.2億円。基準12.4億円は29.2-16.8の導出値。,
+s1_outline__190,2次,株式会社GOTENリゾート,cases,s1_outline__190,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, existing_business, project",
+s1_outline__190,2次,株式会社GOTENリゾート,cases,s1_outline__190,,MULTIPLE_SALES_SERIES,warning,resolved,,5,,,,s1_outline__190_sales_01:applicant; s1_outline__190_sales_02:existing_business; s1_outline__190_sales_03:existing_business; s1_outline__190_sales_04:project; s1_outline__190_sales_05:project,代表系列=s1_outline__190_sales_01
+s1_outline__191,2次,株式会社カナイ,cases,s1_outline__191,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline__194,2次,ZACROS株式会社,cases,s1_outline__194,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline__194_sales_01:applicant; s1_outline__194_sales_02:applicant,代表系列=s1_outline__194_sales_01
+s1_outline__196,2次,株式会社八立製作所,cases,s1_outline__196,,COST_TEXT_NUMERIC_ROUNDING_DIFFERENCE,warning,resolved_with_tolerance,,1340.0,project_cost=1300.0; subsidy=420.0,2,,頁上部に総額13.4億円の建物・設備投資。概要欄は事業費13億円（補助額4.2億円）と丸め表示。,差は代表値の1%または50百万円以内。丸め・精度差として保持
+s1_outline__201,2次,株式会社イートアンドフーズ,sales_series,s1_outline__201_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,66,,increase_rate / target_base_ratio / cagr,1,,2026年度連結成長率66.0%、+170億円。単体はP.8参照だが未収録。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline__201,2次,株式会社イートアンドフーズ,cases,s1_outline__201,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,,,,,,売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）,申請企業自身の比較系列をPDFで再確認
+s1_outline__201,2次,株式会社イートアンドフーズ,cases,s1_outline__201,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s1_outline__202,2次,アライドコーヒーロースターズ株式会社,cases,s1_outline__202,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s1_outline__202_sales_01:applicant; s1_outline__202_sales_02:applicant,代表系列=s1_outline__202_sales_01
+s1_outline__204,2次,メック株式会社,cases,s1_outline__204,,MULTIPLE_INVESTMENT_COMPONENTS,info,resolved,,2,,,,既存工場; 北九州新工場,代表事業費は同一申請内の合計値を使用
+s1_outline__205,2次,ヤマシンスチール株式会社,cases,s1_outline__205,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s1_outline__208,2次,日本電波工業株式会社,metrics,officer_pay,officer_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,2.5%,,,2,補助事業の背景・目的,3社とも値―。単体2.5%、函館2.8%、古川3.0%のみ,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s1_outline__208,2次,日本電波工業株式会社,sales_series,s1_outline__208_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,199,,increase_rate / target_base_ratio / cagr,1,,連結+498億円、199%,記載率が増加率・到達率・年平均率のいずれか確定できない
+s1_outline__208,2次,日本電波工業株式会社,cases,s1_outline__208,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group, subsidiary",
+s1_outline__208,2次,日本電波工業株式会社,cases,s1_outline__208,,MULTIPLE_SALES_SERIES,warning,resolved,,4,,,,s1_outline__208_sales_01:group; s1_outline__208_sales_02:applicant; s1_outline__208_sales_03:subsidiary; s1_outline__208_sales_04:subsidiary,代表系列=s1_outline__208_sales_02
+s2_outline_1,3次,株式会社角藤,cases,s2_outline_1,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s2_outline_1,3次,株式会社角藤,cases,s2_outline_1,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s2_outline_1_sales_01:applicant; s2_outline_1_sales_02:project,代表系列=s2_outline_1_sales_01
+s2_outline_101,3次,安藤パラケミー株式会社,sales_series,s2_outline_101_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,10.4,,increase_rate / target_base_ratio / cagr,1,,会社全体の売上成長目標（〜31年）・売上高成長率10.4%・売上高増加額263億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_103,3次,ベストアメニティ株式会社,sales_series,s2_outline_103_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,150,,increase_rate / target_base_ratio / cagr,1,,2034年 売上高成長150%、売上高増加145億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_103,3次,ベストアメニティ株式会社,cases,s2_outline_103,,MULTIPLE_INVESTMENT_COMPONENTS,info,resolved,,3,,,,第3工場新築; 第4工場新築; 物流センター新築,代表事業費は同一申請内の合計値を使用
+s2_outline_103,3次,ベストアメニティ株式会社,cases,s2_outline_103,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s2_outline_103,3次,ベストアメニティ株式会社,cases,s2_outline_103,,MULTIPLE_SALES_SERIES,warning,resolved,,4,,,,s2_outline_103_sales_01:applicant; s2_outline_103_sales_02:project; s2_outline_103_sales_03:project; s2_outline_103_sales_04:project,代表系列=s2_outline_103_sales_01
+s2_outline_103,3次,ベストアメニティ株式会社,sales_series,s2_outline_103_sales_02,sales,PERIOD_AMBIGUOUS,warning,unresolved,設備投資前 -> 設備投資後, -> ,,2,,"販売額2,959百万円→7,300百万円（製造量2,821t→6,110t）",
+s2_outline_103,3次,ベストアメニティ株式会社,sales_series,s2_outline_103_sales_03,sales,PERIOD_AMBIGUOUS,warning,unresolved,設備投資前 -> 設備投資後, -> ,,2,,"販売額26百万円→3,700百万円（製造量15t→2,030t）",
+s2_outline_103,3次,ベストアメニティ株式会社,sales_series,s2_outline_103_sales_04,sales,PERIOD_AMBIGUOUS,warning,unresolved,設備投資前 -> 設備投資後, -> ,,2,,"合計販売額2,985百万円→11,000百万円（製造量2,836t→8,140t）",
+s2_outline_104,3次,アイサービス株式会社,cases,s2_outline_104,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_104_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_105,3次,株式会社シード,sales_series,s2_outline_105_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,6,,increase_rate / target_base_ratio / cagr,1,,会社全体の売上成長目標（〜31年）・売上高成長率6.0%・売上高増加額151億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_105,3次,株式会社シード,cases,s2_outline_105,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s2_outline_105,3次,株式会社シード,cases,s2_outline_105,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s2_outline_105_sales_01:applicant; s2_outline_105_sales_02:group,代表系列=s2_outline_105_sales_01
+s2_outline_105,3次,株式会社シード,sales_series,s2_outline_105_sales_02,sales,PERIOD_AMBIGUOUS,warning,unresolved, -> 中長期, -> ,,1,,中長期的に連結売上高500億円,
+s2_outline_106,3次,河淳株式会社,sales_series,s2_outline_106_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,39.6,,increase_rate / target_base_ratio / cagr,1,,会社全体の売上成長目標（〜2030年）・売上高成長率+39.6%・売上高増加額304億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_108,3次,株式会社丸杉,sales_series,s2_outline_108_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,49.4,,increase_rate / target_base_ratio / cagr,1,,"2030年売上1,693億円、売上高成長率49.4%、売上高増加額857億円。基準売上836億円は1693-857の逆算。",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_108,3次,株式会社丸杉,cases,s2_outline_108,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_109,3次,株式会社ヤマイシ,sales_series,s2_outline_109_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,10,,increase_rate / target_base_ratio / cagr,1,,会社全体の売上成長目標（〜31年）・売上高成長率10%・売上高増加額123億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_11,3次,たまご＆ファーマーズ株式会社,cases,s2_outline_11,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_11_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_11,3次,たまご＆ファーマーズ株式会社,cases,s2_outline_11,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_110,3次,学校法人花沢学園,cases,s2_outline_110,,COST_TEXT_NUMERIC_MISMATCH,critical,unresolved,,2900.0,project_cost=2900.0; subsidy=680.0; project_cost=2800.0,2,,事業費29億円（補助額6.8億円）。明細事業費合計28億円、括弧内合計9.33億円で概要と不一致。,本文・Box候補と代表値を併存。分析前にcost_amount_candidates.csvで確認
+s2_outline_110,3次,学校法人花沢学園,sales_series,s2_outline_110_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,110,,increase_rate / target_base_ratio / cagr,1,,会社全体の売上成長目標（〜30年）・売上高成長率110%・売上高増加額14億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_110,3次,学校法人花沢学園,cases,s2_outline_110,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[2800.0, 2900.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_115,4次,株式会社コスモス食品,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"6,042→7,847（+9.1%）",
+s2_outline_115,4次,株式会社コスモス食品,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,159→164人,
+s2_outline_115,4次,株式会社コスモス食品,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"11,310→14,984（+9.8%）",
+s2_outline_116,4次,奥伊吹観光株式会社,cases,s2_outline_116,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s2_outline_116,4次,奥伊吹観光株式会社,cases,s2_outline_116,,MULTIPLE_SALES_SERIES,warning,resolved,,3,,,,s2_outline_116_sales_01:applicant; s2_outline_116_sales_02:project; s2_outline_116_sales_03:project,代表系列=s2_outline_116_sales_01
+s2_outline_116,4次,奥伊吹観光株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"4,808→5,906（+7.1%）",
+s2_outline_116,4次,奥伊吹観光株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,50→56人,
+s2_outline_116,4次,奥伊吹観光株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"31,158→41,836（+10.3%）",
+s2_outline_116,4次,奥伊吹観光株式会社,metrics,officer_pay,officer_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"12,515→14,613（+5.3%）",
+s2_outline_117,4次,瀬戸内海印刷株式会社,cases,s2_outline_117,,COST_TEXT_NUMERIC_MISMATCH,critical,unresolved,,4380.0,project_cost=4380.0; subsidy=1360.0; project_cost=4371.0; project_cost=9.0,2,,"事業費4,380百万円（補助額1,360百万円）。明細合計4,371百万円で9百万円差。",本文・Box候補と代表値を併存。分析前にcost_amount_candidates.csvで確認
+s2_outline_117,4次,瀬戸内海印刷株式会社,cases,s2_outline_117,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[9.0, 4371.0, 4380.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_117,4次,瀬戸内海印刷株式会社,cases,s2_outline_117,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_117,4次,瀬戸内海印刷株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"5,967→7,758（+9.1%）",
+s2_outline_117,4次,瀬戸内海印刷株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,60→76人,
+s2_outline_117,4次,瀬戸内海印刷株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"18,038→44,423（+35.0%）",
+s2_outline_118,4次,株式会社光洋,cases,s2_outline_118,,COST_TEXT_NUMERIC_MISMATCH,critical,unresolved,,5191.0,project_cost=5191.0; subsidy=1134.0; project_cost=4880.0; project_cost=311.0,2,,"事業費5,191百万円（補助額1,134百万円）。明細合計4,880百万円で311百万円差。",本文・Box候補と代表値を併存。分析前にcost_amount_candidates.csvで確認
+s2_outline_118,4次,株式会社光洋,cases,s2_outline_118,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[311.0, 4880.0, 5191.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_118,4次,株式会社光洋,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"5,313→6,418（+6.5%）",
+s2_outline_118,4次,株式会社光洋,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,176→214人,
+s2_outline_118,4次,株式会社光洋,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"14,658→28,579（+24.9%）",
+s2_outline_119,4次,株式会社群馬コイケ,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"4,848→5,938（+7.0%）",
+s2_outline_119,4次,株式会社群馬コイケ,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,67→103人,
+s2_outline_119,4次,株式会社群馬コイケ,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"5,511→13,782（+35.7%）",
+s2_outline_12,3次,株式会社フルサワ,sales_series,s2_outline_12_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,208,,increase_rate / target_base_ratio / cagr,1,,2024年度→2029年12月期、売上高成長率208%、増加額40億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_12,3次,株式会社フルサワ,cases,s2_outline_12,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_12_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_120,4次,株式会社クボテック,sales_series,s2_outline_120_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,17.8,,increase_rate / target_base_ratio / cagr,1,,"会社全体の売上成長目標（〜2029年）・売上高増加額4,691百万円・売上高成長率17.8%",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_120,4次,株式会社クボテック,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"3,818→4,944（+9.0%）",
+s2_outline_120,4次,株式会社クボテック,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,11→39人,
+s2_outline_120,4次,株式会社クボテック,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"9,727→46,613（+68.6%）",
+s2_outline_122,4次,杉プラスチック工業株式会社,metrics,employee_pay,employee_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,6.6%,,,2,,"4,704→5,699（+6.6%）",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_122,4次,杉プラスチック工業株式会社,metrics,officer_pay,officer_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,6.6%,,,2,,金額－、+6.6%,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_122,4次,杉プラスチック工業株式会社,sales_series,s2_outline_122_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,268.6,,increase_rate / target_base_ratio / cagr,1,,2030年度、売上高成長率268.6%増、増加額42.42億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_122,4次,杉プラスチック工業株式会社,cases,s2_outline_122,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_122_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_122,4次,杉プラスチック工業株式会社,cases,s2_outline_122,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_123,3次,東洋ケアサービス株式会社,sales_series,s2_outline_123_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,30.3,,increase_rate / target_base_ratio / cagr,1,,2030年まで売上高成長率30.3%、増加額80億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_127,4次,株式会社キィポーション,metrics,employee_pay,employee_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,6.5%,,,2,設備投資の内容,"3,740,890→4,518,969円（+6.5%）",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_127,4次,株式会社キィポーション,metrics,employees,employees,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,17.5%,,,2,設備投資の内容,90→146（+17.5%）,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_127,4次,株式会社キィポーション,metrics,labor,labor,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,36.5%,,,2,設備投資の内容,"6,025,906→15,331,462円（+36.5%）",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_127,4次,株式会社キィポーション,metrics,officer_pay,officer_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,4.5%,,,2,設備投資の内容,金額－、+4.5%,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_127,4次,株式会社キィポーション,cases,s2_outline_127,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_128,3次,株式会社タカラ倉庫運輸サービス,metrics,employee_pay,employee_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,6%,,,2,その他Box,幹事456→543、参加者408→486（ともに+6.0%）,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_128,3次,株式会社タカラ倉庫運輸サービス,metrics,labor,labor,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,19.6%,,,2,その他Box,"幹事714→1,222（+19.6%）、参加者7,234→32,635（+65.2%）",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_128,3次,株式会社タカラ倉庫運輸サービス,sales_series,s2_outline_128_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,215.6,,increase_rate / target_base_ratio / cagr,1,,コンソーシアム、2024年8月期→2031年8月期、成長率215.6%、増加額73.5億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_128,3次,株式会社タカラ倉庫運輸サービス,cases,s2_outline_128,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,,,,,,売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）,申請企業自身の比較系列をPDFで再確認
+s2_outline_128,3次,株式会社タカラ倉庫運輸サービス,cases,s2_outline_128,,CONSORTIUM_APPLICATION,info,resolved,,1,,,,株式会社タカラグループ,
+s2_outline_128,3次,株式会社タカラ倉庫運輸サービス,cases,s2_outline_128,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s2_outline_128,3次,株式会社タカラ倉庫運輸サービス,cases,s2_outline_128,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_13,3次,フジセイコー株式会社,sales_series,s2_outline_13_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,195,,increase_rate / target_base_ratio / cagr,1,,11.8億円→35億円、売上高増加額23億円、売上高成長率195%,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_13,3次,フジセイコー株式会社,cases,s2_outline_13,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_13_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_13,3次,フジセイコー株式会社,cases,s2_outline_13,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_130,4次,株式会社ピカソナチュラルズ,sales_series,s2_outline_130_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,55,,increase_rate / target_base_ratio / cagr,1,,単体2030年6月期160億円、成長率55%、増加額149億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_130,4次,株式会社ピカソナチュラルズ,sales_series,s2_outline_130_sales_02,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,20,,increase_rate / target_base_ratio / cagr,1,,グループ2030年6月期371億円、成長率20%、増加額213億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_130,4次,株式会社ピカソナチュラルズ,cases,s2_outline_130,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_130_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_130,4次,株式会社ピカソナチュラルズ,cases,s2_outline_130,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,"applicant, group",
+s2_outline_130,4次,株式会社ピカソナチュラルズ,cases,s2_outline_130,,MULTIPLE_SALES_SERIES,warning,unresolved,,2,,,,s2_outline_130_sales_01:applicant; s2_outline_130_sales_02:group,代表系列=s2_outline_130_sales_01
+s2_outline_131,4次,株式会社中村畜産,cases,s2_outline_131,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_131_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_132,4次,株式会社コハラ,cases,s2_outline_132,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s2_outline_132,4次,株式会社コハラ,cases,s2_outline_132,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s2_outline_132_sales_01:applicant; s2_outline_132_sales_02:project,代表系列=s2_outline_132_sales_01
+s2_outline_133,4次,株式会社ユタカ,metrics,employee_pay,employee_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,7%,,,2,,"4,681→5,734（+7.0%）",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_133,4次,株式会社ユタカ,metrics,labor,labor,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,30.4%,,,2,,"10,686→23,668（+30.4%）",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_133,4次,株式会社ユタカ,metrics,officer_pay,officer_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,7%,,,2,,金額－、+7.0%,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_134,4次,池田薬品工業株式会社,metrics,employee_pay,employee_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,5.5%,,,2,設備投資の内容,"3,998,288→4,694,730円（+5.5%）",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_134,4次,池田薬品工業株式会社,metrics,employees,employees,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,25.3%,,,2,設備投資の内容,32→63（+25.3%）,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_134,4次,池田薬品工業株式会社,metrics,labor,labor,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,62.1%,,,2,設備投資の内容,"5,246,825→22,368,578円（+62.1%）",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_134,4次,池田薬品工業株式会社,metrics,officer_pay,officer_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,4.5%,,,2,設備投資の内容,金額－、+4.5%,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_135,4次,株式会社リバイト,metrics,employee_pay,employee_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,7.1%,,,2,その他Box,"5,067→6,223（+7.1%）",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_135,4次,株式会社リバイト,metrics,employees,employees,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,28.2%,,,2,その他Box,27→57（+28.2%）,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_135,4次,株式会社リバイト,metrics,labor,labor,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,23.7%,,,2,その他Box,"11,947→22,602（+23.7%）",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_135,4次,株式会社リバイト,cases,s2_outline_135,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_135_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_135,4次,株式会社リバイト,cases,s2_outline_135,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,"applicant, existing_business, project",
+s2_outline_135,4次,株式会社リバイト,cases,s2_outline_135,,MULTIPLE_SALES_SERIES,warning,unresolved,,3,,,,s2_outline_135_sales_01:applicant; s2_outline_135_sales_02:existing_business; s2_outline_135_sales_03:project,代表系列=s2_outline_135_sales_01
+s2_outline_137,4次,株式会社　博多屋,sales_series,s2_outline_137_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,148.19,,increase_rate / target_base_ratio / cagr,1,,2029年2月期13.4億円、対2025年2月期成長率148.19%、増加額4.35億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_138,4次,株式会社ジーケーエス,cases,s2_outline_138,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_138_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_14,3次,スギムラ化学工業株式会社,sales_series,s2_outline_14_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,178.6,,increase_rate / target_base_ratio / cagr,1,,2031年度まで売上高259億円、売上高成長率178.6%、増加額114億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_141,4次,古川電気工業株式会社,metrics,employee_pay,employee_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,7.4%,,,2,設備投資の内容,"従業員給与5,651→7,001千円、+7.4%",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_141,4次,古川電気工業株式会社,cases,s2_outline_141,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_141_sales_02,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_141,4次,古川電気工業株式会社,cases,s2_outline_141,,CONSORTIUM_APPLICATION,info,resolved,,1,,,,古川工業株式会社,
+s2_outline_141,4次,古川電気工業株式会社,cases,s2_outline_141,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,"affiliate, applicant, group",
+s2_outline_141,4次,古川電気工業株式会社,cases,s2_outline_141,,MULTIPLE_SALES_SERIES,warning,unresolved,,3,,,,s2_outline_141_sales_01:group; s2_outline_141_sales_02:applicant; s2_outline_141_sales_03:affiliate,代表系列=s2_outline_141_sales_02
+s2_outline_141,4次,古川電気工業株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"従業員給与5,651→7,001千円、+7.4%",
+s2_outline_141,4次,古川電気工業株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,3,,"古川工業：従業員給与3,838→4,754千円/人、年平均+7.4%。",
+s2_outline_141,4次,古川電気工業株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,従業員数209→213人,
+s2_outline_141,4次,古川電気工業株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,3,,古川工業：補助事業に係る従業員数98→100人。,
+s2_outline_141,4次,古川電気工業株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"労働生産性12,519→28,866千円、年平均+32.1%",
+s2_outline_141,4次,古川電気工業株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,3,,"古川工業：労働生産性4,760→9,968千円/人、年平均+27.9%。",
+s2_outline_143,4次,株式会社ライズクリエイション,cases,s2_outline_143,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_144,4次,株式会社シー・エス・ケイ,metrics,employee_pay,employee_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,7%,,,2,,"4,743→5,810千円、+7.0%",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_144,4次,株式会社シー・エス・ケイ,metrics,labor,labor,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,26.5%,,,2,,"10,990→22,268千円、+26.5%",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_144,4次,株式会社シー・エス・ケイ,metrics,officer_pay,officer_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,7%,,,2,,役員給与は値なし、+7.0%のみ,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_144,4次,株式会社シー・エス・ケイ,sales_series,s2_outline_144_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,30,,increase_rate / target_base_ratio / cagr,1,,2030年までに売上高増加額109億円、売上高成長率30.0%,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_144,4次,株式会社シー・エス・ケイ,cases,s2_outline_144,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_144,4次,株式会社シー・エス・ケイ,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"4,743→5,810千円、+7.0%",
+s2_outline_144,4次,株式会社シー・エス・ケイ,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,123→168人,
+s2_outline_144,4次,株式会社シー・エス・ケイ,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"10,990→22,268千円、+26.5%",
+s2_outline_145,4次,株式会社シャノワール,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"1,723→2,099千円、+6.8%",
+s2_outline_145,4次,株式会社シャノワール,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,345→370人,
+s2_outline_145,4次,株式会社シャノワール,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"2,872→5,843千円、+26.7%",
+s2_outline_145,4次,株式会社シャノワール,metrics,officer_pay,officer_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"7,166→8,415千円、+5.5%",
+s2_outline_146,4次,セーレンアドバンストマテリアルズ株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"5,660→6,992千円、+7.3%",
+s2_outline_146,4次,セーレンアドバンストマテリアルズ株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,58→69人,
+s2_outline_146,4次,セーレンアドバンストマテリアルズ株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"16,588→42,499千円、+36.8%",
+s2_outline_147,4次,株式会社　進和,sales_series,s2_outline_147_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,10.3,,increase_rate / target_base_ratio / cagr,1,,2031年8月期までに売上高増加額335億円、成長率10.3%,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_147,4次,株式会社　進和,cases,s2_outline_147,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[3473.0, 5478.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_147,4次,株式会社　進和,cases,s2_outline_147,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_148,4次,丹羽鋳造株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"4,941→5,948千円、+6.4%",
+s2_outline_148,4次,丹羽鋳造株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,177→183人,
+s2_outline_148,4次,丹羽鋳造株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"9,492→16,350千円、+19.9%",
+s2_outline_148,4次,丹羽鋳造株式会社,metrics,officer_pay,officer_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"19,726→23,642千円、+6.2%",
+s2_outline_149,4次,株式会社サン海苔,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"3,229→3,845千円、+6.0%",
+s2_outline_149,4次,株式会社サン海苔,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,72→72人,
+s2_outline_149,4次,株式会社サン海苔,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"4,211→11,494千円、+39.8%",
+s2_outline_15,3次,賀谷セロファン株式会社,sales_series,s2_outline_15_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,17.1,,increase_rate / target_base_ratio / cagr,1,,2030年度まで売上高成長率17.1%、増加額27.8億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_150,4次,株式会社玉子屋,sales_series,s2_outline_150_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,155,,increase_rate / target_base_ratio / cagr,1,,"2030年までに売上高増加額8,212百万円、成長率+155%",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_151,3次,株式会社清水インダストリ－,cases,s2_outline_151,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_151_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_152,4次,株式会社大熊製作所,sales_series,s2_outline_152_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,298.1,,increase_rate / target_base_ratio / cagr,1,,"2027年度→2030年度、売上高増加額8,094百万円、成長率298.1%",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_152,4次,株式会社大熊製作所,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"4,979→5,973千円、+6.3%",
+s2_outline_152,4次,株式会社大熊製作所,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,128→193人,
+s2_outline_152,4次,株式会社大熊製作所,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"7,087→20,505千円、+42.5%",
+s2_outline_152,4次,株式会社大熊製作所,metrics,officer_pay,officer_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"19,721→23,483千円、+6.0%",
+s2_outline_153,4次,コモライフ株式会社,sales_series,s2_outline_153_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,302.2,,increase_rate / target_base_ratio / cagr,1,,"2030年対2023年、売上高増加額22,542百万円、成長率302.2%",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_153,4次,コモライフ株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"6,413→7,969千円、+7.5%",
+s2_outline_153,4次,コモライフ株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,63→115人,
+s2_outline_153,4次,コモライフ株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"14,378→29,954千円、+27.7%",
+s2_outline_154,4次,アルフレッド株式会社,cases,s2_outline_154,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s2_outline_154,4次,アルフレッド株式会社,cases,s2_outline_154,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_154,4次,アルフレッド株式会社,cases,s2_outline_154,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s2_outline_154_sales_01:applicant; s2_outline_154_sales_02:project,代表系列=s2_outline_154_sales_01
+s2_outline_154,4次,アルフレッド株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,4,,"7,512→10,029千円、+10.1%",
+s2_outline_154,4次,アルフレッド株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,4,,104→140人,
+s2_outline_154,4次,アルフレッド株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,4,,"21,403→33,275千円、+15.8%",
+s2_outline_154,4次,アルフレッド株式会社,metrics,officer_pay,officer_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,4,,"23,716→31,566千円、+10.0%",
+s2_outline_155,4次,信和化工株式会社,sales_series,s2_outline_155_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,15,,increase_rate / target_base_ratio / cagr,1,,2030年までに売上高増加額908百万円、成長率15%,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_155,4次,信和化工株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"5,613→7,136千円、+8.3%",
+s2_outline_155,4次,信和化工株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,40→49人,
+s2_outline_155,4次,信和化工株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"12,516→24,779千円、+25.6%",
+s2_outline_156,4次,上野ロジケム株式会社,cases,s2_outline_156,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s2_outline_156_sales_01:applicant; s2_outline_156_sales_02:applicant,代表系列=s2_outline_156_sales_01
+s2_outline_156,4次,上野ロジケム株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"6,506→7,971千円、+7.0%",
+s2_outline_156,4次,上野ロジケム株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,16→46人,
+s2_outline_156,4次,上野ロジケム株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"29,819→46,030千円、+15.6%",
+s2_outline_157,4次,株式会社ワイズマート,sales_series,s2_outline_157_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,13,,increase_rate / target_base_ratio / cagr,1,,2027年2月期比較。2030年2月期までに売上高成長率13%、売上高増加額259億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_158,4次,株式会社セントラルフード,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"3,481→4,205千円、+6.5%",
+s2_outline_158,4次,株式会社セントラルフード,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,123→132人,
+s2_outline_158,4次,株式会社セントラルフード,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"5,031→11,248千円、+30.8%",
+s2_outline_158,4次,株式会社セントラルフード,sales_series,s2_outline_158_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,基準年度前年 -> 2030年度（事業化3年目）, -> 2030,,1,,"2030年度の会社全体売上10,842百万円、CAGR15%。CAGRは基準年度前年～事業化3年目で算出",
+s2_outline_159,4次,株式会社　ファーストライン,sales_series,s2_outline_159_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,18,,increase_rate / target_base_ratio / cagr,1,,"基準年度～最終年度：売上高増加額1,060百万円、売上高成長率18.0%（年率平均）",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_159,4次,株式会社　ファーストライン,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"3,878→4,685千円、+6.5%",
+s2_outline_159,4次,株式会社　ファーストライン,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,70→75人,
+s2_outline_159,4次,株式会社　ファーストライン,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"10,694→16,855千円、+16.4%",
+s2_outline_159,4次,株式会社　ファーストライン,metrics,officer_pay,officer_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"11,109→12,970千円、+5.3%",
+s2_outline_16,3次,株式会社ヤマキ,sales_series,s2_outline_16_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,75,,increase_rate / target_base_ratio / cagr,1,,2030年度まで売上高成長率75%、増加額37.5億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_160,4次,株式会社ダイドー,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"5,527→6,678千円、+6.5%",
+s2_outline_160,4次,株式会社ダイドー,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,275→284人,
+s2_outline_160,4次,株式会社ダイドー,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"7,920→13,621千円、+19.8%",
+s2_outline_161,4次,株式会社デイリーエッグ,sales_series,s2_outline_161_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,7.4,,increase_rate / target_base_ratio / cagr,1,,2029年度に売上高290億円、売上増加額101億円、売上成長率7.4%。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_163,4次,MHT株式会社,metrics,officer_pay,officer_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,6%,,,2,,役員給与は率+6.0%のみ。,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_164,4次,株式会社東豊精工,sales_series,s2_outline_164_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,14.8,,increase_rate / target_base_ratio / cagr,1,,2030年までに売上高増加額21.4億円、売上高成長率14.8%。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_164,4次,株式会社東豊精工,cases,s2_outline_164,,COST_TEXT_NUMERIC_ROUNDING_DIFFERENCE,warning,resolved_with_tolerance,,2331.0,project_cost=2331.0; subsidy=550.0; project_cost=2296.0,2,,"事業費2,331百万円（補助額550百万円）。表の明細合計2,296百万円。",差は代表値の1%または50百万円以内。丸め・精度差として保持
+s2_outline_164,4次,株式会社東豊精工,cases,s2_outline_164,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[2296.0, 2331.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_165,4次,株式会社南鐵建,sales_series,s2_outline_165_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,106,,increase_rate / target_base_ratio / cagr,1,,2024年9月期から2031年9月期、売上高増加額206.51億円、売上高成長率106%。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_165,4次,株式会社南鐵建,cases,s2_outline_165,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_167,4次,株式会社カネヒロ,cases,s2_outline_167,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[1243.0, 1684.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_168,4次,明和工業株式会社,cases,s2_outline_168,,CONSORTIUM_APPLICATION,info,resolved,,1,,,,株式会社ヨシカワ機械,
+s2_outline_168,4次,明和工業株式会社,cases,s2_outline_168,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"affiliate, applicant",
+s2_outline_168,4次,明和工業株式会社,cases,s2_outline_168,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_168,4次,明和工業株式会社,cases,s2_outline_168,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s2_outline_168_sales_01:applicant; s2_outline_168_sales_02:affiliate,代表系列=s2_outline_168_sales_01
+s2_outline_168,4次,明和工業株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,3,,"ヨシカワ機械：従業員給与3,705→4,475千円/人、年平均+6.5%。",
+s2_outline_168,4次,明和工業株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,3,,ヨシカワ機械：補助事業に係る従業員数33→48人。,
+s2_outline_168,4次,明和工業株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,3,,"ヨシカワ機械：労働生産性14,812→30,959千円/人、年平均+27.9%。",
+s2_outline_171,4次,オギハラ食品株式会社,sales_series,s2_outline_171_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,49.4,,increase_rate / target_base_ratio / cagr,1,,"基準年度から2030年、売上高増加額3,143百万円、売上高成長率49.4%。",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_173,3次,栄屋乳業株式会社,sales_series,s2_outline_173_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近決算 -> 2031年, -> 2031,,1,,直近決算129億円→2031年329億円、増加200億円、成長率+155%。,
+s2_outline_174,4次,ナカネ新建材株式会社,sales_series,s2_outline_174_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近期末 -> 30年10月期, -> 2030,,1,,会社全体～2030年：売上高171億円、増加106億円、成長率163%（直近期末→30年10月期）。,
+s2_outline_175,4次,化成工業株式会社,metrics,officer_pay,officer_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,5.3%,,,2,,役員給与は率+5.3%のみ。,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_176,4次,北アルプス飲料株式会社,sales_series,s2_outline_176_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,480,,increase_rate / target_base_ratio / cagr,1,,"2030年の会社全体売上成長目標：増加額6,382百万円、成長率480%。",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_177,4次,八光エルアール株式会社,sales_series,s2_outline_177_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,7.9,,increase_rate / target_base_ratio / cagr,1,,"～2030年12月期、売上高成長率7.9%、売上高増加額12,709百万円。",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_178,4次,株式会社メタルテック,sales_series,s2_outline_178_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,8.2,,increase_rate / target_base_ratio / cagr,1,,会社全体～30年：売上高成長率8.2%、売上高増加額15.9億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_18,3次,DOWAパワーデバイス株式会社,sales_series,s2_outline_18_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,246,,increase_rate / target_base_ratio / cagr,1,,2030年度まで会社全体の売上成長率246%、売上高増加額92億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_180,4次,株式会社森田あられ,metrics,officer_pay,officer_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,7%,,,2,,役員給与は率+7.0%のみ。,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_180,4次,株式会社森田あられ,cases,s2_outline_180,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_181,4次,株式会社手原産業倉庫,sales_series,s2_outline_181_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,9.01,,increase_rate / target_base_ratio / cagr,1,,"2030年までに売上高増加額3,631百万円、売上高成長率9.01%",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_181,4次,株式会社手原産業倉庫,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"2,625→3,329千円、+8.2%",
+s2_outline_181,4次,株式会社手原産業倉庫,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,329→359人,
+s2_outline_181,4次,株式会社手原産業倉庫,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"5,394→8,492千円、年平均+16.3%",
+s2_outline_182,4次,株式会社北十,sales_series,s2_outline_182_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,23.8,,increase_rate / target_base_ratio / cagr,1,,"基準年度～30年：売上高成長率23.8%、増加額2,077百万円。本文に売上高42億円目標、直近の2.45倍",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_182,4次,株式会社北十,sales_series,s2_outline_182_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 30年, -> 2030,,1,,"基準年度～30年：売上高成長率23.8%、増加額2,077百万円。本文に売上高42億円目標、直近の2.45倍",
+s2_outline_183,4次,ナカシマヘルスフォース株式会社,cases,s2_outline_183,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[8120.0, 9804.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_184,4次,日電精密工業株式会社,metrics,employee_pay,employee_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,7%,,,2,新工場（池田工場）,"5,031→6,163千円、+7.0%",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_184,4次,日電精密工業株式会社,metrics,labor,labor,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,27.8%,,,2,新工場（池田工場）,"6,972→14,561千円、+27.8%",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_184,4次,日電精密工業株式会社,cases,s2_outline_184,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[3717.0, 4044.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_184,4次,日電精密工業株式会社,cases,s2_outline_184,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_184,4次,日電精密工業株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"5,031→6,163千円、+7.0%",
+s2_outline_184,4次,日電精密工業株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,240→261人、年平均上昇率2.8%,
+s2_outline_184,4次,日電精密工業株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"6,972→14,561千円、+27.8%",
+s2_outline_187,4次,石坂産業株式会社,sales_series,s2_outline_187_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,12.4,,increase_rate / target_base_ratio / cagr,1,,"6,716百万円→15,252百万円、増加8,536百万円、売上高成長率12.4%",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_187,4次,石坂産業株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"6,264→7,891千円、+8.0%",
+s2_outline_187,4次,石坂産業株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,145→180人,
+s2_outline_187,4次,石坂産業株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"15,160→32,134千円、+28.5%",
+s2_outline_187,4次,石坂産業株式会社,sales_series,s2_outline_187_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近決算 -> 2030年度, -> 2030,,1,,"6,716百万円→15,252百万円、増加8,536百万円、売上高成長率12.4%",
+s2_outline_188,3次,株式会社ユビタス,sales_series,s2_outline_188_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,42,,increase_rate / target_base_ratio / cagr,1,,2030年までに売上高成長率42%、売上高増加額159億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_19,3次,株式会社高木製作所,sales_series,s2_outline_19_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,168,,increase_rate / target_base_ratio / cagr,1,,2030年まで会社全体の売上成長率168%、売上高増加額304億円。注記：コンソーシアムの合計値,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_19,3次,株式会社高木製作所,cases,s2_outline_19,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,,,,,,売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）,申請企業自身の比較系列をPDFで再確認
+s2_outline_19,3次,株式会社高木製作所,cases,s2_outline_19,,CONSORTIUM_APPLICATION,info,resolved,,1,,,,株式会社高木運輸,
+s2_outline_19,3次,株式会社高木製作所,cases,s2_outline_19,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s2_outline_190,3次,伊藤光学工業株式会社,sales_series,s2_outline_190_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,103,,increase_rate / target_base_ratio / cagr,1,,2031年度までに売上高成長率103%、売上高増加額65.9億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_191,4次,株式会社ビクトリー,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"4,342→5,470千円、+8.0%",
+s2_outline_191,4次,株式会社ビクトリー,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,従業員数（役員含む）35→100人,
+s2_outline_191,4次,株式会社ビクトリー,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"36,767→66,038千円、+21.6%",
+s2_outline_192,4次,フクビ岡山株式会社,cases,s2_outline_192,,COST_TEXT_NUMERIC_MISMATCH,critical,unresolved,,3652.0,project_cost=3652.0; subsidy=900.0; project_cost=4289.0,2,,"事業費3,652百万円、補助額900百万円。記載明細合計4,289百万円。",本文・Box候補と代表値を併存。分析前にcost_amount_candidates.csvで確認
+s2_outline_192,4次,フクビ岡山株式会社,cases,s2_outline_192,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[3652.0, 4289.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_192,4次,フクビ岡山株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"5,242→6,279千円、+6.2%",
+s2_outline_192,4次,フクビ岡山株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,40→60人（+20人）,
+s2_outline_192,4次,フクビ岡山株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"17,445→32,752千円、+23.4%",
+s2_outline_193,4次,ソントン食品株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"5,497→6,640千円、+6.5%",
+s2_outline_193,4次,ソントン食品株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,595→631人,
+s2_outline_193,4次,ソントン食品株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"10,270→19,298千円、+23.4%",
+s2_outline_194,4次,リバードコーポレーション株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"3,728→4,609千円、+7.3%",
+s2_outline_194,4次,リバードコーポレーション株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,120→135人,
+s2_outline_194,4次,リバードコーポレーション株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"10,647→13,174千円、+7.4%",
+s2_outline_195,4次,株式会社レクザム,sales_series,s2_outline_195_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,11.5,,increase_rate / target_base_ratio / cagr,1,,2030年までに売上高成長率11.5%、売上高増加額100億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_196,4次,岩手雪運株式会社,sales_series,s2_outline_196_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,25.79,,increase_rate / target_base_ratio / cagr,1,,基準年度～31年：売上高成長率25.79%、売上高増加額+48億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_196,4次,岩手雪運株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"4,007→4,694千円、+5.4%",
+s2_outline_196,4次,岩手雪運株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,306→393人,
+s2_outline_196,4次,岩手雪運株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"4,766→10,804千円、+31.4%",
+s2_outline_197,3次,株式会社ファイン,cases,s2_outline_197,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"affiliate, applicant",
+s2_outline_197,3次,株式会社ファイン,cases,s2_outline_197,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s2_outline_197_sales_01:applicant; s2_outline_197_sales_02:affiliate,代表系列=s2_outline_197_sales_01
+s2_outline_199,4次,日本毛織株式会社,cases,s2_outline_199,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,group,
+s2_outline_199,4次,日本毛織株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"7,029→8,424千円、+6.2%",
+s2_outline_199,4次,日本毛織株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,340→330人,
+s2_outline_199,4次,日本毛織株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"14,945→23,446千円、+16.2%",
+s2_outline_2,3次,ガイア株式会社,metrics,employee_pay,employee_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,7%,,,2,設備投資の内容,全社481→575（+7.0%）。鳥取428→518、大阪615→773も併記,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_2,3次,ガイア株式会社,cases,s2_outline_2,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_2_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_2,3次,ガイア株式会社,cases,s2_outline_2,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,"applicant, project",
+s2_outline_2,3次,ガイア株式会社,cases,s2_outline_2,,MULTIPLE_SALES_SERIES,warning,unresolved,,2,,,,s2_outline_2_sales_01:applicant; s2_outline_2_sales_02:project,代表系列=s2_outline_2_sales_01
+s2_outline_201,4次,ハムリー株式会社,cases,s2_outline_201,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s2_outline_201_sales_01:applicant; s2_outline_201_sales_02:applicant,代表系列=s2_outline_201_sales_01
+s2_outline_202,4次,東海デキストリン株式会社,cases,s2_outline_202,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_202,4次,東海デキストリン株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"4,833→5,838千円、+6.5%",
+s2_outline_202,4次,東海デキストリン株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,11→23人,
+s2_outline_202,4次,東海デキストリン株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"11,134→48,228千円、+63.0%",
+s2_outline_204,4次,新日本電工株式会社,cases,s2_outline_204,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_205,3次,八戸酒造株式会社,sales_series,s2_outline_205_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,14.28,,increase_rate / target_base_ratio / cagr,1,,2030年度売上16.4億円、増加7.1億円、売上高成長率14.28%（基準9.3億円は差引）,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_206,4次,能勢酒造株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"3,873→4,687千円、+6.6%",
+s2_outline_206,4次,能勢酒造株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,31→54人,
+s2_outline_206,4次,能勢酒造株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"9,529→19,550千円、+27.1%",
+s2_outline_207,4次,ロートニッテン株式会社,sales_series,s2_outline_207_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,10.2,,increase_rate / target_base_ratio / cagr,1,,2031年3月期までに売上高成長率10.2%、増加額98億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_207,4次,ロートニッテン株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"6,130→7,342千円、+6.2%",
+s2_outline_207,4次,ロートニッテン株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,280→300人,
+s2_outline_207,4次,ロートニッテン株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"8,985→17,343千円、+24.5%",
+s2_outline_207,4次,ロートニッテン株式会社,metrics,officer_pay,officer_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"11,143→12,899千円、+5.0%",
+s2_outline_208,4次,NICHIRO株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"4,581→5,611千円、+7.0%",
+s2_outline_208,4次,NICHIRO株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,91→118人,
+s2_outline_208,4次,NICHIRO株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"9,331→23,183千円、+35.4%",
+s2_outline_209,3次,株式会社ファーストダウン,cases,s2_outline_209,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_21,3次,健栄製薬株式会社,sales_series,s2_outline_21_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,7.8,,increase_rate / target_base_ratio / cagr,1,,2030年度までの売上高成長率7.8%、売上高増加額186億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_21,3次,健栄製薬株式会社,cases,s2_outline_21,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_210,4次,南島酒販株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"4,402→5,318千円、+6.5%",
+s2_outline_210,4次,南島酒販株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,114→128人,
+s2_outline_210,4次,南島酒販株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"4,733→8,839千円、+23.1%",
+s2_outline_211,4次,アサヒプリテック株式会社,cases,s2_outline_211,,MULTIPLE_INVESTMENT_COMPONENTS,info,resolved,,5,,,,茨城県坂東工場; 兵庫県テクノセンター; 兵庫県尼崎工場; 長野工場; 福岡工場,代表事業費は同一申請内の合計値を使用
+s2_outline_212,3次,キングパーツ株式会社,cases,s2_outline_212,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s2_outline_212_sales_01:applicant; s2_outline_212_sales_02:applicant,代表系列=s2_outline_212_sales_01
+s2_outline_213,4次,ファインプラス株式会社,sales_series,s2_outline_213_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,7.8,,increase_rate / target_base_ratio / cagr,1,,"2031年3月期までに売上高増加額5,226百万円、売上高成長率7.8%",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_215,3次,昭和化工株式会社,cases,s2_outline_215,,MULTIPLE_INVESTMENT_COMPONENTS,info,resolved,,2,,,,新クロライド工場増設; 無機錫工場改築,代表事業費は同一申請内の合計値を使用
+s2_outline_215,3次,昭和化工株式会社,cases,s2_outline_215,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[2500.0, 3000.0, 11200.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_216,3次,中本Fine Pack株式会社,sales_series,s2_outline_216_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,17.01,,increase_rate / target_base_ratio / cagr,1,,2030年12月期までに売上高成長率17.01%、増加額33.45億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_216,3次,中本Fine Pack株式会社,cases,s2_outline_216,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_217,4次,院庄林業株式会社,cases,s2_outline_217,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_217,4次,院庄林業株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"5,054→6,054千円、+6.2%",
+s2_outline_217,4次,院庄林業株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,287→297人,
+s2_outline_217,4次,院庄林業株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"9,759→18,400千円、+23.5%",
+s2_outline_217,4次,院庄林業株式会社,metrics,officer_pay,officer_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"31,024→37,160千円、+6.2%",
+s2_outline_218,4次,株式会社エム・ケー・ケー,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,3,,"4,000→4,914千円、+7.1%",
+s2_outline_218,4次,株式会社エム・ケー・ケー,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,3,,20→46人,
+s2_outline_218,4次,株式会社エム・ケー・ケー,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,3,,"12,537→17,774千円、+12.3%",
+s2_outline_218,4次,株式会社エム・ケー・ケー,metrics,officer_pay,officer_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,3,,"6,000→7,187千円、+6.2%",
+s2_outline_219,4次,株式会社ナリコマフード,sales_series,s2_outline_219_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,11.9,,increase_rate / target_base_ratio / cagr,1,,"2031年までに売上高増加額40,088百万円、売上高成長率11.9%",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_219,4次,株式会社ナリコマフード,cases,s2_outline_219,,COST_TEXT_NUMERIC_ROUNDING_DIFFERENCE,warning,resolved_with_tolerance,,15078.0,project_cost=15078.0; subsidy=3737.0; project_cost=15116.0,2,,"事業費15,078百万円、補助額3,737百万円。記載明細合計15,116百万円。",差は代表値の1%または50百万円以内。丸め・精度差として保持
+s2_outline_219,4次,株式会社ナリコマフード,cases,s2_outline_219,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[15078.0, 15116.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_219,4次,株式会社ナリコマフード,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"5,640→6,813千円、+6.5%",
+s2_outline_219,4次,株式会社ナリコマフード,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,60→178人,
+s2_outline_219,4次,株式会社ナリコマフード,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"7,720→12,314千円、+16.8%",
+s2_outline_219,4次,株式会社ナリコマフード,metrics,officer_pay,officer_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,役員給与0→0、年平均上昇率+0%,
+s2_outline_22,3次,味覚糖株式会社,cases,s2_outline_22,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s2_outline_22,3次,味覚糖株式会社,cases,s2_outline_22,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_22,3次,味覚糖株式会社,cases,s2_outline_22,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s2_outline_22_sales_01:applicant; s2_outline_22_sales_02:group,代表系列=s2_outline_22_sales_01
+s2_outline_22,3次,味覚糖株式会社,sales_series,s2_outline_22_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近期 -> 2030年, -> 2030,,1,,味覚糖株式会社は直近期314.2億円から2030年620億円、197.3%、増加額305.8億円,
+s2_outline_220,4次,富田薬品株式会社,sales_series,s2_outline_220_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,5.9,,increase_rate / target_base_ratio / cagr,1,,24～30年度：売上高増加額621億円、売上高成長率5.9%。24/30を西暦へ強制変換せず原文保持,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_220,4次,富田薬品株式会社,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"4,009→4,842千円、+6.5%",
+s2_outline_220,4次,富田薬品株式会社,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"1,269→1,269人",
+s2_outline_220,4次,富田薬品株式会社,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,2,,"6,833→9,005千円、+9.6%",
+s2_outline_221,4次,株式会社ニシムタ,sales_series,s2_outline_221_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,1,,"基準年度863.3億円→事業化報告3年目1,010.0億円、増加14,670百万円、CAGR5.3%。",
+s2_outline_222,4次,株式会社 日本橋冷凍手島商店,cases,s2_outline_222,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_223,4次,三ッ和商事株式会社,sales_series,s2_outline_223_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,17.9,,increase_rate / target_base_ratio / cagr,1,,"～2030年度、売上目標6,526百万円（最新決算期2,427百万円）、増加4,099百万円、成長率17.9%。",記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_223,4次,三ッ和商事株式会社,cases,s2_outline_223,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_223,4次,三ッ和商事株式会社,sales_series,s2_outline_223_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,最新決算期 -> 2030年度, -> 2030,,1,,"～2030年度、売上目標6,526百万円（最新決算期2,427百万円）、増加4,099百万円、成長率17.9%。",
+s2_outline_228,4次,株式会社ベネフル,sales_series,s2_outline_228_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,18.3,,increase_rate / target_base_ratio / cagr,1,,2031年5月期売上50億円（現店舗20億円、新店舗10億円×3店）、2024年5月業績比の売上高成長率18.3%。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_232,3次,株式会社モリシタ,cases,s2_outline_232,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,,,,,,売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）,申請企業自身の比較系列をPDFで再確認
+s2_outline_232,3次,株式会社モリシタ,cases,s2_outline_232,,CONSORTIUM_APPLICATION,info,resolved,,1,,,,株式会社ホワイトフォックス,
+s2_outline_232,3次,株式会社モリシタ,cases,s2_outline_232,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s2_outline_234,3次,日本エア・リキード合同会社,cases,s2_outline_234,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_24,3次,高知食糧株式会社,sales_series,s2_outline_24_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,8.9,,increase_rate / target_base_ratio / cagr,1,,2035年売上高200億円、売上高成長率8.9%、売上高増加額126億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_24,3次,高知食糧株式会社,sales_series,s2_outline_24_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近期 -> 2035年, -> 2035,,1,,2035年売上高200億円、売上高成長率8.9%、売上高増加額126億円,
+s2_outline_26,3次,株式会社ティーケーシン,sales_series,s2_outline_26_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,16.3,,increase_rate / target_base_ratio / cagr,1,,2025年4月度から2030年4月度、売上112億円、成長率16.3%、増加額50.6億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_27,3次,株式会社ライト製作所,cases,s2_outline_27,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s2_outline_27,3次,株式会社ライト製作所,cases,s2_outline_27,,MULTIPLE_SALES_SERIES,warning,resolved,,3,,,,s2_outline_27_sales_01:applicant; s2_outline_27_sales_02:applicant; s2_outline_27_sales_03:project,代表系列=s2_outline_27_sales_01
+s2_outline_3,3次,さくら不動産株式会社,cases,s2_outline_3,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,,,,,,売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）,申請企業自身の比較系列をPDFで再確認
+s2_outline_3,3次,さくら不動産株式会社,cases,s2_outline_3,,CONSORTIUM_APPLICATION,info,resolved,,1,,,,The Hakuba Company株式会社,
+s2_outline_3,3次,さくら不動産株式会社,cases,s2_outline_3,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s2_outline_31,3次,アトム株式会社,cases,s2_outline_31,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_31,3次,アトム株式会社,sales_series,s2_outline_31_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近期 -> 2030年9月期, -> 2030,,1,,2030年9月期売上320億円、CAGR14.5%、売上高増加額179億円,
+s2_outline_33,3次,株式会社浪速ポンプ製作所,sales_series,s2_outline_33_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,20,,increase_rate / target_base_ratio / cagr,1,,2030年までに売上高成長率20%、売上高増加額84億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_35,3次,株式会社北海道ちぬやファーム,cases,s2_outline_35,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,,,,,,売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）,申請企業自身の比較系列をPDFで再確認
+s2_outline_35,3次,株式会社北海道ちぬやファーム,cases,s2_outline_35,,CONSORTIUM_APPLICATION,info,resolved,,1,,,,ちぬや冷食株式会社,
+s2_outline_35,3次,株式会社北海道ちぬやファーム,cases,s2_outline_35,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s2_outline_37,3次,ノーラエンジニアリング株式会社,sales_series,s2_outline_37_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,13.6,,increase_rate / target_base_ratio / cagr,1,,コンソーシアムで2030年7月期売上100億円、売上高成長率13.6%、増加額53億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_37,3次,ノーラエンジニアリング株式会社,cases,s2_outline_37,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,,,,,,売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）,申請企業自身の比較系列をPDFで再確認
+s2_outline_37,3次,ノーラエンジニアリング株式会社,cases,s2_outline_37,,CONSORTIUM_APPLICATION,info,resolved,,1,,,,東北ノーラ株式会社,
+s2_outline_37,3次,ノーラエンジニアリング株式会社,cases,s2_outline_37,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s2_outline_37,3次,ノーラエンジニアリング株式会社,sales_series,s2_outline_37_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近期 -> 2030年7月期, -> 2030,,1,,コンソーシアムで2030年7月期売上100億円、売上高成長率13.6%、増加額53億円,
+s2_outline_39,3次,名古屋東部陸運株式会社,sales_series,s2_outline_39_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,14.8,,increase_rate / target_base_ratio / cagr,1,,会社全体の売上成長目標（2027年～2031年）：売上高成長率14.8%、増加額190億円（2031年売上高453億円）,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_41,3次,藤本化学製品株式会社,sales_series,s2_outline_41_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,169,,increase_rate / target_base_ratio / cagr,1,,2035年度に直近決算期比で売上高増加率+169%、売上高増加額314億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_43,3次,近江鍛工株式会社,cases,s2_outline_43,,MULTIPLE_INVESTMENT_COMPONENTS,info,resolved,,3,,,,本社工場・工場倉庫新築; 本社工場・旋盤切断機等; 信楽・長崎工場・旋盤切断機等,代表事業費は同一申請内の合計値を使用
+s2_outline_44,3次,株式会社アヤボ,sales_series,s2_outline_44_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,2,,increase_rate / target_base_ratio / cagr,1,,会社全体の売上成長目標（2025年度～2030年度）：売上高成長率2.0%、売上高増加額1.6億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_46,3次,カンケンテクノ株式会社,cases,s2_outline_46,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,,,,,,売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）,申請企業自身の比較系列をPDFで再確認
+s2_outline_46,3次,カンケンテクノ株式会社,cases,s2_outline_46,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s2_outline_46,3次,カンケンテクノ株式会社,cases,s2_outline_46,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_48,3次,株式会社サンワ,sales_series,s2_outline_48_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,12.2,,increase_rate / target_base_ratio / cagr,1,,会社全体の売上成長目標（～31年9月期）：売上高成長率12.2%、売上高増加額46億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_49,3次,白鷺特殊鋼株式会社,sales_series,s2_outline_49_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,192,,increase_rate / target_base_ratio / cagr,1,,白鷺特殊鋼(株)兵庫の売上成長目標：売上高成長率192%、売上高増加額70億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_49,3次,白鷺特殊鋼株式会社,sales_series,s2_outline_49_sales_02,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,166,,increase_rate / target_base_ratio / cagr,1,,ハクロスチール(株)：売上高成長率166%、売上高増加額10.3億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_49,3次,白鷺特殊鋼株式会社,sales_series,s2_outline_49_sales_03,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,187,,increase_rate / target_base_ratio / cagr,1,,2社合計：売上高成長率187%、売上高増加額81億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_49,3次,白鷺特殊鋼株式会社,cases,s2_outline_49,,CONSORTIUM_APPLICATION,info,resolved,,1,,,,ハクロスチール株式会社,
+s2_outline_49,3次,白鷺特殊鋼株式会社,cases,s2_outline_49,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"affiliate, applicant, group",
+s2_outline_49,3次,白鷺特殊鋼株式会社,cases,s2_outline_49,,MULTIPLE_SALES_SERIES,warning,resolved,,3,,,,s2_outline_49_sales_01:applicant; s2_outline_49_sales_02:affiliate; s2_outline_49_sales_03:group,代表系列=s2_outline_49_sales_01
+s2_outline_5,3次,奥長良川名水株式会社,cases,s2_outline_5,,COST_TEXT_NUMERIC_MISMATCH,critical,unresolved,,1214.665,project_cost=1300.0; subsidy=300.0,2,,事業費13億円（補助額3.0億円）、建物634.635百万円、機械580.030百万円,本文・Box候補と代表値を併存。分析前にcost_amount_candidates.csvで確認
+s2_outline_5,3次,奥長良川名水株式会社,cases,s2_outline_5,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, project",
+s2_outline_5,3次,奥長良川名水株式会社,cases,s2_outline_5,,MULTIPLE_SALES_SERIES,warning,resolved,,3,,,,s2_outline_5_sales_01:applicant; s2_outline_5_sales_02:project; s2_outline_5_sales_03:project,代表系列=s2_outline_5_sales_01
+s2_outline_51,3次,有楽製菓株式会社,sales_series,s2_outline_51_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,16,,increase_rate / target_base_ratio / cagr,2,,本文は2030年7月期売上高340億円。成長目標Boxは売上高成長率16%、売上高増加額155億円。会社概要は2024年7月期165億円。,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_51,3次,有楽製菓株式会社,cases,s2_outline_51,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_51_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_51,3次,有楽製菓株式会社,sales_series,s2_outline_51_sales_01,sales,SALES_ARITHMETIC_MISMATCH,critical,unresolved,16,16,,2,,本文は2030年7月期売上高340億円。成長目標Boxは売上高成長率16%、売上高増加額155億円。会社概要は2024年7月期165億円。,
+s2_outline_51,3次,有楽製菓株式会社,cases,s2_outline_51,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_52,3次,株式会社GYXUS,cases,s2_outline_52,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"affiliate, applicant, group",
+s2_outline_52,3次,株式会社GYXUS,cases,s2_outline_52,,MULTIPLE_SALES_SERIES,warning,resolved,,7,,,,s2_outline_52_sales_01:applicant; s2_outline_52_sales_02:affiliate; s2_outline_52_sales_03:affiliate; s2_outline_52_sales_04:affiliate; s2_outline_52_sales_05:affiliate; s2_outline_52_sales_06:affiliate; s2_outline_52_sales_07:group,代表系列=s2_outline_52_sales_01
+s2_outline_52,3次,株式会社GYXUS,metrics,employee_pay,employee_pay,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 基準年度+3年後, -> ,,2,,"申請者の従業員給与4,905→6,012千円（+7.0%）",
+s2_outline_52,3次,株式会社GYXUS,metrics,employees,employees,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 基準年度+3年後, -> ,,2,,申請者GYXUS従業員数14→38（年平均増加率39.5%）,
+s2_outline_52,3次,株式会社GYXUS,metrics,labor,labor,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 基準年度+3年後, -> ,,2,,"申請者GYXUSの労働生産性16,438→47,918千円（+42.9%）",
+s2_outline_52,3次,株式会社GYXUS,sales_series,s2_outline_52_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近決算期 -> 基準年度+3年後, -> ,,1,,"単位百万円：GYXUS 43→4,677、増加4,634、成長率376.3%",
+s2_outline_52,3次,株式会社GYXUS,sales_series,s2_outline_52_sales_02,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近決算期 -> 基準年度+3年後, -> ,,1,,KOSEI GYXUS 0→337百万円、増加337百万円、成長率―,
+s2_outline_52,3次,株式会社GYXUS,sales_series,s2_outline_52_sales_03,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近決算期 -> 基準年度+3年後, -> ,,1,,"光州産業8,097→9,732百万円、増加1,636百万円、6.3%",
+s2_outline_52,3次,株式会社GYXUS,sales_series,s2_outline_52_sales_04,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近決算期 -> 基準年度+3年後, -> ,,1,,GYXUS関東0→275百万円、増加275百万円、成長率―,
+s2_outline_52,3次,株式会社GYXUS,sales_series,s2_outline_52_sales_05,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近決算期 -> 基準年度+3年後, -> ,,1,,グラデュオ151→595百万円、増加445百万円、58.1%,
+s2_outline_52,3次,株式会社GYXUS,sales_series,s2_outline_52_sales_06,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近決算期 -> 基準年度+3年後, -> ,,1,,"沖潮開発2,051→2,733百万円、増加682百万円、10.0%",
+s2_outline_52,3次,株式会社GYXUS,sales_series,s2_outline_52_sales_07,sales,PERIOD_AMBIGUOUS,warning,unresolved,直近決算期 -> 基準年度+3年後, -> ,,1,,"合計10,342→18,349百万円、増加8,007百万円、21.1%",
+s2_outline_58,3次,巴工業株式会社,cases,s2_outline_58,,CONSORTIUM_APPLICATION,info,resolved,,1,,,,巴マシナリー株式会社,
+s2_outline_58,3次,巴工業株式会社,cases,s2_outline_58,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group, project, subsidiary",
+s2_outline_58,3次,巴工業株式会社,cases,s2_outline_58,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_58,3次,巴工業株式会社,cases,s2_outline_58,,MULTIPLE_SALES_SERIES,warning,resolved,,4,,,,s2_outline_58_sales_01:applicant; s2_outline_58_sales_02:project; s2_outline_58_sales_03:subsidiary; s2_outline_58_sales_04:group,代表系列=s2_outline_58_sales_01
+s2_outline_6,3次,株式会社上野凮月堂,sales_series,s2_outline_6_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,149,,increase_rate / target_base_ratio / cagr,1,,2031年度まで売上高成長率+149%、増加額+85億円。上野凮月堂とCHDの合計値,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_6,3次,株式会社上野凮月堂,cases,s2_outline_6,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,,,,,,売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）,申請企業自身の比較系列をPDFで再確認
+s2_outline_6,3次,株式会社上野凮月堂,cases,s2_outline_6,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s2_outline_60,3次,株式会社トッカコーポレーション,cases,s2_outline_60,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_61,3次,株式会社川金コアテック,sales_series,s2_outline_61_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,173,,increase_rate / target_base_ratio / cagr,1,,2030年度、売上高成長率173%（cagr20%）、売上高増加額95億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_62,3次,株式会社エネルギーギャップ,sales_series,s2_outline_62_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,753,,increase_rate / target_base_ratio / cagr,1,,2030年度、2024年度比602億円増、売上高成長率753%,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_63,3次,エックスサーバー株式会社,metrics,employee_pay,employee_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,10%,,,3,,申請者695→925（+10.0%）。関連会社727→968（+10.0%）,率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_63,3次,エックスサーバー株式会社,metrics,officer_pay,officer_pay,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,10.2%,,,3,,"申請者は基準値－、目標1,120万円、+10.2%。関連会社は基準値－、目標968万円、+10.0%",率はあるが、年平均・累積・到達率の明示と算術確認材料が不足
+s2_outline_67,3次,千代田空調機器株式会社,sales_series,s2_outline_67_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,21.3,,increase_rate / target_base_ratio / cagr,1,,基準年→2030年度、売上高成長率21.3%、増加額80億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_68,3次,三友プラントサービス株式会社,cases,s2_outline_68,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_68_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_68,3次,三友プラントサービス株式会社,sales_series,s2_outline_68_sales_01,sales,SALES_ARITHMETIC_MISMATCH,critical,unresolved,68,68,,1,,2024/12期82億円→2030/12期139億円、増加56億円、成長率68%,
+s2_outline_69,3次,松村フーズ株式会社,cases,s2_outline_69,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_69_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_69,3次,松村フーズ株式会社,sales_series,s2_outline_69_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 事業化報告3年目, -> ,,1,,298.5億円→474.9億円、増加176.4億円、売上高成長率16.7%,
+s2_outline_70,3次,株式会社光製作所,sales_series,s2_outline_70_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,82.6,,increase_rate / target_base_ratio / cagr,1,,2030年まで売上高成長率+82.6%、増加額77.8億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_71,3次,至誠堂製薬株式会社,sales_series,s2_outline_71_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,244.8,,increase_rate / target_base_ratio / cagr,1,,2031年3月期、直近決算比売上高成長率+244.8%、増加額+68.2億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_71,3次,至誠堂製薬株式会社,cases,s2_outline_71,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_72,3次,ときわ製作所株式会社,cases,s2_outline_72,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_73,3次,株式会社ライジング,sales_series,s2_outline_73_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,133,,increase_rate / target_base_ratio / cagr,1,,2031年まで売上高成長率+133%、増加額51億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_73,3次,株式会社ライジング,cases,s2_outline_73,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_74,3次,株式会社山福,cases,s2_outline_74,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_74_sales_02,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_74,3次,株式会社山福,cases,s2_outline_74,,CONSORTIUM_APPLICATION,info,resolved,,1,,,,有限会社エクセル,
+s2_outline_74,3次,株式会社山福,cases,s2_outline_74,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,"applicant, group",
+s2_outline_74,3次,株式会社山福,cases,s2_outline_74,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[4870.0, 5100.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_74,3次,株式会社山福,cases,s2_outline_74,,MULTIPLE_SALES_SERIES,warning,unresolved,,2,,,,s2_outline_74_sales_01:group; s2_outline_74_sales_02:applicant,代表系列=s2_outline_74_sales_02
+s2_outline_77,3次,株式会社やまみ,cases,s2_outline_77,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_77_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_78,3次,株式会社宮古島の雪塩,sales_series,s2_outline_78_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,217,,increase_rate / target_base_ratio / cagr,1,,2029年度まで売上高成長率217%、増加額80億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_79,3次,大京株式会社,sales_series,s2_outline_79_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,65,,increase_rate / target_base_ratio / cagr,1,,2029年度まで売上高成長率65%、増加額208億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_79,3次,大京株式会社,cases,s2_outline_79,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_8,3次,牛乳石鹸共進社株式会社,sales_series,s2_outline_8_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,18.9,,increase_rate / target_base_ratio / cagr,1,,2030年度まで売上高成長率18.9%、売上高増加額167億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_8,3次,牛乳石鹸共進社株式会社,cases,s2_outline_8,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_80,3次,株式会社レイズ,sales_series,s2_outline_80_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,67,,increase_rate / target_base_ratio / cagr,1,,2029年度まで単体売上高成長率+67%、増加額103億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_80,3次,株式会社レイズ,sales_series,s2_outline_80_sales_02,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,222,,increase_rate / target_base_ratio / cagr,1,,2034年度までグループ連結売上高成長率+222%、売上高500億円を目指す,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_80,3次,株式会社レイズ,cases,s2_outline_80,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,s2_outline_80_sales_01,,,,,AI画像目視で申請企業系列と確認,申請企業自身の比較系列をPDFで再確認
+s2_outline_80,3次,株式会社レイズ,cases,s2_outline_80,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,"applicant, group",
+s2_outline_80,3次,株式会社レイズ,cases,s2_outline_80,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_80,3次,株式会社レイズ,cases,s2_outline_80,,MULTIPLE_SALES_SERIES,warning,unresolved,,2,,,,s2_outline_80_sales_01:applicant; s2_outline_80_sales_02:group,代表系列=s2_outline_80_sales_01
+s2_outline_81,3次,東亜薬品株式会社,cases,s2_outline_81,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s2_outline_81_sales_01:applicant; s2_outline_81_sales_02:applicant,代表系列=s2_outline_81_sales_01
+s2_outline_84,3次,株式会社ジョヴィ,cases,s2_outline_84,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, existing_business",
+s2_outline_84,3次,株式会社ジョヴィ,cases,s2_outline_84,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s2_outline_84_sales_01:existing_business; s2_outline_84_sales_02:applicant,代表系列=s2_outline_84_sales_02
+s2_outline_85,3次,Ｌ物流株式会社,cases,s2_outline_85,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_86,3次,ヤマトスチール株式会社,sales_series,s2_outline_86_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,10,,increase_rate / target_base_ratio / cagr,1,,～2030年、売上高成長率10%、売上高増加額420億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_86,3次,ヤマトスチール株式会社,cases,s2_outline_86,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[12600.0, 13300.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_87,3次,長野牛乳株式会社,cases,s2_outline_87,,COST_TEXT_NUMERIC_MISMATCH,critical,unresolved,,8900.0,project_cost=8900.0; subsidy=2200.0; project_cost=9150.0,2,,事業費89億円（補助額22億円）。明細合計91.5億円。,本文・Box候補と代表値を併存。分析前にcost_amount_candidates.csvで確認
+s2_outline_87,3次,長野牛乳株式会社,sales_series,s2_outline_87_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,122,,increase_rate / target_base_ratio / cagr,1,,2030年3月期、売上高成長率122%、売上高増加額99億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_87,3次,長野牛乳株式会社,cases,s2_outline_87,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[8900.0, 9150.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_87,3次,長野牛乳株式会社,cases,s2_outline_87,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s2_outline_87_sales_01:applicant; s2_outline_87_sales_02:applicant,代表系列=s2_outline_87_sales_01
+s2_outline_9,3次,株式会社マルト水谷,sales_series,s2_outline_9_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,97.2,,increase_rate / target_base_ratio / cagr,1,,2024年3月期→2031年3月期、売上高成長率97.2%、増加額255億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_9,3次,株式会社マルト水谷,cases,s2_outline_9,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_90,3次,有価物回収協業組合　石坂グループ,cases,s2_outline_90,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,
+s2_outline_91,3次,ＫＩＤＯ　ＰＡＣＫＡＧＩＮＧ株式会社,cases,s2_outline_91,,COST_TEXT_NUMERIC_MISMATCH,critical,unresolved,,4600.0,project_cost=4600.0; subsidy=1500.0; project_cost=5220.0,2,,事業費46億円（補助額15億円）。投資会社別明細合計52.2億円。,本文・Box候補と代表値を併存。分析前にcost_amount_candidates.csvで確認
+s2_outline_91,3次,ＫＩＤＯ　ＰＡＣＫＡＧＩＮＧ株式会社,cases,s2_outline_91,,CONSORTIUM_APPLICATION,info,resolved,,1,,,,ＫＩＤＯホールディングス株式会社,
+s2_outline_91,3次,ＫＩＤＯ　ＰＡＣＫＡＧＩＮＧ株式会社,cases,s2_outline_91,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group",
+s2_outline_91,3次,ＫＩＤＯ　ＰＡＣＫＡＧＩＮＧ株式会社,cases,s2_outline_91,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[4600.0, 5220.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_91,3次,ＫＩＤＯ　ＰＡＣＫＡＧＩＮＧ株式会社,cases,s2_outline_91,,MULTIPLE_SALES_SERIES,warning,resolved,,2,,,,s2_outline_91_sales_01:applicant; s2_outline_91_sales_02:group,代表系列=s2_outline_91_sales_01
+s2_outline_91,3次,ＫＩＤＯ　ＰＡＣＫＡＧＩＮＧ株式会社,sales_series,s2_outline_91_sales_01,sales,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 2031年3月期, -> 2031,,1,,単体売上2031/3期196億円、年平均成長率16.9%、売上増加額73億円,
+s2_outline_91,3次,ＫＩＤＯ　ＰＡＣＫＡＧＩＮＧ株式会社,sales_series,s2_outline_91_sales_02,sales,PERIOD_AMBIGUOUS,warning,unresolved,基準年度 -> 2031年3月期, -> 2031,,1,,コンソーシアム2031/3期199.6億円、年平均17.1%、増加75億円,
+s2_outline_94,3次,株式会社富士カーボン製造所,cases,s2_outline_94,,MIXED_ENTITY_METRICS,warning,resolved,,,,,,"applicant, group, subsidiary",
+s2_outline_94,3次,株式会社富士カーボン製造所,cases,s2_outline_94,,MULTIPLE_SALES_SERIES,warning,resolved,,3,,,,s2_outline_94_sales_01:applicant; s2_outline_94_sales_02:subsidiary; s2_outline_94_sales_03:group,代表系列=s2_outline_94_sales_01
+s2_outline_95,3次,山崎商事運輸株式会社,sales_series,s2_outline_95_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,25,,increase_rate / target_base_ratio / cagr,1,,～31年5月期、売上高成長率25.0%、売上高増加額36.6億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_97,3次,中村土建株式会社,cases,s2_outline_97,,MULTIPLE_COST_VALUES_PRESENT,warning,open_context_check,,,,,,"project_cost:[1900.0, 2000.0]",総投資額・補助対象経費・内訳の概念差を確認
+s2_outline_98,3次,ホーコス株式会社,sales_series,s2_outline_98_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,169,,increase_rate / target_base_ratio / cagr,1,,2023～2029年度、売上高成長率169%、売上高増加額167億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_99,3次,株式会社シュゼット・ホールディングス,sales_series,s2_outline_99_sales_01,sales,RATE_DEFINITION_AMBIGUOUS,critical,unresolved,84,,increase_rate / target_base_ratio / cagr,2,,コンソーシアム全体（2024→2030年）：売上高84%、売上増加額135億円,記載率が増加率・到達率・年平均率のいずれか確定できない
+s2_outline_99,3次,株式会社シュゼット・ホールディングス,cases,s2_outline_99,,REPRESENTATIVE_ENTITY_AMBIGUOUS,critical,unresolved,,,,,,売上について申請企業単体系列の記載なし（労働生産性・給与等の申請企業値とは別）,申請企業自身の比較系列をPDFで再確認
+s2_outline_99,3次,株式会社シュゼット・ホールディングス,cases,s2_outline_99,,CONSORTIUM_APPLICATION,info,resolved,,1,,,,株式会社スタジオ・シュゼット,
+s2_outline_99,3次,株式会社シュゼット・ホールディングス,cases,s2_outline_99,,MIXED_ENTITY_METRICS,warning,unresolved,,,,,,group,
+s2_outline_99,3次,株式会社シュゼット・ホールディングス,cases,s2_outline_99,,MULTIPLE_INVESTMENT_REVIEW_REQUIRED,warning,unresolved,,,,,,本文に複数案件を示唆する表現あり,

@@ -26,17 +26,21 @@ function countCsvRecords(text) {
 
 const expected = {
   "cases.csv": 381,
-  "metrics.csv": 1548,
+  "metrics.csv": 1556,
   "sales_targets.csv": 381,
-  "sales_annual.csv": 445,
+  "sales_annual.csv": 466,
   "sales_series.csv": 508,
-  "sales_series_annual.csv": 445,
+  "sales_series_annual.csv": 466,
   "boxes.csv": 3055,
   "validations.csv": 1548,
   "cost_validations.csv": 381,
   "unit_normalization_changes.csv": 35,
   "unit_revalidation_changes.csv": 36,
   "pdf_manifest.csv": 381,
+  "investment_components.csv": 543,
+  "case_entities.csv": 952,
+  "cost_amount_candidates.csv": 1042,
+  "quality_flags.csv": 737,
 };
 
 for (const [name, count] of Object.entries(expected)) {
@@ -48,12 +52,16 @@ const cases = JSON.parse(await fs.readFile(path.join(projectDir, "html", "data",
 assert(cases.length === 381, "cases.json: expected 381 cases");
 assert(new Set(cases.map((row) => row.case_id)).size === 381, "case_id must be unique");
 assert(cases.every((row) => /^https:\/\//.test(row.pdf_url)), "all PDF URLs must be HTTPS links");
-assert(cases.every((row) => row.manual_audit_pages?.length > 0), "all cases must have visual-audit pages");
+const fullAuditLines = (await fs.readFile(path.join(projectDir, "data", "manual_audit", "full_manual_visual_audit.jsonl"), "utf8")).trim().split("\n");
+assert(fullAuditLines.length === 381, "full visual audit must cover 381 cases");
+const fullAudit = fullAuditLines.map((line) => JSON.parse(line));
+assert(new Set(fullAudit.map((row) => row.case_id)).size === 381, "full visual audit case_id must be unique");
+assert(fullAudit.every((row) => row.status), "all full visual audit rows must have status");
 assert(cases.every((row) => ["high", "medium", "low"].includes(row.manual_audit_confidence)), "all cases must have audit confidence");
 assert(cases.reduce((sum, row) => sum + row.sales_series.length, 0) === 508, "sales series count mismatch");
-assert(cases.filter((row) => row.officer_pay_status === "rate_only").length === 217, "officer rate-only count mismatch");
+assert(cases.filter((row) => row.officer_pay_status === "rate_only").length === 216, "officer rate-only count mismatch");
 assert(cases.every((row) => row.project_cost_unit_raw && row.subsidy_unit_raw), "all cases must retain raw cost units");
-assert(cases.every((row) => row.cost_unit_validation?.includes("raw_unit_confirmed")), "all cases must have confirmed cost units");
+assert(cases.every((row) => row.cost_unit_validation?.includes("raw_unit_confirmed") || row.cost_unit_validation === "participant_boxes_confirmed_and_summed"), "all cases must have confirmed cost units");
 assert(cases.every((row) => row.metrics?.every((metric) => "unit_raw" in metric && "unit_validation" in metric)), "all metrics must expose raw-unit audit fields");
 
 for (const [name, count] of [["pages.jsonl", 887], ["narratives.jsonl", 2999]]) {
@@ -97,6 +105,11 @@ for (const column of [
   "labor_base_value_raw", "labor_base_value_man_yen_per_person", "labor_unit_validation",
   "officer_pay_base_value_raw", "officer_pay_base_value_man_yen_per_person", "officer_pay_unit_validation",
 ]) assert(caseCsv.includes(column), `cases.csv must include ${column}`);
+for (const column of [
+  "has_multiple_investments", "cost_text_numeric_mismatch", "has_consortium",
+  "has_multiple_sales_series", "has_ambiguous_rate_any", "analysis_exclusion_recommended",
+  "analysis_exclusion_reasons",
+]) assert(caseCsv.includes(column), `cases.csv must include analysis flag ${column}`);
 
 const metricsCsv = await fs.readFile(path.join(projectDir, "data", "processed", "metrics.csv"), "utf8");
 for (const column of [
@@ -104,6 +117,16 @@ for (const column of [
   "target_value_man_yen_per_person", "unit_conversion_factor", "unit_evidence_source",
   "unit_validation", "source_box_label", "entity_match_status",
 ]) assert(metricsCsv.includes(column), `metrics.csv must include ${column}`);
+for (const column of ["rate_definition", "rate_interpretation_status", "rate_reconciliation_status", "rate_ambiguous"])
+  assert(metricsCsv.includes(column), `metrics.csv must include ${column}`);
+
+const salesSeriesCsv = await fs.readFile(path.join(projectDir, "data", "processed", "sales_series.csv"), "utf8");
+for (const column of ["rate_interpretation_status", "rate_ambiguous", "rate_interpretation_note"])
+  assert(salesSeriesCsv.includes(column), `sales_series.csv must include ${column}`);
+
+const qualityFlagsCsv = await fs.readFile(path.join(projectDir, "data", "processed", "quality_flags.csv"), "utf8");
+for (const column of ["flag_code", "severity", "status", "alternative_value", "evidence", "resolution_note"])
+  assert(qualityFlagsCsv.includes(column), `quality_flags.csv must include ${column}`);
 
 const unitSummary = JSON.parse(await fs.readFile(path.join(projectDir, "data", "processed", "unit_normalization_summary.json"), "utf8"));
 assert(unitSummary.cases === 381, "unit normalization case count mismatch");
@@ -118,9 +141,11 @@ assert(boxCsv.includes("補助事業の背景・目的"), "boxes.csv must includ
 
 const textFiles = [
   "README.md", "dataset_stats.json", "docs/methodology.md", "docs/data_dictionary.md",
-  "docs/validation.md", "html/index.html", "html/qa.html", "html/data/cases.json", "scripts/build_dataset.mjs",
+  "docs/validation.md", "docs/analysis_quality_flags.md", "html/index.html", "html/qa.html", "html/data/cases.json", "scripts/build_dataset.mjs",
+  "scripts/build_analysis_flags.py", "scripts/validate_analysis_flags.py",
   "scripts/sales_series.mjs", "data/processed/cases.csv", "data/processed/pdf_manifest.csv",
   "data/processed/sales_series.csv", "data/processed/sales_series_annual.csv",
+  "data/processed/quality_flags.csv", "data/processed/case_entities.csv", "data/processed/investment_components.csv",
 ];
 for (const relative of textFiles) {
   const text = await fs.readFile(path.join(projectDir, relative), "utf8");
@@ -146,4 +171,4 @@ try {
   if (error?.code !== "ENOENT") throw error;
 }
 
-console.log(JSON.stringify({ status: "ok", ...expected, json_cases: cases.length, pages_jsonl: 887, narratives_jsonl: 2999, manual_audit_cases: 381, officer_rate_only: 217 }, null, 2));
+console.log(JSON.stringify({ status: "ok", ...expected, json_cases: cases.length, pages_jsonl: 887, narratives_jsonl: 2999, manual_audit_cases: 381, officer_rate_only: cases.filter((row) => row.officer_pay_status === "rate_only").length }, null, 2));

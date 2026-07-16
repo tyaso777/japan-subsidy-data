@@ -1,0 +1,25 @@
+{
+  "cases": 381,
+  "sales_series": 508,
+  "metrics": 1556,
+  "investment_components": 543,
+  "case_entities": 952,
+  "cost_amount_candidates": 1042,
+  "quality_flags": 737,
+  "flag_counts": {
+    "CONSORTIUM_APPLICATION": 17,
+    "COST_TEXT_NUMERIC_MISMATCH": 13,
+    "COST_TEXT_NUMERIC_ROUNDING_DIFFERENCE": 9,
+    "MIXED_ENTITY_METRICS": 86,
+    "MULTIPLE_COST_VALUES_PRESENT": 30,
+    "MULTIPLE_INVESTMENT_COMPONENTS": 9,
+    "MULTIPLE_INVESTMENT_REVIEW_REQUIRED": 65,
+    "MULTIPLE_SALES_SERIES": 88,
+    "PERIOD_AMBIGUOUS": 181,
+    "RATE_ARITHMETIC_MISMATCH": 9,
+    "RATE_DEFINITION_AMBIGUOUS": 168,
+    "REPRESENTATIVE_ENTITY_AMBIGUOUS": 56,
+    "SALES_ARITHMETIC_MISMATCH": 6
+  },
+  "cases_exclusion_recommended": 179
+}

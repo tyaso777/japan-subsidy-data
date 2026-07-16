@@ -72,7 +72,7 @@
 5. 項目ラベル・単位・Box・主体を対応付け、原単位値を保持したまま万円/人・百万円・億円へ換算。成長率・CAGR・補助率も再計算。
 6. 個々のレコードに検証状態、根拠原文、出典ページ、公式PDF URLを保持。
 
-詳細は `docs/methodology.md`、`cases.csv` の列定義は [`docs/cases_data_dictionary.md`](docs/cases_data_dictionary.md)、その他データの列定義は `docs/data_dictionary.md`、単位処理は [`docs/unit_normalization.md`](docs/unit_normalization.md)、検証内容は `docs/validation.md` を参照してください。実際に統計分析・回次比較を行う前に、期間・主体・複数系列・欠損値の扱いをまとめた `docs/analysis_data_handling.md` も確認してください。
+詳細は `docs/methodology.md`、`cases.csv` の列定義は [`docs/cases_data_dictionary.md`](docs/cases_data_dictionary.md)、その他データの列定義は `docs/data_dictionary.md`、単位処理は [`docs/unit_normalization.md`](docs/unit_normalization.md)、検証内容は `docs/validation.md` を参照してください。実際に統計分析・回次比較を行う前に、期間・主体・複数系列・欠損値の扱いをまとめた `docs/analysis_data_handling.md` と、案件構造・数値不一致・率の曖昧性・推奨除外条件を定義した [`docs/analysis_quality_flags.md`](docs/analysis_quality_flags.md) を確認してください。
 
 ## 重要な注意点
 

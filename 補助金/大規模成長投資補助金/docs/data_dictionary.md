@@ -28,6 +28,15 @@
 - `cost_validations.csv`: 事業費・補助額の原値、原単位、百万円換算値と検証根拠。
 - `unit_normalization_changes.csv`: 項目ラベル・単位・Boxを照合して訂正または補完した単位の履歴。
 - `unit_revalidation_changes.csv`: 単位訂正と、原値・原単位から再計算して精緻化した換算値の履歴。
+- `investment_components.csv`: 工場、拠点、参加会社、費目などの投資内訳。代表事業費に含めたかも保持する。
+- `case_entities.csv`: 申請企業、親会社、子会社、共同申請者、売上系列主体の関係表。
+- `cost_amount_candidates.csv`: 事業費Box・本文に現れた金額候補、原単位、百万円換算値、代表値との差。
+- `quality_flags.csv`: 案件または個別値に対する品質フラグ、重要度、解決状態、根拠、代替値。
+- `analysis_quality_summary.json`: 分析用テーブルの件数とフラグ分布。
+
+## 分析品質フラグ
+
+`cases.csv` には複数投資、コンソーシアム、親子会社、複数売上系列、率・年度・単位・算術の曖昧性を案件単位で絞り込む要約フラグがある。詳細な問題箇所は `quality_flags.csv`、複数の金額・主体は上記の縦持ちテーブルで確認する。定義と厳格比較用の除外条件は [`analysis_quality_flags.md`](analysis_quality_flags.md) を参照。
 
 ## 原単位と換算値
 
