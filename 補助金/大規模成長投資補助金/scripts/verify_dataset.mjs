@@ -34,6 +34,8 @@ const expected = {
   "boxes.csv": 3055,
   "validations.csv": 1548,
   "cost_validations.csv": 381,
+  "unit_normalization_changes.csv": 35,
+  "unit_revalidation_changes.csv": 36,
   "pdf_manifest.csv": 381,
 };
 
@@ -49,7 +51,10 @@ assert(cases.every((row) => /^https:\/\//.test(row.pdf_url)), "all PDF URLs must
 assert(cases.every((row) => row.manual_audit_pages?.length > 0), "all cases must have visual-audit pages");
 assert(cases.every((row) => ["high", "medium", "low"].includes(row.manual_audit_confidence)), "all cases must have audit confidence");
 assert(cases.reduce((sum, row) => sum + row.sales_series.length, 0) === 508, "sales series count mismatch");
-assert(cases.filter((row) => row.officer_pay_status === "rate_only").length === 216, "officer rate-only count mismatch");
+assert(cases.filter((row) => row.officer_pay_status === "rate_only").length === 217, "officer rate-only count mismatch");
+assert(cases.every((row) => row.project_cost_unit_raw && row.subsidy_unit_raw), "all cases must retain raw cost units");
+assert(cases.every((row) => row.cost_unit_validation?.includes("raw_unit_confirmed")), "all cases must have confirmed cost units");
+assert(cases.every((row) => row.metrics?.every((metric) => "unit_raw" in metric && "unit_validation" in metric)), "all metrics must expose raw-unit audit fields");
 
 for (const [name, count] of [["pages.jsonl", 887], ["narratives.jsonl", 2999]]) {
   const lines = (await fs.readFile(path.join(projectDir, "data", "text", name), "utf8")).trim().split("\n");
@@ -72,6 +77,8 @@ assert(qaHtml.includes("申請企業自身の代表系列"), "QA HTML must separ
 assert(qaHtml.includes("PDF上の主系列"), "QA HTML must separate reported primary series");
 assert(qaHtml.includes("枠テーマ：") && qaHtml.includes("枠内容："), "QA HTML must separate box theme and content");
 assert(qaHtml.includes('"sales_series":['), "QA HTML must embed sales series data");
+assert(qaHtml.includes("原単位") && qaHtml.includes("万円換算値"), "QA HTML must display raw and normalized metric values");
+assert(qaHtml.includes("増加額（原表記）") && qaHtml.includes("増加額（億円換算）"), "QA HTML must display raw and normalized sales increases");
 assert(qaHtml.includes("21/3期") && qaHtml.includes("30/3期"), "QA HTML must retain two-digit fiscal period labels");
 for (const [name, document] of [["index.html", html], ["qa.html", qaHtml]]) {
   const scripts = [...document.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
@@ -84,6 +91,26 @@ assert(caseCsv.includes("sales_representative_series_id"), "cases.csv must ident
 assert(caseCsv.includes("sales_reported_primary_series_id"), "cases.csv must retain the PDF-reported primary series");
 assert(caseCsv.includes("AI画像目視で申請企業系列と確認"), "cases.csv must document representative selection reasons");
 assert(caseCsv.includes("manual_audit_confidence"), "cases.csv must include manual audit metadata");
+for (const column of [
+  "project_cost_value_raw", "project_cost_unit_raw", "project_cost_million_yen_normalized",
+  "sales_increase_value_raw", "sales_increase_unit_raw", "sales_increase_oku_yen_normalized",
+  "labor_base_value_raw", "labor_base_value_man_yen_per_person", "labor_unit_validation",
+  "officer_pay_base_value_raw", "officer_pay_base_value_man_yen_per_person", "officer_pay_unit_validation",
+]) assert(caseCsv.includes(column), `cases.csv must include ${column}`);
+
+const metricsCsv = await fs.readFile(path.join(projectDir, "data", "processed", "metrics.csv"), "utf8");
+for (const column of [
+  "base_value_raw", "target_value_raw", "unit_raw", "base_value_man_yen_per_person",
+  "target_value_man_yen_per_person", "unit_conversion_factor", "unit_evidence_source",
+  "unit_validation", "source_box_label", "entity_match_status",
+]) assert(metricsCsv.includes(column), `metrics.csv must include ${column}`);
+
+const unitSummary = JSON.parse(await fs.readFile(path.join(projectDir, "data", "processed", "unit_normalization_summary.json"), "utf8"));
+assert(unitSummary.cases === 381, "unit normalization case count mismatch");
+assert(unitSummary.metric_unit_changes === 35, "unit normalization change count mismatch");
+assert(unitSummary.changed_companies === 31, "unit normalization company count mismatch");
+assert(unitSummary.revalidation_changes === 36, "unit revalidation change count mismatch");
+assert(unitSummary.revalidation_changed_companies === 32, "unit revalidation company count mismatch");
 
 const boxCsv = await fs.readFile(path.join(projectDir, "data", "processed", "boxes.csv"), "utf8");
 assert(boxCsv.includes("box_theme") && boxCsv.includes("box_content"), "boxes.csv must include theme/content columns");
@@ -119,4 +146,4 @@ try {
   if (error?.code !== "ENOENT") throw error;
 }
 
-console.log(JSON.stringify({ status: "ok", ...expected, json_cases: cases.length, pages_jsonl: 887, narratives_jsonl: 2999, manual_audit_cases: 381, officer_rate_only: 216 }, null, 2));
+console.log(JSON.stringify({ status: "ok", ...expected, json_cases: cases.length, pages_jsonl: 887, narratives_jsonl: 2999, manual_audit_cases: 381, officer_rate_only: 217 }, null, 2));

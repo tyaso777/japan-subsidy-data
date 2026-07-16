@@ -341,6 +341,10 @@ const readmeSection = `
 監査結果をCSV・HTMLへ反映するには、次を実行します。
 
 \`node scripts/integrate_manual_audit.mjs <project-dir> <stage-dir>\`
+
+続けて、出力先で原単位・換算値・根拠Boxを付与します。
+
+\`python scripts/normalize_units.py --project-root <stage-dir>\`
 `;
 let readme = await fs.readFile(path.join(projectDir, "README.md"), "utf8");
 readme = readme.replace(/\n## 生成AIによる全件画像監査[\s\S]*?(?=\n## |$)/, "");
@@ -439,7 +443,7 @@ await fs.writeFile(path.join(stageDir, "html", "qa.html"), qaIntegrated, "utf8")
 for (const name of ["schema.json", "cross_batch_validation.md", "sales_numeric_validation.md", "recheck_A1.md", "recheck_A2.md", "recheck_B.md"]) {
   await fs.copyFile(path.join(here, name), path.join(stageDir, name === "schema.json" ? "data/manual_audit/schema.json" : `docs/${name}`));
 }
-for (const name of ["integrate_manual_audit.mjs", "validate_integration.mjs"]) {
+for (const name of ["integrate_manual_audit.mjs", "validate_integration.mjs", "normalize_units.py"]) {
   await fs.copyFile(path.join(here, name), path.join(stageDir, "scripts", name));
 }
 

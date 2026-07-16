@@ -44,10 +44,14 @@
 - `data/processed/cases.csv`: 1案件1行の案件マスタ
 - `docs/cases_data_dictionary.md`: `cases.csv` 全133列の型・単位・Null・コード値を説明するデータ定義書
 - `data/processed/metrics.csv`: 主要4指標の縦持ちデータ
+- `data/processed/unit_normalization_changes.csv`: 原単位を訂正・補完した企業と項目の監査履歴
+- `data/processed/unit_revalidation_changes.csv`: 単位訂正に加え、原値からの再換算で精緻化した金額を含む変更一覧
 - `data/processed/sales_targets.csv`: 売上成長目標Boxの選択済み抽出結果
 - `data/processed/sales_annual.csv`: PDFに明記された年次売上高の縦持ちデータ
 - `data/processed/sales_series.csv`: 単体・連結、会社全体・補助事業等を分離した売上系列
 - `data/processed/sales_series_annual.csv`: 売上系列ごとの基準・中間・目標時点
+- `data/manual_audit/full_manual_visual_audit.jsonl`: 全381案件について、公開PDFの全ページを画像で再確認した監査台帳
+- `data/manual_audit/full_manual_visual_audit_changes.csv`: 全件目視監査で実際に変わった列の修正前・修正後
 - `data/processed/boxes.csv`: ページ内Boxごとの枠テーマ・枠内容・座標・分類
 - `data/processed/pdf_manifest.csv`: 公式PDF URL、元ファイル名、ページ数の台帳
 - `data/text/narratives.jsonl`: 文章セクションごとの原文
@@ -65,10 +69,10 @@
 3. ページ内の座標を使って文章をBoxごとに分離し、会社名ヘッダーの混入を除外。
    左側に見出しセル、右側に本文がある「補助事業の背景・目的」「設備投資の内容」「目標値」等は、横方向の同一セクションとして復元し、`box_theme` と `box_content` に分離。
 4. 事業費・補助額、売上成長目標、主要4指標を構造化。
-5. 単位変換、成長率・CAGR・補助率の再計算、年度順序の確認、一部案件の目視確認を実施。
+5. 項目ラベル・単位・Box・主体を対応付け、原単位値を保持したまま万円/人・百万円・億円へ換算。成長率・CAGR・補助率も再計算。
 6. 個々のレコードに検証状態、根拠原文、出典ページ、公式PDF URLを保持。
 
-詳細は `docs/methodology.md`、`cases.csv` の完全な列定義は [`docs/cases_data_dictionary.md`](docs/cases_data_dictionary.md)、その他データの列定義は `docs/data_dictionary.md`、検証内容は `docs/validation.md` を参照してください。実際に統計分析・回次比較を行う前に、期間・主体・複数系列・欠損値の扱いをまとめた `docs/analysis_data_handling.md` も確認してください。
+詳細は `docs/methodology.md`、`cases.csv` の列定義は [`docs/cases_data_dictionary.md`](docs/cases_data_dictionary.md)、その他データの列定義は `docs/data_dictionary.md`、単位処理は [`docs/unit_normalization.md`](docs/unit_normalization.md)、検証内容は `docs/validation.md` を参照してください。実際に統計分析・回次比較を行う前に、期間・主体・複数系列・欠損値の扱いをまとめた `docs/analysis_data_handling.md` も確認してください。
 
 ## 重要な注意点
 
@@ -85,6 +89,12 @@
 ## 再生成
 
 `node scripts/build_dataset.mjs --source-dir <抽出作業ディレクトリ>`
+
+続けて原単位・換算値・根拠Boxを付与し、検証します。
+
+`python scripts/normalize_units.py --project-root .`
+
+`node scripts/verify_dataset.mjs`
 
 ## ローカルPDFの準備
 
@@ -139,8 +149,14 @@ python scripts/build_comparison.py --mapping comparison/my_data.mapping.json --i
 - `5年後`、`基準年度+3年後`などは、同じ系列の基準年を確定できる場合に基準年から補正後年を算出
 - PDF内で数値同士が一致しない場合、推測値へ置き換えず原文値と不整合注記を保持
 
-監査結果は `data/manual_audit/manual_audit.jsonl`、監査スキーマは `data/manual_audit/schema.json` にあります。横断検証と二巡目確認の記録は `docs/cross_batch_validation.md`、`docs/sales_numeric_validation.md`、`docs/recheck_*.md` を参照してください。
+初回監査は `data/manual_audit/manual_audit.jsonl`、2026年7月の全件再監査は `data/manual_audit/full_manual_visual_audit.jsonl` にあります。全381案件の全ページを1件ずつ画像で確認し、事業費・補助額、売上系列、主要4指標、期間、主体、単位を再照合しました。実際の変更は `data/manual_audit/full_manual_visual_audit_changes.csv`、手順と注意点は `docs/full_manual_visual_audit.md` を参照してください。
 
-監査結果をCSV・HTMLへ反映するには、次を実行します。
+全件再監査台帳をCSV・HTMLへ反映するには、次を実行します。Node.jsは不要です。
 
-`node scripts/integrate_manual_audit.mjs <project-dir> <stage-dir>`
+`python scripts/apply_full_manual_audit.py --project-root . --ledger-dir <manual_audit_v2_batch*.jsonl のあるフォルダ>`
+
+最終検証では、381 PDF・887ページの実ページ数と監査台帳の確認ページが完全一致することを確認しました。反映後のデータは売上508系列、主要指標1,556レコード、年度別売上466点です。追加ページ監査で判明した参加企業系列や原文内不整合の扱いも`docs/full_manual_visual_audit.md`に記録しています。
+
+追加ページ監査の確定補正を再適用する場合は、次を実行します。
+
+`python scripts/complete_page_audit.py --project-root .`

@@ -1,0 +1,14 @@
+{
+  "cases": 381,
+  "metrics": 1548,
+  "sales_series": 508,
+  "metric_unit_changes": 35,
+  "changed_companies": 31,
+  "revalidation_changes": 36,
+  "revalidation_changed_companies": 32,
+  "metric_box_confirmed": 1264,
+  "metric_normalized": 1543,
+  "cost_raw_unit_confirmed": 381,
+  "sales_explicit_unit_match": 352,
+  "sales_unit_confirmed": 437
+}

@@ -25,6 +25,17 @@
 - `boxes.csv`: 1ページ×1Box1行。
 - `narratives.jsonl`: 1案件×1文章セクション1行。
 - `pages.jsonl`: PDF 1ページ1行。
+- `cost_validations.csv`: 事業費・補助額の原値、原単位、百万円換算値と検証根拠。
+- `unit_normalization_changes.csv`: 項目ラベル・単位・Boxを照合して訂正または補完した単位の履歴。
+- `unit_revalidation_changes.csv`: 単位訂正と、原値・原単位から再計算して精緻化した換算値の履歴。
+
+## 原単位と換算値
+
+- 主要指標は `base_value_raw`、`target_value_raw`、`unit_raw` にPDFの原表記を保持し、金額指標は `base_value_man_yen_per_person`、`target_value_man_yen_per_person` に万円/人換算値を持つ。
+- 事業費・補助額は `*_value_raw`、`*_unit_raw`、原表記の単純換算 `*_raw_converted_million_yen`、精度を比較して採用した `*_million_yen_normalized` を併存させる。
+- 売上増加額は `increase_value_raw`、`increase_unit_raw` と `increase_oku_normalized` を併存させる。
+- `sales_multiple` はPDFに「1.7倍」「33倍」等と記載された倍率、または基準値・目標値から導出した倍率。`growth_rate_pct` と混同しない。たとえば1.7倍は170%成長ではなく、累積増加率に直す場合は70%である。
+- 単位は公募回次ではなく、同一Box内の項目ラベル・単位・主体との対応で判定する。詳細は `unit_normalization.md` を参照。
 
 ## Box列
 
@@ -49,7 +60,7 @@
 ## 売上期間
 
 - `*_period_label`: PDFの原文表記（例：`24/3期`）。
-- `*_year_before_correction`: PDF目視監査時点の年。2桁年・FY・相対年等はnull。
+- `*_year_before_correction`: PDFに現れた年の数値部分。`24/3期`なら`24`、`2024年度`なら`2024`。相対年だけで年数値がない場合はnull。
 - `*_year_after_correction`: 分析用の補正後年。2桁年・FYは20yyとし、`5年後`等は同じ系列の基準年から計算できる場合に補正する。
 - `*_year`: 後方互換用で、原則として`*_year_after_correction`と同じ。
 - `*_year_correction_method`, `*_year_correction_confidence`: 補正方法と信頼度。
