@@ -113,6 +113,9 @@ const dashboardHtml = await fs.readFile(path.join(projectDir, "html", "analysis_
 assert(dashboardHtml.includes("全体分析ダッシュボード"), "analysis dashboard title is missing");
 assert(dashboardHtml.includes("const DATA=[") && dashboardHtml.includes("const BENCH=["), "analysis dashboard must embed cases and official benchmarks");
 assert(dashboardHtml.includes("表示対象をCSV出力") && dashboardHtml.includes("公式統計に対する位置"), "analysis dashboard controls or position table are missing");
+assert(dashboardHtml.includes('placeholder="企業名・case_id・本文を検索"') && dashboardHtml.includes("空白＝AND、OR＝OR") && dashboardHtml.includes("工場 建設 OR 新設"), "dashboard search must explain body-text AND/OR query syntax");
+assert(dashboardHtml.includes("function parseSearch(query)") && dashboardHtml.includes("function matchesSearch(d,query)") && dashboardHtml.includes("d.search_text"), "dashboard must search normalized company, case ID, and PDF body text with AND/OR groups");
+assert(dashboardHtml.includes('"search_text":"') && dashboardHtml.includes("新工場建築"), "dashboard must embed searchable PDF body text for each case");
 assert(dashboardHtml.includes("5次") && dashboardHtml.includes("applicant_value") && dashboardHtml.includes("accepted_value"), "analysis dashboard must include round 5 applicant/accepted benchmarks");
 assert(dashboardHtml.includes("employee_pay_total_increase_estimated_oku") && dashboardHtml.includes("比較可能な7指標"), "analysis dashboard must expose the seven comparable metrics");
 assert(dashboardHtml.includes("目標1人当たり給与") && dashboardHtml.includes("公開事業費÷公開基準売上高"), "analysis dashboard must document proxy formulas");
