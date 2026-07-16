@@ -145,6 +145,7 @@ assert(dashboardHtml.includes("母分散（Σ(x－平均)²÷n）") && dashboard
 assert(dashboardHtml.includes("公募回別：公式公表値と公開企業PDFからの推測値") && dashboardHtml.includes('class="round-comparison" data-round="${round}"') && dashboardHtml.includes("publicStats(m.field,round)"), "official and estimated values must be combined into separate round 1-4 comparison tables");
 assert(dashboardHtml.includes('<th colspan="2">公式公表値</th>') && dashboardHtml.includes('<th colspan="4">公開企業PDFからの推測値</th>') && dashboardHtml.includes("5次は企業別PDFを未収録のため、この比較表には含めません"), "round comparison tables must align official applicant/accepted values with estimated n, mean, median, and variance");
 assert(dashboardHtml.includes("setupCollapsibleSections") && dashboardHtml.includes("localStorage.setItem(key,box.open?'open':'closed')") && dashboardHtml.includes("requestAnimationFrame(redraw)"), "collapsible section state must persist and charts must redraw when reopened");
+assert(dashboardHtml.includes('.section-box>summary{background:#f5f7fa') && dashboardHtml.includes('.section-box[open]>summary{background:#e8eef7}'), "collapsible header bars must have distinct closed and open background colors");
 assert(!dashboardHtml.includes('class="benchmark-grid"'), "separate official benchmark bar panels must be removed");
 assert(!/\.\.\/local_assets\/pdfs\/[^\"'\s#]*__/.test(dashboardHtml), "analysis dashboard local PDF filenames must collapse repeated underscores");
 const benchmarkCsv = await fs.readFile(path.join(projectDir, "data", "reference", "official_round_benchmarks.csv"), "utf8");
