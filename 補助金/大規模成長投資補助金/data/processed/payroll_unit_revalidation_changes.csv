@@ -1,0 +1,5 @@
+﻿case_id,company,metric_key,source_unit_raw,adopted_analysis_unit,conversion_factor_to_man_yen,before_base_man_yen_per_person,after_base_man_yen_per_person,before_target_man_yen_per_person,after_target_man_yen_per_person,unit_validation,reason,pdf_url
+s2_outline_17,日生流通運輸倉庫株式会社,labor,百万円/人,万円/人,1,47600,476,126400,1264,source_unit_conflict_cell_unit_preferred,"PDF行見出しは百万円/人だが各セルは476万円/人・1,264万円/人と明記",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_17.pdf
+s2_outline_17,日生流通運輸倉庫株式会社,employee_pay,百万円/人,万円/人,1,42700,427,49500,495,source_unit_conflict_cell_unit_preferred,PDF行見出しは百万円/人だが各セルは427万円/人・495万円/人と明記,https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_17.pdf
+s1_outline_69,NAX JAPAN株式会社,labor,万円/人,千円/人,0.1,10001,1000.1,11690,1169,source_unit_conflict_assumed_thousand_yen,"PDFは万円/人表記だが10,001・11,690は千円/人相当と判断。原表記との矛盾を保持",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_69.pdf
+s1_outline_69,NAX JAPAN株式会社,employee_pay,万円/人,千円/人,0.1,6892,689.2,7980,798,source_unit_conflict_assumed_thousand_yen,"PDFは万円/人表記だが6,892・7,980は千円/人相当と判断。原表記との矛盾を保持",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_69.pdf

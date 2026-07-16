@@ -31,7 +31,7 @@
 - [1次～4次の申請者・採択者指標（公式説明資料）](https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/000058716.pdf)
 - [5次公募の申請者・採択者指標](https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf)
 
-公式値は原則として中央値です。ただし「全社売上高に対する補助事業売上高の割合」だけは平均値です。公式値の「採択者」と、本データが対象とする「HPで取組概要PDFが公開された交付決定企業」は同一母集団とは限りません。また、同じ指標名でも対象企業、対象範囲、基準年、計画期間が異なる場合があるため、比較時は定義を併記してください。ダッシュボード用に転記した値は `data/reference/official_round_benchmarks.csv` にあります。
+公式値は原則として中央値です。ただし「全社売上高に対する補助事業売上高の割合」だけは平均値です。公式値の「採択者」と、本データが対象とする「HPで取組概要PDFが公開された交付決定企業」は同一母集団とは限りません。また、同じ指標名でも対象企業、対象範囲、基準年、計画期間が異なる場合があるため、比較時は定義を併記してください。ダッシュボード用に転記した値は `data/reference/official_round_benchmarks.csv`、値ごとの出典方針と資料差分は [`docs/official_round_benchmarks.md`](docs/official_round_benchmarks.md) にあります。
 
 ## 収録範囲
 
@@ -44,10 +44,11 @@
 ## まず見るファイル
 
 - `data/processed/cases.csv`: 1案件1行の案件マスタ
-- `docs/cases_data_dictionary.md`: `cases.csv` 全133列の型・単位・Null・コード値を説明するデータ定義書
+- `docs/cases_data_dictionary.md`: `cases.csv` の型・単位・Null・コード値を説明するデータ定義書
 - `data/processed/metrics.csv`: 主要4指標の縦持ちデータ
 - `data/processed/unit_normalization_changes.csv`: 原単位を訂正・補完した企業と項目の監査履歴
 - `data/processed/unit_revalidation_changes.csv`: 単位訂正に加え、原値からの再換算で精緻化した金額を含む変更一覧
+- `data/processed/payroll_unit_revalidation_changes.csv`: 給与・労働生産性の既知の単位矛盾と採用した分析用換算の履歴
 - `data/processed/sales_targets.csv`: 売上成長目標Boxの選択済み抽出結果
 - `data/processed/sales_annual.csv`: PDFに明記された年次売上高の縦持ちデータ
 - `data/processed/sales_series.csv`: 単体・連結、会社全体・補助事業等を分離した売上系列
@@ -62,6 +63,7 @@
 - `html/qa.html`: ローカルPDFと抽出値・Box原文を照合する確認用HTML
 - `html/qa_v0.1.html`: `cases.csv` の代表値と指標別信頼性を、ローカルPDFと並べて確認する分析前QA用HTML
 - `html/analysis_dashboard.html`: 指標・回次・品質フラグを選び、企業別散布図、分布、公式1～5次代表値、原PDFを連動表示する全体分析HTML
+- `docs/payroll_total_estimation.md`: 給与支給総額の近似式、判定列、日生流通運輸倉庫・NAX JAPANの単位再検証
 - `excel/大規模成長投資補助金_1次～4次_統合データ.xlsx`: 検証済みExcelスナップショット
 
 `cases.csv` の事業費・補助額は同一申請内の投資案件合計です。売上の `sales_*` は申請企業自身（単体・当社・会社全体）の比較用代表値、`sales_reported_*` はPDF上の主系列です。連結・親子会社・補助事業等は `sales_series.csv` に別系列として保持します。
@@ -97,6 +99,16 @@
 続けて原単位・換算値・根拠Boxを付与し、検証します。
 
 `python scripts/normalize_units.py --project-root .`
+
+全件目視監査の反映後、既知の単位矛盾を再検証し、給与支給総額の近似列を生成します。
+
+`python scripts/revalidate_payroll_totals.py`
+
+`python scripts/build_analysis_flags.py`
+
+`python scripts/build_qa_v01.py`
+
+`python scripts/build_analysis_dashboard.py`
 
 `node scripts/verify_dataset.mjs`
 

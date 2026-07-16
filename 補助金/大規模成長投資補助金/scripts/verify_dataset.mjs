@@ -63,6 +63,14 @@ assert(cases.filter((row) => row.officer_pay_status === "rate_only").length === 
 assert(cases.every((row) => row.project_cost_unit_raw && row.subsidy_unit_raw), "all cases must retain raw cost units");
 assert(cases.every((row) => row.cost_unit_validation?.includes("raw_unit_confirmed") || row.cost_unit_validation === "participant_boxes_confirmed_and_summed"), "all cases must have confirmed cost units");
 assert(cases.every((row) => row.metrics?.every((metric) => "unit_raw" in metric && "unit_validation" in metric)), "all metrics must expose raw-unit audit fields");
+const nissho = cases.find((row) => row.case_id === "s2_outline_17");
+const nax = cases.find((row) => row.case_id === "s1_outline_69");
+assert(Number(nissho?.employee_pay_base_value_man_yen_per_person) === 427 && Number(nissho?.employee_pay_target_value_man_yen_per_person) === 495, "Nissho employee-pay unit correction is missing");
+assert(Number(nissho?.employee_pay_total_increase_estimated_oku) === 7.288, "Nissho payroll-total proxy is incorrect");
+assert(nissho?.employee_pay_total_unit_validation === "source_unit_conflict_cell_unit_preferred", "Nissho unit-conflict status is missing");
+assert(Number(nax?.employee_pay_base_value_man_yen_per_person) === 689.2 && Number(nax?.employee_pay_target_value_man_yen_per_person) === 798, "NAX employee-pay unit correction is missing");
+assert(Number(nax?.employee_pay_total_increase_estimated_oku) === 3.71032, "NAX payroll-total proxy is incorrect");
+assert(nax?.employee_pay_total_unit_validation === "source_unit_conflict_assumed_thousand_yen", "NAX unit-conflict status is missing");
 
 for (const [name, count] of [["pages.jsonl", 887], ["narratives.jsonl", 2999]]) {
   const lines = (await fs.readFile(path.join(projectDir, "data", "text", name), "utf8")).trim().split("\n");
@@ -106,10 +114,40 @@ assert(dashboardHtml.includes("全体分析ダッシュボード"), "analysis da
 assert(dashboardHtml.includes("const DATA=[") && dashboardHtml.includes("const BENCH=["), "analysis dashboard must embed cases and official benchmarks");
 assert(dashboardHtml.includes("表示対象をCSV出力") && dashboardHtml.includes("公式統計に対する位置"), "analysis dashboard controls or position table are missing");
 assert(dashboardHtml.includes("5次") && dashboardHtml.includes("applicant_value") && dashboardHtml.includes("accepted_value"), "analysis dashboard must include round 5 applicant/accepted benchmarks");
+assert(dashboardHtml.includes("employee_pay_total_increase_estimated_oku") && dashboardHtml.includes("比較可能な7指標"), "analysis dashboard must expose the seven comparable metrics");
+assert(dashboardHtml.includes("目標1人当たり給与") && dashboardHtml.includes("公開事業費÷公開基準売上高"), "analysis dashboard must document proxy formulas");
+assert(dashboardHtml.includes("drawInteractiveScatter") && dashboardHtml.includes("addEventListener('wheel'") && dashboardHtml.includes("addEventListener('pointermove'"), "analysis dashboard must support wheel zoom and drag pan");
+assert(dashboardHtml.includes("e.target.classList?.contains('pt')"), "scatter point clicks must not be captured by drag handling");
+assert(dashboardHtml.includes("ダブルクリック：全体表示"), "analysis dashboard must explain viewport reset");
+assert(dashboardHtml.includes('id="xlog" type="checkbox">') && dashboardHtml.includes("xlog.checked=false;ylog.checked=false"), "linear scales must be the default initially and after reset");
+assert(dashboardHtml.includes('id="officialRounds"') && dashboardHtml.includes("officialRoundsSelected()"), "analysis dashboard must provide in-plot round checkboxes for official medians");
+assert(dashboardHtml.includes("上の1〜4次をチェック") && dashboardHtml.includes("線をクリックすると公式資料"), "official median overlays must explain selection and source links");
+assert((dashboardHtml.match(/data-check-all=/g) || []).length === 6, "round, exclusion, and official-median checkbox groups must each provide All ON/OFF controls");
+assert(dashboardHtml.includes("細い点線＝申請者") && dashboardHtml.includes("太い破線＝採択者") && dashboardHtml.includes("['accepted_value','採','accepted_n','7 5',3]"), "accepted median lines must be thicker dashed lines than applicant medians");
+assert(dashboardHtml.includes('id="trendX"') && dashboardHtml.includes('id="trendY"') && dashboardHtml.includes("drawTrend('trendX',xmetric.value,'横軸')") && dashboardHtml.includes("drawTrend('trendY',ymetric.value,'縦軸')"), "official benchmark trends must be shown separately for both selected axes");
+assert(dashboardHtml.includes("'横軸':'縦軸')+'：'+AXES[field][0]+'の分布'") && dashboardHtml.includes("${axisName}：${AXES[f][0]}の公式統計推移"), "distribution and trend titles must identify their corresponding axis");
+assert(dashboardHtml.includes('id="selectionPanel"') && dashboardHtml.includes("e.button===2") && dashboardHtml.includes("addEventListener('contextmenu'") && dashboardHtml.includes("右ドラッグ：範囲内企業を一覧"), "scatter plot must support right-drag range selection with a company list");
+assert(dashboardHtml.includes('id="selectionList"') && dashboardHtml.includes("data-case-id") && dashboardHtml.includes("selected=d;render()"), "range-selected company list must switch the selected company and PDF");
+assert(dashboardHtml.includes("ensureHistInteractions") && dashboardHtml.includes("selectHistogramBin") && dashboardHtml.includes("全体を保って階級幅を変更") && dashboardHtml.includes("クリックで企業一覧"), "both histograms must support wheel-controlled bin widths and bar-to-company-list selection");
+assert(dashboardHtml.includes("histViews[id]={field:p.field,bins:12}") && dashboardHtml.includes("Math.min(60") && dashboardHtml.includes("addEventListener('dblclick'"), "histogram wheel interaction must preserve the full range and support reset to 12 bins");
+assert((dashboardHtml.match(/class="section-box" data-section=/g) || []).length === 5, "all five dashboard content rows must use consistent collapsible section boxes");
+assert(dashboardHtml.includes('data-section="distributions"><summary>指標の分布</summary>') && dashboardHtml.includes('data-section="trends"><summary>公式統計の推移</summary>') && dashboardHtml.includes('data-section="details" open><summary>選択企業の詳細</summary>'), "distribution and trend rows must default closed while company details default open");
+assert(dashboardHtml.includes("setupCollapsibleSections") && dashboardHtml.includes("localStorage.setItem(key,box.open?'open':'closed')") && dashboardHtml.includes("requestAnimationFrame(redraw)"), "collapsible section state must persist and charts must redraw when reopened");
+assert(!dashboardHtml.includes('class="benchmark-grid"'), "separate official benchmark bar panels must be removed");
 assert(!/\.\.\/local_assets\/pdfs\/[^\"'\s#]*__/.test(dashboardHtml), "analysis dashboard local PDF filenames must collapse repeated underscores");
 const benchmarkCsv = await fs.readFile(path.join(projectDir, "data", "reference", "official_round_benchmarks.csv"), "utf8");
-assert(countCsvRecords(benchmarkCsv) === 69, "official benchmark row count mismatch");
+assert(countCsvRecords(benchmarkCsv) === 71, "official benchmark row count mismatch");
 assert(benchmarkCsv.includes("company_sales_cagr") && benchmarkCsv.includes("project_sales_share"), "official benchmark metrics are incomplete");
+assert(benchmarkCsv.includes("employee_pay_total_increase_estimated_oku,proxy"), "employee payroll total proxy mapping is missing");
+assert(benchmarkCsv.includes("3次,company_pay_schedule_rate,全社賃上げ予定率,経営力,median,2.4,2.4") &&
+  benchmarkCsv.includes("4次,company_pay_schedule_rate,全社賃上げ予定率,経営力,median,2.5,2.4"),
+"round 3/4 company pay schedule benchmarks are missing");
+assert(benchmarkCsv.includes("https://seichotoushi-hojo.jp/assets/pdf/3ji_median.pdf") &&
+  benchmarkCsv.includes("https://seichotoushi-hojo.jp/assets/pdf/4ji_median.pdf"),
+"round 3/4 company pay schedule benchmark sources are missing");
+const payrollRevalidationCsv = await fs.readFile(path.join(projectDir, "data", "processed", "payroll_unit_revalidation_changes.csv"), "utf8");
+assert(countCsvRecords(payrollRevalidationCsv) === 4, "payroll unit revalidation must contain four metric corrections");
+assert(payrollRevalidationCsv.includes("source_unit_conflict_cell_unit_preferred") && payrollRevalidationCsv.includes("source_unit_conflict_assumed_thousand_yen"), "payroll unit revalidation statuses are incomplete");
 for (const [name, document] of [["index.html", html], ["qa.html", qaHtml], ["qa_v0.1.html", qaV01Html], ["analysis_dashboard.html", dashboardHtml]]) {
   const scripts = [...document.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
   assert(scripts.length > 0, `${name}: script is missing`);
@@ -133,6 +171,12 @@ for (const column of [
   "analysis_exclusion_reasons", "sales_values_analysis_status", "sales_rate_analysis_status",
   "labor_values_analysis_status", "employee_pay_values_analysis_status", "officer_pay_rate_analysis_status",
 ]) assert(caseCsv.includes(column), `cases.csv must include analysis flag ${column}`);
+for (const column of [
+  "employee_pay_total_base_estimated_oku", "employee_pay_total_target_estimated_oku",
+  "employee_pay_total_increase_estimated_oku", "employee_pay_total_calculation_status",
+  "employee_pay_total_period_alignment", "employee_pay_total_entity_alignment",
+  "employee_pay_total_unit_validation", "employee_pay_total_increase_analysis_status",
+]) assert(caseCsv.includes(column), `cases.csv must include payroll estimate field ${column}`);
 
 const metricsCsv = await fs.readFile(path.join(projectDir, "data", "processed", "metrics.csv"), "utf8");
 for (const column of [
@@ -166,9 +210,9 @@ const textFiles = [
   "README.md", "dataset_stats.json", "docs/methodology.md", "docs/data_dictionary.md",
   "docs/validation.md", "docs/analysis_quality_flags.md", "html/index.html", "html/qa.html", "html/qa_v0.1.html", "html/analysis_dashboard.html", "html/data/cases.json", "scripts/build_dataset.mjs", "scripts/build_qa_v01.py", "scripts/build_analysis_dashboard.py",
   "scripts/build_analysis_flags.py", "scripts/validate_analysis_flags.py", "scripts/normalize_local_pdf_names.py",
-  "scripts/sales_series.mjs", "data/processed/cases.csv", "data/processed/pdf_manifest.csv",
+  "scripts/sales_series.mjs", "scripts/revalidate_payroll_totals.py", "data/processed/cases.csv", "data/processed/pdf_manifest.csv",
   "data/processed/sales_series.csv", "data/processed/sales_series_annual.csv",
-  "data/processed/quality_flags.csv", "data/processed/case_entities.csv", "data/processed/investment_components.csv", "data/reference/official_round_benchmarks.csv",
+  "data/processed/quality_flags.csv", "data/processed/case_entities.csv", "data/processed/investment_components.csv", "data/processed/payroll_unit_revalidation_changes.csv", "data/reference/official_round_benchmarks.csv",
 ];
 for (const relative of textFiles) {
   const text = await fs.readFile(path.join(projectDir, relative), "utf8");
