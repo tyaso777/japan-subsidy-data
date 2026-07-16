@@ -52,6 +52,12 @@ def main() -> int:
         "has_period_ambiguity_any", "has_unit_ambiguity_any", "has_arithmetic_mismatch_any",
         "has_ocr_uncertainty_any", "analysis_exclusion_recommended",
     ]
+    analysis_aspects = [
+        "project_cost", "subsidy", "sales_values", "sales_rate",
+        "labor_values", "labor_rate", "employee_pay_values", "employee_pay_rate",
+        "officer_pay_values", "officer_pay_rate", "employees_values", "employees_rate",
+    ]
+    valid_analysis_statuses = {"ready", "usable_with_caution", "partial", "review_required", "unavailable"}
     for row in cases:
         for field in bool_fields:
             if row.get(field) not in {"true", "false"}:
@@ -62,6 +68,12 @@ def main() -> int:
             errors.append(f"{row['case_id']}: exclusion reasons do not match unresolved critical flags")
         if truthy(row["analysis_exclusion_recommended"]) != bool(critical):
             errors.append(f"{row['case_id']}: exclusion boolean does not match critical flags")
+        for aspect in analysis_aspects:
+            status = row.get(f"{aspect}_analysis_status", "")
+            if status not in valid_analysis_statuses:
+                errors.append(f"{row['case_id']}: invalid {aspect}_analysis_status {status!r}")
+            if status == "ready" and row.get(f"{aspect}_analysis_reasons"):
+                errors.append(f"{row['case_id']}: ready {aspect} unexpectedly has reasons")
 
     valid_severity = {"critical", "warning", "info"}
     valid_status = {"unresolved", "resolved", "not_applicable", "open_context_check", "resolved_with_tolerance"}
@@ -93,6 +105,10 @@ def main() -> int:
         "investment_components": len(components), "case_entities": len(entities),
         "cost_amount_candidates": len(amounts), "quality_flags": len(flags),
         "exclusion_recommended": sum(truthy(r["analysis_exclusion_recommended"]) for r in cases),
+        "analysis_status_counts": {
+            aspect: dict(sorted(Counter(r[f"{aspect}_analysis_status"] for r in cases).items()))
+            for aspect in analysis_aspects
+        },
         "flag_counts": dict(sorted(Counter(r["flag_code"] for r in flags).items())),
         "errors": errors[:100],
     }

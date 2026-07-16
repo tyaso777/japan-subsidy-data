@@ -51,6 +51,14 @@ CASE_FLAG_FIELDS = [
     "critical_quality_flag_count",
 ]
 
+ANALYSIS_ASPECTS = [
+    "project_cost", "subsidy", "sales_values", "sales_rate",
+    "labor_values", "labor_rate", "employee_pay_values", "employee_pay_rate",
+    "officer_pay_values", "officer_pay_rate", "employees_values", "employees_rate",
+]
+for _aspect in ANALYSIS_ASPECTS:
+    CASE_FLAG_FIELDS.extend([f"{_aspect}_analysis_status", f"{_aspect}_analysis_reasons"])
+
 METRIC_RATE_FIELDS = [
     "rate_value_raw",
     "rate_numeric_pct",
@@ -385,6 +393,139 @@ def load_narrative_text() -> dict[str, str]:
     return {key: "\n".join(values) for key, values in grouped.items()}
 
 
+def aspect_result(available: bool, partial: bool = False, critical: Iterable[str] = (),
+                  warnings: Iterable[str] = (), missing_reason: str = "NOT_STATED") -> dict[str, str]:
+    critical_codes = sorted(set(critical))
+    warning_codes = sorted(set(warnings))
+    if critical_codes:
+        status = "review_required"
+        reasons = critical_codes + warning_codes
+    elif not available:
+        status = "partial" if partial else "unavailable"
+        reasons = warning_codes or [missing_reason]
+    elif warning_codes:
+        status = "usable_with_caution"
+        reasons = warning_codes
+    else:
+        status = "ready"
+        reasons = []
+    return {"status": status, "reasons": "|".join(reasons)}
+
+
+def cost_aspect_result(case: dict[str, str], candidates: list[dict[str, Any]], candidate_type: str,
+                       representative: float | None) -> dict[str, str]:
+    if representative is None:
+        return aspect_result(False, missing_reason="VALUE_MISSING")
+    typed = [row for row in candidates if row.get("candidate_type") == candidate_type]
+    matched = any(row.get("matches_representative") is True for row in typed)
+    unmatched = [row for row in typed if row.get("matches_representative") is False]
+    material_unmatched = [
+        row for row in unmatched
+        if number(row.get("value_million_yen_normalized")) is not None
+        and abs((number(row.get("value_million_yen_normalized")) or 0) - representative)
+        > max(50, abs(representative) * 0.01)
+    ]
+    text = case.get("cost_box_transcription", "")
+    conflict_hint = bool(re.search(
+        r"不一致|差異|異なる|別範囲|明細(?:表)?(?:は|の|:|：)?合計|拠点別.{0,8}合計|投資会社別明細合計|内訳合計", text
+    ))
+    critical: list[str] = []
+    warnings: list[str] = []
+    if material_unmatched and (not matched or conflict_hint):
+        critical.append("COST_TEXT_NUMERIC_MISMATCH")
+    distinct = {round(number(row.get("value_million_yen_normalized")) or 0, 6) for row in typed}
+    if len(distinct) > 1:
+        warnings.append("MULTIPLE_COST_VALUES_PRESENT")
+    if any(
+        row.get("matches_representative") is False
+        and number(row.get("value_million_yen_normalized")) is not None
+        and abs((number(row.get("value_million_yen_normalized")) or 0) - representative)
+        <= max(50, abs(representative) * 0.01)
+        for row in typed
+    ):
+        warnings.append("ROUNDING_OR_PRECISION_DIFFERENCE")
+    return aspect_result(True, critical=critical, warnings=warnings)
+
+
+def sales_aspect_results(case: dict[str, str], rows: list[dict[str, str]]) -> dict[str, dict[str, str]]:
+    representative_id = case.get("sales_representative_series_id", "")
+    representative = next((row for row in rows if row.get("series_id") == representative_id), None)
+    if representative is None:
+        representative = next((row for row in rows if truthy(row.get("is_applicant_representative"))), None)
+    if representative is None:
+        critical = ["REPRESENTATIVE_ENTITY_AMBIGUOUS"] if rows else []
+        unavailable = aspect_result(False, critical=critical, missing_reason="REPRESENTATIVE_SERIES_MISSING")
+        return {"values": unavailable, "rate": unavailable.copy()}
+
+    critical_values: list[str] = []
+    warning_values: list[str] = []
+    if truthy(case.get("sales_representative_review_required")):
+        critical_values.append("REPRESENTATIVE_ENTITY_AMBIGUOUS")
+    if "不整合" in representative.get("arithmetic_status", ""):
+        critical_values.append("SALES_ARITHMETIC_MISMATCH")
+    methods = {representative.get("baseline_year_correction_method", ""), representative.get("target_year_correction_method", "")}
+    if methods & AMBIGUOUS_YEAR_METHODS:
+        warning_values.append("PERIOD_AMBIGUOUS")
+    base = number(representative.get("baseline_sales_oku"))
+    target = number(representative.get("target_sales_oku"))
+    values_available = base is not None and target is not None
+    values_partial = (base is None) != (target is None)
+    values_result = aspect_result(values_available, partial=values_partial, critical=critical_values,
+                                  warnings=warning_values, missing_reason="SALES_VALUES_MISSING")
+
+    rate_critical = list(critical_values)
+    rate_warnings = list(warning_values)
+    if truthy(representative.get("rate_ambiguous")):
+        rate_critical.append("RATE_DEFINITION_AMBIGUOUS")
+    rate_value = number(representative.get("stated_rate_pct"))
+    if rate_value is None:
+        rate_value = number(representative.get("growth_rate_pct"))
+    if rate_value is None:
+        rate_value = number(representative.get("cagr_pct"))
+    rate_result = aspect_result(rate_value is not None, critical=rate_critical, warnings=rate_warnings,
+                                missing_reason="RATE_NOT_STATED")
+    return {"values": values_result, "rate": rate_result}
+
+
+def metric_aspect_results(rows: list[dict[str, str]], metric_key: str) -> dict[str, dict[str, str]]:
+    candidates = [row for row in rows if row.get("metric_key") == metric_key]
+    row = next((item for item in candidates if item.get("entity_match_status") == "applicant_company_representative"), None)
+    row = row or (candidates[0] if candidates else None)
+    if row is None:
+        unavailable = aspect_result(False, missing_reason="METRIC_NOT_STATED")
+        return {"values": unavailable, "rate": unavailable.copy()}
+
+    status = row.get("status", "")
+    base = number(row.get("base_value"))
+    target = number(row.get("target_value"))
+    values_available = base is not None and target is not None
+    values_partial = (base is None) != (target is None)
+    value_critical: list[str] = []
+    value_warnings: list[str] = []
+    if row.get("unit_validation") == "unit_missing_or_unsupported" and (base is not None or target is not None):
+        value_critical.append("UNIT_AMBIGUOUS")
+    if row.get("entity_match_status") not in {"", "applicant_company_representative"}:
+        value_critical.append("ENTITY_SCOPE_REVIEW_REQUIRED")
+    methods = {row.get("base_year_correction_method", ""), row.get("target_year_correction_method", "")}
+    if methods & AMBIGUOUS_YEAR_METHODS and (base is not None or target is not None):
+        value_warnings.append("PERIOD_AMBIGUOUS")
+    missing_reason = "RATE_ONLY" if status == "rate_only" else "VALUES_NOT_STATED"
+    values_result = aspect_result(values_available, partial=values_partial, critical=value_critical,
+                                  warnings=value_warnings, missing_reason=missing_reason)
+
+    rate_critical = list(value_critical)
+    rate_warnings = list(value_warnings)
+    if truthy(row.get("rate_ambiguous")):
+        rate_critical.append("RATE_DEFINITION_AMBIGUOUS")
+    if row.get("rate_reconciliation_status") == "mismatch":
+        rate_critical.append("RATE_ARITHMETIC_MISMATCH")
+    elif row.get("rate_reconciliation_status") == "rounding_or_period_warning":
+        rate_warnings.append("RATE_ROUNDING_OR_PERIOD_WARNING")
+    rate_result = aspect_result(number(row.get("listed_rate_pct")) is not None, critical=rate_critical,
+                                warnings=rate_warnings, missing_reason="RATE_NOT_STATED")
+    return {"values": values_result, "rate": rate_result}
+
+
 def main() -> int:
     cases, case_fields = read_csv(PROCESSED / "cases.csv")
     sales, sales_fields = read_csv(PROCESSED / "sales_series.csv")
@@ -591,6 +732,9 @@ def main() -> int:
     entities_by_case: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in entity_rows:
         entities_by_case[row["case_id"]].append(row)
+    cost_candidates_by_case: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in cost_candidates:
+        cost_candidates_by_case[row["case_id"]].append(row)
 
     # Case-level summaries and corresponding informational flags.
     flags_by_case: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -634,6 +778,19 @@ def main() -> int:
         critical = [x for x in case_flags if x["severity"] == "critical" and x["status"] != "resolved"]
         reasons = sorted({x["flag_code"] for x in critical})
         comp = component_summary[cid]
+        project_cost_result = cost_aspect_result(
+            case, cost_candidates_by_case[cid], "project_cost",
+            number(case.get("project_cost_million_yen_normalized")) or number(case.get("project_cost_million_yen")),
+        )
+        subsidy_result = cost_aspect_result(
+            case, cost_candidates_by_case[cid], "subsidy",
+            number(case.get("subsidy_million_yen_normalized")) or number(case.get("subsidy_million_yen")),
+        )
+        sales_results = sales_aspect_results(case, sales_by_case[cid])
+        metric_results = {
+            key: metric_aspect_results(metrics_by_case[cid], key)
+            for key in ("labor", "employee_pay", "officer_pay", "employees")
+        }
         case.update({
             "has_multiple_investments": comp["has_multiple"],
             "investment_component_count": comp["count"],
@@ -660,7 +817,20 @@ def main() -> int:
             "analysis_exclusion_reasons": "|".join(reasons),
             "quality_flag_count": len(case_flags),
             "critical_quality_flag_count": len(critical),
+            "project_cost_analysis_status": project_cost_result["status"],
+            "project_cost_analysis_reasons": project_cost_result["reasons"],
+            "subsidy_analysis_status": subsidy_result["status"],
+            "subsidy_analysis_reasons": subsidy_result["reasons"],
+            "sales_values_analysis_status": sales_results["values"]["status"],
+            "sales_values_analysis_reasons": sales_results["values"]["reasons"],
+            "sales_rate_analysis_status": sales_results["rate"]["status"],
+            "sales_rate_analysis_reasons": sales_results["rate"]["reasons"],
         })
+        for metric_key, results in metric_results.items():
+            case[f"{metric_key}_values_analysis_status"] = results["values"]["status"]
+            case[f"{metric_key}_values_analysis_reasons"] = results["values"]["reasons"]
+            case[f"{metric_key}_rate_analysis_status"] = results["rate"]["status"]
+            case[f"{metric_key}_rate_analysis_reasons"] = results["rate"]["reasons"]
 
     # Stable sort and outputs.
     flags.sort(key=lambda r: (r["case_id"], r["severity"], r["flag_code"], r["subject_id"]))

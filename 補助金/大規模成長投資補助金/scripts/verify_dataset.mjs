@@ -108,7 +108,8 @@ for (const column of [
 for (const column of [
   "has_multiple_investments", "cost_text_numeric_mismatch", "has_consortium",
   "has_multiple_sales_series", "has_ambiguous_rate_any", "analysis_exclusion_recommended",
-  "analysis_exclusion_reasons",
+  "analysis_exclusion_reasons", "sales_values_analysis_status", "sales_rate_analysis_status",
+  "labor_values_analysis_status", "employee_pay_values_analysis_status", "officer_pay_rate_analysis_status",
 ]) assert(caseCsv.includes(column), `cases.csv must include analysis flag ${column}`);
 
 const metricsCsv = await fs.readFile(path.join(projectDir, "data", "processed", "metrics.csv"), "utf8");

@@ -49,7 +49,30 @@
 - `analysis_exclusion_recommended`: 未解決の `critical` フラグが1件以上ある。
 - `analysis_exclusion_reasons`: 未解決の重大フラグコードを `|` で連結。
 
-## 3. 率の解釈
+## 3. 指標別の分析可否
+
+案件全体の `analysis_exclusion_recommended` は最も厳しい全用途共通フラグであり、特定指標の分析母集団を作る際にそのまま使うと過剰除外になる。`cases.csv` には次の指標別ステータスを持たせる。
+
+- `project_cost_analysis_status`, `subsidy_analysis_status`
+- `sales_values_analysis_status`, `sales_rate_analysis_status`
+- `labor_values_analysis_status`, `labor_rate_analysis_status`
+- `employee_pay_values_analysis_status`, `employee_pay_rate_analysis_status`
+- `officer_pay_values_analysis_status`, `officer_pay_rate_analysis_status`
+- `employees_values_analysis_status`, `employees_rate_analysis_status`
+
+各ステータスの意味は次のとおり。
+
+| 状態 | 扱い |
+|---|---|
+| `ready` | 当該値・率について、現在の検証範囲で比較利用可能。 |
+| `usable_with_caution` | 値は利用できるが、期間、丸め、複数候補等の注意がある。感度分析を推奨。 |
+| `partial` | 基準値・目標値の片方だけなど、限定的な分析にのみ利用可能。 |
+| `review_required` | 主体、率定義、単位、算術または金額不一致が未解決。厳格比較から除外。 |
+| `unavailable` | 当該値・率が記載されていない。ゼロとして扱わない。 |
+
+対応する `*_analysis_reasons` に理由コードを `|` 区切りで保持する。売上率が `review_required` でも、売上絶対値や労働生産性が `ready` なら、それらの分析には案件を残せる。
+
+## 4. 率の解釈
 
 すべての率は数値だけで使わず、次の定義列と組み合わせます。
 
@@ -65,7 +88,7 @@
 
 `rate_interpretation_status` は、明示文言、算術、標準表の文脈のどれで解釈したかを示します。`rate_ambiguous=true` は厳格比較から除外してください。`rate_reconciliation_status=mismatch` はPDF記載率と基準値・目標値・期間からの計算率が1ポイント超相違するものです。
 
-## 4. `quality_flags.csv`
+## 5. `quality_flags.csv`
 
 - `subject_table`, `subject_id`, `metric_key`: 問題が案件全体、売上系列、主要指標のどれに属するか。
 - `flag_code`: 問題の標準コード。
@@ -77,14 +100,14 @@
 
 `critical` でも `status=resolved` なら除外理由には含めません。問題を発見した履歴と、現在も未解決であることを区別します。
 
-## 5. 推奨分析母集団
+## 6. 推奨分析母集団
 
 ### 厳格比較用
 
 次を満たす案件だけを使用します。
 
-1. `analysis_exclusion_recommended=false`
-2. 比較対象系列の `rate_ambiguous=false`
+1. 分析する項目に対応する `*_analysis_status` が `ready`。必要に応じて `usable_with_caution` も含め、別集計する。
+2. 率分析では比較対象系列の `rate_ambiguous=false`
 3. 主体を申請企業に揃える場合は、`sales_representative_scope` または `entity_relation` が申請企業を示す
 4. 金額比較では `cost_text_numeric_mismatch=false`
 5. 年度比較では、対象列の補正方法が未解決でない
@@ -94,7 +117,7 @@
 
 381件を残し、フラグを層別条件または説明変数として使います。ただし、不採択案件が含まれないため、これらのフラグから採択確率や審査上の因果効果を推定することはできません。
 
-## 6. 再生成・検証
+## 7. 再生成・検証
 
 ```powershell
 python scripts/build_analysis_flags.py
