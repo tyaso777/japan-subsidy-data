@@ -122,6 +122,7 @@ assert(dashboardHtml.includes("ダブルクリック：全体表示"), "analysis
 assert(dashboardHtml.includes('id="xlog" type="checkbox">') && dashboardHtml.includes("xlog.checked=false;ylog.checked=false"), "linear scales must be the default initially and after reset");
 assert(dashboardHtml.includes('id="sizeMetric"') && dashboardHtml.includes("const SIZE_METRICS={") && dashboardHtml.includes("sizeMetric.value='project_cost_million_yen_normalized'"), "scatter point-size selector must default to project cost");
 assert(dashboardHtml.includes("new Option(`${v[0]}（${total}件）`,k)"), "point-size selector options must show numeric coverage counts");
+assert(dashboardHtml.includes("function updateSizeMetricOptions()") && dashboardHtml.includes("applyFilters();updateSizeMetricOptions();updateSizeLegend()"), "point-size option counts must update after every filter change");
 assert(dashboardHtml.includes("Math.sqrt(4**2+t*(14**2-4**2))") && dashboardHtml.includes("p05:q(.05)") && dashboardHtml.includes("p95:q(.95)"), "point sizes must use area scaling capped at the 5th and 95th percentiles");
 assert(dashboardHtml.includes('id="sizeLegend"') && dashboardHtml.includes("全${s.n}件／表示${shown}件") && dashboardHtml.includes("欠損は小さい薄色点"), "point-size legend must show total and currently displayed coverage");
 assert(dashboardHtml.includes("点サイズ・${esc(sm[0])}") && dashboardHtml.includes("size-missing"), "point tooltips and missing-value styling must explain the size encoding");
