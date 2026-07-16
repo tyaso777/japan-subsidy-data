@@ -138,9 +138,9 @@ python scripts/build_comparison.py --mapping comparison/my_data.mapping.json
 python scripts/build_comparison.py --mapping comparison/my_data.mapping.json --input C:\data\other.csv
 ```
 
-比較結果は`data/processed/comparison_results.csv`と`html/data/comparison_results.json`へ出力され、同じ内容が`html/qa.html`に埋め込まれます。詳しい設定は[`docs/comparison_qa.md`](docs/comparison_qa.md)を参照してください。
+比較結果は`data/processed/comparison_results.csv`と`html/data/comparison_results.json`へ出力され、同じ内容が`html/qa.html`と`html/qa_v0.1.html`に埋め込まれます。`build_comparison.py`は`qa_v0.1.html`も自動再生成します。詳しい設定は[`docs/comparison_qa.md`](docs/comparison_qa.md)を参照してください。
 
-比較表示は初期状態ではOFFです。QA画面上部の［比較検証を開始］を押すと、不一致企業と相違項目が赤く強調されます。
+比較表示は初期状態ではOFFです。QA画面上部の［比較検証を開始］または［差分検証を開始］を押すと、不一致企業と相違項目が赤く強調されます。`qa_v0.1.html`では、該当する代表値カード、主要4指標の行、全列一覧の該当列も同時に強調します。
 
 動作確認用として、`comparison/test_3rows.csv`と`comparison/test_3rows.mapping.json`を収録しています。このテストデータには意図的な不一致と欠損が含まれます。
 

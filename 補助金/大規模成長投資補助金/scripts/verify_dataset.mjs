@@ -96,6 +96,9 @@ assert(qaV01Html.includes("cases.csv 全代表列・補助列"), "QA v0.1 must e
 assert(qaV01Html.includes("project_cost_analysis_status") && qaV01Html.includes("employees_rate_analysis_status"), "QA v0.1 must embed per-metric reliability flags");
 assert(qaV01Html.includes("qa_v01_rail_closed"), "QA v0.1 must persist the collapsible company rail");
 assert(qaV01Html.includes("../local_assets/pdfs/"), "QA v0.1 must use relative local PDF paths");
+assert(qaV01Html.includes("const COMPARISON="), "QA v0.1 must embed external comparison results");
+assert(qaV01Html.includes("差分検証を開始") && qaV01Html.includes("comparison-diff"), "QA v0.1 must provide opt-in difference highlighting");
+assert(qaV01Html.includes("外部抽出データとの差分"), "QA v0.1 must render a per-case comparison table");
 for (const [name, document] of [["index.html", html], ["qa.html", qaHtml], ["qa_v0.1.html", qaV01Html]]) {
   const scripts = [...document.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
   assert(scripts.length > 0, `${name}: script is missing`);

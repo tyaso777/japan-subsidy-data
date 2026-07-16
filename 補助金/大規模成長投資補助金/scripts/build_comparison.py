@@ -13,6 +13,8 @@ import datetime as dt
 import json
 import math
 import re
+import subprocess
+import sys
 import unicodedata
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -487,6 +489,9 @@ def main() -> int:
     output_json.parent.mkdir(parents=True, exist_ok=True)
     output_json.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     inject_qa(qa_path, payload)
+    qa_v01_builder = project_root / "scripts" / "build_qa_v01.py"
+    if qa_v01_builder.exists():
+        subprocess.run([sys.executable, str(qa_v01_builder)], check=True)
     print(json.dumps({"status": "ok", "summary": summary, "output_csv": str(output_csv), "output_json": str(output_json), "qa": str(qa_path)}, ensure_ascii=False, indent=2))
     return 0
 
