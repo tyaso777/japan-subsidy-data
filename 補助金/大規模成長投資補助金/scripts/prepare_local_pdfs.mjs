@@ -25,15 +25,21 @@ const review = JSON.parse(await fs.readFile(sourceFile, "utf8"));
 const pdfDir = path.join(projectDir, "local_assets", "pdfs");
 await fs.mkdir(pdfDir, { recursive: true });
 
+// Official filenames and case IDs may contain repeated underscores.  Local
+// assets deliberately use one underscore so they remain portable across ZIP
+// extraction tools and filesystems that normalize repeated separators.
+const localPdfStem = (caseId) => String(caseId).replace(/_+/g, "_");
+
 const rows = review.cases.map((item) => {
   if (!/^[a-zA-Z0-9_-]+$/.test(item.case_id)) throw new Error(`Unsafe case_id: ${item.case_id}`);
+  const localStem = localPdfStem(item.case_id);
   return {
     case_id: item.case_id,
     round: item.round,
     company: item.company,
     source: item.pdf_path,
-    destination: path.join(pdfDir, `${item.case_id}.pdf`),
-    local_path: `local_assets/pdfs/${item.case_id}.pdf`,
+    destination: path.join(pdfDir, `${localStem}.pdf`),
+    local_path: `local_assets/pdfs/${localStem}.pdf`,
     source_filename: path.basename(item.pdf_path),
   };
 });

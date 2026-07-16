@@ -28,6 +28,11 @@ BOX_COLUMNS = [
 ]
 
 
+def local_pdf_stem(case_id: str) -> str:
+    """Collapse repeated underscores only for the portable local filename."""
+    return re.sub(r"_+", "_", str(case_id))
+
+
 def read_csv(path: Path) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8-sig", newline="") as handle:
         return list(csv.DictReader(handle))
@@ -204,7 +209,7 @@ def main() -> int:
     added = []
     missing_pdfs = []
     for item in manifest:
-        pdf_path = project / "local_assets" / "pdfs" / f"{item['case_id']}.pdf"
+        pdf_path = project / "local_assets" / "pdfs" / f"{local_pdf_stem(item['case_id'])}.pdf"
         if not pdf_path.exists():
             missing_pdfs.append(item["case_id"])
             continue

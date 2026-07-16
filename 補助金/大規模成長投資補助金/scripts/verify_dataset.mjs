@@ -79,6 +79,7 @@ assert(qaHtml.includes("const DATA=["), "QA HTML must contain embedded case data
 assert(qaHtml.includes("localStorage"), "QA HTML must persist review state");
 assert(qaHtml.includes("review_results.csv"), "QA HTML must export review results");
 assert(qaHtml.includes("../local_assets/pdfs/"), "QA HTML must use relative local PDF paths");
+assert(!/\.\.\/local_assets\/pdfs\/[^\"'\s#]*__/.test(qaHtml), "QA HTML local PDF filenames must collapse repeated underscores");
 assert(qaHtml.includes("pdfOfficial"), "QA HTML must retain official PDF links");
 assert(qaHtml.includes("売上系列（"), "QA HTML must display normalized sales series");
 assert(qaHtml.includes("申請企業自身の代表系列"), "QA HTML must separate applicant representative series");
@@ -96,6 +97,7 @@ assert(qaV01Html.includes("cases.csv 全代表列・補助列"), "QA v0.1 must e
 assert(qaV01Html.includes("project_cost_analysis_status") && qaV01Html.includes("employees_rate_analysis_status"), "QA v0.1 must embed per-metric reliability flags");
 assert(qaV01Html.includes("qa_v01_rail_closed"), "QA v0.1 must persist the collapsible company rail");
 assert(qaV01Html.includes("../local_assets/pdfs/"), "QA v0.1 must use relative local PDF paths");
+assert(!/\.\.\/local_assets\/pdfs\/[^\"'\s#]*__/.test(qaV01Html), "QA v0.1 local PDF filenames must collapse repeated underscores");
 assert(qaV01Html.includes("const COMPARISON="), "QA v0.1 must embed external comparison results");
 assert(qaV01Html.includes("差分検証を開始") && qaV01Html.includes("comparison-diff"), "QA v0.1 must provide opt-in difference highlighting");
 assert(qaV01Html.includes("外部抽出データとの差分"), "QA v0.1 must render a per-case comparison table");
@@ -154,7 +156,7 @@ assert(boxCsv.includes("補助事業の背景・目的"), "boxes.csv must includ
 const textFiles = [
   "README.md", "dataset_stats.json", "docs/methodology.md", "docs/data_dictionary.md",
   "docs/validation.md", "docs/analysis_quality_flags.md", "html/index.html", "html/qa.html", "html/qa_v0.1.html", "html/data/cases.json", "scripts/build_dataset.mjs", "scripts/build_qa_v01.py",
-  "scripts/build_analysis_flags.py", "scripts/validate_analysis_flags.py",
+  "scripts/build_analysis_flags.py", "scripts/validate_analysis_flags.py", "scripts/normalize_local_pdf_names.py",
   "scripts/sales_series.mjs", "data/processed/cases.csv", "data/processed/pdf_manifest.csv",
   "data/processed/sales_series.csv", "data/processed/sales_series_annual.csv",
   "data/processed/quality_flags.csv", "data/processed/case_entities.csv", "data/processed/investment_components.csv",

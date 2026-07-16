@@ -105,7 +105,9 @@
 
 `python scripts/extract_box_sections.py --project-root .`
 
-`local_assets/` は `.gitignore` 対象で、GitHubのZIPにはPDF本体が含まれません。ZIPから `qa.html` を開いた場合は右側に案内が表示されるため、［公式PDFを開く］を使用してください。ローカルPDFを準備した環境では、このフォルダのPDFを相対パスで表示します。`s1_outline__179` のような二重アンダーバーは元の公式ファイル名 `outline__179.pdf` を保持した正常な案件IDです。
+`local_assets/` は `.gitignore` 対象で、GitHubのZIPにはPDF本体が含まれません。ZIPから `qa.html` を開いた場合は右側に案内が表示されるため、［公式PDFを開く］を使用してください。ローカルPDFを準備した環境では、このフォルダのPDFを相対パスで表示します。案件IDと公式URLは元資料名を保持しますが、ローカルPDF名は環境間の互換性のため、連続するアンダースコアを1個に正規化します。例えば案件ID `s1_outline__179` のローカルPDFは `local_assets/pdfs/s1_outline_179.pdf` です。s1・s2とも同じ規則です。
+
+既存のローカルPDFとHTML参照をこの規則へ移行する場合は `python scripts/normalize_local_pdf_names.py --project-root .` を実行します。
 
 ## 確認用HTMLの使い方
 
