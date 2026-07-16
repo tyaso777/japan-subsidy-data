@@ -5,8 +5,10 @@
 ## 基本的な使い方
 
 1. 比較CSVを`comparison/`など任意の場所へ置きます。
-2. `comparison/example.mapping.json`をコピーし、ファイル名・照合キー・列対応を変更します。
-3. プロジェクトルートで次を実行します。
+2. `comparison/canonical_current_fields.mapping.template.json`をコピーします。
+3. `columns`から外部CSVに存在しない項目を要素ごと削除します。
+4. 残した項目の`external`、`external_unit`、`external_multiplier`を外部CSVに合わせます。`current`、`current_unit`、`type`は原則変更しません。
+5. ファイル名と照合キーを設定し、プロジェクトルートで次を実行します。
 
 ```powershell
 python scripts/build_comparison.py --mapping comparison/my_data.mapping.json
@@ -19,6 +21,37 @@ python scripts/build_comparison.py `
   --mapping comparison/my_data.mapping.json `
   --input C:\data\other_extraction.csv
 ```
+
+## canonical current列
+
+`current`側には、`cases.csv`の正規化済み分析列を指定します。テンプレートには、事業費・補助額、売上、労働生産性、従業員給与、役員給与、従業員数、給与総額増加額（推計）の標準的な比較候補を収録しています。外部CSVに存在する項目だけを残すのが基本です。
+
+次のようなPDF原値列は、企業ごとに原単位が異なるため全件比較に使いません。
+
+| 使用しない原値列 | 使用する正規化済み列 | current単位 |
+|---|---|---|
+| `project_cost_million_yen` | `project_cost_million_yen_normalized` | 百万円 |
+| `subsidy_million_yen` | `subsidy_million_yen_normalized` | 百万円 |
+| `labor_base_value` | `labor_base_value_man_yen_per_person` | 万円/人 |
+| `labor_target_value` | `labor_target_value_man_yen_per_person` | 万円/人 |
+| `employee_pay_base_value` | `employee_pay_base_value_man_yen_per_person` | 万円/人 |
+| `employee_pay_target_value` | `employee_pay_target_value_man_yen_per_person` | 万円/人 |
+| `officer_pay_base_value` | `officer_pay_base_value_man_yen_per_person` | 万円/人 |
+| `officer_pay_target_value` | `officer_pay_target_value_man_yen_per_person` | 万円/人 |
+
+原値列と`*_unit`列を組み合わせれば1社ずつの確認はできますが、mapping JSONの`current_unit`は列全体に固定で適用されます。そのため、原単位が混在する列へ一律の単位を指定すると、千円/人の企業が10倍ずれて見えるなどの誤判定が起きます。
+
+`external_multiplier`は外部値を`current_unit`へそろえる倍率です。
+
+| external単位 | current単位 | external_multiplier |
+|---|---|---:|
+| 百万円 | 百万円 | 1 |
+| 億円 | 百万円 | 100 |
+| 万円/人 | 万円/人 | 1 |
+| 千円/人 | 万円/人 | 0.1 |
+| 円/人 | 万円/人 | 0.0001 |
+
+外部CSVの同じ列内でも単位が混在する場合、現在のmappingは行別単位変換を行いません。比較前に外部CSVを1つの単位へ正規化するか、単位ごとに列・ファイルを分けてください。
 
 生成・更新されるファイルは次のとおりです。
 

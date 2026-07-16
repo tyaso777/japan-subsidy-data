@@ -50,6 +50,33 @@ class ComparisonTests(unittest.TestCase):
         self.assertEqual(rows[0]["status"], "different")
         self.assertEqual(rows[0]["match_method"], "key_2")
 
+    def test_thousand_yen_external_matches_normalized_man_yen_current(self):
+        current = [{
+            "case_id": "tonox", "company": "株式会社トノックス",
+            "employee_pay_base_value_man_yen_per_person": "516.9",
+            "employee_pay_target_value_man_yen_per_person": "633.8",
+        }]
+        external = [{
+            "案件ID": "tonox", "企業名": "株式会社トノックス",
+            "給与基準値_千円人": "5,169", "給与目標値_千円人": "6,338",
+        }]
+        rule = {
+            "type": "number", "current_unit": "万円/人", "external_unit": "千円/人",
+            "external_multiplier": 0.1, "absolute_tolerance": 0.01,
+        }
+        mapping = {
+            "dataset_id": "fixture",
+            "record_keys": [{"current": ["case_id"], "external": ["案件ID"]}],
+            "columns": [
+                {**rule, "current": "employee_pay_base_value_man_yen_per_person", "external": "給与基準値_千円人"},
+                {**rule, "current": "employee_pay_target_value_man_yen_per_person", "external": "給与目標値_千円人"},
+            ],
+        }
+        rows, _ = MODULE.compare_dataset(current, external, mapping)
+        self.assertEqual([row["status"] for row in rows], ["equal", "equal"])
+        self.assertAlmostEqual(rows[0]["external_normalized"], 516.9)
+        self.assertAlmostEqual(rows[1]["external_normalized"], 633.8)
+
     def test_html_injection_is_idempotent(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "qa.html"

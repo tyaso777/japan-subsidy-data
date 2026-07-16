@@ -148,12 +148,20 @@
 
 `cases.csv`と別の抽出CSVを比較し、相違・片側欠損を`qa.html`で強調できます。Node.jsやWebサーバーは不要です。
 
-1. `comparison/example.mapping.json`をコピーして、比較CSV名・レコード照合キー・列対応を設定します。
-2. 次を実行します。
+1. [`comparison/canonical_current_fields.mapping.template.json`](comparison/canonical_current_fields.mapping.template.json) をコピーします。
+2. `columns`から、外部CSVに存在しない項目を要素ごと削除します。
+3. 残した項目の `external`、`external_unit`、`external_multiplier` だけを外部CSVに合わせて設定します。`current`、`current_unit`、`type` は原則変更しません。
+4. 比較CSV名とレコード照合キーを設定し、次を実行します。
 
 ```powershell
 python scripts/build_comparison.py --mapping comparison/my_data.mapping.json
 ```
+
+`current`側は、単位が統一された分析用列を使います。例えば、従業員給与の基準値は `employee_pay_base_value_man_yen_per_person`（万円/人）、労働生産性の基準値は `labor_base_value_man_yen_per_person`（万円/人）です。`employee_pay_base_value` や `labor_base_value` はPDF原値であり、企業ごとに円/人・千円/人・万円/人が混在するため、全件の差分比較には使いません。
+
+`external_multiplier`は、外部値を`current_unit`へ変換する倍率です。同じ単位なら`1`、外部の億円をcurrentの百万円へ合わせる場合は`100`、外部の千円/人をcurrentの万円/人へ合わせる場合は`0.1`です。外部CSVに存在する項目だけを比較するのが基本です。
+
+少数項目だけを手で組む場合は `comparison/example.mapping.json` も参照できますが、こちらも正規化済みの`current`列を使用しています。
 
 比較CSVをコマンドで指定する場合：
 

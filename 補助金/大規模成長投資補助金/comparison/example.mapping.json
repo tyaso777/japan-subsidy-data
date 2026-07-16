@@ -19,14 +19,14 @@
   ],
   "columns": [
     {
-      "current": "project_cost_million_yen",
+      "current": "project_cost_million_yen_normalized",
       "external": "事業費_百万円",
       "label": "事業費",
       "type": "number",
       "absolute_tolerance": 0.1
     },
     {
-      "current": "subsidy_million_yen",
+      "current": "subsidy_million_yen_normalized",
       "external": "補助額_億円",
       "label": "補助額",
       "type": "number",
@@ -47,7 +47,7 @@
       "type": "year"
     },
     {
-      "current": "labor_base_value",
+      "current": "labor_base_value_man_yen_per_person",
       "external": "労働生産性基準値",
       "label": "労働生産性・基準値",
       "type": "number",

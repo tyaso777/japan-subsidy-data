@@ -16,7 +16,7 @@
       "comparison_file": "test_3rows.csv",
       "cases_encoding": "utf-8-sig",
       "comparison_encoding": "utf-8-sig",
-      "generated_at": "2026-07-16T09:20:40.441216+00:00"
+      "generated_at": "2026-07-16T23:32:14.979227+00:00"
     }
   ],
   "rows": [
@@ -25,7 +25,7 @@
       "dataset_label": "3行テストデータ",
       "case_id": "s1_outline__179",
       "company": "アサヒセイレン中部株式会社",
-      "field": "project_cost_million_yen",
+      "field": "project_cost_million_yen_normalized",
       "field_label": "事業費",
       "external_column": "事業費_億円",
       "current_raw": "18800",
@@ -53,7 +53,7 @@
       "dataset_label": "3行テストデータ",
       "case_id": "s1_outline__179",
       "company": "アサヒセイレン中部株式会社",
-      "field": "subsidy_million_yen",
+      "field": "subsidy_million_yen_normalized",
       "field_label": "補助額",
       "external_column": "補助額_億円",
       "current_raw": "5000",
@@ -137,7 +137,7 @@
       "dataset_label": "3行テストデータ",
       "case_id": "s1_outline__179",
       "company": "アサヒセイレン中部株式会社",
-      "field": "labor_base_value",
+      "field": "labor_base_value_man_yen_per_person",
       "field_label": "労働生産性・基準値",
       "external_column": "労働生産性基準値_千円人",
       "current_raw": "1849",
@@ -193,7 +193,7 @@
       "dataset_label": "3行テストデータ",
       "case_id": "s1_outline__181",
       "company": "株式会社ホテルニューアワジ",
-      "field": "project_cost_million_yen",
+      "field": "project_cost_million_yen_normalized",
       "field_label": "事業費",
       "external_column": "事業費_億円",
       "current_raw": "8200",
@@ -221,7 +221,7 @@
       "dataset_label": "3行テストデータ",
       "case_id": "s1_outline__181",
       "company": "株式会社ホテルニューアワジ",
-      "field": "subsidy_million_yen",
+      "field": "subsidy_million_yen_normalized",
       "field_label": "補助額",
       "external_column": "補助額_億円",
       "current_raw": "2600",
@@ -305,7 +305,7 @@
       "dataset_label": "3行テストデータ",
       "case_id": "s1_outline__181",
       "company": "株式会社ホテルニューアワジ",
-      "field": "labor_base_value",
+      "field": "labor_base_value_man_yen_per_person",
       "field_label": "労働生産性・基準値",
       "external_column": "労働生産性基準値_千円人",
       "current_raw": "1036",
@@ -361,7 +361,7 @@
       "dataset_label": "3行テストデータ",
       "case_id": "s1_outline__182",
       "company": "埼玉機器株式会社",
-      "field": "project_cost_million_yen",
+      "field": "project_cost_million_yen_normalized",
       "field_label": "事業費",
       "external_column": "事業費_億円",
       "current_raw": "9100",
@@ -389,7 +389,7 @@
       "dataset_label": "3行テストデータ",
       "case_id": "s1_outline__182",
       "company": "埼玉機器株式会社",
-      "field": "subsidy_million_yen",
+      "field": "subsidy_million_yen_normalized",
       "field_label": "補助額",
       "external_column": "補助額_億円",
       "current_raw": "2500",
@@ -473,7 +473,7 @@
       "dataset_label": "3行テストデータ",
       "case_id": "s1_outline__182",
       "company": "埼玉機器株式会社",
-      "field": "labor_base_value",
+      "field": "labor_base_value_man_yen_per_person",
       "field_label": "労働生産性・基準値",
       "external_column": "労働生産性基準値_千円人",
       "current_raw": "693",
@@ -525,5 +525,5 @@
       }
     }
   ],
-  "generated_at": "2026-07-16T09:20:40.441216+00:00"
+  "generated_at": "2026-07-16T23:32:14.979227+00:00"
 }

@@ -1,0 +1,54 @@
+{
+  "template_instructions": "このファイルをコピーし、外部CSVに存在するcolumns要素だけを残してください。各要素のexternal、external_unit、external_multiplierを外部CSVに合わせて変更します。current、current_unit、typeは原則変更しません。",
+  "dataset_id": "replace_me",
+  "dataset_label": "比較データ名",
+  "comparison_file": "replace_me.csv",
+  "encoding": "utf-8-sig",
+  "external_company_column": "企業名",
+  "include_current_only": true,
+  "record_keys": [
+    {
+      "current": ["case_id"],
+      "external": ["案件ID"],
+      "normalizers": ["text"]
+    },
+    {
+      "current": ["round", "company"],
+      "external": ["採択回", "企業名"],
+      "normalizers": ["round", "company"]
+    }
+  ],
+  "columns": [
+    {"current":"project_cost_million_yen_normalized","external":"__外部CSV列名__","label":"事業費","type":"number","current_unit":"百万円","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.1},
+    {"current":"subsidy_million_yen_normalized","external":"__外部CSV列名__","label":"補助額","type":"number","current_unit":"百万円","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.1},
+    {"current":"subsidy_rate_pct","external":"__外部CSV列名__","label":"補助率","type":"percentage","current_unit":"%","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"sales_baseline_year_after_correction","external":"__外部CSV列名__","label":"売上高・基準年度","type":"year","current_unit":"西暦年","external_unit":"__外部単位__","external_multiplier":1},
+    {"current":"sales_baseline_oku_yen","external":"__外部CSV列名__","label":"売上高・基準値","type":"number","current_unit":"億円","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"sales_target_year_after_correction","external":"__外部CSV列名__","label":"売上高・目標年度","type":"year","current_unit":"西暦年","external_unit":"__外部単位__","external_multiplier":1},
+    {"current":"sales_target_oku_yen","external":"__外部CSV列名__","label":"売上高・目標値","type":"number","current_unit":"億円","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"sales_increase_oku_yen_normalized","external":"__外部CSV列名__","label":"売上高増加額","type":"number","current_unit":"億円","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"sales_growth_pct","external":"__外部CSV列名__","label":"売上高成長率","type":"percentage","current_unit":"%","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"sales_cagr_pct","external":"__外部CSV列名__","label":"売上高CAGR","type":"percentage","current_unit":"%/年","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"labor_base_year_after_correction","external":"__外部CSV列名__","label":"労働生産性・基準年度","type":"year","current_unit":"西暦年","external_unit":"__外部単位__","external_multiplier":1},
+    {"current":"labor_base_value_man_yen_per_person","external":"__外部CSV列名__","label":"労働生産性・基準値","type":"number","current_unit":"万円/人","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"labor_target_year_after_correction","external":"__外部CSV列名__","label":"労働生産性・目標年度","type":"year","current_unit":"西暦年","external_unit":"__外部単位__","external_multiplier":1},
+    {"current":"labor_target_value_man_yen_per_person","external":"__外部CSV列名__","label":"労働生産性・目標値","type":"number","current_unit":"万円/人","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"labor_annual_rate_pct","external":"__外部CSV列名__","label":"労働生産性・年平均上昇率","type":"percentage","current_unit":"%/年","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"employee_pay_base_year_after_correction","external":"__外部CSV列名__","label":"従業員給与・基準年度","type":"year","current_unit":"西暦年","external_unit":"__外部単位__","external_multiplier":1},
+    {"current":"employee_pay_base_value_man_yen_per_person","external":"__外部CSV列名__","label":"従業員給与・基準値","type":"number","current_unit":"万円/人","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"employee_pay_target_year_after_correction","external":"__外部CSV列名__","label":"従業員給与・目標年度","type":"year","current_unit":"西暦年","external_unit":"__外部単位__","external_multiplier":1},
+    {"current":"employee_pay_target_value_man_yen_per_person","external":"__外部CSV列名__","label":"従業員給与・目標値","type":"number","current_unit":"万円/人","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"employee_pay_annual_rate_pct","external":"__外部CSV列名__","label":"従業員給与・年平均上昇率","type":"percentage","current_unit":"%/年","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"officer_pay_base_year_after_correction","external":"__外部CSV列名__","label":"役員給与・基準年度","type":"year","current_unit":"西暦年","external_unit":"__外部単位__","external_multiplier":1},
+    {"current":"officer_pay_base_value_man_yen_per_person","external":"__外部CSV列名__","label":"役員給与・基準値","type":"number","current_unit":"万円/人","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"officer_pay_target_year_after_correction","external":"__外部CSV列名__","label":"役員給与・目標年度","type":"year","current_unit":"西暦年","external_unit":"__外部単位__","external_multiplier":1},
+    {"current":"officer_pay_target_value_man_yen_per_person","external":"__外部CSV列名__","label":"役員給与・目標値","type":"number","current_unit":"万円/人","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"officer_pay_annual_rate_pct","external":"__外部CSV列名__","label":"役員給与・年平均上昇率","type":"percentage","current_unit":"%/年","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"employees_base_year_after_correction","external":"__外部CSV列名__","label":"従業員数・基準年度","type":"year","current_unit":"西暦年","external_unit":"__外部単位__","external_multiplier":1},
+    {"current":"employees_base_value","external":"__外部CSV列名__","label":"従業員数・基準値","type":"number","current_unit":"人","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0},
+    {"current":"employees_target_year_after_correction","external":"__外部CSV列名__","label":"従業員数・目標年度","type":"year","current_unit":"西暦年","external_unit":"__外部単位__","external_multiplier":1},
+    {"current":"employees_target_value","external":"__外部CSV列名__","label":"従業員数・目標値","type":"number","current_unit":"人","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0},
+    {"current":"employees_annual_rate_pct","external":"__外部CSV列名__","label":"従業員数・年平均増加率","type":"percentage","current_unit":"%/年","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01},
+    {"current":"employee_pay_total_increase_estimated_oku","external":"__外部CSV列名__","label":"従業員給与支給総額の増加額（推計）","type":"number","current_unit":"億円","external_unit":"__外部単位__","external_multiplier":1,"absolute_tolerance":0.01}
+  ]
+}
