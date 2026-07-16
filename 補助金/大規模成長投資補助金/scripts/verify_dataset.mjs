@@ -88,7 +88,15 @@ assert(qaHtml.includes('"sales_series":['), "QA HTML must embed sales series dat
 assert(qaHtml.includes("原単位") && qaHtml.includes("万円換算値"), "QA HTML must display raw and normalized metric values");
 assert(qaHtml.includes("増加額（原表記）") && qaHtml.includes("増加額（億円換算）"), "QA HTML must display raw and normalized sales increases");
 assert(qaHtml.includes("21/3期") && qaHtml.includes("30/3期"), "QA HTML must retain two-digit fiscal period labels");
-for (const [name, document] of [["index.html", html], ["qa.html", qaHtml]]) {
+const qaV01Html = await fs.readFile(path.join(projectDir, "html", "qa_v0.1.html"), "utf8");
+assert(qaV01Html.includes("代表項目QA"), "QA v0.1 title is missing");
+assert(qaV01Html.includes("const DATA=["), "QA v0.1 must contain embedded case data");
+assert(qaV01Html.includes("先に見る箇所"), "QA v0.1 must present actionable attention items");
+assert(qaV01Html.includes("cases.csv 全代表列・補助列"), "QA v0.1 must expose all scalar case fields");
+assert(qaV01Html.includes("project_cost_analysis_status") && qaV01Html.includes("employees_rate_analysis_status"), "QA v0.1 must embed per-metric reliability flags");
+assert(qaV01Html.includes("qa_v01_rail_closed"), "QA v0.1 must persist the collapsible company rail");
+assert(qaV01Html.includes("../local_assets/pdfs/"), "QA v0.1 must use relative local PDF paths");
+for (const [name, document] of [["index.html", html], ["qa.html", qaHtml], ["qa_v0.1.html", qaV01Html]]) {
   const scripts = [...document.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
   assert(scripts.length > 0, `${name}: script is missing`);
   for (const script of scripts) new vm.Script(script, { filename: name });
@@ -142,7 +150,7 @@ assert(boxCsv.includes("補助事業の背景・目的"), "boxes.csv must includ
 
 const textFiles = [
   "README.md", "dataset_stats.json", "docs/methodology.md", "docs/data_dictionary.md",
-  "docs/validation.md", "docs/analysis_quality_flags.md", "html/index.html", "html/qa.html", "html/data/cases.json", "scripts/build_dataset.mjs",
+  "docs/validation.md", "docs/analysis_quality_flags.md", "html/index.html", "html/qa.html", "html/qa_v0.1.html", "html/data/cases.json", "scripts/build_dataset.mjs", "scripts/build_qa_v01.py",
   "scripts/build_analysis_flags.py", "scripts/validate_analysis_flags.py",
   "scripts/sales_series.mjs", "data/processed/cases.csv", "data/processed/pdf_manifest.csv",
   "data/processed/sales_series.csv", "data/processed/sales_series_annual.csv",
