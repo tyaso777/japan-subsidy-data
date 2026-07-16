@@ -101,7 +101,16 @@ assert(!/\.\.\/local_assets\/pdfs\/[^\"'\s#]*__/.test(qaV01Html), "QA v0.1 local
 assert(qaV01Html.includes("const COMPARISON="), "QA v0.1 must embed external comparison results");
 assert(qaV01Html.includes("差分検証を開始") && qaV01Html.includes("comparison-diff"), "QA v0.1 must provide opt-in difference highlighting");
 assert(qaV01Html.includes("外部抽出データとの差分"), "QA v0.1 must render a per-case comparison table");
-for (const [name, document] of [["index.html", html], ["qa.html", qaHtml], ["qa_v0.1.html", qaV01Html]]) {
+const dashboardHtml = await fs.readFile(path.join(projectDir, "html", "analysis_dashboard.html"), "utf8");
+assert(dashboardHtml.includes("全体分析ダッシュボード"), "analysis dashboard title is missing");
+assert(dashboardHtml.includes("const DATA=[") && dashboardHtml.includes("const BENCH=["), "analysis dashboard must embed cases and official benchmarks");
+assert(dashboardHtml.includes("表示対象をCSV出力") && dashboardHtml.includes("公式統計に対する位置"), "analysis dashboard controls or position table are missing");
+assert(dashboardHtml.includes("5次") && dashboardHtml.includes("applicant_value") && dashboardHtml.includes("accepted_value"), "analysis dashboard must include round 5 applicant/accepted benchmarks");
+assert(!/\.\.\/local_assets\/pdfs\/[^\"'\s#]*__/.test(dashboardHtml), "analysis dashboard local PDF filenames must collapse repeated underscores");
+const benchmarkCsv = await fs.readFile(path.join(projectDir, "data", "reference", "official_round_benchmarks.csv"), "utf8");
+assert(countCsvRecords(benchmarkCsv) === 69, "official benchmark row count mismatch");
+assert(benchmarkCsv.includes("company_sales_cagr") && benchmarkCsv.includes("project_sales_share"), "official benchmark metrics are incomplete");
+for (const [name, document] of [["index.html", html], ["qa.html", qaHtml], ["qa_v0.1.html", qaV01Html], ["analysis_dashboard.html", dashboardHtml]]) {
   const scripts = [...document.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
   assert(scripts.length > 0, `${name}: script is missing`);
   for (const script of scripts) new vm.Script(script, { filename: name });
@@ -155,11 +164,11 @@ assert(boxCsv.includes("補助事業の背景・目的"), "boxes.csv must includ
 
 const textFiles = [
   "README.md", "dataset_stats.json", "docs/methodology.md", "docs/data_dictionary.md",
-  "docs/validation.md", "docs/analysis_quality_flags.md", "html/index.html", "html/qa.html", "html/qa_v0.1.html", "html/data/cases.json", "scripts/build_dataset.mjs", "scripts/build_qa_v01.py",
+  "docs/validation.md", "docs/analysis_quality_flags.md", "html/index.html", "html/qa.html", "html/qa_v0.1.html", "html/analysis_dashboard.html", "html/data/cases.json", "scripts/build_dataset.mjs", "scripts/build_qa_v01.py", "scripts/build_analysis_dashboard.py",
   "scripts/build_analysis_flags.py", "scripts/validate_analysis_flags.py", "scripts/normalize_local_pdf_names.py",
   "scripts/sales_series.mjs", "data/processed/cases.csv", "data/processed/pdf_manifest.csv",
   "data/processed/sales_series.csv", "data/processed/sales_series_annual.csv",
-  "data/processed/quality_flags.csv", "data/processed/case_entities.csv", "data/processed/investment_components.csv",
+  "data/processed/quality_flags.csv", "data/processed/case_entities.csv", "data/processed/investment_components.csv", "data/reference/official_round_benchmarks.csv",
 ];
 for (const relative of textFiles) {
   const text = await fs.readFile(path.join(projectDir, relative), "utf8");

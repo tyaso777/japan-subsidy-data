@@ -28,8 +28,10 @@
 - [1次・2次公募全体における各種指標の中央値](https://seichotoushi-hojo.jp/assets/pdf/information/20250122.pdf)
 - [3次公募における各種指標の中央値](https://seichotoushi-hojo.jp/assets/pdf/3ji_median.pdf)
 - [4次公募における各種指標の中央値](https://seichotoushi-hojo.jp/assets/pdf/4ji_median.pdf)
+- [1次～4次の申請者・採択者指標（公式説明資料）](https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/000058716.pdf)
+- [5次公募の申請者・採択者指標](https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf)
 
-公式中央値の「採択者」と、本データが対象とする「HPで取組概要PDFが公開された交付決定企業」は同一母集団とは限りません。また、同じ指標名でも対象企業、対象範囲、基準年、計画期間が異なる場合があるため、比較時は定義を併記してください。
+公式値は原則として中央値です。ただし「全社売上高に対する補助事業売上高の割合」だけは平均値です。公式値の「採択者」と、本データが対象とする「HPで取組概要PDFが公開された交付決定企業」は同一母集団とは限りません。また、同じ指標名でも対象企業、対象範囲、基準年、計画期間が異なる場合があるため、比較時は定義を併記してください。ダッシュボード用に転記した値は `data/reference/official_round_benchmarks.csv` にあります。
 
 ## 収録範囲
 
@@ -59,6 +61,7 @@
 - `html/index.html`: 案件の検索・一覧用ローカルHTML
 - `html/qa.html`: ローカルPDFと抽出値・Box原文を照合する確認用HTML
 - `html/qa_v0.1.html`: `cases.csv` の代表値と指標別信頼性を、ローカルPDFと並べて確認する分析前QA用HTML
+- `html/analysis_dashboard.html`: 指標・回次・品質フラグを選び、企業別散布図、分布、公式1～5次代表値、原PDFを連動表示する全体分析HTML
 - `excel/大規模成長投資補助金_1次～4次_統合データ.xlsx`: 検証済みExcelスナップショット
 
 `cases.csv` の事業費・補助額は同一申請内の投資案件合計です。売上の `sales_*` は申請企業自身（単体・当社・会社全体）の比較用代表値、`sales_reported_*` はPDF上の主系列です。連結・親子会社・補助事業等は `sales_series.csv` に別系列として保持します。
@@ -122,6 +125,12 @@
 `qa_v0.1.html` をデータ更新後に再生成するには、Node.jsを使わず次を実行します。
 
 `python scripts/build_qa_v01.py`
+
+全体分析ページをデータ更新後に再生成する場合：
+
+`python scripts/build_analysis_dashboard.py`
+
+`analysis_dashboard.html` では、横軸・縦軸、公募回、指標別信頼性、対象範囲、案件構造・主体・単位・OCR等の除外フラグを指定できます。散布図の企業を選択すると、原PDF、主要値、指標別信頼性、同一次の公式申請者・採択者代表値に対する位置を表示します。公式値との比較のうち、売上CAGR・売上増加額・投資額／売上高は公開PDFの定義と完全には一致しないため「近似比較」です。労働生産性率、従業員給与率、役員給与率も、対象主体や期間が異なる案件では元PDFを確認してください。
 
 ### 別抽出データとの比較（Pythonのみ）
 
