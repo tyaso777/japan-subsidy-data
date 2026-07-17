@@ -1,0 +1,3 @@
+case_id,round,company,corporate_number,head_office_prefecture,project_prefectures,industry,source_stage,source_url,note
+s1_outline_41,1次,株式会社ビッグハウス,8350001012159,宮崎県,宮崎県,,adoption_list,https://seichotoushi-hojo.jp/assets/pdf/list_1ji.pdf,交付決定ページの現行JSONに未収録のため採択案件一覧の都道府県を使用
+s1_outline_84,1次,株式会社マグナ・ワイヤレス,6010101011996,東京都,東京都,,adoption_list,https://seichotoushi-hojo.jp/assets/pdf/list_1ji.pdf,交付決定ページの現行JSONに未収録のため採択案件一覧の都道府県を使用

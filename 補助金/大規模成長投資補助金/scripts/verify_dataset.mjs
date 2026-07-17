@@ -41,6 +41,7 @@ const expected = {
   "case_entities.csv": 952,
   "cost_amount_candidates.csv": 1042,
   "quality_flags.csv": 737,
+  "case_locations.csv": 946,
 };
 
 for (const [name, count] of Object.entries(expected)) {
@@ -52,6 +53,9 @@ const cases = JSON.parse(await fs.readFile(path.join(projectDir, "html", "data",
 assert(cases.length === 381, "cases.json: expected 381 cases");
 assert(new Set(cases.map((row) => row.case_id)).size === 381, "case_id must be unique");
 assert(cases.every((row) => /^https:\/\//.test(row.pdf_url)), "all PDF URLs must be HTTPS links");
+assert(cases.every((row) => row.head_office_prefecture && row.project_location_prefectures), "all cases must have head-office and project prefectures");
+assert(cases.filter((row) => row.location_match_status === "exact_pdf_url").length === 379, "379 cases must match the grant-page JSON by PDF URL");
+assert(cases.filter((row) => row.location_match_status === "official_adoption_list_prefecture_fallback").length === 2, "two cases must use the documented adoption-list fallback");
 const fullAuditLines = (await fs.readFile(path.join(projectDir, "data", "manual_audit", "full_manual_visual_audit.jsonl"), "utf8")).trim().split("\n");
 assert(fullAuditLines.length === 381, "full visual audit must cover 381 cases");
 const fullAudit = fullAuditLines.map((line) => JSON.parse(line));
@@ -207,6 +211,15 @@ for (const column of [
   "employee_pay_total_period_alignment", "employee_pay_total_entity_alignment",
   "employee_pay_total_unit_validation", "employee_pay_total_increase_analysis_status",
 ]) assert(caseCsv.includes(column), `cases.csv must include payroll estimate field ${column}`);
+for (const column of [
+  "head_office_address", "head_office_prefecture", "project_location_count",
+  "project_location_addresses", "project_location_prefectures", "project_location_statuses",
+  "has_undecided_project_location", "location_match_status", "location_source_page_url",
+]) assert(caseCsv.includes(column), `cases.csv must include location field ${column}`);
+
+const locationCsv = await fs.readFile(path.join(projectDir, "data", "processed", "case_locations.csv"), "utf8");
+for (const column of ["location_type", "location_sequence", "address_raw", "prefecture", "municipality", "location_status", "detail_level", "source_stage", "source_page_url", "retrieved_at"])
+  assert(locationCsv.includes(column), `case_locations.csv must include ${column}`);
 
 const metricsCsv = await fs.readFile(path.join(projectDir, "data", "processed", "metrics.csv"), "utf8");
 for (const column of [
@@ -243,6 +256,7 @@ const textFiles = [
   "scripts/sales_series.mjs", "scripts/revalidate_payroll_totals.py", "data/processed/cases.csv", "data/processed/pdf_manifest.csv",
   "data/processed/sales_series.csv", "data/processed/sales_series_annual.csv",
   "data/processed/quality_flags.csv", "data/processed/case_entities.csv", "data/processed/investment_components.csv", "data/processed/payroll_unit_revalidation_changes.csv", "data/reference/official_round_benchmarks.csv",
+  "data/processed/case_locations.csv", "data/processed/location_update_summary.json", "data/reference/location_fallbacks.csv", "docs/case_locations.md", "scripts/update_case_locations.py",
 ];
 for (const relative of textFiles) {
   const text = await fs.readFile(path.join(projectDir, relative), "utf8");

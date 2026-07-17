@@ -1,0 +1,4104 @@
+[
+  {
+    "id": "1",
+    "area_code": "28",
+    "area_name": "兵庫県",
+    "area_code_sub": [
+      "28"
+    ],
+    "area_name_sub": [
+      "兵庫県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社岩崎電機製作所",
+    "shop_location": "兵庫県丹波篠山市河原町226-2",
+    "shop_office": [
+      "兵庫県丹波篠山市岩崎406-1,481"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_1.pdf"
+  },
+  {
+    "id": "2",
+    "area_code": "22",
+    "area_name": "静岡県",
+    "area_code_sub": [
+      "03"
+    ],
+    "area_name_sub": [
+      "岩手県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社アイ・テック",
+    "shop_location": "静岡県静岡清水区三保387番地7",
+    "shop_office": [
+      "岩手県北上市和賀町後藤2地割114番40他"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_2.pdf"
+  },
+  {
+    "id": "3",
+    "area_code": "26",
+    "area_name": "京都府",
+    "area_code_sub": [
+      "26"
+    ],
+    "area_name_sub": [
+      "京都府"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社堀場エステック",
+    "shop_location": "京都府京都市南区上鳥羽鉾立町11‐5",
+    "shop_office": [
+      "京都府福山市三和町みわ小字エコートピア4番１"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_3.pdf"
+  },
+  {
+    "id": "4",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "08",
+      "13",
+      "27"
+    ],
+    "area_name_sub": [
+      "茨城県",
+      "東京都",
+      "大阪府"
+    ],
+    "category_code": "9",
+    "category_name": "卸売業・小売業",
+    "shop_name": "株式会社インターオフィス",
+    "shop_location": "東京都港区南青山1-2-6 ラティス青山スクエア6F",
+    "shop_office": [
+      "茨城県猿島郡五霞町元栗橋7453-2",
+      "東京都港区南青山1-2-6 ラティス青山スクエア6F",
+      "大阪府西区北堀江1-19-1 八光心斎橋AIR Bldg.2F"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_4.pdf"
+  },
+  {
+    "id": "5",
+    "area_code": "11",
+    "area_name": "埼玉県",
+    "area_code_sub": [
+      "15"
+    ],
+    "area_name_sub": [
+      "新潟県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "大森機械工業株式会社",
+    "shop_location": "埼玉県越谷市西方2761番地",
+    "shop_office": [
+      "新潟県長岡市高頭町字中山469-19"
+    ],
+    "consortium": [
+      "株式会社大森ホールディングス"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_5.pdf"
+  },
+  {
+    "id": "7",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "07",
+      "21"
+    ],
+    "area_name_sub": [
+      "福島県",
+      "岐阜県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社ＭＡＲＵＷＡ",
+    "shop_location": "愛知県尾張旭市南本地ヶ原町3丁目83番地",
+    "shop_office": [
+      "福島県田村郡三春町大字熊耳字大平7番地1",
+      "岐阜県土岐市鶴里町柿野広畑2322番地3",
+      "福島県いわき市勿来町大高館ノ内1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_7.pdf"
+  },
+  {
+    "id": "8",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "27"
+    ],
+    "area_name_sub": [
+      "大阪府"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "サムテック株式会社",
+    "shop_location": "大阪府大阪市西区江戸堀１丁目２４番１５号",
+    "shop_office": [
+      "大阪府羽曳野市駒ヶ谷1452番30他",
+      "大阪府羽曳野市駒ヶ谷1452番4"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_8.pdf"
+  },
+  {
+    "id": "9",
+    "area_code": "12",
+    "area_name": "千葉県",
+    "area_code_sub": [
+      "08",
+      "12"
+    ],
+    "area_name_sub": [
+      "茨城県",
+      "千葉県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社Pale Blue",
+    "shop_location": "千葉県柏市柏の葉6-6-2　三井リンクラボ柏の葉1-101号室",
+    "shop_office": [
+      "茨城県つくば市上河原崎地区Ａ24街区",
+      "千葉県柏市柏の葉6-6-2　三井リンクラボ柏の葉1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_9.pdf"
+  },
+  {
+    "id": "10",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "24",
+      "23",
+      "13"
+    ],
+    "area_name_sub": [
+      "三重県",
+      "愛知県",
+      "東京都"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社プレジィール",
+    "shop_location": "東京都千代田区丸の内1丁目9番2号 グラントウキョウサウスタワー",
+    "shop_office": [
+      "三重県桑名市陽だまりの丘6-201",
+      "愛知県海部郡蟹江町西之森7-112",
+      "東京都千代田区丸の内1-9-2 グラントウキョウサウスタワー17F"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_10.pdf"
+  },
+  {
+    "id": "11",
+    "area_code": "29",
+    "area_name": "奈良県",
+    "area_code_sub": [
+      "29"
+    ],
+    "area_name_sub": [
+      "奈良県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "大峰堂薬品工業株式会社",
+    "shop_location": "奈良県大和高田市大字根成柿５７４番地",
+    "shop_office": [
+      "奈良県五條市住川町１３２１番地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_11.pdf"
+  },
+  {
+    "id": "12",
+    "area_code": "35",
+    "area_name": "山口県",
+    "area_code_sub": [
+      "27"
+    ],
+    "area_name_sub": [
+      "大阪府"
+    ],
+    "category_code": "8",
+    "category_name": "運輸業・郵便業",
+    "shop_name": "株式会社松岡",
+    "shop_location": "山口県下関市東大和町1-10-12",
+    "shop_office": [
+      "大阪府堺市匠町１１―３"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_12.pdf"
+  },
+  {
+    "id": "13",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "03"
+    ],
+    "area_name_sub": [
+      "岩手県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社アロン社",
+    "shop_location": "東京都港区芝2-5-22",
+    "shop_office": [
+      "岩手県一関市東台14-46 14-65"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_13.pdf"
+  },
+  {
+    "id": "14",
+    "area_code": "18",
+    "area_name": "福井県",
+    "area_code_sub": [
+      "18"
+    ],
+    "area_name_sub": [
+      "福井県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "日華化学株式会社",
+    "shop_location": "福井県福井市文京4-23-1",
+    "shop_office": [
+      "福井県福井市稲津町51字、52字、55字"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_14.pdf"
+  },
+  {
+    "id": "16",
+    "area_code": "17",
+    "area_name": "石川県",
+    "area_code_sub": [
+      "17"
+    ],
+    "area_name_sub": [
+      "石川県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社旭ウエルテック",
+    "shop_location": "石川県白山市中新保町1番地",
+    "shop_office": [
+      "石川県白山市旭工業団地北部地区土地区画整理事業施行区域内１街区２番",
+      "石川県白山市中新保町1番地"
+    ],
+    "consortium": [
+      "株式会社朝日電機製作所",
+      "株式会社石川プレート"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_16.pdf"
+  },
+  {
+    "id": "17",
+    "area_code": "26",
+    "area_name": "京都府",
+    "area_code_sub": [
+      "18"
+    ],
+    "area_name_sub": [
+      "福井県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "進工業株式会社",
+    "shop_location": "京都府京都市下京区四条通烏丸東入ル長刀鉾町8番地京都三井ビルディング8Ｆ",
+    "shop_office": [
+      "福井県小浜市野代4号土渕31‐2"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_17.pdf"
+  },
+  {
+    "id": "19",
+    "area_code": "37",
+    "area_name": "香川県",
+    "area_code_sub": [
+      "37"
+    ],
+    "area_name_sub": [
+      "香川県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社XEN GROUP",
+    "shop_location": "香川県高松市三谷町3234-10",
+    "shop_office": [
+      "香川県高松市三谷町3234番地10"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_19.pdf"
+  },
+  {
+    "id": "20",
+    "area_code": "44",
+    "area_name": "大分県",
+    "area_code_sub": [
+      "44"
+    ],
+    "area_name_sub": [
+      "大分県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "エスティケイテクノロジー株式会社",
+    "shop_location": "大分県大分市大字三佐2468番地10",
+    "shop_office": [
+      "大分県大分市大分流通業務団地3丁目3番22号"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_20.pdf"
+  },
+  {
+    "id": "21",
+    "area_code": "43",
+    "area_name": "熊本県",
+    "area_code_sub": [
+      "43"
+    ],
+    "area_name_sub": [
+      "熊本県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社くまさんメディクス",
+    "shop_location": "熊本県熊本市北区下硯川町2205",
+    "shop_office": [
+      "熊本県菊池市旭志伊坂字山ノ上541番"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_21.pdf"
+  },
+  {
+    "id": "22",
+    "area_code": "16",
+    "area_name": "富山県",
+    "area_code_sub": [
+      "16"
+    ],
+    "area_name_sub": [
+      "富山県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "BBSジャパン株式会社",
+    "shop_location": "富山県高岡市福田六家525",
+    "shop_office": [
+      "富山県高岡市四日市109番26",
+      "富山県高岡市福田六家525"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_22.pdf"
+  },
+  {
+    "id": "23",
+    "area_code": "34",
+    "area_name": "広島県",
+    "area_code_sub": [
+      "34"
+    ],
+    "area_name_sub": [
+      "広島県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社ジェーイーエル",
+    "shop_location": "広島県福山市草戸町２丁目８番２０号",
+    "shop_office": [
+      "広島県尾道市御調町丸門田字四反畠1265番の1他"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_23.pdf"
+  },
+  {
+    "id": "24",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "27"
+    ],
+    "area_name_sub": [
+      "大阪府"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社フジキン",
+    "shop_location": "大阪府大阪市西区立売堀2-3-2",
+    "shop_office": [
+      "大阪府東大阪市新家東町57番,58番",
+      "大阪府大阪市鶴見区安田2-6-19 住友倉庫内"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_24.pdf"
+  },
+  {
+    "id": "25",
+    "area_code": "21",
+    "area_name": "岐阜県",
+    "area_code_sub": [
+      "21"
+    ],
+    "area_name_sub": [
+      "岐阜県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "日本リファイン株式会社",
+    "shop_location": "岐阜県安八郡輪之内町中郷新田2574-1",
+    "shop_office": [
+      "岐阜県安八郡輪之内町中郷新田2574番地1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_25.pdf"
+  },
+  {
+    "id": "26",
+    "area_code": "22",
+    "area_name": "静岡県",
+    "area_code_sub": [
+      "22"
+    ],
+    "area_name_sub": [
+      "静岡県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "日星電気株式会社",
+    "shop_location": "静岡県浜松市中央区大久保町1509番地",
+    "shop_office": [
+      "静岡県浜松市中央区豊岡町61番1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_26.pdf"
+  },
+  {
+    "id": "27",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23"
+    ],
+    "area_name_sub": [
+      "愛知県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社クラタ",
+    "shop_location": "愛知県知立市長篠町新田45番地3",
+    "shop_office": [
+      "愛知県西尾市南中根町山畑68-1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_27.pdf"
+  },
+  {
+    "id": "28",
+    "area_code": "29",
+    "area_name": "奈良県",
+    "area_code_sub": [
+      "29"
+    ],
+    "area_name_sub": [
+      "奈良県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "広陵化学工業株式会社",
+    "shop_location": "奈良県北葛城郡広陵町大字中167番地",
+    "shop_office": [
+      "奈良県北葛城郡広陵町大字中309番地１（予定地番・住所未定）",
+      "奈良県北葛城郡広陵町中167",
+      "奈良県五條市住川町1312番地テクノパークなら工業団地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_28.pdf"
+  },
+  {
+    "id": "29",
+    "area_code": "37",
+    "area_name": "香川県",
+    "area_code_sub": [
+      "37"
+    ],
+    "area_name_sub": [
+      "香川県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社三和テスコ",
+    "shop_location": "香川県高松市朝日町4丁目11番67号",
+    "shop_office": [
+      "香川県高松市郷東町796-67"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_29.pdf"
+  },
+  {
+    "id": "30",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23"
+    ],
+    "area_name_sub": [
+      "愛知県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社メイドー",
+    "shop_location": "愛知県豊田市三軒町4-5",
+    "shop_office": [
+      "愛知県豊田市西中山町又吉洞3-1",
+      "愛知県豊田市木瀬町上ヶ平1142-19",
+      "愛知県みよし市莇生町辰己山108"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_30.pdf"
+  },
+  {
+    "id": "31",
+    "area_code": "37",
+    "area_name": "香川県",
+    "area_code_sub": [
+      "37"
+    ],
+    "area_name_sub": [
+      "香川県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "鎌長製衡株式会社",
+    "shop_location": "香川県高松市牟礼町牟礼２２４６番地",
+    "shop_office": [
+      "香川県高松市牟礼町牟礼2097番地",
+      "香川県高松市牟礼町牟礼901番地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_31.pdf"
+  },
+  {
+    "id": "32",
+    "area_code": "10",
+    "area_name": "群馬県",
+    "area_code_sub": [
+      "10"
+    ],
+    "area_name_sub": [
+      "群馬県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "オリヒロエンジニアリング株式会社",
+    "shop_location": "群馬県富岡市神成478-3",
+    "shop_office": [
+      "群馬県高崎市　仮換地　スマートIC産業団地土地区画整理事業　E1-1-①"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_32.pdf"
+  },
+  {
+    "id": "33",
+    "area_code": "09",
+    "area_name": "栃木県",
+    "area_code_sub": [
+      "09"
+    ],
+    "area_name_sub": [
+      "栃木県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社石井機械製作所",
+    "shop_location": "栃木県足利市福富新町726",
+    "shop_office": [
+      "栃木県足利市上渋垂町1545－1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_33.pdf"
+  },
+  {
+    "id": "34",
+    "area_code": "10",
+    "area_name": "群馬県",
+    "area_code_sub": [
+      "10"
+    ],
+    "area_name_sub": [
+      "群馬県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社柴田合成",
+    "shop_location": "群馬県甘楽郡甘楽町天引2500-8",
+    "shop_office": [
+      "群馬県甘楽郡甘楽町天引2500-8",
+      "群馬県甘楽郡甘楽町天引435他6筆(本社工場隣接地)"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_34.pdf"
+  },
+  {
+    "id": "35",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "09"
+    ],
+    "area_name_sub": [
+      "栃木県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "イグス株式会社",
+    "shop_location": "東京都墨田区錦糸1丁目2番1号　アルカセントラル",
+    "shop_office": [
+      "栃木県さくら市上阿久津1518-1ほか"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_35.pdf"
+  },
+  {
+    "id": "36",
+    "area_code": "08",
+    "area_name": "茨城県",
+    "area_code_sub": [
+      "08"
+    ],
+    "area_name_sub": [
+      "茨城県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社廣澤精機製作所",
+    "shop_location": "茨城県筑西市玉戸2951番地",
+    "shop_office": [
+      "茨城県筑西市村田妙原2173番2、他17筆"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_36.pdf"
+  },
+  {
+    "id": "37",
+    "area_code": "22",
+    "area_name": "静岡県",
+    "area_code_sub": [
+      "22"
+    ],
+    "area_name_sub": [
+      "静岡県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "大日工業株式会社",
+    "shop_location": "静岡県静岡市清水区辻一丁目9番30号",
+    "shop_office": [
+      "静岡県静岡市清水区原字善念寺674-1～8・677-1～7・676-１～2"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_37.pdf"
+  },
+  {
+    "id": "38",
+    "area_code": "34",
+    "area_name": "広島県",
+    "area_code_sub": [
+      "34"
+    ],
+    "area_name_sub": [
+      "広島県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "テラル株式会社",
+    "shop_location": "広島県福山市御幸町森脇230番地",
+    "shop_office": [
+      "広島県福山市北匠町1-7、1-27、1-27"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_38.pdf"
+  },
+  {
+    "id": "39",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "28"
+    ],
+    "area_name_sub": [
+      "兵庫県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社ハウゼコ",
+    "shop_location": "大阪府大阪市中央区南船場2-10-28",
+    "shop_office": [
+      "兵庫県加西市常吉町東畑922-188"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_39.pdf"
+  },
+  {
+    "id": "40",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "13",
+      "11"
+    ],
+    "area_name_sub": [
+      "東京都",
+      "埼玉県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "千代田鋼鉄工業株式会社",
+    "shop_location": "東京都足立区綾瀬6丁目10番6号",
+    "shop_office": [
+      "東京都足立区綾瀬6丁目10番6号",
+      "埼玉県八潮市大字大曽根1409番1号"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_40.pdf"
+  },
+  {
+    "id": "42",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23",
+      "17"
+    ],
+    "area_name_sub": [
+      "愛知県",
+      "石川県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社山田ドビー",
+    "shop_location": "愛知県一宮市玉野下新田35",
+    "shop_office": [
+      "愛知県一宮市玉野下新田35",
+      "石川県能美市湯谷町へ18他"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_42.pdf"
+  },
+  {
+    "id": "43",
+    "area_code": "34",
+    "area_name": "広島県",
+    "area_code_sub": [
+      "08"
+    ],
+    "area_name_sub": [
+      "茨城県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "丸井産業株式会社",
+    "shop_location": "広島県広島市西区商工センター1丁目1－46",
+    "shop_office": [
+      "茨城県稲敷郡阿見町中央8丁目3番2号"
+    ],
+    "consortium": [
+      "株式会社イムロ"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_43.pdf"
+  },
+  {
+    "id": "45",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "27",
+      "13",
+      "23"
+    ],
+    "area_name_sub": [
+      "大阪府",
+      "東京都",
+      "愛知県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "山本ビニター株式会社",
+    "shop_location": "大阪府大阪市天王寺区上汐6丁目3番12号",
+    "shop_office": [
+      "大阪府八尾市渋川町1丁目3番21号",
+      "東京都北区田端新町2丁目13番14号",
+      "愛知県名古屋市西区花の木1丁目7番1号"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_45.pdf"
+  },
+  {
+    "id": "46",
+    "area_code": "14",
+    "area_name": "神奈川県",
+    "area_code_sub": [
+      "11"
+    ],
+    "area_name_sub": [
+      "埼玉県"
+    ],
+    "category_code": "9",
+    "category_name": "卸売業・小売業",
+    "shop_name": "株式会社アイスコ",
+    "shop_location": "神奈川県横浜市泉区新橋町1212",
+    "shop_office": [
+      "埼玉県入間郡毛呂山町大字市場字上西ケ谷"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_46.pdf"
+  },
+  {
+    "id": "47",
+    "area_code": "11",
+    "area_name": "埼玉県",
+    "area_code_sub": [
+      "11"
+    ],
+    "area_name_sub": [
+      "埼玉県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "ポーライト株式会社",
+    "shop_location": "埼玉県北足立郡伊奈町小室4852-1",
+    "shop_office": [
+      "埼玉県北足立郡伊奈町小室4852-1",
+      "埼玉県熊谷市妻沼1875-1",
+      "埼玉県熊谷市上江袋350"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_47.pdf"
+  },
+  {
+    "id": "48",
+    "area_code": "33",
+    "area_name": "岡山県",
+    "area_code_sub": [
+      "33"
+    ],
+    "area_name_sub": [
+      "岡山県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "SINGS株式会社",
+    "shop_location": "岡山県倉敷市玉島陶4841-4",
+    "shop_office": [
+      "岡山県倉敷市玉島乙島字新湊8268番3/8268番4"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_48.pdf"
+  },
+  {
+    "id": "49",
+    "area_code": "44",
+    "area_name": "大分県",
+    "area_code_sub": [
+      "44"
+    ],
+    "area_name_sub": [
+      "大分県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社ＡＫシステム",
+    "shop_location": "大分県由布市庄内町大竜1474番地",
+    "shop_office": [
+      "大分県大分市廻栖野字新界2501番地10",
+      "大分県由布市庄内町大竜1474番地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_49.pdf"
+  },
+  {
+    "id": "50",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23"
+    ],
+    "area_name_sub": [
+      "愛知県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社松尾製作所",
+    "shop_location": "愛知県名古屋市南区荒浜町５－２１",
+    "shop_office": [
+      "愛知県知多郡阿久比町大字卯坂字梅ヶ丘140番地1",
+      "愛知県大府市北崎町井田27番地1",
+      "愛知県知多郡東浦町大字緒川字北鶴根12番地1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_50.pdf"
+  },
+  {
+    "id": "51",
+    "area_code": "40",
+    "area_name": "福岡県",
+    "area_code_sub": [
+      "40"
+    ],
+    "area_name_sub": [
+      "福岡県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社西部技研",
+    "shop_location": "福岡県古賀市青柳3108番地3",
+    "shop_office": [
+      "福岡県宗像市江口113-4",
+      "福岡県古賀市青柳3108の3番地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_51.pdf"
+  },
+  {
+    "id": "52",
+    "area_code": "43",
+    "area_name": "熊本県",
+    "area_code_sub": [
+      "43",
+      "40"
+    ],
+    "area_name_sub": [
+      "熊本県",
+      "福岡県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社平島",
+    "shop_location": "熊本県熊本市西区島崎二丁目4番6号",
+    "shop_office": [
+      "熊本県上益城郡御船町0",
+      "福岡県直方市上頓野4200-31"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_52.pdf"
+  },
+  {
+    "id": "53",
+    "area_code": "11",
+    "area_name": "埼玉県",
+    "area_code_sub": [
+      "02"
+    ],
+    "area_name_sub": [
+      "青森県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "マルコーフーズ株式会社",
+    "shop_location": "埼玉県深谷市新戒697番地1",
+    "shop_office": [
+      "青森県上北郡六戸町金矢１丁目３番２"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_53.pdf"
+  },
+  {
+    "id": "55",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "27"
+    ],
+    "area_name_sub": [
+      "大阪府"
+    ],
+    "category_code": "4",
+    "category_name": "建設業",
+    "shop_name": "株式会社コーヨークリエイト",
+    "shop_location": "大阪府堺市堺区大町西3-1-29 コーヨービル2階",
+    "shop_office": [
+      "大阪府泉南郡岬町多奈川⾕川3351-140"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_55.pdf"
+  },
+  {
+    "id": "56",
+    "area_code": "39",
+    "area_name": "高知県",
+    "area_code_sub": [
+      "39"
+    ],
+    "area_name_sub": [
+      "高知県"
+    ],
+    "category_code": "8",
+    "category_name": "不動産業・物品賃貸業",
+    "shop_name": "高知通運株式会社",
+    "shop_location": "高知県高知市北本町１丁目７番２６号",
+    "shop_office": [
+      "高知県高知市布師田字金山3936番75",
+      "高知県高知市布師田字金山3936番72",
+      "高知県高知市一宮字大坂4786番70"
+    ],
+    "consortium": [
+      "高知運輸株式会社",
+      "株式会社八潮商事",
+      "LIVORTグループ株式会社"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_56.pdf"
+  },
+  {
+    "id": "58",
+    "area_code": "16",
+    "area_name": "富山県",
+    "area_code_sub": [
+      "16"
+    ],
+    "area_name_sub": [
+      "富山県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "三晶エムイーシー株式会社",
+    "shop_location": "富山県滑川市中新1029番地の1",
+    "shop_office": [
+      "富山県滑川市本江355-1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_58.pdf"
+  },
+  {
+    "id": "61",
+    "area_code": "25",
+    "area_name": "滋賀県",
+    "area_code_sub": [
+      "25"
+    ],
+    "area_name_sub": [
+      "滋賀県"
+    ],
+    "category_code": "12",
+    "category_name": "学術研究・専門・技術サービス業",
+    "shop_name": "三恵工業株式会社",
+    "shop_location": "滋賀県栗東市高野305",
+    "shop_office": [
+      "滋賀県蒲生郡竜王町大字岡屋2911番2"
+    ],
+    "consortium": [
+      "株式会社ゴーシューホールディングス"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_61.pdf"
+  },
+  {
+    "id": "62",
+    "area_code": "11",
+    "area_name": "埼玉県",
+    "area_code_sub": [
+      "11"
+    ],
+    "area_name_sub": [
+      "埼玉県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "サーパス工業株式会社",
+    "shop_location": "埼玉県行田市下忍2203",
+    "shop_office": [
+      "埼玉県鴻巣市箕田・寺谷地内"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_62.pdf"
+  },
+  {
+    "id": "63",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23"
+    ],
+    "area_name_sub": [
+      "愛知県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社オティックスホールディングス",
+    "shop_location": "愛知県西尾市中畑町浜田下10",
+    "shop_office": [
+      "愛知県西尾市西浅井町山之腰100",
+      "愛知県西尾市中畑町浜田下13番地1",
+      "愛知県西尾市中畑町二割19番地2"
+    ],
+    "consortium": [
+      "株式会社オティックス西尾"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_63.pdf"
+  },
+  {
+    "id": "65",
+    "area_code": "26",
+    "area_name": "京都府",
+    "area_code_sub": [
+      "26"
+    ],
+    "area_name_sub": [
+      "京都府"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社松風",
+    "shop_location": "京都府京都市東山区福稲上高松町11",
+    "shop_office": [
+      "京都府京都市東山区福稲上高松町11"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_65.pdf"
+  },
+  {
+    "id": "66",
+    "area_code": "20",
+    "area_name": "長野県",
+    "area_code_sub": [
+      "20"
+    ],
+    "area_name_sub": [
+      "長野県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社アルプスツール",
+    "shop_location": "長野県埴科郡坂城町大字坂城１００７０番地",
+    "shop_office": [
+      "長野県埴科郡坂城町南条字中川原5064 番1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_66.pdf"
+  },
+  {
+    "id": "67",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23"
+    ],
+    "area_name_sub": [
+      "愛知県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "アドバンス電気工業株式会社",
+    "shop_location": "愛知県春日井市廻間町浦屋敷519-1",
+    "shop_office": [
+      "愛知県春日井市高森台4-9-2"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_67.pdf"
+  },
+  {
+    "id": "68",
+    "area_code": "20",
+    "area_name": "長野県",
+    "area_code_sub": [
+      "20"
+    ],
+    "area_name_sub": [
+      "長野県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社ミマキエンジニアリング",
+    "shop_location": "長野県東御市滋野乙2182-3",
+    "shop_office": [
+      "長野県東御市滋野乙1560-1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_68.pdf"
+  },
+  {
+    "id": "69",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "13"
+    ],
+    "area_name_sub": [
+      "東京都"
+    ],
+    "category_code": "8",
+    "category_name": "運輸業・郵便業",
+    "shop_name": "NAX JAPAN株式会社",
+    "shop_location": "東京都中央区銀座5-13-3　いちかわビル4階",
+    "shop_office": [
+      "東京都大田区平和島6-1-1　東京流通センター物流ビルA棟AE1-4～1-7"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_69.pdf"
+  },
+  {
+    "id": "70",
+    "area_code": "22",
+    "area_name": "静岡県",
+    "area_code_sub": [
+      "23",
+      "22"
+    ],
+    "area_name_sub": [
+      "愛知県",
+      "静岡県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "協和工業株式会社",
+    "shop_location": "静岡県湖西市吉美3400",
+    "shop_office": [
+      "愛知県豊橋市三弥町字新水洗2番8",
+      "静岡県湖西市吉美3400"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_70.pdf"
+  },
+  {
+    "id": "71",
+    "area_code": "37",
+    "area_name": "香川県",
+    "area_code_sub": [
+      "37"
+    ],
+    "area_name_sub": [
+      "香川県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社北四国グラビア印刷",
+    "shop_location": "香川県観音寺市粟井町755番地",
+    "shop_office": [
+      "香川県三豊市高瀬町佐股字東長谷甲2678-5他11筆"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_71.pdf"
+  },
+  {
+    "id": "72",
+    "area_code": "04",
+    "area_name": "宮城県",
+    "area_code_sub": [
+      "04"
+    ],
+    "area_name_sub": [
+      "宮城県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "ヤマセ電気株式会社",
+    "shop_location": "宮城県加美郡色麻町四竃字枛木町154番地の1",
+    "shop_office": [
+      "宮城県大崎市三本木白坂1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_72.pdf"
+  },
+  {
+    "id": "73",
+    "area_code": "38",
+    "area_name": "愛媛県",
+    "area_code_sub": [
+      "38"
+    ],
+    "area_name_sub": [
+      "愛媛県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社大昌鉄工所",
+    "shop_location": "愛媛県四国中央市川之江町910番地",
+    "shop_office": [
+      "愛媛県四国中央市川之江町519－1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_73.pdf"
+  },
+  {
+    "id": "74",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "40"
+    ],
+    "area_name_sub": [
+      "福岡県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社ユニシス",
+    "shop_location": "東京都台東区台東四丁目11番4号ー7階",
+    "shop_office": [
+      "福岡県糸島市多久"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_74.pdf"
+  },
+  {
+    "id": "75",
+    "area_code": "18",
+    "area_name": "福井県",
+    "area_code_sub": [
+      "18"
+    ],
+    "area_name_sub": [
+      "福井県"
+    ],
+    "category_code": "9",
+    "category_name": "卸売業・小売業",
+    "shop_name": "株式会社伝食",
+    "shop_location": "福井県敦賀市中央町2丁目22番32号",
+    "shop_office": [
+      "福井県敦賀市田結27-1-2",
+      "福井県敦賀市田結27-8-3"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_75.pdf"
+  },
+  {
+    "id": "76",
+    "area_code": "33",
+    "area_name": "岡山県",
+    "area_code_sub": [
+      "33"
+    ],
+    "area_name_sub": [
+      "岡山県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "安田工業株式会社",
+    "shop_location": "岡山県浅口郡里庄町浜中1160",
+    "shop_office": [
+      "岡山県浅口郡里庄町大字新庄字太治郎開地5272番1ほか3筆"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_76.pdf"
+  },
+  {
+    "id": "77",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "41"
+    ],
+    "area_name_sub": [
+      "佐賀県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "千寿製薬株式会社",
+    "shop_location": "大阪府大阪市中央区瓦町3丁目1-9 ",
+    "shop_office": [
+      "佐賀県唐津市石志4228番1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_77.pdf"
+  },
+  {
+    "id": "78",
+    "area_code": "22",
+    "area_name": "静岡県",
+    "area_code_sub": [
+      "22"
+    ],
+    "area_name_sub": [
+      "静岡県"
+    ],
+    "category_code": "18",
+    "category_name": "サービス業_他に分類されないもの",
+    "shop_name": "環境のミカタ株式会社",
+    "shop_location": "静岡県藤枝市前島二丁目21番1号",
+    "shop_office": [
+      "静岡県焼津市利右衛門2623番1、2623番2、2623番3、2623番17"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_78.pdf"
+  },
+  {
+    "id": "79",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "27"
+    ],
+    "area_name_sub": [
+      "大阪府"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "スーパー工業株式会社",
+    "shop_location": "大阪府摂津市鳥飼本町二丁目２番４８号",
+    "shop_office": [
+      "大阪府箕面市森町西３丁目２番３"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_79.pdf"
+  },
+  {
+    "id": "80",
+    "area_code": "29",
+    "area_name": "奈良県",
+    "area_code_sub": [
+      "29"
+    ],
+    "area_name_sub": [
+      "奈良県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "寧薬化学工業株式会社",
+    "shop_location": "奈良県大和高田市旭南町2番25号",
+    "shop_office": [
+      "奈良県葛城市新村45-1",
+      "奈良県葛城市新村43番1号",
+      "奈良県大和高田市旭南町2番25号"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_80.pdf"
+  },
+  {
+    "id": "81",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "11"
+    ],
+    "area_name_sub": [
+      "埼玉県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "デーバー加工サービス㈱",
+    "shop_location": "東京都中央区日本橋小伝馬町15-18EDGE小伝馬町ビル",
+    "shop_office": [
+      "埼玉県比企郡ときがわ町玉川6番2号"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_81.pdf"
+  },
+  {
+    "id": "82",
+    "area_code": "20",
+    "area_name": "長野県",
+    "area_code_sub": [
+      "20"
+    ],
+    "area_name_sub": [
+      "長野県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "サン工業株式会社",
+    "shop_location": "長野県伊那市西箕輪2148-186",
+    "shop_office": [
+      "長野県伊那市西箕輪2148番地53"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_82.pdf"
+  },
+  {
+    "id": "83",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "43"
+    ],
+    "area_name_sub": [
+      "熊本県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社ヒサダ",
+    "shop_location": "愛知県安城市里町三郎11",
+    "shop_office": [
+      "熊本県熊本市南区城南町藤山字正達885-5"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_83.pdf"
+  },
+  {
+    "id": "85",
+    "area_code": "08",
+    "area_name": "茨城県",
+    "area_code_sub": [
+      "08"
+    ],
+    "area_name_sub": [
+      "茨城県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "マルコ工業株式会社",
+    "shop_location": "茨城県坂東市馬立中の台１２７４",
+    "shop_office": [
+      "茨城県坂東市馬立中の台１２７４"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_85.pdf"
+  },
+  {
+    "id": "86",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "28"
+    ],
+    "area_name_sub": [
+      "兵庫県"
+    ],
+    "category_code": "12",
+    "category_name": "学術研究・専門・技術サービス業",
+    "shop_name": "グローバル・テック株式会社",
+    "shop_location": "大阪府大阪市北区堂島1丁目6番20号　堂島アバンザ4F",
+    "shop_office": [
+      "兵庫県加東市新定275-122",
+      "兵庫県加東市新定275-122",
+      "兵庫県加東市新定275-122"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_86.pdf"
+  },
+  {
+    "id": "87",
+    "area_code": "28",
+    "area_name": "兵庫県",
+    "area_code_sub": [
+      "28",
+      "12"
+    ],
+    "area_name_sub": [
+      "兵庫県",
+      "千葉県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "トーカロ株式会社",
+    "shop_location": "兵庫県神戸市中央区港島南町6-4-4",
+    "shop_office": [
+      "兵庫県神戸市中央区港島南町6丁目4番4号",
+      "千葉県船橋市豊富町631－13",
+      "千葉県船橋市行田1丁目1番1号"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_87.pdf"
+  },
+  {
+    "id": "88",
+    "area_code": "26",
+    "area_name": "京都府",
+    "area_code_sub": [
+      "11",
+      "26"
+    ],
+    "area_name_sub": [
+      "埼玉県",
+      "京都府"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社創味食品",
+    "shop_location": "京都府京都市伏見区横大路芝生24番地の3",
+    "shop_office": [
+      "埼玉県羽生市大字上岩瀬字中妻737番1",
+      "京都府船井郡京丹波町富田蒲生野88"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_88.pdf"
+  },
+  {
+    "id": "89",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "26"
+    ],
+    "area_name_sub": [
+      "京都府"
+    ],
+    "category_code": "18",
+    "category_name": "サービス業_他に分類されないもの",
+    "shop_name": "京西テクノス株式会社",
+    "shop_location": "東京都多摩市愛宕4ｰ25-2",
+    "shop_office": [
+      "京都府京都市南区東九条西河辺町49番2"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_89.pdf"
+  },
+  {
+    "id": "91",
+    "area_code": "07",
+    "area_name": "福島県",
+    "area_code_sub": [
+      "36"
+    ],
+    "area_name_sub": [
+      "徳島県"
+    ],
+    "category_code": "4",
+    "category_name": "建設業",
+    "shop_name": "矢田工業株式会社",
+    "shop_location": "福島県郡山市西田町鬼生田字阿広木1番地",
+    "shop_office": [
+      "徳島県鳴門市里浦町里浦字恵美寿676"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_91.pdf"
+  },
+  {
+    "id": "92",
+    "area_code": "21",
+    "area_name": "岐阜県",
+    "area_code_sub": [
+      "21"
+    ],
+    "area_name_sub": [
+      "岐阜県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "アサヒフォージ株式会社",
+    "shop_location": "岐阜県美濃市楓台７２番地２",
+    "shop_office": [
+      "岐阜県郡上市白鳥町大島中ノ棚1689-352,353,354"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_92.pdf"
+  },
+  {
+    "id": "93",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "12",
+      "13"
+    ],
+    "area_name_sub": [
+      "千葉県",
+      "東京都"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "ウイング株式会社",
+    "shop_location": "東京都千代田区神田神保町3-2-3",
+    "shop_office": [
+      "千葉県白井市平塚2616-3",
+      "東京都千代田区神田神保町3-2-3　Daiwa神保町3丁目ビル４階"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_93.pdf"
+  },
+  {
+    "id": "94",
+    "area_code": "09",
+    "area_name": "栃木県",
+    "area_code_sub": [
+      "09"
+    ],
+    "area_name_sub": [
+      "栃木県"
+    ],
+    "category_code": "18",
+    "category_name": "サービス業_他に分類されないもの",
+    "shop_name": "株式会社友和環境",
+    "shop_location": "栃木県下都賀郡壬生町大字藤井1066 番地1",
+    "shop_office": [
+      "栃木県下都賀郡壬生町大字壬生乙字吾妻原3541-1、3542-1、3542-7"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_94.pdf"
+  },
+  {
+    "id": "95",
+    "area_code": "15",
+    "area_name": "新潟県",
+    "area_code_sub": [
+      "15"
+    ],
+    "area_name_sub": [
+      "新潟県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "ナミックス株式会社",
+    "shop_location": "新潟県新潟市北区濁川３９９３番地",
+    "shop_office": [
+      "新潟県新潟市西区北場字立野７８７番１"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_95.pdf"
+  },
+  {
+    "id": "96",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23",
+      "01"
+    ],
+    "area_name_sub": [
+      "愛知県",
+      "北海道"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "大岡技研株式会社",
+    "shop_location": "愛知県豊田市高岡町秋葉山1-1",
+    "shop_office": [
+      "愛知県豊田市田籾長広久手614番205",
+      "北海道室蘭市仲町5番18",
+      "愛知県豊田市高岡町秋葉山1番地1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_96.pdf"
+  },
+  {
+    "id": "97",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "25"
+    ],
+    "area_name_sub": [
+      "滋賀県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "フクシマガリレイ株式会社",
+    "shop_location": "大阪府大阪市西淀川区竹島2-6-18",
+    "shop_office": [
+      "滋賀県湖南市高松町7番"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_97.pdf"
+  },
+  {
+    "id": "99",
+    "area_code": "40",
+    "area_name": "福岡県",
+    "area_code_sub": [
+      "40",
+      "04"
+    ],
+    "area_name_sub": [
+      "福岡県",
+      "宮城県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社オーレック",
+    "shop_location": "福岡県八女郡広川町大字日吉５４８‐２２",
+    "shop_office": [
+      "福岡県八女郡広川町日吉５４８番地の４　５４８番地の２３",
+      "福岡県八女郡広川町日吉５４８番地の２２",
+      "宮城県仙台市宮城野区岩切三丁目２４６番２、２６４番２６"
+    ],
+    "consortium": [
+      "株式会社オーレックホールディングス"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_99.pdf"
+  },
+  {
+    "id": "100",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "25"
+    ],
+    "area_name_sub": [
+      "滋賀県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "マリンフード株式会社",
+    "shop_location": "大阪府豊中市豊南町東4丁目5番1号",
+    "shop_office": [
+      "滋賀県長浜市田村町1291-1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_100.pdf"
+  },
+  {
+    "id": "101",
+    "area_code": "40",
+    "area_name": "福岡県",
+    "area_code_sub": [
+      "40"
+    ],
+    "area_name_sub": [
+      "福岡県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社正興電機製作所",
+    "shop_location": "福岡県福岡市博多区東光2丁目7番25号",
+    "shop_office": [
+      "福岡県北九州市若松区ひびきの北2-101",
+      "福岡県古賀市天神3-20-1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_101.pdf"
+  },
+  {
+    "id": "102",
+    "area_code": "10",
+    "area_name": "群馬県",
+    "area_code_sub": [
+      "10"
+    ],
+    "area_name_sub": [
+      "群馬県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "冬木工業株式会社",
+    "shop_location": "群馬県高崎市栄町27番15号",
+    "shop_office": [
+      "群馬県高崎市宿大類町字塚ノ越842番1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_102.pdf"
+  },
+  {
+    "id": "103",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "24"
+    ],
+    "area_name_sub": [
+      "三重県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "オーケー化成株式会社",
+    "shop_location": "大阪府大阪市中央区備後町1丁目7番3号",
+    "shop_office": [
+      "三重県員弁郡東員町大字穴太太字丒ケ谷２８１０番１の土地　他"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_103.pdf"
+  },
+  {
+    "id": "104",
+    "area_code": "08",
+    "area_name": "茨城県",
+    "area_code_sub": [
+      "08"
+    ],
+    "area_name_sub": [
+      "茨城県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "ヤマダイ株式会社",
+    "shop_location": "茨城県結城郡八千代町平塚4828",
+    "shop_office": [
+      "茨城県結城郡八千代町平塚4828"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_104.pdf"
+  },
+  {
+    "id": "105",
+    "area_code": "24",
+    "area_name": "三重県",
+    "area_code_sub": [
+      "24"
+    ],
+    "area_name_sub": [
+      "三重県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "中外医薬生産株式会社",
+    "shop_location": "三重県伊賀市ゆめが丘７丁目５－５",
+    "shop_office": [
+      "三重県伊賀市西明寺2833",
+      "三重県伊賀市西明寺3160"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_105.pdf"
+  },
+  {
+    "id": "106",
+    "area_code": "40",
+    "area_name": "福岡県",
+    "area_code_sub": [
+      "40"
+    ],
+    "area_name_sub": [
+      "福岡県"
+    ],
+    "category_code": "8",
+    "category_name": "運輸業・郵便業",
+    "shop_name": "株式会社シーエル",
+    "shop_location": "福岡県福岡市博多区金の隈3-14-3",
+    "shop_office": [
+      "福岡県筑紫野市大字下見321-1　他"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_106.pdf"
+  },
+  {
+    "id": "107",
+    "area_code": "19",
+    "area_name": "山梨県",
+    "area_code_sub": [
+      "04"
+    ],
+    "area_name_sub": [
+      "宮城県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社ササキ",
+    "shop_location": "山梨県韮崎市旭町上條北割2058－2",
+    "shop_office": [
+      "宮城県黒川郡大和町テクノヒルズ2番地2"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_107.pdf"
+  },
+  {
+    "id": "108",
+    "area_code": "19",
+    "area_name": "山梨県",
+    "area_code_sub": [
+      "19"
+    ],
+    "area_name_sub": [
+      "山梨県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社ミラプロ",
+    "shop_location": "山梨県北杜市須玉町穴平１１００番地",
+    "shop_office": [
+      "山梨県北杜市須玉町穴平１１００番地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_108.pdf"
+  },
+  {
+    "id": "109",
+    "area_code": "46",
+    "area_name": "鹿児島県",
+    "area_code_sub": [
+      "46"
+    ],
+    "area_name_sub": [
+      "鹿児島県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "マイクロカット株式会社",
+    "shop_location": "鹿児島県霧島市国分上野原テクノパーク12番2号",
+    "shop_office": [
+      "鹿児島県霧島市国分上野原テクノパーク12番２号"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_109.pdf"
+  },
+  {
+    "id": "110",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "27"
+    ],
+    "area_name_sub": [
+      "大阪府"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社菰下鎔断",
+    "shop_location": "大阪府貝塚市港14番地の2",
+    "shop_office": [
+      "大阪府岸和田市岸之浦町13番13",
+      "大阪府貝塚市港14番地の2"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_110.pdf"
+  },
+  {
+    "id": "111",
+    "area_code": "11",
+    "area_name": "埼玉県",
+    "area_code_sub": [
+      "11"
+    ],
+    "area_name_sub": [
+      "埼玉県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社向山工場",
+    "shop_location": "埼玉県川口市幸町3丁目9番1号",
+    "shop_office": [
+      "埼玉県羽生市大字小須賀字西新田447-1他"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_111.pdf"
+  },
+  {
+    "id": "112",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "13"
+    ],
+    "area_name_sub": [
+      "東京都"
+    ],
+    "category_code": "14",
+    "category_name": "生活関連サービス業・娯楽業",
+    "shop_name": "株式会社八芳園",
+    "shop_location": "東京都港区白金台1-1-6",
+    "shop_office": [
+      "東京都港区白金台1丁目1番6号",
+      "東京都港区白金台1丁目5番12号"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_112.pdf"
+  },
+  {
+    "id": "113",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23"
+    ],
+    "area_name_sub": [
+      "愛知県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "トーアス株式会社",
+    "shop_location": "愛知県豊川市大崎町宮の坪58",
+    "shop_office": [
+      "愛知県豊川市穂ノ原3丁目2－20"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_113.pdf"
+  },
+  {
+    "id": "114",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "10"
+    ],
+    "area_name_sub": [
+      "群馬県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社中西製作所",
+    "shop_location": "大阪府大阪市生野区巽南5-4-14",
+    "shop_office": [
+      "群馬県伊勢崎市東上之宮町1633"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_114.pdf"
+  },
+  {
+    "id": "115",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "13"
+    ],
+    "area_name_sub": [
+      "東京都"
+    ],
+    "category_code": "8",
+    "category_name": "運輸業・郵便業",
+    "shop_name": "株式会社国際エキスプレス",
+    "shop_location": "東京都品川区東品川四丁目１２番６号",
+    "shop_office": [
+      "東京都大田区東海5-1-1　大井海貨上屋1号",
+      "東京都大田区東海4-2-3 　国際エキスプレス東京第二倉庫  1階、M2階",
+      "東京都品川区東品川4丁目12番6号　品川 シーサイドキャナルタワー14階"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_115.pdf"
+  },
+  {
+    "id": "116",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23"
+    ],
+    "area_name_sub": [
+      "愛知県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社かねふくめんたいパーク",
+    "shop_location": "愛知県常滑市りんくう町1－25－4",
+    "shop_office": [
+      "愛知県常滑市りんくう町1-25-4"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_116.pdf"
+  },
+  {
+    "id": "117",
+    "area_code": "20",
+    "area_name": "長野県",
+    "area_code_sub": [
+      "20"
+    ],
+    "area_name_sub": [
+      "長野県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "信越理研株式会社",
+    "shop_location": "長野県長野市若穂川田3800-10",
+    "shop_office": [
+      "長野県長野市若穂川田字外新田乙4267-2他",
+      "長野県長野市若穂川田字外新田乙3800 10"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_117.pdf"
+  },
+  {
+    "id": "118",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23"
+    ],
+    "area_name_sub": [
+      "愛知県"
+    ],
+    "category_code": "9",
+    "category_name": "卸売業・小売業",
+    "shop_name": "クリエイトワン株式会社",
+    "shop_location": "愛知県名古屋市中区栄3-25-10 ユーリンビル",
+    "shop_office": [
+      "愛知県名古屋市中区栄3丁目2810-3 及び3丁目2810-4"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_118.pdf"
+  },
+  {
+    "id": "119",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "01",
+      "08"
+    ],
+    "area_name_sub": [
+      "北海道",
+      "茨城県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社フルヤ金属",
+    "shop_location": "東京都豊島区南大塚2丁目37番地5号",
+    "shop_office": [
+      "北海道千歳市流通二丁目１番１",
+      "茨城県筑西市森添島1915 下館第一工業団地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_119.pdf"
+  },
+  {
+    "id": "120",
+    "area_code": "19",
+    "area_name": "山梨県",
+    "area_code_sub": [
+      "04",
+      "19"
+    ],
+    "area_name_sub": [
+      "宮城県",
+      "宮城県",
+      "山梨県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "旭陽電気株式会社",
+    "shop_location": "山梨県韮崎市神山町鍋山300",
+    "shop_office": [
+      "宮城県黒川郡大和町テクノヒルズ30",
+      "宮城県黒川郡大和町テクノヒルズ56",
+      "山梨県韮崎市上ノ山3160"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_120.pdf"
+  },
+  {
+    "id": "121",
+    "area_code": "39",
+    "area_name": "高知県",
+    "area_code_sub": [
+      "39"
+    ],
+    "area_name_sub": [
+      "高知県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "土佐鶴酒造株式会社",
+    "shop_location": "高知県安芸郡安田町安田1586",
+    "shop_office": [
+      "高知県安芸郡安田町安田1520番地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_121.pdf"
+  },
+  {
+    "id": "122",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "27"
+    ],
+    "area_name_sub": [
+      "大阪府"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "岸和田製鋼株式会社",
+    "shop_location": "大阪府岸和田市臨海町20番地",
+    "shop_office": [
+      "大阪府岸和田市臨海町20番地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_122.pdf"
+  },
+  {
+    "id": "123",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "12"
+    ],
+    "area_name_sub": [
+      "千葉県"
+    ],
+    "category_code": "18",
+    "category_name": "サービス業_他に分類されないもの",
+    "shop_name": "株式会社タケエイ",
+    "shop_location": "東京都港区芝公園二丁目４番１号 A-10階",
+    "shop_office": [
+      "千葉県市原市八幡海岸通1-1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_123.pdf"
+  },
+  {
+    "id": "124",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "01"
+    ],
+    "area_name_sub": [
+      "北海道"
+    ],
+    "category_code": "13",
+    "category_name": "宿泊業・飲食サービス業",
+    "shop_name": "株式会社シロ",
+    "shop_location": "東京都港区北青山3-6-7 青山パラシオタワー8F",
+    "shop_office": [
+      "北海道砂川市東2条北3丁目"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_124.pdf"
+  },
+  {
+    "id": "125",
+    "area_code": "22",
+    "area_name": "静岡県",
+    "area_code_sub": [
+      "22"
+    ],
+    "area_name_sub": [
+      "静岡県"
+    ],
+    "category_code": "18",
+    "category_name": "サービス業_他に分類されないもの",
+    "shop_name": "株式会社ミダック",
+    "shop_location": "静岡県浜松市中央区有玉南町2163番地",
+    "shop_office": [
+      "静岡県浜松市浜名区新都田1丁目104-10"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_125.pdf"
+  },
+  {
+    "id": "126",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23"
+    ],
+    "area_name_sub": [
+      "愛知県"
+    ],
+    "category_code": "8",
+    "category_name": "運輸業・郵便業",
+    "shop_name": "高末株式会社",
+    "shop_location": "愛知県名古屋市熱田区横田二丁目4番26号",
+    "shop_office": [
+      "愛知県春日井市田楽町字池ノ上685 番3"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_126.pdf"
+  },
+  {
+    "id": "127",
+    "area_code": "30",
+    "area_name": "和歌山県",
+    "area_code_sub": [
+      "30",
+      "13"
+    ],
+    "area_name_sub": [
+      "和歌山県",
+      "東京都"
+    ],
+    "category_code": "9",
+    "category_name": "卸売業・小売業",
+    "shop_name": "株式会社ユニワールド",
+    "shop_location": "和歌山県有田市千田72番地",
+    "shop_office": [
+      "和歌山県有田川町奥408-6",
+      "和歌山県有田市千田72",
+      "東京都中央区八丁堀3-25-9 Daiwa八丁堀駅前ビル西館4F"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_127.pdf"
+  },
+  {
+    "id": "128",
+    "area_code": "35",
+    "area_name": "山口県",
+    "area_code_sub": [
+      "35"
+    ],
+    "area_name_sub": [
+      "山口県"
+    ],
+    "category_code": "18",
+    "category_name": "サービス業_他に分類されないもの",
+    "shop_name": "株式会社ただおザウルス",
+    "shop_location": "山口県周南市浜田1丁目6番5号",
+    "shop_office": [
+      "山口県防府市浜方三ノ桝534"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_128.pdf"
+  },
+  {
+    "id": "129",
+    "area_code": "11",
+    "area_name": "埼玉県",
+    "area_code_sub": [
+      "11"
+    ],
+    "area_name_sub": [
+      "埼玉県"
+    ],
+    "category_code": "9",
+    "category_name": "卸売業・小売業",
+    "shop_name": "株式会社浜屋",
+    "shop_location": "埼玉県東松山市大字下唐子1594番地",
+    "shop_office": [
+      "埼玉県東松山市大字石橋字小林1587番地1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_129.pdf"
+  },
+  {
+    "id": "130",
+    "area_code": "09",
+    "area_name": "栃木県",
+    "area_code_sub": [
+      "09"
+    ],
+    "area_name_sub": [
+      "栃木県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "小林酒造株式会社",
+    "shop_location": "栃木県小山市卒島７４３―１",
+    "shop_office": [
+      "栃木県栃木市惣社町1510-19",
+      "栃木県日光市瀬尾1640-35"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_130.pdf"
+  },
+  {
+    "id": "131",
+    "area_code": "26",
+    "area_name": "京都府",
+    "area_code_sub": [
+      "25"
+    ],
+    "area_name_sub": [
+      "滋賀県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社遠藤写真工芸所",
+    "shop_location": "京都府京都市中京区丸太町通小川西入横鍛治町100番地石田大成社ビル",
+    "shop_office": [
+      "滋賀県草津市追分南2丁目1202番"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_131.pdf"
+  },
+  {
+    "id": "132",
+    "area_code": "14",
+    "area_name": "神奈川県",
+    "area_code_sub": [
+      "12"
+    ],
+    "area_name_sub": [
+      "千葉県"
+    ],
+    "category_code": "9",
+    "category_name": "卸売業・小売業",
+    "shop_name": "株式会社ヨシノ自動車",
+    "shop_location": "神奈川県川崎市川崎区池田2-4-6",
+    "shop_office": [
+      "千葉県木更津市潮浜2－1－15"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_132.pdf"
+  },
+  {
+    "id": "134",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23"
+    ],
+    "area_name_sub": [
+      "愛知県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社コンメックス",
+    "shop_location": "愛知県額田郡幸田町深溝一本樹11番地1",
+    "shop_office": [
+      "愛知県額田郡幸田町大字須美字松坂６番２"
+    ],
+    "consortium": [
+      "株式会社近藤製作所"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_134.pdf"
+  },
+  {
+    "id": "135",
+    "area_code": "43",
+    "area_name": "熊本県",
+    "area_code_sub": [
+      "43",
+      "34",
+      "08"
+    ],
+    "area_name_sub": [
+      "熊本県",
+      "広島県",
+      "茨城県"
+    ],
+    "category_code": "8",
+    "category_name": "運輸業・郵便業",
+    "shop_name": "株式会社永井運送",
+    "shop_location": "熊本県宇城市松橋町曲野2942－1",
+    "shop_office": [
+      "熊本県宇城市松橋町曲野地内",
+      "広島県広島市南区出島1丁目33-22",
+      "茨城県下妻市皆葉1704"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_135.pdf"
+  },
+  {
+    "id": "136",
+    "area_code": "28",
+    "area_name": "兵庫県",
+    "area_code_sub": [
+      "28"
+    ],
+    "area_name_sub": [
+      "兵庫県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "まねき食品株式会社",
+    "shop_location": "兵庫県姫路市北条953番地",
+    "shop_office": [
+      "兵庫県姫路市御国野町国分寺401番地1他"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_136.pdf"
+  },
+  {
+    "id": "137",
+    "area_code": "12",
+    "area_name": "千葉県",
+    "area_code_sub": [
+      "12"
+    ],
+    "area_name_sub": [
+      "千葉県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "総武機械株式会社",
+    "shop_location": "千葉県東金市丹尾30番6",
+    "shop_office": [
+      "千葉県東金市大豆谷5番2",
+      "千葉県東金市丹尾30番6"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_137.pdf"
+  },
+  {
+    "id": "138",
+    "area_code": "28",
+    "area_name": "兵庫県",
+    "area_code_sub": [
+      "28"
+    ],
+    "area_name_sub": [
+      "兵庫県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "菅野包装資材株式会社",
+    "shop_location": "兵庫県加西市繁昌町894番地",
+    "shop_office": [
+      "兵庫県加西市中富町625"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_138.pdf"
+  },
+  {
+    "id": "139",
+    "area_code": "22",
+    "area_name": "静岡県",
+    "area_code_sub": [
+      "22"
+    ],
+    "area_name_sub": [
+      "静岡県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "川﨑工業株式会社",
+    "shop_location": "静岡県菊川市加茂1131番地",
+    "shop_office": [
+      "静岡県菊川市加茂字山田1442-1　外7筆"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_139.pdf"
+  },
+  {
+    "id": "140",
+    "area_code": "28",
+    "area_name": "兵庫県",
+    "area_code_sub": [
+      "24"
+    ],
+    "area_name_sub": [
+      "三重県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "新生電子株式会社",
+    "shop_location": "兵庫県尼崎市西長洲町2-6-25",
+    "shop_office": [
+      "三重県多気郡明和町平尾字野田481-14"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_140.pdf"
+  },
+  {
+    "id": "141",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "10"
+    ],
+    "area_name_sub": [
+      "群馬県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "共栄フード株式会社",
+    "shop_location": "東京都中央区日本橋浜町二丁目１番１号",
+    "shop_office": [
+      "群馬県佐波郡玉村町大字坂井1559番",
+      "群馬県伊勢崎市東上野宮町1625番2宮郷工業団地内"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_141.pdf"
+  },
+  {
+    "id": "143",
+    "area_code": "43",
+    "area_name": "熊本県",
+    "area_code_sub": [
+      "43"
+    ],
+    "area_name_sub": [
+      "熊本県"
+    ],
+    "category_code": "9",
+    "category_name": "卸売業・小売業",
+    "shop_name": "株式会社ロッキー",
+    "shop_location": "熊本県熊本市北区植木町植木１３３番地の１",
+    "shop_office": [
+      "熊本県熊本県上益城郡益城町古閑82、84-5",
+      "熊本県上益城郡益城町福富1107",
+      "熊本県熊本市南区城南町東阿高18-1"
+    ],
+    "consortium": [
+      "株式会社ザ．キッチン",
+      "株式会社アールミート"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_143.pdf"
+  },
+  {
+    "id": "145",
+    "area_code": "17",
+    "area_name": "石川県",
+    "area_code_sub": [
+      "09"
+    ],
+    "area_name_sub": [
+      "栃木県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社小松電業所",
+    "shop_location": "石川県小松市国府台5丁目20番",
+    "shop_office": [
+      "栃木県小山市大字東野田2726番1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_145.pdf"
+  },
+  {
+    "id": "146",
+    "area_code": "37",
+    "area_name": "香川県",
+    "area_code_sub": [
+      "24",
+      "37"
+    ],
+    "area_name_sub": [
+      "三重県",
+      "香川県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "アオイ電子株式会社",
+    "shop_location": "香川県高松市香西南町455番地の1",
+    "shop_office": [
+      "三重県多気郡多気町五佐奈1177番地の1",
+      "香川県高松市香西南町455番地の1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_146.pdf"
+  },
+  {
+    "id": "147",
+    "area_code": "15",
+    "area_name": "新潟県",
+    "area_code_sub": [
+      "15"
+    ],
+    "area_name_sub": [
+      "新潟県"
+    ],
+    "category_code": "8",
+    "category_name": "運輸業・郵便業",
+    "shop_name": "株式会社ｂｕｄ梱包出荷サポート",
+    "shop_location": "新潟県北蒲原郡聖籠町東港七丁目６０６８番地１５",
+    "shop_office": [
+      "新潟県北蒲原郡聖籠町大字蓮潟字長峰山３０４９－５　他30筆"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_147.pdf"
+  },
+  {
+    "id": "148",
+    "area_code": "09",
+    "area_name": "栃木県",
+    "area_code_sub": [
+      "09",
+      "13"
+    ],
+    "area_name_sub": [
+      "栃木県",
+      "東京都"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社しばた工芸",
+    "shop_location": "栃木県宇都宮市旭2丁目2番3号",
+    "shop_office": [
+      "栃木県栃木県鹿沼市茂呂60-1ほか",
+      "栃木県鹿沼市茂呂81-1",
+      "東京都中央区八丁堀4丁目10番8号　第3SSビル801"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_148.pdf"
+  },
+  {
+    "id": "149",
+    "area_code": "02",
+    "area_name": "青森県",
+    "area_code_sub": [
+      "02"
+    ],
+    "area_name_sub": [
+      "青森県"
+    ],
+    "category_code": "8",
+    "category_name": "運輸業・郵便業",
+    "shop_name": "株式会社共同物流サービス",
+    "shop_location": "青森県八戸市卸センター1丁目13-1",
+    "shop_office": [
+      "青森県八戸市卸センター卸センター第四拡張用地内（住所未決定）"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_149.pdf"
+  },
+  {
+    "id": "150",
+    "area_code": "29",
+    "area_name": "奈良県",
+    "area_code_sub": [
+      "29"
+    ],
+    "area_name_sub": [
+      "奈良県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "三笠産業株式会社",
+    "shop_location": "奈良県北葛城郡広陵町寺戸53番地",
+    "shop_office": [
+      "奈良県北葛城郡広陵町南　他（番地等未確定）"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_150.pdf"
+  },
+  {
+    "id": "151",
+    "area_code": "38",
+    "area_name": "愛媛県",
+    "area_code_sub": [
+      "38",
+      "39"
+    ],
+    "area_name_sub": [
+      "愛媛県",
+      "高知県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "四国医療サービス株式会社",
+    "shop_location": "愛媛県松山市久万ノ台1195番地",
+    "shop_office": [
+      "愛媛県松山市久万ノ台1196-2,1200-1.1250-1.1250-2.1251-1.1251-2.1252-2",
+      "高知県高知市農人町1-16-203"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_151.pdf"
+  },
+  {
+    "id": "152",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "28"
+    ],
+    "area_name_sub": [
+      "兵庫県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "ヤマトミシン製造株式会社",
+    "shop_location": "大阪府大阪市北区西天満４丁目４番１２号",
+    "shop_office": [
+      "兵庫県三田市広野66番地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_152.pdf"
+  },
+  {
+    "id": "153",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "13"
+    ],
+    "area_name_sub": [
+      "東京都"
+    ],
+    "category_code": "13",
+    "category_name": "宿泊業・飲食サービス業",
+    "shop_name": "株式会社越後屋",
+    "shop_location": "東京都港区芝五丁目30-11",
+    "shop_office": [
+      "東京都港区芝五丁目30-11"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_153.pdf"
+  },
+  {
+    "id": "154",
+    "area_code": "19",
+    "area_name": "山梨県",
+    "area_code_sub": [
+      "19"
+    ],
+    "area_name_sub": [
+      "山梨県"
+    ],
+    "category_code": "13",
+    "category_name": "宿泊業・飲食サービス業",
+    "shop_name": "中央観光株式会社",
+    "shop_location": "山梨県富士吉田市上吉田東9-1-18",
+    "shop_office": [
+      "山梨県南都留郡忍野村忍草平山梅沢2549番4、7、12の一部"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_154.pdf"
+  },
+  {
+    "id": "155",
+    "area_code": "16",
+    "area_name": "富山県",
+    "area_code_sub": [
+      "16"
+    ],
+    "area_name_sub": [
+      "富山県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社スギノマシン",
+    "shop_location": "富山県滑川市栗山2880番地",
+    "shop_office": [
+      "富山県滑川市栗山2880番地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_155.pdf"
+  },
+  {
+    "id": "156",
+    "area_code": "39",
+    "area_name": "高知県",
+    "area_code_sub": [
+      "39",
+      "38"
+    ],
+    "area_name_sub": [
+      "高知県",
+      "愛媛県"
+    ],
+    "category_code": "18",
+    "category_name": "サービス業_他に分類されないもの",
+    "shop_name": "株式会社ダイセイ",
+    "shop_location": "高知県高知市南川添9番5号",
+    "shop_office": [
+      "高知県高知市春野町弘岡下字4501番7　他7筆",
+      "愛媛県今治市延喜甲389番地2"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_156.pdf"
+  },
+  {
+    "id": "157",
+    "area_code": "28",
+    "area_name": "兵庫県",
+    "area_code_sub": [
+      "28"
+    ],
+    "area_name_sub": [
+      "兵庫県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "ハマダコンフェクト株式会社",
+    "shop_location": "兵庫県加古川市尾上町池田850-68",
+    "shop_office": [
+      "兵庫県加古川市尾上町池田850-68"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_157.pdf"
+  },
+  {
+    "id": "158",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "22"
+    ],
+    "area_name_sub": [
+      "静岡県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "平和食品工業株式会社",
+    "shop_location": "東京都世田谷区等々力４－６－１",
+    "shop_office": [
+      "静岡県御殿場市保土沢1261-1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_158.pdf"
+  },
+  {
+    "id": "159",
+    "area_code": "30",
+    "area_name": "和歌山県",
+    "area_code_sub": [
+      "30"
+    ],
+    "area_name_sub": [
+      "和歌山県"
+    ],
+    "category_code": "13",
+    "category_name": "宿泊業・飲食サービス業",
+    "shop_name": "浦島観光ホテル株式会社",
+    "shop_location": "和歌山県東牟婁郡那智勝浦町勝浦1165-2",
+    "shop_office": [
+      "和歌山県東牟婁郡那智勝浦町大字勝浦字老翁谷1165番2の1",
+      "和歌山県東牟婁郡那智勝浦町大字勝浦字磯ノ湯1158番3",
+      "和歌山県東牟婁郡那智勝浦町大字勝浦字磯ノ湯1158番5の4"
+    ],
+    "consortium": [
+      "株式会社みちのりホテルズ",
+      "株式会社丸峰観光ホテル"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_159.pdf"
+  },
+  {
+    "id": "162",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23"
+    ],
+    "area_name_sub": [
+      "愛知県"
+    ],
+    "category_code": "8",
+    "category_name": "運輸業・郵便業",
+    "shop_name": "信光陸運株式会社",
+    "shop_location": "愛知県小牧市新小木1丁目30番地",
+    "shop_office": [
+      "愛知県一宮市千秋町天摩字北野35番"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_162.pdf"
+  },
+  {
+    "id": "164",
+    "area_code": "42",
+    "area_name": "長崎県",
+    "area_code_sub": [
+      "13"
+    ],
+    "area_name_sub": [
+      "東京都"
+    ],
+    "category_code": "9",
+    "category_name": "卸売業・小売業",
+    "shop_name": "株式会社福砂屋グループ",
+    "shop_location": "長崎県長崎市船大工町3-1",
+    "shop_office": [
+      "東京都町田市南町田3丁目3"
+    ],
+    "consortium": [
+      "株式会社福砂屋",
+      "株式会社カステラ本家福砂屋"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_164.pdf"
+  },
+  {
+    "id": "166",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "26"
+    ],
+    "area_name_sub": [
+      "京都府"
+    ],
+    "category_code": "4",
+    "category_name": "建設業",
+    "shop_name": "株式会社福地建設",
+    "shop_location": "大阪府大阪市中央区徳井町2丁目4番8号",
+    "shop_office": [
+      "京都府京田辺市宮津大木一番地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_166.pdf"
+  },
+  {
+    "id": "167",
+    "area_code": "33",
+    "area_name": "岡山県",
+    "area_code_sub": [
+      "33"
+    ],
+    "area_name_sub": [
+      "岡山県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "銘建工業株式会社",
+    "shop_location": "岡山県真庭市勝山1209",
+    "shop_office": [
+      "岡山県真庭市勝山1209他"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_167.pdf"
+  },
+  {
+    "id": "168",
+    "area_code": "28",
+    "area_name": "兵庫県",
+    "area_code_sub": [
+      "28"
+    ],
+    "area_name_sub": [
+      "兵庫県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社大真空",
+    "shop_location": "兵庫県加古川市野口町水足179-6",
+    "shop_office": [
+      "兵庫県加古川市野口町水足179-6",
+      "兵庫県加古川市野口町水足179-15",
+      "兵庫県加古川市平岡町新在家1192-8"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_168.pdf"
+  },
+  {
+    "id": "169",
+    "area_code": "15",
+    "area_name": "新潟県",
+    "area_code_sub": [
+      "15"
+    ],
+    "area_name_sub": [
+      "新潟県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "サトウ食品株式会社",
+    "shop_location": "新潟県新潟市東区宝町13-5",
+    "shop_office": [
+      "新潟県北蒲原郡聖籠町東港5丁目626番23ほか"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_169.pdf"
+  },
+  {
+    "id": "170",
+    "area_code": "25",
+    "area_name": "滋賀県",
+    "area_code_sub": [
+      "25"
+    ],
+    "area_name_sub": [
+      "滋賀県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社光製作所",
+    "shop_location": "滋賀県近江八幡市鷹飼町1526　ＹＰ2　2Ｆ",
+    "shop_office": [
+      "滋賀県近江八幡市東川町825-1"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_170.pdf"
+  },
+  {
+    "id": "171",
+    "area_code": "08",
+    "area_name": "茨城県",
+    "area_code_sub": [
+      "08"
+    ],
+    "area_name_sub": [
+      "茨城県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "昭和産業株式会社",
+    "shop_location": "茨城県筑西市玉戸1007-3",
+    "shop_office": [
+      "茨城県筑西市小川151-5",
+      "茨城県筑西市小川1911",
+      "茨城県筑西市小川1910"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_171.pdf"
+  },
+  {
+    "id": "173",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23"
+    ],
+    "area_name_sub": [
+      "愛知県"
+    ],
+    "category_code": "9",
+    "category_name": "卸売業・小売業",
+    "shop_name": "中央紙通商株式会社",
+    "shop_location": "愛知県名古屋市中区丸の内二丁目１番３６号",
+    "shop_office": [
+      "愛知県小牧市小針2丁目403番地"
+    ],
+    "consortium": [
+      "中央ペーパーロジ株式会社"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_173.pdf"
+  },
+  {
+    "id": "174",
+    "area_code": "47",
+    "area_name": "沖縄県",
+    "area_code_sub": [
+      "47"
+    ],
+    "area_name_sub": [
+      "沖縄県"
+    ],
+    "category_code": "13",
+    "category_name": "宿泊業・飲食サービス業",
+    "shop_name": "株式会社Ｐｌａｎ・Ｄｏ・Ｓｅｅ琉球",
+    "shop_location": "沖縄県那覇市久茂地三丁目29番52号",
+    "shop_office": [
+      "沖縄県那覇市前島3-25-1"
+    ],
+    "consortium": [
+      "株式会社Ｐｌａｎ・Ｄｏ・Ｓｅｅ"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_174.pdf"
+  },
+  {
+    "id": "177",
+    "area_code": "06",
+    "area_name": "山形県",
+    "area_code_sub": [
+      "06"
+    ],
+    "area_name_sub": [
+      "山形県"
+    ],
+    "category_code": "11",
+    "category_name": "不動産業・物品賃貸業",
+    "shop_name": "さいほく鉄工株式会社",
+    "shop_location": "山形県新庄市十日町字中山野村西5702-1",
+    "shop_office": [
+      "山形県新庄市十日町字中山野村西5702番地の1"
+    ],
+    "consortium": [
+      "小松物産交易株式会社"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline_177.pdf"
+  },
+  {
+    "id": "179",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23",
+      "16"
+    ],
+    "area_name_sub": [
+      "愛知県",
+      "富山県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "アサヒセイレン中部株式会社",
+    "shop_location": "愛知県西尾市吉良町岡山背撫山4-24",
+    "shop_office": [
+      "愛知県幸田町大字須美字前山地内",
+      "愛知県西尾市吉良町岡山背撫山4-24",
+      "富山県射水市沖塚原20-1"
+    ],
+    "consortium": [
+      "SAN株式会社"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__179.pdf"
+  },
+  {
+    "id": "181",
+    "area_code": "28",
+    "area_name": "兵庫県",
+    "area_code_sub": [
+      "28"
+    ],
+    "area_name_sub": [
+      "兵庫県"
+    ],
+    "category_code": "13",
+    "category_name": "宿泊業・飲食サービス業",
+    "shop_name": "株式会社ホテルニューアワジ",
+    "shop_location": "兵庫県洲本市小路谷20",
+    "shop_office": [
+      "兵庫県洲本市小路谷5-1",
+      "兵庫県あわじ市松帆古津路970-72",
+      "兵庫県南あわじ市松帆古津路970-81"
+    ],
+    "consortium": [
+      "株式会社あわじ浜離宮"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__181.pdf"
+  },
+  {
+    "id": "182",
+    "area_code": "11",
+    "area_name": "埼玉県",
+    "area_code_sub": [
+      "11"
+    ],
+    "area_name_sub": [
+      "埼玉県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "埼玉機器株式会社",
+    "shop_location": "埼玉県さいたま市中央区下落合７丁目１番地３号\t",
+    "shop_office": [
+      "埼玉県富士見市上南畑地区産業団地Bブロック"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__182.pdf"
+  },
+  {
+    "id": "183",
+    "area_code": "06",
+    "area_name": "山形県",
+    "area_code_sub": [
+      "06"
+    ],
+    "area_name_sub": [
+      "山形県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "スズキハイテック株式会社",
+    "shop_location": "山形県山形市銅町2丁目2番30号",
+    "shop_office": [
+      "山形県山形市銅町2丁目2番30号",
+      "山形県山形市宮町2丁目27番"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__183.pdf"
+  },
+  {
+    "id": "184",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "27"
+    ],
+    "area_name_sub": [
+      "大阪府"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "泉南乳業株式会社",
+    "shop_location": "大阪府貝塚市小瀬532番地",
+    "shop_office": [
+      "大阪府堺市中区土塔町1991番地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__184.pdf"
+  },
+  {
+    "id": "188",
+    "area_code": "37",
+    "area_name": "香川県",
+    "area_code_sub": [
+      "37"
+    ],
+    "area_name_sub": [
+      "香川県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "山城金属株式会社",
+    "shop_location": "香川県仲多度郡琴平町榎井175-1",
+    "shop_office": [
+      "香川県まんのう町長尾字川原1106-1",
+      "香川県丸亀市綾歌町岡田上1785"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__188.pdf"
+  },
+  {
+    "id": "189",
+    "area_code": "23",
+    "area_name": "愛知県",
+    "area_code_sub": [
+      "23"
+    ],
+    "area_name_sub": [
+      "愛知県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "長﨑ジャッキ株式会社",
+    "shop_location": "愛知県碧南市須磨町5-2",
+    "shop_office": [
+      "愛知県安城市福釜町釜ヶ渕69-1.69-2.70.71.72.73.74.107-1",
+      "愛知県碧南市須磨町5-2"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__189.pdf"
+  },
+  {
+    "id": "190",
+    "area_code": "41",
+    "area_name": "佐賀県",
+    "area_code_sub": [
+      "41"
+    ],
+    "area_name_sub": [
+      "佐賀県"
+    ],
+    "category_code": "13",
+    "category_name": "宿泊業・飲食サービス業",
+    "shop_name": "株式会社GOTENリゾート",
+    "shop_location": "佐賀県藤津郡太良町大浦乙３１６－３",
+    "shop_office": [
+      "佐賀県嬉野市嬉野町岩屋川内字岩ノ元乙1110-2"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__190.pdf"
+  },
+  {
+    "id": "191",
+    "area_code": "11",
+    "area_name": "埼玉県",
+    "area_code_sub": [
+      "11"
+    ],
+    "area_name_sub": [
+      "埼玉県"
+    ],
+    "category_code": "9",
+    "category_name": "卸売業・小売業",
+    "shop_name": "株式会社カナイ",
+    "shop_location": "埼玉県八潮市大字西袋７１７-１",
+    "shop_office": [
+      "埼玉県八潮市大字浮塚大字浮塚２０"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__191.pdf"
+  },
+  {
+    "id": "192",
+    "area_code": "34",
+    "area_name": "広島県",
+    "area_code_sub": [
+      "34"
+    ],
+    "area_name_sub": [
+      "広島県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "池田糖化工業株式会社",
+    "shop_location": "広島県福山市桜馬場町２番２８号",
+    "shop_office": [
+      "広島県福山市箕沖町95番地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__192.pdf"
+  },
+  {
+    "id": "194",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "10"
+    ],
+    "area_name_sub": [
+      "群馬県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "ZACROS株式会社",
+    "shop_location": "東京都文京区小石川一丁目1番1号　文京ガーデンゲートタワー22階",
+    "shop_office": [
+      "群馬県沼田市町田町1520番地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__194.pdf"
+  },
+  {
+    "id": "195",
+    "area_code": "12",
+    "area_name": "千葉県",
+    "area_code_sub": [
+      "12",
+      "27",
+      "09"
+    ],
+    "area_name_sub": [
+      "千葉県",
+      "大阪府",
+      "栃木県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "アシザワ・ファインテック株式会社",
+    "shop_location": "千葉県習志野市茜浜1-4-2",
+    "shop_office": [
+      "千葉県習志野市茜浜1-4-2",
+      "大阪府吹田市片山町4-15-13",
+      "栃木県小山市犬塚2-6-10"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__195.pdf"
+  },
+  {
+    "id": "196",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "27"
+    ],
+    "area_name_sub": [
+      "大阪府"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社八立製作所",
+    "shop_location": "大阪府大阪市生野区巽中二丁目２１番４号",
+    "shop_office": [
+      "大阪府大阪市平野区加美北三丁目６番１６号"
+    ],
+    "consortium": [],
+    "shop_url": "/assets/pdf/koufu/outline__196.pdf"
+  },
+  {
+    "id": "197",
+    "area_code": "34",
+    "area_name": "広島県",
+    "area_code_sub": [
+      "34"
+    ],
+    "area_name_sub": [
+      "広島県"
+    ],
+    "category_code": "16",
+    "category_name": "医療・福祉",
+    "shop_name": "株式会社福山臨床検査センター",
+    "shop_location": "広島県福山市草戸町1丁目23番21号",
+    "shop_office": [
+      "広島県福山市草戸町1丁目23番21号"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__197.pdf"
+  },
+  {
+    "id": "198",
+    "area_code": "37",
+    "area_name": "香川県",
+    "area_code_sub": [
+      "37"
+    ],
+    "area_name_sub": [
+      "香川県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "ユニコム株式会社",
+    "shop_location": "香川県仲多度郡多度津町堀江3-7-15",
+    "shop_office": [
+      "香川県仲多度郡多度津町北鴨3丁目2-17他",
+      "香川県仲多度郡多度津町堀江3-7-15",
+      "香川県仲多度郡多度津町北鴨3-1-43"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__198.pdf"
+  },
+  {
+    "id": "199",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "17"
+    ],
+    "area_name_sub": [
+      "石川県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社ティー・シー・ピー",
+    "shop_location": "東京都千代田区外神田6-1-8",
+    "shop_office": [
+      "石川県白山市旭工業団地北部地区土地区画整理事業施行地区内１-１"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__199.pdf"
+  },
+  {
+    "id": "200",
+    "area_code": "20",
+    "area_name": "長野県",
+    "area_code_sub": [
+      "4"
+    ],
+    "area_name_sub": [
+      "宮城県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社イズミテクノ",
+    "shop_location": "長野県岡谷市御倉町3-20",
+    "shop_office": [
+      "宮城県黒川郡大衡村松の平2−25"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__200.pdf"
+  },
+  {
+    "id": "201",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "45",
+      "27",
+      "33"
+    ],
+    "area_name_sub": [
+      "宮崎県",
+      "大阪府",
+      "岡山県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社イートアンドフーズ",
+    "shop_location": "大阪府枚方市春日北町１丁目10番10号",
+    "shop_office": [
+      "宮崎県都城市高城町桜木字脇ノ田1702番地13",
+      "大阪府枚方市春日北町１丁目10番10号",
+      "岡山県笠岡市茂平字苫無1381番地60"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__201.pdf"
+  },
+  {
+    "id": "202",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "28"
+    ],
+    "area_name_sub": [
+      "兵庫県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "アライドコーヒーロースターズ株式会社",
+    "shop_location": "東京都大田区仲池上2-23-21",
+    "shop_office": [
+      "兵庫県小野市山田町宇池ノ谷1991-12"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__202.pdf"
+  },
+  {
+    "id": "203",
+    "area_code": "26",
+    "area_name": "京都府",
+    "area_code_sub": [
+      "26"
+    ],
+    "area_name_sub": [
+      "京都府"
+    ],
+    "category_code": "14",
+    "category_name": "生活関連サービス業・娯楽業",
+    "shop_name": "株式会社東映京都スタジオ",
+    "shop_location": "京都府京都市右京区太秦東蜂岡町10番地",
+    "shop_office": [
+      "京都府京都市右京区太秦東蜂岡町10番地"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__203.pdf"
+  },
+  {
+    "id": "204",
+    "area_code": "28",
+    "area_name": "兵庫県",
+    "area_code_sub": [
+      "40",
+      "15",
+      "28"
+    ],
+    "area_name_sub": [
+      "福岡県",
+      "新潟県",
+      "兵庫県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "メック株式会社",
+    "shop_location": "兵庫県尼崎市杭瀬南新町3丁目4番1号",
+    "shop_office": [
+      "福岡県北九州市若松区向洋町10番",
+      "新潟県長岡市西陵町221番地36",
+      "兵庫県尼崎市杭瀬南新町3丁目4番1号"
+    ],
+    "consortium": [],
+    "shop_url": "/assets/pdf/koufu/outline__204.pdf"
+  },
+  {
+    "id": "205",
+    "area_code": "27",
+    "area_name": "大阪府",
+    "area_code_sub": [
+      "21"
+    ],
+    "area_name_sub": [
+      "岐阜県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "ヤマシンスチール株式会社",
+    "shop_location": "大阪府大阪市中央区上町1-19-5",
+    "shop_office": [
+      "岐阜県恵那市武並町竹折字折坂199-222"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__205.pdf"
+  },
+  {
+    "id": "206",
+    "area_code": "03",
+    "area_name": "岩手県",
+    "area_code_sub": [
+      "03"
+    ],
+    "area_name_sub": [
+      "岩手県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "上山製紙株式会社",
+    "shop_location": "岩手県一関市千厩町千厩字町浦75",
+    "shop_office": [
+      "岩手県一関市千厩町千厩字町浦95",
+      "岩手県一関市千厩町千厩字町浦75"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__206.pdf"
+  },
+  {
+    "id": "207",
+    "area_code": "33",
+    "area_name": "岡山県",
+    "area_code_sub": [
+      "33"
+    ],
+    "area_name_sub": [
+      "岡山県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "株式会社ジェイ・イー・ティ",
+    "shop_location": "岡山県浅口郡里庄町新庄金山6078",
+    "shop_office": [
+      "岡山県浅口郡里庄町新庄金山6078",
+      "岡山県浅口市鴨方町"
+    ],
+    "consortium": [
+      ""
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__207.pdf"
+  },
+  {
+    "id": "208",
+    "area_code": "13",
+    "area_name": "東京都",
+    "area_code_sub": [
+      "11"
+    ],
+    "area_name_sub": [
+      "埼玉県"
+    ],
+    "category_code": "5",
+    "category_name": "製造業",
+    "shop_name": "日本電波工業株式会社",
+    "shop_location": "東京都渋谷区笹塚1-47-1 メルクマール京王笹塚",
+    "shop_office": [
+      "東京都渋谷区笹塚1-47-1 メルクマール京王笹塚",
+      "埼玉県狭山市上広瀬1275-2"
+    ],
+    "consortium": [
+      "函館エヌ・デー・ケー株式会社",
+      "古川エヌ・デー・ケー株式会社"
+    ],
+    "shop_url": "/assets/pdf/koufu/outline__208.pdf"
+  }
+]

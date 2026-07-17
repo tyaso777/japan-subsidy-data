@@ -44,7 +44,9 @@
 ## まず見るファイル
 
 - `data/processed/cases.csv`: 1案件1行の案件マスタ
+- `data/processed/case_locations.csv`: 本社所在地・事業実施場所を1所在地1行で保持する明細
 - `docs/cases_data_dictionary.md`: `cases.csv` の型・単位・Null・コード値を説明するデータ定義書
+- `docs/case_locations.md`: 所在地データの公式URL、結合方法、列定義、現行ページ未収録案件の扱い
 - `data/processed/metrics.csv`: 主要4指標の縦持ちデータ
 - `data/processed/unit_normalization_changes.csv`: 原単位を訂正・補完した企業と項目の監査履歴
 - `data/processed/unit_revalidation_changes.csv`: 単位訂正に加え、原値からの再換算で精緻化した金額を含む変更一覧

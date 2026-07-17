@@ -1,0 +1,38 @@
+{
+  "retrieved_at": "2026-07-17",
+  "case_count": 381,
+  "location_row_count": 946,
+  "head_office_row_count": 381,
+  "project_row_count": 565,
+  "multiple_project_location_case_count": 127,
+  "match_status_counts": {
+    "exact_pdf_url": 379,
+    "official_adoption_list_prefecture_fallback": 2
+  },
+  "detail_level_counts": {
+    "contains_planned": 1,
+    "contains_undecided": 4,
+    "full_address": 374,
+    "prefecture_only": 2
+  },
+  "project_location_status_counts": {
+    "planned": 1,
+    "published": 560,
+    "undecided": 4
+  },
+  "full_address_missing_municipality_row_count": 1,
+  "sources": [
+    {
+      "cohort": "1_2",
+      "page_url": "https://seichotoushi-hojo.jp/1_2ji/koufu/",
+      "data_url": "https://seichotoushi-hojo.jp/assets/data/koufu.json?260715",
+      "snapshot": "data/reference/official_grant_locations_1_2.json"
+    },
+    {
+      "cohort": "3_4",
+      "page_url": "https://seichotoushi-hojo.jp/koufu/",
+      "data_url": "https://seichotoushi-hojo.jp/assets/data/koufu-renew.json?26070702",
+      "snapshot": "data/reference/official_grant_locations_3_4.json"
+    }
+  ]
+}
