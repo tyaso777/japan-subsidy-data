@@ -115,6 +115,10 @@ assert(qaV01Html.includes("差分検証を開始") && qaV01Html.includes("compar
 assert(qaV01Html.includes("外部抽出データとの差分"), "QA v0.1 must render a per-case comparison table");
 const dashboardHtml = await fs.readFile(path.join(projectDir, "html", "public_metrics_dashboard.html"), "utf8");
 const legacyDashboardHtml = await fs.readFile(path.join(projectDir, "html", "analysis_dashboard.html"), "utf8");
+const prefectureEconomyCsv = await fs.readFile(path.join(projectDir, "data", "reference", "prefecture_economic_indicators.csv"), "utf8");
+const prefectureSourcesCsv = await fs.readFile(path.join(projectDir, "data", "reference", "prefecture_economic_indicator_sources.csv"), "utf8");
+assert(countCsvRecords(prefectureEconomyCsv) === 47, "prefecture economic reference must contain all 47 prefectures");
+assert(countCsvRecords(prefectureSourcesCsv) === 5, "prefecture economic source catalog must document all five indicators");
 assert(dashboardHtml.includes("採択企業 公開指標比較ダッシュボード"), "public metrics dashboard title is missing");
 assert(legacyDashboardHtml.includes("location.replace('public_metrics_dashboard.html'"), "legacy analysis dashboard must redirect to the renamed file");
 assert(dashboardHtml.includes("const DATA=[") && dashboardHtml.includes("const BENCH=["), "analysis dashboard must embed cases and official benchmarks");
@@ -131,6 +135,9 @@ assert(dashboardHtml.includes("e.target.classList?.contains('pt')"), "scatter po
 assert(dashboardHtml.includes("ダブルクリック：全体表示"), "analysis dashboard must explain viewport reset");
 assert(dashboardHtml.includes('id="xlog" type="checkbox">') && dashboardHtml.includes("xlog.checked=false;ylog.checked=false"), "linear scales must be the default initially and after reset");
 assert(dashboardHtml.includes('id="sizeMetric"') && dashboardHtml.includes("const SIZE_METRICS={") && dashboardHtml.includes("sizeMetric.value='project_cost_million_yen_normalized'"), "scatter point-size selector must default to project cost");
+assert(dashboardHtml.includes('id="colorMetric"') && dashboardHtml.includes('id="colorLocation"') && dashboardHtml.includes("const COLOR_METRICS={") && dashboardHtml.includes("function updateColorLegend()"), "scatter must expose categorical and regional-economic point colors");
+assert(dashboardHtml.includes('id="regionFilter"') && dashboardHtml.includes('id="prefectureFilter"') && dashboardHtml.includes("function matchesLocation(d)"), "dashboard must filter by head-office or project region and prefecture");
+assert(dashboardHtml.includes("全国47都道府県の五分位") && dashboardHtml.includes("地域経済指標の定義と出典") && dashboardHtml.includes("PREF_SOURCES.map"), "dashboard must explain regional-economic color bins and official sources");
 assert(dashboardHtml.includes("new Option(`${v[0]}（${total}件）`,k)"), "point-size selector options must show numeric coverage counts");
 assert(dashboardHtml.includes("function updateSizeMetricOptions()") && dashboardHtml.includes("applyFilters();updateSizeMetricOptions();updateSizeLegend()"), "point-size option counts must update after every filter change");
 assert(dashboardHtml.includes("Math.sqrt(4**2+t*(14**2-4**2))") && dashboardHtml.includes("p05:q(.05)") && dashboardHtml.includes("p95:q(.95)"), "point sizes must use area scaling capped at the 5th and 95th percentiles");
