@@ -1,0 +1,61 @@
+{
+  "pair_count": 40,
+  "company_count": 80,
+  "prior_pair_count": 5,
+  "new_pair_count": 35,
+  "round_counts": {
+    "1次": 8,
+    "2次": 4,
+    "3次": 14,
+    "4次": 14
+  },
+  "industry_counts": {
+    "製造業": 30,
+    "サービス業_他に分類されないもの": 2,
+    "卸売業・小売業": 3,
+    "運輸業・郵便業": 4,
+    "学術研究・専門・技術サービス業": 1
+  },
+  "lower_core_two_or_more_count": 40,
+  "lower_core_two_or_more_share": 1.0,
+  "lower_core_three_or_more_count": 36,
+  "lower_core_three_or_more_share": 0.9,
+  "lower_core_score3_two_or_more_count": 29,
+  "lower_core_score3_two_or_more_share": 0.725,
+  "lower_qualitative_total_higher_count": 12,
+  "equal_qualitative_total_count": 8,
+  "higher_qualitative_total_higher_count": 20,
+  "factor_frequency": {
+    "demand": {
+      "label": "需要根拠の具体性",
+      "lower_strong_share": 0.7,
+      "higher_strong_share": 0.8
+    },
+    "constraint": {
+      "label": "能力制約の明確さ",
+      "lower_strong_share": 0.975,
+      "higher_strong_share": 0.95
+    },
+    "transformation": {
+      "label": "事業・工程の構造転換",
+      "lower_strong_share": 0.975,
+      "higher_strong_share": 0.9
+    },
+    "regional": {
+      "label": "地域供給網・代替困難性",
+      "lower_strong_share": 0.775,
+      "higher_strong_share": 0.7
+    },
+    "execution": {
+      "label": "実行確度",
+      "lower_strong_share": 0.9,
+      "higher_strong_share": 0.95
+    },
+    "strategic": {
+      "label": "政策・戦略分野との整合",
+      "lower_strong_share": 0.9,
+      "higher_strong_share": 1.0
+    }
+  },
+  "interpretation_boundary": "採択企業同士の比較であり、採択確率・因果効果・審査点を推定するものではない"
+}

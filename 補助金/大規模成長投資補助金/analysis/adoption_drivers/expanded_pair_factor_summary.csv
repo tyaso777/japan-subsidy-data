@@ -1,0 +1,7 @@
+﻿factor,factor_ja,pair_count,lower_mean_score,higher_mean_score,mean_score_gap_lower_minus_higher,lower_strong_count,lower_strong_share,lower_strong_wilson95_low,lower_strong_wilson95_high,higher_strong_count,higher_strong_share,higher_strong_wilson95_low,higher_strong_wilson95_high,lower_score3_count,lower_score3_share,higher_score3_count,higher_score3_share,lower_score_higher_pairs,equal_score_pairs,higher_score_higher_pairs,paired_sign_test_p
+demand,需要根拠の具体性,40,1.975,2.200,-0.225,28,0.700,0.546,0.819,32,0.800,0.652,0.895,11,0.275,16,0.400,13,8,19,0.377
+constraint,能力制約の明確さ,40,2.675,2.625,0.050,39,0.975,0.871,0.996,38,0.950,0.835,0.986,28,0.700,27,0.675,9,25,6,0.607
+transformation,事業・工程の構造転換,40,2.625,2.625,0.000,39,0.975,0.871,0.996,36,0.900,0.769,0.960,26,0.650,29,0.725,10,19,11,1.000
+regional,地域供給網・代替困難性,40,2.250,2.050,0.200,31,0.775,0.625,0.877,28,0.700,0.546,0.819,20,0.500,15,0.375,13,18,9,0.523
+execution,実行確度,40,2.225,2.550,-0.325,36,0.900,0.769,0.960,38,0.950,0.835,0.986,13,0.325,24,0.600,6,17,17,0.035
+strategic,政策・戦略分野との整合,40,2.350,2.600,-0.250,36,0.900,0.769,0.960,40,1.000,0.912,1.000,18,0.450,24,0.600,7,20,13,0.263

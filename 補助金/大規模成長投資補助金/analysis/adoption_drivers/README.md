@@ -42,6 +42,27 @@ python analyze_adoption_drivers.py
 - `external_financial_confirmations.csv`: 3～5次の公式採択案件一覧にある金融機関確認の全295件
 - `external_financial_confirmation_summary.csv`: 公募回別の金融機関確認提出率
 
+40ペアへの目視精査拡張:
+
+- `select_matched_pair_candidates.py`: 同一公募回・同一業種・近い投資規模で40ペア（80社）を重複なく選定し、公開PDF本文の精査票を一時生成
+- `expanded_pair_manual_codes.csv`: 需要、能力制約、構造転換、地域性、実行確度、政策整合を0～3点で目視符号化した原票
+- `analyze_expanded_matched_pairs.py`: 符号化原票を集計し、信頼区間・ペア内符号検定・部分標本感度分析を生成
+- `expanded_matched_pair_report.md`: 40ペアの結論、全ペア監査表、第6次公募への含意
+- `expanded_matched_pair_review.csv`: 40ペアの数値・6要因・根拠・企業別公式PDF URL
+- `expanded_pair_company_coding.csv`: 80社の企業単位データ
+- `expanded_pair_factor_summary.csv`: 要因別頻度、Wilson 95%区間、ペア内符号検定
+- `expanded_pair_sensitivity.csv`: 旧5ペア除外、3～4次、製造業／非製造業などの感度分析
+- `expanded_pair_review.xlsx`: 上記の表と方法・出典をまとめた閲覧用Excel
+
+再生成:
+
+```powershell
+python select_matched_pair_candidates.py
+python analyze_expanded_matched_pairs.py
+```
+
+この環境ではOS標準の `python` がPython 2の場合があるため、実際にはPython 3.10以降を使用してください。`select_matched_pair_candidates.py` が作る `tmp/pdfs` の精査票は中間ファイルで、Git管理対象ではありません。
+
 外部データを再取得して更新する場合:
 
 ```powershell
