@@ -153,6 +153,7 @@
 - `expanded_pair_factor_summary.csv`: 要因別頻度、Wilson 95%区間、ペア内符号検定
 - `expanded_pair_sensitivity.csv`: 旧5ペア除外、3～4次、業種別などの感度分析
 - `expanded_pair_manual_codes.csv`: 人手符号化の原票
+- `expanded_matched_pair_dashboard.html`: 主要結果、散布図、40ペアの根拠を閲覧する単独HTML
 
 ## 根拠資料
 

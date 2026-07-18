@@ -53,12 +53,15 @@ python analyze_adoption_drivers.py
 - `expanded_pair_factor_summary.csv`: 要因別頻度、Wilson 95%区間、ペア内符号検定
 - `expanded_pair_sensitivity.csv`: 旧5ペア除外、3～4次、製造業／非製造業などの感度分析
 - `expanded_pair_review.xlsx`: 上記の表と方法・出典をまとめた閲覧用Excel
+- `expanded_matched_pair_dashboard.html`: 主要結果、6要因比較、80社散布図、40ペアの根拠をまとめた単独HTML
+- `build_expanded_pair_dashboard.py`: CSV・JSONから上記HTMLを再生成
 
 再生成:
 
 ```powershell
 python select_matched_pair_candidates.py
 python analyze_expanded_matched_pairs.py
+python build_expanded_pair_dashboard.py
 ```
 
 この環境ではOS標準の `python` がPython 2の場合があるため、実際にはPython 3.10以降を使用してください。`select_matched_pair_candidates.py` が作る `tmp/pdfs` の精査票は中間ファイルで、Git管理対象ではありません。

@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>採択企業40ペア・定性補完要因分析</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --background: #f5f7fb;
+  --foreground: #172033;
+  --card: #ffffff;
+  --card-foreground: #172033;
+  --muted: #e9edf4;
+  --muted-foreground: #5d687b;
+  --border: #d8dee9;
+  --primary: #17365d;
+  --primary-foreground: #ffffff;
+  --accent: #e7f0fb;
+  --accent-foreground: #17365d;
+  --ring: #3877bd;
+  --viz-series-1: #2f6fb3;
+  --viz-series-2: #e8792e;
+  --viz-series-3: #238b7e;
+  --viz-series-4: #8b5bb5;
+  --destructive: #b42318;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #111722;
+    --foreground: #edf2f8;
+    --card: #192231;
+    --card-foreground: #edf2f8;
+    --muted: #263244;
+    --muted-foreground: #b1bccb;
+    --border: #344155;
+    --primary: #d8e8fb;
+    --primary-foreground: #10223a;
+    --accent: #263d58;
+    --accent-foreground: #edf4fc;
+    --ring: #8ab4e5;
+    --viz-series-1: #72a7df;
+    --viz-series-2: #f2a15f;
+    --viz-series-3: #61bbae;
+    --viz-series-4: #b79add;
+    --destructive: #ff9088;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+a { color: var(--viz-series-1); }
+button, select { font: inherit; }
+button:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+.page { max-width: 1360px; margin: 0 auto; padding: 28px 24px 56px; }
+.hero { margin-bottom: 22px; }
+h1 { margin: 0 0 8px; font-size: clamp(1.5rem, 3vw, 2.25rem); line-height: 1.25; font-weight: 500; }
+h2 { margin: 0 0 14px; font-size: 1.25rem; font-weight: 500; }
+h3 { margin: 0 0 10px; font-size: 1rem; font-weight: 500; }
+p { margin: 0; }
+.lede { max-width: 980px; color: var(--muted-foreground); }
+.viz-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 22px 0; }
+.card {
+  background: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+.viz-stat-label { color: var(--muted-foreground); }
+.viz-stat-value { margin-top: 3px; font-size: 1.8rem; line-height: 1.2; font-weight: 500; }
+.viz-stat-context { margin-top: 5px; color: var(--muted-foreground); font-size: .88rem; }
+.section { margin-top: 30px; }
+.section-head { display: flex; gap: 16px; align-items: baseline; justify-content: space-between; flex-wrap: wrap; margin-bottom: 10px; }
+.section-note { color: var(--muted-foreground); font-size: .88rem; }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted-foreground); font-size: .88rem; }
+.legend-item { display: inline-flex; align-items: center; gap: 7px; }
+.legend-mark { width: 12px; height: 12px; display: inline-block; background: var(--viz-series-1); border-radius: 50%; }
+.legend-mark.high { background: var(--viz-series-2); border-radius: 2px; transform: rotate(45deg); }
+.chart-wrap { width: 100%; overflow: hidden; }
+.chart-wrap svg { display: block; width: 100%; height: auto; }
+.chart-grid { stroke: var(--border); stroke-width: 1; }
+.chart-axis { stroke: var(--muted-foreground); stroke-width: 1; }
+.chart-label { fill: var(--foreground); font-size: 13px; }
+.chart-muted { fill: var(--muted-foreground); font-size: 12px; }
+.series-low { fill: var(--viz-series-1); }
+.series-high { fill: var(--viz-series-2); }
+.pair-link { stroke: var(--primary); stroke-width: 2; opacity: .7; }
+.point { cursor: pointer; transition: opacity .16s ease, transform .16s ease; }
+.point:not(.selected) { opacity: .58; }
+.point:hover, .point:focus { opacity: 1; }
+.point.selected { opacity: 1; stroke: var(--foreground); stroke-width: 2.5; }
+.controls { display: flex; align-items: end; gap: 14px; flex-wrap: wrap; margin: 18px 0; }
+.field { display: grid; gap: 5px; min-width: min(100%, 440px); }
+.field label { color: var(--muted-foreground); font-size: .88rem; }
+.field select {
+  width: 100%;
+  padding: 9px 34px 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--card-foreground);
+}
+.pair-meta { color: var(--muted-foreground); font-size: .88rem; }
+.pair-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.company-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 13px; }
+.company-role { color: var(--muted-foreground); font-size: .82rem; }
+.company-name { font-size: 1.08rem; font-weight: 500; }
+.quant-badge { white-space: nowrap; padding: 3px 8px; border-radius: 999px; background: var(--muted); color: var(--foreground); font-size: .82rem; }
+.score-list { display: grid; gap: 8px; margin: 14px 0; }
+.score-row { display: grid; grid-template-columns: 155px minmax(80px, 1fr) 26px; gap: 9px; align-items: center; font-size: .86rem; }
+.score-track { height: 8px; border-radius: 999px; background: var(--muted); overflow: hidden; }
+.score-fill { height: 100%; background: var(--viz-series-1); }
+.company-high .score-fill { background: var(--viz-series-2); }
+.evidence { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.evidence-label { color: var(--muted-foreground); font-size: .82rem; }
+.company-actions { margin-top: 12px; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--card-foreground);
+  text-decoration: none;
+}
+.interpretation { margin-top: 14px; padding: 14px 16px; border-left: 4px solid var(--viz-series-3); background: var(--accent); color: var(--accent-foreground); }
+.method { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.method ul { margin: 8px 0 0; padding-left: 1.25rem; }
+.method li + li { margin-top: 5px; }
+.warning { color: var(--destructive); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+@media (max-width: 820px) {
+  .page { padding: 20px 14px 42px; }
+  .viz-grid, .pair-grid, .method { grid-template-columns: 1fr; }
+  .score-row { grid-template-columns: 130px minmax(70px, 1fr) 24px; }
+  .chart-label { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) { .point { transition: none; } }
+</style>
+</head>
+<body>
+<main class="page" id="analysis-app">
+  <header class="hero">
+    <h1>採択企業40ペア・定性補完要因分析</h1>
+    <p class="lede">同一公募回・同一業種・近い投資規模で、公開定量スコアに差がある採択企業を比較。数値が低い企業に、どのような案件固有の強みがあるかを公開PDFから確認しました。</p>
+  </header>
+
+  <section class="viz-grid" aria-label="主要結果">
+    <div class="card">
+      <div class="viz-stat-label">精査規模</div>
+      <div class="viz-stat-value" id="sample-stat"></div>
+      <div class="viz-stat-context">企業重複なし・1〜4次</div>
+    </div>
+    <div class="card">
+      <div class="viz-stat-label">低定量側・厳格3点が2要因以上</div>
+      <div class="viz-stat-value" id="strict-stat"></div>
+      <div class="viz-stat-context">旧5ペアを除いても26/35件</div>
+    </div>
+    <div class="card">
+      <div class="viz-stat-label">低定量側・能力制約／構造転換</div>
+      <div class="viz-stat-value">各39/40</div>
+      <div class="viz-stat-context">いずれも97.5%</div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="factor-title">
+    <div class="section-head">
+      <div>
+        <h2 id="factor-title">6要因の出現頻度</h2>
+        <p class="section-note">2点以上＝案件固有の根拠あり。両側とも採択企業です。</p>
+      </div>
+      <div class="legend" aria-label="系列凡例">
+        <span class="legend-item"><span class="legend-mark"></span>公開定量スコア低位</span>
+        <span class="legend-item"><span class="legend-mark high"></span>公開定量スコア高位</span>
+      </div>
+    </div>
+    <div class="chart-wrap" id="factor-chart"></div>
+  </section>
+
+  <section class="section" aria-labelledby="scatter-title">
+    <div class="section-head">
+      <div>
+        <h2 id="scatter-title">公開定量スコアと定性6要因合計</h2>
+        <p class="section-note">点を選ぶと同じペアの企業情報を表示します。定性合計は0〜18点。</p>
+      </div>
+      <div class="legend" aria-label="点の凡例">
+        <span class="legend-item"><span class="legend-mark"></span>低位側</span>
+        <span class="legend-item"><span class="legend-mark high"></span>高位側</span>
+      </div>
+    </div>
+    <div class="chart-wrap" id="scatter-chart"></div>
+  </section>
+
+  <section class="section" aria-labelledby="pair-title">
+    <div class="section-head">
+      <div>
+        <h2 id="pair-title">ペア別の根拠</h2>
+        <p class="section-note">6要因の評点、根拠要約、企業別公式PDFを確認できます。</p>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="field">
+        <label for="pair-select">表示するペア</label>
+        <select id="pair-select"></select>
+      </div>
+      <div class="pair-meta" id="pair-meta"></div>
+    </div>
+    <div class="pair-grid" id="pair-detail"></div>
+    <p class="interpretation" id="pair-interpretation"></p>
+  </section>
+
+  <section class="section method" aria-label="読み方と限界">
+    <div>
+      <h2>この結果から言えること</h2>
+      <ul>
+        <li>低定量側でも、能力制約・構造転換を中心に案件固有の強みが確認できました。</li>
+        <li>中央値未満を補うには、一般論ではなく顧客、数量、設備、地域供給網などの証拠が必要です。</li>
+        <li>実行確度は高定量側のほうが強く、用地・認証・実証・資金・立上げ計画が差になり得ます。</li>
+      </ul>
+    </div>
+    <div>
+      <h2>解釈上の限界</h2>
+      <ul>
+        <li class="warning">採択企業同士の比較であり、採択確率や因果効果を推定したものではありません。</li>
+        <li>公開PDFは採択理由書ではなく、審査時資料が編集・要約されている可能性があります。</li>
+        <li>評点は0〜3点の目視符号化。代表8社は公式PDF原画面とも照合しました。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+<script>
+const DATA = {"summary":{"pair_count":40,"company_count":80,"prior_pair_count":5,"new_pair_count":35,"round_counts":{"1次":8,"2次":4,"3次":14,"4次":14},"industry_counts":{"製造業":30,"サービス業_他に分類されないもの":2,"卸売業・小売業":3,"運輸業・郵便業":4,"学術研究・専門・技術サービス業":1},"lower_core_two_or_more_count":40,"lower_core_two_or_more_share":1.0,"lower_core_three_or_more_count":36,"lower_core_three_or_more_share":0.9,"lower_core_score3_two_or_more_count":29,"lower_core_score3_two_or_more_share":0.725,"lower_qualitative_total_higher_count":12,"equal_qualitative_total_count":8,"higher_qualitative_total_higher_count":20,"factor_frequency":{"demand":{"label":"需要根拠の具体性","lower_strong_share":0.7,"higher_strong_share":0.8},"constraint":{"label":"能力制約の明確さ","lower_strong_share":0.975,"higher_strong_share":0.95},"transformation":{"label":"事業・工程の構造転換","lower_strong_share":0.975,"higher_strong_share":0.9},"regional":{"label":"地域供給網・代替困難性","lower_strong_share":0.775,"higher_strong_share":0.7},"execution":{"label":"実行確度","lower_strong_share":0.9,"higher_strong_share":0.95},"strategic":{"label":"政策・戦略分野との整合","lower_strong_share":0.9,"higher_strong_share":1.0}},"interpretation_boundary":"採択企業同士の比較であり、採択確率・因果効果・審査点を推定するものではない"},"factors":[{"key":"demand","label":"需要根拠の具体性","low":0.7,"high":0.8,"low3":0.275,"high3":0.4,"p":0.377},{"key":"constraint","label":"能力制約の明確さ","low":0.975,"high":0.95,"low3":0.7,"high3":0.675,"p":0.607},{"key":"transformation","label":"事業・工程の構造転換","low":0.975,"high":0.9,"low3":0.65,"high3":0.725,"p":1.0},{"key":"regional","label":"地域供給網・代替困難性","low":0.775,"high":0.7,"low3":0.5,"high3":0.375,"p":0.523},{"key":"execution","label":"実行確度","low":0.9,"high":0.95,"low3":0.325,"high3":0.6,"p":0.035},{"key":"strategic","label":"政策・戦略分野との整合","low":0.9,"high":1.0,"low3":0.45,"high3":0.6,"p":0.263}],"pairs":[{"id":"L01","round":"1次","industry":"製造業","interpretation":"低数値側は戦略分野の具体需要と着工準備、高数値側は全社変革と実行確度が強い","confidence":"high","low":{"company":"株式会社くまさんメディクス","quant":0.586,"qual":12,"cost":27.0,"subsidy":8.6,"strong":"需要根拠の具体性 / 能力制約の明確さ / 実行確度 / 政策・戦略分野との整合","evidence":"半導体メーカーの複数年増産要請、AI/HBM向けクリーンルーム、約2万㎡の用地と150人規模工場","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_21.pdf","scores":{"demand":2,"constraint":2,"transformation":1,"regional":1,"execution":3,"strategic":3}},"high":{"company":"テラル株式会社","quant":0.709,"qual":12,"cost":27.0,"subsidy":8.6,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"6倉庫の集約、工場・R&D・ERPの一体整備、用地契約済み","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_38.pdf","scores":{"demand":1,"constraint":2,"transformation":3,"regional":1,"execution":3,"strategic":2}}},{"id":"L02","round":"1次","industry":"製造業","interpretation":"高数値側は需要・制約・変革・実行が一貫し、採択案件の典型的な強い物語","confidence":"high","low":{"company":"BBSジャパン株式会社","quant":0.518,"qual":12,"cost":48.0,"subsidy":16.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度","evidence":"海外・高級車向け鍛造ホイール需要、能力1.2～1.5倍、富山の生産集積","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_22.pdf","scores":{"demand":2,"constraint":3,"transformation":2,"regional":2,"execution":2,"strategic":1}},"high":{"company":"菅野包装資材株式会社","quant":0.606,"qual":17,"cost":48.0,"subsidy":16.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"OEM増産要請と引合い、既存9ラインの能力限界、GX型工程転換、用地・FSSC","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_138.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":2,"execution":3,"strategic":3}}},{"id":"L03","round":"1次","industry":"製造業","interpretation":"低数値側でも顧客需要と政策的重要性が明確なら採択され得る反例","confidence":"high","low":{"company":"広陵化学工業株式会社","quant":0.301,"qual":15,"cost":17.0,"subsidy":5.3,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"医療向け受注増、国産オリジナル医療機器、国内供給と経済安全保障","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_28.pdf","scores":{"demand":3,"constraint":2,"transformation":3,"regional":2,"execution":2,"strategic":3}},"high":{"company":"株式会社スギノマシン","quant":0.604,"qual":10,"cost":17.0,"subsidy":5.6,"strong":"事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"ERP・PLMによるデータ駆動経営、半導体・航空宇宙への展開","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_155.pdf","scores":{"demand":1,"constraint":1,"transformation":3,"regional":1,"execution":2,"strategic":2}}},{"id":"L04","round":"1次","industry":"製造業","interpretation":"高数値側は実名顧客に近い需要と取得済み用地、低側は能力制約が補完","confidence":"high","low":{"company":"大峰堂薬品工業株式会社","quant":0.45,"qual":11,"cost":113.0,"subsidy":36.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 政策・戦略分野との整合","evidence":"漢方OEMの能力逼迫、需要増に対する自動化投資","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_11.pdf","scores":{"demand":2,"constraint":3,"transformation":2,"regional":1,"execution":1,"strategic":2}},"high":{"company":"トーカロ株式会社","quant":0.634,"qual":13,"cost":112.0,"subsidy":34.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 実行確度 / 政策・戦略分野との整合","evidence":"主要半導体装置メーカーの需要、隣接用地取得、新工場・R&D整備","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_87.pdf","scores":{"demand":3,"constraint":2,"transformation":1,"regional":1,"execution":3,"strategic":3}}},{"id":"L05","round":"1次","industry":"製造業","interpretation":"両社とも構造転換と実行確度が強く、数値差だけで案件品質を説明できない","confidence":"high","low":{"company":"小林酒造株式会社","quant":0.37,"qual":13,"cost":12.6,"subsidy":4.2,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度","evidence":"国産ウイスキー・輸出・観光の複合化、用地取得、地域原料調達","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_130.pdf","scores":{"demand":1,"constraint":2,"transformation":3,"regional":3,"execution":3,"strategic":1}},"high":{"company":"株式会社ミラプロ","quant":0.652,"qual":13,"cost":13.0,"subsidy":4.4,"strong":"需要根拠の具体性 / 事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"PLM/SCM/ERP導入、半導体上位顧客、製造から設計・サービスへの転換","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_108.pdf","scores":{"demand":2,"constraint":1,"transformation":3,"regional":1,"execution":3,"strategic":3}}},{"id":"L06","round":"1次","industry":"サービス業_他に分類されないもの","interpretation":"非製造業では地域インフラ性とサービス統合が弱い公開数値を補う","confidence":"high","low":{"company":"株式会社ダイセイ","quant":0.366,"qual":13,"cost":12.0,"subsidy":4.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性","evidence":"物流サービス統合、倉庫・人手制約、災害対応を含む地域物流基盤","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_156.pdf","scores":{"demand":2,"constraint":3,"transformation":3,"regional":3,"execution":1,"strategic":1}},"high":{"company":"株式会社ただおザウルス","quant":0.554,"qual":16,"cost":15.0,"subsidy":4.7,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"素材メーカーとの連携・受入要請、資源循環施設、地域の代替困難性","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_128.pdf","scores":{"demand":3,"constraint":2,"transformation":3,"regional":3,"execution":2,"strategic":3}}},{"id":"L07","round":"1次","industry":"卸売業・小売業","interpretation":"低側は明確な能力制約、高側は顧客要請と循環政策への整合が優位","confidence":"high","low":{"company":"株式会社ユニワールド","quant":0.438,"qual":13,"cost":17.0,"subsidy":5.7,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度","evidence":"物流能力の限界、保管能力2倍、地域雇用の維持","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_127.pdf","scores":{"demand":2,"constraint":3,"transformation":2,"regional":3,"execution":2,"strategic":1}},"high":{"company":"株式会社浜屋","quant":0.58,"qual":13,"cost":15.0,"subsidy":4.3,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 政策・戦略分野との整合","evidence":"事業提携先からの要請、リユース・資源循環需要","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_129.pdf","scores":{"demand":3,"constraint":2,"transformation":2,"regional":2,"execution":1,"strategic":3}}},{"id":"L08","round":"1次","industry":"運輸業・郵便業","interpretation":"高数値側は顧客基盤・能力制約・事業モデル転換が一本の因果でつながる","confidence":"high","low":{"company":"信光陸運株式会社","quant":0.398,"qual":12,"cost":22.0,"subsidy":7.3,"strong":"需要根拠の具体性 / 事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"食品保管への転換、アサヒロジとの連携、場所・工期を明示","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_162.pdf","scores":{"demand":2,"constraint":1,"transformation":3,"regional":1,"execution":3,"strategic":2}},"high":{"company":"株式会社シーエル","quant":0.575,"qual":16,"cost":21.0,"subsidy":6.3,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"150社の荷主、増加する需要、センター不足、運送から3PLへの転換","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_106.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":2,"execution":3,"strategic":2}}},{"id":"L09","round":"2次","industry":"製造業","interpretation":"低側でも代替困難な地域供給と定量的能力増強が強い採択根拠になる","confidence":"high","low":{"company":"上山製紙株式会社","quant":0.326,"qual":14,"cost":30.0,"subsidy":9.9,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"能力330トン×3から1800トン、地域に同業不在、災害時供給","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__206.pdf","scores":{"demand":1,"constraint":3,"transformation":3,"regional":3,"execution":2,"strategic":2}},"high":{"company":"ヤマシンスチール株式会社","quant":0.537,"qual":17,"cost":29.7,"subsidy":8.3,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"国内シェア70%、顧客増産要請、月880から1260トン、設備を特定","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__205.pdf","scores":{"demand":3,"constraint":3,"transformation":2,"regional":3,"execution":3,"strategic":3}}},{"id":"L10","round":"2次","industry":"製造業","interpretation":"両社とも能力制約と実行確度が強く、低側は国内回帰と地域性で補完","confidence":"high","low":{"company":"株式会社ティー・シー・ピー","quant":0.434,"qual":16,"cost":21.756,"subsidy":7.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"国内回帰・知財、リードタイムと検査制約、工場・設備を具体化","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__199.pdf","scores":{"demand":2,"constraint":3,"transformation":3,"regional":3,"execution":3,"strategic":2}},"high":{"company":"メック株式会社","quant":0.601,"qual":14,"cost":23.0,"subsidy":5.5,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"能力40%増、クリーンルームとパイロット、半導体技術","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__204.pdf","scores":{"demand":2,"constraint":3,"transformation":2,"regional":1,"execution":3,"strategic":3}}},{"id":"L11","round":"2次","industry":"製造業","interpretation":"公開数値が大きくても公開文章の質が必ず高いわけではない対照例","confidence":"medium","low":{"company":"ZACROS株式会社","quant":0.495,"qual":9,"cost":129.0,"subsidy":41.0,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 政策・戦略分野との整合","evidence":"3m幅塗工と能力1.3倍、ポートフォリオ転換だが顧客需要は一般論","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__194.pdf","scores":{"demand":1,"constraint":3,"transformation":2,"regional":0,"execution":1,"strategic":2}},"high":{"company":"池田糖化工業株式会社","quant":0.766,"qual":9,"cost":161.913,"subsidy":50.0,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 政策・戦略分野との整合","evidence":"新商品・海外展開と高付加価値化だが需要・実行の具体性は限定的","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__192.pdf","scores":{"demand":1,"constraint":2,"transformation":3,"regional":0,"execution":1,"strategic":2}}},{"id":"L12","round":"2次","industry":"製造業","interpretation":"低側は特定取引先内の重要性と供給網、高側は独自技術と実行設計","confidence":"high","low":{"company":"株式会社八立製作所","quant":0.216,"qual":12,"cost":13.4,"subsidy":4.2,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 政策・戦略分野との整合","evidence":"顧客ニーズ、小松大阪向けブラケット80%シェア、国内供給網","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__196.pdf","scores":{"demand":2,"constraint":2,"transformation":2,"regional":3,"execution":1,"strategic":2}},"high":{"company":"株式会社イズミテクノ","quant":0.382,"qual":14,"cost":17.0,"subsidy":5.3,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"独自の粒子制御コーティング、全自動ライン、半導体用途","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__200.pdf","scores":{"demand":2,"constraint":2,"transformation":3,"regional":1,"execution":3,"strategic":3}}},{"id":"L13","round":"3次","industry":"製造業","interpretation":"低数値側の方が需要根拠と変革性が強く、数値順位と文章品質が逆転","confidence":"high","low":{"company":"都吹株式会社","quant":0.414,"qual":16,"cost":32.0,"subsidy":10.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"既存顧客の引合い、能力限界、冷凍豆腐輸出、地元大豆・港湾・雇用","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_140.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":3,"execution":2,"strategic":2}},"high":{"company":"株式会社ファーストダウン","quant":0.586,"qual":12,"cost":31.0,"subsidy":10.0,"strong":"能力制約の明確さ / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"日産40万から60万パック、11人から1人、163人雇用、農業供給網","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_209.pdf","scores":{"demand":1,"constraint":3,"transformation":1,"regional":3,"execution":2,"strategic":2}}},{"id":"L14","round":"3次","industry":"製造業","interpretation":"低側は実名顧客、高側は実証・政策戦略性で異なる採択ロジック","confidence":"high","low":{"company":"中本Fine Pack株式会社","quant":0.467,"qual":15,"cost":35.0,"subsidy":9.7,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"エフピコの要請、PET循環、素材から製品までの一貫化","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_216.pdf","scores":{"demand":3,"constraint":2,"transformation":3,"regional":2,"execution":2,"strategic":3}},"high":{"company":"株式会社PXP","quant":0.718,"qual":15,"cost":37.0,"subsidy":9.6,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"実証済み、25MW工場、次世代CIGSとエネルギー安全保障","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_186.pdf","scores":{"demand":1,"constraint":3,"transformation":3,"regional":2,"execution":3,"strategic":3}}},{"id":"L15","round":"3次","industry":"製造業","interpretation":"高側は将来需要と能力不足の時点・数量が明確、低側は省人化と地域性","confidence":"high","low":{"company":"株式会社英楽","quant":0.287,"qual":15,"cost":19.0,"subsidy":6.3,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"IQF導入、人手不足、AIウォーターカッター、食品産地の雇用","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_40.pdf","scores":{"demand":2,"constraint":3,"transformation":3,"regional":3,"execution":2,"strategic":2}},"high":{"company":"モルツウェル株式会社","quant":0.658,"qual":16,"cost":18.0,"subsidy":5.9,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"受注増加、2027年の能力不足、3万から7万食、用地取得","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_88.pdf","scores":{"demand":3,"constraint":3,"transformation":2,"regional":3,"execution":3,"strategic":2}}},{"id":"L16","round":"3次","industry":"製造業","interpretation":"医薬・半導体など政策的重要分野では供給制約の解消自体が強い","confidence":"high","low":{"company":"東亜薬品株式会社","quant":0.501,"qual":13,"cost":190.0,"subsidy":46.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"医薬品不足・規制対応、保管ボトルネック、新製剤棟","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_81.pdf","scores":{"demand":2,"constraint":3,"transformation":2,"regional":1,"execution":2,"strategic":3}},"high":{"company":"日本エア・リキード合同会社","quant":0.767,"qual":12,"cost":203.0,"subsidy":50.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"大規模ガス供給能力、半導体供給と経済安全保障","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_234.pdf","scores":{"demand":2,"constraint":2,"transformation":1,"regional":2,"execution":2,"strategic":3}}},{"id":"L17","round":"3次","industry":"製造業","interpretation":"低側はバリューチェーン転換、高側は能力制約と地域供給網が明確","confidence":"high","low":{"company":"ハビックス株式会社","quant":0.423,"qual":13,"cost":36.0,"subsidy":9.8,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"素材から衛生用品・OEMへの展開、戦略提携","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_65.pdf","scores":{"demand":1,"constraint":2,"transformation":3,"regional":2,"execution":2,"strategic":3}},"high":{"company":"キングパーツ株式会社","quant":0.518,"qual":15,"cost":34.0,"subsidy":11.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"工場制約、能力2倍、国内生産と経済安全保障","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_212.pdf","scores":{"demand":2,"constraint":3,"transformation":2,"regional":3,"execution":2,"strategic":3}}},{"id":"L18","round":"3次","industry":"製造業","interpretation":"低側は外注制約と供給網の脆弱性を事業変革に結び付けている","confidence":"high","low":{"company":"大和鋼業株式会社","quant":0.408,"qual":14,"cost":39.0,"subsidy":12.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"20%外注の内製化、供給業者の事業承継問題","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_23.pdf","scores":{"demand":2,"constraint":3,"transformation":3,"regional":2,"execution":2,"strategic":2}},"high":{"company":"株式会社ファイン","quant":0.501,"qual":12,"cost":36.0,"subsidy":11.0,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"医療食・OTCの海外展開、ジェネリック医薬品","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_197.pdf","scores":{"demand":1,"constraint":2,"transformation":3,"regional":1,"execution":2,"strategic":3}}},{"id":"L19","round":"3次","industry":"製造業","interpretation":"高側は需要・制約・能力増分・海外展開を定量化した完成度の高い案件","confidence":"high","low":{"company":"中央製乳株式会社","quant":0.418,"qual":13,"cost":66.0,"subsidy":15.0,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"能力・設備老朽化、新しいチルドカップ、地域酪農供給網","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_42.pdf","scores":{"demand":1,"constraint":3,"transformation":2,"regional":3,"execution":2,"strategic":2}},"high":{"company":"至誠堂製薬株式会社","quant":0.583,"qual":17,"cost":58.0,"subsidy":16.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"大手製薬の引合い、能力限界、バッチ2～4倍・能力10倍、15か国","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_71.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":2,"execution":3,"strategic":3}}},{"id":"L20","round":"3次","industry":"製造業","interpretation":"低数値側でも受注残と顧客要請を具体化できれば非常に強い","confidence":"high","low":{"company":"株式会社キド","quant":0.39,"qual":16,"cost":26.0,"subsidy":5.7,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"5～6年先までの受注、増産要請、リードタイム4分の1、戦略タンク","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_83.pdf","scores":{"demand":3,"constraint":3,"transformation":2,"regional":3,"execution":2,"strategic":3}},"high":{"company":"株式会社 八天堂","quant":0.529,"qual":16,"cost":26.0,"subsidy":8.3,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"日産7万個の限界、OEM・賞味期限延長、FSSC、地域コンソーシアム","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_214.pdf","scores":{"demand":2,"constraint":3,"transformation":3,"regional":3,"execution":3,"strategic":2}}},{"id":"L21","round":"3次","industry":"製造業","interpretation":"低側は複数顧客要請、高側はアンカー企業投資との地域連動が強い","confidence":"high","low":{"company":"株式会社ライト製作所","quant":0.367,"qual":16,"cost":66.0,"subsidy":16.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"複数医療機器メーカーからの要請、能力2倍、2工場体制","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_27.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":2,"execution":2,"strategic":3}},"high":{"company":"東亜工業株式会社","quant":0.731,"qual":15,"cost":57.0,"subsidy":19.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"SUBARU・BEVライン、1230億円投資との連動、地域自動車集積","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_93.pdf","scores":{"demand":2,"constraint":2,"transformation":2,"regional":3,"execution":3,"strategic":3}}},{"id":"L22","round":"3次","industry":"製造業","interpretation":"低側は市場地位・地域供給・実行設計がそろい、数値差を補完","confidence":"high","low":{"company":"北海道乳業株式会社","quant":0.623,"qual":17,"cost":97.0,"subsidy":29.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"用地・能力限界、ヨーグルト国内シェア30%、酪農供給網、AI・ロボット","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_89.pdf","scores":{"demand":2,"constraint":3,"transformation":3,"regional":3,"execution":3,"strategic":3}},"high":{"company":"味覚糖株式会社","quant":0.725,"qual":13,"cost":117.0,"subsidy":39.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"189億円規模の能力増、工程ボトルネック、米国輸出","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_22.pdf","scores":{"demand":2,"constraint":3,"transformation":3,"regional":1,"execution":2,"strategic":2}}},{"id":"L23","round":"3次","industry":"製造業","interpretation":"両社とも需要は具体的だが、実行準備と独自資産が差別化要素","confidence":"high","low":{"company":"株式会社田中食品興業所","quant":0.405,"qual":12,"cost":20.0,"subsidy":6.6,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"大手製パン会社、海外向けフィリング、多品種自動化","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_45.pdf","scores":{"demand":2,"constraint":2,"transformation":3,"regional":1,"execution":2,"strategic":2}},"high":{"company":"株式会社トッカコーポレーション","quant":0.574,"qual":14,"cost":17.0,"subsidy":5.5,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"包装外注化需要、専門包装、ISO・特許・人材育成","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_60.pdf","scores":{"demand":2,"constraint":2,"transformation":3,"regional":2,"execution":3,"strategic":2}}},{"id":"L24","round":"3次","industry":"製造業","interpretation":"低数値側は増産要請と能力増分の明示で、数値劣後を説明可能","confidence":"high","low":{"company":"長野牛乳株式会社","quant":0.414,"qual":15,"cost":89.0,"subsidy":22.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"増産要請、能力2倍超、2から4ライン、地域酪農供給網","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_87.pdf","scores":{"demand":3,"constraint":3,"transformation":2,"regional":3,"execution":2,"strategic":2}},"high":{"company":"栄屋乳業株式会社","quant":0.75,"qual":14,"cost":61.0,"subsidy":20.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"既存工場がフル稼働、輸出向け冷凍品、新工場","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_173.pdf","scores":{"demand":2,"constraint":3,"transformation":3,"regional":2,"execution":2,"strategic":2}}},{"id":"L25","round":"3次","industry":"サービス業_他に分類されないもの","interpretation":"高側は顧客・地域・政策・実行の全要素が強いが、低側も循環制約が明確","confidence":"high","low":{"company":"株式会社フォース","quant":0.444,"qual":14,"cost":36.0,"subsidy":7.3,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"再生砂の処理制約、完全3R、設備計画を具体化","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_96.pdf","scores":{"demand":1,"constraint":3,"transformation":3,"regional":1,"execution":3,"strategic":3}},"high":{"company":"有価物回収協業組合　石坂グループ","quant":0.604,"qual":18,"cost":42.0,"subsidy":12.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"自治体・TSMC需要、AI選別、災害・廃棄物対応","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_90.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":3,"execution":3,"strategic":3}}},{"id":"L26","round":"3次","industry":"運輸業・郵便業","interpretation":"物流案件では地域供給網と能力制約が採択物語の中心","confidence":"high","low":{"company":"Ｌ物流株式会社","quant":0.514,"qual":14,"cost":46.0,"subsidy":14.0,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"4サービス統合、地域コールドチェーン、用地・設備・特許","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_85.pdf","scores":{"demand":1,"constraint":2,"transformation":3,"regional":3,"execution":3,"strategic":2}},"high":{"company":"日生流通運輸倉庫株式会社","quant":0.661,"qual":15,"cost":81.0,"subsidy":17.0,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"冷蔵保管率100%超、食品供給プラットフォーム、24バース","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_17.pdf","scores":{"demand":2,"constraint":3,"transformation":3,"regional":3,"execution":2,"strategic":2}}},{"id":"L27","round":"4次","industry":"製造業","interpretation":"高側は実名受注・統合・ODM化がそろう代表例、低側は規制需要で補う","confidence":"high","low":{"company":"フクビ岡山株式会社","quant":0.381,"qual":14,"cost":36.52,"subsidy":9.0,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"断熱規制需要、能力限界、投資額・ラインを具体化","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_192.pdf","scores":{"demand":1,"constraint":3,"transformation":2,"regional":2,"execution":3,"strategic":3}},"high":{"company":"株式会社キィポーション","quant":0.642,"qual":18,"cost":37.0,"subsidy":9.1,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"実名A/B/C社の受注、5工場統合、ODM化、FSSC、自治体・雇用","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_127.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":3,"execution":3,"strategic":3}}},{"id":"L28","round":"4次","industry":"製造業","interpretation":"高側は複数の具体顧客と地域必需性、低側は戦略需要と能力制約","confidence":"high","low":{"company":"NICHIRO株式会社","quant":0.527,"qual":14,"cost":33.0,"subsidy":11.0,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"能力200%、一貫ライン、AIデータセンター用途","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_208.pdf","scores":{"demand":1,"constraint":3,"transformation":3,"regional":2,"execution":2,"strategic":3}},"high":{"company":"株式会社 日本橋冷凍手島商店","quant":0.636,"qual":18,"cost":34.35,"subsidy":11.17,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"航空会社・小売需要、製氷不足、輸出、生活インフラとしての氷","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_222.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":3,"execution":3,"strategic":3}}},{"id":"L29","round":"4次","industry":"製造業","interpretation":"低側は事業モデル転換と地域、高側は戦略資源循環が採択根拠","confidence":"high","low":{"company":"リバードコーポレーション株式会社","quant":0.334,"qual":14,"cost":59.18,"subsidy":18.6,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"垂直統合D2Cペットフード、能力ボトルネック、地域雇用","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_194.pdf","scores":{"demand":1,"constraint":3,"transformation":3,"regional":3,"execution":2,"strategic":2}},"high":{"company":"アサヒプリテック株式会社","quant":0.529,"qual":15,"cost":61.67,"subsidy":19.11,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"貴金属リサイクル、新元素、半導体・水素、資源安全保障","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_211.pdf","scores":{"demand":2,"constraint":3,"transformation":3,"regional":2,"execution":2,"strategic":3}}},{"id":"L30","round":"4次","industry":"製造業","interpretation":"高側は受注と共同開発、低側は能力制約と市場転換で補完","confidence":"high","low":{"company":"株式会社コスモス食品","quant":0.327,"qual":13,"cost":16.84,"subsidy":3.92,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"フリーズドライ能力40%増、即食・海外、認証","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_115.pdf","scores":{"demand":1,"constraint":3,"transformation":3,"regional":2,"execution":2,"strategic":2}},"high":{"company":"株式会社群馬コイケ","quant":0.548,"qual":16,"cost":16.12,"subsidy":4.03,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"受注加速、造船会社との共同開発、輸出、設備計画","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_119.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":1,"execution":3,"strategic":3}}},{"id":"L31","round":"4次","industry":"製造業","interpretation":"両社とも能力制約・構造転換・地域・実行・政策性が強く、需要表現だけ差","confidence":"high","low":{"company":"日本海精錬株式会社","quant":0.355,"qual":16,"cost":15.15,"subsidy":4.99,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"鉛処理120から250トン/日、PPリサイクル、再投資8000万円、地域循環","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_226.pdf","scores":{"demand":1,"constraint":3,"transformation":3,"regional":3,"execution":3,"strategic":3}},"high":{"company":"株式会社トノックス","quant":0.487,"qual":17,"cost":16.41,"subsidy":4.73,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"工場フル稼働、用地取得、自社ブランドEV・自動運転・特装車","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_227.pdf","scores":{"demand":2,"constraint":3,"transformation":3,"regional":3,"execution":3,"strategic":3}}},{"id":"L32","round":"4次","industry":"製造業","interpretation":"低数値側の方が複数の質的要因で強く、公開数値だけの評価限界を示す","confidence":"high","low":{"company":"株式会社サン海苔","quant":0.174,"qual":17,"cost":13.88,"subsidy":4.26,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"生産者発祥企業、能力不足、HACCP、輸出、地域海苔供給網","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_149.pdf","scores":{"demand":2,"constraint":3,"transformation":3,"regional":3,"execution":3,"strategic":3}},"high":{"company":"丹羽鋳造株式会社","quant":0.387,"qual":10,"cost":13.0,"subsidy":3.72,"strong":"能力制約の明確さ / 実行確度 / 政策・戦略分野との整合","evidence":"物流ボトルネックと将来自動化","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_148.pdf","scores":{"demand":1,"constraint":3,"transformation":1,"regional":1,"execution":2,"strategic":2}}},{"id":"L33","round":"4次","industry":"製造業","interpretation":"両社とも具体需要と能力制約が明確、実行資産が採択を支える","confidence":"high","low":{"company":"能勢酒造株式会社","quant":0.358,"qual":17,"cost":18.85,"subsidy":5.07,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"良品計画を実名提示、能力2.2倍、リターナブル瓶、ISO","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_206.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":3,"execution":3,"strategic":2}},"high":{"company":"株式会社山本製作所","quant":0.612,"qual":17,"cost":19.62,"subsidy":6.4,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"内製率98%、世界向け産業洗浄、能力限界、地域ものづくり","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_225.pdf","scores":{"demand":2,"constraint":3,"transformation":3,"regional":3,"execution":3,"strategic":3}}},{"id":"L34","round":"4次","industry":"製造業","interpretation":"高側は顧客要請を内製化・設計機能へつなぎ、効果を定量化","confidence":"high","low":{"company":"セーレンアドバンストマテリアルズ株式会社","quant":0.456,"qual":14,"cost":43.53,"subsidy":14.11,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"顧客との共同R&D、工場フル稼働、AI・EV・LiDAR用途","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_146.pdf","scores":{"demand":3,"constraint":3,"transformation":2,"regional":1,"execution":2,"strategic":3}},"high":{"company":"三恵株式会社","quant":0.588,"qual":17,"cost":47.64,"subsidy":11.7,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"顧客増産要請、内製化で15%原価減、FSS・OEM設計、設備具体化","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_162.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":2,"execution":3,"strategic":3}}},{"id":"L35","round":"4次","industry":"製造業","interpretation":"高側は制約から統合投資への因果が明確、低側は顧客要請と政策性","confidence":"high","low":{"company":"杉プラスチック工業株式会社","quant":0.317,"qual":13,"cost":20.0,"subsidy":4.9,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"顧客の増産要請、自動化、資源循環","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_122.pdf","scores":{"demand":2,"constraint":2,"transformation":2,"regional":2,"execution":2,"strategic":3}},"high":{"company":"株式会社シー・エス・ケイ","quant":0.659,"qual":17,"cost":17.69,"subsidy":5.9,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"工場能力限界、集約・自動化、インフラ・再エネ用途","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_144.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":2,"execution":3,"strategic":3}}},{"id":"L36","round":"4次","industry":"卸売業・小売業","interpretation":"両社とも実名顧客と事業変革が強く、低側は能力増と実行設計で補う","confidence":"high","low":{"company":"株式会社カネヒロ","quant":0.357,"qual":17,"cost":12.43,"subsidy":3.09,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"未充足の引合い、能力2倍・内製化、TSMC地域、上流設計参入","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_167.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":2,"execution":3,"strategic":3}},"high":{"company":"株式会社アダチ","quant":0.459,"qual":15,"cost":17.36,"subsidy":4.09,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"実名スーパー、受注・新規商談、物流から提案型サービスへの転換","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_113.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":2,"execution":2,"strategic":2}}},{"id":"L37","round":"4次","industry":"卸売業・小売業","interpretation":"低側は業態転換と実証、高側は物流制約と地域代替困難性","confidence":"high","low":{"company":"株式会社コハラ","quant":0.396,"qual":16,"cost":16.18,"subsidy":4.88,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"機械商社からロボットSIerへ、デモラボ、地域DX、実証","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_132.pdf","scores":{"demand":2,"constraint":2,"transformation":3,"regional":3,"execution":3,"strategic":3}},"high":{"company":"ナカネ新建材株式会社","quant":0.525,"qual":14,"cost":22.68,"subsidy":7.09,"strong":"能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"倉庫ボトルネック、3PL参入、地域建材物流","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_174.pdf","scores":{"demand":1,"constraint":3,"transformation":3,"regional":3,"execution":2,"strategic":2}}},{"id":"L38","round":"4次","industry":"学術研究・専門・技術サービス業","interpretation":"低側は顧客名と待機期間、高側は統合・認証・知財で実行確度を補強","confidence":"high","low":{"company":"ハムリー株式会社","quant":0.494,"qual":14,"cost":23.67,"subsidy":7.29,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"実名製薬・国立研究機関、6～12か月待ち、非臨床試験能力","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_201.pdf","scores":{"demand":3,"constraint":3,"transformation":2,"regional":1,"execution":2,"strategic":3}},"high":{"company":"アルフレッド株式会社","quant":0.674,"qual":15,"cost":16.35,"subsidy":5.16,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 実行確度 / 政策・戦略分野との整合","evidence":"2ラボ集約、用地候補、ISO・特許、インド展開","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_154.pdf","scores":{"demand":2,"constraint":3,"transformation":3,"regional":1,"execution":3,"strategic":3}}},{"id":"L39","round":"4次","industry":"運輸業・郵便業","interpretation":"低側は地域の代替困難性、高側はアンカー企業要請が中心","confidence":"high","low":{"company":"上野ロジケム株式会社","quant":0.508,"qual":14,"cost":35.41,"subsidy":9.43,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"危険物業務の外部化需要、ワンストップ化、地域で限定的なインフラ","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_156.pdf","scores":{"demand":2,"constraint":2,"transformation":3,"regional":3,"execution":2,"strategic":2}},"high":{"company":"有限会社ワンプラスワン","quant":0.59,"qual":14,"cost":38.31,"subsidy":11.12,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"トヨタ調達物流の要請、自動車集積向けサービス","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_200.pdf","scores":{"demand":3,"constraint":2,"transformation":3,"regional":2,"execution":2,"strategic":2}}},{"id":"L40","round":"4次","industry":"運輸業・郵便業","interpretation":"低側は複数顧客要請と3PL転換、高側は港湾インフラと提携で採択説明","confidence":"high","low":{"company":"株式会社新潟食品運輸","quant":0.595,"qual":16,"cost":31.09,"subsidy":10.15,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"複数顧客から保管拡張要請、能力限界、地域食品3PL","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_166.pdf","scores":{"demand":3,"constraint":3,"transformation":3,"regional":3,"execution":2,"strategic":2}},"high":{"company":"吉田海運ロジソリューションズ株式会社","quant":0.692,"qual":15,"cost":22.84,"subsidy":7.61,"strong":"需要根拠の具体性 / 能力制約の明確さ / 事業・工程の構造転換 / 地域供給網・代替困難性 / 実行確度 / 政策・戦略分野との整合","evidence":"港湾コールドチェーン、配車8倍、JR九州との連携","pdf":"https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_189.pdf","scores":{"demand":2,"constraint":3,"transformation":2,"regional":3,"execution":3,"strategic":2}}}]};
+const FACTOR_LABELS = {
+  demand: "需要根拠の具体性",
+  constraint: "能力制約の明確さ",
+  transformation: "事業・工程の構造転換",
+  regional: "地域供給網・代替困難性",
+  execution: "実行確度",
+  strategic: "政策・戦略分野との整合"
+};
+const app = document.getElementById("analysis-app");
+const pairSelect = document.getElementById("pair-select");
+let selectedPairId = DATA.pairs[0].id;
+
+const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;"
+})[char]);
+const fmtPct = (value) => `${(value * 100).toFixed(1)}%`;
+const fmtNum = (value, digits = 2) => value == null ? "—" : Number(value).toLocaleString("ja-JP", { maximumFractionDigits: digits });
+const svgEl = (tag, attrs = {}) => {
+  const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value));
+  return node;
+};
+
+function renderStats() {
+  document.getElementById("sample-stat").textContent = `${DATA.summary.pair_count}ペア・${DATA.summary.company_count}社`;
+  document.getElementById("strict-stat").textContent = `${DATA.summary.lower_core_score3_two_or_more_count}/40`;
+}
+
+function renderFactorChart() {
+  const compact = window.innerWidth < 620;
+  const width = compact ? 390 : 1120;
+  const height = compact ? 372 : 356;
+  const left = compact ? 118 : 238;
+  const right = compact ? 66 : 72;
+  const top = compact ? 28 : 30;
+  const rowH = compact ? 52 : 48;
+  const plotW = width - left - right;
+  const mobileLabels = {
+    demand: "需要根拠", constraint: "能力制約", transformation: "構造転換",
+    regional: "地域代替性", execution: "実行確度", strategic: "政策整合"
+  };
+  const svg = svgEl("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-labelledby": "factor-svg-title factor-svg-desc" });
+  const title = svgEl("title", { id: "factor-svg-title" });
+  title.textContent = "低定量側と高定量側の定性要因出現頻度";
+  const desc = svgEl("desc", { id: "factor-svg-desc" });
+  desc.textContent = "能力制約と構造転換は低定量側でも97.5%。需要根拠は70%、地域性は77.5%。";
+  svg.append(title, desc);
+  (compact ? [0, .5, 1] : [0, .25, .5, .75, 1]).forEach((tick) => {
+    const x = left + tick * plotW;
+    svg.appendChild(svgEl("line", { x1: x, y1: top, x2: x, y2: height - 28, class: "chart-grid" }));
+    const label = svgEl("text", { x, y: height - 8, "text-anchor": "middle", class: "chart-muted" });
+    label.textContent = `${tick * 100}%`;
+    svg.appendChild(label);
+  });
+  DATA.factors.forEach((factor, index) => {
+    const y = top + index * rowH + 8;
+    const label = svgEl("text", { x: left - 14, y: y + 15, "text-anchor": "end", class: "chart-label" });
+    label.textContent = compact ? mobileLabels[factor.key] : factor.label;
+    svg.appendChild(label);
+    const lowW = factor.low * plotW;
+    const highW = factor.high * plotW;
+    svg.appendChild(svgEl("rect", { x: left, y, width: lowW, height: 14, rx: 3, class: "series-low" }));
+    svg.appendChild(svgEl("rect", { x: left, y: y + 18, width: highW, height: 14, rx: 3, class: "series-high" }));
+    const lowText = svgEl("text", compact
+      ? { x: width - 4, y: y + 11, "text-anchor": "end", class: "chart-label" }
+      : { x: Math.min(left + lowW + 8, width - 34), y: y + 11, class: "chart-label" });
+    lowText.textContent = fmtPct(factor.low);
+    const highText = svgEl("text", compact
+      ? { x: width - 4, y: y + 29, "text-anchor": "end", class: "chart-label" }
+      : { x: Math.min(left + highW + 8, width - 34), y: y + 29, class: "chart-label" });
+    highText.textContent = fmtPct(factor.high);
+    svg.append(lowText, highText);
+  });
+  const wrap = document.getElementById("factor-chart");
+  wrap.replaceChildren(svg);
+}
+
+function pointData() {
+  return DATA.pairs.flatMap((pair) => [
+    { pairId: pair.id, side: "low", company: pair.low.company, x: pair.low.quant, y: pair.low.qual },
+    { pairId: pair.id, side: "high", company: pair.high.company, x: pair.high.quant, y: pair.high.qual }
+  ]);
+}
+
+function renderScatter() {
+  const compact = window.innerWidth < 620;
+  const width = compact ? 390 : 1120;
+  const height = compact ? 382 : 472;
+  const left = compact ? 46 : 72;
+  const right = compact ? 12 : 34;
+  const top = compact ? 18 : 24;
+  const bottom = compact ? 58 : 68;
+  const plotW = width - left - right, plotH = height - top - bottom;
+  const points = pointData();
+  const xs = points.map((d) => d.x);
+  const xMin = Math.max(0, Math.floor((Math.min(...xs) - .03) * 10) / 10);
+  const xMax = Math.min(1, Math.ceil((Math.max(...xs) + .03) * 10) / 10);
+  const sx = (v) => left + (v - xMin) / (xMax - xMin) * plotW;
+  const sy = (v) => top + (18 - v) / 18 * plotH;
+  const svg = svgEl("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-labelledby": "scatter-svg-title scatter-svg-desc" });
+  const title = svgEl("title", { id: "scatter-svg-title" });
+  title.textContent = "企業別の公開定量スコアと定性6要因合計";
+  const desc = svgEl("desc", { id: "scatter-svg-desc" });
+  desc.textContent = "80社を低定量側の円と高定量側のひし形で表示。選択したペアを線で結ぶ。";
+  svg.append(title, desc);
+  for (let y = 0; y <= 18; y += compact ? 6 : 3) {
+    const py = sy(y);
+    svg.appendChild(svgEl("line", { x1: left, y1: py, x2: width - right, y2: py, class: "chart-grid" }));
+    const label = svgEl("text", { x: left - 12, y: py + 4, "text-anchor": "end", class: "chart-muted" });
+    label.textContent = y;
+    svg.appendChild(label);
+  }
+  const xStep = compact ? .2 : .1;
+  for (let x = Math.ceil(xMin / xStep) * xStep; x <= xMax + .001; x += xStep) {
+    const px = sx(x);
+    svg.appendChild(svgEl("line", { x1: px, y1: top, x2: px, y2: height - bottom, class: "chart-grid" }));
+    const label = svgEl("text", { x: px, y: height - bottom + 24, "text-anchor": "middle", class: "chart-muted" });
+    label.textContent = x.toFixed(1);
+    svg.appendChild(label);
+  }
+  svg.appendChild(svgEl("line", { x1: left, y1: height - bottom, x2: width - right, y2: height - bottom, class: "chart-axis" }));
+  svg.appendChild(svgEl("line", { x1: left, y1: top, x2: left, y2: height - bottom, class: "chart-axis" }));
+  const xLabel = svgEl("text", { x: left + plotW / 2, y: height - 14, "text-anchor": "middle", class: "chart-label" });
+  xLabel.textContent = "公開5軸の定量スコア（相対値）";
+  const yLabelX = compact ? 12 : 18;
+  const yLabel = svgEl("text", { x: yLabelX, y: top + plotH / 2, transform: `rotate(-90 ${yLabelX} ${top + plotH / 2})`, "text-anchor": "middle", class: "chart-label" });
+  yLabel.textContent = "定性6要因合計（0〜18点）";
+  svg.append(xLabel, yLabel);
+  const selected = DATA.pairs.find((pair) => pair.id === selectedPairId);
+  svg.appendChild(svgEl("line", { x1: sx(selected.low.quant), y1: sy(selected.low.qual), x2: sx(selected.high.quant), y2: sy(selected.high.qual), class: "pair-link" }));
+  points.forEach((point) => {
+    const selectedClass = point.pairId === selectedPairId ? " selected" : "";
+    const mark = point.side === "low"
+      ? svgEl("circle", { cx: sx(point.x), cy: sy(point.y), r: 6.5, class: `point series-low${selectedClass}` })
+      : svgEl("rect", { x: sx(point.x) - 5.5, y: sy(point.y) - 5.5, width: 11, height: 11, rx: 1, transform: `rotate(45 ${sx(point.x)} ${sy(point.y)})`, class: `point series-high${selectedClass}` });
+    mark.setAttribute("tabindex", "0");
+    mark.setAttribute("role", "button");
+    mark.setAttribute("aria-label", `${point.company}、${point.side === "low" ? "低定量側" : "高定量側"}、定量${point.x.toFixed(3)}、定性${point.y}点`);
+    const tip = svgEl("title");
+    tip.textContent = `${point.company}\n定量 ${point.x.toFixed(3)} / 定性 ${point.y}点`;
+    mark.appendChild(tip);
+    const choose = () => selectPair(point.pairId, true);
+    mark.addEventListener("click", choose);
+    mark.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") { event.preventDefault(); choose(); }
+    });
+    svg.appendChild(mark);
+  });
+  document.getElementById("scatter-chart").replaceChildren(svg);
+}
+
+function scoreRows(company, side) {
+  return Object.entries(FACTOR_LABELS).map(([key, label]) => {
+    const value = company.scores[key];
+    return `<div class="score-row"><span>${escapeHtml(label)}</span><span class="score-track"><span class="score-fill" style="width:${value / 3 * 100}%"></span></span><span>${value}</span></div>`;
+  }).join("");
+}
+
+function companyCard(company, side) {
+  const role = side === "low" ? "公開定量スコア低位" : "公開定量スコア高位";
+  return `<article class="card company-${side}">
+    <div class="company-head">
+      <div><div class="company-role">${role}</div><div class="company-name">${escapeHtml(company.company)}</div></div>
+      <span class="quant-badge">定量 ${company.quant.toFixed(3)} / 定性 ${company.qual}点</span>
+    </div>
+    <div class="pair-meta">事業費 ${fmtNum(company.cost)}億円　補助金 ${fmtNum(company.subsidy)}億円</div>
+    <div class="score-list" aria-label="${escapeHtml(company.company)}の6要因評点">${scoreRows(company, side)}</div>
+    <div class="evidence"><div class="evidence-label">根拠要約</div><p>${escapeHtml(company.evidence)}</p></div>
+    <div class="company-actions"><a class="btn" href="${escapeHtml(company.pdf)}" target="_blank" rel="noopener noreferrer">公式PDFを開く</a></div>
+  </article>`;
+}
+
+function renderPair() {
+  const pair = DATA.pairs.find((item) => item.id === selectedPairId);
+  document.getElementById("pair-meta").textContent = `${pair.id}｜${pair.round}｜${pair.industry}｜評点確度 ${pair.confidence}`;
+  document.getElementById("pair-detail").innerHTML = companyCard(pair.low, "low") + companyCard(pair.high, "high");
+  document.getElementById("pair-interpretation").textContent = pair.interpretation;
+}
+
+function selectPair(pairId, syncSelect = false) {
+  selectedPairId = pairId;
+  if (syncSelect) pairSelect.value = pairId;
+  renderPair();
+  renderScatter();
+}
+
+function initPairSelect() {
+  DATA.pairs.forEach((pair) => {
+    const option = document.createElement("option");
+    option.value = pair.id;
+    option.textContent = `${pair.id}｜${pair.low.company} ↔ ${pair.high.company}`;
+    pairSelect.appendChild(option);
+  });
+  pairSelect.value = selectedPairId;
+  pairSelect.addEventListener("change", () => selectPair(pairSelect.value));
+}
+
+renderStats();
+renderFactorChart();
+initPairSelect();
+renderPair();
+renderScatter();
+let compactLayout = window.innerWidth < 620;
+window.addEventListener("resize", () => {
+  const nextCompact = window.innerWidth < 620;
+  if (nextCompact !== compactLayout) {
+    compactLayout = nextCompact;
+    renderFactorChart();
+    renderScatter();
+  }
+});
+</script>
+</body>
+</html>
