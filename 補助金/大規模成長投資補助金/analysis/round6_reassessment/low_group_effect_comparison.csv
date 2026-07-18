@@ -1,0 +1,9 @@
+﻿field,label,low_n,other_n,low_median,other_median,median_ratio_low_to_other
+value_added_increase_estimated_oku,No.8 付加価値増加額,118,254,9.413415,23.862135000000002,0.39449173345134453
+value_added_subsidy_ratio_proxy_pct,No.14 付加価値増加/補助金,118,254,106.30553994732222,199.08221135029353,0.533978094910113
+sales_increase_per_subsidy,売上増加額/補助金,103,235,4.5,8.451682176091625,0.532438384009486
+payroll_increase_per_subsidy,給与総額増加/補助金,118,254,0.21728727272727275,0.3335,0.6515360501567399
+jobs_increase_per_subsidy_oku,雇用増/補助金1億円,118,255,1.7976660682226213,2.6666666666666665,0.674124775583483
+investment_sales_ratio_pct,No.13 投資額/売上高,46,132,65.02277524835236,40.911103529814085,1.5893674244442422
+subsidy_oku,補助金額,118,263,8.25,9.6,0.859375
+project_cost_oku,事業費,118,263,30.21,35.41,0.8531488280146853

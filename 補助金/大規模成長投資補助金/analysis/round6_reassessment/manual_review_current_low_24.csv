@@ -1,0 +1,25 @@
+round,company,below_n,observed_n,demand,constraint,transformation,regional,execution,strategic,evidence,pdf_url,coding_confidence
+1次,株式会社伝食,6,8,1,3,3,3,3,2,"狭隘施設を加工・物流・O2O・見学機能を統合する拠点へ転換。5,600坪の用地取得済み。地域水産流通との結び付きが強い。",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_75.pdf,high
+1次,浦島観光ホテル株式会社,5,8,2,3,2,3,2,2,"築30～60年施設と人員制約で稼働率に上限。団体型から個人・インバウンド型へ転換し、地域観光の中核機能を担う。",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_159.pdf,high
+1次,株式会社ＡＫシステム,6,8,2,3,3,3,3,3,"増産・対象範囲拡大の要請に対し工場・設備不足で失注。取得済み用地に専門工場を分離し、九州半導体需要と雇用に対応。",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_49.pdf,high
+1次,株式会社ハウゼコ,6,8,2,3,3,2,2,3,"大手住宅・建材メーカーからOEM引合い。分散拠点と物流非効率を集約・自動化工場で解消。",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_39.pdf,high
+1次,協和工業株式会社,6,9,3,3,3,1,2,2,"コンクリート大型製品の移管打診、2022年新規受注の約8割が高張力鋼。売上上限を新工場・800tプレスで解除。",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_70.pdf,high
+1次,イグス株式会社,5,6,2,3,3,2,2,3,"4拠点分散と工場狭隘が供給制約。生産・倉庫を統合し自動化して半導体・工作機械等の需要に対応。",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_35.pdf,high
+1次,日本リファイン株式会社,5,7,3,3,3,2,2,3,"顧客照会1.5倍、自動車電池メーカーから生産要請。蒸留・NMP分散工程を自動化し電池・資源循環需要へ対応。",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_25.pdf,high
+1次,千寿製薬株式会社,4,5,2,3,2,1,2,3,"新薬需要を年間7,500万本、将来1億本超と予測し現行7,000万本能力に3,500万本ラインを追加。医薬品安定供給が明確。",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_77.pdf,high
+1次,株式会社オティックスホールディングス,6,8,3,3,3,2,3,3,"EV部品を受注済み。エンジン部品需要減少に対しEVモビリティ部品企業へ転換。先行工場も自己資金で完成済み。",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_63.pdf,high
+2次,株式会社GOTENリゾート,5,8,3,3,3,3,2,2,"既存2旅館の稼働率90%以上、23期連続黒字。客室制約を高級宿泊拠点で解除し地域産品・越境ECまで展開。",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__190.pdf,high
+2次,株式会社ホテルニューアワジ,7,8,2,2,3,3,3,3,"客室単価・稼働率を含む収益設計、インバウンド特化2館の共同事業。自治体・生産者との協力、認証・実証実績が豊富。",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__181.pdf,high
+2次,アシザワ・ファインテック株式会社,7,8,2,3,3,2,3,3,"防爆・クリーン・ドライ環境不足で試験・受託加工需要を取りこぼし。自社遊休地に新工場を設け新素材市場へ進出。",https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__195.pdf,high
+3次,第一物産株式会社,5,7,3,3,3,3,3,3,"村田製作所を含む実名顧客と約2,000社の取引基盤。MLCC・全固体電池向け治具需要を閉校跡地の一貫工場で取り込む。",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_32.pdf,high
+3次,ときわ製作所株式会社,5,8,2,3,3,3,3,2,"主要顧客から増産要請。4拠点分散・老朽設備を取得済み用地へ統合し受託加工と自社製品輸出を両立。",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_72.pdf,high
+3次,東洋スクリーン工業株式会社,6,7,1,3,2,1,2,3,"工場が能力上限に達し面積不足・老朽化・動線問題が具体的。半導体・水処理向けに移転増強するが需要証拠は一般的。",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_30.pdf,high
+4次,株式会社環境整備産業,7,8,3,3,3,3,3,3,"TSMCの現地視察と受入不可案件、県外搬出比65.8%・61.3%。M&Aと県内最大級処理施設で地域の廃棄物処理制約を解消。",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_172.pdf,high
+4次,南島酒販株式会社,6,8,1,2,3,3,2,2,"酒造事業を取得し卸から沖縄産酒の製造者へ転換。顧客確約は弱いが、地域米・観光・県産ブランドの統合性が高い。",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_210.pdf,high
+4次,株式会社シャノワール,6,8,2,3,3,1,3,2,"現工場が出店・販売機会を制約。取得済み用地に中央工場を新設し焼菓子内製化と生産能力3倍を実現。",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_145.pdf,high
+4次,株式会社ニシムタ,7,9,3,3,3,2,2,2,"自社惣菜売上1.28倍。狭い店舗厨房を中央工場化し小売から食品製造機能を持つ企業へ転換。",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_221.pdf,high
+4次,株式会社エム・ケー・ケー,5,8,2,1,3,3,2,3,"Marriott MoxyとBonvoy会員基盤を活用。百貨店閉店跡を250室ホテル・複合拠点へ転換し地域中心部の空洞化に対応。",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_218.pdf,high
+4次,木本製菓株式会社,6,9,1,0,3,3,3,2,"菓子事業からホテルブランドへ構造転換。上野駅前13階建て計画、500人分備蓄、台東区一時滞在施設登録、ZEB計画。本文抽出不良。",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_136.pdf,low
+4次,奥伊吹観光株式会社,5,7,3,3,3,3,2,2,"年間25万人来場、9割が日帰り、宿泊機能なしで消費額が7,500円程度に限定。日帰りスキー場から滞在型リゾートへ転換。",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_116.pdf,high
+4次,明和工業株式会社,7,9,2,3,3,3,3,3,"エンジニアリング需要と子会社受注が増加。老朽設備・子会社の能力不足をM&Aと隣接取得地の一貫工場で解消。",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_168.pdf,high
+4次,株式会社ヤマキ食品,6,8,2,3,3,3,3,2,"競合撤退による需要集中と高付加価値・小ロット需要。多品種自動化、PB、契約農家モデルを相見積もりを含む具体計画で実施。",https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_121.pdf,high

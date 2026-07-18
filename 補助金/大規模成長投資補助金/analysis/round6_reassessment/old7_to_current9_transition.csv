@@ -1,0 +1,9 @@
+﻿sample,old7_lagging,dashboard9_lagging,n
+all,False,False,228
+all,False,True,28
+all,True,False,35
+all,True,True,90
+clean,False,False,127
+clean,False,True,16
+clean,True,False,17
+clean,True,True,42

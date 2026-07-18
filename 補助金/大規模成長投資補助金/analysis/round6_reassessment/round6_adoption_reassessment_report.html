@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第6次申請に向けた採択者中央値未満案件の再分析</title>
+<style>
+:root { --ink:#172235; --muted:#5f6f86; --navy:#16324f; --teal:#0f766e; --teal2:#14b8a6; --orange:#d97706; --red:#b42318; --bg:#f4f7fb; --line:#dbe3ee; --card:#fff; --pale:#edf8f6; --pale-orange:#fff7e8; --pale-blue:#eef5ff; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; font-family:"Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif; color:var(--ink); background:var(--bg); line-height:1.7; }
+a { color:#075985; text-decoration-thickness:1px; text-underline-offset:3px; }
+button,input,select { font:inherit; }
+.hero { background:linear-gradient(125deg,#132a44,#16566a); color:white; padding:48px max(24px,calc((100vw - 1480px)/2)); }
+.eyebrow { font-size:13px; letter-spacing:.13em; text-transform:uppercase; opacity:.76; }
+.hero h1 { font-size:clamp(27px,3.2vw,46px); line-height:1.25; margin:8px 0 16px; max-width:1100px; }
+.hero p { max-width:1040px; margin:0; color:#d9edf2; font-size:16px; }
+.layout { display:grid; grid-template-columns:255px minmax(0,1fr); gap:24px; max-width:1480px; margin:0 auto; padding:24px; align-items:start; }
+.toc { position:sticky; top:12px; background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden; max-height:calc(100vh - 24px); }
+.toc-head { display:flex; justify-content:space-between; align-items:center; padding:13px 14px; background:#e7eef7; border-bottom:1px solid var(--line); }
+.toc-head strong { font-size:14px; }
+.toc button { border:0; background:transparent; color:var(--muted); cursor:pointer; padding:4px 6px; }
+.toc nav { padding:8px; overflow:auto; max-height:calc(100vh - 72px); }
+.toc a { display:block; padding:7px 8px; border-radius:8px; text-decoration:none; color:#33445d; font-size:13px; line-height:1.45; }
+.toc a:hover { background:#eef4fa; }
+.toc.collapsed nav { display:none; }
+.toc.collapsed { width:max-content; justify-self:end; }
+main { min-width:0; }
+section { scroll-margin-top:18px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; margin-bottom:22px; box-shadow:0 3px 14px rgba(26,45,70,.045); }
+section h2 { font-size:24px; line-height:1.35; margin:0 0 18px; }
+section h3 { font-size:18px; margin:28px 0 10px; }
+h4 { margin:0 0 6px; font-size:16px; }
+p { margin:8px 0 12px; }
+.lead { font-size:17px; color:#263951; }
+.sub { color:var(--muted); font-size:12px; line-height:1.55; }
+.callout { border-left:5px solid var(--teal); background:var(--pale); padding:16px 18px; margin:16px 0; }
+.callout.warn { border-color:var(--orange); background:var(--pale-orange); }
+.callout strong:first-child { display:block; margin-bottom:4px; }
+.stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin:18px 0; }
+.stat { background:#f8fafc; border:1px solid var(--line); border-radius:12px; padding:15px; }
+.stat .value { font-size:30px; line-height:1.15; font-weight:700; color:var(--navy); }
+.stat .label { color:var(--muted); font-size:13px; margin-top:5px; }
+.thesis { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:18px 0; }
+.thesis article { padding:18px; border-top:4px solid var(--teal); background:#f8fbfd; }
+.thesis article:nth-child(2) { border-color:#3b82f6; } .thesis article:nth-child(3) { border-color:var(--orange); }
+.equation { background:#f1f5f9; border-radius:10px; padding:12px 14px; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+.stack { display:flex; height:46px; border-radius:9px; overflow:hidden; margin:12px 0 8px; color:#fff; font-weight:700; text-align:center; }
+.stack > div { display:flex; align-items:center; justify-content:center; min-width:38px; }
+.stack .clear { background:#0f766e; } .stack .partial { background:#3b82f6; } .stack .unknown { background:#d97706; }
+.legend { display:flex; flex-wrap:wrap; gap:14px; font-size:13px; color:var(--muted); }
+.legend span::before { content:""; display:inline-block; width:10px; height:10px; margin-right:5px; border-radius:2px; background:var(--c); }
+.bar-row,.factor-row { display:grid; grid-template-columns:160px minmax(160px,1fr) 150px; gap:12px; align-items:center; margin:10px 0; }
+.bar-track { height:14px; background:#e7edf4; overflow:hidden; border-radius:999px; }
+.bar-track span { display:block; height:100%; background:linear-gradient(90deg,var(--teal),var(--teal2)); }
+.bar-label,.bar-value { font-size:13px; } .bar-value { text-align:right; color:var(--muted); }
+.factor-row { grid-template-columns:220px minmax(160px,1fr) 120px; }
+.bar-track.factor { height:18px; }
+.factor-number { text-align:right; font-weight:700; } .factor-number span { display:block; font-size:12px; color:var(--muted); font-weight:400; }
+.table-wrap { overflow:auto; border:1px solid var(--line); border-radius:10px; margin:14px 0; }
+table { width:100%; border-collapse:collapse; min-width:780px; font-size:13px; }
+th { background:#edf2f8; color:#34445b; font-weight:700; text-align:left; position:sticky; top:0; z-index:1; }
+th,td { padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+tbody tr:last-child td { border-bottom:0; } tbody tr:hover { background:#f8fbfd; }
+table.numeric td:not(:first-child), table.numeric th:not(:first-child) { text-align:right; }
+table.compact td,table.compact th { padding:7px 8px; }
+.metric-no { font-weight:700; white-space:nowrap; } .key-row { font-weight:700; color:#0c4a6e; }
+.badge { display:inline-block; border-radius:999px; padding:2px 8px; background:#e9eef5; color:#3b4a60; font-size:11px; white-space:nowrap; }
+.badge.good { background:#dff5ee; color:#075b50; } .badge.warn { background:#fff0d4; color:#8b4a05; } .badge.neutral { background:#edf0f4; color:#536174; }
+.case-grid,.change-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.case-card,.change-card { border:1px solid var(--line); border-radius:12px; padding:16px; background:#fbfcfe; }
+.case-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:8px; }
+.case-card p,.change-card p { font-size:14px; }
+.criteria-flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:18px 0; counter-reset:step; }
+.criteria-flow article { position:relative; padding:14px; border-top:3px solid var(--teal); background:#f6fafb; }
+.criteria-flow article::before { counter-increment:step; content:counter(step); display:inline-grid; place-items:center; width:24px; height:24px; border-radius:50%; background:var(--navy); color:white; font-size:12px; margin-bottom:7px; }
+.checklist { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 22px; padding:0; list-style:none; }
+.checklist li { position:relative; padding:8px 8px 8px 34px; border-bottom:1px solid var(--line); }
+.checklist li::before { content:"✓"; position:absolute; left:7px; color:var(--teal); font-weight:700; }
+.filters { display:grid; grid-template-columns:2fr 1fr 1.5fr auto; gap:10px; margin:12px 0; }
+.filters input,.filters select { width:100%; border:1px solid #cbd5e1; background:white; padding:9px 10px; border-radius:8px; }
+.filter-check { display:flex; align-items:center; gap:6px; white-space:nowrap; }
+.case-results table { min-width:980px; }
+.pill-yes { color:#08756a; font-weight:700; } .pill-no { color:#8b95a5; }
+.footnote { font-size:12px; color:var(--muted); border-top:1px solid var(--line); padding-top:12px; margin-top:18px; }
+code { font-size:12px; overflow-wrap:anywhere; }
+@media(max-width:1050px) { .layout { grid-template-columns:1fr; } .toc { position:sticky; top:0; z-index:20; max-height:none; } .toc nav { max-height:35vh; } .toc.collapsed { width:100%; justify-self:stretch; } .stats { grid-template-columns:repeat(2,1fr); } .criteria-flow { grid-template-columns:repeat(2,1fr); } }
+@media(max-width:700px) { .hero { padding:32px 18px; } .layout { padding:12px; } section { padding:19px 15px; } .stats,.thesis,.case-grid,.change-grid,.checklist,.criteria-flow { grid-template-columns:1fr; } .bar-row,.factor-row { grid-template-columns:1fr; gap:5px; } .bar-value,.factor-number { text-align:left; } .filters { grid-template-columns:1fr; } }
+@media print { body { background:white; } .toc,.filters { display:none; } .layout { display:block; padding:0; } section { break-inside:avoid; box-shadow:none; } .hero { background:#16324f !important; print-color-adjust:exact; } }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="eyebrow">Accepted-case reassessment / Round 6 application strategy</div>
+  <h1>採択者中央値を下回っても採択された案件は、どこまで説明できるか</h1>
+  <p>公開企業PDF 381社、1～5次の公式代表値、現行ダッシュボード9指標、目視レビュー44社、第6次事前公開資料を統合した再分析。目的は「中央値を超えるだけ」の助言から、需要・制約・効果・実行性・国費追加性が一つの因果鎖になった申請設計へ移すことです。</p>
+</header>
+<div class="layout">
+<aside class="toc" id="toc">
+  <div class="toc-head"><strong>目次</strong><button id="tocToggle" type="button" aria-expanded="true">閉じる</button></div>
+  <nav>
+    <a href="#conclusion">1. 結論</a><a href="#scope">2. 問いと限界</a><a href="#data">3. データ・再構築妥当性</a>
+    <a href="#definition">4. 「中央値未満」の定義</a><a href="#quant">5. 定量的にどこまで説明できるか</a>
+    <a href="#qual">6. 44社の定性レビュー</a><a href="#five">7. 方向性8指標すべて未満の5社</a>
+    <a href="#official">8. 公式の申請者／採択者差</a><a href="#round6">9. 第6次の制度変更</a>
+    <a href="#targets">10. 数値の持っていき方</a><a href="#recipe">11. 通る申請の組み立て</a>
+    <a href="#cases">12. 対象113社を確認</a><a href="#limitations">13. 限界・再現手順</a>
+  </nav>
+</aside>
+<main>
+<section id="conclusion">
+  <h2>1. 結論：中央値未満は「弱い申請」の同義語ではない</h2>
+  <p class="lead">最大の知見は、採択者中央値未満案件の大半が、申請者全体から見ても弱いわけではないことです。現行9指標で低位とした118社のうち、117社は少なくとも1指標で同回の申請者代表値以上、80社は観測指標の過半数で申請者代表値以上でした。</p>
+  <div class="stats">
+    <div class="stat"><div class="value">118</div><div class="label">現行9指標の低位案件（381社中）</div></div>
+    <div class="stat"><div class="value">117/118</div><div class="label">申請者代表値以上の指標が1つ以上</div></div>
+    <div class="stat"><div class="value">80/118</div><div class="label">観測指標の過半数が申請者代表値以上</div></div>
+    <div class="stat"><div class="value">5</div><div class="label">方向性8指標ですべて採択者中央値未満</div></div>
+  </div>
+  <div class="thesis">
+    <article><h4>① 中央値は足切りではない</h4><p>単一指標なら、定義上、採択者の約半数は中央値以下です。複数指標も相関するため、「5/8が未満」を独立した5敗と数えるのは過大評価です。</p></article>
+    <article><h4>② 108/113社には別の定量的な勝ち筋</h4><p>No.13を方向中立として除いた113社のうち42社は2領域以上、66社は1領域で採択者中央値以上。全面劣後は5社でした。</p></article>
+    <article><h4>③ 残る5社は定性だけでなく因果鎖が具体的</h4><p>実名需要、物理的能力制約、工場統合・工程転換、地域供給網、用地・顧客・認証など実行根拠が結び付いていました。</p></article>
+  </div>
+  <div class="callout"><strong>第6次コンサルの中心命題</strong>「採択者中央値を全部超える」ではなく、公式必須条件を安全に満たしたうえで、<b>外部需要 → 現在の能力制約 → 投資仕様 → 生産・販売増 → 付加価値・賃金・地域波及 → 国費1円当たり効果</b>を同じ数量単位で接続し、金融・人員・工程・補助金必要性まで証拠化することです。</div>
+</section>
+
+<section id="scope">
+  <h2>2. この分析が答える問い／答えない問い</h2>
+  <div class="callout warn"><strong>因果推論・合格確率の推定ではありません</strong>公開されているのは交付決定企業の要約PDFです。非採択企業の個票、審査項目別得点、審査時申請書は非公開なので、「この要素が合否を何点動かすか」「この計画の合格確率は何%か」は推定できません。</div>
+  <div class="criteria-flow">
+    <article><h4>記述</h4><p>採択者中央値未満案件が何社いるか。</p></article>
+    <article><h4>分解</h4><p>成長・生産性／付加価値・賃金の別領域に強みがあるか。</p></article>
+    <article><h4>仮説抽出</h4><p>公開要約に繰り返し現れる定性パターンは何か。</p></article>
+    <article><h4>制度接続</h4><p>第6次の様式・審査基準で何を証拠化すべきか。</p></article>
+  </div>
+  <p>したがって本報告の「説明」は、採択済み案件の公開情報における<b>整合的な解釈</b>です。識別力を確かめるには、同業・同規模の非採択申請書または審査点が必要です。</p>
+</section>
+
+<section id="data">
+  <h2>3. データと企業別指標の再構築妥当性</h2>
+  <p>対象は1～4次の公開企業PDF 381社です。うち抽出上の重大な注意フラグがないものは202社。公式代表値の母集団とは件数が一致しないため、企業PDF中央値と公式採択者中央値の一致は「水準妥当性」の確認であり、企業別公式値の検証ではありません。</p>
+  <div class="table-wrap"><table class="compact numeric"><thead><tr><th>公募回</th><th>公開PDF</th><th>品質除外なし</th><th>現行9指標低位</th><th>方向性8指標低位</th></tr></thead><tbody><tr><td>1次</td><td>156</td><td>90</td><td>45（28.8%）</td><td>42（26.9%）</td></tr><tr><td>2次</td><td>25</td><td>19</td><td>8（32.0%）</td><td>7（28.0%）</td></tr><tr><td>3次</td><td>107</td><td>44</td><td>36（33.6%）</td><td>35（32.7%）</td></tr><tr><td>4次</td><td>93</td><td>49</td><td>29（31.2%）</td><td>29（31.2%）</td></tr></tbody></table></div>
+  <h3>現行9指標の再構築監査</h3>
+  <div class="table-wrap"><table class="compact"><thead><tr><th>指標</th><th>公開PDFから再構築する値</th><th>性質</th><th>観測件数</th><th>中央値差率の中央値（絶対値）</th><th>最大差率（絶対値）</th></tr></thead><tbody><tr><td><span class="metric-no">No.1</span></td><td>全社年平均売上高成長率</td><td><span class="badge warn">推計・近似</span></td><td>99 / 381<div class="sub">26.0%</div></td><td>14.2%</td><td>30.8%</td></tr><tr><td><span class="metric-no">No.2</span></td><td>全社売上高増加額</td><td><span class="badge warn">推計・近似</span></td><td>338 / 381<div class="sub">88.7%</div></td><td>16.0%</td><td>49.1%</td></tr><tr><td><span class="metric-no">No.7</span></td><td>補助事業年平均労働生産性の伸び</td><td><span class="badge good">ほぼ直接比較</span></td><td>375 / 381<div class="sub">98.4%</div></td><td>12.7%</td><td>30.5%</td></tr><tr><td><span class="metric-no">No.8</span></td><td>補助事業付加価値増加額（簡易補正推計）</td><td><span class="badge warn">推計・近似</span></td><td>372 / 381<div class="sub">97.6%</div></td><td>6.7%</td><td>9.7%</td></tr><tr><td><span class="metric-no">No.9</span></td><td>年平均従業員目標賃上げ率</td><td><span class="badge good">ほぼ直接比較</span></td><td>380 / 381<div class="sub">99.7%</div></td><td>4.5%</td><td>16.3%</td></tr><tr><td><span class="metric-no">No.10</span></td><td>従業員給与支給総額の増加額（推計）</td><td><span class="badge warn">推計・近似</span></td><td>372 / 381<div class="sub">97.6%</div></td><td>5.3%</td><td>17.9%</td></tr><tr><td><span class="metric-no">No.11</span></td><td>年平均役員目標賃上げ率</td><td><span class="badge good">ほぼ直接比較</span></td><td>312 / 381<div class="sub">81.9%</div></td><td>6.9%</td><td>12.5%</td></tr><tr><td><span class="metric-no">No.13</span></td><td>全社売上高に対する投資額割合（近似）</td><td><span class="badge warn">推計・近似</span></td><td>178 / 381<div class="sub">46.7%</div></td><td>7.8%</td><td>13.5%</td></tr><tr><td><span class="metric-no">No.14</span></td><td>補助金額に対する付加価値増加額割合（推計）</td><td><span class="badge warn">推計・近似</span></td><td>372 / 381<div class="sub">97.6%</div></td><td>3.4%</td><td>20.1%</td></tr></tbody></table></div>
+  <p class="footnote">「中央値差」は、各公募回の公開PDF再構築中央値と公式採択者代表値との差率の絶対値を4公募回で要約。No.8は1.1倍の一律水準補正、No.14は補正前No.8分子÷補助金額。No.8・14は個社公式値の再現ではありません。第2次は公開PDFが25社と少なく、No.1は3社、No.13は11社のみで特に不安定です。</p>
+</section>
+
+<section id="definition">
+  <h2>4. 「採択者中央値未満案件」の定義は一意ではない</h2>
+  <p>ダッシュボード互換定義は「9指標のうち5指標以上が観測でき、同回の採択者中央値未満が60%以上」。118社（31.0%）が該当します。ただしNo.13（投資額／全社売上高）は、1～5次の4回で採択者中央値が申請者中央値より低く、単純に高いほど良い指標ではありません。主要推論ではNo.13を外した方向性8指標を使い、113社（29.7%）を分析対象にしました。</p>
+  <div class="equation">低位 = 観測数 ≥ 5 かつ（採択者中央値未満の指標数 ÷ 観測数）≥ 60%</div>
+  <h3>閾値感度</h3>
+  <div class="bar-row">
+          <div class="bar-label">未満割合 50%</div>
+          <div class="bar-track"><span style="width:50.66%"></span></div>
+          <div class="bar-value">193社（50.7%）</div>
+        </div><div class="bar-row">
+          <div class="bar-label">未満割合 60%</div>
+          <div class="bar-track"><span style="width:30.97%"></span></div>
+          <div class="bar-value">118社（31.0%）</div>
+        </div><div class="bar-row">
+          <div class="bar-label">未満割合 67%</div>
+          <div class="bar-track"><span style="width:23.62%"></span></div>
+          <div class="bar-value">90社（23.6%）</div>
+        </div><div class="bar-row">
+          <div class="bar-label">未満割合 75%</div>
+          <div class="bar-track"><span style="width:13.91%"></span></div>
+          <div class="bar-value">53社（13.9%）</div>
+        </div><div class="bar-row">
+          <div class="bar-label">未満割合 80%</div>
+          <div class="bar-track"><span style="width:8.92%"></span></div>
+          <div class="bar-value">34社（8.9%）</div>
+        </div>
+  <p class="sub">現行9指標、観測5指標以上、全381社。50%なら193社、75%なら53社となり、結論は閾値に依存します。</p>
+  <h3>旧7指標から現行9指標への入れ替わり</h3>
+  <div class="table-wrap"><table class="compact numeric"><thead><tr><th>旧7指標→現行9指標</th><th>社数</th><th>全381社比</th></tr></thead><tbody><tr><td>いずれも非該当</td><td>228</td><td>59.8%</td></tr><tr><td>現行9指標で新規該当</td><td>28</td><td>7.3%</td></tr><tr><td>旧7指標のみ該当</td><td>35</td><td>9.2%</td></tr><tr><td>両定義で該当</td><td>90</td><td>23.6%</td></tr></tbody></table></div>
+  <p>旧分析の125社をそのまま引き継ぐのは不適切です。No.8・14の追加と最低観測数の統一により、90社のみ共通、35社が外れ、28社が新たに入っています。</p>
+</section>
+
+<section id="quant">
+  <h2>5. 定量的にどこまで説明できるか</h2>
+  <p>方向性8指標を、①全社成長（No.1・2）、②生産性／付加価値（No.7・8・14）、③賃金（No.9・10・11）の3領域に分け、各領域で1指標でも採択者中央値以上なら「領域勝ち」としました。</p>
+  <div class="stack" aria-label="113社の定量説明レベル">
+    <div class="clear" style="width:37.17%">42</div>
+    <div class="partial" style="width:58.41%">66</div>
+    <div class="unknown" style="width:4.42%">5</div>
+  </div>
+  <div class="legend"><span style="--c:#0f766e">2領域以上で補完 42社</span><span style="--c:#3b82f6">1領域で補完 66社</span><span style="--c:#d97706">公開方向性定量では未説明 5社</span></div>
+  <div class="callout"><strong>解釈</strong>108/113社（95.6%）には少なくとも1領域の採択者中央値以上があり、「全部弱いのに採択」ではありません。ただし1指標の勝ちを採択理由と断定するものではなく、領域間の補完可能性を示す記述です。</div>
+  <h3>「別の効率指標が高かったから」とは、群全体では説明できない</h3>
+  <div class="table-wrap"><table class="compact numeric"><thead><tr><th>補助的な効果指標</th><th>現行9指標低位群の中央値</th><th>その他採択企業の中央値</th><th>低位群／その他</th></tr></thead><tbody><tr><td>No.8 付加価値増加額</td><td>9.4</td><td>23.9</td><td>39.4%</td></tr><tr><td>No.14 付加価値増加/補助金</td><td>106.3</td><td>199.1</td><td>53.4%</td></tr><tr><td>売上増加額/補助金</td><td>4.5</td><td>8.5</td><td>53.2%</td></tr><tr><td>給与総額増加/補助金</td><td>0.2</td><td>0.3</td><td>65.2%</td></tr><tr><td>雇用増/補助金1億円</td><td>1.8</td><td>2.7</td><td>67.4%</td></tr><tr><td>No.13 投資額/売上高</td><td>65.0</td><td>40.9</td><td>158.9%</td></tr><tr><td>補助金額</td><td>8.2</td><td>9.6</td><td>85.9%</td></tr><tr><td>事業費</td><td>30.2</td><td>35.4</td><td>85.3%</td></tr></tbody></table></div>
+  <p>売上増／補助金、給与増／補助金、雇用増／補助金も、低位群の中央値はその他採択企業の53～67%でした。したがって「公開9指標は低いが、別の費用対効果で一律に救済された」という説明は棄却すべきです。No.13だけは低位群の方が高く、企業規模に対する投資の大胆さを示しますが、採択者と申請者の公式比較では高いほど有利ではありません。</p>
+  <h3>なぜ118社も生じるのか：中央値の性質と指標の非独立性</h3>
+  <p>各指標で中央値未満になる確率を単純に50%と置くだけでも、現行の観測数構成では期待値は114.6社です。118社という件数自体は、隠れた採択基準が大量に働いた証拠ではありません。さらにNo.8とNo.14は同じ付加価値増加額を分子に持ち、No.2・8・10は企業規模の影響を共有します。公募回×指標ごとの実際の上下比率と欠損位置を保ち、企業間で判定を1万回並べ替えた場合は平均98.7社、95%範囲88～109社でした。実測118社の上振れは、企業内で低位判定が束になる相関構造と整合しますが、「謎の採択」の直接証拠ではありません。</p>
+  <div class="callout warn"><strong>してはいけない読み方</strong>9指標を独立した9票として「6敗3勝」と評価すること。No.13を高いほど良いと採点すること。No.8とNo.14を別々の強み／弱みとして二重計上すること。</div>
+</section>
+
+<section id="qual">
+  <h2>6. 現行低位44社の目視レビュー</h2>
+  <p>既存40ペアの低位側で現行9指標にも該当する20社と、既存レビュー外の現行9指標低位・品質除外なし35社から公募回・業種を分散して選んだ24社、計44社を公開採択概要で再確認しました。0＝記載なし、1＝一般的、2＝具体、3＝強い具体証拠として符号化しています。</p>
+  <div class="factor-row">
+          <div><strong>需要根拠の具体性</strong><div class="sub">2点以上を「明確」と符号化</div></div>
+          <div class="bar-track factor"><span style="width:75.00%"></span></div>
+          <div class="factor-number">33/44<span>75.0%</span></div>
+        </div><div class="factor-row">
+          <div><strong>能力制約の明確さ</strong><div class="sub">2点以上を「明確」と符号化</div></div>
+          <div class="bar-track factor"><span style="width:95.45%"></span></div>
+          <div class="factor-number">42/44<span>95.5%</span></div>
+        </div><div class="factor-row">
+          <div><strong>事業・工程の構造転換</strong><div class="sub">2点以上を「明確」と符号化</div></div>
+          <div class="bar-track factor"><span style="width:100.00%"></span></div>
+          <div class="factor-number">44/44<span>100.0%</span></div>
+        </div><div class="factor-row">
+          <div><strong>地域・供給網への波及</strong><div class="sub">2点以上を「明確」と符号化</div></div>
+          <div class="bar-track factor"><span style="width:90.91%"></span></div>
+          <div class="factor-number">40/44<span>90.9%</span></div>
+        </div><div class="factor-row">
+          <div><strong>実行確度</strong><div class="sub">2点以上を「明確」と符号化</div></div>
+          <div class="bar-track factor"><span style="width:95.45%"></span></div>
+          <div class="factor-number">42/44<span>95.5%</span></div>
+        </div><div class="factor-row">
+          <div><strong>政策・戦略分野との整合</strong><div class="sub">2点以上を「明確」と符号化</div></div>
+          <div class="bar-track factor"><span style="width:95.45%"></span></div>
+          <div class="factor-number">42/44<span>95.5%</span></div>
+        </div>
+  <p><b>事業・工程の構造転換</b>は44/44、<b>能力制約</b>・<b>実行確度</b>・<b>政策整合</b>は各42/44、<b>地域・供給網</b>は40/44で2点以上でした。需要証拠は33/44で、全社に実名発注や契約があるわけではありません。一方、4つの中核要素（需要・制約・転換・地域）のうち3つ以上が具体的だった案件は42/44です。</p>
+  <div class="callout warn"><strong>この比率は合否識別力ではない</strong>目的抽出・採択企業のみ・単独かつ非盲検の評価です。例えば「構造転換100%」は、採択企業の公開要約で繰り返される提示様式を示すだけで、非採択企業にも同じ記載がある可能性を排除しません。</div>
+  <h3>低定量採択案件で再現可能性が高い提示順</h3>
+  <ol>
+    <li><b>需要：</b>顧客名、発注・増産要請、失注件数、市場数量、稼働率、待ち期間。</li>
+    <li><b>制約：</b>能力／面積／排水／温湿度／防爆／人員／物流など、現在値と上限値。</li>
+    <li><b>転換：</b>設備の羅列ではなく、分散→統合、外注→内製、単品→高付加価値、多段→一貫、自動化。</li>
+    <li><b>波及：</b>地域雇用だけでなく、供給網の代替困難性、域外流出削減、観光滞在、共同配送、地域産品。</li>
+    <li><b>実行：</b>用地、許認可、顧客試験、見積、金融、採用、工程、責任者、リスク代替案。</li>
+  </ol>
+</section>
+
+<section id="five">
+  <h2>7. 方向性8指標の観測値がすべて採択者中央値未満の5社</h2>
+  <p>公開定量だけでは補完を見いだせなかった5社です。2社は抽出品質の注意フラグがあり、個別値の読み過ぎにも注意が必要です。それでも公開要約には、投資が必要となる外部需要・能力制約・供給網上の意味が具体的に記載されていました。</p>
+  <div class="case-grid"><article class="case-card">
+          <div class="case-head"><div><span class="badge">2次</span> <strong>アシザワ・ファインテック株式会社</strong></div><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__195.pdf" target="_blank" rel="noopener">公開採択概要 ↗</a></div>
+          <h4>特殊需要に対する明確な能力制約</h4>
+          <p>電池・電子材料向け微粉砕で、防爆・クリーン・ドライ環境が不足。試験・受託加工の取りこぼしを24時間自動化の専用工場で解く。</p>
+          <div class="sub">方向性8指標：7/7が採択者中央値未満。品質除外なし。</div>
+        </article><article class="case-card">
+          <div class="case-head"><div><span class="badge">2次</span> <strong>株式会社ホテルニューアワジ</strong></div><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__181.pdf" target="_blank" rel="noopener">公開採択概要 ↗</a></div>
+          <h4>地域観光の面的転換と実行基盤</h4>
+          <p>インバウンド向け二都市・二社共同の宿泊拠点。高単価・連泊化、自治体・生産者との連携、認証・実証実績を一体で提示。</p>
+          <div class="sub">方向性8指標：7/7が採択者中央値未満。品質除外なし。</div>
+        </article><article class="case-card">
+          <div class="case-head"><div><span class="badge">2次</span> <strong>株式会社八立製作所</strong></div><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__196.pdf" target="_blank" rel="noopener">公開採択概要 ↗</a></div>
+          <h4>実名顧客と代替困難な国内供給網</h4>
+          <p>主要顧客からの増産要請と、コマツ大阪工場向けブラケットの高い供給シェアを背景に、国内供給能力の増強を提示。</p>
+          <div class="sub">方向性8指標：8/8が採択者中央値未満。品質除外なし。</div>
+        </article><article class="case-card">
+          <div class="case-head"><div><span class="badge">3次</span> <strong>株式会社シュゼット・ホールディングス</strong></div><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_99.pdf" target="_blank" rel="noopener">公開採択概要 ↗</a></div>
+          <h4>不可避の移転と供給継続を成長投資へ転換</h4>
+          <p>賃貸期限、排水能力、老朽・アスベストという制約を、二工場再編・高級需要・インバウンド・レジリエンス向上へ接続。</p>
+          <div class="sub">方向性8指標：5/5が採択者中央値未満。品質注意フラグあり。</div>
+        </article><article class="case-card">
+          <div class="case-head"><div><span class="badge">3次</span> <strong>株式会社タカラ倉庫運輸サービス</strong></div><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_128.pdf" target="_blank" rel="noopener">公開採択概要 ↗</a></div>
+          <h4>物流制約の共同化による地域インフラ効果</h4>
+          <p>分散拠点を統合し、共同配送・内陸デポ・保税機能で物流2030年問題に対応。輸送・保管コスト削減も数値化。</p>
+          <div class="sub">方向性8指標：6/6が採択者中央値未満。品質注意フラグあり。</div>
+        </article></div>
+  <p class="footnote">これらは採択理由の確定ではありません。「公開定量では説明できない残差」に対して、公開要約から最も整合的な仮説を付したものです。</p>
+</section>
+
+<section id="official">
+  <h2>8. 公式統計が示す、申請者から採択者へ上がる指標</h2>
+  <p>1～5次で一貫して採択者が申請者を上回るのは、成長率だけでなく<b>売上・付加価値・給与総額の絶対増加</b>と<b>補助金額当たり付加価値</b>です。第5次でも、補助事業売上高増加額は57.4→74.8億円、付加価値増加額は19.9→28.1億円、給与総額増加額は2.8→3.9億円、付加価値増加額／補助金額は171→213%でした。</p>
+  <div class="table-wrap"><table class="compact"><thead><tr><th>公式指標</th><th>単位</th><th>採択者＞申請者</th><th>差の中央値</th><th>5次申請者</th><th>5次採択者</th><th>読み方</th></tr></thead><tbody><tr><td><span class="">全社年平均売上高成長率</span></td><td>%/年</td><td>5/5</td><td>21.4%</td><td>20.0</td><td>21.0</td><td><span class="badge good">採択者が高い</span></td></tr><tr><td><span class="key-row">全社売上高増加額</span></td><td>億円</td><td>5/5</td><td>59.2%</td><td>67.1</td><td>82.4</td><td><span class="badge good">採択者が高い</span></td></tr><tr><td><span class="">全社売上高に対する補助事業売上高の割合</span></td><td>%</td><td>5/5</td><td>11.3%</td><td>80.0</td><td>89.0</td><td><span class="badge good">採択者が高い</span></td></tr><tr><td><span class="">補助事業年平均売上高成長率</span></td><td>%/年</td><td>4/5</td><td>18.2%</td><td>22.0</td><td>22.0</td><td><span class="badge good">採択者が高い</span></td></tr><tr><td><span class="key-row">補助事業売上高増加額</span></td><td>億円</td><td>5/5</td><td>70.9%</td><td>57.4</td><td>74.8</td><td><span class="badge good">採択者が高い</span></td></tr><tr><td><span class="">年平均労働生産性の伸び</span></td><td>%/年</td><td>4/5</td><td>20.0%</td><td>21.0</td><td>21.0</td><td><span class="badge good">採択者が高い</span></td></tr><tr><td><span class="key-row">補助事業付加価値増加額</span></td><td>億円</td><td>5/5</td><td>63.6%</td><td>19.9</td><td>28.1</td><td><span class="badge good">採択者が高い</span></td></tr><tr><td><span class="">年平均従業員目標賃上げ率</span></td><td>%/年</td><td>4/5</td><td>7.7%</td><td>6.5</td><td>7.0</td><td><span class="badge good">採択者が高い</span></td></tr><tr><td><span class="key-row">従業員給与支給総額の増加額</span></td><td>億円</td><td>5/5</td><td>45.8%</td><td>2.8</td><td>3.9</td><td><span class="badge good">採択者が高い</span></td></tr><tr><td><span class="">年平均役員目標賃上げ率</span></td><td>%/年</td><td>4/4</td><td>11.4%</td><td>5.5</td><td>6.0</td><td><span class="badge good">採択者が高い</span></td></tr><tr><td><span class="">役員給与支給総額の増加額</span></td><td>億円</td><td>3/4</td><td>46.4%</td><td>0.1</td><td>0.1</td><td><span class="badge good">採択者が高い</span></td></tr><tr><td><span class="">全社売上高に対する投資額割合</span></td><td>%</td><td>1/5</td><td>-4.2%</td><td>64.0</td><td>61.0</td><td><span class="badge neutral">採択者が低い／一定せず</span></td></tr><tr><td><span class="key-row">補助金額に対する付加価値増加額割合</span></td><td>%</td><td>5/5</td><td>24.6%</td><td>171.0</td><td>213.0</td><td><span class="badge good">採択者が高い</span></td></tr><tr><td><span class="">ローカルベンチマークの得点</span></td><td>点</td><td>1/5</td><td>0.0%</td><td>23.0</td><td>23.0</td><td><span class="badge good">採択者が高い</span></td></tr><tr><td><span class="">全社賃上げ予定率</span></td><td>%</td><td>1/3</td><td>0.0%</td><td>2.3</td><td>2.5</td><td><span class="badge neutral">採択者が低い／一定せず</span></td></tr></tbody></table></div>
+  <div class="callout"><strong>申請助言への変換</strong>率だけを上げるのではなく、①何億円の売上を追加し、②何億円の付加価値を増やし、③何億円の給与を地域に追加し、④補助金1億円当たり何億円の付加価値を生むかを並べてください。No.13は「高いほど良い」ではなく、企業規模に対する投資の大胆さと実現可能性の文脈指標です。</div>
+</section>
+
+<section id="round6">
+  <h2>9. 第6次で重要度が増した論点</h2>
+  <p>第6次は事前公開段階であり、正式公募開始時の資料で更新確認が必要です。公式審査は経営力、先進性・成長性、地域波及、大規模投資・費用対効果、実現可能性、補助金の必要性から構成され、書面の定量面に加えて経営者プレゼンで定性面も評価されます。第5次は198件申請、147件が書面通過、77件が最終採択でしたが、この段階数から審査配点を逆算することはできません。</p>
+  <div class="callout"><strong>まず満たすべき公式要件</strong>一般企業は投資額20億円以上（外注費・専門家経費を除く補助対象経費、税抜）かつ完了後3年間の補助事業従業員等1人当たり給与支給総額CAGR 5.0%以上。100億宣言企業は投資額15億円以上、同4.5%以上です。補助上限50億円、補助率1/3以下。これらは審査上の目標ではなく入口要件・返還条件です。</div>
+  <div class="change-grid"><article class="change-card">
+          <h4>足下の全社賃上げ</h4>
+          <p><strong>公式上の意味：</strong>補助事業期間中の全社賃上げを新たに評価。最低でも物価上昇率超。</p>
+          <p><strong>申請実務：</strong>最新決算→基準年度を年次で積み上げ、原資と一人当たり付加価値に接続</p>
+          <a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/gaiyou_6ji.pdf" target="_blank" rel="noopener">公式資料 ↗</a>
+        </article><article class="change-card">
+          <h4>補助金の必要性</h4>
+          <p><strong>公式上の意味：</strong>現預金等から国費支援の追加性を独立審査。</p>
+          <p><strong>申請実務：</strong>運転資金、別投資、借入・増資の限界、補助なしの縮小・後ろ倒しを数値化</p>
+          <a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/youryou_6ji.pdf" target="_blank" rel="noopener">公式資料 ↗</a>
+        </article><article class="change-card">
+          <h4>実現可能性・モニタリング</h4>
+          <p><strong>公式上の意味：</strong>実現可能性を厳格化し、事業期間中・事業化報告期間の数値をモニタリング。</p>
+          <p><strong>申請実務：</strong>需要、能力、仕様、認証、用地、人材、調達、販路、資金、工程を同じ単位で接続</p>
+          <a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/youryou_6ji.pdf" target="_blank" rel="noopener">公式資料 ↗</a>
+        </article><article class="change-card">
+          <h4>金融機関・ファンド</h4>
+          <p><strong>公式上の意味：</strong>確認書に加え出資・融資表明書を新設し、後者は大幅加点。</p>
+          <p><strong>申請実務：</strong>可能なら様式4-2を早期交渉。未実行は取消リスクがあるため実行可能額に限定</p>
+          <a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/youryou_6ji.pdf" target="_blank" rel="noopener">公式資料 ↗</a>
+        </article><article class="change-card">
+          <h4>新規・強化加点</h4>
+          <p><strong>公式上の意味：</strong>中小→中堅移行、AX、ファミリーガバナンス等。</p>
+          <p><strong>申請実務：</strong>適用可否と必要様式を最初に確定。後付けではなく本体ロジックと整合</p>
+          <a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/gaiyou_6ji.pdf" target="_blank" rel="noopener">公式資料 ↗</a>
+        </article><article class="change-card">
+          <h4>補助率1/4の許容</h4>
+          <p><strong>公式上の意味：</strong>1/3水準に満たなくても1/4で追加採択する可能性。</p>
+          <p><strong>申請実務：</strong>追加自己負担と賃上げ履行が可能な場合にのみ様式2で許容</p>
+          <a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/youryou_6ji.pdf" target="_blank" rel="noopener">公式資料 ↗</a>
+        </article></div>
+  <h3>実務上の優先順位</h3>
+  <ol>
+    <li><b>足下の全社賃上げ：</b>基準年度後だけでなく、直近決算から基準年度までの全社賃上げを年次で設計。事前公開資料が参照する2025年CPI 3.2%は最低限の参考であり、それを上回る実行可能な水準と原資を説明する。</li>
+    <li><b>補助金の必要性：</b>現預金が多い企業ほど、運転資金・別投資・M&A・借入余力・担保・増資検討・補助なし反実仮想を数値で示す。</li>
+    <li><b>資金の確度：</b>金融機関／ファンドの出資・融資表明書は大幅加点だが、未実行の取消リスクがある。盛らずに実行可能額を確定する。</li>
+    <li><b>モニタリング：</b>売上・能力・稼働・付加価値・賃金を同じKPIツリーで月次／四半期管理し、下振れ時の経営判断を記す。</li>
+  </ol>
+</section>
+
+<section id="targets">
+  <h2>10. 第6次で数値をどう持っていくか</h2>
+  <p>下表の「1～5次傾向参照」は採択者公式値のTheil–Sen直線を第6次へ外挿した頑健な参考、「検討用ストレッチ」は事業計画を逆算するためのシナリオです。いずれも公式足切り・合格基準ではありません。</p>
+  <div class="table-wrap"><table class="compact numeric"><thead><tr><th>指標</th><th>単位</th><th>5次申請者</th><th>5次採択者</th><th>1～5次傾向参照</th><th>検討用ストレッチ</th><th>申請設計上の役割</th></tr></thead><tbody><tr><td>全社年平均売上高成長率</td><td>%/年</td><td>20.0</td><td>21.0</td><td>22.5</td><td>25.0</td><td>成長率だけでなく絶対増加額と両立</td></tr><tr><td>全社売上高増加額</td><td>億円</td><td>67.1</td><td>82.4</td><td>83.5</td><td>100.0</td><td>全社にとっての成長インパクト</td></tr><tr><td>補助事業売上高増加額</td><td>億円</td><td>57.4</td><td>74.8</td><td>80.0</td><td>90.0</td><td>五回連続で採択者中央値が申請者中央値を上回る</td></tr><tr><td>補助事業付加価値増加額</td><td>億円</td><td>19.9</td><td>28.1</td><td>31.4</td><td>35.0</td><td>絶対効果の中核</td></tr><tr><td>年平均従業員目標賃上げ率</td><td>%/年</td><td>6.5</td><td>7.0</td><td>7.7</td><td>7.5</td><td>未達返還リスクを考慮し実行可能性を優先</td></tr><tr><td>従業員給与支給総額の増加額</td><td>億円</td><td>2.8</td><td>3.9</td><td>4.3</td><td>5.0</td><td>賃上げ率だけでなく地域に落ちる給与総額</td></tr><tr><td>補助金額に対する付加価値増加額割合</td><td>%</td><td>171.0</td><td>213.0</td><td>237.8</td><td>250.0</td><td>国費1円当たり効果</td></tr></tbody></table></div>
+  <div class="callout warn"><strong>中央値を目標値にしない</strong>中央値を少し超えるように数字を作ると、需要証拠、設備能力、価格・数量、P/L、人員、賃上げの間で矛盾が生じます。まず裏付け可能な需要数量と制約解消能力からボトムアップで計算し、その結果を申請者・採択者公式値と比較してください。</div>
+  <h3>案件別の三段階表示</h3>
+  <ul>
+    <li><b>必達：</b>公式の要件・返還条件を安全余裕込みで満たす数値。</li>
+    <li><b>ベース：</b>受注確度、歩留まり、稼働率、採用期間を保守的に積み上げた取締役会コミット値。</li>
+    <li><b>上振れ：</b>追加顧客・高稼働・価格改善を条件にしたシナリオ。審査用の約束と混同しない。</li>
+  </ul>
+</section>
+
+<section id="recipe">
+  <h2>11. 「通る申請」を作るための実務レシピ</h2>
+  <p class="lead">良い申請は、強い形容詞ではなく、同じ数量が資料全体を貫きます。市場予測100ではなく、顧客別需要→設備能力→販売数量→損益→付加価値→賃金→地域波及→国費効果まで照合できる状態を作ります。</p>
+  <div class="criteria-flow">
+    <article><h4>需要台帳</h4><p>顧客・用途・数量・時期・確度・証拠資料を1行1案件で管理。</p></article>
+    <article><h4>制約台帳</h4><p>現能力、最大稼働、失注、外注、リードタイム、品質条件を定量化。</p></article>
+    <article><h4>能力ブリッジ</h4><p>設備ごとのCT・稼働・歩留まり・人員から増産可能量を計算。</p></article>
+    <article><h4>財務ブリッジ</h4><p>数量×単価→粗利→営業利益→減価償却→付加価値→給与原資。</p></article>
+    <article><h4>費用対効果</h4><p>補助金1億円当たり売上・付加価値・給与・雇用・域外流出削減。</p></article>
+    <article><h4>実行ゲート</h4><p>用地、許認可、見積、発注、採用、金融、認証を日付と責任者で管理。</p></article>
+    <article><h4>追加性</h4><p>補助なしなら何を何年遅らせ、能力・雇用・波及がどれだけ失われるか。</p></article>
+    <article><h4>経営者説明</h4><p>経営判断、資源配分、モニタリング、撤退／修正基準を自分の言葉で話す。</p></article>
+  </div>
+  <h3>申請前レビュー・チェックリスト</h3>
+  <ul class="checklist">
+    <li>実名顧客、LOI、注文、増産要請、問い合わせ、失注ログのいずれかがある。</li>
+    <li>現状能力と投資後能力が同じ単位・時間基準・歩留まりで比較できる。</li>
+    <li>設備費と売上増の間に「何台×何個×稼働率×単価」のブリッジがある。</li>
+    <li>補助事業売上と全社売上の二重計上、グループ／単体の混同がない。</li>
+    <li>付加価値額は公式Excelの営業利益＋給与＋役員給与＋減価償却と一致する。</li>
+    <li>賃上げは率だけでなく人数・給与総額・原資・未達時対応まで説明できる。</li>
+    <li>地域波及は雇用人数だけでなく、仕入・外注・物流・観光消費等を金額化する。</li>
+    <li>現預金、運転資金、別投資、借入、増資、補助なしケースの資金表がある。</li>
+    <li>金融機関表明書の金額・条件・実行時期が事業スケジュールと一致する。</li>
+    <li>経営者が5分で需要→制約→投資→効果→必要性を数値付きで説明できる。</li>
+  </ul>
+  <h3>第6次A001・関連様式との対応</h3>
+  <p>スライド番号は事前公開版A001に基づきます。正式版で必ず再照合してください。A002の数値、A001の文章・図、A003/A004の金融確認で年度・法人範囲・金額を一致させます。</p>
+  <div class="table-wrap"><table class="compact"><thead><tr><th>第6次の審査軸</th><th>A001で関連する主な箇所</th><th>審査者が照合できる状態にする内容</th></tr></thead><tbody><tr><td>① 経営力</td><td>7～16、22</td><td>5～10年ビジョン、ポートフォリオ、今回投資、全社成長、賃上げ、資金配分を一つの経営判断として接続</td></tr><tr><td>② 先進性・成長性</td><td>25、28、30～34</td><td>市場数量、実名需要、競合差、能力制約、価格・販路、付加価値と労働投入、AXを根拠資料と接続</td></tr><tr><td>③ 地域への波及</td><td>37～45</td><td>足下・完了後の賃上げ、雇用・給与総額、地域調達、域外流出、供給網レジリエンスを金額・人数で提示</td></tr><tr><td>④ 大規模投資・費用対効果</td><td>50～54</td><td>平時投資との差、見積・価格妥当性、国費1円当たり効果、補助金による行動変容を反実仮想で説明</td></tr><tr><td>⑤ 実現可能性</td><td>57～65、A003・A004</td><td>責任者、用地、許認可、仕様、発注、採用、資金、工程、リスク代替案、金融機関の審査・支援</td></tr><tr><td>⑥ 補助金の必要性</td><td>67、A002</td><td>現預金、運転資金、別投資、借入・担保・増資の限界、補助なしの場合の縮小・延期を数値化</td></tr></tbody></table></div>
+  <div class="callout"><strong>中央値未満を許容できる条件</strong>低い指標を隠さず、なぜ低いか、その代わりにどの効果を最大化するか、公式要件をどう安全に履行するかを明示すること。特に絶対効果または国費当たり効果で弱い場合は、実名需要・能力制約・地域供給網・追加性・実行確度の証拠密度を上げる必要があります。</div>
+</section>
+
+<section id="cases">
+  <h2>12. 方向性8指標低位113社を確認する</h2>
+  <p>会社名・業種・公募回・定量補完レベルで絞り込めます。「公開定量では未説明」の5社は上の個別精査対象です。</p>
+  <div class="filters">
+    <input id="caseSearch" type="search" placeholder="会社名・業種を検索（例：半導体、ホテル）" aria-label="会社名・業種を検索">
+    <select id="roundFilter" aria-label="公募回"><option value="">全公募回</option><option>1次</option><option>2次</option><option>3次</option><option>4次</option></select>
+    <select id="levelFilter" aria-label="定量説明レベル"><option value="">全説明レベル</option><option>明確な定量補完（領域2以上）</option><option>部分的な定量補完（領域1）</option><option>公開方向性定量では未説明</option></select>
+    <label class="filter-check"><input id="cleanFilter" type="checkbox"> 品質除外なしのみ</label>
+  </div>
+  <div id="caseCount" class="sub" aria-live="polite"></div>
+  <div class="table-wrap case-results"><table><thead><tr><th>公募回</th><th>企業</th><th>業種</th><th>未満／観測</th><th>領域勝ち</th><th>成長</th><th>生産性・付加価値</th><th>賃金</th><th>説明レベル</th><th>品質</th><th>原資料</th></tr></thead><tbody id="caseBody"></tbody></table></div>
+</section>
+
+<section id="limitations">
+  <h2>13. 限界・再現手順・データ</h2>
+  <ul>
+    <li>不採択企業個票と審査点がないため、因果効果、配点、合格確率は推定できません。</li>
+    <li>公開PDFは交付決定後の要約で、審査時申請書や公式採択者母集団と一致しません。</li>
+    <li>No.8・14は集計中央値の水準を近づけた近似で、企業別公式値ではありません。</li>
+    <li>目視44社は目的抽出・採択企業のみ・単独非盲検評価です。次段階は二重符号化と非採択比較です。</li>
+    <li>第6次は事前公開版に基づきます。正式公募要領・様式公開時に差分確認が必要です。</li>
+  </ul>
+  <h3>再現</h3>
+  <div class="equation">python analyze_round6_reassessment.py<br>python build_round6_reassessment_report.py</div>
+  <p>分析コード、ケース別判定、感度分析、公式差、目視符号化、出典一覧を同じフォルダに保存しています。</p>
+  <div class="table-wrap"><table class="compact"><thead><tr><th>種別</th><th>場所</th><th>用途</th></tr></thead><tbody><tr><td>local</td><td><code>data\processed\cases.csv</code></td><td>381社の公開PDF抽出・品質フラグ</td></tr><tr><td>local</td><td><code>data\reference\official_round_benchmarks.csv</code></td><td>1～5次の申請者・採択者公式代表値</td></tr><tr><td>local</td><td><code>analysis\adoption_drivers\expanded_pair_company_coding.csv</code></td><td>40ペア80社の目視符号化</td></tr><tr><td>official</td><td><a href="https://chukentou-seichotoushi-hojo.jp/" target="_blank" rel="noopener">公式リンク ↗</a></td><td>6次の最新スケジュール、正式版公開の確認先</td></tr><tr><td>official</td><td><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/gaiyou_6ji.pdf" target="_blank" rel="noopener">公式リンク ↗</a></td><td>6次事前公開概要、5次からの変更点</td></tr><tr><td>official</td><td><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/youryou_6ji.pdf" target="_blank" rel="noopener">公式リンク ↗</a></td><td>6次事前公開公募要領、審査基準・提出書類</td></tr><tr><td>official</td><td><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/youshiki_6ji.zip" target="_blank" rel="noopener">公式リンク ↗</a></td><td>6次事前公開様式、スライド要求・Excel計算式</td></tr><tr><td>official</td><td><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/5ji_median.pdf" target="_blank" rel="noopener">公式リンク ↗</a></td><td>5次申請者198件・採択者77件の中央値</td></tr><tr><td>official</td><td><a href="https://chukentou-seichotoushi-hojo.jp/information/index.html" target="_blank" rel="noopener">公式リンク ↗</a></td><td>5次審査・採択結果</td></tr></tbody></table></div>
+  <p class="footnote">主な出力：<a href="case_level_reassessment.csv">ケース別再評価CSV</a>／<a href="focused_qualitative_review_44.csv">44社目視レビューCSV</a>／<a href="metric_reconstruction_validation.csv">指標再構築検証CSV</a>／<a href="official_applicant_accepted_gaps_by_round.csv">公式差の公募回別CSV</a>／<a href="round6_numeric_framework.csv">第6次数値フレームCSV</a></p>
+</section>
+</main>
+</div>
+<script>
+const cases = [{"company": "株式会社ホテルニューアワジ", "round": "2次", "industry": "宿泊業・飲食サービス業", "clean": true, "observed": 7, "below": 7, "componentWins": 0, "level": "公開方向性定量では未説明", "growth": false, "productivity": false, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__181.pdf"}, {"company": "アシザワ・ファインテック株式会社", "round": "2次", "industry": "製造業", "clean": true, "observed": 7, "below": 7, "componentWins": 0, "level": "公開方向性定量では未説明", "growth": false, "productivity": false, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__195.pdf"}, {"company": "株式会社八立製作所", "round": "2次", "industry": "製造業", "clean": true, "observed": 8, "below": 8, "componentWins": 0, "level": "公開方向性定量では未説明", "growth": false, "productivity": false, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__196.pdf"}, {"company": "株式会社シュゼット・ホールディングス", "round": "3次", "industry": "サービス業_他に分類されないもの", "clean": false, "observed": 5, "below": 5, "componentWins": 0, "level": "公開方向性定量では未説明", "growth": false, "productivity": false, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_99.pdf"}, {"company": "株式会社タカラ倉庫運輸サービス", "round": "3次", "industry": "運輸業・郵便業", "clean": false, "observed": 6, "below": 6, "componentWins": 0, "level": "公開方向性定量では未説明", "growth": false, "productivity": false, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_128.pdf"}, {"company": "高知食糧株式会社", "round": "3次", "industry": "卸売業・小売業", "clean": false, "observed": 8, "below": 7, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": true, "productivity": false, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_24.pdf"}, {"company": "株式会社サン海苔", "round": "4次", "industry": "製造業", "clean": true, "observed": 8, "below": 7, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": true, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_149.pdf"}, {"company": "株式会社環境整備産業", "round": "4次", "industry": "サービス業_他に分類されないもの", "clean": true, "observed": 8, "below": 7, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_172.pdf"}, {"company": "株式会社クラタ", "round": "1次", "industry": "製造業", "clean": true, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": true, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_27.pdf"}, {"company": "株式会社ハウゼコ", "round": "1次", "industry": "製造業", "clean": true, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": true, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_39.pdf"}, {"company": "株式会社ＡＫシステム", "round": "1次", "industry": "製造業", "clean": true, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_49.pdf"}, {"company": "株式会社オティックスホールディングス", "round": "1次", "industry": "製造業", "clean": true, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": true, "productivity": false, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_63.pdf"}, {"company": "株式会社福砂屋グループ", "round": "1次", "industry": "卸売業・小売業", "clean": false, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_164.pdf"}, {"company": "株式会社シャノワール", "round": "4次", "industry": "卸売業・小売業", "clean": true, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_145.pdf"}, {"company": "アサヒセイレン中部株式会社", "round": "2次", "industry": "製造業", "clean": false, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": true, "productivity": false, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__179.pdf"}, {"company": "株式会社イズミテクノ", "round": "2次", "industry": "製造業", "clean": true, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": true, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__200.pdf"}, {"company": "千代田鋼鉄工業株式会社", "round": "1次", "industry": "製造業", "clean": true, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": true, "productivity": false, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_40.pdf"}, {"company": "山本ビニター株式会社", "round": "1次", "industry": "製造業", "clean": false, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_45.pdf"}, {"company": "ポーライト株式会社", "round": "1次", "industry": "製造業", "clean": false, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": true, "productivity": false, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_47.pdf"}, {"company": "株式会社アルプスツール", "round": "1次", "industry": "製造業", "clean": true, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": true, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_66.pdf"}, {"company": "冬木工業株式会社", "round": "1次", "industry": "製造業", "clean": false, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": true, "productivity": false, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_102.pdf"}, {"company": "オーケー化成株式会社", "round": "1次", "industry": "製造業", "clean": false, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_103.pdf"}, {"company": "賀谷セロファン株式会社", "round": "3次", "industry": "製造業", "clean": false, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_15.pdf"}, {"company": "東洋スクリーン工業株式会社", "round": "3次", "industry": "製造業", "clean": true, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_30.pdf"}, {"company": "株式会社キド", "round": "3次", "industry": "製造業", "clean": true, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": true, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_83.pdf"}, {"company": "山崎商事運輸株式会社", "round": "3次", "industry": "運輸業・郵便業", "clean": false, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_95.pdf"}, {"company": "学校法人花沢学園", "round": "3次", "industry": "教育・学習支援業", "clean": false, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_110.pdf"}, {"company": "信和化工株式会社", "round": "4次", "industry": "製造業", "clean": false, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_155.pdf"}, {"company": "株式会社東豊精工", "round": "4次", "industry": "製造業", "clean": false, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_164.pdf"}, {"company": "フクビ岡山株式会社", "round": "4次", "industry": "製造業", "clean": false, "observed": 7, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_192.pdf"}, {"company": "株式会社ベネフル", "round": "4次", "industry": "卸売業・小売業", "clean": false, "observed": 6, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_228.pdf"}, {"company": "エスティケイテクノロジー株式会社", "round": "1次", "industry": "製造業", "clean": false, "observed": 6, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_20.pdf"}, {"company": "イグス株式会社", "round": "1次", "industry": "製造業", "clean": true, "observed": 6, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_35.pdf"}, {"company": "株式会社平島", "round": "1次", "industry": "製造業", "clean": false, "observed": 6, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_52.pdf"}, {"company": "マルコーフーズ株式会社", "round": "1次", "industry": "製造業", "clean": false, "observed": 6, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_53.pdf"}, {"company": "大岡技研株式会社", "round": "1次", "industry": "製造業", "clean": false, "observed": 6, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_96.pdf"}, {"company": "株式会社北海道ちぬやファーム", "round": "3次", "industry": "卸売業・小売業", "clean": false, "observed": 6, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_35.pdf"}, {"company": "株式会社レクザム", "round": "4次", "industry": "製造業", "clean": false, "observed": 6, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": true, "productivity": false, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_195.pdf"}, {"company": "株式会社モリシタ", "round": "3次", "industry": "卸売業・小売業", "clean": false, "observed": 6, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_232.pdf"}, {"company": "株式会社ライト製作所", "round": "3次", "industry": "製造業", "clean": true, "observed": 5, "below": 4, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": true, "productivity": false, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_27.pdf"}, {"company": "三晶エムイーシー株式会社", "round": "1次", "industry": "製造業", "clean": true, "observed": 5, "below": 4, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_58.pdf"}, {"company": "千寿製薬株式会社", "round": "1次", "industry": "製造業", "clean": true, "observed": 5, "below": 4, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_77.pdf"}, {"company": "協和工業株式会社", "round": "1次", "industry": "製造業", "clean": true, "observed": 8, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_70.pdf"}, {"company": "安田工業株式会社", "round": "1次", "industry": "製造業", "clean": false, "observed": 8, "below": 6, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": false, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_76.pdf"}, {"company": "池田薬品工業株式会社", "round": "4次", "industry": "製造業", "clean": false, "observed": 8, "below": 6, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": true, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_134.pdf"}, {"company": "株式会社リバイト", "round": "4次", "industry": "宿泊業・飲食サービス業", "clean": false, "observed": 8, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_135.pdf"}, {"company": "木本製菓株式会社", "round": "4次", "industry": "宿泊業・飲食サービス業", "clean": true, "observed": 8, "below": 6, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_136.pdf"}, {"company": "明和工業株式会社", "round": "4次", "industry": "製造業", "clean": true, "observed": 8, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": true, "productivity": false, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_168.pdf"}, {"company": "化成工業株式会社", "round": "4次", "industry": "製造業", "clean": false, "observed": 8, "below": 6, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": false, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_175.pdf"}, {"company": "株式会社ニシムタ", "round": "4次", "industry": "卸売業・小売業", "clean": true, "observed": 8, "below": 6, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": true, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_221.pdf"}, {"company": "鎌長製衡株式会社", "round": "1次", "industry": "製造業", "clean": true, "observed": 8, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_31.pdf"}, {"company": "環境のミカタ株式会社", "round": "1次", "industry": "サービス業_他に分類されないもの", "clean": false, "observed": 8, "below": 6, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": true, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_78.pdf"}, {"company": "株式会社アヤボ", "round": "3次", "industry": "製造業", "clean": false, "observed": 8, "below": 6, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_44.pdf"}, {"company": "株式会社コスモス食品", "round": "4次", "industry": "製造業", "clean": true, "observed": 8, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_115.pdf"}, {"company": "株式会社ヤマキ食品", "round": "4次", "industry": "製造業", "clean": true, "observed": 8, "below": 6, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_121.pdf"}, {"company": "株式会社　ファーストライン", "round": "4次", "industry": "運輸業・郵便業", "clean": false, "observed": 8, "below": 6, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_159.pdf"}, {"company": "南島酒販株式会社", "round": "4次", "industry": "卸売業・小売業", "clean": true, "observed": 8, "below": 6, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_210.pdf"}, {"company": "株式会社GOTENリゾート", "round": "2次", "industry": "宿泊業・飲食サービス業", "clean": true, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__190.pdf"}, {"company": "オリヒロエンジニアリング株式会社", "round": "1次", "industry": "製造業", "clean": false, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": false, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_32.pdf"}, {"company": "株式会社ビッグハウス", "round": "1次", "industry": "", "clean": false, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_41.pdf"}, {"company": "株式会社伝食", "round": "1次", "industry": "卸売業・小売業", "clean": true, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": true, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_75.pdf"}, {"company": "寧薬化学工業株式会社", "round": "1次", "industry": "製造業", "clean": true, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_80.pdf"}, {"company": "サン工業株式会社", "round": "1次", "industry": "製造業", "clean": false, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_82.pdf"}, {"company": "ヤマダイ株式会社", "round": "1次", "industry": "製造業", "clean": false, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_104.pdf"}, {"company": "株式会社ダイセイ", "round": "1次", "industry": "サービス業_他に分類されないもの", "clean": true, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_156.pdf"}, {"company": "浦島観光ホテル株式会社", "round": "1次", "industry": "宿泊業・飲食サービス業", "clean": true, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_159.pdf"}, {"company": "三友プラントサービス株式会社", "round": "3次", "industry": "サービス業_他に分類されないもの", "clean": false, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": false, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_68.pdf"}, {"company": "株式会社　博多屋", "round": "4次", "industry": "宿泊業・飲食サービス業", "clean": false, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_137.pdf"}, {"company": "オギハラ食品株式会社", "round": "4次", "industry": "製造業", "clean": false, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": false, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_171.pdf"}, {"company": "八戸酒造株式会社", "round": "3次", "industry": "製造業", "clean": false, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_205.pdf"}, {"company": "キングパーツ株式会社", "round": "3次", "industry": "製造業", "clean": true, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": false, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_212.pdf"}, {"company": "株式会社エム・ケー・ケー", "round": "4次", "industry": "宿泊業・飲食サービス業", "clean": true, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_218.pdf"}, {"company": "株式会社ティー・シー・ピー", "round": "2次", "industry": "製造業", "clean": true, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__199.pdf"}, {"company": "サムテック株式会社", "round": "1次", "industry": "製造業", "clean": true, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": true, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_8.pdf"}, {"company": "株式会社アイスコ", "round": "1次", "industry": "卸売業・小売業", "clean": false, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_46.pdf"}, {"company": "デーバー加工サービス㈱", "round": "1次", "industry": "製造業", "clean": false, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_81.pdf"}, {"company": "株式会社光製作所", "round": "1次", "industry": "製造業", "clean": false, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_170.pdf"}, {"company": "株式会社ヤマキ", "round": "3次", "industry": "製造業", "clean": false, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_16.pdf"}, {"company": "第一物産株式会社", "round": "3次", "industry": "卸売業・小売業", "clean": true, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": false, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_32.pdf"}, {"company": "中央製乳株式会社", "round": "3次", "industry": "製造業", "clean": true, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_42.pdf"}, {"company": "株式会社サンワ", "round": "3次", "industry": "運輸業・郵便業", "clean": false, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": false, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_48.pdf"}, {"company": "株式会社光製作所", "round": "3次", "industry": "製造業", "clean": false, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_70.pdf"}, {"company": "長野牛乳株式会社", "round": "3次", "industry": "製造業", "clean": false, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": true, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_87.pdf"}, {"company": "株式会社シード", "round": "3次", "industry": "製造業", "clean": false, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_105.pdf"}, {"company": "河淳株式会社", "round": "3次", "industry": "卸売業・小売業", "clean": false, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_106.pdf"}, {"company": "株式会社ヤマイシ", "round": "3次", "industry": "卸売業・小売業", "clean": false, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_109.pdf"}, {"company": "奥伊吹観光株式会社", "round": "4次", "industry": "生活関連サービス業・娯楽業", "clean": true, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_116.pdf"}, {"company": "杉プラスチック工業株式会社", "round": "4次", "industry": "製造業", "clean": false, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_122.pdf"}, {"company": "リバードコーポレーション株式会社", "round": "4次", "industry": "製造業", "clean": true, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_194.pdf"}, {"company": "株式会社ファイン", "round": "3次", "industry": "製造業", "clean": true, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_197.pdf"}, {"company": "能勢酒造株式会社", "round": "4次", "industry": "製造業", "clean": true, "observed": 7, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_206.pdf"}, {"company": "中本Fine Pack株式会社", "round": "3次", "industry": "製造業", "clean": false, "observed": 7, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": false, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_216.pdf"}, {"company": "日本リファイン株式会社", "round": "1次", "industry": "製造業", "clean": true, "observed": 6, "below": 4, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_25.pdf"}, {"company": "上野ロジケム株式会社", "round": "4次", "industry": "運輸業・郵便業", "clean": true, "observed": 6, "below": 4, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_156.pdf"}, {"company": "株式会社旭ウエルテック", "round": "1次", "industry": "製造業", "clean": false, "observed": 6, "below": 4, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_16.pdf"}, {"company": "サーパス工業株式会社", "round": "1次", "industry": "製造業", "clean": false, "observed": 6, "below": 4, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": false, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_62.pdf"}, {"company": "ヤマセ電気株式会社", "round": "1次", "industry": "製造業", "clean": false, "observed": 6, "below": 4, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": false, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_72.pdf"}, {"company": "マルコ工業株式会社", "round": "1次", "industry": "製造業", "clean": true, "observed": 6, "below": 4, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_85.pdf"}, {"company": "さくら不動産株式会社", "round": "3次", "industry": "不動産業・物品賃貸業", "clean": false, "observed": 6, "below": 4, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": false, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_3.pdf"}, {"company": "株式会社英楽", "round": "3次", "industry": "製造業", "clean": true, "observed": 6, "below": 4, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_40.pdf"}, {"company": "Ｌ物流株式会社", "round": "3次", "industry": "運輸業・郵便業", "clean": true, "observed": 6, "below": 4, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_85.pdf"}, {"company": "NICHIRO株式会社", "round": "4次", "industry": "製造業", "clean": true, "observed": 6, "below": 4, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": false, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_208.pdf"}, {"company": "ナミックス株式会社", "round": "1次", "industry": "製造業", "clean": false, "observed": 8, "below": 5, "componentWins": 3, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_95.pdf"}, {"company": "信光陸運株式会社", "round": "1次", "industry": "運輸業・郵便業", "clean": true, "observed": 8, "below": 5, "componentWins": 1, "level": "部分的な定量補完（1構成）", "growth": false, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_162.pdf"}, {"company": "株式会社GYXUS", "round": "3次", "industry": "製造業", "clean": true, "observed": 8, "below": 5, "componentWins": 3, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_52.pdf"}, {"company": "ＫＩＤＯ　ＰＡＣＫＡＧＩＮＧ株式会社", "round": "3次", "industry": "製造業", "clean": false, "observed": 8, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_91.pdf"}, {"company": "株式会社デイリーエッグ", "round": "4次", "industry": "製造業", "clean": false, "observed": 8, "below": 5, "componentWins": 3, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_161.pdf"}, {"company": "株式会社松尾製作所", "round": "1次", "industry": "製造業", "clean": true, "observed": 8, "below": 5, "componentWins": 3, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_50.pdf"}, {"company": "ハビックス株式会社", "round": "3次", "industry": "製造業", "clean": true, "observed": 8, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_65.pdf"}, {"company": "ときわ製作所株式会社", "round": "3次", "industry": "製造業", "clean": true, "observed": 8, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": true, "wage": false, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_72.pdf"}, {"company": "都吹株式会社", "round": "3次", "industry": "製造業", "clean": true, "observed": 8, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_140.pdf"}, {"company": "有限会社ワンプラスワン", "round": "4次", "industry": "運輸業・郵便業", "clean": true, "observed": 8, "below": 5, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": true, "productivity": false, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_200.pdf"}, {"company": "株式会社高木製作所", "round": "3次", "industry": "製造業", "clean": false, "observed": 5, "below": 3, "componentWins": 2, "level": "明確な定量補完（2構成以上）", "growth": false, "productivity": true, "wage": true, "pdf": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_19.pdf"}];
+const body = document.getElementById('caseBody');
+const count = document.getElementById('caseCount');
+const search = document.getElementById('caseSearch');
+const round = document.getElementById('roundFilter');
+const level = document.getElementById('levelFilter');
+const clean = document.getElementById('cleanFilter');
+function yn(value) { return value ? '<span class="pill-yes">●</span>' : '<span class="pill-no">—</span>'; }
+function safe(value) { const span=document.createElement('span'); span.textContent=value ?? ''; return span.innerHTML; }
+function renderCases() {
+  const q = search.value.trim().toLowerCase();
+  const filtered = cases.filter(c => (!q || (c.company+' '+c.industry).toLowerCase().includes(q)) && (!round.value || c.round===round.value) && (!level.value || c.level===level.value) && (!clean.checked || c.clean));
+  count.textContent = `${filtered.length}社 / ${cases.length}社`;
+  body.innerHTML = filtered.map(c => `<tr><td>${safe(c.round)}</td><td><strong>${safe(c.company)}</strong></td><td>${safe(c.industry)}</td><td>${c.below}/${c.observed}</td><td>${c.componentWins}</td><td>${yn(c.growth)}</td><td>${yn(c.productivity)}</td><td>${yn(c.wage)}</td><td>${safe(c.level)}</td><td>${c.clean?'除外なし':'注意'}</td><td><a href="${safe(c.pdf)}" target="_blank" rel="noopener">PDF ↗</a></td></tr>`).join('');
+}
+[search,round,level,clean].forEach(el => el.addEventListener('input',renderCases));
+renderCases();
+const toc = document.getElementById('toc'); const tocButton = document.getElementById('tocToggle');
+tocButton.addEventListener('click', () => { const collapsed=toc.classList.toggle('collapsed'); tocButton.textContent=collapsed?'目次を開く':'閉じる'; tocButton.setAttribute('aria-expanded', String(!collapsed)); });
+if (window.innerWidth <= 1050) { toc.classList.add('collapsed'); tocButton.textContent='目次を開く'; tocButton.setAttribute('aria-expanded','false'); }
+</script>
+</body>
+</html>

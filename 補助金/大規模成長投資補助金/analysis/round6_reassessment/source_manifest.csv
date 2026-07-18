@@ -1,0 +1,10 @@
+﻿source_type,location,use
+local,data\processed\cases.csv,381社の公開PDF抽出・品質フラグ
+local,data\reference\official_round_benchmarks.csv,1～5次の申請者・採択者公式代表値
+local,analysis\adoption_drivers\expanded_pair_company_coding.csv,40ペア80社の目視符号化
+official,https://chukentou-seichotoushi-hojo.jp/,6次の最新スケジュール、正式版公開の確認先
+official,https://chukentou-seichotoushi-hojo.jp/assets/documents/common/gaiyou_6ji.pdf,6次事前公開概要、5次からの変更点
+official,https://chukentou-seichotoushi-hojo.jp/assets/documents/common/youryou_6ji.pdf,6次事前公開公募要領、審査基準・提出書類
+official,https://chukentou-seichotoushi-hojo.jp/assets/documents/common/youshiki_6ji.zip,6次事前公開様式、スライド要求・Excel計算式
+official,https://chukentou-seichotoushi-hojo.jp/assets/documents/common/5ji_median.pdf,5次申請者198件・採択者77件の中央値
+official,https://chukentou-seichotoushi-hojo.jp/information/index.html,5次審査・採択結果

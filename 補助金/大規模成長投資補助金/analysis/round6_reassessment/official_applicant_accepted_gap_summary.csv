@@ -1,0 +1,16 @@
+﻿metric_key,metric_label,unit,rounds_n,accepted_higher_rounds_n,accepted_equal_rounds_n,accepted_lower_rounds_n,median_gap_pct,latest_applicant,latest_accepted
+company_sales_cagr,全社年平均売上高成長率,%/年,5,5,0,0,21.42857142857142,20.0,21.0
+company_sales_increase,全社売上高増加額,億円,5,5,0,0,59.22077922077922,67.1,82.4
+project_sales_share,全社売上高に対する補助事業売上高の割合,%,5,5,0,0,11.250000000000004,80.0,89.0
+project_sales_cagr,補助事業年平均売上高成長率,%/年,5,4,1,0,18.181818181818187,22.0,22.0
+project_sales_increase,補助事業売上高増加額,億円,5,5,0,0,70.92651757188497,57.4,74.8
+labor_cagr,年平均労働生産性の伸び,%/年,5,4,1,0,19.999999999999996,21.0,21.0
+value_added_increase,補助事業付加価値増加額,億円,5,5,0,0,63.565891472868216,19.9,28.1
+employee_pay_rate,年平均従業員目標賃上げ率,%/年,5,4,1,0,7.692307692307687,6.5,7.0
+employee_pay_total_increase,従業員給与支給総額の増加額,億円,5,5,0,0,45.83333333333335,2.8,3.9
+officer_pay_rate,年平均役員目標賃上げ率,%/年,4,4,0,0,11.363636363636353,5.5,6.0
+officer_pay_total_increase,役員給与支給総額の増加額,億円,4,3,1,0,46.42857142857143,0.07,0.1
+investment_sales_ratio,全社売上高に対する投資額割合,%,5,1,0,4,-4.1666666666666625,64.0,61.0
+value_added_subsidy_ratio,補助金額に対する付加価値増加額割合,%,5,5,0,0,24.56140350877194,171.0,213.0
+local_benchmark_score,ローカルベンチマークの得点,点,5,1,4,0,0.0,23.0,23.0
+company_pay_schedule_rate,全社賃上げ予定率,%,3,1,1,1,0.0,2.3,2.5
