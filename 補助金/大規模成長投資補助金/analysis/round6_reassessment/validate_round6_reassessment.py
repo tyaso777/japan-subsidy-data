@@ -229,8 +229,10 @@ def main() -> None:
     ]
     for wording in false_majority_wording:
         assert wording not in report, f"false majority wording remains: {wording}"
-    assert "観測指標の半数以上が申請者代表値以上" in report
-    assert "代表値を厳密に上回る場合だけ数えると39／65／9" in report
+    assert "観測指標の少なくとも半数が申請者代表値以上" in report
+    assert "中央値を厳密に上回る場合だけ数えると、それぞれ39件、65件、9件" in report
+    assert "最新公表回" in report
+    assert "}×100" in report
     print("round6 reassessment validation: OK")
 
 
