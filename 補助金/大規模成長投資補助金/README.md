@@ -65,7 +65,6 @@
 - `html/qa.html`: ローカルPDFと抽出値・Box原文を照合する確認用HTML
 - `html/qa_v0.1.html`: `cases.csv` の代表値と指標別信頼性を、ローカルPDFと並べて確認する分析前QA用HTML
 - `html/public_metrics_dashboard.html`: 指標・回次・品質フラグを選び、企業別散布図、分布、公式1～5次代表値、原PDFを連動表示する「採択企業 公開指標比較ダッシュボード」
-- `html/public_metrics_dashboard_online.html`: 企業データをHTML内に保持し、原PDFを公式Web URLから表示する単体配布向けオンライン版
 - `docs/payroll_total_estimation.md`: 給与支給総額の近似式、判定列、日生流通運輸倉庫・NAX JAPANの単位再検証
 - `excel/大規模成長投資補助金_1次～4次_統合データ.xlsx`: 検証済みExcelスナップショット
 
@@ -146,8 +145,6 @@
 `python scripts/build_analysis_dashboard.py`
 
 `public_metrics_dashboard.html` では、横軸・縦軸、公募回、指標別信頼性、対象範囲、案件構造・主体・単位・OCR等の除外フラグを指定できます。散布図の企業を選択すると、原PDF、主要値、指標別信頼性、同一次の公式申請者・採択者代表値に対する位置を表示します。公式値との比較のうち、売上CAGR・売上増加額・投資額／売上高は公開PDFの定義と完全には一致しないため「近似比較」です。労働生産性率、従業員給与率、役員給与率も、対象主体や期間が異なる案件では元PDFを確認してください。旧 `analysis_dashboard.html` は新ファイルへの転送用として残しています。
-
-単体配布には `public_metrics_dashboard_online.html` を使用します。企業データと公式統計はHTML内に埋め込まれます。公式サイトは外部iframe表示を拒否するため、オンラインモードでは右側に選択企業名と「公式PDFを別タブで開く」ボタンを表示し、公式URLを直接開きます。閲覧にはインターネット接続が必要で、「表示」メニューからローカルPDFへ切り替えることもできます。
 
 ### 別抽出データとの比較（Pythonのみ）
 
