@@ -1,0 +1,9 @@
+﻿round,metric_key,unit,proxy_n,proxy_median,official_accepted_median,relative_difference_pct
+1次,value_added_increase,億円,148,11.65205,14.2,-17.943309859154933
+1次,value_added_subsidy_ratio,%,148,132.23158333333333,126.0,4.9457010582010685
+2次,value_added_increase,億円,25,16.5409,17.6,-6.017613636363639
+2次,value_added_subsidy_ratio,%,25,179.00000000000003,149.0,20.13422818791948
+3次,value_added_increase,億円,106,20.9105,24.1,-13.234439834024903
+3次,value_added_subsidy_ratio,%,106,167.80283029001072,171.0,-1.8696898888826197
+4次,value_added_increase,億円,93,17.479,21.1,-17.1611374407583
+4次,value_added_subsidy_ratio,%,93,207.70670685757352,209.0,-0.6188005466155388

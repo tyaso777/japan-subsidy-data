@@ -1,0 +1,43 @@
+# 採択企業の「補完要因」分析
+
+## 目的
+
+公開企業PDFの指標が申請者・採択者中央値を下回る企業について、別の定量指標が弱さを補っているかを診断します。既存ダッシュボードは変更しません。
+
+これは採択要因の因果推論ではありません。非採択企業の個票、審査項目別点数、プレゼンテーション評価が公開されていないためです。「採択企業内で、公開情報により説明できる範囲」を明確にする分析です。
+
+## 実行
+
+```powershell
+python analyze_adoption_drivers.py
+```
+
+入力は `data/processed/cases.csv`、`data/reference/official_round_benchmarks.csv`、`data/processed/sales_series.csv`、`data/text/pages.jsonl` です。
+
+出力:
+
+- `company_diagnostics.csv`: 企業別の劣後数、補助金効率、補完指標、文章テーマ
+- `round_summary.csv`: 公募回別の集計
+- `group_comparison.csv`: 可視指標劣後群とその他採択企業の比較
+- `metric_assessment.csv`: 指標の重要性、公式上の位置付け、測定可能性
+- `summary.json`: 主要集計値
+
+## 判定ルール
+
+- 可視7指標のうち3指標以上が観測でき、採択者中央値を下回る比率が60%以上の企業を「可視指標劣後」とします。
+- 中央値は足切り基準ではありません。採択者の半数が各指標の中央値を下回るため、複数指標を束ねて診断します。
+- 付加価値増加額の公開PDF推計は、`(目標労働生産性×目標従業員数－基準労働生産性×基準従業員数)÷10,000`（億円）です。従業員数の主体範囲が審査入力と一致する保証はないため、企業別の公式値ではなく「proxy」としています。
+
+## 公式根拠
+
+- [第4次公募 公募要領](https://seichotoushi-hojo.jp/assets/pdf/outline_4ji.pdf): 経営力、先進性・成長性、地域への波及効果、大規模投資・費用対効果、実現可能性、加点項目
+- [第3次公募 補助金の概要](https://seichotoushi-hojo.jp/assets/pdf/about_3ji.pdf): 補助金額に対する付加価値増加額などの費用対効果
+- [第1次公募 一次審査結果](https://seichotoushi-hojo.jp/1_2ji/information/2024/05/28.html): 一次審査・プレゼンテーション審査の存在
+- [第1次公募 採択結果](https://seichotoushi-hojo.jp/1_2ji/information/2024/06/21.html)
+- [第2次公募 採択結果](https://seichotoushi-hojo.jp/1_2ji/information/2024/11/07.html)
+- [第3次公募 採択結果](https://seichotoushi-hojo.jp/information/2025/06/30.html)
+- [第4次公募 採択結果](https://seichotoushi-hojo.jp/information/2025/10/10.html)
+
+## 注意
+
+公開企業PDFは交付決定企業を中心とするデータで、公募時の「採択申請者」母集団と一対一ではありません。特に1次・2次はラベルと母集団差に注意してください。文章テーマは単語の言及有無であり、審査上の評価や点数ではありません。

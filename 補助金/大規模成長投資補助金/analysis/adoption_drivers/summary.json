@@ -1,0 +1,16 @@
+{
+  "case_count": 381,
+  "visible_metric_lagging_definition": "3指標以上観測かつ採択者中央値未満が60%以上",
+  "visible_metric_lagging_n": 125,
+  "visible_metric_lagging_pct": 32.8,
+  "lagging_above_value_added_increase_n": 27,
+  "lagging_above_value_added_subsidy_ratio_n": 45,
+  "lagging_with_any_quantitative_compensation_n": 54,
+  "unresolved_visible_lag_n": 71,
+  "limitations": [
+    "非採択企業の個票と審査点がないため採択要因の因果推論はできない",
+    "公式中央値は合否基準ではなく各指標の採択者の半数は中央値未満になる",
+    "公開PDF母集団と公募時の採択申請者母集団は一致しない",
+    "付加価値推計の従業員数は補助事業従事者で、全社または審査入力値と一致しない可能性がある"
+  ]
+}
