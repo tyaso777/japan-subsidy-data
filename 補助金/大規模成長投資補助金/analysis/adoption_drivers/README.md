@@ -22,6 +22,16 @@ python analyze_adoption_drivers.py
 - `metric_assessment.csv`: 指標の重要性、公式上の位置付け、測定可能性
 - `summary.json`: 主要集計値
 
+深掘り分析:
+
+- `deepen_adoption_profiles.py`: 5つの定量軸、採択プロファイル、文章根拠密度、パレート支配を計算
+- `application_profiles.csv`: 企業別の採択プロファイルと審査項目別文章特徴
+- `profile_summary.csv`: 採択プロファイル別集計
+- `criteria_evidence_summary.csv`: 公開文章の審査項目別根拠密度
+- `threshold_sensitivity.csv`: 「強い軸」の閾値を変えた感度分析
+- `applicant_benchmark_summary.csv`: 採択者中央値未満でも申請者中央値以上かを集計
+- `deep_dive_report.md`: 「どういう申請が通るのか」の詳細な解釈と申請スコアカード
+
 ## 判定ルール
 
 - 可視7指標のうち3指標以上が観測でき、採択者中央値を下回る比率が60%以上の企業を「可視指標劣後」とします。

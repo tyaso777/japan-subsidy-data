@@ -1,0 +1,26 @@
+{
+  "company_count": 381,
+  "profile_counts": {
+    "企業変革投資型": 82,
+    "複合バランス型": 76,
+    "補助金効率型": 62,
+    "成長・生産性型": 57,
+    "定性・非公開要因候補": 57,
+    "賃金・雇用型": 29,
+    "効果絶対額型": 18
+  },
+  "strong_axis_distribution": {
+    "0": 119,
+    "1": 106,
+    "2": 80,
+    "3": 47,
+    "4": 25,
+    "5": 4
+  },
+  "pareto_dominated_n": 288,
+  "pareto_dominated_pct": 75.6,
+  "unresolved_visible_lag_n": 71,
+  "qualitative_compensation_candidate_n": 11,
+  "visible_lagging_above_at_least_one_applicant_median_n": 124,
+  "warning": "採択企業内の類型化であり、採択確率・審査点・因果効果ではない"
+}
