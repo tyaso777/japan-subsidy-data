@@ -62,7 +62,7 @@ HTML = r'''<!doctype html>
   --purple:#b8a1d3;--wash:#233239;--warm:#382a22;--shadow:none;
 }}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.75}
-a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation}.page{width:min(1420px,100%);margin:auto;padding:28px clamp(16px,3vw,44px) 72px}
+a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation}dfn{font-style:normal;font-weight:800;color:var(--blue)}.page{width:min(1420px,100%);margin:auto;padding:28px clamp(16px,3vw,44px) 72px}
 .hero{background:var(--paper);border-top:8px solid var(--orange);box-shadow:var(--shadow);padding:clamp(28px,5vw,68px);margin-bottom:24px}
 .eyebrow{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--orange);font-weight:800}.hero h1{font-family:var(--serif);font-size:clamp(2rem,5vw,4.3rem);line-height:1.12;margin:.2em 0}.hero .lead{font-size:clamp(1rem,1.8vw,1.35rem);max-width:980px;color:var(--muted)}
 .meta{display:flex;gap:20px;flex-wrap:wrap;margin-top:30px;font-size:.88rem;color:var(--muted)}
@@ -89,27 +89,41 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
   <header class="hero">
     <div class="eyebrow">Adoption drivers / analytical dossier</div>
     <h1>採択要因分析<br>方法・結果・示唆</h1>
-    <p class="lead">大規模成長投資補助金の公開企業PDFと公式中央値を用いて、「採択者中央値を下回っても採択されている案件」をどこまで説明できるかを段階的に検証した。381社の定量スクリーニング、5軸プロファイル、公開文章の根拠密度、40組80社の目視ペア精査を一つの分析体系として再構成する。</p>
-    <div class="meta"><span>分析対象：公開企業PDF 381社</span><span>公募回：1～4次（第5次はベンチマーク補助）</span><span>作成：2026-07-18</span><span>版：1.0</span></div>
+    <p class="lead">大規模成長投資補助金の公開企業PDFと公式中央値を用いて、「採択者中央値（各公募回の採択者における各指標の中央値）を下回っても採択されている案件」をどこまで説明できるかを段階的に検証した。381社の定量スクリーニング、複数の定量切り口による類型化、公開文章の分析、40組80社の目視ペア精査を一つの分析体系として再構成する。</p>
+    <div class="meta"><span>分析対象：公開企業PDF 381社</span><span>公募回：1～4次（第5次はベンチマーク補助）</span><span>作成：2026-07-18</span><span>版：1.1</span></div>
   </header>
 
   <nav class="toc" aria-label="目次">
-    <a href="#executive">01 要旨</a><a href="#design">02 データと設計</a><a href="#screen">03 劣後群スクリーニング</a><a href="#proxy">04 Proxy検証</a>
-    <a href="#profiles">05 5軸プロファイル</a><a href="#text">06 公開文章分析</a><a href="#pairs">07 40ペア目視精査</a><a href="#sixth">08 第6次への含意</a>
+    <a href="#executive">01 要旨・用語</a><a href="#design">02 データと設計</a><a href="#screen">03 中央値劣後群の抽出</a><a href="#proxy">04 推計指標の検証</a>
+    <a href="#profiles">05 多軸プロファイル</a><a href="#text">06 公開文章分析</a><a href="#pairs">07 40ペア目視精査</a><a href="#sixth">08 第6次への含意</a>
     <a href="#synthesis">09 統合解釈</a><a href="#limits">10 限界と次の設計</a><a href="#appendix">11 定義・再現方法</a><a href="#sources">12 出典</a>
   </nav>
 
   <section class="chapter" id="executive">
     <div class="chapter-head"><div class="no">01</div><div><h2>エグゼクティブ・サマリー</h2><p class="subtitle">本分析が示したこと、示していないことを先に分離する。</p></div></div>
+    <h3>最初に読む用語</h3>
+    <p>以下は制度上の公式名称ではなく、本分析内で企業を整理・比較するための分析用語である。</p>
+    <table class="table responsive"><thead><tr><th>用語</th><th>この資料での定義</th><th>読み方・注意</th></tr></thead><tbody>
+      <tr><td data-label="用語"><dfn>採択者中央値／申請者中央値</dfn></td><td data-label="定義">公式資料に掲載された、公募回ごとの「採択者」／「申請者全体」における各指標の中央値。</td><td data-label="注意">採択者中央値は採択ラインではない。申請者中央値は申請集団内の相対位置を見る比較基準。</td></tr>
+      <tr><td data-label="用語"><dfn>可視7指標</dfn></td><td data-label="定義">公開企業PDFから企業別に取得でき、同じ公募回の採択者中央値と比較できる7指標。全社売上高CAGR（年平均成長率）・増加額、労働生産性CAGR、1人当たり給与CAGR、給与総額増加額、役員報酬CAGR、投資額／全社売上高。</td><td data-label="注意">公開PDFで見える範囲に限定した指標群で、審査指標全体ではない。</td></tr>
+      <tr><td data-label="用語"><dfn>可視指標劣後</dfn></td><td data-label="定義">可視7指標のうち3指標以上を観測でき、その60%以上が同じ公募回の採択者中央値未満である案件。本資料では125社。</td><td data-label="注意">「不合格水準」ではない。採択者中央値は合格線ではなく、採択者の半数が下回る代表値。</td></tr>
+      <tr><td data-label="用語"><dfn>Proxy（推計指標）</dfn></td><td data-label="定義">公式の企業別値を直接取得できないため、公開PDFの数値を式に代入して近似した指標。例：付加価値増加額、付加価値増加額／補助金額。</td><td data-label="注意">入力欄の主体・人数範囲が公式計算と一致する保証がなく、企業別公式値としては扱わない。</td></tr>
+      <tr><td data-label="用語"><dfn>定量補完</dfn></td><td data-label="定義">可視指標劣後125社のうち、追加のProxyまたは補助事業指標が少なくとも一つ、同回採択者中央値以上だった案件。本資料では54社。</td><td data-label="注意">弱い指標が統計的に「相殺された」という意味ではなく、別の強い定量軸が観測されたという診断。</td></tr>
+      <tr><td data-label="用語"><dfn>定量未説明</dfn></td><td data-label="定義">可視指標劣後125社のうち、上記の定量補完を公開データから確認できなかった案件。本資料では71社。</td><td data-label="注意">採択理由がないのではなく、公開定量だけでは理由を回収できないという意味。</td></tr>
+      <tr><td data-label="用語"><dfn>5軸</dfn>／<dfn>強い軸</dfn></td><td data-label="定義">成長・生産性、絶対効果、補助金効率、賃金・雇用、企業変革投資の5つ。同回内パーセンタイル0.65以上を「強い軸」とする。</td><td data-label="注意">0.65は分析上の基本閾値であり、制度上の採択基準ではない。</td></tr>
+      <tr><td data-label="用語"><dfn>パレート支配あり</dfn></td><td data-label="定義">同回の別企業が、観測可能な5軸すべてで同等以上かつ一つ以上で上回る状態。</td><td data-label="注意">企業として劣るという評価ではなく、公開5軸の単調ランキングだけでは採択を説明できないことを示す。</td></tr>
+      <tr><td data-label="用語"><dfn>低定量側／高定量側</dfn></td><td data-label="定義">40組の類似企業ペア内で、公開定量の総合的な相対位置が低い側／高い側。両社とも採択企業。</td><td data-label="注意">採択・非採択の比較ではなく、採択企業同士の探索的比較。</td></tr>
+      <tr><td data-label="用語"><dfn>文章根拠</dfn></td><td data-label="定義">審査観点の語と、数字・実績・受注・契約・比較・顧客等の証拠マーカーが同じ文に現れるもの。</td><td data-label="注意">審査点そのものではなく、公開文章に現れた根拠の密度。</td></tr>
+    </tbody></table>
     <div class="kpis">
-      <div class="kpi"><strong>125社</strong><small>可視7指標で採択者中央値に広く劣後（381社の32.8%）</small></div>
-      <div class="kpi"><strong>54社</strong><small>追加の定量Proxyで少なくとも一つ補完</small></div>
-      <div class="kpi"><strong>71社</strong><small>公開定量だけでは説明が残る案件</small></div>
+      <div class="kpi"><strong>125社</strong><small>可視指標劣後（381社の32.8%）</small></div>
+      <div class="kpi"><strong>54社</strong><small>定量補完：追加の推計・補助事業指標に強み</small></div>
+      <div class="kpi"><strong>71社</strong><small>定量未説明：公開定量では理由を回収できず</small></div>
       <div class="kpi"><strong>40ペア</strong><small>同回・同業種・近い投資規模の目視比較</small></div>
     </div>
     <div class="callout">結論は「中央値を超えれば通る」ではない。採択案件は、<b>申請者全体に対する最低限の競争力</b>を持ちつつ、需要・能力制約・構造転換・実行確度などを束ねて、投資から付加価値・賃金までの因果連鎖を説明している。</div>
     <div class="grid2">
-      <div><h3>最も堅い知見</h3><ul><li>可視指標劣後125社のうち124社は、観測可能な指標の少なくとも一つで同回の<b>申請者中央値以上</b>だった。</li><li>公開Proxyでは「付加価値増加額÷補助金額」が公式中央値に比較的近く、費用対効果の補完診断として最も有用だった。</li><li>低定量側40社でも、能力制約と構造転換の強い根拠は各39社（97.5%）。4中核要因の2つ以上が全40社で確認された。</li></ul></div>
+      <div><h3>最も堅い知見</h3><ul><li>可視指標劣後125社のうち124社は、観測可能な指標の少なくとも一つで同回の<b>申請者中央値以上</b>だった。</li><li>公開Proxy（推計指標）では「付加価値増加額÷補助金額」が公式中央値に比較的近く、費用対効果の補完診断として最も有用だった。</li><li>低定量側（40ペア内で公開定量の相対位置が低い採択企業）でも、能力制約と構造転換の強い根拠は各39社（97.5%）。4中核要因の2つ以上が全40社で確認された。</li></ul></div>
       <div><h3>読み過ぎてはいけない点</h3><ul><li>標本は原則として採択企業のみ。非採択個票がないため、採択確率・因果効果・重みは推定できない。</li><li>採択者中央値は合格線ではなく、各指標で採択者の半数が下回る記述統計である。</li><li>公開2ページPDFは申請書・審査点を代替しない。文章分析で「定量未説明」71社の理由を十分には回収できなかった。</li></ul></div>
     </div>
     <div class="finding"><strong>実務上の中心命題</strong>数値は「全部高くする」より、①第5次採択者中央値を競争水準の目安に置く、②主戦場となる1～2軸を選ぶ、③補助金1円当たり効果と絶対効果を両立させる、④需要→設備制約→投資→売上・付加価値→賃金・雇用を同一モデルで接続する、という設計が重要である。</div>
@@ -136,14 +150,14 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
 
   <section class="chapter" id="screen">
     <div class="chapter-head"><div class="no">03</div><div><h2>可視指標劣後群のスクリーニング</h2><p class="subtitle">「中央値未満」を一指標で断定せず、観測数と劣後比率を条件化した。</p></div></div>
-    <div class="formula">visible_lag = 観測可能な可視7指標が3個以上 AND 同回採択者中央値未満の比率が60%以上</div>
-    <p class="footnote">可視7指標：全社売上高CAGR、全社売上高増加額、労働生産性CAGR、1人当たり給与成長率、給与支給総額増加額、役員報酬成長率、投資額／全社売上高。</p>
+    <div class="formula">可視指標劣後 = 観測可能な可視7指標が3個以上 AND 同回採択者中央値未満の比率が60%以上</div>
+    <p class="footnote">可視7指標：全社売上高CAGR、全社売上高増加額、労働生産性CAGR、1人当たり給与成長率、給与支給総額増加額、役員報酬成長率、投資額／全社売上高。データ・コード上の変数名は <span class="mono">visible_lag</span>。</p>
     <div class="flow">
       <div class="flow-box"><strong>381</strong><span>全公開案件</span></div><div class="arrow">→</div>
       <div class="flow-box warn"><strong>125</strong><span>可視指標劣後<br>32.8%</span></div><div class="arrow">→</div>
-      <div class="flow-box"><strong>54 / 71</strong><span>定量Proxyで補完 / 公開定量では未説明</span></div>
+      <div class="flow-box"><strong>54 / 71</strong><span>定量補完 / 定量未説明</span></div>
     </div>
-    <div class="grid2"><div><div class="chart-title">公募回別の劣後率</div><div id="roundChart" class="chart" role="img" aria-label="公募回別の可視指標劣後率"></div></div><div><div class="chart-title">劣後群とその他採択企業の差</div><div id="groupChart" class="chart" role="img" aria-label="劣後群の同回内パーセンタイル差"></div></div></div>
+    <div class="grid2"><div><div class="chart-title">公募回別の可視指標劣後率</div><div id="roundChart" class="chart" role="img" aria-label="公募回別の可視指標劣後率"></div></div><div><div class="chart-title">可視指標劣後群とその他採択企業の差</div><div id="groupChart" class="chart" role="img" aria-label="可視指標劣後群の同回内パーセンタイル差"></div></div></div>
     <div class="finding"><strong>サイズとProxy効果がともに小さい</strong>劣後群は、補助金額・事業費・付加価値増加額Proxy・付加価値／補助金など、多くの比較でその他採択企業より低い。単純な「小さい案件だが補助金効率が高かった」という一つの説明では71社を回収できない。</div>
     <h3>申請者中央値に置き直すと見え方が変わる</h3>
     <div id="applicantChart" class="chart" role="img" aria-label="申請者中央値以上の指標割合"></div>
@@ -236,9 +250,12 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
     <h3>主要判定</h3>
     <table class="table responsive"><thead><tr><th>名称</th><th>定義</th><th>用途</th></tr></thead><tbody>
       <tr><td data-label="名称">可視指標劣後</td><td data-label="定義">観測3指標以上、採択者中央値未満の割合60%以上</td><td data-label="用途">追加説明が必要な案件の入口</td></tr>
-      <tr><td data-label="定義">定量補完</td><td data-label="定義">付加価値増加額、付加価値／補助金、補助事業売上等の少なくとも一つが採択者中央値以上</td><td data-label="用途">公開可視7指標の外側の勝ち筋</td></tr>
+      <tr><td data-label="名称">Proxy（推計指標）</td><td data-label="定義">公開PDFの数値から計算した近似値で、企業別公式値ではない</td><td data-label="用途">非公開の公式指標に近い傾向を集計診断</td></tr>
+      <tr><td data-label="名称">定量補完</td><td data-label="定義">付加価値増加額、付加価値／補助金、補助事業売上等の少なくとも一つが採択者中央値以上</td><td data-label="用途">公開可視7指標の外側の勝ち筋</td></tr>
+      <tr><td data-label="名称">定量未説明</td><td data-label="定義">可視指標劣後に該当し、追加の定量補完を公開データで確認できない</td><td data-label="用途">公開定量の限界を示す残余群</td></tr>
       <tr><td data-label="名称">強い軸</td><td data-label="定義">5軸の同回内パーセンタイルが0.65以上</td><td data-label="用途">プロファイル分類。0.60～0.75で感度分析</td></tr>
       <tr><td data-label="名称">パレート支配</td><td data-label="定義">同回の別企業が観測5軸すべてで同等以上かつ一つ以上で上</td><td data-label="用途">単調ランキングでは説明できない案件の識別</td></tr>
+      <tr><td data-label="名称">低定量側／高定量側</td><td data-label="定義">採択企業同士の類似ペア内で公開定量の相対位置が低い側／高い側</td><td data-label="用途">低定量案件に共通する定性要因の探索</td></tr>
       <tr><td data-label="名称">強い定性根拠</td><td data-label="定義">0～3点符号化の2点以上。3点は固有名・数量・契約・工程など厳格な証拠</td><td data-label="用途">40ペア目視比較</td></tr>
     </tbody></table>
     <h3>再生成順</h3>
@@ -289,7 +306,7 @@ function lineChart(id,series,{min=0,max=100,suffix='%',labels=['0.60','0.65','0.
 
 verticalBars('roundChart',D.rounds.map(r=>({label:r.round,value:num(r.visible_metric_lagging_pct)})),{max:50});
 horizontalDiff('groupChart',D.groups.map(r=>({label:r.metric.replace('（億円）','').replace('（推計）',''),value:num(r.within_round_percentile_difference)})));
-groupedBars('applicantChart',D.applicant.map(r=>({label:r.group,share:num(r.mean_above_applicant_share)*100,any:num(r.at_least_one_above_applicant_n)/num(r.n)*100})),[{key:'share',label:'観測指標の平均割合',color:'var(--blue)'},{key:'any',label:'少なくとも1指標',color:'var(--orange)'}],{max:100});
+groupedBars('applicantChart',D.applicant.map(r=>({label:r.group==='定量で未説明'?'定量未説明':r.group,share:num(r.mean_above_applicant_share)*100,any:num(r.at_least_one_above_applicant_n)/num(r.n)*100})),[{key:'share',label:'観測指標の平均割合',color:'var(--blue)'},{key:'any',label:'少なくとも1指標',color:'var(--orange)'}],{max:100});
 
 const proxyNames={value_added_increase:'付加価値増加額',value_added_subsidy_ratio:'付加価値／補助金'};
 const proxyItems=['1次','2次','3次','4次'].map(rd=>{const o={label:rd};D.proxy.filter(r=>r.round===rd).forEach(r=>o[r.metric_key]=num(r.relative_difference_pct));return o});
@@ -298,11 +315,11 @@ divergingBars('proxyChart',proxyItems,[{key:'value_added_increase',label:'付加
 document.getElementById('profileList').innerHTML=D.profiles.map(r=>`<div class="profile-row"><b>${esc(r.application_profile)}</b><div class="bar-track"><div class="bar-fill" style="width:${num(r.share_pct)}%"></div></div><small>${r.company_count}社 / ${pct(r.share_pct)}</small></div>`).join('');
 verticalBars('axisChart',Object.entries(D.deep.strong_axis_distribution).map(([k,v])=>({label:`${k}軸`,value:num(v),color:num(k)===0?'var(--orange)':'var(--blue)'})),{max:130,suffix:'社'});
 const thresholdGroups=['全採択企業','可視指標劣後','定量で未説明'];
-lineChart('thresholdChart',thresholdGroups.map((g,i)=>({label:g,color:['var(--blue)','var(--orange)','var(--red)'][i],values:D.thresholds.filter(r=>r.group===g).map(r=>num(r.at_least_one_strong_axis_pct))})),{min:0,max:100});
+lineChart('thresholdChart',thresholdGroups.map((g,i)=>({label:g==='定量で未説明'?'定量未説明':g,color:['var(--blue)','var(--orange)','var(--red)'][i],values:D.thresholds.filter(r=>r.group===g).map(r=>num(r.at_least_one_strong_axis_pct))})),{min:0,max:100});
 
 const critNames={management:'経営力',innovation_market:'革新・市場',regional_spillover:'地域波及',feasibility:'実現可能性',policy_relevance:'政策整合'};
 const critItems=Object.keys(critNames).map(c=>{const o={label:critNames[c]};['可視指標劣後','定量で未説明'].forEach(g=>{o[g]=num(D.criteria.find(r=>r.group===g&&r.criterion===c).mean_within_round_percentile)*100});return o});
-groupedBars('criteriaChart',critItems,[{key:'可視指標劣後',label:'可視指標劣後',color:'var(--blue)'},{key:'定量で未説明',label:'定量で未説明',color:'var(--orange)'}],{max:60,baseline:50});
+groupedBars('criteriaChart',critItems,[{key:'可視指標劣後',label:'可視指標劣後',color:'var(--blue)'},{key:'定量で未説明',label:'定量未説明',color:'var(--orange)'}],{max:60,baseline:50});
 
 const pairItems=D.pairFactors.map(r=>({label:r.factor_ja,lower:num(r.lower_strong_share)*100,higher:num(r.higher_strong_share)*100}));
 groupedBars('pairChart',pairItems,[{key:'lower',label:'低定量側',color:'var(--orange)'},{key:'higher',label:'高定量側',color:'var(--blue)'}],{max:100});
