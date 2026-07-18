@@ -124,7 +124,7 @@ assert(dashboardHtml.includes("採択企業 公開指標比較ダッシュボー
 assert(legacyDashboardHtml.includes("location.replace('public_metrics_dashboard.html'"), "legacy analysis dashboard must redirect to the renamed file");
 assert(dashboardHtml.includes("const DATA=[") && dashboardHtml.includes("const BENCH=["), "analysis dashboard must embed cases and official benchmarks");
 assert(dashboardHtml.includes("const DEFAULT_PDF_MODE='local'") && onlineDashboardHtml.includes("const DEFAULT_PDF_MODE='online'"), "local and online dashboards must use their intended PDF defaults");
-assert(onlineDashboardHtml.includes('id="pdfMode"') && onlineDashboardHtml.includes("mode==='online'?(selected.pdf_url"), "online dashboard must display official Web PDFs with a selectable fallback mode");
+assert(onlineDashboardHtml.includes('id="pdfMode"') && onlineDashboardHtml.includes('id="onlinePdfNotice"') && onlineDashboardHtml.includes("if(mode==='online'){frame.hidden=true"), "online dashboard must avoid blocked iframe embedding and expose a direct official-PDF action");
 assert(onlineDashboardHtml.includes("const DATA=[") && !onlineDashboardHtml.includes("__DEFAULT_PDF_MODE__"), "online dashboard must be a self-contained generated file");
 assert(dashboardHtml.includes("表示対象をCSV出力") && dashboardHtml.includes("公式統計に対する位置"), "analysis dashboard controls or position table are missing");
 assert(dashboardHtml.includes('placeholder="企業名・case_id・本文を検索"') && dashboardHtml.includes("空白＝AND、OR＝OR") && dashboardHtml.includes("工場 建設 OR 新設"), "dashboard search must explain body-text AND/OR query syntax");
