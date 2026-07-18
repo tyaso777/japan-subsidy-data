@@ -1,0 +1,6 @@
+﻿metric_no,metric_key,metric_label,total_value_n,total_cases,total_coverage_pct,lagging_group_n,lagging_available_n,lagging_coverage_pct,lagging_above_official_n,lagging_above_share_of_available_pct,unique_compensation_n,official_statistic,round_pdf_counts,calculation,median_threshold_eligible
+4,project_sales_share,4. 全社売上高に対する補助事業売上高の割合,17,381,4.4619422572178475,125,6,4.8,0,0.0,0,mean,1次 7 / 2次 3 / 3次 4 / 4次 3,目標補助事業売上高÷目標全社売上高×100,False
+5,project_sales_cagr,5. 補助事業年平均売上高成長率,2,381,0.5249343832020997,125,1,0.8,1,100.0,1,median,1次 1 / 2次 0 / 3次 0 / 4次 1,補助事業売上高の基準値・目標値と期間から年平均成長率を算出,True
+6,project_sales_increase,6. 補助事業売上高増加額,13,381,3.4120734908136483,125,7,5.6,4,57.142857142857146,0,median,1次 7 / 2次 1 / 3次 4 / 4次 1,目標補助事業売上高－基準補助事業売上高,True
+8,value_added_increase,8. 補助事業付加価値増加額,372,381,97.63779527559055,125,122,97.6,27,22.131147540983605,8,median,1次 148 / 2次 25 / 3次 106 / 4次 93,"（目標労働生産性×目標人数－基準労働生産性×基準人数）÷10,000",True
+14,value_added_subsidy_ratio,14. 補助金額に対する付加価値増加額割合,372,381,97.63779527559055,125,122,97.6,45,36.885245901639344,25,median,1次 148 / 2次 25 / 3次 106 / 4次 93,付加価値増加額の推計値÷補助金額×100,True

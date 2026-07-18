@@ -60,6 +60,12 @@ python analyze_adoption_drivers.py
 
 - `adoption_drivers_analysis_report.html`: 381社の定量スクリーニング、Proxy検証、5軸プロファイル、文章分析、40ペア目視精査、第6次向け数値設計を「問い→方法→結果→解釈→限界」の順で統合した単独HTML
 - `build_adoption_drivers_analysis_report.py`: 同フォルダのCSV・JSONから上記HTMLを再生成。画面閲覧・モバイル・印刷に対応
+- `validate_metric_reconstruction.py`: 基本7指標の公募回別分布統計と公式中央値との乖離、追加5指標の利用可能件数・補完寄与を再計算
+- `visible_metric_validation.csv`: 基本7指標×1～4次について、PDF値件数・収録率・中央値・平均値・標本標準偏差・標本分散・公式採択者中央値との差を収録
+- `visible_metric_validation_summary.csv`: 基本7指標ごとの総収録率、4回の中央値乖離率の要約
+- `additional_metric_validation_by_round.csv`: 追加5指標の公募回別件数と公式代表値との比較。No.4の公式値が平均、他4指標が中央値であることも保持
+- `additional_metric_coverage.csv`: 追加5指標について、全381社・可視指標劣後125社で作れる件数、公式代表値以上の件数、固有の補完件数を収録
+- `additional_metric_overlap.csv`: No.8・14とNo.4～6の補完件数の重なり
 
 再生成:
 
@@ -67,6 +73,7 @@ python analyze_adoption_drivers.py
 python select_matched_pair_candidates.py
 python analyze_expanded_matched_pairs.py
 python build_expanded_pair_dashboard.py
+python validate_metric_reconstruction.py
 python build_adoption_drivers_analysis_report.py
 ```
 
@@ -85,6 +92,8 @@ python prepare_sixth_round_consulting.py --refresh-external
 - 可視7指標のうち3指標以上が観測でき、採択者中央値を下回る比率が60%以上の企業を「可視指標劣後」とします。
 - 中央値は足切り基準ではありません。採択者の半数が各指標の中央値を下回るため、複数指標を束ねて診断します。
 - 付加価値増加額の公開PDF推計は、`(目標労働生産性×目標従業員数－基準労働生産性×基準従業員数)÷10,000`（億円）です。従業員数の主体範囲が審査入力と一致する保証はないため、企業別の公式値ではなく「proxy」としています。
+- 追加評価5指標は同じ情報量ではありません。No.8・14は372社で作れますが、No.4・5・6は17社・2社・13社のみです。No.4の公式代表値は平均値なので、採択者中央値以上を使う定量補完判定には含めません。
+- 分布統計の標準偏差と分散は、不偏推定量として `ddof=1` を使った標本標準偏差・標本分散です。公式側で公表されているのは代表値であり、平均値・標準偏差・分散を直接比較しているわけではありません。
 
 ## 公式根拠
 

@@ -37,6 +37,11 @@ payload = {
     "strategy": rows("sixth_round_numeric_strategy.csv"),
     "finance": rows("external_financial_confirmation_summary.csv"),
     "metrics": rows("metric_assessment.csv"),
+    "visibleValidation": rows("visible_metric_validation.csv"),
+    "visibleValidationSummary": rows("visible_metric_validation_summary.csv"),
+    "additionalValidation": rows("additional_metric_validation_by_round.csv"),
+    "additionalCoverage": rows("additional_metric_coverage.csv"),
+    "additionalOverlap": rows("additional_metric_overlap.csv"),
 }
 
 DATA = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
@@ -90,11 +95,11 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
     <div class="eyebrow">Adoption drivers / analytical dossier</div>
     <h1>採択要因分析<br>方法・結果・示唆</h1>
     <p class="lead">大規模成長投資補助金の公開企業PDFと公式中央値を用いて、「採択者中央値（各公募回の採択者における各指標の中央値）を下回っても採択されている案件」をどこまで説明できるかを段階的に検証した。381社の定量スクリーニング、複数の定量切り口による類型化、公開文章の分析、40組80社の目視ペア精査を一つの分析体系として再構成する。</p>
-    <div class="meta"><span>分析対象：公開企業PDF 381社</span><span>公募回：1～4次（第5次はベンチマーク補助）</span><span>版：1.3</span></div>
+    <div class="meta"><span>分析対象：公開企業PDF 381社</span><span>公募回：1～4次（第5次はベンチマーク補助）</span><span>版：1.4</span></div>
   </header>
 
   <nav class="toc" aria-label="目次">
-    <a href="#executive">01 要旨・用語</a><a href="#design">02 データと設計</a><a href="#screen">03 中央値劣後群の抽出</a><a href="#proxy">04 追加評価指標の検証</a>
+    <a href="#executive">01 要旨・用語</a><a href="#design">02 データと設計</a><a href="#screen">03 基本7指標の妥当性</a><a href="#proxy">04 追加評価指標の検証</a>
     <a href="#profiles">05 多軸プロファイル</a><a href="#text">06 公開文章分析</a><a href="#pairs">07 40ペア目視精査</a><a href="#sixth">08 第6次への含意</a>
     <a href="#synthesis">09 統合解釈</a><a href="#limits">10 限界と次の設計</a><a href="#appendix">11 定義・再現方法</a><a href="#sources">12 出典</a>
   </nav>
@@ -108,8 +113,8 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
       <tr><td data-label="用語"><dfn>可視7指標</dfn></td><td data-label="定義">公開企業PDFから企業別の値を取得または推計でき、同じ公募回の採択者中央値と比較できる7指標。具体的な7項目は直後の「可視7指標の内訳」に一つずつ示す。</td><td data-label="注意">公開PDFで比較できる範囲に限定した分析用の指標群であり、審査指標全体ではない。</td></tr>
       <tr><td data-label="用語"><dfn>可視指標劣後</dfn></td><td data-label="定義">可視7指標のうち3指標以上を観測でき、その60%以上が同じ公募回の採択者中央値未満である案件。本資料では125社。</td><td data-label="注意">「不合格水準」ではない。採択者中央値は合格線ではなく、採択者の半数が下回る代表値。</td></tr>
       <tr><td data-label="用語"><dfn>推計値（Proxy）</dfn></td><td data-label="定義">公開PDFの複数の数値を式に代入して近似した企業別値。「どの指標群に属するか」ではなく、「値を直接取得したか、計算で近似したか」を表す属性。</td><td data-label="注意">可視7指標のNo.10も推計値である。したがって「Proxy＝可視7指標の外側」ではない。入力欄の主体・人数範囲が公式計算と一致する保証がないため、企業別公式値として扱わない。</td></tr>
-      <tr><td data-label="用語"><dfn>追加評価5指標</dfn></td><td data-label="定義">可視7指標だけでは弱く見える企業に、別の定量的な強みがあるかを評価するため、可視7指標の外側に追加した5指標。No.4・5・6・8・14を企業別に推計する。</td><td data-label="注意">5指標の内訳と計算は後掲表に示す。これらも多くは推計値だが、「追加評価」は用途、「推計値」は作り方を表し、意味が異なる。</td></tr>
-      <tr><td data-label="用語"><dfn>定量補完</dfn></td><td data-label="定義">可視指標劣後125社のうち、追加評価5指標の少なくとも一つが同回採択者中央値以上だった案件。本資料では54社。</td><td data-label="注意">弱い指標が統計的に「相殺された」という意味ではなく、可視7指標とは別の定量軸で強みが観測されたという診断。</td></tr>
+      <tr><td data-label="用語"><dfn>追加評価5指標</dfn></td><td data-label="定義">可視7指標だけでは弱く見える企業に、別の定量的な強みがあるかを評価するため、可視7指標の外側に追加したNo.4・5・6・8・14。</td><td data-label="注意">No.8・14は372社で作れる主要2指標。No.4～6は2～17社しか作れない参考3指標で、情報量は均一ではない。</td></tr>
+      <tr><td data-label="用語"><dfn>定量補完</dfn></td><td data-label="定義">可視指標劣後125社のうち、中央値比較が可能な追加評価指標No.5・6・8・14の少なくとも一つが同回採択者中央値以上だった案件。本資料では54社。</td><td data-label="注意">No.4の公式代表値は平均値なので、この中央値判定には含めない。弱い指標が統計的に相殺されたという意味でもない。</td></tr>
       <tr><td data-label="用語"><dfn>定量未説明</dfn></td><td data-label="定義">可視指標劣後125社のうち、上記の定量補完を公開データから確認できなかった案件。本資料では71社。</td><td data-label="注意">採択理由がないのではなく、公開定量だけでは理由を回収できないという意味。</td></tr>
       <tr><td data-label="用語"><dfn>5軸</dfn>／<dfn>強い軸</dfn></td><td data-label="定義">成長・生産性、絶対効果、補助金効率、賃金・雇用、企業変革投資の5つ。同回内パーセンタイル0.65以上を「強い軸」とする。</td><td data-label="注意">0.65は分析上の基本閾値であり、制度上の採択基準ではない。</td></tr>
       <tr><td data-label="用語"><dfn>パレート支配あり</dfn></td><td data-label="定義">同回の別企業が、観測可能な5軸すべてで同等以上かつ一つ以上で上回る状態。</td><td data-label="注意">企業として劣るという評価ではなく、公開5軸の単調ランキングだけでは採択を説明できないことを示す。</td></tr>
@@ -128,9 +133,9 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
       <tr><td data-label="7指標内の番号" class="num">7</td><td data-label="公式No." class="num nowrap">No.13</td><td data-label="指標名"><b>全社売上高に対する投資額割合</b></td><td data-label="単位" class="nowrap">%</td><td data-label="内容">投資額を基準時点の全社売上高で割った割合。企業規模に対して今回の投資がどの程度大きいかを見る。</td></tr>
     </tbody></table>
     <h4>定量補完の判定に使う追加評価5指標</h4>
-    <p class="footnote">可視指標劣後企業について、次の5指標のうち一つでも同一公募回の採択者中央値以上なら「定量補完」とした。企業別の値はいずれも公開PDF・売上系列から作る推計値である。</p>
+    <p class="footnote">企業別の値はいずれも公開PDF・売上系列から作る推計値。No.5・6・8・14は同一公募回の採択者中央値以上なら「定量補完」とした。No.4は公式代表値が平均値のため、中央値ベースの補完判定には含めない。</p>
     <table class="table responsive"><thead><tr><th class="nowrap">公式No.</th><th>追加評価指標</th><th>企業別推計値の作り方</th><th>評価上の意味</th></tr></thead><tbody>
-      <tr><td data-label="公式No." class="num nowrap">No.4</td><td data-label="指標"><b>全社売上高に対する補助事業売上高の割合</b></td><td data-label="作り方">補助事業の目標売上高 ÷ 全社の目標売上高 × 100。</td><td data-label="意味">今回の補助事業が、将来の会社全体に占める比重を測る。</td></tr>
+      <tr><td data-label="公式No." class="num nowrap">No.4</td><td data-label="指標"><b>全社売上高に対する補助事業売上高の割合</b><br><span class="tag orange">参考・公式は平均値</span></td><td data-label="作り方">補助事業の目標売上高 ÷ 全社の目標売上高 × 100。</td><td data-label="意味">今回の補助事業が、将来の会社全体に占める比重を測る。</td></tr>
       <tr><td data-label="公式No." class="num nowrap">No.5</td><td data-label="指標"><b>補助事業年平均売上高成長率</b></td><td data-label="作り方">公開PDFから抽出した補助事業の基準・目標売上高と期間からCAGRを計算。</td><td data-label="意味">会社全体ではなく、投資対象事業そのものの成長速度を測る。</td></tr>
       <tr><td data-label="公式No." class="num nowrap">No.6</td><td data-label="指標"><b>補助事業売上高増加額</b></td><td data-label="作り方">補助事業の目標売上高 − 基準売上高。</td><td data-label="意味">投資対象事業が生む売上高の絶対増加額を測る。</td></tr>
       <tr><td data-label="公式No." class="num nowrap">No.8</td><td data-label="指標"><b>補助事業付加価値増加額</b></td><td data-label="作り方">（目標労働生産性 × 目標従業員数 − 基準労働生産性 × 基準従業員数）÷ 10,000。結果は億円。</td><td data-label="意味">売上高ではなく、補助事業が生む付加価値の絶対増加額を近似する。</td></tr>
@@ -139,13 +144,13 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
     <p class="method"><b>判定に含めない補助診断：</b> 売上高増加額／補助金額、給与総額増加額／補助金額、雇用増加数／補助金1億円、補助金額、事業費なども群間比較や5軸分析には使用した。ただし、これらは「定量補完54社」を決める5指標には含めていない。</p>
     <div class="kpis">
       <div class="kpi"><strong>125社</strong><small>可視指標劣後（381社の32.8%）</small></div>
-      <div class="kpi"><strong>54社</strong><small>定量補完：追加評価5指標のいずれかで中央値以上</small></div>
+      <div class="kpi"><strong>54社</strong><small>定量補完：中央値比較可能な追加指標で中央値以上</small></div>
       <div class="kpi"><strong>71社</strong><small>定量未説明：公開定量では理由を回収できず</small></div>
       <div class="kpi"><strong>40ペア</strong><small>同回・同業種・近い投資規模の目視比較</small></div>
     </div>
     <div class="callout">結論は「中央値を超えれば通る」ではない。採択案件は、<b>申請者全体に対する最低限の競争力</b>を持ちつつ、需要・能力制約・構造転換・実行確度などを束ねて、投資から付加価値・賃金までの因果連鎖を説明している。</div>
     <div class="grid2">
-      <div><h3>最も堅い知見</h3><ul><li>可視指標劣後125社のうち124社は、観測可能な指標の少なくとも一つで同回の<b>申請者中央値以上</b>だった。</li><li>追加評価5指標のうち、「付加価値増加額÷補助金額」の推計値は公式中央値に比較的近く、費用対効果の補完診断として最も有用だった。</li><li>低定量側（40ペア内で公開定量の相対位置が低い採択企業）でも、能力制約と構造転換の強い根拠は各39社（97.5%）。4中核要因の2つ以上が全40社で確認された。</li></ul></div>
+      <div><h3>最も堅い知見</h3><ul><li>可視指標劣後125社のうち124社は、観測可能な指標の少なくとも一つで同回の<b>申請者中央値以上</b>だった。</li><li>追加評価5指標のうち、十分な件数を持つのはNo.8・14で、「付加価値増加額÷補助金額」の推計値は公式中央値にも比較的近い。</li><li>低定量側（40ペア内で公開定量の相対位置が低い採択企業）でも、能力制約と構造転換の強い根拠は各39社（97.5%）。4中核要因の2つ以上が全40社で確認された。</li></ul></div>
       <div><h3>読み過ぎてはいけない点</h3><ul><li>標本は原則として採択企業のみ。非採択個票がないため、採択確率・因果効果・重みは推定できない。</li><li>採択者中央値は合格線ではなく、各指標で採択者の半数が下回る記述統計である。</li><li>公開2ページPDFは申請書・審査点を代替しない。文章分析で「定量未説明」71社の理由を十分には回収できなかった。</li></ul></div>
     </div>
     <div class="finding"><strong>実務上の中心命題</strong>数値は「全部高くする」より、①第5次採択者中央値を競争水準の目安に置く、②主戦場となる1～2軸を選ぶ、③補助金1円当たり効果と絶対効果を両立させる、④需要→設備制約→投資→売上・付加価値→賃金・雇用を同一モデルで接続する、という設計が重要である。</div>
@@ -161,7 +166,7 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
     <h3>研究質問</h3>
     <table class="table responsive"><thead><tr><th>段階</th><th>問い</th><th>方法</th><th>推論範囲</th></tr></thead><tbody>
       <tr><td data-label="段階">A. スクリーニング</td><td data-label="問い">採択者中央値を複数指標で下回る案件はどの程度あるか</td><td data-label="方法">可視7指標、同回採択者中央値、観測3指標以上、劣後率60%以上</td><td data-label="推論範囲">採択案件内の記述</td></tr>
-      <tr><td data-label="段階">B. 定量補完</td><td data-label="問い">可視7指標の外側にある定量的な強みを確認できるか</td><td data-label="方法">補助事業売上高の割合・CAGR・増加額、付加価値増加額、付加価値増加額／補助金額の追加評価5指標を企業別に推計し、同回採択者中央値と比較</td><td data-label="推論範囲">公開値による補完可能性</td></tr>
+      <tr><td data-label="段階">B. 定量補完</td><td data-label="問い">可視7指標の外側にある定量的な強みを確認できるか</td><td data-label="方法">追加5指標を推計し、まず利用可能件数を監査。中央値比較可能なNo.5・6・8・14を同回採択者中央値と比較</td><td data-label="推論範囲">公開値による補完可能性</td></tr>
       <tr><td data-label="段階">C. 多軸診断</td><td data-label="問い">企業ごとの勝ち筋は一つか、複数か</td><td data-label="方法">5軸を同回内パーセンタイル化、プロファイル・パレート支配・感度分析</td><td data-label="推論範囲">採択案件内の相対配置</td></tr>
       <tr><td data-label="段階">D. 定性精査</td><td data-label="問い">低定量案件に共通する具体的な根拠は何か</td><td data-label="方法">40組80社を6要因0～3点で目視符号化、Wilson区間・符号検定</td><td data-label="推論範囲">採択案件同士の探索的比較</td></tr>
     </tbody></table>
@@ -171,7 +176,18 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
   </section>
 
   <section class="chapter" id="screen">
-    <div class="chapter-head"><div class="no">03</div><div><h2>可視指標劣後群のスクリーニング</h2><p class="subtitle">「中央値未満」を一指標で断定せず、観測数と劣後比率を条件化した。</p></div></div>
+    <div class="chapter-head"><div class="no">03</div><div><h2>基本比較7指標の妥当性と劣後群抽出</h2><p class="subtitle">劣後判定に使う前に、公開PDFから作った企業別値の収録率・分布と公式採択者中央値との距離を公募回別に再検証した。</p></div></div>
+    <h3>3.1 基本比較7指標は、どの程度公式分布を再現しているか</h3>
+    <div class="kpis"><div class="kpi"><strong>28比較</strong><small>7指標×1～4次</small></div><div class="kpi"><strong>15 / 28</strong><small>PDF中央値が公式中央値の±10%以内</small></div><div class="kpi"><strong>26.0～99.7%</strong><small>指標別のPDF値収録率</small></div><div class="kpi"><strong>3件</strong><small>最少セル：2次のNo.1全社売上高CAGR</small></div></div>
+    <div class="method"><b>検証方法：</b> 1～4次の各指標について、公開PDF収録企業のうち値を作れる件数、収録率、中央値、平均値、標本標準偏差、標本分散を計算し、公式の採択者中央値とPDF標本中央値を比較した。標準偏差と分散は公開PDF標本の散らばりであり、公式側には対応する公表値がない。分散の単位は元指標の単位の2乗である。</div>
+    <div class="grid2"><div><div class="chart-title">指標別のPDF値収録率</div><div id="visibleCoverageChart" class="chart" role="img" aria-label="基本7指標のPDF値収録率"></div><p class="chart-note">381社中。No.1とNo.13は欠損が多く、同じ「基本7指標」でも情報量は均一ではない。</p></div><div><div class="chart-title">公式中央値との乖離（公募回4比較の要約）</div><div id="visibleErrorChart" class="chart" role="img" aria-label="基本7指標の公式中央値との絶対乖離"></div><p class="chart-note">棒は4回の絶対乖離率の中央値と最大値。小さいほど公式採択者中央値に近い。</p></div></div>
+    <h4>公募回別の全統計</h4>
+    <table class="table responsive"><thead><tr><th>指標</th><th>回</th><th>PDF件数 / 収録数</th><th>公式採択者<br>件数・中央値</th><th>PDF中央値</th><th>差</th><th>PDF平均値</th><th>標本標準偏差</th><th>標本分散</th></tr></thead><tbody id="visibleValidationTable"></tbody></table>
+    <p class="footnote">「PDF件数 / 収録数」の分母はその回に収録した公開企業PDF数で、公式採択者件数とは別母集団。公式採択者件数は1次109、2次85、3次116、4次102に対し、公開PDF収録数は順に156、25、107、93である。</p>
+    <div class="finding"><strong>妥当性は指標ごとに異なる</strong>No.9従業員賃上げ率、No.10給与総額増加額、No.11役員賃上げ率は、4回の公式中央値に対する絶対乖離率の中央値がそれぞれ4.5%、5.3%、6.9%で、集計的な追随性が比較的高い。No.13投資額／売上高も7.8%だが収録率は46.7%。一方、No.1全社売上高CAGRは収録率26.0%、No.2全社売上高増加額は3次で公式中央値を49.1%上回り、No.7労働生産性は2次で30.5%下回る。全7指標を同じ精度の測定値として扱うべきではない。</div>
+    <p>売上増加額や投資額／売上高では平均値が中央値を大きく上回り、標準偏差・分散も大きい。これは右裾の長い分布と外れ値の影響を示すため、企業の相対位置には平均値より中央値が適する。ただし、公式母集団と公開PDF母集団が一致しない以上、中央値が近いことは企業別計算式の完全な正しさを証明せず、遠いことも直ちに計算誤りを意味しない。</p>
+    <h3>3.2 妥当性の差を踏まえた可視指標劣後群のスクリーニング</h3>
+    <p>欠損の多い指標や分布の歪みを一つだけで判定材料にしないため、観測できた指標数と、そのうち中央値を下回る比率を同時に条件化した。</p>
     <div class="formula">可視指標劣後 = 観測可能な可視7指標が3個以上 AND 同回採択者中央値未満の比率が60%以上</div>
     <p class="footnote">可視7指標の正式名称、単位、意味は第1章「可視7指標の内訳」を参照。データ・コード上の判定変数名は <span class="mono">visible_lag</span>。</p>
     <div class="flow">
@@ -187,10 +203,17 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
   </section>
 
   <section class="chapter" id="proxy">
-    <div class="chapter-head"><div class="no">04</div><div><h2>追加評価指標の構築と検証</h2><p class="subtitle">可視7指標の外側に追加した5指標について、公開値から作る企業別推計値が公式採択者中央値をどの程度再現するか検証した。</p></div></div>
+    <div class="chapter-head"><div class="no">04</div><div><h2>追加評価指標の構築、利用可能件数、検証</h2><p class="subtitle">追加した5指標を同列に扱わず、まず企業別値を作れる件数と劣後群での寄与件数を示し、その後に公式代表値との距離を検証した。</p></div></div>
+    <h3>4.1 追加5指標のうち、実際に使えるのはどれか</h3>
+    <div class="kpis"><div class="kpi"><strong>372社</strong><small>No.8・No.14を推計可能（97.6%）</small></div><div class="kpi"><strong>2～17社</strong><small>No.4～No.6を作れる企業数</small></div><div class="kpi"><strong>53社</strong><small>劣後125社中、No.8またはNo.14が公式中央値以上</small></div><div class="kpi"><strong>1社</strong><small>No.4～No.6だけで新たに補完された企業</small></div></div>
+    <div id="additionalCoverageChart" class="chart" role="img" aria-label="追加評価5指標の利用可能率"></div>
+    <table class="table responsive"><thead><tr><th>追加指標</th><th>全381社で作れる</th><th>劣後125社で作れる</th><th>公式代表値以上</th><th>固有の補完</th><th>公募回別PDF件数</th><th>判定上の扱い</th></tr></thead><tbody id="additionalCoverageTable"></tbody></table>
+    <div class="method"><b>No.4の統計上の注意：</b> 公式公表値は「中央値」ではなく「平均値」である。現行の定量補完定義は同回の採択者中央値以上なので、No.4を補完判定には用いていない。No.5とNo.6は中央値比較が可能だが、企業別値はそれぞれ2社、13社しかなく、一般化できない。</div>
+    <div class="finding"><strong>「追加5指標」の実質は主要2指標＋疎な参考3指標</strong>可視指標劣後125社のうち、No.8またはNo.14で補完された企業は53社。No.4～No.6のいずれかが中央値以上なのは5社だが、そのうち4社はNo.8／No.14でも既に補完されており、純増は1社だけだった。したがって54社という補完件数は、ほぼNo.8付加価値増加額とNo.14付加価値増加額／補助金額による。</div>
+    <h3>4.2 主要追加2指標の計算と公式中央値への追随性</h3>
     <div class="formula">付加価値増加額の推計値（億円） = {目標労働生産性 × 目標従業員数 − 基準労働生産性 × 基準従業員数} ÷ 10,000</div>
     <div class="formula">補助金費用対効果の推計値（%） = 100 × 付加価値増加額の推計値 ÷ 補助金額（億円）</div>
-    <div class="method"><b>重要な制約：</b> 公開PDFの「従業員数」と様式2の補助事業P/Lの主体範囲が一致する保証はない。企業別公式値ではなく、集計・診断用の推計値（Proxy）としてのみ使用する。</div>
+    <div class="method"><b>重要な制約：</b> 公開PDFの「従業員数」と様式2の補助事業P/Lの主体範囲が一致する保証はない。企業別公式値ではなく、集計・診断用の推計値（Proxy）としてのみ使用する。No.8・No.14の公募回別推計件数は1次148、2次25、3次106、4次93である。</div>
     <div id="proxyChart" class="chart" role="img" aria-label="公式中央値に対するProxy中央値の相対差"></div>
     <table class="table responsive"><thead><tr><th>指標</th><th>1次</th><th>2次</th><th>3次</th><th>4次</th><th>評価</th></tr></thead><tbody>
       <tr><td data-label="指標">付加価値増加額</td><td data-label="1次">−17.9%</td><td data-label="2次">−6.0%</td><td data-label="3次">−13.2%</td><td data-label="4次">−17.2%</td><td data-label="評価">方向は追うが、公式値を系統的に下回る</td></tr>
@@ -274,8 +297,8 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
       <tr><td data-label="名称">可視指標劣後</td><td data-label="定義">観測3指標以上、採択者中央値未満の割合60%以上</td><td data-label="用途">追加説明が必要な案件の入口</td></tr>
       <tr><td data-label="名称">推計値（Proxy）</td><td data-label="定義">公開PDFの複数値を式で組み合わせた近似値。可視7指標内にも外にも存在する</td><td data-label="用途">企業別公式値を直接取得できない指標の傾向を診断</td></tr>
       <tr><td data-label="名称">追加評価5指標</td><td data-label="定義">可視7指標の外側に追加したNo.4・5・6・8・14の企業別推計値</td><td data-label="用途">可視指標劣後企業の別の定量的強みを評価</td></tr>
-      <tr><td data-label="名称">定量補完</td><td data-label="定義">追加評価5指標の少なくとも一つが同回採択者中央値以上</td><td data-label="用途">可視7指標の外側の勝ち筋</td></tr>
-      <tr><td data-label="名称">定量未説明</td><td data-label="定義">可視指標劣後に該当し、追加評価5指標のいずれも採択者中央値以上と確認できない</td><td data-label="用途">公開定量の限界を示す残余群</td></tr>
+      <tr><td data-label="名称">定量補完</td><td data-label="定義">中央値比較可能な追加指標No.5・6・8・14の少なくとも一つが同回採択者中央値以上</td><td data-label="用途">可視7指標の外側の勝ち筋。No.4は公式が平均値のため対象外</td></tr>
+      <tr><td data-label="名称">定量未説明</td><td data-label="定義">可視指標劣後に該当し、上記4指標のいずれも採択者中央値以上と確認できない</td><td data-label="用途">公開定量の限界を示す残余群</td></tr>
       <tr><td data-label="名称">強い軸</td><td data-label="定義">5軸の同回内パーセンタイルが0.65以上</td><td data-label="用途">プロファイル分類。0.60～0.75で感度分析</td></tr>
       <tr><td data-label="名称">パレート支配</td><td data-label="定義">同回の別企業が観測5軸すべてで同等以上かつ一つ以上で上</td><td data-label="用途">単調ランキングでは説明できない案件の識別</td></tr>
       <tr><td data-label="名称">低定量側／高定量側</td><td data-label="定義">採択企業同士の類似ペア内で公開定量の相対位置が低い側／高い側</td><td data-label="用途">低定量案件に共通する定性要因の探索</td></tr>
@@ -284,13 +307,14 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
     <h3>再生成順</h3>
     <pre class="formula">python analyze_adoption_drivers.py
 python deepen_adoption_profiles.py
+python validate_metric_reconstruction.py
 python prepare_sixth_round_consulting.py
 python select_matched_pair_candidates.py
 python analyze_expanded_matched_pairs.py
 python build_adoption_drivers_analysis_report.py</pre>
     <p class="footnote">Python 3.10以降を想定。外部データを更新する場合のみ <span class="mono">prepare_sixth_round_consulting.py --refresh-external</span> を使用する。</p>
     <h3>主な監査ファイル</h3>
-    <ul class="sources"><li><a href="report.md">report.md</a>：初期スクリーニング</li><li><a href="deep_dive_report.md">deep_dive_report.md</a>：5軸・文章・スコアカード</li><li><a href="expanded_matched_pair_report.md">expanded_matched_pair_report.md</a>：40ペア全件監査</li><li><a href="expanded_matched_pair_review.xlsx">expanded_matched_pair_review.xlsx</a>：閲覧用ワークブック</li><li><a href="sixth_round_consulting_guide.md">sixth_round_consulting_guide.md</a>：第6次相談ガイド</li></ul>
+    <ul class="sources"><li><a href="visible_metric_validation.csv">visible_metric_validation.csv</a>：基本7指標×4回の件数・中央値・平均値・標準偏差・分散</li><li><a href="additional_metric_coverage.csv">additional_metric_coverage.csv</a>：追加5指標の利用可能件数・補完寄与</li><li><a href="report.md">report.md</a>：初期スクリーニング</li><li><a href="deep_dive_report.md">deep_dive_report.md</a>：5軸・文章・スコアカード</li><li><a href="expanded_matched_pair_report.md">expanded_matched_pair_report.md</a>：40ペア全件監査</li><li><a href="expanded_matched_pair_review.xlsx">expanded_matched_pair_review.xlsx</a>：閲覧用ワークブック</li><li><a href="sixth_round_consulting_guide.md">sixth_round_consulting_guide.md</a>：第6次相談ガイド</li></ul>
   </section>
 
   <section class="chapter" id="sources">
@@ -309,6 +333,8 @@ python build_adoption_drivers_analysis_report.py</pre>
 <script>
 const D=JSON.parse(document.getElementById('report-data').textContent);
 const num=v=>Number(v); const pct=(v,d=1)=>`${num(v).toFixed(d)}%`;
+const stat=v=>{const x=num(v);if(!Number.isFinite(x))return '—';const a=Math.abs(x),d=a>=1000?0:a>=100?1:a>=10?2:3;return x.toLocaleString('ja-JP',{maximumFractionDigits:d})};
+const signedPct=v=>{const x=num(v);return Number.isFinite(x)?`${x>=0?'+':''}${x.toFixed(1)}%`:'—'};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const svg=(w,h,body)=>`<svg viewBox="0 0 ${w} ${h}" aria-hidden="true">${body}</svg>`;
@@ -326,6 +352,17 @@ function horizontalDiff(id,items){const el=document.getElementById(id),w=720,h=i
 function divergingBars(id,items,series,{min=-25,max=25,suffix='%'}={}){const el=document.getElementById(id),w=760,h=items.length*54+68,ml=180,mr=48,mt=34,mb=22,pw=w-ml-mr,ph=h-mt-mb,x=v=>ml+(v-min)/(max-min)*pw;let b='';[min,min/2,0,max/2,max].forEach(v=>{b+=line(x(v),mt,x(v),h-mb,v===0?'var(--muted)':'var(--line)',v===0?'5 4':'');b+=text(x(v),18,`${v}${suffix}`,`text-anchor="middle" fill="var(--muted)" font-size="11"`)});items.forEach((d,i)=>{const y=mt+i*(ph/items.length)+6;b+=text(ml-10,y+17,d.label,`text-anchor="end" fill="var(--ink)" font-size="11"`);series.forEach((s,j)=>{const v=d[s.key],yy=y+j*17,xa=Math.min(x(0),x(v)),ww=Math.abs(x(v)-x(0));b+=`<rect x="${xa}" y="${yy}" width="${ww}" height="11" fill="${s.color}"/>`;b+=text(x(v)+(v<0?-5:5),yy+10,`${v.toFixed(1)}${suffix}`,`${v<0?'text-anchor="end"':''} fill="var(--ink)" font-size="10"`)})});el.innerHTML=`<div class="legend">${series.map(s=>`<span><i class="swatch" style="background:${s.color}"></i>${esc(s.label)}</span>`).join('')}</div>`+svg(w,h,b)}
 function groupedBars(id,items,series,{max=100,suffix='%',baseline=null,height=null}={}){const el=document.getElementById(id),w=760,h=height||items.length*52+62,ml=180,mr=44,mt=32,mb=20,pw=w-ml-mr,ph=h-mt-mb;let b='';const x=v=>ml+v/max*pw;[0,.25,.5,.75,1].forEach(t=>{b+=line(x(max*t),mt,x(max*t),h-mb);b+=text(x(max*t),18,`${Math.round(max*t)}${suffix}`,`text-anchor="middle" fill="var(--muted)" font-size="11"`)});if(baseline!==null)b+=line(x(baseline),mt,x(baseline),h-mb,'var(--muted)','5 4');items.forEach((d,i)=>{const y=mt+i*(ph/items.length)+5;b+=text(ml-10,y+17,d.label,`text-anchor="end" fill="var(--ink)" font-size="11"`);series.forEach((s,j)=>{const yy=y+j*17;b+=`<rect x="${ml}" y="${yy}" width="${Math.max(0,x(d[s.key])-ml)}" height="11" fill="${s.color}"/>`;b+=text(x(d[s.key])+5,yy+10,`${d[s.key].toFixed(1)}${suffix}`,`fill="var(--ink)" font-size="10"`)})});el.innerHTML=`<div class="legend">${series.map(s=>`<span><i class="swatch" style="background:${s.color}"></i>${esc(s.label)}</span>`).join('')}</div>`+svg(w,h,b)}
 function lineChart(id,series,{min=0,max=100,suffix='%',labels=['0.60','0.65','0.70','0.75']}={}){const el=document.getElementById(id),w=760,h=300,ml=58,mr=32,mt=35,mb=48,pw=w-ml-mr,ph=h-mt-mb,x=i=>ml+i/(labels.length-1)*pw,y=v=>mt+(max-v)/(max-min)*ph;let b='';[0,.25,.5,.75,1].forEach(t=>{const v=min+(max-min)*t;b+=line(ml,y(v),w-mr,y(v));b+=text(ml-8,y(v)+4,`${v.toFixed(0)}${suffix}`,`text-anchor="end" fill="var(--muted)" font-size="11"`)});labels.forEach((l,i)=>{b+=text(x(i),h-18,l,`text-anchor="middle" fill="var(--muted)" font-size="11"`)});series.forEach(s=>{const pts=s.values.map((v,i)=>`${x(i)},${y(v)}`).join(' ');b+=`<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="3"/>`;s.values.forEach((v,i)=>{b+=`<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="${s.color}"/>`})});el.innerHTML=`<div class="legend">${series.map(s=>`<span><i class="swatch" style="background:${s.color}"></i>${esc(s.label)}</span>`).join('')}</div>`+svg(w,h,b)}
+
+const visibleShort={1:'No.1 売上CAGR',2:'No.2 売上増加額',7:'No.7 労働生産性',9:'No.9 従業員賃上げ',10:'No.10 給与総額',11:'No.11 役員賃上げ',13:'No.13 投資／売上'};
+const visibleSummary=D.visibleValidationSummary.map(r=>({label:visibleShort[num(r.metric_no)],coverage:num(r.pdf_coverage_pct),medianError:num(r.round_median_abs_difference_pct),maxError:num(r.max_abs_difference_pct)}));
+groupedBars('visibleCoverageChart',visibleSummary,[{key:'coverage',label:'PDF値収録率',color:'var(--blue)'}],{max:100,height:430});
+groupedBars('visibleErrorChart',visibleSummary,[{key:'medianError',label:'絶対乖離率の中央値',color:'var(--blue)'},{key:'maxError',label:'最大絶対乖離率',color:'var(--orange)'}],{max:55,height:430});
+document.getElementById('visibleValidationTable').innerHTML=D.visibleValidation.map(r=>`<tr><td data-label="指標"><b>${esc(visibleShort[num(r.metric_no)])}</b><br><span class="tag">${esc(r.source_type)}</span><small class="muted"> ${esc(r.unit)}</small></td><td data-label="回">${esc(r.round)}</td><td data-label="PDF件数 / 収録数" class="num">${r.pdf_value_n} / ${r.public_pdf_cases}<br><small>${pct(r.pdf_coverage_pct)}</small></td><td data-label="公式採択者 件数・中央値" class="num">n=${r.official_accepted_n}<br><b>${stat(r.official_accepted_median)}</b></td><td data-label="PDF中央値" class="num"><b>${stat(r.pdf_median)}</b></td><td data-label="差" class="num">${stat(r.median_difference)}<br><small>${signedPct(r.median_difference_pct)}</small></td><td data-label="PDF平均値" class="num">${stat(r.pdf_mean)}</td><td data-label="標本標準偏差" class="num">${stat(r.pdf_sample_std)}</td><td data-label="標本分散" class="num">${stat(r.pdf_sample_variance)}</td></tr>`).join('');
+
+const additionalShort={4:'No.4 事業売上比率',5:'No.5 事業売上CAGR',6:'No.6 事業売上増加',8:'No.8 付加価値増加',14:'No.14 付加価値／補助金'};
+const additionalRows=D.additionalCoverage.map(r=>({label:additionalShort[num(r.metric_no)],totalCoverage:num(r.total_coverage_pct),lagCoverage:num(r.lagging_coverage_pct)}));
+groupedBars('additionalCoverageChart',additionalRows,[{key:'totalCoverage',label:'全381社での利用可能率',color:'var(--blue)'},{key:'lagCoverage',label:'劣後125社での利用可能率',color:'var(--orange)'}],{max:100,height:340});
+document.getElementById('additionalCoverageTable').innerHTML=D.additionalCoverage.map(r=>{const eligible=String(r.median_threshold_eligible).toLowerCase()==='true';return `<tr><td data-label="追加指標"><b>${esc(additionalShort[num(r.metric_no)])}</b><br><small>${esc(r.calculation)}</small></td><td data-label="全381社で作れる" class="num">${r.total_value_n}社<br><small>${pct(r.total_coverage_pct)}</small></td><td data-label="劣後125社で作れる" class="num">${r.lagging_available_n}社<br><small>${pct(r.lagging_coverage_pct)}</small></td><td data-label="公式代表値以上" class="num">${eligible?`${r.lagging_above_official_n}社<br><small>利用可能社の${pct(r.lagging_above_share_of_available_pct)}</small>`:'—'}</td><td data-label="固有の補完" class="num">${eligible?`${r.unique_compensation_n}社`:'—'}</td><td data-label="公募回別PDF件数"><small>${esc(r.round_pdf_counts)}</small></td><td data-label="判定上の扱い">${eligible?'<span class="tag">採択者中央値と比較</span>':'<span class="tag orange">参考のみ：公式は平均</span>'}</td></tr>`}).join('');
 
 verticalBars('roundChart',D.rounds.map(r=>({label:r.round,value:num(r.visible_metric_lagging_pct)})),{max:50});
 horizontalDiff('groupChart',D.groups.map(r=>({label:r.metric.replace('（億円）','').replace('（推計）',''),value:num(r.within_round_percentile_difference)})));
