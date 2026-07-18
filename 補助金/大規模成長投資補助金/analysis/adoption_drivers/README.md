@@ -32,6 +32,24 @@ python analyze_adoption_drivers.py
 - `applicant_benchmark_summary.csv`: 採択者中央値未満でも申請者中央値以上かを集計
 - `deep_dive_report.md`: 「どういう申請が通るのか」の詳細な解釈と申請スコアカード
 
+第6次公募向け相談資料:
+
+- `prepare_sixth_round_consulting.py`: 第5次公式中央値、類似企業の目視精査、3～5次の金融機関確認データを統合
+- `sixth_round_consulting_guide.md`: 第6次の数値目線、数値の作り方、5ペアの精査、相談時の判定基準
+- `sixth_round_numeric_strategy.csv`: 13指標の制度下限・採択者中央値・実務目標
+- `sixth_round_benchmark_trends.csv`: 主要7指標の1次～5次採択者中央値の推移
+- `matched_pair_review.csv`: 同一公募回・近い投資規模でそろえた5ペアの数値と人手精査所見
+- `external_financial_confirmations.csv`: 3～5次の公式採択案件一覧にある金融機関確認の全295件
+- `external_financial_confirmation_summary.csv`: 公募回別の金融機関確認提出率
+
+外部データを再取得して更新する場合:
+
+```powershell
+python prepare_sixth_round_consulting.py --refresh-external
+```
+
+ローカルに公式PDFを保存済みの場合は、`--pdf-dir` で `list_3ji.pdf`、`list_4ji.pdf`、`list_5ji.pdf` のあるフォルダを指定できます。
+
 ## 判定ルール
 
 - 可視7指標のうち3指標以上が観測でき、採択者中央値を下回る比率が60%以上の企業を「可視指標劣後」とします。

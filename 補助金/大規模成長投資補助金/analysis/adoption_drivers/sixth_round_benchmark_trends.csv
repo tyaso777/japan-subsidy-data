@@ -1,0 +1,8 @@
+﻿metric_key,metric,unit,accepted_round_1,accepted_round_2,accepted_round_3,accepted_round_4,accepted_round_5,all_applicants_round_5,round_5_accepted_gap,accepted_change_round_1_to_5,accepted_strictly_increasing,source_url
+company_sales_cagr,全社年平均売上高成長率,%/年,10,12,14,17,21,20,1.0,11.0,True,https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf
+company_sales_increase,全社売上高増加額,億円,55.0,46.7,62.3,61.3,82.4,67.1,15.3,27.4,False,https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf
+project_sales_increase,補助事業売上高増加額,億円,41.1,41.2,56.1,53.5,74.8,57.4,17.4,33.7,False,https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf
+value_added_increase,補助事業付加価値増加額,億円,14.2,17.6,24.1,21.1,28.1,19.9,8.2,13.9,False,https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf
+employee_pay_rate,補助事業従業員1人当たり給与CAGR,%/年,4.3,5.4,6.2,6.5,7.0,6.5,0.5,2.7,True,https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf
+employee_pay_total_increase,補助事業従業員給与総額増加額,億円,2.3,2.9,3.5,2.9,3.9,2.8,1.1,1.6,False,https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf
+value_added_subsidy_ratio,付加価値増加額／補助金額,%,126,149,171,209,213,171,42.0,87.0,True,https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf
