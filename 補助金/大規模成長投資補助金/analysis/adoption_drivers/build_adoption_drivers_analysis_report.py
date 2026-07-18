@@ -77,7 +77,7 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
 .spark-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.spark{background:var(--wash);padding:15px}.spark h4{font-size:.92rem;margin:0 0 4px}.spark .value{font:700 1.6rem/1.1 var(--serif)}
 .formula{font-family:ui-monospace,"Cascadia Mono",monospace;background:var(--wash);padding:14px 16px;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap;max-width:100%;border-left:4px solid var(--blue)}
 .matrix{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}.matrix section{background:var(--paper);padding:20px}.matrix h3{margin:0 0 8px}.supported{color:var(--green)}.unsupported{color:var(--red)}
-.callout{font-size:clamp(1.2rem,2.2vw,1.7rem);font-family:var(--serif);line-height:1.55;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:24px 0;margin:28px 0}.sources li{margin:.45rem 0}.mono{font-family:ui-monospace,"Cascadia Mono",monospace;font-size:.86em}.muted{color:var(--muted)}
+.callout{font-size:clamp(1.2rem,2.2vw,1.7rem);font-family:var(--serif);line-height:1.55;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:24px 0;margin:28px 0}.sources li{margin:.45rem 0}.mono{font-family:ui-monospace,"Cascadia Mono",monospace;font-size:.86em}.muted{color:var(--muted)}.nowrap{white-space:nowrap}
 .print-only{display:none}.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}.swatch{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px}
 @media(max-width:900px){.toc{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2,.grid3{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.chapter-head{grid-template-columns:58px 1fr}.flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg);height:26px}.spark-grid{grid-template-columns:1fr}.strategy-row{grid-template-columns:38px 1fr}.strategy-row>*:not(.sno){grid-column:2}.matrix{grid-template-columns:1fr}}
 @media(max-width:620px){.page{padding:12px 10px 48px}.hero,.chapter{padding:22px 17px}.toc{grid-template-columns:1fr}.kpis{grid-template-columns:1fr}.chapter-head{display:block}.no{font-size:1rem;margin-bottom:8px}.profile-row{grid-template-columns:1fr}.profile-row small{text-align:left}.table.responsive,.table.responsive tbody,.table.responsive tr,.table.responsive td{display:block;width:100%}.table.responsive thead{display:none}.table.responsive tr{padding:10px 0;border-bottom:1px solid var(--line)}.table.responsive td{border:0;padding:3px 0}.table.responsive td::before{content:attr(data-label);display:block;color:var(--muted);font-size:.72rem;font-weight:700}.table.responsive .num{text-align:left}}
@@ -90,7 +90,7 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
     <div class="eyebrow">Adoption drivers / analytical dossier</div>
     <h1>採択要因分析<br>方法・結果・示唆</h1>
     <p class="lead">大規模成長投資補助金の公開企業PDFと公式中央値を用いて、「採択者中央値（各公募回の採択者における各指標の中央値）を下回っても採択されている案件」をどこまで説明できるかを段階的に検証した。381社の定量スクリーニング、複数の定量切り口による類型化、公開文章の分析、40組80社の目視ペア精査を一つの分析体系として再構成する。</p>
-    <div class="meta"><span>分析対象：公開企業PDF 381社</span><span>公募回：1～4次（第5次はベンチマーク補助）</span><span>作成：2026-07-18</span><span>版：1.1</span></div>
+    <div class="meta"><span>分析対象：公開企業PDF 381社</span><span>公募回：1～4次（第5次はベンチマーク補助）</span><span>作成：2026-07-18</span><span>版：1.2</span></div>
   </header>
 
   <nav class="toc" aria-label="目次">
@@ -105,7 +105,7 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
     <p>以下は制度上の公式名称ではなく、本分析内で企業を整理・比較するための分析用語である。</p>
     <table class="table responsive"><thead><tr><th>用語</th><th>この資料での定義</th><th>読み方・注意</th></tr></thead><tbody>
       <tr><td data-label="用語"><dfn>採択者中央値／申請者中央値</dfn></td><td data-label="定義">公式資料に掲載された、公募回ごとの「採択者」／「申請者全体」における各指標の中央値。</td><td data-label="注意">採択者中央値は採択ラインではない。申請者中央値は申請集団内の相対位置を見る比較基準。</td></tr>
-      <tr><td data-label="用語"><dfn>可視7指標</dfn></td><td data-label="定義">公開企業PDFから企業別に取得でき、同じ公募回の採択者中央値と比較できる7指標。全社売上高CAGR（年平均成長率）・増加額、労働生産性CAGR、1人当たり給与CAGR、給与総額増加額、役員報酬CAGR、投資額／全社売上高。</td><td data-label="注意">公開PDFで見える範囲に限定した指標群で、審査指標全体ではない。</td></tr>
+      <tr><td data-label="用語"><dfn>可視7指標</dfn></td><td data-label="定義">公開企業PDFから企業別の値を取得または推計でき、同じ公募回の採択者中央値と比較できる7指標。具体的な7項目は直後の「可視7指標の内訳」に一つずつ示す。</td><td data-label="注意">公開PDFで比較できる範囲に限定した分析用の指標群であり、審査指標全体ではない。</td></tr>
       <tr><td data-label="用語"><dfn>可視指標劣後</dfn></td><td data-label="定義">可視7指標のうち3指標以上を観測でき、その60%以上が同じ公募回の採択者中央値未満である案件。本資料では125社。</td><td data-label="注意">「不合格水準」ではない。採択者中央値は合格線ではなく、採択者の半数が下回る代表値。</td></tr>
       <tr><td data-label="用語"><dfn>Proxy（推計指標）</dfn></td><td data-label="定義">公式の企業別値を直接取得できないため、公開PDFの数値を式に代入して近似した指標。例：付加価値増加額、付加価値増加額／補助金額。</td><td data-label="注意">入力欄の主体・人数範囲が公式計算と一致する保証がなく、企業別公式値としては扱わない。</td></tr>
       <tr><td data-label="用語"><dfn>定量補完</dfn></td><td data-label="定義">可視指標劣後125社のうち、追加のProxyまたは補助事業指標が少なくとも一つ、同回採択者中央値以上だった案件。本資料では54社。</td><td data-label="注意">弱い指標が統計的に「相殺された」という意味ではなく、別の強い定量軸が観測されたという診断。</td></tr>
@@ -114,6 +114,17 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
       <tr><td data-label="用語"><dfn>パレート支配あり</dfn></td><td data-label="定義">同回の別企業が、観測可能な5軸すべてで同等以上かつ一つ以上で上回る状態。</td><td data-label="注意">企業として劣るという評価ではなく、公開5軸の単調ランキングだけでは採択を説明できないことを示す。</td></tr>
       <tr><td data-label="用語"><dfn>低定量側／高定量側</dfn></td><td data-label="定義">40組の類似企業ペア内で、公開定量の総合的な相対位置が低い側／高い側。両社とも採択企業。</td><td data-label="注意">採択・非採択の比較ではなく、採択企業同士の探索的比較。</td></tr>
       <tr><td data-label="用語"><dfn>文章根拠</dfn></td><td data-label="定義">審査観点の語と、数字・実績・受注・契約・比較・顧客等の証拠マーカーが同じ文に現れるもの。</td><td data-label="注意">審査点そのものではなく、公開文章に現れた根拠の密度。</td></tr>
+    </tbody></table>
+    <h4>可視7指標の内訳</h4>
+    <p class="footnote">「公式No.」は、最大15指標を収録する公募回の並びに合わせた共通番号。企業別の値は公開企業PDF、比較対象は同一公募回の公式採択者中央値である。</p>
+    <table class="table responsive"><thead><tr><th>7指標内の番号</th><th class="nowrap">公式No.</th><th>指標名</th><th class="nowrap">単位</th><th>何を測るか・計算の考え方</th></tr></thead><tbody>
+      <tr><td data-label="7指標内の番号" class="num">1</td><td data-label="公式No." class="num nowrap">No.1</td><td data-label="指標名"><b>全社年平均売上高成長率</b></td><td data-label="単位" class="nowrap">%／年</td><td data-label="内容">基準時点から目標時点までに、会社全体の売上高が年平均で何%成長する計画か。一般にCAGR（年平均成長率）で表す。</td></tr>
+      <tr><td data-label="7指標内の番号" class="num">2</td><td data-label="公式No." class="num nowrap">No.2</td><td data-label="指標名"><b>全社売上高増加額</b></td><td data-label="単位" class="nowrap">億円</td><td data-label="内容">目標時点の全社売上高から基準時点の全社売上高を引いた絶対増加額。企業規模の影響を受けやすい。</td></tr>
+      <tr><td data-label="7指標内の番号" class="num">3</td><td data-label="公式No." class="num nowrap">No.7</td><td data-label="指標名"><b>補助事業年平均労働生産性の伸び</b></td><td data-label="単位" class="nowrap">%／年</td><td data-label="内容">補助事業の従業員1人当たり付加価値額が、計画期間中に年平均で何%伸びるか。売上高ではなく、付加価値と従業員数の関係を見る。</td></tr>
+      <tr><td data-label="7指標内の番号" class="num">4</td><td data-label="公式No." class="num nowrap">No.9</td><td data-label="指標名"><b>補助事業従業員1人当たり給与支給額の年平均成長率</b></td><td data-label="単位" class="nowrap">%／年</td><td data-label="内容">補助事業に従事する従業員の1人当たり給与支給額を、基準時点から目標時点まで年平均で何%引き上げる計画か。</td></tr>
+      <tr><td data-label="7指標内の番号" class="num">5</td><td data-label="公式No." class="num nowrap">No.10</td><td data-label="指標名"><b>補助事業従業員給与支給総額の増加額</b></td><td data-label="単位" class="nowrap">億円</td><td data-label="内容">目標時点の給与支給総額から基準時点の給与支給総額を引いた額。本分析の企業別値は、公開された1人当たり給与と従業員数から計算した推計値であり、公式の企業別値ではない。</td></tr>
+      <tr><td data-label="7指標内の番号" class="num">6</td><td data-label="公式No." class="num nowrap">No.11</td><td data-label="指標名"><b>年平均役員目標賃上げ率</b></td><td data-label="単位" class="nowrap">%／年</td><td data-label="内容">役員1人当たりの報酬等を、基準時点から目標時点まで年平均で何%引き上げる計画か。従業員の賃上げ率とは別の指標。</td></tr>
+      <tr><td data-label="7指標内の番号" class="num">7</td><td data-label="公式No." class="num nowrap">No.13</td><td data-label="指標名"><b>全社売上高に対する投資額割合</b></td><td data-label="単位" class="nowrap">%</td><td data-label="内容">投資額を基準時点の全社売上高で割った割合。企業規模に対して今回の投資がどの程度大きいかを見る。</td></tr>
     </tbody></table>
     <div class="kpis">
       <div class="kpi"><strong>125社</strong><small>可視指標劣後（381社の32.8%）</small></div>
@@ -151,7 +162,7 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
   <section class="chapter" id="screen">
     <div class="chapter-head"><div class="no">03</div><div><h2>可視指標劣後群のスクリーニング</h2><p class="subtitle">「中央値未満」を一指標で断定せず、観測数と劣後比率を条件化した。</p></div></div>
     <div class="formula">可視指標劣後 = 観測可能な可視7指標が3個以上 AND 同回採択者中央値未満の比率が60%以上</div>
-    <p class="footnote">可視7指標：全社売上高CAGR、全社売上高増加額、労働生産性CAGR、1人当たり給与成長率、給与支給総額増加額、役員報酬成長率、投資額／全社売上高。データ・コード上の変数名は <span class="mono">visible_lag</span>。</p>
+    <p class="footnote">可視7指標の正式名称、単位、意味は第1章「可視7指標の内訳」を参照。データ・コード上の判定変数名は <span class="mono">visible_lag</span>。</p>
     <div class="flow">
       <div class="flow-box"><strong>381</strong><span>全公開案件</span></div><div class="arrow">→</div>
       <div class="flow-box warn"><strong>125</strong><span>可視指標劣後<br>32.8%</span></div><div class="arrow">→</div>
