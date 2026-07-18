@@ -90,11 +90,11 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
     <div class="eyebrow">Adoption drivers / analytical dossier</div>
     <h1>採択要因分析<br>方法・結果・示唆</h1>
     <p class="lead">大規模成長投資補助金の公開企業PDFと公式中央値を用いて、「採択者中央値（各公募回の採択者における各指標の中央値）を下回っても採択されている案件」をどこまで説明できるかを段階的に検証した。381社の定量スクリーニング、複数の定量切り口による類型化、公開文章の分析、40組80社の目視ペア精査を一つの分析体系として再構成する。</p>
-    <div class="meta"><span>分析対象：公開企業PDF 381社</span><span>公募回：1～4次（第5次はベンチマーク補助）</span><span>作成：2026-07-18</span><span>版：1.2</span></div>
+    <div class="meta"><span>分析対象：公開企業PDF 381社</span><span>公募回：1～4次（第5次はベンチマーク補助）</span><span>版：1.3</span></div>
   </header>
 
   <nav class="toc" aria-label="目次">
-    <a href="#executive">01 要旨・用語</a><a href="#design">02 データと設計</a><a href="#screen">03 中央値劣後群の抽出</a><a href="#proxy">04 推計指標の検証</a>
+    <a href="#executive">01 要旨・用語</a><a href="#design">02 データと設計</a><a href="#screen">03 中央値劣後群の抽出</a><a href="#proxy">04 追加評価指標の検証</a>
     <a href="#profiles">05 多軸プロファイル</a><a href="#text">06 公開文章分析</a><a href="#pairs">07 40ペア目視精査</a><a href="#sixth">08 第6次への含意</a>
     <a href="#synthesis">09 統合解釈</a><a href="#limits">10 限界と次の設計</a><a href="#appendix">11 定義・再現方法</a><a href="#sources">12 出典</a>
   </nav>
@@ -107,8 +107,9 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
       <tr><td data-label="用語"><dfn>採択者中央値／申請者中央値</dfn></td><td data-label="定義">公式資料に掲載された、公募回ごとの「採択者」／「申請者全体」における各指標の中央値。</td><td data-label="注意">採択者中央値は採択ラインではない。申請者中央値は申請集団内の相対位置を見る比較基準。</td></tr>
       <tr><td data-label="用語"><dfn>可視7指標</dfn></td><td data-label="定義">公開企業PDFから企業別の値を取得または推計でき、同じ公募回の採択者中央値と比較できる7指標。具体的な7項目は直後の「可視7指標の内訳」に一つずつ示す。</td><td data-label="注意">公開PDFで比較できる範囲に限定した分析用の指標群であり、審査指標全体ではない。</td></tr>
       <tr><td data-label="用語"><dfn>可視指標劣後</dfn></td><td data-label="定義">可視7指標のうち3指標以上を観測でき、その60%以上が同じ公募回の採択者中央値未満である案件。本資料では125社。</td><td data-label="注意">「不合格水準」ではない。採択者中央値は合格線ではなく、採択者の半数が下回る代表値。</td></tr>
-      <tr><td data-label="用語"><dfn>Proxy（推計指標）</dfn></td><td data-label="定義">公式の企業別値を直接取得できないため、公開PDFの数値を式に代入して近似した指標。例：付加価値増加額、付加価値増加額／補助金額。</td><td data-label="注意">入力欄の主体・人数範囲が公式計算と一致する保証がなく、企業別公式値としては扱わない。</td></tr>
-      <tr><td data-label="用語"><dfn>定量補完</dfn></td><td data-label="定義">可視指標劣後125社のうち、追加のProxyまたは補助事業指標が少なくとも一つ、同回採択者中央値以上だった案件。本資料では54社。</td><td data-label="注意">弱い指標が統計的に「相殺された」という意味ではなく、別の強い定量軸が観測されたという診断。</td></tr>
+      <tr><td data-label="用語"><dfn>推計値（Proxy）</dfn></td><td data-label="定義">公開PDFの複数の数値を式に代入して近似した企業別値。「どの指標群に属するか」ではなく、「値を直接取得したか、計算で近似したか」を表す属性。</td><td data-label="注意">可視7指標のNo.10も推計値である。したがって「Proxy＝可視7指標の外側」ではない。入力欄の主体・人数範囲が公式計算と一致する保証がないため、企業別公式値として扱わない。</td></tr>
+      <tr><td data-label="用語"><dfn>追加評価5指標</dfn></td><td data-label="定義">可視7指標だけでは弱く見える企業に、別の定量的な強みがあるかを評価するため、可視7指標の外側に追加した5指標。No.4・5・6・8・14を企業別に推計する。</td><td data-label="注意">5指標の内訳と計算は後掲表に示す。これらも多くは推計値だが、「追加評価」は用途、「推計値」は作り方を表し、意味が異なる。</td></tr>
+      <tr><td data-label="用語"><dfn>定量補完</dfn></td><td data-label="定義">可視指標劣後125社のうち、追加評価5指標の少なくとも一つが同回採択者中央値以上だった案件。本資料では54社。</td><td data-label="注意">弱い指標が統計的に「相殺された」という意味ではなく、可視7指標とは別の定量軸で強みが観測されたという診断。</td></tr>
       <tr><td data-label="用語"><dfn>定量未説明</dfn></td><td data-label="定義">可視指標劣後125社のうち、上記の定量補完を公開データから確認できなかった案件。本資料では71社。</td><td data-label="注意">採択理由がないのではなく、公開定量だけでは理由を回収できないという意味。</td></tr>
       <tr><td data-label="用語"><dfn>5軸</dfn>／<dfn>強い軸</dfn></td><td data-label="定義">成長・生産性、絶対効果、補助金効率、賃金・雇用、企業変革投資の5つ。同回内パーセンタイル0.65以上を「強い軸」とする。</td><td data-label="注意">0.65は分析上の基本閾値であり、制度上の採択基準ではない。</td></tr>
       <tr><td data-label="用語"><dfn>パレート支配あり</dfn></td><td data-label="定義">同回の別企業が、観測可能な5軸すべてで同等以上かつ一つ以上で上回る状態。</td><td data-label="注意">企業として劣るという評価ではなく、公開5軸の単調ランキングだけでは採択を説明できないことを示す。</td></tr>
@@ -126,15 +127,25 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
       <tr><td data-label="7指標内の番号" class="num">6</td><td data-label="公式No." class="num nowrap">No.11</td><td data-label="指標名"><b>年平均役員目標賃上げ率</b></td><td data-label="単位" class="nowrap">%／年</td><td data-label="内容">役員1人当たりの報酬等を、基準時点から目標時点まで年平均で何%引き上げる計画か。従業員の賃上げ率とは別の指標。</td></tr>
       <tr><td data-label="7指標内の番号" class="num">7</td><td data-label="公式No." class="num nowrap">No.13</td><td data-label="指標名"><b>全社売上高に対する投資額割合</b></td><td data-label="単位" class="nowrap">%</td><td data-label="内容">投資額を基準時点の全社売上高で割った割合。企業規模に対して今回の投資がどの程度大きいかを見る。</td></tr>
     </tbody></table>
+    <h4>定量補完の判定に使う追加評価5指標</h4>
+    <p class="footnote">可視指標劣後企業について、次の5指標のうち一つでも同一公募回の採択者中央値以上なら「定量補完」とした。企業別の値はいずれも公開PDF・売上系列から作る推計値である。</p>
+    <table class="table responsive"><thead><tr><th class="nowrap">公式No.</th><th>追加評価指標</th><th>企業別推計値の作り方</th><th>評価上の意味</th></tr></thead><tbody>
+      <tr><td data-label="公式No." class="num nowrap">No.4</td><td data-label="指標"><b>全社売上高に対する補助事業売上高の割合</b></td><td data-label="作り方">補助事業の目標売上高 ÷ 全社の目標売上高 × 100。</td><td data-label="意味">今回の補助事業が、将来の会社全体に占める比重を測る。</td></tr>
+      <tr><td data-label="公式No." class="num nowrap">No.5</td><td data-label="指標"><b>補助事業年平均売上高成長率</b></td><td data-label="作り方">公開PDFから抽出した補助事業の基準・目標売上高と期間からCAGRを計算。</td><td data-label="意味">会社全体ではなく、投資対象事業そのものの成長速度を測る。</td></tr>
+      <tr><td data-label="公式No." class="num nowrap">No.6</td><td data-label="指標"><b>補助事業売上高増加額</b></td><td data-label="作り方">補助事業の目標売上高 − 基準売上高。</td><td data-label="意味">投資対象事業が生む売上高の絶対増加額を測る。</td></tr>
+      <tr><td data-label="公式No." class="num nowrap">No.8</td><td data-label="指標"><b>補助事業付加価値増加額</b></td><td data-label="作り方">（目標労働生産性 × 目標従業員数 − 基準労働生産性 × 基準従業員数）÷ 10,000。結果は億円。</td><td data-label="意味">売上高ではなく、補助事業が生む付加価値の絶対増加額を近似する。</td></tr>
+      <tr><td data-label="公式No." class="num nowrap">No.14</td><td data-label="指標"><b>補助金額に対する付加価値増加額割合</b></td><td data-label="作り方">No.8の推計値 ÷ 補助金額 × 100。</td><td data-label="意味">補助金1円当たりの付加価値効果、すなわち費用対効果を近似する。</td></tr>
+    </tbody></table>
+    <p class="method"><b>判定に含めない補助診断：</b> 売上高増加額／補助金額、給与総額増加額／補助金額、雇用増加数／補助金1億円、補助金額、事業費なども群間比較や5軸分析には使用した。ただし、これらは「定量補完54社」を決める5指標には含めていない。</p>
     <div class="kpis">
       <div class="kpi"><strong>125社</strong><small>可視指標劣後（381社の32.8%）</small></div>
-      <div class="kpi"><strong>54社</strong><small>定量補完：追加の推計・補助事業指標に強み</small></div>
+      <div class="kpi"><strong>54社</strong><small>定量補完：追加評価5指標のいずれかで中央値以上</small></div>
       <div class="kpi"><strong>71社</strong><small>定量未説明：公開定量では理由を回収できず</small></div>
       <div class="kpi"><strong>40ペア</strong><small>同回・同業種・近い投資規模の目視比較</small></div>
     </div>
     <div class="callout">結論は「中央値を超えれば通る」ではない。採択案件は、<b>申請者全体に対する最低限の競争力</b>を持ちつつ、需要・能力制約・構造転換・実行確度などを束ねて、投資から付加価値・賃金までの因果連鎖を説明している。</div>
     <div class="grid2">
-      <div><h3>最も堅い知見</h3><ul><li>可視指標劣後125社のうち124社は、観測可能な指標の少なくとも一つで同回の<b>申請者中央値以上</b>だった。</li><li>公開Proxy（推計指標）では「付加価値増加額÷補助金額」が公式中央値に比較的近く、費用対効果の補完診断として最も有用だった。</li><li>低定量側（40ペア内で公開定量の相対位置が低い採択企業）でも、能力制約と構造転換の強い根拠は各39社（97.5%）。4中核要因の2つ以上が全40社で確認された。</li></ul></div>
+      <div><h3>最も堅い知見</h3><ul><li>可視指標劣後125社のうち124社は、観測可能な指標の少なくとも一つで同回の<b>申請者中央値以上</b>だった。</li><li>追加評価5指標のうち、「付加価値増加額÷補助金額」の推計値は公式中央値に比較的近く、費用対効果の補完診断として最も有用だった。</li><li>低定量側（40ペア内で公開定量の相対位置が低い採択企業）でも、能力制約と構造転換の強い根拠は各39社（97.5%）。4中核要因の2つ以上が全40社で確認された。</li></ul></div>
       <div><h3>読み過ぎてはいけない点</h3><ul><li>標本は原則として採択企業のみ。非採択個票がないため、採択確率・因果効果・重みは推定できない。</li><li>採択者中央値は合格線ではなく、各指標で採択者の半数が下回る記述統計である。</li><li>公開2ページPDFは申請書・審査点を代替しない。文章分析で「定量未説明」71社の理由を十分には回収できなかった。</li></ul></div>
     </div>
     <div class="finding"><strong>実務上の中心命題</strong>数値は「全部高くする」より、①第5次採択者中央値を競争水準の目安に置く、②主戦場となる1～2軸を選ぶ、③補助金1円当たり効果と絶対効果を両立させる、④需要→設備制約→投資→売上・付加価値→賃金・雇用を同一モデルで接続する、という設計が重要である。</div>
@@ -150,7 +161,7 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
     <h3>研究質問</h3>
     <table class="table responsive"><thead><tr><th>段階</th><th>問い</th><th>方法</th><th>推論範囲</th></tr></thead><tbody>
       <tr><td data-label="段階">A. スクリーニング</td><td data-label="問い">採択者中央値を複数指標で下回る案件はどの程度あるか</td><td data-label="方法">可視7指標、同回採択者中央値、観測3指標以上、劣後率60%以上</td><td data-label="推論範囲">採択案件内の記述</td></tr>
-      <tr><td data-label="段階">B. 定量補完</td><td data-label="問い">公開情報から作る追加指標で弱さを説明できるか</td><td data-label="方法">付加価値・補助金効率・雇用効率のProxy、同回比較</td><td data-label="推論範囲">公開値による補完可能性</td></tr>
+      <tr><td data-label="段階">B. 定量補完</td><td data-label="問い">可視7指標の外側にある定量的な強みを確認できるか</td><td data-label="方法">補助事業売上高の割合・CAGR・増加額、付加価値増加額、付加価値増加額／補助金額の追加評価5指標を企業別に推計し、同回採択者中央値と比較</td><td data-label="推論範囲">公開値による補完可能性</td></tr>
       <tr><td data-label="段階">C. 多軸診断</td><td data-label="問い">企業ごとの勝ち筋は一つか、複数か</td><td data-label="方法">5軸を同回内パーセンタイル化、プロファイル・パレート支配・感度分析</td><td data-label="推論範囲">採択案件内の相対配置</td></tr>
       <tr><td data-label="段階">D. 定性精査</td><td data-label="問い">低定量案件に共通する具体的な根拠は何か</td><td data-label="方法">40組80社を6要因0～3点で目視符号化、Wilson区間・符号検定</td><td data-label="推論範囲">採択案件同士の探索的比較</td></tr>
     </tbody></table>
@@ -169,23 +180,23 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
       <div class="flow-box"><strong>54 / 71</strong><span>定量補完 / 定量未説明</span></div>
     </div>
     <div class="grid2"><div><div class="chart-title">公募回別の可視指標劣後率</div><div id="roundChart" class="chart" role="img" aria-label="公募回別の可視指標劣後率"></div></div><div><div class="chart-title">可視指標劣後群とその他採択企業の差</div><div id="groupChart" class="chart" role="img" aria-label="可視指標劣後群の同回内パーセンタイル差"></div></div></div>
-    <div class="finding"><strong>サイズとProxy効果がともに小さい</strong>劣後群は、補助金額・事業費・付加価値増加額Proxy・付加価値／補助金など、多くの比較でその他採択企業より低い。単純な「小さい案件だが補助金効率が高かった」という一つの説明では71社を回収できない。</div>
+    <div class="finding"><strong>サイズと追加評価指標の効果がともに小さい</strong>可視指標劣後群は、補助金額・事業費・付加価値増加額の推計値・付加価値増加額／補助金額など、多くの比較でその他採択企業より低い。単純な「小さい案件だが補助金効率が高かった」という一つの説明では71社を回収できない。</div>
     <h3>申請者中央値に置き直すと見え方が変わる</h3>
     <div id="applicantChart" class="chart" role="img" aria-label="申請者中央値以上の指標割合"></div>
     <p>可視指標劣後125社のうち124社、定量未説明71社のうち70社は、少なくとも一指標で申請者中央値以上だった。平均すると劣後群でも観測指標の59.7%、未説明群でも58.4%が申請者中央値以上である。したがって「採択者中央値未満」は「申請者集団でも弱い」と同義ではない。</p>
   </section>
 
   <section class="chapter" id="proxy">
-    <div class="chapter-head"><div class="no">04</div><div><h2>追加定量Proxyの構築と検証</h2><p class="subtitle">公開値から作れる指標を、公式採択者中央値との再現性で評価した。</p></div></div>
-    <div class="formula">付加価値増加額 Proxy（億円） = {目標労働生産性 × 目標従業員数 − 基準労働生産性 × 基準従業員数} ÷ 10,000</div>
-    <div class="formula">補助金費用対効果 Proxy（%） = 100 × 付加価値増加額 Proxy ÷ 補助金額（億円）</div>
-    <div class="method"><b>重要な制約：</b> 公開PDFの「従業員数」と様式2の補助事業P/Lの主体範囲が一致する保証はない。企業別公式値ではなく、集計・診断用Proxyとしてのみ使用する。</div>
+    <div class="chapter-head"><div class="no">04</div><div><h2>追加評価指標の構築と検証</h2><p class="subtitle">可視7指標の外側に追加した5指標について、公開値から作る企業別推計値が公式採択者中央値をどの程度再現するか検証した。</p></div></div>
+    <div class="formula">付加価値増加額の推計値（億円） = {目標労働生産性 × 目標従業員数 − 基準労働生産性 × 基準従業員数} ÷ 10,000</div>
+    <div class="formula">補助金費用対効果の推計値（%） = 100 × 付加価値増加額の推計値 ÷ 補助金額（億円）</div>
+    <div class="method"><b>重要な制約：</b> 公開PDFの「従業員数」と様式2の補助事業P/Lの主体範囲が一致する保証はない。企業別公式値ではなく、集計・診断用の推計値（Proxy）としてのみ使用する。</div>
     <div id="proxyChart" class="chart" role="img" aria-label="公式中央値に対するProxy中央値の相対差"></div>
     <table class="table responsive"><thead><tr><th>指標</th><th>1次</th><th>2次</th><th>3次</th><th>4次</th><th>評価</th></tr></thead><tbody>
       <tr><td data-label="指標">付加価値増加額</td><td data-label="1次">−17.9%</td><td data-label="2次">−6.0%</td><td data-label="3次">−13.2%</td><td data-label="4次">−17.2%</td><td data-label="評価">方向は追うが、公式値を系統的に下回る</td></tr>
       <tr><td data-label="指標">付加価値増加額／補助金</td><td data-label="1次">+4.9%</td><td data-label="2次">+20.1%</td><td data-label="3次">−1.9%</td><td data-label="4次">−0.6%</td><td data-label="評価">1・3・4次で高い再現性、2次は要注意</td></tr>
     </tbody></table>
-    <div class="finding"><strong>最も有用な公開補完KPI</strong>「付加価値増加額／補助金額」は公式上も費用対効果として明記され、公開Proxyの中央値再現性も比較的高い。ただし、これだけで可視指標劣後群を説明できるのは45社であり、万能な採択モデルではない。</div>
+    <div class="finding"><strong>最も有用な追加評価指標</strong>「付加価値増加額／補助金額」は公式上も費用対効果として明記され、公開値から作る推計中央値の再現性も比較的高い。ただし、これだけで可視指標劣後群を定量補完できるのは45社であり、万能な採択モデルではない。</div>
   </section>
 
   <section class="chapter" id="profiles">
@@ -247,7 +258,7 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
     <table class="table responsive"><thead><tr><th>限界</th><th>影響</th><th>改善案</th></tr></thead><tbody>
       <tr><td data-label="限界">非採択企業の個票がない</td><td data-label="影響">採択確率、オッズ比、判別性能、因果効果を推定不能</td><td data-label="改善案">第6次で相談案件を事前登録し、採否・一次審査・プレゼン進出を追跡</td></tr>
       <tr><td data-label="限界">公開PDFと申請書の情報差</td><td data-label="影響">定性面の欠測が「弱さ」に見える</td><td data-label="改善案">申請書項目別の構造化符号化、非公開資料は匿名化して集計</td></tr>
-      <tr><td data-label="限界">Proxyの主体・単位差</td><td data-label="影響">企業別の付加価値・給与総額を誤測定し得る</td><td data-label="改善案">様式2の補助事業P/Lと公開値を別変数として保持し、照合フラグを設ける</td></tr>
+      <tr><td data-label="限界">推計値の主体・単位差</td><td data-label="影響">企業別の付加価値・給与総額を誤測定し得る</td><td data-label="改善案">様式2の補助事業P/Lと公開値を別変数として保持し、照合フラグを設ける</td></tr>
       <tr><td data-label="限界">目視符号化が単一評価</td><td data-label="影響">評価者の解釈がスコアへ混入</td><td data-label="改善案">2名以上の独立符号化、Cohen's κ/ICC、盲検化、事前コードブック</td></tr>
       <tr><td data-label="限界">多重比較と探索性</td><td data-label="影響">p=0.035を偶然の差と区別しにくい</td><td data-label="改善案">主要仮説を事前指定し、FDR/Bonferroni、外部標本で再現</td></tr>
       <tr><td data-label="限界">公募回間の制度変更</td><td data-label="影響">単純な時系列比較に構成変化が混ざる</td><td data-label="改善案">回固定効果、業種・規模層別、要領変更点のイベント変数</td></tr>
@@ -261,9 +272,10 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
     <h3>主要判定</h3>
     <table class="table responsive"><thead><tr><th>名称</th><th>定義</th><th>用途</th></tr></thead><tbody>
       <tr><td data-label="名称">可視指標劣後</td><td data-label="定義">観測3指標以上、採択者中央値未満の割合60%以上</td><td data-label="用途">追加説明が必要な案件の入口</td></tr>
-      <tr><td data-label="名称">Proxy（推計指標）</td><td data-label="定義">公開PDFの数値から計算した近似値で、企業別公式値ではない</td><td data-label="用途">非公開の公式指標に近い傾向を集計診断</td></tr>
-      <tr><td data-label="名称">定量補完</td><td data-label="定義">付加価値増加額、付加価値／補助金、補助事業売上等の少なくとも一つが採択者中央値以上</td><td data-label="用途">公開可視7指標の外側の勝ち筋</td></tr>
-      <tr><td data-label="名称">定量未説明</td><td data-label="定義">可視指標劣後に該当し、追加の定量補完を公開データで確認できない</td><td data-label="用途">公開定量の限界を示す残余群</td></tr>
+      <tr><td data-label="名称">推計値（Proxy）</td><td data-label="定義">公開PDFの複数値を式で組み合わせた近似値。可視7指標内にも外にも存在する</td><td data-label="用途">企業別公式値を直接取得できない指標の傾向を診断</td></tr>
+      <tr><td data-label="名称">追加評価5指標</td><td data-label="定義">可視7指標の外側に追加したNo.4・5・6・8・14の企業別推計値</td><td data-label="用途">可視指標劣後企業の別の定量的強みを評価</td></tr>
+      <tr><td data-label="名称">定量補完</td><td data-label="定義">追加評価5指標の少なくとも一つが同回採択者中央値以上</td><td data-label="用途">可視7指標の外側の勝ち筋</td></tr>
+      <tr><td data-label="名称">定量未説明</td><td data-label="定義">可視指標劣後に該当し、追加評価5指標のいずれも採択者中央値以上と確認できない</td><td data-label="用途">公開定量の限界を示す残余群</td></tr>
       <tr><td data-label="名称">強い軸</td><td data-label="定義">5軸の同回内パーセンタイルが0.65以上</td><td data-label="用途">プロファイル分類。0.60～0.75で感度分析</td></tr>
       <tr><td data-label="名称">パレート支配</td><td data-label="定義">同回の別企業が観測5軸すべてで同等以上かつ一つ以上で上</td><td data-label="用途">単調ランキングでは説明できない案件の識別</td></tr>
       <tr><td data-label="名称">低定量側／高定量側</td><td data-label="定義">採択企業同士の類似ペア内で公開定量の相対位置が低い側／高い側</td><td data-label="用途">低定量案件に共通する定性要因の探索</td></tr>
@@ -290,7 +302,7 @@ python build_adoption_drivers_analysis_report.py</pre>
       <li><a href="https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf">第5次公募 各種指標の中央値</a>：申請者全体・採択者の公式代表値。</li>
       <li><a href="https://seichotoushi-hojo.jp/assets/pdf/list_3ji.pdf">第3次採択案件一覧</a>、<a href="https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf">第4次採択案件一覧</a>、<a href="https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/list_5ji.pdf">第5次採択案件一覧</a>：金融機関確認。</li>
     </ul>
-    <div class="method"><b>引用上の原則：</b> 公式中央値は公表値、企業別数値・定性所見は公開企業PDF、推計値は本分析のProxyとして明示する。中央値を審査基準・足切り値とは表現しない。</div>
+    <div class="method"><b>引用上の原則：</b> 公式中央値は公表値、企業別数値・定性所見は公開企業PDF、式から作った企業別値は推計値（Proxy）として明示する。中央値を審査基準・足切り値とは表現しない。</div>
   </section>
 </main>
 <script id="report-data" type="application/json">__DATA__</script>
