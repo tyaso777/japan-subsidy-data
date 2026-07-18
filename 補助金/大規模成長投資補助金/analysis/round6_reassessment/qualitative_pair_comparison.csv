@@ -1,0 +1,7 @@
+﻿factor,factor_ja,pair_count,lower_mean_score,higher_mean_score,mean_score_gap_lower_minus_higher,lower_strong_count,lower_strong_share,lower_strong_wilson95_low,lower_strong_wilson95_high,higher_strong_count,higher_strong_share,higher_strong_wilson95_low,higher_strong_wilson95_high,lower_score3_count,lower_score3_share,higher_score3_count,higher_score3_share,lower_score_higher_pairs,equal_score_pairs,higher_score_higher_pairs,paired_sign_test_p,bonferroni_p_6,interpretation
+demand,需要根拠の具体性,40,1.975,2.2,-0.225,28,0.7,0.546,0.819,32,0.8,0.652,0.895,11,0.275,16,0.4,13,8,19,0.377,1.0,6要素補正後に低位側固有の差は確認できない
+constraint,能力制約の明確さ,40,2.675,2.625,0.05,39,0.975,0.871,0.996,38,0.95,0.835,0.986,28,0.7,27,0.675,9,25,6,0.607,1.0,6要素補正後に低位側固有の差は確認できない
+transformation,事業・工程の構造転換,40,2.625,2.625,0.0,39,0.975,0.871,0.996,36,0.9,0.769,0.96,26,0.65,29,0.725,10,19,11,1.0,1.0,6要素補正後に低位側固有の差は確認できない
+regional,地域供給網・代替困難性,40,2.25,2.05,0.2,31,0.775,0.625,0.877,28,0.7,0.546,0.819,20,0.5,15,0.375,13,18,9,0.523,1.0,6要素補正後に低位側固有の差は確認できない
+execution,実行確度,40,2.225,2.55,-0.325,36,0.9,0.769,0.96,38,0.95,0.835,0.986,13,0.325,24,0.6,6,17,17,0.035,0.21000000000000002,6要素補正後に低位側固有の差は確認できない
+strategic,政策・戦略分野との整合,40,2.35,2.6,-0.25,36,0.9,0.769,0.96,40,1.0,0.912,1.0,18,0.45,24,0.6,7,20,13,0.263,1.0,6要素補正後に低位側固有の差は確認できない

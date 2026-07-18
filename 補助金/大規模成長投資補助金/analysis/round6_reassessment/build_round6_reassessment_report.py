@@ -74,7 +74,11 @@ def build() -> None:
     cases = pd.read_csv(HERE / "case_level_reassessment.csv", low_memory=False)
     studies = pd.read_csv(HERE / "fully_below_case_studies.csv")
     gaps = pd.read_csv(HERE / "official_applicant_accepted_gap_summary.csv")
+    gap_detail = pd.read_csv(HERE / "official_applicant_accepted_gaps_by_round.csv")
     effects = pd.read_csv(HERE / "low_group_effect_comparison.csv")
+    robustness = pd.read_csv(HERE / "metric_set_robustness.csv")
+    value_added_loro = pd.read_csv(HERE / "value_added_leave_one_round_out.csv")
+    pair_comparison = pd.read_csv(HERE / "qualitative_pair_comparison.csv")
     framework = pd.read_csv(HERE / "round6_numeric_framework.csv")
     changes = pd.read_csv(HERE / "round6_official_changes.csv")
     transitions = pd.read_csv(HERE / "old7_to_current9_transition.csv")
@@ -108,6 +112,9 @@ def build() -> None:
     clear_n = primary["two_or_more_component_wins_n"]
     partial_n = primary["one_component_win_n"]
     unexplained_n = primary["zero_component_win_n"]
+    strict_clear_n = primary["strict_two_or_more_component_n"]
+    strict_partial_n = primary["strict_one_component_n"]
+    strict_unexplained_n = primary["strict_zero_component_n"]
 
     sensitivity_primary = sensitivity[
         sensitivity["sample"].eq("all")
@@ -117,8 +124,8 @@ def build() -> None:
     sensitivity_bars = "".join(
         f'''<div class="bar-row">
           <div class="bar-label">未満割合 {fmt(100 * row.below_share_threshold, 0)}%</div>
-          <div class="bar-track"><span style="width:{min(100, float(row.lagging_pct)):.2f}%"></span></div>
-          <div class="bar-value">{int(row.lagging_n)}社（{fmt(row.lagging_pct)}%）</div>
+          <div class="bar-track"><span style="width:{min(100, float(row.conditional_lagging_pct)):.2f}%"></span></div>
+          <div class="bar-value">{int(row.lagging_n)}/{int(row.eligible_n)}（{fmt(row.conditional_lagging_pct)}%）</div>
         </div>'''
         for row in sensitivity_primary.itertuples()
     )
@@ -167,7 +174,14 @@ def build() -> None:
     }
     for row in gaps.itertuples():
         emphasis = "key-row" if row.metric_key in important else ""
-        direction = "採択者が高い" if row.accepted_higher_rounds_n > row.accepted_lower_rounds_n else "採択者が低い／一定せず"
+        if row.accepted_higher_rounds_n >= max(3, row.rounds_n - 1):
+            direction, badge_kind = "概ね採択者が高い", "good"
+        elif row.accepted_equal_rounds_n >= 3:
+            direction, badge_kind = "差は不明瞭", "neutral"
+        elif row.accepted_lower_rounds_n >= 3:
+            direction, badge_kind = "概ね採択者が低い", "neutral"
+        else:
+            direction, badge_kind = "公募回で混在", "neutral"
         gap_rows.append([
             f'<span class="{emphasis}">{esc(row.metric_label)}</span>',
             esc(row.unit),
@@ -175,7 +189,7 @@ def build() -> None:
             fmt(row.median_gap_pct) + "%",
             fmt(row.latest_applicant),
             fmt(row.latest_accepted),
-            f'<span class="badge {"good" if direction == "採択者が高い" else "neutral"}">{direction}</span>',
+            f'<span class="badge {badge_kind}">{direction}</span>',
         ])
     gap_table = table(
         ["公式指標", "単位", "採択者＞申請者", "差の中央値", "5次申請者", "5次採択者", "読み方"], gap_rows, "compact"
@@ -205,6 +219,49 @@ def build() -> None:
         "compact numeric",
     )
 
+    robustness_rows = [
+        [
+            esc(row.specification), esc(row.definition),
+            f"{int(row.n):,}/{int(row.eligible_n):,}<div class=\"sub\">{fmt(row.conditional_pct)}%</div>",
+            f"{int(row.clean_n):,}/{int(row.clean_eligible_n):,}<div class=\"sub\">{fmt(row.clean_conditional_pct)}%</div>",
+            fmt(row.jaccard_with_dashboard9, 2),
+        ]
+        for row in robustness.itertuples()
+    ]
+    robustness_table = table(
+        ["仕様", "操作的定義", "該当／判定可能", "品質除外なし：該当／判定可能", "現行9指標とのJaccard"],
+        robustness_rows,
+        "compact",
+    )
+
+    loro_rows = [
+        [
+            esc(row.round), f"{int(row.observed_n):,}", fmt(row.raw_proxy_median),
+            fmt(row.official_accepted_median), fmt(row.loro_factor, 3),
+            fmt(row.heldout_predicted_median), fmt(row.heldout_error_pct) + "%",
+        ]
+        for row in value_added_loro.itertuples()
+    ]
+    loro_table = table(
+        ["除外公募回", "粗近似n", "粗近似中央値", "公式採択者中央値", "他3回で作る係数", "除外回予測", "誤差率"],
+        loro_rows,
+        "compact numeric",
+    )
+
+    pair_rows = [
+        [
+            esc(row.factor_ja), fmt(row.lower_mean_score, 3), fmt(row.higher_mean_score, 3),
+            fmt(row.mean_score_gap_lower_minus_higher, 3), fmt(row.paired_sign_test_p, 3),
+            fmt(row.bonferroni_p_6, 3), esc(row.interpretation),
+        ]
+        for row in pair_comparison.itertuples()
+    ]
+    pair_table = table(
+        ["要素", "低位側平均", "高位側平均", "低位－高位", "符号検定p", "6要素補正p", "解釈"],
+        pair_rows,
+        "compact numeric",
+    )
+
     criteria_table = table(
         ["第6次の審査軸", "A001で関連する主な箇所", "審査者が照合できる状態にする内容"],
         [
@@ -214,6 +271,32 @@ def build() -> None:
             ["④ 大規模投資・費用対効果", "50～54", "平時投資との差、見積・価格妥当性、国費1円当たり効果、補助金による行動変容を反実仮想で説明"],
             ["⑤ 実現可能性", "57～65、A003・A004", "責任者、用地、許認可、仕様、発注、採用、資金、工程、リスク代替案、金融機関の審査・支援"],
             ["⑥ 補助金の必要性", "67、A002", "現預金、運転資金、別投資、借入・担保・増資の限界、補助なしの場合の縮小・延期を数値化"],
+        ],
+        "compact",
+    )
+
+    proxy_definition_table = table(
+        ["指標", "企業PDF値の構築方法", "公式値との差・取扱い"],
+        [
+            ["No.1 全社売上高CAGR", "（公開目標売上高÷公開基準売上高）^(1/年数)－1", "年度・連結／単体の対応を確認できる場合のみ使用。公式企業別値ではない。"],
+            ["No.2 全社売上高増加額", "公開目標売上高－公開基準売上高", "同一主体・同一売上系列を優先。複数系列や期間曖昧は品質注意。"],
+            ["No.7・9・11 各CAGR", "PDF記載率を基本的にそのまま使用", "公開PDFに記載された率として最も直接比較しやすいが、公式提出時の非公開値との同一性は保証されない。"],
+            ["No.8 付加価値増加額", "{（目標労働生産性×目標従業員数）－（基準労働生産性×基準従業員数）}÷10,000×1.1", "公式は営業利益＋従業員給与＋役員給与＋減価償却費。人数も就業時間換算従業員＋役員であり一致しない。1.1は集計中央値の水準補正。"],
+            ["No.10 給与総額増加額", "{（目標1人当たり給与×目標従業員数）－（基準1人当たり給与×基準従業員数）}÷10,000", "公開人数の主体・範囲が公式の常時使用従業員と一致する保証がないため、企業別公式値ではない。"],
+            ["No.13 投資額／全社売上高", "公開事業費（百万円）÷公開基準売上高（億円）", "第6次の公式審査では高水準を正方向評価。一方、1～5次の採択者・申請者代表値では単調差が確認できないため、除外結果は感度分析としてのみ使用。"],
+            ["No.14 付加価値増加額／補助金", "No.8の1.1倍前の粗近似分子÷公開補助金額×100", "No.8と同じ分子情報を共有するため、独立した証拠として二重計上しない。"],
+        ],
+        "compact",
+    )
+
+    evidence_table = table(
+        ["区分", "根拠", "このレポートでの扱い", "許される表現"],
+        [
+            ["A 公式要件", "第6次の公式公募要領・様式", "申請要件、返還・取消条件", "満たす必要がある／未達リスクがある"],
+            ["B 公式評価項目", "第6次の公式審査基準", "評価方向・加点項目", "審査で評価される／高水準が正方向"],
+            ["C 公開データ上の観察", "381企業レコードと1～5次の公式代表値", "操作的定義、記述統計、感度分析", "収録範囲で何件・どの傾向が観測された"],
+            ["D 採択案件の記載パターン", "目的抽出した採択44社の目視符号化", "探索仮説。採否識別力は未検証", "公開要約に反復して現れた"],
+            ["E 分析者の実務提案", "A～Dと申請実務を接続した提案", "公式要件ではない", "整合性・説明可能性を高めるため推奨する"],
         ],
         "compact",
     )
@@ -228,13 +311,23 @@ def build() -> None:
         for _, row in changes.iterrows()
     )
 
-    round_rows = [
-        [esc(row["round"]), f'{int(row["public_pdf_n"]):,}', f'{int(row["clean_n"]):,}',
-         f'{int(row["dashboard9_low_n"]):,}（{fmt(row["dashboard9_low_pct"])}%）',
-         f'{int(row["directional8_low_n"]):,}（{fmt(row["directional8_low_pct"])}%）']
-        for _, row in rounds.iterrows()
-    ]
-    round_table = table(["公募回", "公開PDF", "品質除外なし", "現行9指標低位", "方向性8指標低位"], round_rows, "compact numeric")
+    official_accepted_by_round = (
+        gap_detail.groupby("round", sort=False)["accepted_n"].max().to_dict()
+    )
+    round_rows = []
+    for _, row in rounds.iterrows():
+        official_n = official_accepted_by_round.get(row["round"], float("nan"))
+        round_rows.append([
+            esc(row["round"]), f'{int(official_n):,}' if pd.notna(official_n) else "—",
+            f'{int(row["public_pdf_n"]):,}', f'{int(row["clean_n"]):,}',
+            f'{int(row["dashboard9_low_n"]):,}（全レコードの{fmt(row["dashboard9_low_pct"])}%）',
+            f'{int(row["directional8_low_n"]):,}（全レコードの{fmt(row["directional8_low_pct"])}%）',
+        ])
+    round_table = table(
+        ["公募回", "公式採択案件数", "収録企業レコード", "品質除外なし", "現行9指標低位", "No.13除外感度"],
+        round_rows,
+        "compact numeric",
+    )
 
     transition_labels = {
         (False, False): "いずれも非該当",
@@ -359,90 +452,115 @@ code {{ font-size:12px; overflow-wrap:anywhere; }}
 <aside class="toc" id="toc">
   <div class="toc-head"><strong>目次</strong><button id="tocToggle" type="button" aria-expanded="true">閉じる</button></div>
   <nav>
-    <a href="#conclusion">1. 結論</a><a href="#scope">2. 問いと限界</a><a href="#data">3. データ・再構築妥当性</a>
-    <a href="#definition">4. 「中央値未満」の定義</a><a href="#quant">5. 定量的にどこまで説明できるか</a>
-    <a href="#qual">6. 44社の定性レビュー</a><a href="#five">7. 方向性8指標すべて未満の5社</a>
+    <a href="#conclusion">1. 結論</a><a href="#scope">2. 問いと限界</a><a href="#data">3. データ・集計水準整合</a>
+    <a href="#definition">4. 「中央値未満」の定義</a><a href="#quant">5. 中央値以上観測の残存</a>
+    <a href="#qual">6. 目的抽出44社の記載パターン</a><a href="#five">7. 全観測値が未満の精査対象</a>
     <a href="#official">8. 公式の申請者／採択者差</a><a href="#round6">9. 第6次の制度変更</a>
-    <a href="#targets">10. 数値の持っていき方</a><a href="#recipe">11. 通る申請の組み立て</a>
-    <a href="#cases">12. 対象113社を確認</a><a href="#limitations">13. 限界・再現手順</a>
+    <a href="#targets">10. 付録：過去値と探索シナリオ</a><a href="#recipe">11. 説明可能性を高める設計</a>
+    <a href="#cases">12. No.13除外感度の113社</a><a href="#limitations">13. 限界・再現手順</a>
   </nav>
 </aside>
 <main>
 <section id="conclusion">
-  <h2>1. 結論：中央値未満は「弱い申請」の同義語ではない</h2>
-  <p class="lead">最大の知見は、採択者中央値未満案件の大半が、申請者全体から見ても弱いわけではないことです。現行9指標で低位とした118社のうち、117社は少なくとも1指標で同回の申請者代表値以上、80社は観測指標の過半数で申請者代表値以上でした。</p>
+  <h2>1. 結論：確認できたのは採択理由ではなく、「中央値未満」分類の構造</h2>
+  <p class="lead">現行9指標で判定可能な373企業レコードのうち118（31.6%）、品質除外なしでは199中58（29.1%）が操作的な低位定義に該当しました。しかし、各指標が独立に50%の確率で中央値未満になる単純モデルでも期待値は114.6です。したがって、118という件数自体は例外的採択や隠れた審査基準の証拠ではありません。</p>
   <div class="stats">
-    <div class="stat"><div class="value">{dashboard['n']}</div><div class="label">現行9指標の低位案件（381社中）</div></div>
+    <div class="stat"><div class="value">{dashboard['n']}/{dashboard['eligible_n']}</div><div class="label">現行9指標で判定可能な企業レコード中</div></div>
     <div class="stat"><div class="value">{dashboard['any_applicant_win_n']}/{dashboard['n']}</div><div class="label">申請者代表値以上の指標が1つ以上</div></div>
-    <div class="stat"><div class="value">{dashboard['applicant_majority_n']}/{dashboard['n']}</div><div class="label">観測指標の過半数が申請者代表値以上</div></div>
-    <div class="stat"><div class="value">{unexplained_n}</div><div class="label">方向性8指標ですべて採択者中央値未満</div></div>
+    <div class="stat"><div class="value">{dashboard['applicant_half_or_more_n']}/{dashboard['n']}</div><div class="label">観測指標の半数以上が申請者代表値以上（過半数67、厳密超過の過半数58）</div></div>
+    <div class="stat"><div class="value">5～9</div><div class="label">比較仕様により中央値以上の観測が残らない企業数</div></div>
   </div>
   <div class="thesis">
-    <article><h4>① 中央値は足切りではない</h4><p>単一指標なら、定義上、採択者の約半数は中央値以下です。複数指標も相関するため、「5/8が未満」を独立した5敗と数えるのは過大評価です。</p></article>
-    <article><h4>② 108/113社には別の定量的な勝ち筋</h4><p>No.13を方向中立として除いた113社のうち42社は2領域以上、66社は1領域で採択者中央値以上。全面劣後は5社でした。</p></article>
-    <article><h4>③ 残る5社は定性だけでなく因果鎖が具体的</h4><p>実名需要、物理的能力制約、工場統合・工程転換、地域供給網、用地・顧客・認証など実行根拠が結び付いていました。</p></article>
+    <article><h4>① 分類は仕様依存</h4><p>現行9指標118、No.8除外101、No.13・14除外134、構成単位164。旧7指標からも35社が外れ28社が加わり、単一の「低位群」は安定しません。</p></article>
+    <article><h4>② 非未満指標の残存は採択理由ではない</h4><p>No.13除外感度113社のうち108社には1領域以上で中央値以上が残りますが、これは60%未満という選定規則の裏返しを含み、審査上の補償を証明しません。</p></article>
+    <article><h4>③ 定性要素は申請設計仮説</h4><p>全観測値が未満となる少数社には需要・能力制約・構造転換等の具体記載がありますが、非採択対照がないため採否識別要因ではありません。</p></article>
   </div>
-  <div class="callout"><strong>第6次コンサルの中心命題</strong>「採択者中央値を全部超える」ではなく、公式必須条件を安全に満たしたうえで、<b>外部需要 → 現在の能力制約 → 投資仕様 → 生産・販売増 → 付加価値・賃金・地域波及 → 国費1円当たり効果</b>を同じ数量単位で接続し、金融・人員・工程・補助金必要性まで証拠化することです。</div>
+  <div class="callout"><strong>最終的に言えること</strong>本分析が示すのは、採択者中央値未満という分類が全面的な定量劣後を意味しないことです。少数の残差群に見られる定性記載は、第6次の公式審査項目と整合する申請設計仮説として扱えますが、採択を保証する要因とはいえません。</div>
 </section>
 
 <section id="scope">
   <h2>2. この分析が答える問い／答えない問い</h2>
   <div class="callout warn"><strong>因果推論・合格確率の推定ではありません</strong>公開されているのは交付決定企業の要約PDFです。非採択企業の個票、審査項目別得点、審査時申請書は非公開なので、「この要素が合否を何点動かすか」「この計画の合格確率は何%か」は推定できません。</div>
   <div class="criteria-flow">
-    <article><h4>記述</h4><p>採択者中央値未満案件が何社いるか。</p></article>
+    <article><h4>記述</h4><p>操作的定義に該当する企業レコードがいくつあるか。</p></article>
     <article><h4>分解</h4><p>成長・生産性／付加価値・賃金の別領域に強みがあるか。</p></article>
     <article><h4>仮説抽出</h4><p>公開要約に繰り返し現れる定性パターンは何か。</p></article>
     <article><h4>制度接続</h4><p>第6次の様式・審査基準で何を証拠化すべきか。</p></article>
   </div>
-  <p>したがって本報告の「説明」は、採択済み案件の公開情報における<b>整合的な解釈</b>です。識別力を確かめるには、同業・同規模の非採択申請書または審査点が必要です。</p>
+  <p>したがって本報告の「説明」は、採択済み企業の公開情報における<b>整合的な解釈</b>です。識別力を確かめるには、同業・同規模の非採択申請書または審査点が必要です。</p>
+  <h3>結論の証拠レベル</h3>
+  {evidence_table}
+  <h3>本文で使う用語</h3>
+  <ul>
+    <li><b>公式代表値：</b>事務局公表の申請者全体・採択者の中央値等。指標によって平均値の場合があるため、総称として「代表値」とします。</li>
+    <li><b>企業PDF値：</b>交付決定後の公開要約に記載された値、または複数の公開値から再構築した近似値。審査時の企業別公式値ではありません。</li>
+    <li><b>低位：</b>本分析の操作的なスクリーニング定義への該当。審査上の低評価・不合格水準を意味しません。</li>
+    <li><b>中央値以上の観測が残る：</b>別領域に採択者代表値以上の公開指標があるという記述。採択理由、審査上の補償、因果効果を意味しません。</li>
+    <li><b>品質除外なし：</b>率定義・代表主体・算術対応などに重大な注意フラグが付いていないケース。正確性を保証する認証ではありません。</li>
+  </ul>
 </section>
 
 <section id="data">
-  <h2>3. データと企業別指標の再構築妥当性</h2>
-  <p>対象は1～4次の公開企業PDF 381社です。うち抽出上の重大な注意フラグがないものは202社。公式代表値の母集団とは件数が一致しないため、企業PDF中央値と公式採択者中央値の一致は「水準妥当性」の確認であり、企業別公式値の検証ではありません。</p>
+  <h2>3. データ、分析単位、集計水準の整合確認</h2>
+  <p>分析単位は、1～4次の交付決定後公開PDFから作った381の<b>企業レコード</b>です。申請案件母集団ではありません。共同申請・公開時点・収録単位が異なるため、1次のように収録企業レコード数が公式採択案件数を上回る回もあります。公式申請者・採択者代表値との比較は独立2群比較でも、企業別値の検証でもありません。</p>
   {round_table}
-  <h3>現行9指標の再構築監査</h3>
+  <p class="sub">「申請者全体」には採択者も含まれます。公式代表値は丸め値であり、小差・同値を強く解釈しません。</p>
+  <h3>現行9指標の集計水準整合</h3>
   {validation_table}
-  <p class="footnote">「中央値差」は、各公募回の公開PDF再構築中央値と公式採択者代表値との差率の絶対値を4公募回で要約。No.8は1.1倍の一律水準補正、No.14は補正前No.8分子÷補助金額。No.8・14は個社公式値の再現ではありません。第2次は公開PDFが25社と少なく、No.1は3社、No.13は11社のみで特に不安定です。</p>
+  <h3>主要な企業PDF値の定義</h3>
+  {proxy_definition_table}
+  <p>品質注意179社は、率定義の曖昧さ135件、代表主体の曖昧さ56件、事業費本文との不一致13件、率の算術不一致8件、売上の算術不一致6件を含みます（重複あり）。このため全381社と品質除外なし202社を併記します。</p>
+  <p class="footnote">「中央値差率」は（企業PDF中央値÷公式採択者代表値－1）×100。その絶対値を4公募回で要約しています。No.8は同じ1～4次の公式水準を参考に1.1倍しているため、表はインサンプル較正後の整合であり「妥当性検証」ではありません。第2次はNo.1が3社、No.13が11社のみで特に不安定です。</p>
+  <h3>No.8の公募回外チェック</h3>
+  <p>1公募回を除外し、残る3回の「公式中央値÷粗近似中央値」の中央値を係数として除外回を予測しました。誤差率は−5.4%～+13.5%ですが、検証単位は4個の公募回中央値だけです。企業別精度、順位精度、誤差分布は未検証です。</p>
+  {loro_table}
 </section>
 
 <section id="definition">
   <h2>4. 「採択者中央値未満案件」の定義は一意ではない</h2>
-  <p>ダッシュボード互換定義は「9指標のうち5指標以上が観測でき、同回の採択者中央値未満が60%以上」。118社（31.0%）が該当します。ただしNo.13（投資額／全社売上高）は、1～5次の4回で採択者中央値が申請者中央値より低く、単純に高いほど良い指標ではありません。主要推論ではNo.13を外した方向性8指標を使い、113社（29.7%）を分析対象にしました。</p>
+  <p>ダッシュボード互換定義は「9指標のうち5指標以上が観測でき、同回の採択者中央値未満が60%以上」です。判定可能373企業レコード中118（31.6%）、品質除外なしでは199中58（29.1%）が該当します。全381レコードを分母にした31.0%は、判定不能8レコードも含む参考値です。</p>
+  <p>No.13（投資額／全社売上高）は、第6次の公式審査では高水準を正方向に評価します。一方、過去の申請者・採択者代表値には一貫した上下差がなく、過去採択の識別指標としての単調性は確認できません。このためNo.13除外8指標は主分析ではなく感度分析です。同仕様では判定可能371中113（30.5%）、品質除外なし198中55（27.8%）が該当します。</p>
   <div class="equation">低位 = 観測数 ≥ 5 かつ（採択者中央値未満の指標数 ÷ 観測数）≥ 60%</div>
+  <p class="sub">観測数5は、9指標の過半を実測できないケースを主要判定から外すための最低情報量です。60%は「観測指標の明確な過半が未満」を抽出する操作的閾値であり、制度上・統計理論上の境界ではありません。この任意性を隠さないため、最低観測数と割合を系統的に変えた感度分析を併記します。</p>
   <h3>閾値感度</h3>
   {sensitivity_bars}
-  <p class="sub">現行9指標、観測5指標以上、全381社。50%なら193社、75%なら53社となり、結論は閾値に依存します。</p>
+  <p class="sub">現行9指標、観測5指標以上の判定可能373レコード。50%なら193/373、75%なら53/373となり、該当数は閾値に依存します。</p>
   <h3>旧7指標から現行9指標への入れ替わり</h3>
   {transition_table}
   <p>旧分析の125社をそのまま引き継ぐのは不適切です。No.8・14の追加と最低観測数の統一により、90社のみ共通、35社が外れ、28社が新たに入っています。</p>
+  <h3>指標集合を変えた頑健性確認</h3>
+  {robustness_table}
+  <p class="sub">No.8とNo.14は同じ付加価値増加額を共有し、No.2・8・10には企業規模の共通要因があります。該当数は101～176、構成単位判定では164まで動きます。したがって「低位群」はデータに内在する唯一の集団ではなく、分析仕様が作る比較群です。</p>
 </section>
 
 <section id="quant">
-  <h2>5. 定量的にどこまで説明できるか</h2>
-  <p>方向性8指標を、①全社成長（No.1・2）、②生産性／付加価値（No.7・8・14）、③賃金（No.9・10・11）の3領域に分け、各領域で1指標でも採択者中央値以上なら「領域勝ち」としました。</p>
+  <h2>5. 中央値以上の観測値がどこに残るか</h2>
+  <p>No.13除外感度の8指標を、①全社成長（No.1・2）、②生産性／付加価値（No.7・8・14）、③賃金（No.9・10・11）の3領域に分けました。各領域に同回の採択者中央値以上の指標が1つでもあれば「中央値以上の観測値あり」と数えます。これは記述分類であり、審査上の補償、優位性、採択理由を意味しません。</p>
   <div class="stack" aria-label="113社の定量説明レベル">
     <div class="clear" style="width:{100*clear_n/explanation_total:.2f}%">{clear_n}</div>
     <div class="partial" style="width:{100*partial_n/explanation_total:.2f}%">{partial_n}</div>
     <div class="unknown" style="width:{100*unexplained_n/explanation_total:.2f}%">{unexplained_n}</div>
   </div>
-  <div class="legend"><span style="--c:#0f766e">2領域以上で補完 {clear_n}社</span><span style="--c:#3b82f6">1領域で補完 {partial_n}社</span><span style="--c:#d97706">公開方向性定量では未説明 {unexplained_n}社</span></div>
-  <div class="callout"><strong>解釈</strong>108/113社（{100*(clear_n+partial_n)/explanation_total:.1f}%）には少なくとも1領域の採択者中央値以上があり、「全部弱いのに採択」ではありません。ただし1指標の勝ちを採択理由と断定するものではなく、領域間の補完可能性を示す記述です。</div>
-  <h3>「別の効率指標が高かったから」とは、群全体では説明できない</h3>
+  <div class="legend"><span style="--c:#0f766e">2領域以上に中央値以上あり {clear_n}社</span><span style="--c:#3b82f6">1領域に中央値以上あり {partial_n}社</span><span style="--c:#d97706">観測指標に中央値以上なし {unexplained_n}社</span></div>
+  <div class="callout"><strong>定義上の注意</strong>同値を含む判定では42／66／5、代表値を厳密に上回る場合だけ数えると{strict_clear_n}／{strict_partial_n}／{strict_unexplained_n}です。108/113に1領域以上が残ることは、60%以上未満という抽出規則の裏返しを大きく含みます。採択を説明した割合として読んではいけません。</div>
+  <h3>別の効率指標による一般的な補完は、単純中央値では確認できない</h3>
   {effect_table}
-  <p>売上増／補助金、給与増／補助金、雇用増／補助金も、低位群の中央値はその他採択企業の53～67%でした。したがって「公開9指標は低いが、別の費用対効果で一律に救済された」という説明は棄却すべきです。No.13だけは低位群の方が高く、企業規模に対する投資の大胆さを示しますが、採択者と申請者の公式比較では高いほど有利ではありません。</p>
+  <p>売上増／補助金、給与増／補助金、雇用増／補助金についても、低位群の中央値はその他採択企業の53～67%でした。公募回・業種・規模を調整しない探索的比較ですが、「公開9指標は低くても別の費用対効果が一般に高い」という単純な説明を支持しません。No.13は低位群の方が高いものの、公式には正方向評価、過去集計では識別性が不明瞭という二つの事実を分けて扱います。</p>
   <h3>なぜ118社も生じるのか：中央値の性質と指標の非独立性</h3>
-  <p>各指標で中央値未満になる確率を単純に50%と置くだけでも、現行の観測数構成では期待値は{fmt(perm['simple_coin_expected'])}社です。118社という件数自体は、隠れた採択基準が大量に働いた証拠ではありません。さらにNo.8とNo.14は同じ付加価値増加額を分子に持ち、No.2・8・10は企業規模の影響を共有します。公募回×指標ごとの実際の上下比率と欠損位置を保ち、企業間で判定を1万回並べ替えた場合は平均{fmt(perm['permutation_expected'])}社、95%範囲{fmt(perm['permutation_q025'],0)}～{fmt(perm['permutation_q975'],0)}社でした。実測118社の上振れは、企業内で低位判定が束になる相関構造と整合しますが、「謎の採択」の直接証拠ではありません。</p>
+  <p>各指標で中央値未満になる確率を仮に50%と置くと、現行の観測数構成における期待値は{fmt(perm['simple_coin_expected'])}社です。公開PDF母集団は公式中央値の算出母集団と同一ではないため、これは理論比較にすぎません。さらに、公募回×指標ごとの実際の上下比率と欠損位置を固定し、企業間で判定だけを1万回並べ替える帰無分布は平均{fmt(perm['permutation_expected'])}社、95%範囲{fmt(perm['permutation_q025'],0)}～{fmt(perm['permutation_q975'],0)}社、実測118社以上となる片側p={fmt(perm['permutation_p_ge_observed'],4)}でした。これは企業内で低位判定が束になる相関を示しますが、採択要因の検定ではありません。</p>
   <div class="callout warn"><strong>してはいけない読み方</strong>9指標を独立した9票として「6敗3勝」と評価すること。No.13を高いほど良いと採点すること。No.8とNo.14を別々の強み／弱みとして二重計上すること。</div>
 </section>
 
 <section id="qual">
-  <h2>6. 現行低位44社の目視レビュー</h2>
-  <p>既存40ペアの低位側で現行9指標にも該当する20社と、既存レビュー外の現行9指標低位・品質除外なし35社から公募回・業種を分散して選んだ24社、計44社を公開採択概要で再確認しました。0＝記載なし、1＝一般的、2＝具体、3＝強い具体証拠として符号化しています。</p>
+  <h2>6. 目的抽出44社の公開要約に反復して現れた要素</h2>
+  <p>既存40ペアの低位側で現行9指標にも該当する20社と、既存レビュー外の現行9指標低位・品質除外なし35社から、公募回・業種の偏りを抑えて選んだ24社、計44社を公開採択概要で確認しました。対象は採択後の公開要約であり、審査時申請書ではありません。0＝記載なし、1＝一般的、2＝具体、3＝強い具体証拠として、単独評価者が非盲検で符号化しました。</p>
   {factor_bars}
   <p><b>事業・工程の構造転換</b>は44/44、<b>能力制約</b>・<b>実行確度</b>・<b>政策整合</b>は各42/44、<b>地域・供給網</b>は40/44で2点以上でした。需要証拠は33/44で、全社に実名発注や契約があるわけではありません。一方、4つの中核要素（需要・制約・転換・地域）のうち3つ以上が具体的だった案件は42/44です。</p>
-  <div class="callout warn"><strong>この比率は合否識別力ではない</strong>目的抽出・採択企業のみ・単独かつ非盲検の評価です。例えば「構造転換100%」は、採択企業の公開要約で繰り返される提示様式を示すだけで、非採択企業にも同じ記載がある可能性を排除しません。</div>
-  <h3>低定量採択案件で再現可能性が高い提示順</h3>
+  <div class="callout warn"><strong>この比率は合否識別力ではない</strong>目的抽出・採択企業のみ・単独かつ非盲検の評価で、評価者間一致度も未測定です。例えば「構造転換100%」は公開要約で反復する提示様式を示すだけで、非採択企業にも同じ記載がある可能性を排除しません。</div>
+  <h3>既存40ペアでの低位側・高位側比較</h3>
+  {pair_table}
+  <p class="sub">6要素のいずれもBonferroni補正後p値は0.05以上です。低位側だけに特有の定性要素は確認できず、ここから「定性面が定量劣後を補った」とは言えません。次段階には、事前登録コードブック、2名独立・盲検符号化、根拠ページ保存、非採択対照が必要です。</p>
+  <h3>公開採択概要で頻出した提示パターン</h3>
   <ol>
     <li><b>需要：</b>顧客名、発注・増産要請、失注件数、市場数量、稼働率、待ち期間。</li>
     <li><b>制約：</b>能力／面積／排水／温湿度／防爆／人員／物流など、現在値と上限値。</li>
@@ -453,25 +571,26 @@ code {{ font-size:12px; overflow-wrap:anywhere; }}
 </section>
 
 <section id="five">
-  <h2>7. 方向性8指標の観測値がすべて採択者中央値未満の5社</h2>
-  <p>公開定量だけでは補完を見いだせなかった5社です。2社は抽出品質の注意フラグがあり、個別値の読み過ぎにも注意が必要です。それでも公開要約には、投資が必要となる外部需要・能力制約・供給網上の意味が具体的に記載されていました。</p>
+  <h2>7. No.13除外仕様で観測値がすべて中央値未満の5社</h2>
+  <p>No.13を除いた選定仕様で、観測できた指標がすべて同回の採択者中央値未満となる5社です。2社は抽出品質の注意フラグがあります。No.8・14を一つの構成単位にまとめた別仕様では7社、同値を「超過」に数えない厳密判定では9社となるため、確定的な例外企業群ではありません。</p>
   <div class="case-grid">{study_cards}</div>
   <p class="footnote">これらは採択理由の確定ではありません。「公開定量では説明できない残差」に対して、公開要約から最も整合的な仮説を付したものです。</p>
 </section>
 
 <section id="official">
   <h2>8. 公式統計が示す、申請者から採択者へ上がる指標</h2>
-  <p>1～5次で一貫して採択者が申請者を上回るのは、成長率だけでなく<b>売上・付加価値・給与総額の絶対増加</b>と<b>補助金額当たり付加価値</b>です。第5次でも、補助事業売上高増加額は57.4→74.8億円、付加価値増加額は19.9→28.1億円、給与総額増加額は2.8→3.9億円、付加価値増加額／補助金額は171→213%でした。</p>
+  <p>1～5次で概ね採択者が申請者を上回るのは、成長率だけでなく<b>売上・付加価値・給与総額の絶対増加</b>と<b>補助金額当たり付加価値</b>です。第5次でも、補助事業売上高増加額は57.4→74.8億円、付加価値増加額は19.9→28.1億円、給与総額増加額は2.8→3.9億円、付加価値増加額／補助金額は171→213%でした。</p>
   {gap_table}
-  <div class="callout"><strong>申請助言への変換</strong>率だけを上げるのではなく、①何億円の売上を追加し、②何億円の付加価値を増やし、③何億円の給与を地域に追加し、④補助金1億円当たり何億円の付加価値を生むかを並べてください。No.13は「高いほど良い」ではなく、企業規模に対する投資の大胆さと実現可能性の文脈指標です。</div>
+  <p class="footnote">差の中央値は、各公募回の（採択者代表値－申請者全体代表値）÷申請者全体代表値×100の中央値です。申請者全体には採択者も含まれ、両群は独立ではありません。公式代表値は丸め値のため、小差・同値を強く解釈しません。</p>
+  <div class="callout"><strong>C 観察からE 実務提案への変換</strong>率だけでなく、①追加売上、②追加付加価値、③追加給与、④補助金1億円当たり付加価値を、需要・能力・損益の計算鎖で示します。No.13は公式評価上は高水準が正方向ですが、過去代表値の採択者・申請者差は不明瞭です。大胆さだけでなく財務健全性と実現可能性を併記してください。</div>
 </section>
 
 <section id="round6">
   <h2>9. 第6次で重要度が増した論点</h2>
-  <p>第6次は事前公開段階であり、正式公募開始時の資料で更新確認が必要です。公式審査は経営力、先進性・成長性、地域波及、大規模投資・費用対効果、実現可能性、補助金の必要性から構成され、書面の定量面に加えて経営者プレゼンで定性面も評価されます。第5次は198件申請、147件が書面通過、77件が最終採択でしたが、この段階数から審査配点を逆算することはできません。</p>
-  <div class="callout"><strong>まず満たすべき公式要件</strong>一般企業は投資額20億円以上（外注費・専門家経費を除く補助対象経費、税抜）かつ完了後3年間の補助事業従業員等1人当たり給与支給総額CAGR 5.0%以上。100億宣言企業は投資額15億円以上、同4.5%以上です。補助上限50億円、補助率1/3以下。これらは審査上の目標ではなく入口要件・返還条件です。</div>
+  <p><span class="badge good">B 公式評価項目</span> 第6次は事前公開段階であり、正式公募開始時の資料で更新確認が必要です。公式審査は経営力、先進性・成長性、地域波及、大規模投資・費用対効果、実現可能性、補助金の必要性から構成され、書面の定量面に加えて経営者プレゼンで定性面も評価されます。第5次は198件申請、147件が書面通過、77件が最終採択でしたが、この段階数から配点を逆算することはできません。</p>
+  <div class="callout"><strong>A まず満たすべき公式要件</strong>一般企業は投資額20億円以上（外注費・専門家経費を除く補助対象経費、税抜）かつ完了後3年間の補助事業従業員等1人当たり給与支給総額CAGR 5.0%以上。100億宣言企業は投資額15億円以上、同4.5%以上です。補助上限50億円、補助率1/3以下。これらは審査上の目標ではなく入口要件・返還条件です。</div>
   <div class="change-grid">{change_cards}</div>
-  <h3>実務上の優先順位</h3>
+  <h3>E 分析者提案：実務上の優先順位</h3>
   <ol>
     <li><b>足下の全社賃上げ：</b>基準年度後だけでなく、直近決算から基準年度までの全社賃上げを年次で設計。事前公開資料が参照する2025年CPI 3.2%は最低限の参考であり、それを上回る実行可能な水準と原資を説明する。</li>
     <li><b>補助金の必要性：</b>現預金が多い企業ほど、運転資金・別投資・M&A・借入余力・担保・増資検討・補助なし反実仮想を数値で示す。</li>
@@ -481,10 +600,10 @@ code {{ font-size:12px; overflow-wrap:anywhere; }}
 </section>
 
 <section id="targets">
-  <h2>10. 第6次で数値をどう持っていくか</h2>
-  <p>下表の「1～5次傾向参照」は採択者公式値のTheil–Sen直線を第6次へ外挿した頑健な参考、「検討用ストレッチ」は事業計画を逆算するためのシナリオです。いずれも公式足切り・合格基準ではありません。</p>
+  <h2>10. 付録：過去代表値と探索シナリオ</h2>
+  <p>下表の「1～5次傾向参照」は、公募回を等間隔と仮定し、最大5点の採択者公式代表値にTheil–Sen直線を当てて第6次へ外挿した探索値です。制度変更、応募者構成、不確実性区間を反映せず、予測値でも合格基準でもありません。「検討用ストレッチ」も事業計画を逆算するための分析者シナリオで、公式根拠はありません。</p>
   {framework_table}
-  <div class="callout warn"><strong>中央値を目標値にしない</strong>中央値を少し超えるように数字を作ると、需要証拠、設備能力、価格・数量、P/L、人員、賃上げの間で矛盾が生じます。まず裏付け可能な需要数量と制約解消能力からボトムアップで計算し、その結果を申請者・採択者公式値と比較してください。</div>
+  <div class="callout warn"><strong>本文の判断順序</strong>①公式要件、②顧客需要と能力制約から積み上げた実行可能なベースケース、③過去代表値との事後比較、④下振れ時にも要件を履行できる安全余裕、の順に判断します。探索外挿を先に目標化しません。</div>
   <h3>案件別の三段階表示</h3>
   <ul>
     <li><b>必達：</b>公式の要件・返還条件を安全余裕込みで満たす数値。</li>
@@ -494,7 +613,8 @@ code {{ font-size:12px; overflow-wrap:anywhere; }}
 </section>
 
 <section id="recipe">
-  <h2>11. 「通る申請」を作るための実務レシピ</h2>
+  <h2>11. 要件整合性と説明可能性を高める実務設計</h2>
+  <p><span class="badge warn">E 分析者提案</span> 以下は公式要件そのものではなく、A～Dの証拠を申請書内で矛盾なく接続するための実務設計です。</p>
   <p class="lead">良い申請は、強い形容詞ではなく、同じ数量が資料全体を貫きます。市場予測100ではなく、顧客別需要→設備能力→販売数量→損益→付加価値→賃金→地域波及→国費効果まで照合できる状態を作ります。</p>
   <div class="criteria-flow">
     <article><h4>需要台帳</h4><p>顧客・用途・数量・時期・確度・証拠資料を1行1案件で管理。</p></article>
@@ -526,16 +646,16 @@ code {{ font-size:12px; overflow-wrap:anywhere; }}
 </section>
 
 <section id="cases">
-  <h2>12. 方向性8指標低位113社を確認する</h2>
-  <p>会社名・業種・公募回・定量補完レベルで絞り込めます。「公開定量では未説明」の5社は上の個別精査対象です。</p>
+  <h2>12. No.13除外感度の113企業レコード</h2>
+  <p>会社名・業種・公募回・中央値以上の観測領域数で絞り込めます。これは過去集計の識別性を確認する感度仕様であり、第6次公式評価からNo.13を除くことを意味しません。</p>
   <div class="filters">
     <input id="caseSearch" type="search" placeholder="会社名・業種を検索（例：半導体、ホテル）" aria-label="会社名・業種を検索">
     <select id="roundFilter" aria-label="公募回"><option value="">全公募回</option><option>1次</option><option>2次</option><option>3次</option><option>4次</option></select>
-    <select id="levelFilter" aria-label="定量説明レベル"><option value="">全説明レベル</option><option>明確な定量補完（領域2以上）</option><option>部分的な定量補完（領域1）</option><option>公開方向性定量では未説明</option></select>
+    <select id="levelFilter" aria-label="中央値以上の観測領域数"><option value="">全区分</option><option>2領域以上に中央値以上あり</option><option>1領域に中央値以上あり</option><option>観測指標に中央値以上なし</option></select>
     <label class="filter-check"><input id="cleanFilter" type="checkbox"> 品質除外なしのみ</label>
   </div>
   <div id="caseCount" class="sub" aria-live="polite"></div>
-  <div class="table-wrap case-results"><table><thead><tr><th>公募回</th><th>企業</th><th>業種</th><th>未満／観測</th><th>領域勝ち</th><th>成長</th><th>生産性・付加価値</th><th>賃金</th><th>説明レベル</th><th>品質</th><th>原資料</th></tr></thead><tbody id="caseBody"></tbody></table></div>
+  <div class="table-wrap case-results"><table><thead><tr><th>公募回</th><th>企業</th><th>業種</th><th>未満／観測</th><th>中央値以上の領域数</th><th>成長</th><th>生産性・付加価値</th><th>賃金</th><th>区分</th><th>品質</th><th>原資料</th></tr></thead><tbody id="caseBody"></tbody></table></div>
 </section>
 
 <section id="limitations">
@@ -545,13 +665,15 @@ code {{ font-size:12px; overflow-wrap:anywhere; }}
     <li>公開PDFは交付決定後の要約で、審査時申請書や公式採択者母集団と一致しません。</li>
     <li>No.8・14は集計中央値の水準を近づけた近似で、企業別公式値ではありません。</li>
     <li>目視44社は目的抽出・採択企業のみ・単独非盲検評価です。次段階は二重符号化と非採択比較です。</li>
+    <li>欠損はランダムとは限りません。公募回、様式、企業属性により指標の観測可能性が異なり、低位群の構成を歪める可能性があります。</li>
+    <li>低位群の件数と構成は、同値処理、No.8・14の重複処理、品質除外、指標集合に依存します。</li>
     <li>第6次は事前公開版に基づきます。正式公募要領・様式公開時に差分確認が必要です。</li>
   </ul>
   <h3>再現</h3>
   <div class="equation">python analyze_round6_reassessment.py<br>python build_round6_reassessment_report.py</div>
-  <p>分析コード、ケース別判定、感度分析、公式差、目視符号化、出典一覧を同じフォルダに保存しています。</p>
+  <p>分析コード、企業別判定、感度分析、公式差、目視符号化、出典一覧を同じフォルダに保存しています。操作的定義と推定限界は<a href="methodology.md" target="_blank" rel="noopener">方法論ノート</a>、成果物一覧は<a href="README.md" target="_blank" rel="noopener">README</a>にまとめています。</p>
   {source_table}
-  <p class="footnote">主な出力：<a href="case_level_reassessment.csv">ケース別再評価CSV</a>／<a href="focused_qualitative_review_44.csv">44社目視レビューCSV</a>／<a href="metric_reconstruction_validation.csv">指標再構築検証CSV</a>／<a href="official_applicant_accepted_gaps_by_round.csv">公式差の公募回別CSV</a>／<a href="round6_numeric_framework.csv">第6次数値フレームCSV</a></p>
+  <p class="footnote">主な出力：<a href="case_level_reassessment.csv">企業別再評価CSV</a>／<a href="metric_set_robustness.csv">指標集合の頑健性CSV</a>／<a href="value_added_leave_one_round_out.csv">No.8公募回外チェックCSV</a>／<a href="qualitative_pair_comparison.csv">40ペア比較CSV</a>／<a href="focused_qualitative_review_44.csv">44社目視レビューCSV</a>／<a href="metric_reconstruction_validation.csv">指標再構築CSV</a>／<a href="official_applicant_accepted_gaps_by_round.csv">公式差CSV</a>／<a href="round6_numeric_framework.csv">探索数値フレームCSV</a></p>
 </section>
 </main>
 </div>

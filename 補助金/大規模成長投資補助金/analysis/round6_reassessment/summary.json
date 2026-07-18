@@ -14,18 +14,29 @@
     "definition": "9指標中5指標以上観測、採択者中央値未満が60%以上",
     "n": 118,
     "pct": 31.0,
+    "eligible_n": 373,
+    "conditional_pct": 31.6,
     "clean_n": 58,
+    "clean_eligible_n": 199,
     "any_applicant_win_n": 117,
-    "applicant_majority_n": 80
+    "applicant_half_or_more_n": 80,
+    "applicant_majority_n": 67,
+    "strict_above_applicant_majority_n": 58
   },
   "directional_primary": {
-    "definition": "No.13を方向中立として除外した8指標中5指標以上観測、未満60%以上",
+    "definition": "No.13は公式上正方向評価だが、過去代表値で単調性が確認できないため感度分析上除外。残る8指標中5指標以上観測、未満60%以上",
     "n": 113,
     "pct": 29.7,
+    "eligible_n": 371,
+    "conditional_pct": 30.5,
     "clean_n": 55,
+    "clean_eligible_n": 198,
     "two_or_more_component_wins_n": 42,
     "one_component_win_n": 66,
     "zero_component_win_n": 5,
+    "strict_two_or_more_component_n": 39,
+    "strict_one_component_n": 65,
+    "strict_zero_component_n": 9,
     "all_observed_below_companies": [
       "株式会社ホテルニューアワジ",
       "アシザワ・ファインテック株式会社",
@@ -33,6 +44,29 @@
       "株式会社シュゼット・ホールディングス",
       "株式会社タカラ倉庫運輸サービス"
     ]
+  },
+  "robustness": {
+    "metric_set_counts": {
+      "現行9指標": 118,
+      "No.13除外8指標": 113,
+      "No.14除外8指標": 118,
+      "No.8除外8指標": 101,
+      "No.13・14除外7指標": 134,
+      "構成単位3領域": 164,
+      "絶対効果3指標": 176,
+      "率4指標": 128
+    },
+    "deduplicated_all_below_n": 7,
+    "deduplicated_all_below_companies": [
+      "株式会社ホテルニューアワジ",
+      "アシザワ・ファインテック株式会社",
+      "株式会社八立製作所",
+      "株式会社シュゼット・ホールディングス",
+      "株式会社タカラ倉庫運輸サービス",
+      "株式会社イズミテクノ",
+      "株式会社キド"
+    ],
+    "warning": "仕様により件数・企業集合が変わるため、5社を確定的な例外群と解釈しない。"
   },
   "old_vs_new": {
     "old7_n": 125,
