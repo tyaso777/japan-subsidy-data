@@ -56,12 +56,18 @@ python analyze_adoption_drivers.py
 - `expanded_matched_pair_dashboard.html`: 主要結果、6要因比較、80社散布図、40ペアの根拠をまとめた単独HTML
 - `build_expanded_pair_dashboard.py`: CSV・JSONから上記HTMLを再生成
 
+分析全体の専門家向け資料:
+
+- `adoption_drivers_analysis_report.html`: 381社の定量スクリーニング、Proxy検証、5軸プロファイル、文章分析、40ペア目視精査、第6次向け数値設計を「問い→方法→結果→解釈→限界」の順で統合した単独HTML
+- `build_adoption_drivers_analysis_report.py`: 同フォルダのCSV・JSONから上記HTMLを再生成。画面閲覧・モバイル・印刷に対応
+
 再生成:
 
 ```powershell
 python select_matched_pair_candidates.py
 python analyze_expanded_matched_pairs.py
 python build_expanded_pair_dashboard.py
+python build_adoption_drivers_analysis_report.py
 ```
 
 この環境ではOS標準の `python` がPython 2の場合があるため、実際にはPython 3.10以降を使用してください。`select_matched_pair_candidates.py` が作る `tmp/pdfs` の精査票は中間ファイルで、Git管理対象ではありません。
