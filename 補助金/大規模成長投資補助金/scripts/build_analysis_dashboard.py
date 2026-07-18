@@ -191,6 +191,7 @@ def main() -> None:
     print(f"wrote {REFERENCE_OUTPUT} ({REFERENCE_OUTPUT.stat().st_size:,} bytes)")
 
 
+# Version labels are changed only when the project owner explicitly requests a release change.
 TEMPLATE = r'''<!doctype html>
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>採択企業 公開指標比較ダッシュボード｜大規模成長投資補助金</title>
@@ -232,8 +233,7 @@ TEMPLATE = r'''<!doctype html>
  <details class="section-box" data-section="trends"><summary>公式統計の推移</summary><div class="section-body histgrid"><section class="inner-panel"><h2 id="trendYTitle" style="font-size:15px;margin:0 0 8px"></h2><svg id="trendY" class="trend" role="img" aria-label="縦軸指標の公式公表値の公募回別推移"></svg><p class="note" id="trendYNote"></p></section><section class="inner-panel"><h2 id="trendXTitle" style="font-size:15px;margin:0 0 8px"></h2><svg id="trendX" class="trend" role="img" aria-label="横軸指標の公式公表値の公募回別推移"></svg><p class="note" id="trendXNote"></p></section></div></details>
  <details class="section-box" data-section="details" open><summary>選択企業の詳細</summary><div class="section-body"><section class="details" id="details"></section></div></details>
  <details class="section-box" data-section="changelog"><summary>変更履歴</summary><div class="section-body">
-  <section class="version-block"><div class="version-head"><h3>v0.2</h3><span>現行版</span></div><ul class="change-log"><li><strong>企業一覧と散布図の選択表示を統一：</strong>企業一覧から選んだ場合も選択点を太い輪郭と拡大表示で強調し、現在の表示範囲外にある場合は同じ拡大率のまま点が見える位置へ移動します。</li></ul></section>
-  <section class="version-block"><div class="version-head"><h3>v0.1</h3><span>前版</span></div><ul class="change-log"><li><strong>順位表示を改善：</strong>収録採択企業内の上位割合を上位ほど緑、下位ほど赤になるグラデーションで表示しました。</li><li><strong>公式中央値の見出しを明確化：</strong>選択企業の公募回に応じて「第1次公募 申請者中央値」のように表示します。</li><li><strong>推計指標の詳細リンクを追加：</strong>選択企業の詳細から、No.8・No.14などの計算方法と注意点を別ウィンドウで確認できるようにしました。</li><li><strong>軸選択を見やすく：</strong>縦軸・横軸を専用の1行に分け、操作説明の直後から両軸の定義資料を別ウィンドウで開けるようにしました。</li><li><strong>PDF表示を切替可能に：</strong>閉じる操作を「原資料」欄へ移し、閉じた後は画面右端の細い「≪」バー全体から再表示できるようにしました。表示状態はブラウザーに保存されます。</li></ul></section>
+  <section class="version-block"><div class="version-head"><h3>v0.1</h3><span>現行版</span></div><ul class="change-log"><li><strong>企業一覧と散布図の選択表示を統一：</strong>企業一覧から選んだ場合も選択点を太い輪郭と拡大表示で強調し、現在の表示範囲外にある場合は同じ拡大率のまま点が見える位置へ移動します。</li><li><strong>順位表示を改善：</strong>収録採択企業内の上位割合を上位ほど緑、下位ほど赤になるグラデーションで表示しました。</li><li><strong>公式中央値の見出しを明確化：</strong>選択企業の公募回に応じて「第1次公募 申請者中央値」のように表示します。</li><li><strong>推計指標の詳細リンクを追加：</strong>選択企業の詳細から、No.8・No.14などの計算方法と注意点を別ウィンドウで確認できるようにしました。</li><li><strong>軸選択を見やすく：</strong>縦軸・横軸を専用の1行に分け、操作説明の直後から両軸の定義資料を別ウィンドウで開けるようにしました。</li><li><strong>PDF表示を切替可能に：</strong>閉じる操作を「原資料」欄へ移し、閉じた後は画面右端の細い「≪」バー全体から再表示できるようにしました。表示状態はブラウザーに保存されます。</li></ul></section>
  </div></details>
 __METHODOLOGY_ENTRY__
  </main><button class="pdf-reopen" id="pdfReopen" type="button" aria-label="原資料を開く" aria-controls="pdfPane" aria-expanded="false">≪</button><aside class="pdf" id="pdfPane"><div class="pdfbar"><strong>原資料</strong><a id="localPdf" target="pdfFrame">ローカルPDF</a><a id="officialPdf" target="_blank" rel="noopener">公式PDF</a><button id="pdfToggle" type="button" aria-controls="pdfPane" aria-expanded="true">PDFを閉じる ≫</button></div><iframe id="pdfFrame" name="pdfFrame" title="選択企業のPDF"></iframe></aside></div>
