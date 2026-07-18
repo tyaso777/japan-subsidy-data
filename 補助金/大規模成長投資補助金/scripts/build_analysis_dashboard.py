@@ -14,8 +14,22 @@ BENCH = PROJECT / "data" / "reference" / "official_round_benchmarks.csv"
 PREF_ECONOMY = PROJECT / "data" / "reference" / "prefecture_economic_indicators.csv"
 PREF_SOURCES = PROJECT / "data" / "reference" / "prefecture_economic_indicator_sources.csv"
 OUTPUT = PROJECT / "html" / "public_metrics_dashboard.html"
+REFERENCE_OUTPUT = PROJECT / "html" / "official_metrics_reference.html"
 LEGACY_OUTPUT = PROJECT / "html" / "analysis_dashboard.html"
 VALUE_ADDED_LEVEL_ADJUSTMENT = 1.1
+
+REFERENCE_DATA_FIELDS = (
+    "round",
+    "sales_cagr_pct",
+    "sales_increase_oku_yen_normalized",
+    "labor_annual_rate_pct",
+    "value_added_increase_estimated_oku",
+    "employee_pay_annual_rate_pct",
+    "employee_pay_total_increase_estimated_oku",
+    "officer_pay_annual_rate_pct",
+    "investment_sales_ratio_pct",
+    "value_added_subsidy_ratio_proxy_pct",
+)
 
 
 KEEP = [
@@ -116,6 +130,13 @@ def compact_case(row: dict, search_text: str = "") -> dict:
     return out
 
 
+METHODOLOGY_LINK = '''<p class="methodology-page-link"><a href="official_metrics_reference.html">公式15指標：算出可否・計算方法・統計量を開く →</a></p>'''
+METHODOLOGY_DETAIL = '''<header class="reference-head"><div><h1>公式15指標：算出可否・計算方法・統計量</h1><p>公式公表値と公開企業PDFから作成した推測値を、公募回・指標別に確認できます。</p></div><a href="public_metrics_dashboard.html">ダッシュボードに戻る</a></header><details class="section-box" data-section="methodology" open><summary>公式15指標：算出可否・計算方法・統計量</summary><div class="section-body"><section class="methodology" id="methodology"></section></div></details>'''
+REFERENCE_STYLE = '''
+.reference-mode{height:auto}.reference-mode .top,.reference-mode .filters,.reference-mode .pdf{display:none}.reference-mode .layout{display:block;height:auto}.reference-mode .main{max-width:1120px;margin:0 auto;padding:22px;overflow:visible}.reference-mode .main>*{display:none}.reference-mode .main>.reference-head,.reference-mode .main>[data-section="methodology"]{display:flex}.reference-mode .main>[data-section="methodology"]{display:block;border:0;overflow:visible}.reference-mode [data-section="methodology"]>summary{display:none}.reference-mode [data-section="methodology"]>.section-body{padding:0}.reference-head{align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px}.reference-head h1{font-size:22px;margin:0 0 5px}.reference-head p{font-size:12px;color:var(--muted);margin:0}.reference-head a,.methodology-page-link a{color:var(--blue);font-weight:700}.methodology-page-link{margin:12px 2px 18px;font-size:13px}@media(max-width:800px){.reference-mode .main{padding:12px}.reference-head{flex-direction:column}.reference-head h1{font-size:18px}}
+'''
+
+
 def main() -> None:
     cases = json.loads(CASES.read_text(encoding="utf-8"))
     search_parts: dict[str, list[str]] = {}
@@ -147,15 +168,27 @@ def main() -> None:
     with PREF_SOURCES.open(encoding="utf-8-sig", newline="") as fh:
         prefecture_sources = list(csv.DictReader(fh))
     payload = json.dumps(rows, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    reference_rows = [{k: row.get(k) for k in REFERENCE_DATA_FIELDS} for row in rows]
+    reference_payload = json.dumps(reference_rows, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     bench_payload = json.dumps(bench, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     prefecture_payload = json.dumps(prefecture_economy, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     source_payload = json.dumps(prefecture_sources, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     html = (TEMPLATE.replace("__DATA__", payload).replace("__BENCH__", bench_payload)
-            .replace("__PREF_ECONOMY__", prefecture_payload).replace("__PREF_SOURCES__", source_payload))
+            .replace("__PREF_ECONOMY__", prefecture_payload).replace("__PREF_SOURCES__", source_payload)
+            .replace("__METHODOLOGY_ENTRY__", METHODOLOGY_LINK))
     OUTPUT.write_text(html, encoding="utf-8", newline="\n")
+    reference_html = (TEMPLATE.replace("__DATA__", reference_payload).replace("__BENCH__", bench_payload)
+                      .replace("__PREF_ECONOMY__", "[]").replace("__PREF_SOURCES__", source_payload)
+                      .replace("__METHODOLOGY_ENTRY__", METHODOLOGY_DETAIL)
+                      .replace("<body>", '<body class="reference-mode">', 1)
+                      .replace("</style>", REFERENCE_STYLE + "</style>", 1)
+                      .replace("<title>採択企業 公開指標比較ダッシュボード｜大規模成長投資補助金</title>",
+                               "<title>公式15指標：算出可否・計算方法・統計量｜大規模成長投資補助金</title>"))
+    REFERENCE_OUTPUT.write_text(reference_html, encoding="utf-8", newline="\n")
     legacy = '''<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>採択企業 公開指標比較ダッシュボードへ移動</title></head><body><p><a href="public_metrics_dashboard.html">採択企業 公開指標比較ダッシュボードを開く</a></p><script>location.replace('public_metrics_dashboard.html'+location.search+location.hash)</script></body></html>'''
     LEGACY_OUTPUT.write_text(legacy, encoding="utf-8", newline="\n")
     print(f"wrote {OUTPUT} ({len(rows)} cases, {len(bench)} benchmark rows, {OUTPUT.stat().st_size:,} bytes)")
+    print(f"wrote {REFERENCE_OUTPUT} ({REFERENCE_OUTPUT.stat().st_size:,} bytes)")
 
 
 TEMPLATE = r'''<!doctype html>
@@ -188,13 +221,13 @@ TEMPLATE = r'''<!doctype html>
  <hr class="filter-divider"><section class="sidebar-companies" id="selectionPanel" aria-label="対象企業一覧"><div class="selection-head"><button type="button" class="selection-focus" id="selectionFocus" aria-label="企業一覧へ移動。上下矢印キーで企業を切り替え"><span id="selectionLabel">対象企業</span> <span id="selectionCount"></span></button><button type="button" id="clearSelection" hidden>中央条件解除</button></div><p class="company-filter-summary" id="centerFilterSummary">中央画面の条件：なし</p><div class="selection-list" id="selectionList"></div></section>
  </aside><main class="main">
  <section class="section-group" aria-labelledby="scatterGroupTitle"><h2 class="section-group-title" id="scatterGroupTitle">2軸比較プロット</h2>
- <details class="section-box" data-section="controls" open><summary>表示指標・操作</summary><div class="section-body"><div class="controls"><label>縦軸<select id="ymetric"></select></label><label><input id="ylog" type="checkbox"> 対数</label><label>横軸<select id="xmetric"></select></label><label><input id="xlog" type="checkbox"> 対数</label><label>点の大きさ<select id="sizeMetric"></select></label><label>点の色<select id="colorMetric"></select></label><label>地域指標の基準地点<select id="colorLocation"><option value="project">事業実施場所</option><option value="head_office">本社所在地</option></select></label></div><p class="note">散布図はホイールで拡大・縮小、ドラッグで移動、ダブルクリックで全体表示へ戻せます。従来の7指標に、No.8とNo.14の推計2指標を加えた9指標から2軸を選べます。地域経済指標の色は全国47都道府県の五分位です。事業実施場所が複数県にまたがる場合は、重複しない都道府県の単純平均を使います。給与支給総額の増加額は「（目標1人当たり給与×目標従業員数）－（基準1人当たり給与×基準従業員数）」÷10,000、投資額割合は公開事業費÷公開基準売上高の近似値です。No.8・No.14の定義と公式様式との差は、最下部の「公式15指標」を参照してください。</p></div></details>
+ <details class="section-box" data-section="controls" open><summary>表示指標・操作</summary><div class="section-body"><div class="controls"><label>縦軸<select id="ymetric"></select></label><label><input id="ylog" type="checkbox"> 対数</label><label>横軸<select id="xmetric"></select></label><label><input id="xlog" type="checkbox"> 対数</label><label>点の大きさ<select id="sizeMetric"></select></label><label>点の色<select id="colorMetric"></select></label><label>地域指標の基準地点<select id="colorLocation"><option value="project">事業実施場所</option><option value="head_office">本社所在地</option></select></label></div><p class="note">散布図はホイールで拡大・縮小、ドラッグで移動、ダブルクリックで全体表示へ戻せます。従来の7指標に、No.8とNo.14の推計2指標を加えた9指標から2軸を選べます。地域経済指標の色は全国47都道府県の五分位です。事業実施場所が複数県にまたがる場合は、重複しない都道府県の単純平均を使います。給与支給総額の増加額は「（目標1人当たり給与×目標従業員数）－（基準1人当たり給与×基準従業員数）」÷10,000、投資額割合は公開事業費÷公開基準売上高の近似値です。No.8・No.14の定義と公式様式との差は、ページ下部から開ける「公式15指標」を参照してください。</p></div></details>
  <details class="section-box" data-section="scatter" open><summary>プロット表示</summary><div class="section-body"><div class="legend" id="legend"></div><div class="size-legend" id="sizeLegend" aria-live="polite"></div><div class="official-rounds" id="officialRounds"><strong>図中に公式中央値を表示：</strong><label><input type="checkbox" value="1次"><i style="background:var(--r1)"></i>1次</label><label><input type="checkbox" value="2次"><i style="background:var(--r2)"></i>2次</label><label><input type="checkbox" value="3次"><i style="background:var(--r3)"></i>3次</label><label><input type="checkbox" value="4次"><i style="background:var(--r4)"></i>4次</label><span class="bulk-actions"><button type="button" data-check-all="#officialRounds" data-checked="true">All ON</button><button type="button" data-check-all="#officialRounds" data-checked="false">All OFF</button></span><span class="official-style">細い点線＝申請者全体／太い破線＝採択者</span></div><div class="scatter-shell"><div class="plotwrap"><svg id="scatter" class="scatter" role="img" aria-label="選択した2指標の企業別散布図"></svg><div id="tip" class="tooltip"></div></div></div><p class="note" id="benchNote"></p></div></details>
  </section>
  <details class="section-box" data-section="distributions"><summary>指標の分布</summary><div class="section-body histgrid"><section class="inner-panel"><svg id="histY" class="hist" role="img" aria-label="縦軸指標の分布"></svg><p class="hist-stats" id="histYStats"></p><p class="note hist-help">ホイール：全体を保って階級幅を変更（<span id="histYBinCount">12階級</span>）／棒クリック：企業一覧／同じ棒を再クリック：解除／空白クリック：この指標の条件解除／ダブルクリック：12階級へ戻す</p></section><section class="inner-panel"><svg id="histX" class="hist" role="img" aria-label="横軸指標の分布"></svg><p class="hist-stats" id="histXStats"></p><p class="note hist-help">ホイール：全体を保って階級幅を変更（<span id="histXBinCount">12階級</span>）／棒クリック：企業一覧／同じ棒を再クリック：解除／空白クリック：この指標の条件解除／ダブルクリック：12階級へ戻す</p></section></div></details>
  <details class="section-box" data-section="trends"><summary>公式統計の推移</summary><div class="section-body histgrid"><section class="inner-panel"><h2 id="trendYTitle" style="font-size:15px;margin:0 0 8px"></h2><svg id="trendY" class="trend" role="img" aria-label="縦軸指標の公式公表値の公募回別推移"></svg><p class="note" id="trendYNote"></p></section><section class="inner-panel"><h2 id="trendXTitle" style="font-size:15px;margin:0 0 8px"></h2><svg id="trendX" class="trend" role="img" aria-label="横軸指標の公式公表値の公募回別推移"></svg><p class="note" id="trendXNote"></p></section></div></details>
  <details class="section-box" data-section="details" open><summary>選択企業の詳細</summary><div class="section-body"><section class="details" id="details"></section></div></details>
- <details class="section-box" data-section="methodology"><summary>公式15指標：算出可否・計算方法・統計量</summary><div class="section-body"><section class="methodology" id="methodology"></section></div></details>
+ __METHODOLOGY_ENTRY__
  </main><aside class="pdf"><div class="pdfbar"><strong>原資料</strong><a id="localPdf" target="pdfFrame">ローカルPDF</a><a id="officialPdf" target="_blank" rel="noopener">公式PDF</a></div><iframe id="pdfFrame" name="pdfFrame" title="選択企業のPDF"></iframe></aside></div>
 <script>const DATA=__DATA__;const BENCH=__BENCH__;const PREF_ECONOMY=__PREF_ECONOMY__;const PREF_SOURCES=__PREF_SOURCES__;</script>
 <script>
@@ -308,7 +341,7 @@ function drawTrend(id,field,axisName){const svg=document.getElementById(id),titl
 function posText(v,b){if(v==null)return['比較不可',''];if(v>=b.accepted_value)return['採択者中央値以上','above'];if(v>=b.applicant_value)return['申請者中央値以上・採択者中央値未満','between'];return['申請者中央値未満','below']}
 function drawDetails(){if(!selected){details.innerHTML='<p class="note">散布図の点をクリックすると、企業別の値・信頼性・公式代表値との位置関係を表示します。</p>';return}const d=selected;let mapped=BENCH.filter(b=>b.round===d.round&&b.current_field&&Object.hasOwn(AXES,b.current_field));let rows=mapped.map(b=>{let v=n(d[b.current_field]),[p,c]=posText(v,b),meta=OFFICIAL_METRICS.find(m=>m.key===b.metric_key);let peer=DATA.filter(x=>x.round===d.round&&n(x[b.current_field])!==null).map(x=>n(x[b.current_field])).sort((a,z)=>a-z),rank=v===null?null:1+peer.filter(x=>x>v).length,topPct=rank===null?'—':`上位${Math.max(1,Math.ceil(rank/peer.length*100))}%`;return `<tr><td>${meta?meta.no+'. ':''}${esc(b.metric_label)}<br><small>${b.comparability==='proxy'?'近似比較':'比較可能'}</small></td><td>${fmt(v)} ${esc(b.unit)}</td><td>${fmt(b.applicant_value)}</td><td>${fmt(b.accepted_value)}</td><td class="${c}">${p}</td><td>${topPct}</td></tr>`}).join('');let flags=Object.entries(FLAG).map(([k,v])=>`<span class="flag ${d[k]?'on':''}">${d[k]?'●':'○'} ${v}</span>`).join('');let stats=[['1. 売上高CAGR',d.sales_cagr_pct,'%/年','sales_rate'],['2. 売上高増加額',d.sales_increase_oku_yen_normalized,'億円','sales_values'],['7. 労働生産性',d.labor_annual_rate_pct,'%/年','labor_rate'],['8. 付加価値増加（簡易補正推計）',d.value_added_increase_estimated_oku,'億円','value_added_increase_estimated'],['9. 従業員賃上げ率',d.employee_pay_annual_rate_pct,'%/年','employee_pay_rate'],['10. 給与総額増加（推計）',d.employee_pay_total_increase_estimated_oku,'億円','employee_pay_total_increase'],['11. 役員賃上げ率',d.officer_pay_annual_rate_pct,'%/年','officer_pay_rate'],['13. 投資額割合（近似）',d.investment_sales_ratio_pct,'%','investment_sales_ratio'],['14. 付加価値増加／補助金（推計）',d.value_added_subsidy_ratio_proxy_pct,'%','value_added_subsidy_ratio_proxy']].map(([k,v,u,s])=>`<div class="kv"><div class="k">${k}</div><div class="v">${fmt(v)} ${u}</div><span class="status ${d[s+'_analysis_status']||'unavailable'}">${esc(d[s+'_analysis_status']||'unavailable')}</span></div>`).join('');details.innerHTML=`<h2>${esc(d.company)}</h2><div class="sub">${esc(d.case_id)} ／ ${esc(d.round)} ／ ${esc(d.scope||'対象範囲不明')}　<a href="qa_v0.1.html#${encodeURIComponent(d.case_id)}">代表項目QAを開く</a></div><div class="summary">${stats}</div><h3 style="font-size:14px">分析上の注意フラグ</h3><div class="flags">${flags}</div><h3 style="font-size:14px">公式統計に対する位置</h3><table><thead><tr><th>指標</th><th>企業値</th><th>申請者</th><th>採択者</th><th>判定</th><th>収録採択企業内 上位割合</th></tr></thead><tbody>${rows}</tbody></table><p class="note">「上位割合」は当データセットの同一次・同指標で、企業値を大きい順に並べた順位から算出しています（上位割合＝順位÷収録企業数、同値は同順位）。申請者全体に対する順位ではありません。No.8は粗近似値を1.1倍した簡易補正推計、No.14は補正前粗近似値を使う比率推計です。給与総額増加と投資額割合も公開値からの近似比較です。</p>`}
 function loadPdf(){const frame=document.getElementById('pdfFrame'),local=document.getElementById('localPdf'),official=document.getElementById('officialPdf'),top=document.getElementById('officialTop');if(!selected){frame.removeAttribute('src');return}local.href=selected.local_pdf||'#';official.href=selected.pdf_url||'#';top.href=selected.pdf_url||'#';const next=selected.local_pdf||selected.pdf_url||'about:blank';if(frame.getAttribute('src')!==next)frame.setAttribute('src',next)}
-function csvCell(v){let s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}function exportRows(){return centralFilterRows()}function exportCsv(){const keys=[...new Set(['case_id','round','company','pdf_url',xmetric.value,ymetric.value,'value_added_increase_proxy_raw_oku','value_added_increase_estimated_oku','value_added_subsidy_ratio_proxy_pct','head_office_prefecture','project_location_prefectures','analysis_exclusion_recommended'])];const rows=exportRows();let text='\ufeff'+keys.join(',')+'\n'+rows.map(d=>keys.map(k=>csvCell(d[k])).join(',')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv'}));a.download='filtered_cases.csv';a.click();URL.revokeObjectURL(a.href)}setupBoxSelectionPanel();setupColorFilterControls();drawMethodology();appendValueAddedMethodology();appendPrefectureMethodology();setup();reset.addEventListener('click',()=>{colorFilterValues=null;colorFilterSignature='';render()});setupCollapsibleSections();
+function csvCell(v){let s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}function exportRows(){return centralFilterRows()}function exportCsv(){const keys=[...new Set(['case_id','round','company','pdf_url',xmetric.value,ymetric.value,'value_added_increase_proxy_raw_oku','value_added_increase_estimated_oku','value_added_subsidy_ratio_proxy_pct','head_office_prefecture','project_location_prefectures','analysis_exclusion_recommended'])];const rows=exportRows();let text='\ufeff'+keys.join(',')+'\n'+rows.map(d=>keys.map(k=>csvCell(d[k])).join(',')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv'}));a.download='filtered_cases.csv';a.click();URL.revokeObjectURL(a.href)}if(document.body.classList.contains('reference-mode')){drawMethodology();appendValueAddedMethodology();appendPrefectureMethodology()}else{setupBoxSelectionPanel();setupColorFilterControls();setup();reset.addEventListener('click',()=>{colorFilterValues=null;colorFilterSignature='';render()});setupCollapsibleSections()}
 </script></body></html>'''
 
 

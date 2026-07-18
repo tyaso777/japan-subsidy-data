@@ -65,6 +65,7 @@
 - `html/qa.html`: ローカルPDFと抽出値・Box原文を照合する確認用HTML
 - `html/qa_v0.1.html`: `cases.csv` の代表値と指標別信頼性を、ローカルPDFと並べて確認する分析前QA用HTML
 - `html/public_metrics_dashboard.html`: 指標・回次・品質フラグを選び、企業別散布図、分布、公式1～5次代表値、原PDFを連動表示する「採択企業 公開指標比較ダッシュボード」
+- `html/official_metrics_reference.html`: 公式15指標の算出可否・計算方法、公式公表値と公開企業PDF推測値の統計量、No.8・No.14の推計定義をまとめた参照ページ
 - `docs/payroll_total_estimation.md`: 給与支給総額の近似式、判定列、日生流通運輸倉庫・NAX JAPANの単位再検証
 - `excel/大規模成長投資補助金_1次～4次_統合データ.xlsx`: 検証済みExcelスナップショット
 
