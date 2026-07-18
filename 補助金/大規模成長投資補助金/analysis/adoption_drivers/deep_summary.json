@@ -5,7 +5,7 @@
     "複合バランス型": 76,
     "補助金効率型": 62,
     "成長・生産性型": 57,
-    "定性・非公開要因候補": 57,
+    "公開5軸で強み未特定": 57,
     "賃金・雇用型": 29,
     "効果絶対額型": 18
   },
@@ -17,8 +17,6 @@
     "4": 25,
     "5": 4
   },
-  "pareto_dominated_n": 288,
-  "pareto_dominated_pct": 75.6,
   "unresolved_visible_lag_n": 71,
   "qualitative_compensation_candidate_n": 11,
   "visible_lagging_above_at_least_one_applicant_median_n": 124,

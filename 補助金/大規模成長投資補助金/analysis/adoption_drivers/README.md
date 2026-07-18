@@ -24,7 +24,7 @@ python analyze_adoption_drivers.py
 
 深掘り分析:
 
-- `deepen_adoption_profiles.py`: 5つの定量軸、採択プロファイル、文章根拠密度、パレート支配を計算
+- `deepen_adoption_profiles.py`: 5つの定量軸、採択企業内プロファイル、文章根拠密度を計算。非採択個票がないため、採否の識別力は評価しない
 - `application_profiles.csv`: 企業別の採択プロファイルと審査項目別文章特徴
 - `profile_summary.csv`: 採択プロファイル別集計
 - `criteria_evidence_summary.csv`: 公開文章の審査項目別根拠密度

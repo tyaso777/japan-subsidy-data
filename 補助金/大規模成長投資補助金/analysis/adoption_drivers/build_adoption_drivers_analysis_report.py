@@ -71,7 +71,7 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
 .hero{background:var(--paper);border-top:8px solid var(--orange);box-shadow:var(--shadow);padding:clamp(28px,5vw,68px);margin-bottom:24px}
 .eyebrow{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--orange);font-weight:800}.hero h1{font-family:var(--serif);font-size:clamp(2rem,5vw,4.3rem);line-height:1.12;margin:.2em 0}.hero .lead{font-size:clamp(1rem,1.8vw,1.35rem);max-width:980px;color:var(--muted)}
 .meta{display:flex;gap:20px;flex-wrap:wrap;margin-top:30px;font-size:.88rem;color:var(--muted)}
-.toc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:24px 0 52px}.toc a{background:var(--paper);padding:13px 16px;text-decoration:none;color:var(--ink);font-weight:650}.toc a:hover,.toc a:focus-visible{background:var(--wash);outline:2px solid var(--blue);outline-offset:-2px}
+.toc-shell{position:sticky;top:0;z-index:30;background:var(--bg);padding:8px 0 10px;margin:16px 0 42px}.toc-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--paper);border:1px solid var(--line);padding:7px 10px}.toc-toolbar b{font-size:.86rem}.toc-toggle{appearance:none;border:1px solid var(--line);background:var(--wash);color:var(--ink);font:inherit;font-size:.82rem;font-weight:700;padding:5px 11px;cursor:pointer}.toc-toggle:hover,.toc-toggle:focus-visible{outline:2px solid var(--blue);outline-offset:2px}.toc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-top:0}.toc a{background:var(--paper);padding:10px 14px;text-decoration:none;color:var(--ink);font-weight:650}.toc a:hover,.toc a:focus-visible{background:var(--wash);outline:2px solid var(--blue);outline-offset:-2px}.toc-shell.is-collapsed .toc{display:none}.toc-shell.is-collapsed{margin-bottom:22px}
 .chapter{background:var(--paper);box-shadow:var(--shadow);margin:0 0 30px;padding:clamp(24px,4vw,54px);scroll-margin-top:20px}.chapter-head{display:grid;grid-template-columns:88px 1fr;gap:22px;border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:28px}.no{font:700 clamp(2rem,5vw,4rem)/1 var(--serif);color:var(--orange)}h2{font:700 clamp(1.55rem,3vw,2.55rem)/1.3 var(--serif);margin:0}.subtitle{color:var(--muted);margin:.45rem 0 0;max-width:900px}h3{font-size:1.14rem;margin:2.2rem 0 .7rem;color:var(--blue)}h4{margin:1.2rem 0 .3rem}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:24px 0}.kpi{border-top:4px solid var(--blue);background:var(--wash);padding:18px}.kpi strong{display:block;font:700 clamp(1.6rem,3vw,2.5rem)/1.05 var(--serif);margin-bottom:6px}.kpi small{color:var(--muted)}
 .finding{border-left:5px solid var(--orange);background:var(--warm);padding:18px 21px;margin:24px 0}.finding strong{display:block;margin-bottom:4px}.method{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;margin:20px 0;color:var(--muted)}.method b{color:var(--ink)}
 .chart{min-height:260px;margin:18px 0 8px}.chart svg{display:block;width:100%;height:auto;overflow:visible}.chart-title{font-weight:750;margin-bottom:2px}.chart-note,.footnote{font-size:.83rem;color:var(--muted)}
@@ -86,7 +86,7 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
 .print-only{display:none}.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}.swatch{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px}
 @media(max-width:900px){.toc{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2,.grid3{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.chapter-head{grid-template-columns:58px 1fr}.flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg);height:26px}.spark-grid{grid-template-columns:1fr}.strategy-row{grid-template-columns:38px 1fr}.strategy-row>*:not(.sno){grid-column:2}.matrix{grid-template-columns:1fr}}
 @media(max-width:620px){.page{padding:12px 10px 48px}.hero,.chapter{padding:22px 17px}.toc{grid-template-columns:1fr}.kpis{grid-template-columns:1fr}.chapter-head{display:block}.no{font-size:1rem;margin-bottom:8px}.profile-row{grid-template-columns:1fr}.profile-row small{text-align:left}.table.responsive,.table.responsive tbody,.table.responsive tr,.table.responsive td{display:block;width:100%}.table.responsive thead{display:none}.table.responsive tr{padding:10px 0;border-bottom:1px solid var(--line)}.table.responsive td{border:0;padding:3px 0}.table.responsive td::before{content:attr(data-label);display:block;color:var(--muted);font-size:.72rem;font-weight:700}.table.responsive .num{text-align:left}}
-@media print{body{background:#fff;color:#111;font-size:10.5pt}.page{width:100%;padding:0}.hero,.chapter{box-shadow:none;background:#fff;margin:0;padding:12mm 10mm}.hero{border-top:5mm solid #c76d2a}.chapter{break-before:page}.chapter:first-of-type{break-before:auto}.toc{break-after:page}.chart,.finding,.method,.strategy-row,.spark{break-inside:avoid}.print-only{display:block}.toc a{color:#111;background:#fff}.page a::after{content:""}}
+@media print{body{background:#fff;color:#111;font-size:10.5pt}.page{width:100%;padding:0}.hero,.chapter{box-shadow:none;background:#fff;margin:0;padding:12mm 10mm}.hero{border-top:5mm solid #c76d2a}.chapter{break-before:page}.chapter:first-of-type{break-before:auto}.toc-shell{position:static;margin:0 0 10mm;padding:0}.toc-toolbar{display:none}.toc{break-after:page}.chart,.finding,.method,.strategy-row,.spark{break-inside:avoid}.print-only{display:block}.toc a{color:#111;background:#fff}.page a::after{content:""}}
 </style>
 </head>
 <body>
@@ -95,14 +95,17 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
     <div class="eyebrow">Adoption drivers / analytical dossier</div>
     <h1>採択要因分析<br>方法・結果・示唆</h1>
     <p class="lead">大規模成長投資補助金の公開企業PDFと公式中央値を用いて、「採択者中央値（各公募回の採択者における各指標の中央値）を下回っても採択されている案件」をどこまで説明できるかを段階的に検証した。381社の定量スクリーニング、複数の定量切り口による類型化、公開文章の分析、40組80社の目視ペア精査を一つの分析体系として再構成する。</p>
-    <div class="meta"><span>分析対象：公開企業PDF 381社</span><span>公募回：1～4次（第5次はベンチマーク補助）</span><span>版：1.4</span></div>
+    <div class="meta"><span>分析対象：公開企業PDF 381社</span><span>公募回：1～4次（第5次はベンチマーク補助）</span><span>版：1.5</span></div>
   </header>
 
-  <nav class="toc" aria-label="目次">
-    <a href="#executive">01 要旨・用語</a><a href="#design">02 データと設計</a><a href="#screen">03 基本7指標の妥当性</a><a href="#proxy">04 追加評価指標の検証</a>
-    <a href="#profiles">05 多軸プロファイル</a><a href="#text">06 公開文章分析</a><a href="#pairs">07 40ペア目視精査</a><a href="#sixth">08 第6次への含意</a>
-    <a href="#synthesis">09 統合解釈</a><a href="#limits">10 限界と次の設計</a><a href="#appendix">11 定義・再現方法</a><a href="#sources">12 出典</a>
-  </nav>
+  <div class="toc-shell" id="tocShell">
+    <div class="toc-toolbar"><b>目次</b><button type="button" class="toc-toggle" id="tocToggle" aria-controls="tocNav" aria-expanded="true">目次を閉じる</button></div>
+    <nav class="toc" id="tocNav" aria-label="目次">
+      <a href="#executive">01 要旨・用語</a><a href="#design">02 データと設計</a><a href="#screen">03 基本7指標の妥当性</a><a href="#proxy">04 追加評価指標の検証</a>
+      <a href="#profiles">05 多軸プロファイル</a><a href="#text">06 公開文章分析</a><a href="#pairs">07 40ペア目視精査</a><a href="#sixth">08 第6次への含意</a>
+      <a href="#synthesis">09 統合解釈</a><a href="#limits">10 限界と次の設計</a><a href="#appendix">11 定義・再現方法</a><a href="#sources">12 出典</a>
+    </nav>
+  </div>
 
   <section class="chapter" id="executive">
     <div class="chapter-head"><div class="no">01</div><div><h2>エグゼクティブ・サマリー</h2><p class="subtitle">本分析が示したこと、示していないことを先に分離する。</p></div></div>
@@ -117,7 +120,7 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
       <tr><td data-label="用語"><dfn>定量補完</dfn></td><td data-label="定義">可視指標劣後125社のうち、中央値比較が可能な追加評価指標No.5・6・8・14の少なくとも一つが同回採択者中央値以上だった案件。本資料では54社。</td><td data-label="注意">No.4の公式代表値は平均値なので、この中央値判定には含めない。弱い指標が統計的に相殺されたという意味でもない。</td></tr>
       <tr><td data-label="用語"><dfn>定量未説明</dfn></td><td data-label="定義">可視指標劣後125社のうち、上記の定量補完を公開データから確認できなかった案件。本資料では71社。</td><td data-label="注意">採択理由がないのではなく、公開定量だけでは理由を回収できないという意味。</td></tr>
       <tr><td data-label="用語"><dfn>5軸</dfn>／<dfn>強い軸</dfn></td><td data-label="定義">成長・生産性、絶対効果、補助金効率、賃金・雇用、企業変革投資の5つ。同回内パーセンタイル0.65以上を「強い軸」とする。</td><td data-label="注意">0.65は分析上の基本閾値であり、制度上の採択基準ではない。</td></tr>
-      <tr><td data-label="用語"><dfn>パレート支配あり</dfn></td><td data-label="定義">同回の別企業が、観測可能な5軸すべてで同等以上かつ一つ以上で上回る状態。</td><td data-label="注意">企業として劣るという評価ではなく、公開5軸の単調ランキングだけでは採択を説明できないことを示す。</td></tr>
+      <tr><td data-label="用語"><dfn>公開5軸で強み未特定</dfn></td><td data-label="定義">観測できた5軸の最大値も同回内55パーセンタイル未満だった採択企業。本資料では57社。</td><td data-label="注意">定性面が強いと確認した群ではない。公開定量5軸から相対的な強みを特定できず、別データでの追加確認が必要な残余群。</td></tr>
       <tr><td data-label="用語"><dfn>低定量側／高定量側</dfn></td><td data-label="定義">40組の類似企業ペア内で、公開定量の総合的な相対位置が低い側／高い側。両社とも採択企業。</td><td data-label="注意">採択・非採択の比較ではなく、採択企業同士の探索的比較。</td></tr>
       <tr><td data-label="用語"><dfn>文章根拠</dfn></td><td data-label="定義">審査観点の語と、数字・実績・受注・契約・比較・顧客等の証拠マーカーが同じ文に現れるもの。</td><td data-label="注意">審査点そのものではなく、公開文章に現れた根拠の密度。</td></tr>
     </tbody></table>
@@ -167,7 +170,7 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
     <table class="table responsive"><thead><tr><th>段階</th><th>問い</th><th>方法</th><th>推論範囲</th></tr></thead><tbody>
       <tr><td data-label="段階">A. スクリーニング</td><td data-label="問い">採択者中央値を複数指標で下回る案件はどの程度あるか</td><td data-label="方法">可視7指標、同回採択者中央値、観測3指標以上、劣後率60%以上</td><td data-label="推論範囲">採択案件内の記述</td></tr>
       <tr><td data-label="段階">B. 定量補完</td><td data-label="問い">可視7指標の外側にある定量的な強みを確認できるか</td><td data-label="方法">追加5指標を推計し、まず利用可能件数を監査。中央値比較可能なNo.5・6・8・14を同回採択者中央値と比較</td><td data-label="推論範囲">公開値による補完可能性</td></tr>
-      <tr><td data-label="段階">C. 多軸診断</td><td data-label="問い">企業ごとの勝ち筋は一つか、複数か</td><td data-label="方法">5軸を同回内パーセンタイル化、プロファイル・パレート支配・感度分析</td><td data-label="推論範囲">採択案件内の相対配置</td></tr>
+      <tr><td data-label="段階">C. 多軸記述</td><td data-label="問い">採択企業は公開定量上、どの軸に相対的な特徴があるか</td><td data-label="方法">5軸を同回内パーセンタイル化し、明示的な規則でプロファイル分類・閾値感度分析</td><td data-label="推論範囲">採択案件内の類型。採否の識別力は評価しない</td></tr>
       <tr><td data-label="段階">D. 定性精査</td><td data-label="問い">低定量案件に共通する具体的な根拠は何か</td><td data-label="方法">40組80社を6要因0～3点で目視符号化、Wilson区間・符号検定</td><td data-label="推論範囲">採択案件同士の探索的比較</td></tr>
     </tbody></table>
     <h3>主要入力</h3>
@@ -223,12 +226,25 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
   </section>
 
   <section class="chapter" id="profiles">
-    <div class="chapter-head"><div class="no">05</div><div><h2>5軸プロファイルと単調ランキングの限界</h2><p class="subtitle">指標を同回内パーセンタイルへ変換し、規模・回の違いを抑えて案件の勝ち筋を分類した。</p></div></div>
-    <div class="grid2"><div><h3>5つの定量軸</h3><ol><li><b>成長・生産性</b>：全社／補助事業の成長率・増加額</li><li><b>絶対効果</b>：売上、付加価値、給与総額、雇用の増加額</li><li><b>補助金効率</b>：各効果÷補助金額</li><li><b>賃金・雇用</b>：給与成長、給与総額、雇用</li><li><b>企業変革投資</b>：投資額／売上、事業費規模</li></ol></div><div><h3>分類規則</h3><ul><li>各軸は同一公募回内のパーセンタイル平均。</li><li>0.65以上を「強い軸」の基本閾値。</li><li>3軸以上が強い場合は「複合バランス型」。</li><li>最大軸も0.55未満なら「定性・非公開要因候補」。</li><li>同回内で5軸すべてが別企業以下ならパレート支配あり。</li></ul></div></div>
-    <div class="grid2"><div><div class="chart-title">採択プロファイルの構成</div><div id="profileList" class="profile-list"></div></div><div><div class="chart-title">強い軸の本数</div><div id="axisChart" class="chart" role="img" aria-label="強い定量軸の本数分布"></div></div></div>
-    <div class="kpis"><div class="kpi"><strong>262社</strong><small>0.65以上の軸を少なくとも一つ持つ（68.8%）</small></div><div class="kpi"><strong>119社</strong><small>0.65以上の強い軸がゼロ</small></div><div class="kpi"><strong>288社</strong><small>同回内で公開5軸上パレート支配あり（75.6%）</small></div><div class="kpi"><strong>76社</strong><small>複合バランス型</small></div></div>
+    <div class="chapter-head"><div class="no">05</div><div><h2>公開5軸プロファイルの定義と読み方</h2><p class="subtitle">これは採択企業381社の内部類型であり、採択・非採択を分けるモデルではない。分類名、判定順、構成指標を明示する。</p></div></div>
+    <div class="method"><b>推論できる範囲：</b> 同じ公募回の採択企業の中で、各企業がどの公開定量軸で相対的に高いかを記述する。非採択企業の個票がないため、「このプロファイルだから採択されやすい」「この軸が採択要因である」とは判断できない。</div>
+    <h3>5軸は何から作っているか</h3>
+    <p>各構成指標を同一公募回内のパーセンタイルへ変換し、企業ごとに利用可能な構成指標の平均を軸スコアとした。したがって0.65は「同回採択企業内のおおむね65パーセンタイル」であり、65点や採択確率65%ではない。欠損により、同じ軸でも企業ごとに平均へ入る構成指標数が異なる。</p>
+    <table class="table responsive"><thead><tr><th>軸</th><th>平均する構成指標</th><th>軸が高いときの意味</th></tr></thead><tbody>
+      <tr><td data-label="軸"><b>成長・生産性</b></td><td data-label="構成指標">全社売上高CAGR・増加額、労働生産性CAGR、補助事業売上高の割合・CAGR・増加額</td><td data-label="意味">売上成長または生産性向上が、同回の採択企業内で相対的に大きい</td></tr>
+      <tr><td data-label="軸"><b>効果絶対額</b></td><td data-label="構成指標">全社売上高増加額、付加価値増加額、給与総額増加額、雇用増加数</td><td data-label="意味">補助金額で割る前の経済効果の規模が相対的に大きい</td></tr>
+      <tr><td data-label="軸"><b>補助金効率</b></td><td data-label="構成指標">付加価値・売上高・給与総額・雇用の各増加量÷補助金額</td><td data-label="意味">補助金1円当たりの公開定量効果が相対的に大きい</td></tr>
+      <tr><td data-label="軸"><b>賃金・雇用</b></td><td data-label="構成指標">従業員賃上げ率、給与総額増加額、雇用増加数、雇用増加数÷補助金額</td><td data-label="意味">賃金還元または雇用効果が相対的に大きい</td></tr>
+      <tr><td data-label="軸"><b>企業変革投資</b></td><td data-label="構成指標">投資額÷基準全社売上高、事業費</td><td data-label="意味">企業規模に対する投資負担または投資の絶対規模が相対的に大きい</td></tr>
+    </tbody></table>
+    <h3>採択プロファイルの全定義</h3>
+    <div class="formula">判定順：① 0.65以上の軸が3本以上 → 複合バランス型　② 全軸が0.55未満 → 公開5軸で強み未特定　③ それ以外 → 最も高い軸の名称</div>
+    <table class="table responsive"><thead><tr><th>プロファイル</th><th>件数</th><th>判定規則</th><th>正しい読み方</th></tr></thead><tbody id="profileDefinitionTable"></tbody></table>
+    <div class="grid2"><div><div class="chart-title">採択プロファイルの構成</div><div id="profileList" class="profile-list"></div></div><div><div class="chart-title">0.65以上の軸の本数</div><div id="axisChart" class="chart" role="img" aria-label="強い定量軸の本数分布"></div></div></div>
+    <div class="kpis"><div class="kpi"><strong>262社</strong><small>0.65以上の軸を少なくとも一つ持つ（68.8%）</small></div><div class="kpi"><strong>119社</strong><small>0.65以上の軸がゼロ</small></div><div class="kpi"><strong>57社</strong><small>全5軸が0.55未満で、公開5軸では強み未特定</small></div><div class="kpi"><strong>76社</strong><small>0.65以上の軸が3本以上の複合バランス型</small></div></div>
     <div id="thresholdChart" class="chart" role="img" aria-label="強い軸閾値の感度分析"></div>
-    <div class="finding"><strong>パレート支配75.6%の意味</strong>公開5軸をすべて「高いほどよい」とする単調ランキングでは、実際の採択集合を表現できない。これは審査が不合理という意味ではなく、事業の先進性、地域波及、実行確度、財務・政策加点、プレゼンなど未観測・非単調の要素が大きいことを示す。</div>
+    <div class="finding"><strong>「公開5軸で強み未特定」は、定性面が強いという判定ではない</strong>該当57社について次に確認すべき候補は、需要根拠、能力制約、事業・工程の構造転換、地域供給網での代替困難性、資金・体制などの実行確度、政策分野との整合、申請書やプレゼンにのみ存在する非公開情報である。ただし、プロファイル分類だけではどの候補が該当するか分からない。第6章の文章分析と第7章の目視精査で別途確認する。</div>
+    <p><b>旧版の「採択企業内パレート支配率」は本章から削除した。</b> 採択企業Aが別の採択企業Bに公開5軸で下回っていても、両社とも採択されているため採否の識別にはならない。非採択企業に支配されているか、支配の有無が採択率と関係するかを調べるには、非採択企業の同じ5軸データが必要である。</p>
   </section>
 
   <section class="chapter" id="text">
@@ -263,8 +279,8 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
   <section class="chapter" id="synthesis">
     <div class="chapter-head"><div class="no">09</div><div><h2>分析を統合した解釈</h2><p class="subtitle">複数の分析が同じ方向を指す部分と、なお未観測の部分を分ける。</p></div></div>
     <div class="matrix">
-      <section><h3 class="supported">データが支持する</h3><ul><li>採択者中央値未満でも、申請者集団に対する競争力は多くの案件に残る。</li><li>費用対効果、とくに付加価値増加額／補助金額は重要な補完軸。</li><li>案件の勝ち筋は単一指標ではなく、複数軸・絶対効果・効率の組合せ。</li><li>低定量案件にも能力制約・構造転換・実行確度等の具体的根拠が高頻度で存在。</li><li>公開5軸の単調総合点では採択集合を再現できない。</li></ul></section>
-      <section><h3 class="unsupported">データが支持しない／未判定</h3><ul><li>「指標XをY以上にすれば採択確率がZ%上がる」という効果量。</li><li>採択者中央値を合格線として扱うこと。</li><li>低定量なら定性点が自動的に補償するという交換率。</li><li>公開PDFの文章量・キーワード数を審査点とみなすこと。</li><li>金融機関確認の提出自体が採択を生むという因果。</li></ul></section>
+      <section><h3 class="supported">データが支持する</h3><ul><li>採択者中央値未満でも、申請者集団に対する競争力は多くの案件に残る。</li><li>費用対効果、とくに付加価値増加額／補助金額は重要な補完軸。</li><li>採択企業の公開定量上の特徴は、複数軸・絶対効果・効率など複数のプロファイルに分かれる。</li><li>低定量案件にも能力制約・構造転換・実行確度等の具体的根拠が高頻度で存在。</li></ul></section>
+      <section><h3 class="unsupported">データが支持しない／未判定</h3><ul><li>「指標XをY以上にすれば採択確率がZ%上がる」という効果量。</li><li>採択者中央値を合格線として扱うこと。</li><li>採択企業内の順位・プロファイル・パレート関係から、採択要因や識別力を推定すること。</li><li>低定量なら定性点が自動的に補償するという交換率。</li><li>公開PDFの文章量・キーワード数を審査点とみなすこと。</li><li>金融機関確認の提出自体が採択を生むという因果。</li></ul></section>
     </div>
     <h3>最も整合的な採択仮説</h3>
     <div class="flow">
@@ -300,7 +316,7 @@ a{color:var(--blue);text-underline-offset:3px}button,a{touch-action:manipulation
       <tr><td data-label="名称">定量補完</td><td data-label="定義">中央値比較可能な追加指標No.5・6・8・14の少なくとも一つが同回採択者中央値以上</td><td data-label="用途">可視7指標の外側の勝ち筋。No.4は公式が平均値のため対象外</td></tr>
       <tr><td data-label="名称">定量未説明</td><td data-label="定義">可視指標劣後に該当し、上記4指標のいずれも採択者中央値以上と確認できない</td><td data-label="用途">公開定量の限界を示す残余群</td></tr>
       <tr><td data-label="名称">強い軸</td><td data-label="定義">5軸の同回内パーセンタイルが0.65以上</td><td data-label="用途">プロファイル分類。0.60～0.75で感度分析</td></tr>
-      <tr><td data-label="名称">パレート支配</td><td data-label="定義">同回の別企業が観測5軸すべてで同等以上かつ一つ以上で上</td><td data-label="用途">単調ランキングでは説明できない案件の識別</td></tr>
+      <tr><td data-label="名称">公開5軸で強み未特定</td><td data-label="定義">利用可能な軸が3本以上あり、最大の軸も同回内0.55未満</td><td data-label="用途">追加調査が必要な採択企業の識別。定性面が強いという判定ではない</td></tr>
       <tr><td data-label="名称">低定量側／高定量側</td><td data-label="定義">採択企業同士の類似ペア内で公開定量の相対位置が低い側／高い側</td><td data-label="用途">低定量案件に共通する定性要因の探索</td></tr>
       <tr><td data-label="名称">強い定性根拠</td><td data-label="定義">0～3点符号化の2点以上。3点は固有名・数量・契約・工程など厳格な証拠</td><td data-label="用途">40ペア目視比較</td></tr>
     </tbody></table>
@@ -340,6 +356,10 @@ const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim
 const svg=(w,h,body)=>`<svg viewBox="0 0 ${w} ${h}" aria-hidden="true">${body}</svg>`;
 const line=(x1,y1,x2,y2,stroke='var(--line)',dash='')=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${stroke}" ${dash?`stroke-dasharray="${dash}"`:''}/>`;
 const text=(x,y,s,opt='')=>`<text x="${x}" y="${y}" ${opt}>${esc(s)}</text>`;
+const tocShell=document.getElementById('tocShell'),tocToggle=document.getElementById('tocToggle');
+const syncTocOffset=()=>{document.documentElement.style.scrollPaddingTop=`${tocShell.offsetHeight+12}px`};
+tocToggle.addEventListener('click',()=>{const collapsed=tocShell.classList.toggle('is-collapsed');tocToggle.setAttribute('aria-expanded',String(!collapsed));tocToggle.textContent=collapsed?'目次を開く':'目次を閉じる';syncTocOffset()});
+window.addEventListener('resize',syncTocOffset);syncTocOffset();
 
 function verticalBars(id,items,{max=null,color='var(--blue)',suffix='%',height=270}={}){
   const el=document.getElementById(id), w=720,h=height, ml=52,mr=18,mt=20,mb=52, pw=w-ml-mr,ph=h-mt-mb;
@@ -372,6 +392,16 @@ const proxyNames={value_added_increase:'付加価値増加額',value_added_subsi
 const proxyItems=['1次','2次','3次','4次'].map(rd=>{const o={label:rd};D.proxy.filter(r=>r.round===rd).forEach(r=>o[r.metric_key]=num(r.relative_difference_pct));return o});
 divergingBars('proxyChart',proxyItems,[{key:'value_added_increase',label:'付加価値増加額',color:'var(--blue)'},{key:'value_added_subsidy_ratio',label:'付加価値／補助金',color:'var(--orange)'}]);
 
+const profileRules={
+  '複合バランス型':{rule:'5軸のうち3軸以上が0.65以上',meaning:'複数の公開定量軸で、同回採択企業内の相対位置が高い。'},
+  '公開5軸で強み未特定':{rule:'利用可能な全軸が0.55未満',meaning:'公開5軸から相対的な強みを特定できない残余群。定性面が強いという判定ではない。'},
+  '成長・生産性型':{rule:'上の2条件に該当せず、成長・生産性軸が最大',meaning:'5軸の中では成長・生産性が最も高い。0.65以上とは限らない。'},
+  '効果絶対額型':{rule:'上の2条件に該当せず、効果絶対額軸が最大',meaning:'5軸の中では経済効果の絶対規模が最も高い。0.65以上とは限らない。'},
+  '補助金効率型':{rule:'上の2条件に該当せず、補助金効率軸が最大',meaning:'5軸の中では補助金1円当たり効果が最も高い。0.65以上とは限らない。'},
+  '賃金・雇用型':{rule:'上の2条件に該当せず、賃金・雇用軸が最大',meaning:'5軸の中では賃金還元・雇用効果が最も高い。0.65以上とは限らない。'},
+  '企業変革投資型':{rule:'上の2条件に該当せず、企業変革投資軸が最大',meaning:'5軸の中では企業規模に対する投資または事業費規模が最も高い。0.65以上とは限らない。'}
+};
+document.getElementById('profileDefinitionTable').innerHTML=D.profiles.map(r=>{const d=profileRules[r.application_profile];return `<tr><td data-label="プロファイル"><b>${esc(r.application_profile)}</b></td><td data-label="件数" class="num">${r.company_count}社<br><small>${pct(r.share_pct)}</small></td><td data-label="判定規則">${esc(d.rule)}</td><td data-label="正しい読み方">${esc(d.meaning)}</td></tr>`}).join('');
 document.getElementById('profileList').innerHTML=D.profiles.map(r=>`<div class="profile-row"><b>${esc(r.application_profile)}</b><div class="bar-track"><div class="bar-fill" style="width:${num(r.share_pct)}%"></div></div><small>${r.company_count}社 / ${pct(r.share_pct)}</small></div>`).join('');
 verticalBars('axisChart',Object.entries(D.deep.strong_axis_distribution).map(([k,v])=>({label:`${k}軸`,value:num(v),color:num(k)===0?'var(--orange)':'var(--blue)'})),{max:130,suffix:'社'});
 const thresholdGroups=['全採択企業','可視指標劣後','定量で未説明'];

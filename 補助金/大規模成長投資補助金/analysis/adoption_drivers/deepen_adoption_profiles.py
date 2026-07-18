@@ -96,21 +96,6 @@ def evidence_features(text: str, terms: tuple[str, ...]) -> tuple[int, int, floa
     return unique_terms, evidence_sentences, density
 
 
-def pareto_dominated(group: pd.DataFrame, axes: list[str]) -> tuple[pd.Series, pd.Series]:
-    dominated = pd.Series(False, index=group.index)
-    dominators = pd.Series(0, index=group.index, dtype=int)
-    complete = group[axes].dropna()
-    values = complete.to_numpy()
-    indexes = complete.index.to_list()
-    for i, index in enumerate(indexes):
-        ge = (values >= values[i]).all(axis=1)
-        gt = (values > values[i]).any(axis=1)
-        count = int((ge & gt).sum())
-        dominated.loc[index] = count > 0
-        dominators.loc[index] = count
-    return dominated, dominators
-
-
 def assign_profile(row: pd.Series, axes: list[str]) -> str:
     scores = row[axes].dropna()
     if len(scores) < 3:
@@ -119,7 +104,7 @@ def assign_profile(row: pd.Series, axes: list[str]) -> str:
     if len(strong) >= 3:
         return "複合バランス型"
     if scores.max() < 0.55:
-        return "定性・非公開要因候補"
+        return "公開5軸で強み未特定"
     return AXIS_LABELS[scores.idxmax()]
 
 
@@ -207,13 +192,6 @@ def main() -> None:
     df["weak_axis_count"] = df[axes].lt(0.35).sum(axis=1)
     df["application_profile"] = df.apply(assign_profile, axis=1, axes=axes)
 
-    df["pareto_dominated"] = False
-    df["pareto_dominator_count"] = 0
-    for _, group in df.groupby("round"):
-        dominated, dominators = pareto_dominated(group, axes)
-        df.loc[group.index, "pareto_dominated"] = dominated
-        df.loc[group.index, "pareto_dominator_count"] = dominators
-
     all_text, by_role = load_text()
     df["text_length"] = df["case_id"].astype(str).map(lambda x: len(all_text.get(x, "")))
     df["vision_text_length"] = df["case_id"].astype(str).map(
@@ -244,7 +222,6 @@ def main() -> None:
             share_pct=("case_id", lambda s: 100 * len(s) / len(df)),
             visible_lagging_pct=("visible_metric_lagging", lambda s: 100 * s.mean()),
             unresolved_lag_pct=("unresolved_visible_lag", lambda s: 100 * s.mean()),
-            pareto_dominated_pct=("pareto_dominated", lambda s: 100 * s.mean()),
             median_quantitative_axis=("quantitative_axis_mean", "median"),
             median_text_evidence_percentile=("text_evidence_percentile_mean", "median"),
         )
@@ -256,7 +233,6 @@ def main() -> None:
         "全採択企業": pd.Series(True, index=df.index),
         "可視指標劣後": df["visible_metric_lagging"].fillna(False),
         "定量で未説明": df["unresolved_visible_lag"].fillna(False),
-        "パレート支配あり": df["pareto_dominated"].fillna(False),
         "その他採択企業": ~df["visible_metric_lagging"].fillna(False),
     }
     evidence_rows = []
@@ -307,8 +283,8 @@ def main() -> None:
         "case_id", "round", "company", "pdf_url", "industry", "visible_metric_lagging",
         "unresolved_visible_lag", "applicant_comparable_count", "above_applicant_median_count",
         "above_applicant_median_share", "application_profile", *axes, "quantitative_axis_mean",
-        "quantitative_axis_max", "strong_axis_count", "weak_axis_count", "pareto_dominated",
-        "pareto_dominator_count", "text_length", "vision_text_length", "project_text_length",
+        "quantitative_axis_max", "strong_axis_count", "weak_axis_count",
+        "text_length", "vision_text_length", "project_text_length",
         *[col for criterion in CRITERIA_TERMS for col in (
             f"text_{criterion}_unique_terms", f"text_{criterion}_evidence_sentences",
             f"text_{criterion}_evidence_density", f"text_{criterion}_density_pct",
@@ -317,8 +293,8 @@ def main() -> None:
         "qualitative_compensation_candidate",
     ]
     profiles = df[output_cols].sort_values(
-        ["unresolved_visible_lag", "pareto_dominated", "quantitative_axis_mean"],
-        ascending=[False, False, True],
+        ["unresolved_visible_lag", "quantitative_axis_mean"],
+        ascending=[False, True],
     )
     profiles.to_csv(HERE / "application_profiles.csv", index=False, encoding="utf-8-sig")
     profile_summary.to_csv(HERE / "profile_summary.csv", index=False, encoding="utf-8-sig")
@@ -330,8 +306,6 @@ def main() -> None:
         "company_count": int(len(df)),
         "profile_counts": df["application_profile"].value_counts().to_dict(),
         "strong_axis_distribution": df["strong_axis_count"].value_counts().sort_index().to_dict(),
-        "pareto_dominated_n": int(df["pareto_dominated"].sum()),
-        "pareto_dominated_pct": round(100 * df["pareto_dominated"].mean(), 1),
         "unresolved_visible_lag_n": int(df["unresolved_visible_lag"].sum()),
         "qualitative_compensation_candidate_n": int(df["qualitative_compensation_candidate"].sum()),
         "visible_lagging_above_at_least_one_applicant_median_n": int(
