@@ -114,6 +114,7 @@ assert(qaV01Html.includes("const COMPARISON="), "QA v0.1 must embed external com
 assert(qaV01Html.includes("差分検証を開始") && qaV01Html.includes("comparison-diff"), "QA v0.1 must provide opt-in difference highlighting");
 assert(qaV01Html.includes("外部抽出データとの差分"), "QA v0.1 must render a per-case comparison table");
 const dashboardHtml = await fs.readFile(path.join(projectDir, "html", "public_metrics_dashboard.html"), "utf8");
+const onlineDashboardHtml = await fs.readFile(path.join(projectDir, "html", "public_metrics_dashboard_online.html"), "utf8");
 const legacyDashboardHtml = await fs.readFile(path.join(projectDir, "html", "analysis_dashboard.html"), "utf8");
 const prefectureEconomyCsv = await fs.readFile(path.join(projectDir, "data", "reference", "prefecture_economic_indicators.csv"), "utf8");
 const prefectureSourcesCsv = await fs.readFile(path.join(projectDir, "data", "reference", "prefecture_economic_indicator_sources.csv"), "utf8");
@@ -122,6 +123,9 @@ assert(countCsvRecords(prefectureSourcesCsv) === 5, "prefecture economic source 
 assert(dashboardHtml.includes("採択企業 公開指標比較ダッシュボード"), "public metrics dashboard title is missing");
 assert(legacyDashboardHtml.includes("location.replace('public_metrics_dashboard.html'"), "legacy analysis dashboard must redirect to the renamed file");
 assert(dashboardHtml.includes("const DATA=[") && dashboardHtml.includes("const BENCH=["), "analysis dashboard must embed cases and official benchmarks");
+assert(dashboardHtml.includes("const DEFAULT_PDF_MODE='local'") && onlineDashboardHtml.includes("const DEFAULT_PDF_MODE='online'"), "local and online dashboards must use their intended PDF defaults");
+assert(onlineDashboardHtml.includes('id="pdfMode"') && onlineDashboardHtml.includes("mode==='online'?(selected.pdf_url"), "online dashboard must display official Web PDFs with a selectable fallback mode");
+assert(onlineDashboardHtml.includes("const DATA=[") && !onlineDashboardHtml.includes("__DEFAULT_PDF_MODE__"), "online dashboard must be a self-contained generated file");
 assert(dashboardHtml.includes("表示対象をCSV出力") && dashboardHtml.includes("公式統計に対する位置"), "analysis dashboard controls or position table are missing");
 assert(dashboardHtml.includes('placeholder="企業名・case_id・本文を検索"') && dashboardHtml.includes("空白＝AND、OR＝OR") && dashboardHtml.includes("工場 建設 OR 新設"), "dashboard search must explain body-text AND/OR query syntax");
 assert(dashboardHtml.includes('<header class="top"><h1>採択企業 公開指標比較ダッシュボード</h1><div class="top-search"><input id="search"') && !dashboardHtml.includes('<aside class="filters">\n <h2>企業を絞り込む</h2>'), "dashboard search must be placed in the top bar rather than the left filter rail");
@@ -193,7 +197,7 @@ assert(benchmarkCsv.includes("https://seichotoushi-hojo.jp/assets/pdf/3ji_median
 const payrollRevalidationCsv = await fs.readFile(path.join(projectDir, "data", "processed", "payroll_unit_revalidation_changes.csv"), "utf8");
 assert(countCsvRecords(payrollRevalidationCsv) === 4, "payroll unit revalidation must contain four metric corrections");
 assert(payrollRevalidationCsv.includes("source_unit_conflict_cell_unit_preferred") && payrollRevalidationCsv.includes("source_unit_conflict_assumed_thousand_yen"), "payroll unit revalidation statuses are incomplete");
-for (const [name, document] of [["index.html", html], ["qa.html", qaHtml], ["qa_v0.1.html", qaV01Html], ["public_metrics_dashboard.html", dashboardHtml]]) {
+for (const [name, document] of [["index.html", html], ["qa.html", qaHtml], ["qa_v0.1.html", qaV01Html], ["public_metrics_dashboard.html", dashboardHtml], ["public_metrics_dashboard_online.html", onlineDashboardHtml]]) {
   const scripts = [...document.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
   assert(scripts.length > 0, `${name}: script is missing`);
   for (const script of scripts) new vm.Script(script, { filename: name });
@@ -262,7 +266,7 @@ assert(boxCsv.includes("補助事業の背景・目的"), "boxes.csv must includ
 
 const textFiles = [
   "README.md", "dataset_stats.json", "docs/methodology.md", "docs/data_dictionary.md",
-  "docs/validation.md", "docs/analysis_quality_flags.md", "html/index.html", "html/qa.html", "html/qa_v0.1.html", "html/analysis_dashboard.html", "html/public_metrics_dashboard.html", "html/data/cases.json", "scripts/build_dataset.mjs", "scripts/build_qa_v01.py", "scripts/build_analysis_dashboard.py",
+  "docs/validation.md", "docs/analysis_quality_flags.md", "html/index.html", "html/qa.html", "html/qa_v0.1.html", "html/analysis_dashboard.html", "html/public_metrics_dashboard.html", "html/public_metrics_dashboard_online.html", "html/data/cases.json", "scripts/build_dataset.mjs", "scripts/build_qa_v01.py", "scripts/build_analysis_dashboard.py",
   "scripts/build_analysis_flags.py", "scripts/validate_analysis_flags.py", "scripts/normalize_local_pdf_names.py",
   "scripts/sales_series.mjs", "scripts/revalidate_payroll_totals.py", "data/processed/cases.csv", "data/processed/pdf_manifest.csv",
   "data/processed/sales_series.csv", "data/processed/sales_series_annual.csv",
