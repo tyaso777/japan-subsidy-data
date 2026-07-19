@@ -1,0 +1,120 @@
+{
+  "analysis_scope": "publicly recorded accepted/grant-decided company records only",
+  "not_identified": [
+    "acceptance probability",
+    "causal effect of metrics",
+    "reason for acceptance"
+  ],
+  "primary_definition": {
+    "metric_set": "current9",
+    "minimum_observed_metrics": 5,
+    "below_applicant_median_share_threshold": 0.6,
+    "strict_comparison": "company value < same-round applicant median"
+  },
+  "counts": {
+    "hypotheses": [
+      {
+        "hypothesis": "H1_measurement_error",
+        "evidence_direction": "measurement_affects_membership_but_not_full_explanation",
+        "result": "品質注意率は中核群42.9%、その他47.0%（Fisher p=0.6991）。ただし期間曖昧性は42.9%対15.4%（Fisher p=0.0009152、BH q=0.007321）。No.8・14除外でも30件だが、補正後28件との共通は15件、Jaccard=0.349。",
+        "interpretation": "期間定義の曖昧性は中核群で多く、H1を部分的に支持する。測定・近似方法は個社の分類を動かすが、品質フラグ除外後も比率はほぼ同じで、現象全体を測定誤差だけでは説明できない。"
+      },
+      {
+        "hypothesis": "H7_scale",
+        "evidence_direction": "evaluate_with_round_adjusted_scale_ranks",
+        "result": "[{\"variable\": \"baseline_sales_oku\", \"median_within_round_percentile\": 0.4111111111111111, \"p_value\": 0.45147742612869357}, {\"variable\": \"project_cost_oku\", \"median_within_round_percentile\": 0.3870967741935484, \"p_value\": 0.7055147242637868}, {\"variable\": \"subsidy_oku\", \"median_within_round_percentile\": 0.44618583891255836, \"p_value\": 0.6784660766961652}, {\"variable\": \"employees_base\", \"median_within_round_percentile\": 0.33962264150943394, \"p_value\": 0.010349482525873706}]",
+        "interpretation": "同回内規模順位とマッチド対照差を併読する。規模が低ければ絶対効果指標の低さを機械的に説明し得るが、採択理由は同定しない。"
+      },
+      {
+        "hypothesis": "H8_multidimensional_selection",
+        "evidence_direction": "within_company_clustering_and_compensating_dimensions",
+        "result": "公募回×指標の周辺度数を固定した置換で60%以上未満の期待値14.30件に対し観測28件（上側p=0.00030）。中核28件中、少なくとも1指標が申請者中央値以上なのは28件。共同申請等は25.0%対2.9%（同回置換p=0.00025、BH q=0.00975）。",
+        "interpretation": "指標の弱さが企業内で偶然以上に集積するかと、別指標の強みが残るかを示す。採択企業内の記述であり、多次元選抜が採択を生んだという因果推論ではない。"
+      },
+      {
+        "hypothesis": "H9_financial_confirmation",
+        "evidence_direction": "refuted_as_discriminator",
+        "result": "3・4次の外部表に結合できた中核群は23/23件で確認書あり。その他外部表では190/195件（Fisher p=1）。",
+        "interpretation": "金融機関確認書はほぼ全採択案件に存在し、中核群を識別する変数ではない。要件充足又は一般的な申請実務を表す可能性が高い。"
+      }
+    ],
+    "scale_evidence": [
+      {
+        "variable": "baseline_sales_oku",
+        "median_within_round_percentile": 0.4111111111111111,
+        "p_value": 0.45147742612869357
+      },
+      {
+        "variable": "project_cost_oku",
+        "median_within_round_percentile": 0.3870967741935484,
+        "p_value": 0.7055147242637868
+      },
+      {
+        "variable": "subsidy_oku",
+        "median_within_round_percentile": 0.44618583891255836,
+        "p_value": 0.6784660766961652
+      },
+      {
+        "variable": "employees_base",
+        "median_within_round_percentile": 0.33962264150943394,
+        "p_value": 0.010349482525873706
+      }
+    ],
+    "primary_core_n": 28,
+    "primary_eligible_n": 373,
+    "primary_core_clean_n": 16,
+    "primary_clean_eligible_n": 199,
+    "core_with_any_at_or_above_applicant_n": 28,
+    "core_all_observed_below_n": 0,
+    "no13_sensitivity_n": 30,
+    "old7_sensitivity_n": 30,
+    "old7_jaccard": 0.3488372093023256,
+    "structure_geography_feature_n": 39,
+    "structure_geography_bh_q_below_0_05_n": 2,
+    "financial_confirmation": {
+      "sample": "core28_round3_4_external_linked",
+      "total_n": 23,
+      "confirmation_true_n": 23,
+      "confirmation_true_pct": 100.0,
+      "comparison_group": "other_round3_4_external_records",
+      "comparison_total_n": 195.0,
+      "comparison_true_n": 190.0,
+      "comparison_true_pct": 97.43589743589743,
+      "fisher_odds_ratio": null,
+      "fisher_two_sided_p": 1.0
+    }
+  },
+  "boundary_sensitivity": {
+    "method": "require company value to be at least 0%, 1%, 5%, or 10% below the same-round applicant median before counting it as below",
+    "primary_core_observed_cells": 208,
+    "primary_core_abs_gap_lt_5pct_cells": 25
+  },
+  "permutation": {
+    "method": "within each round × metric, shuffle below-median flags across records with that metric observed; missingness positions and marginal below counts are fixed",
+    "permutations": 20000,
+    "seed_base": 20260719
+  },
+  "matching": {
+    "treated_n": 28,
+    "control_n_unique": 28,
+    "same_round_required": true,
+    "scale_variables": [
+      "baseline sales",
+      "project cost",
+      "subsidy",
+      "baseline employees"
+    ],
+    "industry_exact_match_n": 19,
+    "industry_exact_match_pct": 67.85714285714286,
+    "minimum_shared_scale_variables": 2,
+    "matching_without_replacement": true,
+    "matching_method": "same-round greedy 1:1 matching on log scale distance with industry mismatch penalty"
+  },
+  "source_files": [
+    "C:\\Users\\AtsushiSuzuki\\Documents\\Codex\\japan-subsidy-data\\補助金\\大規模成長投資補助金\\analysis\\round6_reassessment\\case_level_reassessment.csv",
+    "C:\\Users\\AtsushiSuzuki\\Documents\\Codex\\japan-subsidy-data\\補助金\\大規模成長投資補助金\\data\\processed\\cases.csv",
+    "C:\\Users\\AtsushiSuzuki\\Documents\\Codex\\japan-subsidy-data\\補助金\\大規模成長投資補助金\\data\\reference\\official_round_benchmarks.csv",
+    "C:\\Users\\AtsushiSuzuki\\Documents\\Codex\\japan-subsidy-data\\補助金\\大規模成長投資補助金\\analysis\\applicant_median_residual\\application_round_crosswalk_1_2.csv",
+    "C:\\Users\\AtsushiSuzuki\\Documents\\Codex\\japan-subsidy-data\\補助金\\大規模成長投資補助金\\analysis\\adoption_drivers\\external_financial_confirmations.csv"
+  ]
+}

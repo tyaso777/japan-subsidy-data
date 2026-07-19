@@ -1,0 +1,5 @@
+﻿minimum_relative_gap_below_benchmark,definition,eligible_n,flag_n,overlap_with_primary_n,jaccard_with_primary,primary_core_observed_cell_n,primary_core_abs_gap_lt_5pct_cell_n
+0.0,company_value < applicant_median,373,28,28,1.0,208,25
+0.01,company_value < applicant_median - abs(applicant_median)*0.01,373,27,27,0.9642857142857143,208,25
+0.05,company_value < applicant_median - abs(applicant_median)*0.05,373,20,20,0.7142857142857143,208,25
+0.1,company_value < applicant_median - abs(applicant_median)*0.1,373,14,14,0.5,208,25

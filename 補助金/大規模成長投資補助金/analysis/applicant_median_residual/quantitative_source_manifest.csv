@@ -1,0 +1,6 @@
+﻿source_file,role,sha256,file_size_bytes
+C:\Users\AtsushiSuzuki\Documents\Codex\japan-subsidy-data\補助金\大規模成長投資補助金\analysis\round6_reassessment\case_level_reassessment.csv,企業別公開PDF推計値・既存品質判定（回次中央値は本分析で再付与）,4c3e31c0b6008ad3db0ab9cbd22af212280764ab9d5e2924312b5ac288b47908,228002
+C:\Users\AtsushiSuzuki\Documents\Codex\japan-subsidy-data\補助金\大規模成長投資補助金\data\processed\cases.csv,規模・案件構造・地理・品質の元データ,993b5e29539453b5190e6e5777edf09d72fee511f580da4778b86e70c4354731,1514844
+C:\Users\AtsushiSuzuki\Documents\Codex\japan-subsidy-data\補助金\大規模成長投資補助金\data\reference\official_round_benchmarks.csv,公募回別の公式申請者・採択者中央値,f4cfd2dfb3777df7c3ee5e8dff04a9884fe893201acad0540b195a64537f7bb9,19760
+C:\Users\AtsushiSuzuki\Documents\Codex\japan-subsidy-data\補助金\大規模成長投資補助金\analysis\applicant_median_residual\application_round_crosswalk_1_2.csv,公式採択一覧で補正した1・2次の申請公募回クロスウォーク,c600106875ecc60f76a5c69086b99252325f9a103ca12eeafe7ebaf4009ed01d,31082
+C:\Users\AtsushiSuzuki\Documents\Codex\japan-subsidy-data\補助金\大規模成長投資補助金\analysis\adoption_drivers\external_financial_confirmations.csv,3・4次の金融機関確認書外部表,f2f1f26620adcb14dbfe929545da3ad490ea865b42335e21e5ea0a87696b4bec,79611

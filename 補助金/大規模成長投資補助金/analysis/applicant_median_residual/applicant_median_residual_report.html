@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>公開指標では弱く見える採択案件：補正後28件の仮説検証</title>
+<style>
+:root{--bg:#f4f7fb;--paper:#fff;--ink:#172033;--muted:#5e6b80;--line:#d8e0ec;--nav:#101c34;--nav-ink:#eaf0fb;--blue:#376cb8;--blue-soft:#e9f1ff;--green:#2d855e;--green-soft:#e4f4ec;--red:#b9504f;--red-soft:#f9e9e8;--amber:#bd7b20;--amber-soft:#fff1d7;--purple:#7b5cb8;--purple-soft:#f0eafb;--shadow:0 8px 24px rgba(31,48,78,.08)}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1420;--paper:#151e2d;--ink:#edf2fb;--muted:#aebbd0;--line:#334157;--nav:#090e18;--nav-ink:#edf2fb;--blue:#74a7ed;--blue-soft:#1d3658;--green:#71c69a;--green-soft:#173b2c;--red:#ee8984;--red-soft:#4b2527;--amber:#e6ac5a;--amber-soft:#49351d;--purple:#ad91e2;--purple-soft:#352b4a;--shadow:none}}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--ink);font-family:"Yu Gothic UI","Hiragino Sans",Meiryo,sans-serif;line-height:1.7} a{color:var(--blue)} code{font-family:ui-monospace,Consolas,monospace;font-size:.9em} .layout{display:grid;grid-template-columns:280px minmax(0,1fr);max-width:1640px;margin:auto} .toc{position:sticky;top:0;height:100vh;background:var(--nav);color:var(--nav-ink);padding:24px 18px;overflow:auto} .toc h2{font-size:16px;margin:0 0 12px} .toc p{font-size:12px;color:#b8c6de;margin:0 0 18px} .toc a{display:block;color:var(--nav-ink);text-decoration:none;padding:7px 9px;border-left:2px solid transparent;font-size:13px} .toc a:hover{background:rgba(255,255,255,.08);border-color:#79a7ea} .toc button{width:100%;border:1px solid #4b5d78;background:transparent;color:var(--nav-ink);padding:8px;border-radius:6px;cursor:pointer;margin-top:18px} .reopen{display:none;position:fixed;left:0;top:16px;z-index:20;border:0;background:var(--nav);color:var(--nav-ink);padding:10px 8px;border-radius:0 6px 6px 0;cursor:pointer} body.nav-closed .layout{grid-template-columns:1fr} body.nav-closed .toc{display:none} body.nav-closed .reopen{display:block} main{min-width:0;padding:38px clamp(18px,4vw,64px) 80px} .hero{background:linear-gradient(130deg,var(--nav),#294c7e);color:white;padding:40px clamp(22px,5vw,64px);border-radius:16px;margin-bottom:28px} .hero h1{font-size:clamp(28px,4vw,48px);line-height:1.25;margin:0 0 16px} .hero p{max-width:980px;font-size:17px;margin:0;color:#e2ebf9} .eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#bcd0ee;margin-bottom:8px} section.report{background:var(--paper);padding:clamp(22px,4vw,46px);border:1px solid var(--line);border-radius:14px;margin:0 0 22px;box-shadow:var(--shadow)} h2{font-size:26px;line-height:1.35;margin:0 0 20px} h3{font-size:19px;margin:28px 0 10px} h4{font-size:15px;margin:0 0 8px} p{margin:0 0 15px} .lead{font-size:18px} .callout{padding:18px 20px;background:var(--blue-soft);border-left:5px solid var(--blue);margin:18px 0} .warning{background:var(--amber-soft);border-left-color:var(--amber)} .critical{background:var(--red-soft);border-left-color:var(--red)} .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0} .stat{border-top:4px solid var(--blue);background:var(--bg);padding:16px} .stat b{display:block;font-size:30px;line-height:1.2} .stat small{display:block;color:var(--muted)} .two-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px} .flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0} .flow div{background:var(--bg);padding:14px;border-top:3px solid var(--blue)} .flow b{display:block;margin-bottom:5px} .flow small{color:var(--muted)} .table-wrap{overflow-x:auto} table{width:100%;border-collapse:collapse;font-size:13px} th,td{padding:10px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top} th{font-weight:600} thead th{background:var(--bg);white-space:nowrap} tbody tr:hover{background:color-mix(in srgb,var(--blue-soft) 55%,transparent)} .bar-track{display:block;width:100%;height:5px;background:var(--line);margin-top:5px;border-radius:4px;overflow:hidden;min-width:60px} .bar-fill{display:block;height:100%;background:var(--blue)} .bar-fill.red{background:var(--red)} .bar-fill.green{background:var(--green)} .bar-fill.amber{background:var(--amber)} .bar-fill.purple{background:var(--purple)} .null-chart{position:relative;height:92px;margin:28px 6% 12px;border-bottom:2px solid var(--line)} .null-chart .interval{position:absolute;top:42px;height:12px;background:var(--amber);border-radius:8px} .null-chart .expected,.null-chart .observed{position:absolute;bottom:0;width:2px;height:64px;background:var(--amber)} .null-chart .observed{background:var(--red);width:4px} .null-chart span{position:absolute;top:4px;transform:translateX(-50%);white-space:nowrap;font-size:12px} .null-chart .olabel{font-weight:bold} .axis{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)} .verdicts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px} .verdict{padding:15px;border-left:5px solid var(--line);background:var(--bg)} .verdict.support{border-color:var(--green)} .verdict.partial{border-color:var(--amber)} .verdict.refute{border-color:var(--red)} .verdict.unknown{border-color:var(--purple)} .verdict b{display:block} .verdict small{color:var(--muted)} .formula{font-family:ui-monospace,Consolas,monospace;background:var(--bg);padding:12px 14px;border:1px solid var(--line);overflow:auto} details.subdetails{margin:12px 0;border-top:1px solid var(--line)} details.subdetails>summary{cursor:pointer;padding:10px 0;font-weight:600} .case-tools{display:flex;gap:10px;flex-wrap:wrap;margin:15px 0} .case-tools label{font-size:12px;color:var(--muted)} .case-tools input,.case-tools select{display:block;margin-top:3px;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);min-width:180px} .case-count{margin-left:auto;align-self:end;font-weight:bold} .case-card{border-top:1px solid var(--line)} .case-card>details>summary{display:flex;justify-content:space-between;gap:18px;cursor:pointer;padding:15px 4px;list-style:none} .case-card>details>summary::-webkit-details-marker{display:none} .case-card>details>summary:before{content:"＋";margin-right:8px;color:var(--blue)} .case-card>details[open]>summary:before{content:"−"} .case-card summary span:first-of-type{flex:1} .case-card summary small{display:block;color:var(--muted);font-weight:normal} .case-summary{text-align:right} .case-body{padding:4px 8px 24px 28px} .case-meta{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;font-size:12px;color:var(--muted)} .case-meta>span{background:var(--bg);padding:3px 7px} .chip{color:var(--ink)!important;background:var(--green-soft)!important} .counter{background:var(--amber-soft);padding:12px 14px} .links{display:flex;gap:12px;margin-top:12px} .status{display:inline-block;padding:2px 6px;border-radius:4px;font-weight:bold} .status.below{background:var(--red-soft);color:var(--red)} .status.above{background:var(--green-soft);color:var(--green)} .score-guide{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0} .score-guide div{background:var(--bg);padding:10px} .source-note{font-size:12px;color:var(--muted)} .footer-note{text-align:center;color:var(--muted);font-size:12px;margin-top:28px}
+@media(max-width:980px){.layout{display:block}.toc{position:sticky;top:0;height:auto;max-height:100vh;overflow:auto;z-index:19}.toc nav{columns:2}.grid,.flow{grid-template-columns:repeat(2,1fr)}.two-col,.verdicts{grid-template-columns:1fr}}
+@media(max-width:620px){main{padding:16px 10px 50px}.hero,section.report{border-radius:8px;padding:22px 16px}.grid,.flow{grid-template-columns:1fr}.toc nav{columns:1}.case-card>details>summary{display:block}.case-summary{text-align:left;margin:6px 0 0 24px}.score-guide{grid-template-columns:1fr 1fr}}
+@media print{.toc,.reopen,.case-tools{display:none!important}.layout{display:block}main{padding:0}section.report{box-shadow:none;break-inside:auto}details>*{display:block!important}details>summary{list-style:none}a{color:inherit;text-decoration:none}}
+</style>
+</head>
+<body>
+<button class="reopen" id="reopen" aria-label="目次を開く">≫</button>
+<div class="layout">
+<aside class="toc" id="toc"><h2>目次</h2><p>旧29件をデータ監査で補正し、定量・定性・制度の代替仮説を比較</p><nav>
+<a href="#conclusion">1. エグゼクティブ・サマリー</a><a href="#definition">2. データ監査と対象定義</a><a href="#official">3. 公式審査との関係</a><a href="#quant">4. 定量的な頑健性</a><a href="#hypotheses">5. 説明仮説の比較</a><a href="#qual">6. 全28件の定性精査</a><a href="#archetypes">7. 説明類型と厳しい3件</a><a href="#cases">8. 企業別証拠</a><a href="#round6">9. 第6次への実務示唆</a><a href="#limits">10. 限界と再現方法</a><a href="#sources">11. 資料</a>
+</nav><button id="closeToc">目次を閉じる</button></aside>
+<main>
+<header class="hero"><div class="eyebrow">採択残差の仮説検証</div><h1>公開指標では弱く見える採択案件を、<br>どこまで説明できるか</h1><p>当初抽出した29件を公式採択一覧で再監査し、申請公募回を補正した最終28件を対象とする。近似誤差、閾値、規模、費用対効果、共同申請、地域性、定性証拠、非公開審査の各仮説を、反証可能性とともに比較した。</p></header>
+
+<section class="report" id="conclusion"><h2>1. エグゼクティブ・サマリー</h2>
+<p class="source-note"><b>採択残差：</b>採択・交付されたという事実のうち、公開PDFから比較できる9指標だけでは説明できない部分。本レポートは、この残差の説明候補を比較するものであり、審査員の判断を復元するものではない。</p>
+<p class="lead"><b>結論は「28件に共通する特殊事情が一つあった」ではない。</b>案件固有の需要、能力制約、事業転換、地域供給網、実行準備は確認できる。しかし、同じ特徴は別の採択企業にも高頻度で現れ、公開資料だけでは採択への因果効果を識別できない。最も整合的なのは、測定上のずれ、企業規模、評価主体、定性的な案件固有性、公開されない審査情報が案件ごとに重なったという説明である。</p>
+<div class="grid"><div class="stat"><b>28 / 373</b><small>主定義に該当（7.5%）</small></div><div class="stat"><b>28 / 28</b><small>少なくとも1指標は申請者中央値以上</small></div><div class="stat"><b>0</b><small>全観測指標が申請者中央値未満</small></div></div>
+<p class="source-note">分母373は、収録採択・交付企業レコードのうち9指標を5つ以上判定できた件数であり、全申請又は全採択件数ではない。全28件に中央値以上の指標が残ることも、主定義が「未満60%以上」であり最大40%の反対方向を許すため、定義からほぼ予想される性質である。</p>
+<div class="callout"><b>実務上の読み方：</b>「定量値が弱くても、定性ストーリーで逆転できる」という証拠ではない。公開9指標に弱点がある案件ほど、①顧客・数量を伴う需要、②投資しなければ解けない物理制約、③設備仕様から売上・付加価値・賃金へ至る計算、④用地・許認可・資金の実行証拠を、一つの検証可能な因果鎖として示す必要がある。</div>
+<div class="verdicts"><div class="verdict support"><b>比較的強い観測</b><small>28件のうち13件は、需要又は能力制約に実名・数量・実行事実を伴う3点証拠がある。共同申請等も7/28件で、その他採択より多い。</small></div><div class="verdict partial"><b>説明の一部になる</b><small>期間曖昧性、近似指標、従業員規模、回次境界、評価主体のずれは「弱く見える」理由を説明する。</small></div><div class="verdict refute"><b>代替優位は確認できない</b><small>補助金1億円当たり雇用・給与効果、金融機関確認書、語句密度は、28件だけの優位を示さない。</small></div><div class="verdict unknown"><b>観測できない</b><small>審査点、プレゼン質疑、財務余力、補助金必要性、不採択企業の個票。したがって個別の採択理由は確定できない。</small></div></div>
+</section>
+
+<section class="report" id="definition"><h2>2. データ監査と対象定義</h2>
+<div class="callout critical"><b>重要な訂正：当初29件ではなく、最終分析対象は28件である。</b><br>元データの1・2次 <code>round</code> は申請公募回ではなく、企業PDFの公開・命名バッチを反映していた。公式の1次・2次採択一覧の企業名を照合し、旧社名2件を法人番号で確認したところ、181件中60件で回次が逆だった。正しい回次の申請者中央値を付け直すと、旧29件から2件を除き1件を加えた28件となった。この訂正を隠さず、以下の全統計・定性精査を再計算している。</div>
+<div class="table-wrap"><table><thead><tr><th>企業</th><th>保存回次 → 申請公募回</th><th>対象集合への影響</th></tr></thead><tbody><tr><th>株式会社八立製作所</th><td>2次 → 1次</td><td>旧29件から除外</td></tr><tr><th>アサヒセイレン中部株式会社</th><td>2次 → 1次</td><td>旧29件から除外</td></tr><tr><th>浦島観光ホテル株式会社</th><td>1次 → 2次</td><td>補正後28件へ追加</td></tr></tbody></table></div>
+<p class="source-note">補正根拠：<a href="https://seichotoushi-hojo.jp/assets/pdf/list_1ji.pdf" target="_blank" rel="noopener">1次採択一覧</a>、<a href="https://seichotoushi-hojo.jp/assets/pdf/list_2ji.pdf" target="_blank" rel="noopener">2次採択一覧</a>、<a href="https://seichotoushi-hojo.jp/assets/pdf/list_2ji_tsuika.pdf" target="_blank" rel="noopener">2次追加採択一覧</a>。固定クロスウォークと生成・検証スクリプトを本レポートと同じフォルダに保存した。</p>
+<h3>補正後28件の機械的定義</h3>
+<p>この28件は「審査上の定量評価が低かった企業」ではない。次の分析規則を満たす収録レコードの集合である。</p>
+<div class="flow"><div><b>対象</b><small>1～4次の公開企業PDFを収録した採択・交付企業レコード</small></div><div><b>比較</b><small>補正した申請公募回の申請者全体・公式中央値</small></div><div><b>可観測性</b><small>9指標のうち5指標以上を企業別に再現</small></div><div><b>抽出</b><small>観測指標の60%以上で企業値が中央値未満</small></div></div>
+<div class="formula">core28 = observed_metrics ≥ 5 AND count(company_value &lt; applicant_median[application_round]) / observed_metrics ≥ 0.60</div>
+<p class="source-note">中央値は分布の中心であり、公式の足切り線・合格点ではない。分析単位は企業PDFの収録レコードで、共同申請の参加者等を含み、公式の採択申請件数と一致しない場合がある。</p>
+<h3>公募回別の判定可能レコード</h3><div class="table-wrap"><table><thead><tr><th>申請公募回</th><th>5指標以上判定可能</th><th>28件条件に該当</th><th>収録内比率</th></tr></thead><tbody><tr><th>1次</th><td>100</td><td>3</td><td>3.0%</td></tr><tr><th>2次</th><td>74</td><td>2</td><td>2.7%</td></tr><tr><th>3次</th><td>106</td><td>8</td><td>7.5%</td></tr><tr><th>4次</th><td>93</td><td>15</td><td>16.1%</td></tr></tbody></table></div>
+<p>補正後は1次3/100、2次2/74、3次8/106、4次15/93である。各回の収録率と分析単位が同一ではないため、これを公募回別の採択確率や制度変化として比較しない。</p>
+<h3>60%・観測5以上という規則の感度</h3><div class="two-col"><div class="table-wrap"><table><thead><tr><th>未満率の閾値（観測5以上）</th><th>該当</th></tr></thead><tbody><tr><th>50%以上</th><td>66</td></tr><tr><th>60%以上（主定義）</th><td>28</td></tr><tr><th>3分の2以上</th><td>17</td></tr><tr><th>75%以上</th><td>11</td></tr></tbody></table></div><div class="table-wrap"><table><thead><tr><th>最低観測数（未満60%以上）</th><th>判定可能</th><th>該当</th></tr></thead><tbody><tr><th>4指標以上</th><td>376</td><td>28</td></tr><tr><th>5指標以上</th><td>373</td><td>28</td></tr><tr><th>6指標以上</th><td>362</td><td>26</td></tr><tr><th>7指標以上</th><td>322</td><td>22</td></tr></tbody></table></div></div>
+<p>50%なら66件、3分の2なら17件、75%なら11件となる。28件は自然に存在するカテゴリーではなく、分析上の閾値で切り出したケーススタディ集合である。</p>
+<h3>中央値の境界に対する感度</h3><div class="table-wrap"><table><thead><tr><th>「未満」と数える条件</th><th>該当</th><th>主定義との共通</th><th>Jaccard</th></tr></thead><tbody><tr><th>厳密な未満（主定義）</th><td>28</td><td>28</td><td>1.000</td></tr><tr><th>1%以上下回る</th><td>27</td><td>27</td><td>0.964</td></tr><tr><th>5%以上下回る</th><td>20</td><td>20</td><td>0.714</td></tr><tr><th>10%以上下回る</th><td>14</td><td>14</td><td>0.500</td></tr></tbody></table></div>
+<p>主定義28件が持つ観測セル208個のうち、中央値との差が5%未満なのは25個（12.0%）。企業値が中央値を5%以上下回る場合だけを「未満」と数えると該当は20件、10%以上では14件へ減る。したがって、少なくとも一部は中央値近傍の丸め・推計誤差で所属が動く。</p>
+<h3>どの指標で下回るのか</h3><div class="table-wrap"><table><thead><tr><th>指標</th><th>未満／観測</th><th>未満率</th></tr></thead><tbody><tr><th>No.1 全社年平均売上高成長率</th><td>7/11</td><td>63.6%<span class="bar-track" aria-hidden="true"><span class="bar-fill red" style="width:63.6%"></span></span></td></tr><tr><th>No.2 全社売上高増加額</th><td>14/23</td><td>60.9%<span class="bar-track" aria-hidden="true"><span class="bar-fill red" style="width:60.9%"></span></span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>23/28</td><td>82.1%<span class="bar-track" aria-hidden="true"><span class="bar-fill red" style="width:82.1%"></span></span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>24/28</td><td>85.7%<span class="bar-track" aria-hidden="true"><span class="bar-fill red" style="width:85.7%"></span></span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>11/28</td><td>39.3%<span class="bar-track" aria-hidden="true"><span class="bar-fill red" style="width:39.3%"></span></span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>24/28</td><td>85.7%<span class="bar-track" aria-hidden="true"><span class="bar-fill red" style="width:85.7%"></span></span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>13/24</td><td>54.2%<span class="bar-track" aria-hidden="true"><span class="bar-fill red" style="width:54.2%"></span></span></td></tr><tr><th>No.13 投資額／全社売上高（近似）</th><td>2/10</td><td>20.0%<span class="bar-track" aria-hidden="true"><span class="bar-fill red" style="width:20.0%"></span></span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>27/28</td><td>96.4%<span class="bar-track" aria-hidden="true"><span class="bar-fill red" style="width:96.4%"></span></span></td></tr></tbody></table></div>
+<p>弱さはNo.7、No.8、No.10、No.14に集中する。No.8とNo.14は同じ付加価値増加額の近似分子を共有し、No.8とNo.10は従業員規模の影響を強く受ける。したがって9回の独立した失点とはみなせない。</p>
+<details class="subdetails"><summary>算式で構成した4指標の式と公式値との差</summary><div class="table-wrap"><table><thead><tr><th>指標</th><th>本分析の式</th><th>主要なずれ</th></tr></thead><tbody>
+<tr><th>No.8 付加価値増加額</th><td>［（目標労働生産性×目標従業員数）－（基準労働生産性×基準従業員数）］÷10,000×1.1</td><td>公式付加価値は営業利益＋従業員給与＋役員給与＋減価償却費。公式分母は就業時間換算従業員＋役員であり、公開PDFの人数と一致しない。1.1は1～4次の集計中央値を参考にした水準補正で、企業別誤差を直さない。</td></tr>
+<tr><th>No.10 給与総額増加額</th><td>［（目標1人当たり給与×目標従業員数）－（基準1人当たり給与×基準従業員数）］÷10,000</td><td>公開PDFの従業員数の主体・範囲が、公式の常時使用従業員と一致する保証がない。</td></tr>
+<tr><th>No.13 投資額／全社売上高</th><td>公開事業費÷公開基準売上高×100</td><td>公開基準売上高がない案件は欠損。比率が高いほど投資リスクは大きい一方、過大投資にもなり得るため、他の8指標と違い方向が一意でない。</td></tr>
+<tr><th>No.14 付加価値増加額／補助金</th><td>No.8の1.1倍補正前の粗近似値÷公開補助金額×100</td><td>No.8と同じ人数・労働生産性を使う。独立した証拠として二重計上できず、企業別公式値でもない。</td></tr>
+</tbody></table></div><p>No.1・2もPDF記載値に近いものの、企業値の期間と公式集計の期間が一致する保証がないため「準直接」と扱う。公式定義と相対的に直接比較しやすいNo.7・9・11だけでは83件が該当し、補正後28件との共通は15件、Jaccard係数0.156である。近似指標を除けば同じ企業群が残るわけではない。</p></details>
+</section>
+
+<section class="report" id="official"><h2>3. 公開9指標は、公式審査の一部分しか見ていない</h2>
+<p>1次公募では、定量面の書面審査を通過した254件に対し、計画の蓋然性をみるプレゼン審査を行い、最終109件を採択した。事務局は不採択者へ「合格者平均に比べ相対的に評価の低かった審査項目」を知らせており、単一指標の足切りではなく複数項目の相対評価であることが確認できる。</p>
+<div class="flow"><div><b>① 経営力</b><small>成長ビジョン、戦略、経営資源、管理体制、資金計画</small></div><div><b>② 先進性・成長性</b><small>市場検証、競合差別化、生産性・付加価値</small></div><div><b>③ 地域波及</b><small>給与・雇用、地域取引、供給網レジリエンス</small></div><div><b>④～⑥</b><small>費用対効果、実現可能性、補助金の必要性（6次）</small></div></div>
+<p>公開PDFは交付決定後の概要資料であり、申請書全体、ローカルベンチマーク、資金繰り、審査員との質疑を含まない。このため、28件を「数値が悪いのに定性だけで逆転した」と断定するのは早い。正確には、<b>公開9指標だけでは総合評価を再構成できない28件</b>である。</p>
+<div class="callout warning"><b>識別できること：</b>公開9指標で説明できない程度と、公開資料に現れた補完候補。<br><b>識別できないこと：</b>各候補の審査点、採択への因果効果、不採択企業との差、審査員が重視した理由。</div>
+<p class="source-note">公式根拠：<a href="https://seichotoushi-hojo.jp/1_2ji/information/2024/06/21.html" target="_blank" rel="noopener">1次公募の採択結果</a>、<a href="https://seichotoushi-hojo.jp/1_2ji/information/2024/05/28.html" target="_blank" rel="noopener">不採択理由の情報開示</a>、<a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/youryou_6ji.pdf" target="_blank" rel="noopener">6次公募要領・事前公開版</a>。</p>
+</section>
+
+<section class="report" id="quant"><h2>4. 定量的な頑健性：件数と構成企業を分けて評価する</h2>
+<h3>未満判定は、無作為に散らばるより企業内へ集積している</h3><p>公募回×指標ごとの未満件数と欠損位置を固定し、企業への割当だけを20,000回入れ替えた。60%以上未満となるレコードは平均14.30件、95%範囲8～21件に対し、観測は28件だった（上側 p=0.00030）。主要品質注意なしでも観測16件、期待8.92件（p=0.00510）。</p>
+<div class="null-chart" role="img" aria-label="置換分布の期待14.30件、95%範囲8から21件に対し観測28件"><div class="interval" style="left:20.00%;width:32.50%"></div><div class="expected" style="left:35.75%"></div><div class="observed" style="left:70.00%"></div><span class="elabel" style="left:35.75%">期待 14.30</span><span class="olabel" style="left:70.00%">観測 28</span></div><div class="axis"><span>0件</span><span>20件</span><span>40件</span></div>
+<div class="callout warning"><b>この置換検定は採択理由の検定ではない。</b>No.8とNo.14は分子を共有し、No.8とNo.10は従業員規模に依存する。置換は現実の指標間相関を壊すため、棄却できるのは「各指標の周辺未満率と欠損だけで説明できる」という限定的な帰無仮説である。特別な企業群の存在、定性評価、採択因果を証明しない。</div>
+<h3>指標集合を変えると、総数以上に構成企業が変わる</h3><div class="table-wrap"><table><thead><tr><th>指標集合</th><th>該当</th><th>補正後28件との共通</th><th>Jaccard</th><th>定義</th></tr></thead><tbody><tr><th>現行9指標</th><td>28</td><td>28</td><td>1.000<span class="bar-track" aria-hidden="true"><span class="bar-fill amber" style="width:100.0%"></span></span></td><td>現行9指標、観測5以上、申請者中央値未満60%以上</td></tr><tr><th>No.13除外</th><td>30</td><td>28</td><td>0.933<span class="bar-track" aria-hidden="true"><span class="bar-fill amber" style="width:93.3%"></span></span></td><td>方向が一意でないNo.13を除外</td></tr><tr><th>No.8除外</th><td>28</td><td>19</td><td>0.514<span class="bar-track" aria-hidden="true"><span class="bar-fill amber" style="width:51.4%"></span></span></td><td>簡易補正推計No.8を除外</td></tr><tr><th>No.14除外</th><td>26</td><td>18</td><td>0.500<span class="bar-track" aria-hidden="true"><span class="bar-fill amber" style="width:50.0%"></span></span></td><td>粗近似比率No.14を除外</td></tr><tr><th>従来7指標</th><td>30</td><td>15</td><td>0.349<span class="bar-track" aria-hidden="true"><span class="bar-fill amber" style="width:34.9%"></span></span></td><td>No.8・14追加前の7指標</td></tr><tr><th>No.8・13・14除外</th><td>33</td><td>20</td><td>0.488<span class="bar-track" aria-hidden="true"><span class="bar-fill amber" style="width:48.8%"></span></span></td><td>No.8・13・14を除外</td></tr><tr><th>直接・準直接5指標</th><td>37</td><td>13</td><td>0.250<span class="bar-track" aria-hidden="true"><span class="bar-fill amber" style="width:25.0%"></span></span></td><td>PDF直書き又は基礎値からほぼ直接求める5指標、観測4以上</td></tr><tr><th>直接比較3指標</th><td>83</td><td>15</td><td>0.156<span class="bar-track" aria-hidden="true"><span class="bar-fill amber" style="width:15.6%"></span></span></td><td>公式定義との比較可能性が相対的に高い率3指標、3指標中2以上</td></tr></tbody></table></div>
+<p>従来7指標では30件だが、補正後28件との共通は15件、Jaccard係数は0.349である。Jaccard係数は2集合の共通件数÷和集合件数。したがって「公開指標の多くが申請者中央値を下回る採択案件が一定数ある」という集団レベルの観察と、「どの企業が該当するか」という個社分類は分けて扱う必要がある。</p>
+</section>
+
+<section class="report" id="hypotheses"><h2>5. 説明仮説の比較：何が残り、何が棄却されたか</h2>
+<p class="source-note"><b>統計表記：</b>p値は、差がないという仮定の下で観測以上の差が出る確率の目安。BH q値は、多数の特徴を同時に探索したことをBenjamini–Hochberg法で補正した値。いずれも効果の大きさや因果関係を直接表さない。</p>
+<div class="verdicts">
+<div class="verdict partial"><b>H1 期間・主体・近似のずれ：部分支持</b><small>品質注意全体は42.9%対47.0%で差がない。一方、期間曖昧性は42.9%対15.4%（Fisher p=0.00092、品質8項目内BH q=0.0073）。5%の境界条件でも8件が外れ、分類誤差は無視できない。</small></div>
+<div class="verdict partial"><b>H2 従業員規模が絶対額を押し下げる：記述的に整合</b><small>基準従業員数中央値は78人対135人、同回内順位中央値は34.0%（0.5との差の符号反転p=0.0103）。ただしNo.8・10が人数に依存するため、抽出規則が小規模企業を選びやすい内生性を含む。</small></div>
+<div class="verdict refute"><b>H3 補助金当たり効果が隠れて高い：支持されず</b><small>同回マッチ28対の中央値は、補助金1億円当たり雇用1.02人対2.36人、給与増0.143億円対0.289億円。いずれも28件側が低い。もっとも、No.10で抽出した群の給与効率比較には機械的な選択効果がある。</small></div>
+<div class="verdict partial"><b>H4 共同申請・評価主体の不一致：関連あり、機序未識別</b><small>共同申請等は7/28件（25.0%）、その他10/345件（2.9%）。同回置換 p=0.0002、39特徴内BH q=0.0097。単独企業の指標と申請全体の効果が一致しない可能性はあるが、相乗効果や採択効果そのものは観測していない。</small></div>
+<div class="verdict partial"><b>H5 地域・供給網の構成差：探索的</b><small>本社関東は28件で0.0%、その他で27.8%（同回置換 p=0.0019、BH q=0.0370）。探索した39特徴中の一つである。 定性精査では供給網・地域インフラ型が10件。業種・地域・公募回の残余交絡を除けず、地域優遇の証拠ではない。</small></div>
+<div class="verdict refute"><b>H6 金融機関確認書：識別力なし</b><small>3・4次で28件側23/23、その他190/195。Fisher p=1。一般的な申請実務・加点であって28件固有ではない。</small></div>
+<div class="verdict partial"><b>H7 定性的な案件固有性：存在するが識別力は未確認</b><small>全28件に事業転換・実行準備の具体記述がある。一方、非無作為の比較採択28件でも同じ特徴が高頻度で、A～E・Hに明確な差を検出しない。差がないことは同等性の証明でもない。</small></div>
+<div class="verdict unknown"><b>H8 プレゼン・財務・必要性：観測不能</b><small>公開PDFにない審査要素。公式制度上は重要だが、28件について高かったかは検証できない。</small></div>
+</div>
+<h3>探索的な同回マッチ28対</h3><p>同じ公募回を必須とし、基準売上高・事業費・補助金・基準従業員数のうち2変数以上の対数距離と業種一致を優先し、対照を重複なしで割り当てた。19対は業種も一致するが、基準売上高が両社でそろうのは8対だけである。これは採択企業内の探索比較であって、不採択企業との差、採択効果又は厳密な近傍対照ではない。</p>
+<div class="table-wrap"><table><thead><tr><th>変数</th><th>完全対</th><th>28件中央値</th><th>採択対照中央値</th><th>平均差の符号反転p</th></tr></thead><tbody><tr><th>事業費（億円）</th><td>28</td><td>26.00</td><td>28.00</td><td>0.8694</td></tr><tr><th>補助金額（億円）</th><td>28</td><td>7.24</td><td>7.50</td><td>0.9894</td></tr><tr><th>基準従業員数</th><td>28</td><td>78.00</td><td>86.00</td><td>0.8183</td></tr><tr><th>従業員増加数</th><td>28</td><td>9.00</td><td>21.50</td><td>0.0001</td></tr><tr><th>補助金1億円当たり従業員増加数</th><td>28</td><td>1.02</td><td>2.36</td><td>0.0101</td></tr><tr><th>補助金1億円当たり売上増加額</th><td>21</td><td>4.31</td><td>7.37</td><td>0.2302</td></tr><tr><th>補助金1億円当たり給与総額増加額</th><td>28</td><td>0.14</td><td>0.29</td><td>0.0065</td></tr></tbody></table></div>
+<p class="source-note">p値は各対の差の符号を20,000回ランダムに反転し、平均差の絶対値を比較した両側ランダム化検定。中央値差そのものの検定ではない。</p>
+</section>
+
+<section class="report" id="qual"><h2>6. 全28件の定性精査：事実・推論・反証を分ける</h2>
+<p>各公開PDFの全ページを読み、A～Hの説明候補とIの反証を0～3点で符号化した。点数は公式審査点ではなく、公開文章に現れる証拠の具体性を揃えて比較する研究用コードである。企業群を知った上での非盲検評価であり、独立した複数評価者による二重コーディングではない。</p>
+<div class="score-guide"><div><b>0</b><small>確認できない</small></div><div><b>1</b><small>一般論・弱い示唆</small></div><div><b>2</b><small>案件固有の具体説明</small></div><div><b>3</b><small>数量・実名・実行事実を伴う</small></div></div>
+<div class="table-wrap"><table><thead><tr><th>観点</th><th>2点以上</th><th>28件内割合</th><th>比較採択28件</th><th>Fisher p</th><th>操作的定義</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>22/28</td><td>78.6%<span class="bar-track" aria-hidden="true"><span class="bar-fill green" style="width:78.6%"></span></span></td><td>75.0%</td><td>1.000</td><td>実名顧客、受注・引合い、契約、数量見通しなど、投資後の需要が抽象論を超えて示されるか。</td></tr><tr><th>B 能力制約</th><td>22/28</td><td>78.6%<span class="bar-track" aria-hidden="true"><span class="bar-fill green" style="width:78.6%"></span></span></td><td>96.4%</td><td>0.101</td><td>既存設備の稼働限界、受注辞退、外注・輸送制約など、投資しなければ需要に応えられない事情があるか。</td></tr><tr><th>C 事業転換・差別化</th><td>28/28</td><td>100.0%<span class="bar-track" aria-hidden="true"><span class="bar-fill green" style="width:100.0%"></span></span></td><td>100.0%</td><td>1.000</td><td>内製化、垂直統合、ODM化、新工程・新市場など、単なる設備更新ではない行動変容があるか。</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>25/28</td><td>89.3%<span class="bar-track" aria-hidden="true"><span class="bar-fill green" style="width:89.3%"></span></span></td><td>89.3%</td><td>1.000</td><td>地域雇用、重要部材、廃棄物処理、観光・食料等で、代替しにくい供給網上の役割があるか。</td></tr><tr><th>E 実行準備</th><td>28/28</td><td>100.0%<span class="bar-track" aria-hidden="true"><span class="bar-fill green" style="width:100.0%"></span></span></td><td>92.9%</td><td>0.491</td><td>用地、許認可、設備仕様、工程、体制、既投資など、計画が実行段階へ進んでいるか。</td></tr><tr><th>F 資金・自己負担能力</th><td>7/28</td><td>25.0%<span class="bar-track" aria-hidden="true"><span class="bar-fill green" style="width:25.0%"></span></span></td><td>比較なし</td><td>—</td><td>自己資金、融資、財務余力、資金調達の具体性が公開資料で確認できるか。非公開になりやすい。</td></tr><tr><th>G 雇用・賃上げの質</th><td>28/28</td><td>100.0%<span class="bar-track" aria-hidden="true"><span class="bar-fill green" style="width:100.0%"></span></span></td><td>比較なし</td><td>—</td><td>人数や率だけでなく、技能形成、定着、処遇改善、地域の良質な雇用との接続が説明されるか。</td></tr><tr><th>H 政策適合・波及性</th><td>28/28</td><td>100.0%<span class="bar-track" aria-hidden="true"><span class="bar-fill green" style="width:100.0%"></span></span></td><td>92.9%</td><td>0.491</td><td>人手不足、レジリエンス、GX、地域内取引など、公募目的への波及経路が具体的か。</td></tr><tr><th>I 反証の強さ</th><td>19/28</td><td>67.9%<span class="bar-track" aria-hidden="true"><span class="bar-fill green" style="width:67.9%"></span></span></td><td>比較なし</td><td>—</td><td>定性説明を採択理由とみなすことへの反証。高いほど、説明が一般的・事後的・不完全で因果主張が難しい。</td></tr></tbody></table></div>
+<p><b>読み方：</b>C事業転換、E実行準備、G雇用・賃上げ、H政策適合は28/28件で2点以上だが、比較採択でもCは100%、E・Hは92.9%である。これは「定性的な強みがある」ことと「28件に固有で採択を識別する」ことが別であると示す。比較群は別目的で選ばれた採択企業の非無作為標本であり、差を検出しないことは同等性を証明しない。F・Gは比較群に対応コードがなく、28件内の記述に限る。</p>
+<h3>自動テキスト指標でも、文章の強さは確認されない</h3><div class="table-wrap"><table><thead><tr><th>指標</th><th>28件</th><th>その他採択</th><th>差</th><th>同回置換p</th></tr></thead><tbody><tr><th>5観点テキスト証拠順位の平均</th><td>0.450</td><td>0.510</td><td>-0.059</td><td>0.047</td></tr><tr><th>経営力語句密度の同回順位</th><td>0.390</td><td>0.514</td><td>-0.124</td><td>0.026</td></tr><tr><th>市場・先進性語句密度の同回順位</th><td>0.404</td><td>0.513</td><td>-0.109</td><td>0.048</td></tr><tr><th>地域波及語句密度の同回順位</th><td>0.501</td><td>0.506</td><td>-0.005</td><td>0.925</td></tr><tr><th>実現可能性語句密度の同回順位</th><td>0.510</td><td>0.505</td><td>0.005</td><td>0.928</td></tr><tr><th>政策適合語句密度の同回順位</th><td>0.447</td><td>0.510</td><td>-0.062</td><td>0.248</td></tr><tr><th>公開PDF抽出文字数</th><td>2,851</td><td>2,467</td><td>384.616</td><td>0.103</td></tr></tbody></table></div>
+<p>経営力・市場語句の同回順位は28件側が低く、地域・実現可能性はほぼ同じである。語句密度は内容の質を測らないが、「定性語を多く書いたから通った」という単純な説明とは整合しない。7項目を探索し、最小の未調整p値は0.026であるため、多重比較を考慮せず決定的な差と扱わない。</p>
+<h3>テーマ出現率</h3><div class="table-wrap"><table><thead><tr><th>テーマ</th><th>28件</th><th>その他採択</th><th>差</th><th>Fisher p</th></tr></thead><tbody><tr><th>market_evidence</th><td>92.9%</td><td>81.9%</td><td>11.0pt</td><td>0.194</td></tr><tr><th>regional_jobs</th><td>32.1%</td><td>25.5%</td><td>6.6pt</td><td>0.502</td></tr><tr><th>supply_chain</th><td>35.7%</td><td>29.2%</td><td>6.5pt</td><td>0.520</td></tr><tr><th>new_capacity</th><td>78.6%</td><td>77.9%</td><td>0.7pt</td><td>1.000</td></tr><tr><th>labor_saving</th><td>78.6%</td><td>78.2%</td><td>0.4pt</td><td>1.000</td></tr><tr><th>innovation</th><td>53.6%</td><td>55.8%</td><td>-2.2pt</td><td>0.845</td></tr><tr><th>green</th><td>28.6%</td><td>33.7%</td><td>-5.1pt</td><td>0.680</td></tr><tr><th>global</th><td>28.6%</td><td>34.6%</td><td>-6.0pt</td><td>0.679</td></tr></tbody></table></div>
+<h3>既存レビューとの一致度</h3><p>以前の別目的目視レビューと重なる16件について、後から一致度を確認した。全項目で±1点以内100%だが、完全一致は43.8～81.3%。E・Hの順位相関は弱い。独立二重コーディングによる再現性評価ではないため、1点差の順位ではなく「案件固有の証拠があるか」という大きな方向に限定して読む。</p><div class="table-wrap"><table><thead><tr><th>観点</th><th>重複</th><th>完全一致</th><th>±1点</th><th>順位相関</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>16</td><td>68.8%</td><td>100.0%</td><td>0.67</td></tr><tr><th>B 物理的な能力制約</th><td>16</td><td>43.8%</td><td>100.0%</td><td>0.73</td></tr><tr><th>C 事業転換・差別化</th><td>16</td><td>81.2%</td><td>100.0%</td><td>0.62</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>16</td><td>68.8%</td><td>100.0%</td><td>0.59</td></tr><tr><th>E 実行準備</th><td>16</td><td>56.2%</td><td>100.0%</td><td>0.13</td></tr><tr><th>H 政策適合・波及性</th><td>16</td><td>43.8%</td><td>100.0%</td><td>-0.13</td></tr></tbody></table></div>
+</section>
+
+<section class="report" id="archetypes"><h2>7. 説明類型と、公開定量上もっとも厳しい3件</h2>
+<p>企業ごとの公開事実を主要な説明候補へ整理した。類型は排他的な採択理由ではなく、複数要因のうち公開情報で比較的具体的なものを便宜的に一つ選んだ分類である。</p>
+<div class="table-wrap"><table><thead><tr><th>主要類型</th><th>件数</th><th>構成</th></tr></thead><tbody><tr><th>事業転換・垂直統合</th><td>10</td><td>35.7%<span class="bar-track" aria-hidden="true"><span class="bar-fill purple" style="width:35.7%"></span></span></td></tr><tr><th>供給網・地域インフラ</th><td>10</td><td>35.7%<span class="bar-track" aria-hidden="true"><span class="bar-fill purple" style="width:35.7%"></span></span></td></tr><tr><th>需要確約・能力制約</th><td>6</td><td>21.4%<span class="bar-track" aria-hidden="true"><span class="bar-fill purple" style="width:21.4%"></span></span></td></tr><tr><th>実行準備・財務</th><td>1</td><td>3.6%<span class="bar-track" aria-hidden="true"><span class="bar-fill purple" style="width:3.6%"></span></span></td></tr><tr><th>その他</th><td>1</td><td>3.6%<span class="bar-track" aria-hidden="true"><span class="bar-fill purple" style="width:3.6%"></span></span></td></tr></tbody></table></div>
+<div class="two-col"><div><h3>供給網・地域インフラ</h3><p>重要部材、食品、廃棄物処理、観光等で地域・取引網の代替困難性を示す。定量効果が小さくても、供給途絶回避や地域内波及を説明し得る。</p><h3>事業転換・垂直統合</h3><p>卸から製造、外注から内製、工程統合、宿泊型への転換など、既存延長でない行動変容を示す。</p></div><div><h3>需要確約・能力制約</h3><p>実名顧客の要請、既存能力を超える需要、受注辞退等により、投資の因果鎖と販売確度を補う。</p><h3>実行準備・財務／その他</h3><p>用地・許認可・資金・工程の準備が中心。ただし財務とプレゼンは公開PDFに乏しく、ここは最も観測しにくい。</p></div></div>
+<div class="callout critical"><b>類型の存在を採択理由と取り違えない。</b>公開PDFは採択後の概要資料であり、審査員が実際に何を高く評価したかを示さない。19/28件で反証スコアIが2点以上となり、顧客契約の欠如、他案件にも一般的な説明、主体・期間のずれなど、因果主張を弱める材料が残る。</div>
+<h3>中央値以上が1指標しかない3件</h3>
+<p>全28件は少なくとも1指標が申請者中央値以上だが、その強みが1指標だけの案件は3件である。この3件は「他の定量強みが補った」という説明を最も置きにくく、公開資料の定性事実又は非公開審査へ説明を求める度合いが高い。</p>
+<div class="table-wrap"><table><thead><tr><th>企業</th><th>唯一の中央値以上</th><th>公開PDFの案件固有事実</th><th>反証・未解決点</th></tr></thead><tbody><tr><th>株式会社シュゼット・ホールディングス<br><small>3次</small></th><td>No.13 投資額／全社売上高（近似）</td><td>販売・改善実績、借地更新不能、排水処理上限、2新工場、140人増を示す。</td><td>ブランド実績は強いが、新工場需要の顧客別確約はなく、コンソーシアム主体・率定義にも品質注意がある。</td></tr><tr><th>株式会社北海道ちぬやファーム<br><small>3次</small></th><td>No.11 年平均役員1人当たり報酬の伸び</td><td>冷凍能力1.5倍、7,020t倉庫、外部倉庫依存、農家減少と原料供給不安が明示される。</td><td>需要根拠は市場予測とグループ内部能力が中心で、顧客契約はない。コンソーシアム主体の曖昧さにも品質注意がある。</td></tr><tr><th>株式会社レクザム<br><small>4次</small></th><td>No.2 全社売上高増加額</td><td>自動倉庫、SMT、後工程の自動化と財務強化方針は記載されるが、顧客需要と現有能力差は定量化されない。</td><td>事業領域が広く、当該投資に結び付く顧客証拠・能力不足・資金計画が弱い。率定義にも品質注意があり、公開資料だけでは補完説明が不足する。</td></tr></tbody></table></div>
+<p class="source-note">No.13は投資額／全社売上高で、値が高いほど常に良いとは限らない。株式会社シュゼット・ホールディングスは方向が一意な8指標では全観測値が申請者中央値未満となる唯一のケースである。</p>
+<h3>説明力が比較的高い6例</h3><p>数字・固有名詞・実行事実が比較的そろう例を、反証と並べた。強い事例だけを抜き出した例示であり、6社の共通点を28件全体へ一般化しない。</p><div class="table-wrap"><table><thead><tr><th>企業</th><th>公開資料の事実</th><th>説明候補</th><th>反証・限界</th></tr></thead><tbody><tr><th>株式会社環境整備産業</th><td>TSMC視察、断り案件、県外処理率、M&amp;A、保有地、設備費は公開資料上の事実。</td><td>定量指標の弱さを、実需、明白な地域処理不足、取得済みノウハウ・用地が補った可能性が高い。採択因果は未確定。</td><td>固有需要・地域不足・準備状況は強いが、採択企業のみの資料で非採択比較はない。</td></tr><tr><th>八戸酒造株式会社</th><td>1.5万人の蔵見学、火入れ能力3倍、八戸市との土地購入合意、旧蔵の観光転用が明示される。</td><td>推論: 酒造能力増強だけでなく、文化財・観光・農業を結ぶ地域拠点化が、公開定量値以外の強い評価候補になり得た。</td><td>輸出需要は市場統計中心で顧客別証拠はないが、能力・土地・観光実績は案件固有で反証は比較的弱い。率定義には品質注意がある。</td></tr><tr><th>ときわ製作所株式会社</th><td>既存顧客の増産要請、4拠点分散、取得済み用地、補助対象外改修、自社製品量産が明示される。</td><td>推論: 顧客需要、物理制約、先行投資、地域供給不足が連続しており、公開情報で説明しやすい案件である。ただし採択因果は不明。</td><td>顧客名と増産数量は非開示だが、取得済み用地、補助対象外投資、4拠点分散という案件固有証拠があり、反証は比較的弱い。</td></tr><tr><th>株式会社ニシムタ</th><td>惣菜売上1.28倍、14店舗分能力、狭い店舗厨房、139.9億円の工場・店舗投資が示される。</td><td>推論: 自社内で観測できる需要と店舗網を使い、小売から製造へ転換するため、申請者代表値未満群でも公開情報による説明力が高い。</td><td>需要は自社実績と自社店舗で一定程度検証可能だが、セントラルキッチン化自体は一般的で、外部顧客による検証はない。</td></tr><tr><th>株式会社ホテルニューアワジ</th><td>認証、官民プロジェクト、既存収益実績、客室数と売上式は公開資料上の事実。</td><td>公開定量の弱さを、地域全体を巻き込む実行基盤と既存運営資産が補った可能性。ただし因果的な採択理由ではない。</td><td>認証・官民連携・既存実績の個別性は強いが、外国人需要は予測であり非採択案件との比較はない。</td></tr><tr><th>リバードコーポレーション株式会社</th><td>15から22バッチ/日への増強、包装ボトルネック、設備台数、20名新規雇用、DtoC一貫モデルが明示される。</td><td>推論: 公開定量値の弱さに対して、測定可能な能力制約と垂直統合型の事業転換が比較的強い説明候補である。採択因果を示すものではない。</td><td>市場成長と健康志向は一般的で、顧客契約や受注内示を欠く。垂直統合・自動化自体も他の採択案件に多い。</td></tr></tbody></table></div>
+<h3>外部資料による限定的な裏取り</h3><div class="table-wrap"><table><thead><tr><th>企業</th><th>時点</th><th>確認事項</th><th>結果</th><th>資料・限界</th></tr></thead><tbody><tr><th>株式会社オティックスホールディングス</th><td>採択前</td><td>電動車向けアルミダイカスト部品の工場投資</td><td>愛知県が2023年の立地計画として公表</td><td><a href="https://www.pref.aichi.jp/site/chiji-kaiken/20230731.html" target="_blank" rel="noopener">外部資料</a><br><small>計画の先行性は裏付けるが補助金の採択理由そのものではない</small></td></tr><tr><th>南島酒販株式会社</th><td>採択前後</td><td>卸売から製造・ブランド保有へ進む事業転換</td><td>泡盛メーカー識名酒造の子会社化をM&amp;A支援会社が公表</td><td><a href="https://www.integroup.jp/news/14624.html" target="_blank" rel="noopener">外部資料</a><br><small>個別補助事業の採択点や日本酒蔵の実現可能性を直接証明しない</small></td></tr><tr><th>奥伊吹観光株式会社</th><td>交付決定後</td><td>日帰り型から宿泊型総合リゾートへの転換</td><td>2026年に24.2億円のホテル建設を企業発表</td><td><a href="https://prtimes.jp/main/html/rd/p/000000261.000025847.html" target="_blank" rel="noopener">外部資料</a><br><small>事後的な実行確認であり申請時点の審査資料ではない</small></td></tr><tr><th>フクビ岡山株式会社</th><td>交付決定後</td><td>高性能断熱材の第2生産拠点</td><td>会社が2026年2月に交付決定と対象事業を公表</td><td><a href="https://www.fukuvi-okayama.co.jp/assets/images/prerelease.pdf" target="_blank" rel="noopener">外部資料</a><br><small>採択理由や顧客需要の強さを独立に検証する資料ではない</small></td></tr><tr><th>株式会社サン海苔</th><td>交付決定後</td><td>海苔製造プロセスへの大規模投資</td><td>会社が交付決定・賃上げ目標・投資規模を公表</td><td><a href="https://sannori.com/news/keisansho-cyusho/" target="_blank" rel="noopener">外部資料</a><br><small>公開PDFと企業発表の整合確認にとどまる</small></td></tr><tr><th>株式会社コスモス食品</th><td>交付決定後</td><td>フリーズドライ技術・受託開発能力</td><td>会社サイトが50年の技術蓄積と開発から製品化までの体制を説明</td><td><a href="https://www.cosmosfoods.co.jp/" target="_blank" rel="noopener">外部資料</a><br><small>企業の一般的能力は裏付けるが補助事業の追加需要や採択点は不明</small></td></tr></tbody></table></div>
+</section>
+
+<section class="report" id="cases"><h2>8. 企業別28件：事実・推論・反証を分けて読む</h2>
+<p>各社について、公開資料の事実、採択説明としての推論、反証・留保を分離した。企業名を開くと9指標の値、同回申請者中央値、A～Iのページ根拠を確認できる。</p>
+<div class="case-tools"><label>検索<input id="caseSearch" type="search" placeholder="企業名・業種・事実"></label><label>公募回<select id="roundFilter"><option value="">すべて</option><option>1次</option><option>2次</option><option>3次</option><option>4次</option></select></label><label>類型<select id="archetypeFilter"><option value="">すべて</option><option value="その他">その他</option><option value="事業転換・垂直統合">事業転換・垂直統合</option><option value="供給網・地域インフラ">供給網・地域インフラ</option><option value="実行準備・財務">実行準備・財務</option><option value="需要確約・能力制約">需要確約・能力制約</option></select></label><span class="case-count" id="caseCount">28件</span></div>
+<div id="caseList">
+    <article class="case-card" data-round="1次" data-archetype="需要確約・能力制約" data-search="千寿製薬株式会社 1次 製造業 需要確約・能力制約 能力7,000万本、需要7,500万本超、追加3,500万本という需給差は公開資料上の事実。 定量指標が申請者中央値を下回っても、明確な供給不足と医薬品安定供給を直結した計画が評価候補。ただし需要予測の外部検証はできない。">
+      <details>
+        <summary>
+          <span><b>千寿製薬株式会社</b><small>1次・製造業</small></span>
+          <span class="case-summary"><b>3/5指標が未満</b><small>需要確約・能力制約</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 高</span><span class="chip" title="需要の確からしさ">A 3</span><span class="chip" title="能力制約">B 3</span><span class="chip" title="事業転換・差別化">C 2</span><span class="chip" title="供給網・地域の不可欠性">D 2</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="雇用・賃上げの質">G 2</span><span class="chip" title="政策適合・波及性">H 2</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>能力7,000万本、需要7,500万本超、追加3,500万本という需給差は公開資料上の事実。</p></section>
+            <section><h4>採択説明としての推論</h4><p>定量指標が申請者中央値を下回っても、明確な供給不足と医薬品安定供給を直結した計画が評価候補。ただし需要予測の外部検証はできない。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>能力と需要の差は具体的だが、需要値は社内販売予測で顧客契約・公的需要の裏付けは示されない。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>8.25 %</td><td>12.00 %</td><td>0.69倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>2.33 億円</td><td>5.10 億円</td><td>0.46倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>7.89 %</td><td>3.50 %</td><td>2.25倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>2.03 億円</td><td>0.90 億円</td><td>2.26倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>6.61 %</td><td>61.00 %</td><td>0.11倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>3</td><td>現有能力7,000万本に対し、新薬を含む需要を2027年度7,500万本、2031年度1億本超と予測。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>B 能力制約</th><td>3</td><td>2027年度に需要が現有7,000万本能力を超えるため、3,500万本の追加能力が必要と数量で示す。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>2</td><td>既存点眼薬事業のライン増設だが、新薬供給と冗長化を同時に実現し開発余力を作る。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>2</td><td>新薬を含む製品の安定供給と有事・保守時の冗長性を示すが、地域固有の不可欠性は弱い。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>E 実行準備</th><td>3</td><td>既存唐津工場に同種ラインを増設し、能力・建物費・機械装置費・ソフトウェア費まで具体化。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>0</td><td>自己負担原資、借入、資金調達余力に関する具体記載なし。</td><td>p.1-2 / 公開概要全体</td></tr><tr><th>G 雇用・賃上げの質</th><td>2</td><td>従業員給与年平均7.89％、補助事業従業員109人から117人を計画。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>2</td><td>医薬品の安定供給、新薬開発加速、有事の供給継続という社会的便益を明示。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>1</td><td>能力と需要の差は具体的だが、需要値は社内販売予測で顧客契約・公的需要の裏付けは示されない。</td><td>p.2 / 補助事業の概要</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s1_outline_77.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_77.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="1次" data-archetype="事業転換・垂直統合" data-search="株式会社オティックスホールディングス 1次 製造業 事業転換・垂直統合 受注済み案件、売上転換目標、自己資金での先行工場完成は公開資料上の事実。 見える指標の不足を、受注済み需要、先行投資実績、主力事業転換の一貫性が補った可能性が高い。ただし審査得点は不明。">
+      <details>
+        <summary>
+          <span><b>株式会社オティックスホールディングス</b><small>1次・製造業</small></span>
+          <span class="case-summary"><b>5/8指標が未満</b><small>事業転換・垂直統合</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 高</span><span class="chip" title="需要の確からしさ">A 3</span><span class="chip" title="能力制約">B 2</span><span class="chip" title="事業転換・差別化">C 3</span><span class="chip" title="供給網・地域の不可欠性">D 2</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="資金・自己負担能力">F 2</span><span class="chip" title="雇用・賃上げの質">G 2</span><span class="chip" title="政策適合・波及性">H 2</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>受注済み案件、売上転換目標、自己資金での先行工場完成は公開資料上の事実。</p></section>
+            <section><h4>採択説明としての推論</h4><p>見える指標の不足を、受注済み需要、先行投資実績、主力事業転換の一貫性が補った可能性が高い。ただし審査得点は不明。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>受注済み、自己資金による先行工場という個別性は強いが、非採択案件との比較資料はない。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.2 全社売上高増加額</th><td>99.00 億円</td><td>19.50 億円</td><td>5.08倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>9.20 %</td><td>12.00 %</td><td>0.77倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>2.60 億円</td><td>5.10 億円</td><td>0.51倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>3.85 %</td><td>3.50 %</td><td>1.10倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>0.15 億円</td><td>0.90 億円</td><td>0.17倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>3.00 %</td><td>3.40 %</td><td>0.88倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.13 投資額／全社売上高（近似）</th><td>202.44 %</td><td>50.00 %</td><td>4.05倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>4.74 %</td><td>61.00 %</td><td>0.08倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>3</td><td>受注済みの電動車部品を量産すると明記し、電動車部品売上を82億円から181億円、将来600億円へ拡大する計画。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>B 能力制約</th><td>2</td><td>生産量急拡大と三河地域の採用難に対応する自動化・省力化が必要だが、現行能力の数値上限は非開示。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>3</td><td>エンジン部品メーカーから電動車・モビリティ部品メーカーへ事業の中核を転換。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>2</td><td>日本の自動車産業を支える供給基盤と、モデル工場のグループ展開を示す。地域での代替困難性の数量根拠はない。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>E 実行準備</th><td>3</td><td>第1工場を自己資金で完成済み。第2工場の建設、ダイカスト・加工・研究設備まで具体化。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>2</td><td>第1工場を自己資金で完成した実績はあるが、第2工場の資金調達構成や返済余力は非開示。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>G 雇用・賃上げの質</th><td>2</td><td>省力化、重量物搬送自動化、女性・高齢者が働きやすい工場と賃金上昇目標を提示。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>2</td><td>電動化・脱炭素と国内自動車サプライチェーン維持への適合を示す。</td><td>p.1 / 長期成長ビジョン</td></tr><tr><th>I 反証の強さ</th><td>1</td><td>受注済み、自己資金による先行工場という個別性は強いが、非採択案件との比較資料はない。</td><td>p.1-2 / 公開概要全体</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s1_outline_63.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_63.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="1次" data-archetype="需要確約・能力制約" data-search="株式会社松尾製作所 1次 製造業 需要確約・能力制約 引き合い、59品番、複雑工程と設備構成は公開資料上の事実。 公開定量指標が弱くても、品番単位の需要と製造課題を一対一で結び付けた実装具体性が評価候補。ただし採択理由の確定ではない。">
+      <details>
+        <summary>
+          <span><b>株式会社松尾製作所</b><small>1次・製造業</small></span>
+          <span class="case-summary"><b>5/8指標が未満</b><small>需要確約・能力制約</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 中</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="能力制約">B 2</span><span class="chip" title="事業転換・差別化">C 2</span><span class="chip" title="実行準備">E 2</span><span class="chip" title="雇用・賃上げの質">G 2</span><span class="chip" title="政策適合・波及性">H 2</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>引き合い、59品番、複雑工程と設備構成は公開資料上の事実。</p></section>
+            <section><h4>採択説明としての推論</h4><p>公開定量指標が弱くても、品番単位の需要と製造課題を一対一で結び付けた実装具体性が評価候補。ただし採択理由の確定ではない。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>顧客名・受注量は非開示で、電動化・自動化・人手不足は他の採択案件にも頻出する。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.1 全社年平均売上高成長率</th><td>6.30 %</td><td>7.00 %</td><td>0.90倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.2 全社売上高増加額</th><td>188.00 億円</td><td>19.50 億円</td><td>9.64倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>6.50 %</td><td>12.00 %</td><td>0.54倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>21.75 億円</td><td>5.10 億円</td><td>4.27倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>3.00 %</td><td>3.50 %</td><td>0.86倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>7.29 億円</td><td>0.90 億円</td><td>8.10倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>3.00 %</td><td>3.40 %</td><td>0.88倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>56.50 %</td><td>61.00 %</td><td>0.93倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>顧客から次世代電動車部品の引き合いがあり、59品番の量産工程を計画。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>B 能力制約</th><td>2</td><td>組付けは従来品の2倍以上の部品・約3倍のステップを要し、ネック工程の高速化・冗長化が必要。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>2</td><td>汎用部品から高付加価値の次世代電動車部品へ比重を移し、専用自動化工程を新設。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>1</td><td>国内自動車産業や地域雇用への寄与は示すが、当社固有の供給代替困難性は明示されない。</td><td>p.1 / 長期成長ビジョン</td></tr><tr><th>E 実行準備</th><td>2</td><td>59品番ごとの専用ライン、AI検査、レーザー溶接等を具体化。用地・許認可・見積の記載はない。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>0</td><td>自己負担原資、借入、資金調達余力に関する具体記載なし。</td><td>p.1-2 / 公開概要全体</td></tr><tr><th>G 雇用・賃上げの質</th><td>2</td><td>賃金年平均3.0％、補助事業従業員1,390人から1,401人を計画し、省人化と働きやすさを両立。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>2</td><td>電動化・カーボンニュートラルと国内自動車産業への寄与を明示。</td><td>p.1 / 長期成長ビジョン</td></tr><tr><th>I 反証の強さ</th><td>2</td><td>顧客名・受注量は非開示で、電動化・自動化・人手不足は他の採択案件にも頻出する。</td><td>p.1-2 / 公開概要全体</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s1_outline_50.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_50.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="2次" data-archetype="供給網・地域インフラ" data-search="株式会社ホテルニューアワジ 2次 宿泊業・飲食サービス業 供給網・地域インフラ 認証、官民プロジェクト、既存収益実績、客室数と売上式は公開資料上の事実。 公開定量の弱さを、地域全体を巻き込む実行基盤と既存運営資産が補った可能性。ただし因果的な採択理由ではない。">
+      <details>
+        <summary>
+          <span><b>株式会社ホテルニューアワジ</b><small>2次・宿泊業・飲食サービス業</small></span>
+          <span class="case-summary"><b>5/8指標が未満</b><small>供給網・地域インフラ</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 高</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="事業転換・差別化">C 3</span><span class="chip" title="供給網・地域の不可欠性">D 3</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>認証、官民プロジェクト、既存収益実績、客室数と売上式は公開資料上の事実。</p></section>
+            <section><h4>採択説明としての推論</h4><p>公開定量の弱さを、地域全体を巻き込む実行基盤と既存運営資産が補った可能性。ただし因果的な採択理由ではない。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>認証・官民連携・既存実績の個別性は強いが、外国人需要は予測であり非採択案件との比較はない。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.2 全社売上高増加額</th><td>32.90 億円</td><td>23.10 億円</td><td>1.42倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>15.30 %</td><td>17.00 %</td><td>0.90倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>11.35 億円</td><td>9.10 億円</td><td>1.25倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>4.50 %</td><td>5.00 %</td><td>0.90倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>1.36 億円</td><td>1.50 億円</td><td>0.91倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>4.00 %</td><td>4.40 %</td><td>0.91倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.13 投資額／全社売上高（近似）</th><td>120.94 %</td><td>48.00 %</td><td>2.52倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>39.69 %</td><td>107.00 %</td><td>0.37倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>島内外国人宿泊比率1.0％、将来の関西圏流入見込み、客室単価・室数・稼働率90％による売上を提示。</td><td>p.1;6 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>B 能力制約</th><td>1</td><td>島内に外国人特化施設が不足する課題は示すが、自社既存施設の物理的能力上限としては示されない。</td><td>p.1 / 長期成長ビジョン</td></tr><tr><th>C 事業転換・差別化</th><td>3</td><td>国内客中心の宿泊から、2都市・2価格帯で長期滞在する外国人向けリゾートへ運営モデルを転換。</td><td>p.1;6 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>3</td><td>自治体、農漁業者、観光協会等と食・移動・滞在を面的に構築し、島内観光GDP766億円を掲げる。</td><td>p.1;4-6 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>E 実行準備</th><td>3</td><td>地域未来牽引企業等の認証、官民実証、既存セントラルキッチン、具体的平面・運営設計を提示。</td><td>p.3-9 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>1</td><td>計画以上の営業利益と継続投資実績を記すが、自己負担原資や借入条件は非開示。</td><td>p.1 / 長期成長ビジョン</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>賃金年4.5％、正社員・パート賞与、語学を生かす職場、従業員126人から147人・77人から115人を示す。</td><td>p.1;6 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>観光立国、島の食産業、自治体戦略、UIJターン、長期滞在による地域消費を一体化。</td><td>p.1;4-6 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>1</td><td>認証・官民連携・既存実績の個別性は強いが、外国人需要は予測であり非採択案件との比較はない。</td><td>p.1-9 / 公開概要全体</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s1_outline_181.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__181.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="2次" data-archetype="事業転換・垂直統合" data-search="浦島観光ホテル株式会社 2次 宿泊業・飲食サービス業 事業転換・垂直統合 築30～60年の4施設、3フロント分散、各社の投資・補助額、設備内容、賃金・従業員目標、丸峰の民事再生とjpix承継は公開pdf記載事実。3社合計事業費75.9億円・補助額14.3億円は記載額の合算。 公開指標8件中6件が補正後の2次申請者中央値未満でも、既存地域ホテル群の高付加価値型への一体転換、実在する運営制約、補助外負担の大きい投資規模が評価候補になった可能性がある。ただし需要・資金の確約と審査点は非公開で、採択理由は同定できない。">
+      <details>
+        <summary>
+          <span><b>浦島観光ホテル株式会社</b><small>2次・宿泊業・飲食サービス業</small></span>
+          <span class="case-summary"><b>6/8指標が未満</b><small>事業転換・垂直統合</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 中</span><span class="chip" title="能力制約">B 2</span><span class="chip" title="事業転換・差別化">C 2</span><span class="chip" title="供給網・地域の不可欠性">D 2</span><span class="chip" title="実行準備">E 2</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 2</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>築30～60年の4施設、3フロント分散、各社の投資・補助額、設備内容、賃金・従業員目標、丸峰の民事再生とJPiX承継は公開PDF記載事実。3社合計事業費75.9億円・補助額14.3億円は記載額の合算。</p></section>
+            <section><h4>採択説明としての推論</h4><p>公開指標8件中6件が補正後の2次申請者中央値未満でも、既存地域ホテル群の高付加価値型への一体転換、実在する運営制約、補助外負担の大きい投資規模が評価候補になった可能性がある。ただし需要・資金の確約と審査点は非公開で、採択理由は同定できない。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>需要根拠は一般的な観光回復期待が中心で、予約・稼働率・ADR実績、資金確約、地域連携協定を欠く。改修・DXは同業案件にも頻出する。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.2 全社売上高増加額</th><td>14.00 億円</td><td>23.10 億円</td><td>0.61倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>11.00 %</td><td>17.00 %</td><td>0.65倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>6.98 億円</td><td>9.10 億円</td><td>0.77倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>5.60 %</td><td>5.00 %</td><td>1.12倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>1.39 億円</td><td>1.50 億円</td><td>0.93倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>4.00 %</td><td>4.40 %</td><td>0.91倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.13 投資額／全社売上高（近似）</th><td>215.01 %</td><td>48.00 %</td><td>4.48倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>44.39 %</td><td>107.00 %</td><td>0.41倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>1</td><td>個人客・インバウンド、露天風呂付き客室、ペット愛好家等の需要を挙げるが、予約件数・顧客名・需要量は示さない。</td><td>p.1-4 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>B 能力制約</th><td>2</td><td>4施設が築30～60年、3フロントの分散、人手不足による稼働率制約、設備老朽化に伴う保守工数増を具体化。</td><td>p.1-4 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>2</td><td>団体旅行向けの客室・共用部を個人客・インバウンド向け高付加価値型へ改修し、3社でCX・DXを同時展開。</td><td>p.1-4 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>2</td><td>熊野古道、芦ノ牧温泉、三陸復興国立公園の各地で地域代表ホテルと位置付けるが、代替不能性や地域供給量は非開示。</td><td>p.1-4 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>E 実行準備</th><td>2</td><td>PMS、自動チェックイン、カードキー、3フロント集約、清掃ロボット、配管改修まで特定。工期・発注先・許認可は非開示。</td><td>p.2-4 / 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>1</td><td>各社の事業費・補助額とJPiXによる丸峰の事業承継を示すが、自己資金・借入確約は示さず、丸峰は民事再生後である。</td><td>p.2-3 / 補助事業の概要</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>3社別に賃金年平均5.6％・5.8％・8.7％、従業員236→236人・60→62人・110→114人を示し、労働環境改善・人材開発も掲げる。</td><td>p.1-4 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>2</td><td>交流人口拡大、インバウンド、世界遺産・国立公園、地域観光、環境対応を結ぶが、域内消費・調達・波及額は示さない。</td><td>p.1-4 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>2</td><td>需要根拠は一般的な観光回復期待が中心で、予約・稼働率・ADR実績、資金確約、地域連携協定を欠く。改修・DXは同業案件にも頻出する。</td><td>p.1-4 / 公開概要全体</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s1_outline_159.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_159.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="3次" data-archetype="需要確約・能力制約" data-search="ときわ製作所株式会社 3次 製造業 需要確約・能力制約 既存顧客の増産要請、4拠点分散、取得済み用地、補助対象外改修、自社製品量産が明示される。 推論: 顧客需要、物理制約、先行投資、地域供給不足が連続しており、公開情報で説明しやすい案件である。ただし採択因果は不明。">
+      <details>
+        <summary>
+          <span><b>ときわ製作所株式会社</b><small>3次・製造業</small></span>
+          <span class="case-summary"><b>5/8指標が未満</b><small>需要確約・能力制約</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 高</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="能力制約">B 3</span><span class="chip" title="事業転換・差別化">C 3</span><span class="chip" title="供給網・地域の不可欠性">D 3</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="資金・自己負担能力">F 2</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>既存顧客の増産要請、4拠点分散、取得済み用地、補助対象外改修、自社製品量産が明示される。</p></section>
+            <section><h4>採択説明としての推論</h4><p>推論: 顧客需要、物理制約、先行投資、地域供給不足が連続しており、公開情報で説明しやすい案件である。ただし採択因果は不明。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>顧客名と増産数量は非開示だが、取得済み用地、補助対象外投資、4拠点分散という案件固有証拠があり、反証は比較的弱い。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.1 全社年平均売上高成長率</th><td>25.99 %</td><td>13.00 %</td><td>2.00倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.2 全社売上高増加額</th><td>23.90 億円</td><td>42.20 億円</td><td>0.57倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>28.10 %</td><td>22.00 %</td><td>1.28倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>8.35 億円</td><td>15.70 億円</td><td>0.53倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>4.90 %</td><td>6.00 %</td><td>0.82倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>1.58 億円</td><td>2.40 億円</td><td>0.66倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>4.80 %</td><td>5.00 %</td><td>0.96倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>303.50 %</td><td>139.00 %</td><td>2.18倍</td><td><span class="status above">以上</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>既存主要取引先からの増産要請と旺盛な金属加工需要を明記するが、顧客名と要請数量は示さない。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>B 能力制約</th><td>3</td><td>4拠点分散、既存受託加工で人手を要して自社製品を量産できない状況、老朽設備と危険立地を具体化する。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>C 事業転換・差別化</th><td>3</td><td>4拠点を統合して板金・機械加工・組立・溶接を一貫化し、受託加工に加えて自社除草機の量産・輸出へ進む。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>3</td><td>域内サプライヤー減少、大手撤退工場跡地、地域からの活用期待、外注波及、地元雇用を示す。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>E 実行準備</th><td>3</td><td>新拠点を取得済みで、取得・改修費は補助対象外。設備9.5億円、システム0.5億円と投資効果を特定する。</td><td>p.2 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>2</td><td>新拠点取得・改修を補助対象外で実施するが、融資・自己資金額・金融機関支援は公開されない。</td><td>p.2 補助事業の概要</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>従業員59人から80人、給与年率4.9%、安全性・職場環境・地域就職を示す。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>地域サプライヤー不足、工場跡地活用、無農薬農業、自動化・DX、安全性、雇用を一つの計画へ接続する。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>1</td><td>顧客名と増産数量は非開示だが、取得済み用地、補助対象外投資、4拠点分散という案件固有証拠があり、反証は比較的弱い。</td><td>p.1-2 全公開ページ</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_72.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_72.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="3次" data-archetype="供給網・地域インフラ" data-search="八戸酒造株式会社 3次 製造業 供給網・地域インフラ 1.5万人の蔵見学、火入れ能力3倍、八戸市との土地購入合意、旧蔵の観光転用が明示される。 推論: 酒造能力増強だけでなく、文化財・観光・農業を結ぶ地域拠点化が、公開定量値以外の強い評価候補になり得た。">
+      <details>
+        <summary>
+          <span><b>八戸酒造株式会社</b><small>3次・製造業</small></span>
+          <span class="case-summary"><b>5/8指標が未満</b><small>供給網・地域インフラ</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>品質・期間等の注意あり</span><span>推論確度 高</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="能力制約">B 3</span><span class="chip" title="事業転換・差別化">C 3</span><span class="chip" title="供給網・地域の不可欠性">D 3</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="資金・自己負担能力">F 2</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>1.5万人の蔵見学、火入れ能力3倍、八戸市との土地購入合意、旧蔵の観光転用が明示される。</p></section>
+            <section><h4>採択説明としての推論</h4><p>推論: 酒造能力増強だけでなく、文化財・観光・農業を結ぶ地域拠点化が、公開定量値以外の強い評価候補になり得た。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>輸出需要は市場統計中心で顧客別証拠はないが、能力・土地・観光実績は案件固有で反証は比較的弱い。率定義には品質注意がある。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.2 全社売上高増加額</th><td>7.10 億円</td><td>42.20 億円</td><td>0.17倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>12.40 %</td><td>22.00 %</td><td>0.56倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>2.96 億円</td><td>15.70 億円</td><td>0.19倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>10.00 %</td><td>6.00 %</td><td>1.67倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>0.81 億円</td><td>2.40 億円</td><td>0.34倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>7.00 %</td><td>5.00 %</td><td>1.40倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.13 投資額／全社売上高（近似）</th><td>279.57 %</td><td>57.00 %</td><td>4.90倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>41.41 %</td><td>139.00 %</td><td>0.30倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>外国人蔵見学客1.5万人、海外日本食店と清酒輸出額の増加を示す。顧客契約や商品別受注量はない。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>B 能力制約</th><td>3</td><td>火入れ400本/時を1200本/時へ増強し、分散冷蔵、製造・観光動線の競合を具体的なボトルネックとして示す。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>3</td><td>製造を新工場へ移し、重要文化財の旧蔵を観光拠点化することで、酒造と観光を分離・再統合する。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>3</td><td>1775年由来の酒蔵、青森県産米・酵母、観光客、地域文化・農業を結び付け、八戸観光の核を担う計画を示す。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>E 実行準備</th><td>3</td><td>八戸市との土地購入合意、20,357㎡、取得額、火入れ能力、既存設備移設による費用抑制を明記する。</td><td>p.2 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>2</td><td>土地購入合意と既存設備移設による必要最小限化は示すが、借入・自己資金・金融機関支援は不明。</td><td>p.2 補助事業の概要</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>従業員36人から42人、給与年率10.0%、品質向上人材の積極採用と利益の給与還元を示す。</td><td>p.2 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>地域観光、文化継承、輸出、地元農業、雇用、既存文化財活用を一つの事業に接続する。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>1</td><td>輸出需要は市場統計中心で顧客別証拠はないが、能力・土地・観光実績は案件固有で反証は比較的弱い。率定義には品質注意がある。</td><td>p.1-2 全公開ページ</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_205.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_205.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="3次" data-archetype="事業転換・垂直統合" data-search="山崎商事運輸株式会社 3次 運輸業・郵便業 事業転換・垂直統合 本社隣接2,800坪に低温対応物流センターを建て、輸送から3plへ進出し18人増を計画する。 推論: 事業転換と政策適合は明確だが、顧客別需要と稼働確度が公開されず、申請者代表値未満を補う説明力は中程度にとどまる。">
+      <details>
+        <summary>
+          <span><b>山崎商事運輸株式会社</b><small>3次・運輸業・郵便業</small></span>
+          <span class="case-summary"><b>5/7指標が未満</b><small>事業転換・垂直統合</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>品質・期間等の注意あり</span><span>推論確度 中</span><span class="chip" title="能力制約">B 2</span><span class="chip" title="事業転換・差別化">C 3</span><span class="chip" title="供給網・地域の不可欠性">D 2</span><span class="chip" title="実行準備">E 2</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>本社隣接2,800坪に低温対応物流センターを建て、輸送から3PLへ進出し18人増を計画する。</p></section>
+            <section><h4>採択説明としての推論</h4><p>推論: 事業転換と政策適合は明確だが、顧客別需要と稼働確度が公開されず、申請者代表値未満を補う説明力は中程度にとどまる。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>需要は業界一般で顧客契約・荷量を欠き、既存能力差と資金計画も不明。3PL化は他の物流案件にも見られる。率定義にも品質注意がある。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.2 全社売上高増加額</th><td>36.60 億円</td><td>42.20 億円</td><td>0.87倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>21.10 %</td><td>22.00 %</td><td>0.96倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>9.89 億円</td><td>15.70 億円</td><td>0.63倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>7.00 %</td><td>6.00 %</td><td>1.17倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>1.96 億円</td><td>2.40 億円</td><td>0.81倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>5.00 %</td><td>5.00 %</td><td>1.00倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>105.80 %</td><td>139.00 %</td><td>0.76倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>1</td><td>物流2024年問題、メーカーの外注化、3PL市場拡大を挙げるが、顧客名、契約、荷量、稼働予約はない。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>B 能力制約</th><td>2</td><td>全国的な輸送能力不足と自社の高付加価値化課題を示すが、現在の倉庫・輸送能力上限や失注量は示さない。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>3</td><td>実運送中心から、保管・荷役・温度管理・配送を一括受託する3PLへ進出する。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>2</td><td>東西日本の中継立地、物流2024年問題、サプライチェーン効率化を示すが、地域での代替困難性は定量化しない。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>E 実行準備</th><td>2</td><td>本社隣接約2,800坪、2階建て低温物流センター、IC近接、移動ラック・AMR等を具体化する。用地権利、契約、見積は不明。</td><td>p.2 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>1</td><td>本社隣接地の利用可能性は示すが、自己負担資金・借入・金融機関支援は記載されない。</td><td>p.2 補助事業の概要</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>従業員92人から110人、給与年率7.0%、低温環境・省力化による労働環境改善を示す。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>物流2024年問題、3PL、DX・標準化、脱炭素、太陽光、人材確保へ接続する。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>3</td><td>需要は業界一般で顧客契約・荷量を欠き、既存能力差と資金計画も不明。3PL化は他の物流案件にも見られる。率定義にも品質注意がある。</td><td>p.1-2 全公開ページ（不記載確認）</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_95.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_95.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="3次" data-archetype="需要確約・能力制約" data-search="株式会社シュゼット・ホールディングス 3次 サービス業_他に分類されないもの 需要確約・能力制約 販売・改善実績、借地更新不能、排水処理上限、2新工場、140人増を示す。 推論: 強い既往実績と不可避な物理制約が、公開定量値の弱さを補う有力候補である。ただし新規需要の契約証拠は公開されない。">
+      <details>
+        <summary>
+          <span><b>株式会社シュゼット・ホールディングス</b><small>3次・サービス業_他に分類されないもの</small></span>
+          <span class="case-summary"><b>5/6指標が未満</b><small>需要確約・能力制約</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>品質・期間等の注意あり</span><span>推論確度 高</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="能力制約">B 3</span><span class="chip" title="事業転換・差別化">C 2</span><span class="chip" title="供給網・地域の不可欠性">D 2</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>販売・改善実績、借地更新不能、排水処理上限、2新工場、140人増を示す。</p></section>
+            <section><h4>採択説明としての推論</h4><p>推論: 強い既往実績と不可避な物理制約が、公開定量値の弱さを補う有力候補である。ただし新規需要の契約証拠は公開されない。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>ブランド実績は強いが、新工場需要の顧客別確約はなく、コンソーシアム主体・率定義にも品質注意がある。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>3.10 %</td><td>22.00 %</td><td>0.14倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>5.39 億円</td><td>15.70 億円</td><td>0.34倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>5.00 %</td><td>6.00 %</td><td>0.83倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>2.39 億円</td><td>2.40 億円</td><td>1.00倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.13 投資額／全社売上高（近似）</th><td>64.16 %</td><td>57.00 %</td><td>1.13倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>14.40 %</td><td>139.00 %</td><td>0.10倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>工場規模を拡大せず製造売上1.7倍、フィナンシェ販売個数世界一、国内外店舗実績を示す。新規顧客・受注数量はない。</td><td>p.1-3 長期成長ビジョン</td></tr><tr><th>B 能力制約</th><td>3</td><td>2029年に現工場の借地契約更新不能、排水処理能力上限、老朽・アスベスト設備、需要増への能力不足を明記する。</td><td>p.5 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>2</td><td>焼菓子・生菓子の2新工場、多拠点化、新ブランド・新商品で世界展開を狙う。既存一貫モデルの大規模拡張が中心。</td><td>p.2-5 長期成長ビジョン／補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>2</td><td>製菓技術・地域文化、雇用、工場多拠点化によるレジリエンスを示すが、地域供給の不可欠性は限定的。</td><td>p.2-5 長期成長ビジョン／補助事業の概要</td></tr><tr><th>E 実行準備</th><td>3</td><td>工場面積、2工場、設備内容、100.9億円の投資、トヨタ生産方式による既往改善、契約期限と処理能力上限を具体化する。</td><td>p.3-5 長期成長ビジョン／補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>1</td><td>既存売上・店舗・工場実績はあるが、本件の自己負担資金、借入、金融機関支援は公開されない。</td><td>p.1-5 全公開ページ（不記載確認）</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>2社合計で従業員461人から601人、給与年率5.1%、省力化と人への継続投資を示す。</td><td>p.2-4 長期成長ビジョン／補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>国内製菓技術、輸出・インバウンド、製造レジリエンス、DX、省力化、140人増の雇用に接続する。</td><td>p.2-5 長期成長ビジョン／補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>2</td><td>ブランド実績は強いが、新工場需要の顧客別確約はなく、コンソーシアム主体・率定義にも品質注意がある。</td><td>p.1-5 全公開ページ（不記載確認）</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_99.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_99.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="3次" data-archetype="事業転換・垂直統合" data-search="株式会社モリシタ 3次 卸売業・小売業 事業転換・垂直統合 外部委託から自社製造へ移り、本社・工場・物流を一拠点へ集約する計画と9人の雇用増を示す。 推論: 垂直統合の転換幅は大きいが、需要確度・資金・実行準備の公開証拠が薄く、採択説明としては限定的である。">
+      <details>
+        <summary>
+          <span><b>株式会社モリシタ</b><small>3次・卸売業・小売業</small></span>
+          <span class="case-summary"><b>4/6指標が未満</b><small>事業転換・垂直統合</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>品質・期間等の注意あり</span><span>推論確度 中</span><span class="chip" title="能力制約">B 2</span><span class="chip" title="事業転換・差別化">C 3</span><span class="chip" title="実行準備">E 2</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 2</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>外部委託から自社製造へ移り、本社・工場・物流を一拠点へ集約する計画と9人の雇用増を示す。</p></section>
+            <section><h4>採択説明としての推論</h4><p>推論: 垂直統合の転換幅は大きいが、需要確度・資金・実行準備の公開証拠が薄く、採択説明としては限定的である。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>市場・需要の記載が一般的で顧客証拠がなく、資金・用地・許認可も公開されない。コンソーシアム主体の曖昧さにも品質注意がある。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>12.90 %</td><td>22.00 %</td><td>0.59倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>1.41 億円</td><td>15.70 億円</td><td>0.09倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>6.00 %</td><td>6.00 %</td><td>1.00倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>0.38 億円</td><td>2.40 億円</td><td>0.16倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>6.00 %</td><td>5.00 %</td><td>1.20倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>29.19 %</td><td>139.00 %</td><td>0.21倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>1</td><td>プレミアムペットフード市場の拡大と健康志向を述べるが、市場数量、顧客名、受注、販売実績は示さない。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>B 能力制約</th><td>2</td><td>外部委託では品質・柔軟性・個別設計に限界があるとするが、委託能力、納期、失注額は定量化しない。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>C 事業転換・差別化</th><td>3</td><td>卸売から企画・製造・販売を一貫するメーカーベンダーへ進化し、本社・工場・物流を統合する。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>1</td><td>地域向け無料ドッグランと商品開発接点を設けるが、地域供給網上の不可欠性は弱い。</td><td>p.2 補助事業の概要</td></tr><tr><th>E 実行準備</th><td>2</td><td>3階建て施設の機能配置、物流・製造工程、商品モニター活用を示す。用地、許認可、見積、発注は不明。</td><td>p.2 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>0</td><td>自己負担資金、借入、保有資産、金融機関支援を確認できない。</td><td>p.1-2 全公開ページ（不記載確認）</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>2社で従業員29人から38人、給与年率6.0%、製造・物流間の柔軟配置を示す。</td><td>p.2 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>2</td><td>健康志向、個別設計、物流効率、地域の顧客参加型商品開発に接続するが、政策波及の規模は限定的。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>3</td><td>市場・需要の記載が一般的で顧客証拠がなく、資金・用地・許認可も公開されない。コンソーシアム主体の曖昧さにも品質注意がある。</td><td>p.1-2 全公開ページ（不記載確認）</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_232.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_232.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="3次" data-archetype="供給網・地域インフラ" data-search="株式会社北海道ちぬやファーム 3次 卸売業・小売業 供給網・地域インフラ 冷凍能力1.5倍、7,020t倉庫、外部倉庫依存、農家減少と原料供給不安が明示される。 推論: 食品供給と地域農業を支える具体的能力増強は、公開定量値以外の強い評価候補である。主体品質の注意は残る。">
+      <details>
+        <summary>
+          <span><b>株式会社北海道ちぬやファーム</b><small>3次・卸売業・小売業</small></span>
+          <span class="case-summary"><b>5/6指標が未満</b><small>供給網・地域インフラ</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>品質・期間等の注意あり</span><span>推論確度 高</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="能力制約">B 3</span><span class="chip" title="事業転換・差別化">C 2</span><span class="chip" title="供給網・地域の不可欠性">D 3</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>冷凍能力1.5倍、7,020t倉庫、外部倉庫依存、農家減少と原料供給不安が明示される。</p></section>
+            <section><h4>採択説明としての推論</h4><p>推論: 食品供給と地域農業を支える具体的能力増強は、公開定量値以外の強い評価候補である。主体品質の注意は残る。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>需要根拠は市場予測とグループ内部能力が中心で、顧客契約はない。コンソーシアム主体の曖昧さにも品質注意がある。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>13.70 %</td><td>22.00 %</td><td>0.62倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>3.36 億円</td><td>15.70 億円</td><td>0.21倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>5.90 %</td><td>6.00 %</td><td>0.98倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>0.18 億円</td><td>2.40 億円</td><td>0.07倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>5.90 %</td><td>5.00 %</td><td>1.18倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>27.78 %</td><td>139.00 %</td><td>0.20倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>冷凍食品市場の成長予測とグループのコロッケ生産・保管能力限界を示す。顧客名、受注、商品別不足量はない。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>B 能力制約</th><td>3</td><td>外部倉庫依存と生産・保管限界を明示し、冷凍能力1.5倍、倉庫7,020t、包装・加熱・皮むき工程を特定する。</td><td>p.2-3 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>2</td><td>保管・冷凍・加熱・包装を一体で強化し、農業と食品製造の供給体制を高度化する。新規ビジネスモデルより既存事業の統合強化が中心。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>3</td><td>北海道農家の高齢化・離農、原料供給不安、地域農業支援、食品安定供給を倉庫投資と直接結び付ける。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>E 実行準備</th><td>3</td><td>倉庫6,002㎡・7,020t・8室、温湿度自動制御、設備能力と各投資額を具体化する。</td><td>p.2-3 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>0</td><td>コンソーシアムの事業基盤はあるが、自己負担資金・借入・金融機関支援を確認できない。</td><td>p.1-5 全公開ページ（不記載確認）</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>コンソーシアムで従業員220人から268人、給与年率5.9%、作業削減と農業支援を示す。</td><td>p.2 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>食料安定供給、農業持続性、フードロス、省人化、地域雇用・賃上げを具体的設備に接続する。</td><td>p.1 長期成長ビジョン; p.2-3 補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>2</td><td>需要根拠は市場予測とグループ内部能力が中心で、顧客契約はない。コンソーシアム主体の曖昧さにも品質注意がある。</td><td>p.1-5 全公開ページ（不記載確認）</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_35.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_35.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="3次" data-archetype="事業転換・垂直統合" data-search="株式会社高木製作所 3次 製造業 事業転換・垂直統合 トヨタ自動車の要望、主要取引先の増産要請、一貫自動工場、自己資金導入予定が公開pdfに記載される。 推論: 定量指標が申請者代表値を多く下回っても、顧客接続のある自動車供給網案件と非連続な工程転換が評価材料になり得た。ただし審査上の決め手は確認できない。">
+      <details>
+        <summary>
+          <span><b>株式会社高木製作所</b><small>3次・製造業</small></span>
+          <span class="case-summary"><b>3/5指標が未満</b><small>事業転換・垂直統合</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>品質・期間等の注意あり</span><span>推論確度 中</span><span class="chip" title="需要の確からしさ">A 3</span><span class="chip" title="能力制約">B 2</span><span class="chip" title="事業転換・差別化">C 3</span><span class="chip" title="供給網・地域の不可欠性">D 2</span><span class="chip" title="実行準備">E 2</span><span class="chip" title="資金・自己負担能力">F 2</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>トヨタ自動車の要望、主要取引先の増産要請、一貫自動工場、自己資金導入予定が公開PDFに記載される。</p></section>
+            <section><h4>採択説明としての推論</h4><p>推論: 定量指標が申請者代表値を多く下回っても、顧客接続のある自動車供給網案件と非連続な工程転換が評価材料になり得た。ただし審査上の決め手は確認できない。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>自動化・EV対応は他の採択案件にも広く見られ、増産要請の数量、契約、資金計画は公開されない。主体・率定義にも品質注意がある。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>21.20 %</td><td>22.00 %</td><td>0.96倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>33.00 億円</td><td>15.70 億円</td><td>2.10倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>6.30 %</td><td>6.00 %</td><td>1.05倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>1.39 億円</td><td>2.40 億円</td><td>0.58倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>130.42 %</td><td>139.00 %</td><td>0.94倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>3</td><td>トヨタ自動車の物流効率化要望と既存主要取引先からの増産要請を明記。EV・HV向け締結部品需要の増加も記載するが、受注数量は非開示。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>B 能力制約</th><td>2</td><td>点在工程と人手依存を解消し、材料投入から出荷までを一貫自動化する必要を示す。現在能力の数量上限は非開示。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>3</td><td>多品種小ロットの一貫完全自動生産、金型設計DX、設計作業の内製化により部品供給者からシステムサプライヤーへの転換を掲げる。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>2</td><td>国内自動車産業の電動化・物流問題・サプライヤー競争力に接続するが、地域での代替困難性や供給シェアは示さない。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>E 実行準備</th><td>2</td><td>新工場・自動倉庫・AGV・加工設備を特定し、金型自動加工ライン等は自己資金導入予定とする。用地・許認可・発注状況は不明。</td><td>p.2 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>2</td><td>補助対象外を含む自己資金導入予定を明記するが、資金調達計画や金融機関の関与は公開範囲にない。</td><td>p.2 補助事業の概要</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>未経験者・女性・シニアに配慮した省力環境、賃上げ年率6.3%/7.0%、2社合計で従業員193人から199人を示す。</td><td>p.2 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>EV対応、物流2024年問題、DX・AI、省人化、安全性向上を一体で説明する。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>2</td><td>自動化・EV対応は他の採択案件にも広く見られ、増産要請の数量、契約、資金計画は公開されない。主体・率定義にも品質注意がある。</td><td>p.1-2 全公開ページ（不記載確認）</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_19.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_19.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="3次" data-archetype="供給網・地域インフラ" data-search="高知食糧株式会社 3次 卸売業・小売業 供給網・地域インフラ 精米・物流の能力限界、夜間を含むフル稼働、2.6倍能力、地元川上川下との供給網が記載される。 推論: 定量指標の低さに対し、地域食料インフラの能力制約と自動化の必要性が強い説明候補となる。因果的な採択理由は確認できない。">
+      <details>
+        <summary>
+          <span><b>高知食糧株式会社</b><small>3次・卸売業・小売業</small></span>
+          <span class="case-summary"><b>6/8指標が未満</b><small>供給網・地域インフラ</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>品質・期間等の注意あり</span><span>推論確度 高</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="能力制約">B 3</span><span class="chip" title="事業転換・差別化">C 2</span><span class="chip" title="供給網・地域の不可欠性">D 3</span><span class="chip" title="実行準備">E 2</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>精米・物流の能力限界、夜間を含むフル稼働、2.6倍能力、地元川上川下との供給網が記載される。</p></section>
+            <section><h4>採択説明としての推論</h4><p>推論: 定量指標の低さに対し、地域食料インフラの能力制約と自動化の必要性が強い説明候補となる。因果的な採択理由は確認できない。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>増加受注は実名・数量を欠き、自動化・地産地消は他案件にも見られる。率定義の品質注意もある。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.1 全社年平均売上高成長率</th><td>8.90 %</td><td>13.00 %</td><td>0.68倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.2 全社売上高増加額</th><td>126.00 億円</td><td>42.20 億円</td><td>2.99倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>15.00 %</td><td>22.00 %</td><td>0.68倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>6.84 億円</td><td>15.70 億円</td><td>0.44倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>6.10 %</td><td>6.00 %</td><td>1.02倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>1.83 億円</td><td>2.40 億円</td><td>0.76倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>4.60 %</td><td>5.00 %</td><td>0.92倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>115.20 %</td><td>139.00 %</td><td>0.83倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>グループスーパーや量販店からの受注増と需要未対応を示す。実名顧客、注文数量、契約はない。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>B 能力制約</th><td>3</td><td>精米工場・物流センターが能力限界で、残業・夜間交代による人手フル稼働とし、新工場で能力2.6倍を計画する。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>2</td><td>精米・倉庫・配送をFAで統合し、追加投資でパックごはん新事業へ進む。中核は既存流通基盤の高度化。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>3</td><td>高知の食料供給、地産地消、農家・量販店の川上川下、県外資本との競争、物流ハンデを一体で説明する。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>E 実行準備</th><td>2</td><td>本社隣接地、工場・倉庫・配送の再構築、投資額、FAシステム、追加投資を示す。許認可・発注・資金調達は不明。</td><td>p.2 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>1</td><td>収益拡大は述べるが、自己負担資金、借入、金融機関支援は示されない。</td><td>p.2 補助事業の概要</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>過酷作業を高付加価値業務へ転換し、従業員330人から336人、給与年率6.1%を示す。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>食料安定供給、地産地消、農業者支援、物流効率、人手不足、賃上げを地域波及として接続する。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>2</td><td>増加受注は実名・数量を欠き、自動化・地産地消は他案件にも見られる。率定義の品質注意もある。</td><td>p.1-2 全公開ページ（不記載確認）</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_24.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_24.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="供給網・地域インフラ" data-search="オギハラ食品株式会社 4次 製造業 供給網・地域インフラ トップシェア、増産要求、分散工場、雇用目標は事実だが、数量欄未完成と率定義注意がある。 地域ブランドの不可欠性と統合工場の機序が評価候補。ただし需要・実行性の証拠が弱く推論確度は限定的。">
+      <details>
+        <summary>
+          <span><b>オギハラ食品株式会社</b><small>4次・製造業</small></span>
+          <span class="case-summary"><b>5/8指標が未満</b><small>供給網・地域インフラ</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>品質・期間等の注意あり</span><span>推論確度 中</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="能力制約">B 2</span><span class="chip" title="事業転換・差別化">C 2</span><span class="chip" title="供給網・地域の不可欠性">D 3</span><span class="chip" title="実行準備">E 2</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>トップシェア、増産要求、分散工場、雇用目標は事実だが、数量欄未完成と率定義注意がある。</p></section>
+            <section><h4>採択説明としての推論</h4><p>地域ブランドの不可欠性と統合工場の機序が評価候補。ただし需要・実行性の証拠が弱く推論確度は限定的。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>顧客・増産量が非開示で『数値確定後記入』が残る。率定義にも品質注意があり、証拠完成度が低い。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.2 全社売上高増加額</th><td>31.43 億円</td><td>38.50 億円</td><td>0.82倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>41.20 %</td><td>25.00 %</td><td>1.65倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>12.78 億円</td><td>12.90 億円</td><td>0.99倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>6.20 %</td><td>6.50 %</td><td>0.95倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>1.77 億円</td><td>2.00 億円</td><td>0.88倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>6.20 %</td><td>5.50 %</td><td>1.13倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.13 投資額／全社売上高（近似）</th><td>65.89 %</td><td>48.00 %</td><td>1.37倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>99.22 %</td><td>169.00 %</td><td>0.59倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>外食チェーンの新規出店に伴う増産要求、店舗展開、海外販路を示すが顧客名・数量は非開示。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>B 能力制約</th><td>2</td><td>2工場分散、高菜の異物除去、人手包装、供給制限が制約だが、能力・失注量は非開示。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>2</td><td>分散工場を統合し、自動化・FSSC22000・輸出対応へ移行するが主力事業は高菜加工のまま。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>3</td><td>国内トップシェアを掲げ、三池高菜生産者への利益還元と地域食文化の継承を事業目的に据える。</td><td>p.1 / 長期成長ビジョン</td></tr><tr><th>E 実行準備</th><td>2</td><td>統合工場、工程ゾーニング、FSSC22000、検査・開発設備を具体化。用地・見積・認証取得済みではない。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>0</td><td>自己負担原資、借入、資金調達余力に関する具体記載なし。</td><td>p.1-2 / 公開概要全体</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>賃金年平均6.2％、従業員58人から91人、作業負荷・就労環境改善を計画。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>地域農業、食文化、輸出認証、生産者利益、雇用を統合。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>3</td><td>顧客・増産量が非開示で『数値確定後記入』が残る。率定義にも品質注意があり、証拠完成度が低い。</td><td>p.2 / 補助事業の概要</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_171.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_171.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="需要確約・能力制約" data-search="フクビ岡山株式会社 4次 製造業 需要確約・能力制約 省エネ基準義務化、現有能力の限界、第2生産拠点、40人から60人への雇用増が記載される。 推論: 規制により見通しやすい需要と供給能力増強の組合せが、公開指標以外の評価材料になり得た。ただし顧客別需要と資金裏付けは公開されない。">
+      <details>
+        <summary>
+          <span><b>フクビ岡山株式会社</b><small>4次・製造業</small></span>
+          <span class="case-summary"><b>5/7指標が未満</b><small>需要確約・能力制約</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>品質・期間等の注意あり</span><span>推論確度 中</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="能力制約">B 2</span><span class="chip" title="事業転換・差別化">C 2</span><span class="chip" title="供給網・地域の不可欠性">D 2</span><span class="chip" title="実行準備">E 2</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>省エネ基準義務化、現有能力の限界、第2生産拠点、40人から60人への雇用増が記載される。</p></section>
+            <section><h4>採択説明としての推論</h4><p>推論: 規制により見通しやすい需要と供給能力増強の組合せが、公開指標以外の評価材料になり得た。ただし顧客別需要と資金裏付けは公開されない。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>需要根拠は制度変更と市場一般で、個別顧客証拠がない。事業費本文と数値の不一致フラグもあるため、極端な定量劣後の解釈には注意を要する。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.2 全社売上高増加額</th><td>35.40 億円</td><td>38.50 億円</td><td>0.92倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>23.40 %</td><td>25.00 %</td><td>0.94倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>13.94 億円</td><td>12.90 億円</td><td>1.08倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>6.20 %</td><td>6.50 %</td><td>0.95倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>1.67 億円</td><td>2.00 億円</td><td>0.84倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>6.20 %</td><td>5.50 %</td><td>1.13倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>140.81 %</td><td>169.00 %</td><td>0.83倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>2025年4月の省エネ基準適合義務化による高性能断熱材需要の拡大を示す。実名顧客、受注数量、契約は示さない。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>B 能力制約</th><td>2</td><td>現在の生産能力の限界を明記し、第2生産拠点で需要変化へ対応するとするが、現状能力と不足量の数値はない。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>2</td><td>独自製法を用いる第2拠点で原料配合から梱包出荷までを集約し、非住宅・未開拓市場へ展開する。既存事業の拡張性が中心。</td><td>p.2 補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>2</td><td>高性能断熱材の安定供給、地域協定のカーボンフリー、環境先進モデル工場を掲げるが、地域での代替困難性は定量化しない。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>E 実行準備</th><td>2</td><td>工場建設・生産装置・省人設備の金額と独自製法を示す。用地、許認可、見積、発注、融資の記載はない。</td><td>p.2 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>0</td><td>グループ戦略との連携は示すが、自己負担資金、借入、金融機関支援を確認できない。</td><td>p.1-2 全公開ページ（不記載確認）</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>従業員40人から60人、1人当たり給与年率6.2%、搬送ロボットと換気空調による負荷軽減を示す。</td><td>p.2 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>建築物省エネ、カーボンフリー、グリーンエネルギー、省人化という政策課題に直接対応する。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>2</td><td>需要根拠は制度変更と市場一般で、個別顧客証拠がない。事業費本文と数値の不一致フラグもあるため、極端な定量劣後の解釈には注意を要する。</td><td>p.1-2 全公開ページ（不記載確認）</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_192.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_192.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="事業転換・垂直統合" data-search="リバードコーポレーション株式会社 4次 製造業 事業転換・垂直統合 15から22バッチ/日への増強、包装ボトルネック、設備台数、20名新規雇用、dtoc一貫モデルが明示される。 推論: 公開定量値の弱さに対して、測定可能な能力制約と垂直統合型の事業転換が比較的強い説明候補である。採択因果を示すものではない。">
+      <details>
+        <summary>
+          <span><b>リバードコーポレーション株式会社</b><small>4次・製造業</small></span>
+          <span class="case-summary"><b>5/7指標が未満</b><small>事業転換・垂直統合</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 高</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="能力制約">B 3</span><span class="chip" title="事業転換・差別化">C 3</span><span class="chip" title="供給網・地域の不可欠性">D 2</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>15から22バッチ/日への増強、包装ボトルネック、設備台数、20名新規雇用、DtoC一貫モデルが明示される。</p></section>
+            <section><h4>採択説明としての推論</h4><p>推論: 公開定量値の弱さに対して、測定可能な能力制約と垂直統合型の事業転換が比較的強い説明候補である。採択因果を示すものではない。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>市場成長と健康志向は一般的で、顧客契約や受注内示を欠く。垂直統合・自動化自体も他の採択案件に多い。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.2 全社売上高増加額</th><td>27.80 億円</td><td>38.50 億円</td><td>0.72倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>7.40 %</td><td>25.00 %</td><td>0.30倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>5.51 億円</td><td>12.90 億円</td><td>0.43倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>7.30 %</td><td>6.50 %</td><td>1.12倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>1.75 億円</td><td>2.00 億円</td><td>0.87倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>6.00 %</td><td>5.50 %</td><td>1.09倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>26.93 %</td><td>169.00 %</td><td>0.16倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>ペットフード市場年率2.9%と自社の過去年率23.3%を示す。顧客名、内示、受注数量は示さない。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>B 能力制約</th><td>3</td><td>既存設備は15バッチ/日が上限に近く、22バッチ/日へ増強し、包装工程をボトルネックと特定する。</td><td>p.2 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>3</td><td>企画・開発・製造・販売をつなぐDtoCバリューチェーンへ再構築し、新カテゴリ製品と適時配荷を統合する。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>2</td><td>地域未来牽引企業、鳥取での雇用、地方発の商品開発を示すが、地域供給網での不可欠性は限定的。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>E 実行準備</th><td>3</td><td>隣接増築、設備の台数、15から22バッチ/日、包装自動化、8名分工数削減を具体化し、2020年工場新築後の成長実績も示す。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>1</td><td>既存工場建設後の高成長実績はあるが、本投資の自己負担資金・借入・金融機関支援は記載されない。</td><td>p.1-2 全公開ページ</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>8名分の工数削減、新製品ライン20名新規雇用、従業員120人から135人、給与年率7.3%を示す。</td><td>p.2 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>地域雇用、省人化・DX、健康志向商品、低在庫・適時配荷、食品ロス抑制につながる計画である。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>2</td><td>市場成長と健康志向は一般的で、顧客契約や受注内示を欠く。垂直統合・自動化自体も他の採択案件に多い。</td><td>p.1-2 全公開ページ（不記載確認）</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_194.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_194.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="事業転換・垂直統合" data-search="南島酒販株式会社 4次 卸売業・小売業 事業転換・垂直統合 卸売から製造へ進出し、沖縄唯一・日本最南端の日本酒蔵を構築する計画と14人の雇用増を示す。 推論: 地域製造業の空白を埋める事業転換は明確だが、需要確度と実行準備の公開証拠が弱く、採択説明としては中程度である。">
+      <details>
+        <summary>
+          <span><b>南島酒販株式会社</b><small>4次・卸売業・小売業</small></span>
+          <span class="case-summary"><b>6/8指標が未満</b><small>事業転換・垂直統合</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 中</span><span class="chip" title="事業転換・差別化">C 3</span><span class="chip" title="供給網・地域の不可欠性">D 3</span><span class="chip" title="実行準備">E 2</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>卸売から製造へ進出し、沖縄唯一・日本最南端の日本酒蔵を構築する計画と14人の雇用増を示す。</p></section>
+            <section><h4>採択説明としての推論</h4><p>推論: 地域製造業の空白を埋める事業転換は明確だが、需要確度と実行準備の公開証拠が弱く、採択説明としては中程度である。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>主要需要は一般的な観光・輸出トレンドで、顧客・販売契約、酒造免許、操業用地、資金計画が公開されない。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.1 全社年平均売上高成長率</th><td>10.80 %</td><td>14.00 %</td><td>0.77倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.2 全社売上高増加額</th><td>75.00 億円</td><td>38.50 億円</td><td>1.95倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>23.10 %</td><td>25.00 %</td><td>0.92倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>6.51 億円</td><td>12.90 億円</td><td>0.50倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>6.50 %</td><td>6.50 %</td><td>1.00倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>1.79 億円</td><td>2.00 億円</td><td>0.89倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>5.00 %</td><td>5.50 %</td><td>0.91倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>165.78 %</td><td>169.00 %</td><td>0.98倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>1</td><td>観光回復、インバウンド、日本酒輸出、地産地消志向を挙げるが、顧客名、注文、需要数量はない。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>B 能力制約</th><td>1</td><td>取得した日本酒製造事業の量産体制整備を必要とするが、既存能力、失注、工程ボトルネックは示さない。</td><td>p.2 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>3</td><td>酒類卸から、取得した日本酒製造事業を基盤に石垣島で製造・ブランド化する高付加価値事業へ進出する。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>3</td><td>沖縄唯一・日本最南端の日本酒、沖縄産米、観光、製造業空洞化、地域雇用を明確に結び付ける。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>E 実行準備</th><td>2</td><td>製造事業を既に取得し、酒蔵建屋約5億円、製造設備約6.5億円を特定する。用地・許認可・見積・発注は不明。</td><td>p.2 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>1</td><td>事業取得済みであることは準備の間接証拠だが、自己負担資金・融資・金融機関支援は示されない。</td><td>p.2 補助事業の概要</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>従業員114人から128人、給与年率6.5%、沖縄の地場製造業での雇用創出を示す。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>地産地消、製造業維持、観光消費、県産ブランド、地域雇用という政策波及を示す。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>3</td><td>主要需要は一般的な観光・輸出トレンドで、顧客・販売契約、酒造免許、操業用地、資金計画が公開されない。</td><td>p.1-2 全公開ページ（不記載確認）</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_210.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_210.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="事業転換・垂直統合" data-search="奥伊吹観光株式会社 4次 生活関連サービス業・娯楽業 事業転換・垂直統合 来場実績、宿泊機能ゼロ、客単価、室数・稼働率は公開資料上の事実。 既存集客を宿泊消費へ転換する因果鎖と実行設計が、低い公開指標を補う評価候補。ただし需要予測の外部検証は未了。">
+      <details>
+        <summary>
+          <span><b>奥伊吹観光株式会社</b><small>4次・生活関連サービス業・娯楽業</small></span>
+          <span class="case-summary"><b>5/7指標が未満</b><small>事業転換・垂直統合</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 高</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="能力制約">B 3</span><span class="chip" title="事業転換・差別化">C 3</span><span class="chip" title="供給網・地域の不可欠性">D 2</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="雇用・賃上げの質">G 2</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>来場実績、宿泊機能ゼロ、客単価、室数・稼働率は公開資料上の事実。</p></section>
+            <section><h4>採択説明としての推論</h4><p>既存集客を宿泊消費へ転換する因果鎖と実行設計が、低い公開指標を補う評価候補。ただし需要予測の外部検証は未了。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>実績来場者と運営仮定は具体的だが、宿泊需要は予約・契約ではなく予測で、非採択比較もない。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.2 全社売上高増加額</th><td>73.20 億円</td><td>38.50 億円</td><td>1.90倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>10.30 %</td><td>25.00 %</td><td>0.41倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>8.63 億円</td><td>12.90 億円</td><td>0.67倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>7.10 %</td><td>6.50 %</td><td>1.09倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>0.90 億円</td><td>2.00 億円</td><td>0.45倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>5.30 %</td><td>5.50 %</td><td>0.96倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>117.15 %</td><td>169.00 %</td><td>0.69倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>年間来場者25万人、9割が日帰り、現状客単価7,500円を基礎に、客室・単価・季節稼働率を数量化。</td><td>p.1-3 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>B 能力制約</th><td>3</td><td>宿泊施設を保有せず、日帰り客のみで単価が7,500円に頭打ちという能力制約を明示。</td><td>p.1 / 長期成長ビジョン</td></tr><tr><th>C 事業転換・差別化</th><td>3</td><td>日帰りスキー場から通年の滞在型総合リゾートへ転換し、モデル完成後の全国展開・M&amp;Aも構想。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>2</td><td>湖北の宿泊施設不足と地域DMO・自治体連携を示すが、地域全体の供給不足量は非開示。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>E 実行準備</th><td>3</td><td>50室・118名、冬夏の稼働率、既存イベント500人から8,000人、既存グランピング人員転用まで具体化。</td><td>p.2-3 / 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>1</td><td>既存施設運営実績はあるが、自己負担原資や借入条件の記載はない。</td><td>p.1-3 / 公開概要全体</td></tr><tr><th>G 雇用・賃上げの質</th><td>2</td><td>賃金年平均7.1％、従業員50人から56人、運営30人・繁忙期50人、通年雇用を計画。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>インバウンド、日帰り偏重の地域消費、季節雇用を通年化する地域観光モデルを提示。</td><td>p.1-3 / 公開概要全体</td></tr><tr><th>I 反証の強さ</th><td>1</td><td>実績来場者と運営仮定は具体的だが、宿泊需要は予約・契約ではなく予測で、非採択比較もない。</td><td>p.1-3 / 公開概要全体</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_116.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_116.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="事業転換・垂直統合" data-search="明和工業株式会社 4次 製造業 事業転換・垂直統合 工場上限、旧設備、取得済み隣接地、ボーリング、能力2倍は公開資料上の事実。 大規模な事業転換に加え、用地取得済み・調査中という実行準備と明確な能力上限が評価候補。">
+      <details>
+        <summary>
+          <span><b>明和工業株式会社</b><small>4次・製造業</small></span>
+          <span class="case-summary"><b>6/9指標が未満</b><small>事業転換・垂直統合</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 高</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="能力制約">B 3</span><span class="chip" title="事業転換・差別化">C 3</span><span class="chip" title="供給網・地域の不可欠性">D 2</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 2</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>工場上限、旧設備、取得済み隣接地、ボーリング、能力2倍は公開資料上の事実。</p></section>
+            <section><h4>採択説明としての推論</h4><p>大規模な事業転換に加え、用地取得済み・調査中という実行準備と明確な能力上限が評価候補。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>取得済み用地、調査、能力数値は個別性が強いが、需要契約と非採択比較はない。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.1 全社年平均売上高成長率</th><td>20.90 %</td><td>14.00 %</td><td>1.49倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.2 全社売上高増加額</th><td>168.40 億円</td><td>38.50 億円</td><td>4.37倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>12.90 %</td><td>25.00 %</td><td>0.52倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>10.88 億円</td><td>12.90 億円</td><td>0.84倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>5.50 %</td><td>6.50 %</td><td>0.85倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>2.10 億円</td><td>2.00 億円</td><td>1.05倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>0.00 %</td><td>5.50 %</td><td>0.00倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.13 投資額／全社売上高（近似）</th><td>27.75 %</td><td>48.00 %</td><td>0.58倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>138.87 %</td><td>169.00 %</td><td>0.82倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>エンジニアリング需要は顕在化し部門売上が伸長、子会社も受注増と記すが、顧客名・受注額は非開示。</td><td>p.1;3 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>B 能力制約</th><td>3</td><td>子会社工場は面積・能力上限、NC旋盤13機中7機が1992-97年製。新工場で床面積約3倍、能力2倍を計画。</td><td>p.2-3 / 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>3</td><td>水道中心から産業設備ユニットの総合エンジニアリングへ転換し、M&amp;A子会社と垂直統合。</td><td>p.1-3 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>2</td><td>国内完結生産と事業承継難企業のM&amp;Aで製造基盤を守るが、地域内占有率等は非開示。</td><td>p.1 / 長期成長ビジョン</td></tr><tr><th>E 実行準備</th><td>3</td><td>隣接地を取得済みでボーリング調査中。工場面積、設備台数、既存M&amp;A、社員寮まで具体化。</td><td>p.2-3 / 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>1</td><td>既存水道事業の利益とM&amp;A実績は示すが、自己負担原資・借入条件は非開示。</td><td>p.1 / 長期成長ビジョン</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>社員寮で新卒採用を支え、賃金5.5％・6.5％、従業員54人から84人・33人から48人を計画。</td><td>p.1-3 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>2</td><td>国内製造、地政学・為替リスク、事業承継、地方の人材育成へ接続。</td><td>p.1 / 長期成長ビジョン</td></tr><tr><th>I 反証の強さ</th><td>1</td><td>取得済み用地、調査、能力数値は個別性が強いが、需要契約と非採択比較はない。</td><td>p.1-3 / 公開概要全体</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_168.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_168.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="供給網・地域インフラ" data-search="株式会社　ファーストライン 4次 運輸業・郵便業 供給網・地域インフラ 契約協議中、5温度帯仕様、県内初、既存配送経験は公開資料上の事実。 希少設備と地域物流機能が評価候補だが、需要確度は協議段階で、採択を説明したとは言えない。">
+      <details>
+        <summary>
+          <span><b>株式会社　ファーストライン</b><small>4次・運輸業・郵便業</small></span>
+          <span class="case-summary"><b>6/8指標が未満</b><small>供給網・地域インフラ</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>品質・期間等の注意あり</span><span>推論確度 中</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="事業転換・差別化">C 2</span><span class="chip" title="供給網・地域の不可欠性">D 3</span><span class="chip" title="実行準備">E 2</span><span class="chip" title="雇用・賃上げの質">G 2</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>契約協議中、5温度帯仕様、県内初、既存配送経験は公開資料上の事実。</p></section>
+            <section><h4>採択説明としての推論</h4><p>希少設備と地域物流機能が評価候補だが、需要確度は協議段階で、採択を説明したとは言えない。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>引き合いは協議段階で、顧客・契約量は不明。希少性は具体的だが非採択比較はなく、率定義にも注意あり。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.1 全社年平均売上高成長率</th><td>18.00 %</td><td>14.00 %</td><td>1.29倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.2 全社売上高増加額</th><td>10.60 億円</td><td>38.50 億円</td><td>0.28倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>16.40 %</td><td>25.00 %</td><td>0.66倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>5.67 億円</td><td>12.90 億円</td><td>0.44倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>6.50 %</td><td>6.50 %</td><td>1.00倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>0.80 億円</td><td>2.00 億円</td><td>0.40倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>5.30 %</td><td>5.50 %</td><td>0.96倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>129.86 %</td><td>169.00 %</td><td>0.77倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>新規顧客から引き合いを受け契約に向け協議中と明記するが、顧客名・契約量は非開示。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>B 能力制約</th><td>1</td><td>市場の多温度帯需要は示すが、既存倉庫で断った数量や稼働率上限は示されない。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>2</td><td>通常物流から5温度帯一括保管、医薬品・食品対応、共同配送へサービスを拡張。</td><td>p.1-4 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>3</td><td>和歌山県初・県内唯一の5温度帯倉庫として地域物流の中継、事業誘致、地域物流会社支援を掲げる。</td><td>p.1;3-4 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>E 実行準備</th><td>2</td><td>温度帯・対象品・管理設備と既存医薬品配送経験を詳述。用地、許認可、見積は非開示。</td><td>p.2-4 / 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>0</td><td>自己負担原資、借入、資金調達余力に関する具体記載なし。</td><td>p.1-4 / 公開概要全体</td></tr><tr><th>G 雇用・賃上げの質</th><td>2</td><td>賃金年平均6.5％、従業員70人から75人、地域物流会社のM&amp;Aを通じた雇用維持を構想。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>物流2024年問題、食品ロス、医薬品品質、太陽光、地域物流維持を一つの設備に結び付ける。</td><td>p.1-4 / 公開概要全体</td></tr><tr><th>I 反証の強さ</th><td>2</td><td>引き合いは協議段階で、顧客・契約量は不明。希少性は具体的だが非採択比較はなく、率定義にも注意あり。</td><td>p.1-4 / 公開概要全体</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_159.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_159.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="実行準備・財務" data-search="株式会社　博多屋 4次 宿泊業・飲食サービス業 実行準備・財務 自社隣接地、工期、客室・adr、地域団体役職は事実。率定義には分析上の注意がある。 所有地と既存運営基盤による実行確度、地域観光ハブの位置づけが評価候補。ただし需要の契約的裏付けはない。">
+      <details>
+        <summary>
+          <span><b>株式会社　博多屋</b><small>4次・宿泊業・飲食サービス業</small></span>
+          <span class="case-summary"><b>5/8指標が未満</b><small>実行準備・財務</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>品質・期間等の注意あり</span><span>推論確度 中</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="事業転換・差別化">C 2</span><span class="chip" title="供給網・地域の不可欠性">D 3</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="資金・自己負担能力">F 2</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>自社隣接地、工期、客室・ADR、地域団体役職は事実。率定義には分析上の注意がある。</p></section>
+            <section><h4>採択説明としての推論</h4><p>所有地と既存運営基盤による実行確度、地域観光ハブの位置づけが評価候補。ただし需要の契約的裏付けはない。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>来訪需要は公的目標・回復予測で予約根拠がなく、ホテル新設・地域ハブは他案件にもある。率定義に品質注意あり。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.2 全社売上高増加額</th><td>4.35 億円</td><td>38.50 億円</td><td>0.11倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>11.40 %</td><td>25.00 %</td><td>0.46倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>2.58 億円</td><td>12.90 億円</td><td>0.20倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>7.00 %</td><td>6.50 %</td><td>1.08倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>0.53 億円</td><td>2.00 億円</td><td>0.26倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>7.00 %</td><td>5.50 %</td><td>1.27倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.13 投資額／全社売上高（近似）</th><td>132.60 %</td><td>48.00 %</td><td>2.76倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>58.64 %</td><td>169.00 %</td><td>0.35倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>佐世保の宿泊者152.8万人、回復前184.5万人、市目標226万人と、ADR9,500円・98室を提示。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>B 能力制約</th><td>1</td><td>既存282室は運営するが、満室・取りこぼし等の能力制約は示さず、市場機会として説明。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>2</td><td>既存ビジネスホテル群に和モダン大浴場付き新ブランドを加え、全国多店舗展開の起点とする。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>3</td><td>佐世保駅前でハウステンボスと西海国立公園を結ぶハブを担い、観光団体の役職も明記。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>E 実行準備</th><td>3</td><td>自社所有の隣接地、98室、延床面積、2026年着工・2027年竣工、既存ホテル改修実績を提示。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>2</td><td>健全経営、自社所有地、既存ホテル改修実績は示すが、自己負担原資・借入条件は非開示。</td><td>p.1-2 / 公開概要全体</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>賃金年平均7.0％、従業員57人から63人、後継者育成と省力化を明示。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>観光高付加価値化、インバウンド、中心市街地の拠点形成を地域施策と結び付ける。</td><td>p.1-2 / 公開概要全体</td></tr><tr><th>I 反証の強さ</th><td>2</td><td>来訪需要は公的目標・回復予測で予約根拠がなく、ホテル新設・地域ハブは他案件にもある。率定義に品質注意あり。</td><td>p.1-2 / 公開概要全体</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_137.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_137.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="供給網・地域インフラ" data-search="株式会社エム・ケー・ケー 4次 宿泊業・飲食サービス業 供給網・地域インフラ 土地建物取得、marriottブランド、既存ホテル運営、250室への転換、松本中心部の連続閉店が明示される。 推論: 定量指標の弱さを、中心市街地再生という地域課題と高い実行準備が補う構図は明瞭。ただし需要計画には未確定部分が残る。">
+      <details>
+        <summary>
+          <span><b>株式会社エム・ケー・ケー</b><small>4次・宿泊業・飲食サービス業</small></span>
+          <span class="case-summary"><b>5/8指標が未満</b><small>供給網・地域インフラ</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 中</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="事業転換・差別化">C 3</span><span class="chip" title="供給網・地域の不可欠性">D 3</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="資金・自己負担能力">F 2</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>土地建物取得、Marriottブランド、既存ホテル運営、250室への転換、松本中心部の連続閉店が明示される。</p></section>
+            <section><h4>採択説明としての推論</h4><p>推論: 定量指標の弱さを、中心市街地再生という地域課題と高い実行準備が補う構図は明瞭。ただし需要計画には未確定部分が残る。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>地下テナントは複数候補と交渉中で未確定と明記する。Bonvoy会員数は当該ホテルの予約確約ではなく、稼働率・客室単価の裏付けも公開されない。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.2 全社売上高増加額</th><td>23.25 億円</td><td>38.50 億円</td><td>0.60倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>12.30 %</td><td>25.00 %</td><td>0.49倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>6.24 億円</td><td>12.90 億円</td><td>0.48倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>7.10 %</td><td>6.50 %</td><td>1.09倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>1.46 億円</td><td>2.00 億円</td><td>0.73倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>6.20 %</td><td>5.50 %</td><td>1.13倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.13 投資額／全社売上高（近似）</th><td>139.07 %</td><td>48.00 %</td><td>2.90倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>100.69 %</td><td>169.00 %</td><td>0.60倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>Marriott MoxyとBonvoy会員世界2.28億人・国内430万人を需要基盤として示す。宿泊予約、稼働率、確約室数はない。</td><td>p.3-4 補助事業の概要</td></tr><tr><th>B 能力制約</th><td>0</td><td>本件は既存能力不足の解消ではなく、閉店百貨店の用途転換である。ホテル供給不足や既存客室の上限は示さない。</td><td>p.1-4 全公開ページ</td></tr><tr><th>C 事業転換・差別化</th><td>3</td><td>旧百貨店を250室のMoxyホテル・複合拠点へ転換し、ホテル事業を全社成長の主力に据える。</td><td>p.1 長期成長ビジョン; p.3 補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>3</td><td>大型商業施設が相次いで閉店した松本駅前の再生、若年雇用、観光回遊、地域事業者への波及を中心目的とする。</td><td>p.1 長期成長ビジョン; p.3 補助事業の概要</td></tr><tr><th>E 実行準備</th><td>3</td><td>対象建物・土地取得、250室への用途変更、Marriottフランチャイズ、既存148室ホテルの運営実績を示す。</td><td>p.1-3 長期成長ビジョン／補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>2</td><td>所有ビルが満室で年間約1.3億円の賃料収入、既存ホテル運営実績を示すが、本件の融資・自己資金計画はない。</td><td>p.1-2 長期成長ビジョン</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>従業員20人から46人、給与年率7.1%、若年層の雇用と地域定着を掲げる。</td><td>p.1 長期成長ビジョン; p.3 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>中心市街地再生、インバウンド、地域雇用、地元企業連携、観光回遊の波及を具体化する。</td><td>p.1 長期成長ビジョン; p.3-4 補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>3</td><td>地下テナントは複数候補と交渉中で未確定と明記する。Bonvoy会員数は当該ホテルの予約確約ではなく、稼働率・客室単価の裏付けも公開されない。</td><td>p.2 長期成長ビジョン; p.4 補助事業の概要</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_218.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_218.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="需要確約・能力制約" data-search="株式会社コスモス食品 4次 製造業 需要確約・能力制約 能力40％増、賃上げ9.1％、設備内容は事実。需要説明と資料完成度は弱い。 能力制約と省力化の具体性が評価候補だが、補正後28件に固有の強さを示す証拠は乏しく、推論確度は限定的。">
+      <details>
+        <summary>
+          <span><b>株式会社コスモス食品</b><small>4次・製造業</small></span>
+          <span class="case-summary"><b>6/8指標が未満</b><small>需要確約・能力制約</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 中</span><span class="chip" title="能力制約">B 2</span><span class="chip" title="事業転換・差別化">C 2</span><span class="chip" title="供給網・地域の不可欠性">D 2</span><span class="chip" title="実行準備">E 2</span><span class="chip" title="雇用・賃上げの質">G 2</span><span class="chip" title="政策適合・波及性">H 2</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>能力40％増、賃上げ9.1％、設備内容は事実。需要説明と資料完成度は弱い。</p></section>
+            <section><h4>採択説明としての推論</h4><p>能力制約と省力化の具体性が評価候補だが、補正後28件に固有の強さを示す証拠は乏しく、推論確度は限定的。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>顧客・受注根拠がなく、公開スライドにXXや修正メモが残るため、記載の完成度自体が反証になる。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.1 全社年平均売上高成長率</th><td>10.02 %</td><td>14.00 %</td><td>0.72倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.2 全社売上高増加額</th><td>37.06 億円</td><td>38.50 億円</td><td>0.96倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>9.80 %</td><td>25.00 %</td><td>0.39倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>7.25 億円</td><td>12.90 億円</td><td>0.56倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>9.10 %</td><td>6.50 %</td><td>1.40倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>3.26 億円</td><td>2.00 億円</td><td>1.63倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>4.50 %</td><td>5.50 %</td><td>0.82倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>168.13 %</td><td>169.00 %</td><td>0.99倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>1</td><td>海外RTE食品市場の伸長を掲げるが、顧客名、受注量、市場規模の数量根拠はない。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>B 能力制約</th><td>2</td><td>既存設備の製造量限界を示し、真空凍結乾燥機で製造能力40％増を計画。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>2</td><td>自社ブランド・RTE・海外認証・直販を組み合わせ、受託中心から市場接点を広げる。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>2</td><td>地域食材、地域雇用、直販施設を掲げるが、地域供給での占有率や代替困難性は示されない。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>E 実行準備</th><td>2</td><td>倉庫、凍結乾燥機、搬送、検査、生産管理を具体化する一方、様式のXX・修正注記が残る。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>0</td><td>自己負担原資、借入、資金調達余力に関する具体記載なし。</td><td>p.1-2 / 公開概要全体</td></tr><tr><th>G 雇用・賃上げの質</th><td>2</td><td>賃金年平均9.1％、従業員159人から164人、搬送負荷と目視検査の軽減を計画。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>2</td><td>フードロス、持続可能な農業、CO2冷媒、地域食材、海外展開を掲げる。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>3</td><td>顧客・受注根拠がなく、公開スライドにXXや修正メモが残るため、記載の完成度自体が反証になる。</td><td>p.1-2 / 公開概要全体</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_115.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_115.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="供給網・地域インフラ" data-search="株式会社サン海苔 4次 製造業 供給網・地域インフラ 生産者出資の由来、能力不足、haccp制約、雇用維持は公開資料上の事実。 地域生産者とブランド供給を支える事業構造が評価候補。ただし定量的需要確度が弱く、補正後28件への固有性は未検証。">
+      <details>
+        <summary>
+          <span><b>株式会社サン海苔</b><small>4次・製造業</small></span>
+          <span class="case-summary"><b>6/8指標が未満</b><small>供給網・地域インフラ</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 中</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="能力制約">B 2</span><span class="chip" title="事業転換・差別化">C 2</span><span class="chip" title="供給網・地域の不可欠性">D 3</span><span class="chip" title="実行準備">E 2</span><span class="chip" title="雇用・賃上げの質">G 2</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>生産者出資の由来、能力不足、HACCP制約、雇用維持は公開資料上の事実。</p></section>
+            <section><h4>採択説明としての推論</h4><p>地域生産者とブランド供給を支える事業構造が評価候補。ただし定量的需要確度が弱く、補正後28件への固有性は未検証。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>地域物語は具体的だが、需要・能力不足の数量、顧客契約、金融実行性はなく、工場自動化は一般的。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.1 全社年平均売上高成長率</th><td>14.00 %</td><td>14.00 %</td><td>1.00倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.2 全社売上高増加額</th><td>31.39 億円</td><td>38.50 億円</td><td>0.82倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>39.80 %</td><td>25.00 %</td><td>1.59倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>5.77 億円</td><td>12.90 億円</td><td>0.45倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>6.00 %</td><td>6.50 %</td><td>0.92倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>0.44 億円</td><td>2.00 億円</td><td>0.22倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>5.00 %</td><td>5.50 %</td><td>0.91倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>123.09 %</td><td>169.00 %</td><td>0.73倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>製造能力不足で営業機会を失い、海外需要も高まると記載するが、顧客名・失注量は非開示。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>B 能力制約</th><td>2</td><td>製造能力不足、人手工程、高齢化、HACCP未対応が成長・輸出の制約。制約量は非開示。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>2</td><td>生産者由来の海苔加工を、新工場・自動化・HACCP対応で国内外販路へ拡張。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>3</td><td>佐賀海苔生産者の出資で設立され、生産者利益・ブランド・食料自給を支える地域中核性を示す。</td><td>p.1 / 長期成長ビジョン</td></tr><tr><th>E 実行準備</th><td>2</td><td>HACCP対応新工場、自動化、高効率装置を具体化するが、用地・見積・許認可取得状況は非開示。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>0</td><td>自己負担原資、借入、資金調達余力に関する具体記載なし。</td><td>p.1-2 / 公開概要全体</td></tr><tr><th>G 雇用・賃上げの質</th><td>2</td><td>賃金年平均6.0％、従業員72人を維持しながら人手作業と品質リスクを削減。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>佐賀海苔生産者、国内食料自給、価格安定、海外展開を一体で示す。</td><td>p.1 / 長期成長ビジョン</td></tr><tr><th>I 反証の強さ</th><td>2</td><td>地域物語は具体的だが、需要・能力不足の数量、顧客契約、金融実行性はなく、工場自動化は一般的。</td><td>p.1-2 / 公開概要全体</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_149.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_149.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="事業転換・垂直統合" data-search="株式会社ニシムタ 4次 卸売業・小売業 事業転換・垂直統合 惣菜売上1.28倍、14店舗分能力、狭い店舗厨房、139.9億円の工場・店舗投資が示される。 推論: 自社内で観測できる需要と店舗網を使い、小売から製造へ転換するため、申請者代表値未満群でも公開情報による説明力が高い。">
+      <details>
+        <summary>
+          <span><b>株式会社ニシムタ</b><small>4次・卸売業・小売業</small></span>
+          <span class="case-summary"><b>7/9指標が未満</b><small>事業転換・垂直統合</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 高</span><span class="chip" title="需要の確からしさ">A 3</span><span class="chip" title="能力制約">B 3</span><span class="chip" title="事業転換・差別化">C 3</span><span class="chip" title="供給網・地域の不可欠性">D 2</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>惣菜売上1.28倍、14店舗分能力、狭い店舗厨房、139.9億円の工場・店舗投資が示される。</p></section>
+            <section><h4>採択説明としての推論</h4><p>推論: 自社内で観測できる需要と店舗網を使い、小売から製造へ転換するため、申請者代表値未満群でも公開情報による説明力が高い。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>需要は自社実績と自社店舗で一定程度検証可能だが、セントラルキッチン化自体は一般的で、外部顧客による検証はない。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.1 全社年平均売上高成長率</th><td>5.30 %</td><td>14.00 %</td><td>0.38倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.2 全社売上高増加額</th><td>146.70 億円</td><td>38.50 億円</td><td>3.81倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>45.20 %</td><td>25.00 %</td><td>1.81倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>8.81 億円</td><td>12.90 億円</td><td>0.68倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>6.00 %</td><td>6.50 %</td><td>0.92倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>1.00 億円</td><td>2.00 億円</td><td>0.50倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>4.50 %</td><td>5.50 %</td><td>0.82倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.13 投資額／全社売上高（近似）</th><td>15.57 %</td><td>48.00 %</td><td>0.32倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>24.53 %</td><td>169.00 %</td><td>0.15倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>3</td><td>自社惣菜売上が5年で1.28倍、全国市場が2014年比118.6%、14店舗分の能力と新設2店舗による稼働確保を示す。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>B 能力制約</th><td>3</td><td>店舗内作業場が狭く製造品種が限定され、店舗別製造では食品ロス・ムダが生じると特定する。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>C 事業転換・差別化</th><td>3</td><td>小売業から食品製造業へ進出し、店舗厨房をセントラルキッチンへ集約して新商品・冷凍保管・広域展開を実現する。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>2</td><td>南九州の地域密着店舗網と地元物産を基盤とするが、地域供給上の代替困難性は示さない。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>E 実行準備</th><td>3</td><td>工場・2店舗の投資額、建物・設備・造成内訳、面積を示し、自社新店舗で工場稼働率を確保する計画である。</td><td>p.2 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>1</td><td>確立した店舗基盤と大規模投資内訳はあるが、自己負担資金・融資・金融機関支援の記載はない。</td><td>p.1-2 全公開ページ</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>従業員106人から116人、給与年率6.0%、店舗作業の集約と食品ロス削減を示す。</td><td>p.2 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>女性活躍・高齢化に伴う中食需要、HACCP、食品ロス、地域物産、雇用・賃上げに接続する。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>1</td><td>需要は自社実績と自社店舗で一定程度検証可能だが、セントラルキッチン化自体は一般的で、外部顧客による検証はない。</td><td>p.1-2 全公開ページ</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_221.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_221.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="供給網・地域インフラ" data-search="株式会社ヤマキ食品 4次 製造業 供給網・地域インフラ 3社見積、農家支援、iso、雇用目標は公開資料上の事実。 顧客需要よりも、見積済みの実行準備と地域農業を含む事業系全体の整合性が評価候補。採択因果は不明。">
+      <details>
+        <summary>
+          <span><b>株式会社ヤマキ食品</b><small>4次・製造業</small></span>
+          <span class="case-summary"><b>5/8指標が未満</b><small>供給網・地域インフラ</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 高</span><span class="chip" title="需要の確からしさ">A 2</span><span class="chip" title="能力制約">B 2</span><span class="chip" title="事業転換・差別化">C 2</span><span class="chip" title="供給網・地域の不可欠性">D 3</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="雇用・賃上げの質">G 2</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>3社見積、農家支援、ISO、雇用目標は公開資料上の事実。</p></section>
+            <section><h4>採択説明としての推論</h4><p>顧客需要よりも、見積済みの実行準備と地域農業を含む事業系全体の整合性が評価候補。採択因果は不明。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>実行準備は具体的だが、需要・能力不足の数量や顧客契約がなく、類似の新工場案件にも現れる要素。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.1 全社年平均売上高成長率</th><td>12.70 %</td><td>14.00 %</td><td>0.91倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.2 全社売上高増加額</th><td>24.39 億円</td><td>38.50 億円</td><td>0.63倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>27.40 %</td><td>25.00 %</td><td>1.10倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>10.83 億円</td><td>12.90 億円</td><td>0.84倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>6.50 %</td><td>6.50 %</td><td>1.00倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>1.47 億円</td><td>2.00 億円</td><td>0.73倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>6.50 %</td><td>5.50 %</td><td>1.18倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>133.72 %</td><td>169.00 %</td><td>0.79倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>2</td><td>同業撤退で需要が集中し、小ロット・短納期・PB需要が増えると説明するが、顧客名・数量は非開示。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>B 能力制約</th><td>2</td><td>既存工場では増加需要に対応できず、老朽・非効率工程が制約。現行処理能力は非開示。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>2</td><td>新工場で多品種少量・PB・自動化へ移行し、契約農家との調達モデルを拡張。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>3</td><td>契約農家、収穫機貸与、若手農家育成を通じ、地域農業と原料供給を一体化。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>E 実行準備</th><td>3</td><td>ISO22000、具体的工程設計に加え、3社の見積提案を価格・仕様で比較したと明記。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>0</td><td>自己負担原資、借入、資金調達余力に関する具体記載なし。</td><td>p.1-2 / 公開概要全体</td></tr><tr><th>G 雇用・賃上げの質</th><td>2</td><td>賃金年平均6.5％、従業員105人から120人、地域雇用を計画。</td><td>p.2 / 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>農業担い手、フードロス、地域雇用、安定供給を具体的な農家連携に結び付ける。</td><td>p.1-2 / 公開概要全体</td></tr><tr><th>I 反証の強さ</th><td>2</td><td>実行準備は具体的だが、需要・能力不足の数量や顧客契約がなく、類似の新工場案件にも現れる要素。</td><td>p.1-2 / 公開概要全体</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_121.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_121.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="その他" data-search="株式会社レクザム 4次 製造業 その他 自動倉庫、smt、後工程の自動化と財務強化方針は記載されるが、顧客需要と現有能力差は定量化されない。 推論: 自動生産モデル工場と幅広い戦略適合は評価候補だが、申請者代表値を大幅に下回る理由を公開情報だけで説明する力は弱い。">
+      <details>
+        <summary>
+          <span><b>株式会社レクザム</b><small>4次・製造業</small></span>
+          <span class="case-summary"><b>5/6指標が未満</b><small>その他</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>品質・期間等の注意あり</span><span>推論確度 低</span><span class="chip" title="事業転換・差別化">C 2</span><span class="chip" title="実行準備">E 2</span><span class="chip" title="資金・自己負担能力">F 2</span><span class="chip" title="雇用・賃上げの質">G 2</span><span class="chip" title="政策適合・波及性">H 2</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>自動倉庫、SMT、後工程の自動化と財務強化方針は記載されるが、顧客需要と現有能力差は定量化されない。</p></section>
+            <section><h4>採択説明としての推論</h4><p>推論: 自動生産モデル工場と幅広い戦略適合は評価候補だが、申請者代表値を大幅に下回る理由を公開情報だけで説明する力は弱い。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>事業領域が広く、当該投資に結び付く顧客証拠・能力不足・資金計画が弱い。率定義にも品質注意があり、公開資料だけでは補完説明が不足する。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.2 全社売上高増加額</th><td>100.00 億円</td><td>38.50 億円</td><td>2.60倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>24.70 %</td><td>25.00 %</td><td>0.99倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>4.84 億円</td><td>12.90 億円</td><td>0.38倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>6.20 %</td><td>6.50 %</td><td>0.95倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>0.91 億円</td><td>2.00 億円</td><td>0.46倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>97.87 %</td><td>169.00 %</td><td>0.58倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>1</td><td>インド・北米の空調需要や自動車部品需要を挙げるが、顧客名、受注、需要数量はない。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>B 能力制約</th><td>1</td><td>人手不足とコスト増への対応は示すが、既存ラインの能力上限や失注量は示さない。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>2</td><td>西条工場を電子回路実装基板の自動生産モデル工場へ変えるが、既存製品の工程自動化・増産が中心である。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>1</td><td>地域雇用や半導体・自動車供給への貢献を述べるが、供給シェアや地域の代替困難性は示さない。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>E 実行準備</th><td>2</td><td>対象工場・建屋、SMTライン、自動倉庫、後工程設備は特定される。用地、許認可、見積、契約、導入工程は不明。</td><td>p.2 補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>2</td><td>株主配当・役員報酬をゼロとして財務強化と拡大生産を続ける方針を明記するが、本件の資金調達計画はない。</td><td>p.1 長期成長ビジョン</td></tr><tr><th>G 雇用・賃上げの質</th><td>2</td><td>従業員102人から108人、給与年率6.2%を示すが、職種・採用時期・育成は公開されない。</td><td>p.2 補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>2</td><td>半導体戦略、グリーンファクトリー、自動化、省人化に整合する。波及効果の数量化は限定的。</td><td>p.1 長期成長ビジョン; p.2 補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>3</td><td>事業領域が広く、当該投資に結び付く顧客証拠・能力不足・資金計画が弱い。率定義にも品質注意があり、公開資料だけでは補完説明が不足する。</td><td>p.1-2 全公開ページ（不記載確認）</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_195.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_195.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article>
+    <article class="case-card" data-round="4次" data-archetype="供給網・地域インフラ" data-search="株式会社環境整備産業 4次 サービス業_他に分類されないもの 供給網・地域インフラ tsmc視察、断り案件、県外処理率、m&amp;a、保有地、設備費は公開資料上の事実。 定量指標の弱さを、実需、明白な地域処理不足、取得済みノウハウ・用地が補った可能性が高い。採択因果は未確定。">
+      <details>
+        <summary>
+          <span><b>株式会社環境整備産業</b><small>4次・サービス業_他に分類されないもの</small></span>
+          <span class="case-summary"><b>6/8指標が未満</b><small>供給網・地域インフラ</small></span>
+        </summary>
+        <div class="case-body">
+          <div class="case-meta"><span>主要品質注意なし</span><span>推論確度 高</span><span class="chip" title="需要の確からしさ">A 3</span><span class="chip" title="能力制約">B 3</span><span class="chip" title="事業転換・差別化">C 3</span><span class="chip" title="供給網・地域の不可欠性">D 3</span><span class="chip" title="実行準備">E 3</span><span class="chip" title="雇用・賃上げの質">G 3</span><span class="chip" title="政策適合・波及性">H 3</span></div>
+          <div class="two-col">
+            <section><h4>公開資料で確認した事実</h4><p>TSMC視察、断り案件、県外処理率、M&amp;A、保有地、設備費は公開資料上の事実。</p></section>
+            <section><h4>採択説明としての推論</h4><p>定量指標の弱さを、実需、明白な地域処理不足、取得済みノウハウ・用地が補った可能性が高い。採択因果は未確定。</p></section>
+          </div>
+          <p class="counter"><b>反証・留保：</b>固有需要・地域不足・準備状況は強いが、採択企業のみの資料で非採択比較はない。</p>
+          <details class="subdetails"><summary>9指標と申請者中央値の照合</summary>
+            <div class="table-wrap"><table><thead><tr><th>指標</th><th>企業値</th><th>同回申請者中央値</th><th>比</th><th>判定</th></tr></thead><tbody><tr><th>No.1 全社年平均売上高成長率</th><td>12.00 %</td><td>14.00 %</td><td>0.86倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.2 全社売上高増加額</th><td>22.80 億円</td><td>38.50 億円</td><td>0.59倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.7 補助事業年平均労働生産性の伸び</th><td>24.70 %</td><td>25.00 %</td><td>0.99倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.8 付加価値増加額（簡易補正推計）</th><td>8.09 億円</td><td>12.90 億円</td><td>0.63倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.9 年平均従業員1人当たり給与の伸び</th><td>6.50 %</td><td>6.50 %</td><td>1.00倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.10 給与支給総額の増加額（推計）</th><td>0.91 億円</td><td>2.00 億円</td><td>0.46倍</td><td><span class="status below">未満</span></td></tr><tr><th>No.11 年平均役員1人当たり報酬の伸び</th><td>5.80 %</td><td>5.50 %</td><td>1.05倍</td><td><span class="status above">以上</span></td></tr><tr><th>No.14 付加価値増加額／補助金額（比率推計）</th><td>132.00 %</td><td>169.00 %</td><td>0.78倍</td><td><span class="status below">未満</span></td></tr></tbody></table></div>
+          </details>
+          <details class="subdetails"><summary>A～Iの根拠一覧</summary>
+            <div class="table-wrap"><table><thead><tr><th>観点</th><th>点</th><th>根拠</th><th>頁・役割</th></tr></thead><tbody><tr><th>A 需要の確からしさ</th><td>3</td><td>TSMCが大分の処理施設を視察し、能力不足で処理依頼を断る事例が頻発。県外処理比率65.8％・61.3％を提示。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>B 能力制約</th><td>3</td><td>特別管理廃棄物施設が僅少で、既存施設は依頼を断る能力不足。新施設はグループ既存施設の2倍超。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>C 事業転換・差別化</th><td>3</td><td>一般・産業廃棄物中心から、M&amp;Aで獲得したノウハウを基に特別管理廃棄物の焼却・中和へ進出。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>D 供給網・地域の不可欠性</th><td>3</td><td>県外処理65.8％・61.3％、長距離輸送・漏洩・二次感染リスクを県内最大施設で代替。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>E 実行準備</th><td>3</td><td>M&amp;A済み、保有遊休地7,060㎡、工業団地立地、設備別金額、延床面積まで具体化。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>F 資金・自己負担能力</th><td>1</td><td>M&amp;Aと保有地は実行基盤だが、自己負担原資・借入条件は非開示。</td><td>p.1-2 / 公開概要全体</td></tr><tr><th>G 雇用・賃上げの質</th><td>3</td><td>賃金年平均6.5％、従業員55人から65人、3K工程の省人化と労働環境改善を計画。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>H 政策適合・波及性</th><td>3</td><td>半導体・医療廃棄物、県内処理、資源循環、CO2・漏洩リスク、地域雇用を一体化。</td><td>p.1-2 / 長期成長ビジョン／補助事業の概要</td></tr><tr><th>I 反証の強さ</th><td>1</td><td>固有需要・地域不足・準備状況は強いが、採択企業のみの資料で非採択比較はない。</td><td>p.1-2 / 公開概要全体</td></tr></tbody></table></div>
+          </details>
+          <div class="links"><a href="../../local_assets/pdfs/s2_outline_172.pdf" target="_blank" rel="noopener">ローカルPDF</a><a href="https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_172.pdf" target="_blank" rel="noopener">公開PDF</a></div>
+        </div>
+      </details>
+    </article></div>
+</section>
+
+<section class="report" id="round6"><h2>9. 第6次公募への示唆：中央値未満を狙うのではなく、弱点を補う証拠鎖をつくる</h2>
+<div class="callout warning"><b>6次公募要領は、現時点では事前公開版である。</b>公式サイトは公募開始を2026年7月下旬予定とし、公募開始時に審査項目等を更新する可能性を明記している。申請時は必ず<a href="https://chukentou-seichotoushi-hojo.jp/download/" target="_blank" rel="noopener">公式ダウンロードページ</a>の正式最新版へ差し替える。</div>
+<p>今回の28件から「数値が申請者中央値未満でも定性で通せる」と助言するのは危険である。実務上の最適戦略は、<b>実現可能な範囲で可視定量値を同回ベンチマーク以上へ近づけ、そのうえで数字が生まれる因果鎖を一次資料で固定すること</b>である。</p>
+<div class="flow"><div><b>需要の証拠</b><small>顧客名、数量、契約・購入意向書（LOI）、引合い、失注・受注辞退、第三者市場</small></div><div><b>制約の証拠</b><small>稼働率、能力上限、外注費、リードタイム、歩留まり、人手不足</small></div><div><b>投資の作用</b><small>設備仕様→能力→売上・付加価値→雇用・賃金を一つの式で接続</small></div><div><b>実行の証拠</b><small>用地、許認可、見積、工程、責任者、融資・表明書、リスク対策</small></div></div>
+<h3>6次の6審査項目へ落とす</h3>
+<div class="table-wrap"><table><thead><tr><th>公式項目</th><th>申請で示すべきもの</th><th>今回の28件からの教訓</th></tr></thead><tbody>
+<tr><th>① 経営力</th><td>5～10年像、全社戦略、補助事業の位置付け、ガバナンス、資金計画、足下の賃上げ。</td><td>設備説明だけでなく、既存強みと全社変革を結ぶ。全社賃上げは物価上昇率を下回ると大幅不利。</td></tr>
+<tr><th>② 先進性・成長性</th><td>ユーザー、市場規模、競合、持続成長、模倣困難性、生産性・付加価値。</td><td>「市場が伸びる」ではなく顧客・数量・能力差を示す。需要確約・能力制約型の証拠が効く。</td></tr>
+<tr><th>③ 地域への波及</th><td>給与・雇用、利益から賃金への還元、地域取引、供給網レジリエンス。</td><td>雇用人数だけでなく地域内調達額、供給途絶回避、技能職の質を計測する。</td></tr>
+<tr><th>④ 大規模投資・費用対効果</th><td>売上に対する投資、補助金当たり付加価値、補助金による行動変容。</td><td>28件に隠れた効率優位は見つからない。No.14等は必ず競争水準を確認する。</td></tr>
+<tr><th>⑤ 実現可能性</th><td>体制、財務、ローカルベンチマーク、工程・課題、金融コミットメント、情報管理。</td><td>過大な効果を置かない。公式は、実現性に乏しい過大見積りを定量効果にかかわらず大幅不利と明記。</td></tr>
+<tr><th>⑥ 補助金の必要性</th><td>現預金・借入だけでは実現困難な理由、補助なしの規模・時期、資金ギャップ。</td><td>「資金がない」ではなく、補助がなければ何を縮小・延期・中止するのかを示し、補助によって初めて生じる追加効果を明確にする。</td></tr>
+</tbody></table></div>
+<h3>数値目標の持っていき方</h3><ol><li>9指標を公式様式の定義・期間・主体で再計算し、公開PDF近似値をそのまま使わない。</li><li>同回申請者中央値は安全圏ではない。可能なら採択者中央値も参照し、各公式項目に最低1つは明確な強みを置く。</li><li>絶対額が規模で不利なら、補助金当たり効果と地域内波及を併記する。ただし低い絶対効果を比率だけで隠さない。</li><li>顧客需要→設備能力→販売数量→粗利・付加価値→賃金・雇用を同じ前提でつなぎ、様式1・2・決算・プレゼンの数字を一致させる。</li><li>経営者が式、感応度、下振れ時の返済・賃上げ継続を自分の言葉で説明できる状態まで質疑を反復する。</li><li>加点は該当するものだけ確実に取得・記載する。金融機関の出資・融資表明書など「大幅加点」は、実行義務と取消条件も確認する。</li></ol>
+<p>6次事前公開版には、補助率1/4を許容した申請を、本来の採択レベルに満たない場合でも追加採択する可能性が記載されている。事業採算と資金繰りが成立する場合に限り、戦略的選択肢になり得る。</p>
+</section>
+
+<section class="report" id="limits"><h2>10. 限界と再現方法</h2>
+<h3>この分析が答えられないこと</h3><ul><li>不採択企業の企業別9指標・申請書・定性評価がないため、採択確率、予測モデル、採択への因果効果を推定できない。</li><li>公開PDFは採択後の概要資料であり、申請書、審査記録、プレゼン質疑、財務、加点、ローカルベンチマークを完全には含まない。</li><li>9指標の一部は公開値からの近似で、公式様式の期間・人数・主体と一致しない。No.8・14等には構造的な相関がある。</li><li>28件は閾値と指標集合に依存し、自然な母集団ではない。回次補正前後で3レコードが入れ替わったこと自体が、個社分類の不確実性を示す。</li><li>A～Iは対象群を知った非盲検の手作業コードで、比較採択28件も無作為標本ではない。独立二重コーディングではなく、E・Hなど点数の細部は不安定である。</li><li>39の構造・地理特徴と複数のテキスト指標を探索した。BH補正を示しても、共同申請・本社地域の外部妥当性は別標本で再検証が必要である。</li></ul>
+<h3>再現手順</h3><div class="formula">python build_application_round_crosswalk.py<br>python analyze_applicant_median_residual.py<br>python analyze_qualitative_evidence.py<br>python build_applicant_median_residual_report.py<br>python validate_applicant_median_residual.py<br>python validate_applicant_median_residual_report.py</div>
+<p>公式回次クロスウォーク、旧29件から補正後28件への差分、20,000回置換、境界・指標集合感度、28対マッチング、A～Iコーディング、比較表、外部スポットチェックを同じフォルダへCSV・JSON・Markdownで保存した。HTML本文から中間値を分離し、再集計できる。</p>
+<details class="subdetails"><summary>レポート内の集計値</summary><pre id="payload">{&quot;core&quot;: 28, &quot;eligible&quot;: 373, &quot;clean_core&quot;: 16, &quot;clean_eligible&quot;: 199, &quot;permutation_expected&quot;: 14.29985, &quot;permutation_interval&quot;: [8.0, 21.0]}</pre></details>
+</section>
+
+<section class="report" id="sources"><h2>11. 使用資料と証拠の限界</h2><div class="table-wrap"><table><thead><tr><th>ID</th><th>用途</th><th>場所</th><th>限界</th></tr></thead><tbody><tr><th>local_cases</th><td>381件の公開企業PDF抽出値・品質フラグ・企業属性</td><td><code>data/processed/cases.csv</code></td><td>採択・交付企業だけを収録し不採択企業の個票はない</td></tr><tr><th>official_benchmarks</th><td>1～5次の申請者全体・採択者の公式代表値</td><td><code>data/reference/official_round_benchmarks.csv</code></td><td>企業別公式値ではなく集計値</td></tr><tr><th>case_reassessment</th><td>企業別9指標と同回公式代表値の比較</td><td><code>analysis/round6_reassessment/case_level_reassessment.csv</code></td><td>No.8・10・13・14などは公開値からの近似を含む</td></tr><tr><th>qualitative_reference</th><td>既存44件の目視定性コーディング</td><td><code>analysis/round6_reassessment/focused_qualitative_review_44.csv</code></td><td>無作為標本ではなく採択企業内の比較用標本</td></tr><tr><th>text_profiles</th><td>381件の公開PDFテキスト特徴</td><td><code>analysis/adoption_drivers/application_profiles.csv</code></td><td>語句密度は文章の質や審査得点を直接測らない</td></tr><tr><th>theme_diagnostics</th><td>公開PDFのテーマ語句・追加効果指標</td><td><code>analysis/adoption_drivers/company_diagnostics.csv</code></td><td>キーワード法であり意味理解には限界がある</td></tr><tr><th>financial_confirmations</th><td>3～5次採択一覧に掲載された金融機関確認書の有無</td><td><code>analysis/adoption_drivers/external_financial_confirmations.csv</code></td><td>非採択企業の提出率がなく因果効果は推定できない</td></tr><tr><th>first_round_review</th><td>1次の審査5項目と相対評価の説明</td><td><a href="https://seichotoushi-hojo.jp/1_2ji/information/2024/05/28.html" target="_blank" rel="noopener">公式・外部ソース</a></td><td>採択点・配点・企業別評価は非公表</td></tr><tr><th>fourth_guideline</th><td>4次の審査方法・5審査項目・加点措置</td><td><a href="https://seichotoushi-hojo.jp/assets/pdf/outline_4ji.pdf" target="_blank" rel="noopener">公式・外部ソース</a></td><td>3次以前と細部が異なるため全回へそのまま遡及しない</td></tr><tr><th>sixth_home</th><td>6次の公募時期・基本要件</td><td><a href="https://chukentou-seichotoushi-hojo.jp/" target="_blank" rel="noopener">公式・外部ソース</a></td><td>公募開始前は変更される可能性がある</td></tr><tr><th>sixth_guideline</th><td>6次事前公開版の審査基準・加点措置・提出書類</td><td><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/youryou_6ji.pdf" target="_blank" rel="noopener">公式・外部ソース</a></td><td>正式版では審査項目等が更新される可能性がある</td></tr><tr><th>round1_result</th><td>1次の申請・一次通過・採択件数</td><td><a href="https://seichotoushi-hojo.jp/1_2ji/information/2024/06/21.html" target="_blank" rel="noopener">公式・外部ソース</a></td><td>企業PDFレコード数とは単位が異なる</td></tr><tr><th>round3_result</th><td>3次の申請・一次通過・採択件数</td><td><a href="https://seichotoushi-hojo.jp/information/2025/06/30.html" target="_blank" rel="noopener">公式・外部ソース</a></td><td>企業PDFレコード数とは単位が異なる</td></tr><tr><th>round4_result</th><td>4次の申請・一次通過・採択件数</td><td><a href="https://seichotoushi-hojo.jp/information/2025/10/10.html" target="_blank" rel="noopener">公式・外部ソース</a></td><td>企業PDFレコード数とは単位が異なる</td></tr><tr><th>round1_list</th><td>1次採択企業の法人名と申請公募回の確定</td><td><a href="https://seichotoushi-hojo.jp/assets/pdf/list_1ji.pdf" target="_blank" rel="noopener">公式・外部ソース</a></td><td>企業名を照合し旧社名2件だけは法人番号で確認</td></tr><tr><th>round2_list_main</th><td>2次採択企業の法人名と申請公募回の確定</td><td><a href="https://seichotoushi-hojo.jp/assets/pdf/list_2ji.pdf" target="_blank" rel="noopener">公式・外部ソース</a></td><td>追加採択一覧を別資料として併合</td></tr><tr><th>round2_list_additional</th><td>2次追加採択企業の法人名と申請公募回の確定</td><td><a href="https://seichotoushi-hojo.jp/assets/pdf/list_2ji_tsuika.pdf" target="_blank" rel="noopener">公式・外部ソース</a></td><td>本体一覧と重複を除いて併合</td></tr><tr><th>application_round_crosswalk</th><td>1・2次181レコードの保存回次と申請公募回の固定対応</td><td><code>analysis/applicant_median_residual/application_round_crosswalk_1_2.csv</code></td><td>公式一覧の企業名照合と旧社名2件の法人番号確認に基づき元cases.csvは変更していない</td></tr></tbody></table></div>
+<p class="source-note">6次への示唆は、6次事前公開版の明文を優先した。1～4次の28件分析結果を、6次の採択因果として遡及・外挿していない。</p></section>
+<p class="footer-note">公開情報に基づく探索的・記述的分析。企業別の公式審査結果や採択理由を示すものではない。</p>
+</main></div>
+<script>
+const body=document.body,toc=document.getElementById('toc');
+document.getElementById('closeToc').addEventListener('click',()=>body.classList.add('nav-closed'));
+document.getElementById('reopen').addEventListener('click',()=>body.classList.remove('nav-closed'));
+const search=document.getElementById('caseSearch'),round=document.getElementById('roundFilter'),arch=document.getElementById('archetypeFilter'),count=document.getElementById('caseCount');
+function filterCases(){const q=search.value.trim().toLowerCase();let n=0;document.querySelectorAll('.case-card').forEach(card=>{const show=(!q||card.dataset.search.includes(q))&&(!round.value||card.dataset.round===round.value)&&(!arch.value||card.dataset.archetype===arch.value);card.hidden=!show;if(show)n++;});count.textContent=n+'件';}
+[search,round,arch].forEach(el=>el.addEventListener('input',filterCases));
+</script>
+</body></html>

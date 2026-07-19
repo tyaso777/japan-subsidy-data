@@ -1,0 +1,3 @@
+﻿sample,total_n,confirmation_true_n,confirmation_true_pct,comparison_group,comparison_total_n,comparison_true_n,comparison_true_pct,fisher_odds_ratio,fisher_two_sided_p
+core28_round3_4_external_linked,23,23,100.0,other_round3_4_external_records,195.0,190.0,97.43589743589743,inf,1.0
+all_round3_4_external_records,218,213,97.70642201834863,none,,,,,
