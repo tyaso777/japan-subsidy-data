@@ -1,0 +1,425 @@
+[
+  {
+    "case_id": "s2_outline_113",
+    "company": "株式会社アダチ",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "神戸市の包装資材卸、法人番号1140001012434を会社概要・gBizINFO・公式採択一覧で照合。",
+    "web_facts": [
+      {
+        "claim": "2024年売上高63億円、従業員60名。全国のスーパー等への販売網と国内外の調達網を持つ。",
+        "timing": "undated",
+        "source_title": "株式会社アダチ 会社概要",
+        "url": "https://adachi11.co.jp/company",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "100億企業宣言で、IoT新物流倉庫、スーパー向け販売拡大、東南アジア市場開拓を成長戦略に掲げる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "株式会社アダチ 100億企業宣言",
+        "url": "https://growth-100-oku.smrj.go.jp/companies/pdf/00637-00.pdf",
+        "source_type": "company",
+        "published_at": "2025-06-30"
+      },
+      {
+        "claim": "事業継続力強化計画の認定日が2025年5月20日。公式採択一覧では阿波銀行の確認書提出を確認できる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "gBizINFO 株式会社アダチ",
+        "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBango=1140001012434",
+        "source_type": "government",
+        "published_at": "unknown"
+      }
+    ],
+    "scores": {
+      "demand": 2,
+      "capacity_constraint": 2,
+      "business_transformation": 2,
+      "regional_supply_chain": 2,
+      "policy_fit": 2,
+      "execution_finance": 3,
+      "crisis_or_succession": 0,
+      "external_validation": 3
+    },
+    "plausible_reason": "需要増に対する倉庫不足・外部倉庫費というボトルネックを、本社新倉庫、在庫集約、IoT・基幹連携で解く因果関係が明瞭。既存売上、調達販売網、BCP認定、阿波銀行確認が実行可能性を補った可能性がある。",
+    "counterevidence": "顧客の発注書、予約数量、倉庫稼働率、外部倉庫費実額は第三者確認できない。100億企業宣言も自己申告。",
+    "confidence": "Medium",
+    "research_gaps": "顧客別契約数量、倉庫容量・在庫回転、施工契約、土地権利、正式加点資格。"
+  },
+  {
+    "case_id": "s2_outline_154",
+    "company": "アルフレッド株式会社",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "2021年創業、浜松市のアスベスト分析会社、法人番号5080401025170を会社・自治体・公式採択資料で照合。",
+    "web_facts": [
+      {
+        "claim": "石綿事前調査報告は2022年4月に義務化され、年間約200万件の対象工事が想定された。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "環境省 石綿事前調査結果の報告制度",
+        "url": "https://www.env.go.jp/press/110648.html",
+        "source_type": "government",
+        "published_at": "2022-03-18"
+      },
+      {
+        "claim": "浜松市の令和4年度報告に、同社のアスベスト分析キット開発支援が掲載される。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "浜松市 令和4年度ベンチャー支援報告",
+        "url": "https://www.city.hamamatsu.shizuoka.jp/documents/13411/r4_vison_houkoku.pdf",
+        "source_type": "government",
+        "published_at": "2023"
+      },
+      {
+        "claim": "静岡大学とのAIアスベスト画像診断共同研究が2024年10月から実施された。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "浜松地域イノベーション推進機構 令和6年度事業報告",
+        "url": "https://www.hai.or.jp/pdf/hai_r6_jigyouhoukoku.pdf",
+        "source_type": "other",
+        "published_at": "2025"
+      }
+    ],
+    "scores": {
+      "demand": 3,
+      "capacity_constraint": 2,
+      "business_transformation": 3,
+      "regional_supply_chain": 1,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 1,
+      "external_validation": 3
+    },
+    "plausible_reason": "法令改正で生じた大規模需要に対し、国内最大級ラボへの統合、ロボット・AI分析、ISO品質保証で能力制約を解く計画。行政支援と大学共同研究が若い企業の技術・市場実在性を補った。",
+    "counterevidence": "同社の13万検体、国内シェア、2027年能力枯渇、顧客パイプラインは独立確認できない。全国市場の拡大は同社受注を保証しない。",
+    "confidence": "High",
+    "research_gaps": "検体数・稼働率・納期、顧客契約、用地・建築確認、競合増設、静岡銀行の関与内容。"
+  },
+  {
+    "case_id": "s2_outline_136",
+    "company": "木本製菓株式会社",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "台東区上野で菓子・ホテル・不動産を営む同一法人であることを、沿革・旅館業名簿・旧ホテルサイトで確認。",
+    "web_facts": [
+      {
+        "claim": "北千住、上野、高崎等でホテルを展開し、複数ホテルの運営経験を持つ。",
+        "timing": "undated",
+        "source_title": "ココ・グラン 会社概要",
+        "url": "https://www.cocogrand.co.jp/company/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "台東区旅館業一覧で、木本製菓を営業者とするホテルの許可実績を確認できる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "台東区 旅館業施設一覧",
+        "url": "https://www.city.taito.lg.jp/kenchiku/jutaku/eisei/kankyoeisei/shisetuitiran.files/2024_ryokan_all.pdf",
+        "source_type": "government",
+        "published_at": "2024"
+      },
+      {
+        "claim": "旧上野不忍ホテルは2021年7月に閉館。既存建物の更新・再開発という背景がある。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "ココ・グラン上野不忍 閉館案内",
+        "url": "https://www.cocogrand.co.jp/uenoshinobazu/",
+        "source_type": "company",
+        "published_at": "2021"
+      }
+    ],
+    "scores": {
+      "demand": 1,
+      "capacity_constraint": 1,
+      "business_transformation": 3,
+      "regional_supply_chain": 2,
+      "policy_fit": 2,
+      "execution_finance": 3,
+      "crisis_or_succession": 2,
+      "external_validation": 3
+    },
+    "plausible_reason": "築古・耐震課題のあるホテルを、富裕層・グループ旅行向け大型客室、温浴、デジタル運営、菓子店舗、災害対応、ZEBを組み合わせた新カテゴリーへ転換する案件。ホテル運営・許認可実績、所有地、金融機関確認が実行可能性を補った可能性がある。",
+    "counterevidence": "予約、ADR、稼働率、旅行会社契約を確認できず、1室当たり投資額も大きい。2021年閉館後の長い営業空白がある。",
+    "confidence": "Medium",
+    "research_gaps": "客室数・ADR・RevPAR、旅行会社の需要証拠、建築確認・施工契約、資金調達条件。"
+  },
+  {
+    "case_id": "s2_outline_175",
+    "company": "化成工業株式会社",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "長野県阿智村のプラスチック射出成形会社、法人番号2100001022881を会社・gBizINFO・業界資料で照合。",
+    "web_facts": [
+      {
+        "claim": "約200名、20～850トンの成形設備、ISO9001・IATF16949を持ち、2021年に大型成形第2工場を竣工。",
+        "timing": "undated",
+        "source_title": "化成工業 会社概要",
+        "url": "https://www.kasei.co.jp/company/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "TAMA協会資料で金型から成形・組立までの一貫生産、自動車安全部品、海外工場を確認できる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "TAMA協会 技術企業ガイド",
+        "url": "https://www.tamaweb.or.jp/wp6/wp-content/uploads/2019/08/waza5_all_compressed_paged_linked.pdf",
+        "source_type": "other",
+        "published_at": "2019"
+      },
+      {
+        "claim": "事業継続力強化計画認定と、過去の省エネ補助事業実績がある。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "gBizINFO 化成工業株式会社",
+        "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBango=2100001022881",
+        "source_type": "government",
+        "published_at": "unknown"
+      }
+    ],
+    "scores": {
+      "demand": 2,
+      "capacity_constraint": 3,
+      "business_transformation": 2,
+      "regional_supply_chain": 2,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 0,
+      "external_validation": 3
+    },
+    "plausible_reason": "重要保安部品需要に対し、大型成形機、工場床、倉庫不足という具体的な物理制約を新棟・大型機・自動倉庫で解く案件。IATF、自動車安全部品実績、既存増設経験、金融機関確認が供給網価値と実行力を裏付ける。",
+    "counterevidence": "発注書、設備稼働率、受注断念量、指定サプライヤー数は独立確認できない。EV需要と地域波及は一般論・未定量。",
+    "confidence": "High",
+    "research_gaps": "顧客内示、設備稼働率、倉庫外部費、設備契約、地域調達額。"
+  },
+  {
+    "case_id": "s2_outline_119",
+    "company": "株式会社群馬コイケ",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "伊勢崎市で小池酸素工業グループの溶断・医療機器を製造する法人として会社概要・沿革・公式採択一覧を照合。",
+    "web_facts": [
+      {
+        "claim": "1975年に小池酸素工業のガス溶断器部門を分離して設立され、プラズマ切断消耗品、医療機器等を長期製造している。",
+        "timing": "undated",
+        "source_title": "群馬コイケ 沿革",
+        "url": "https://www.gunmakoike.co.jp/enkaku.html",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "ISO9001、ISO13485、ISO14001の対象範囲に、溶断器、プラズマ・レーザー消耗品、医療機器を含む。",
+        "timing": "undated",
+        "source_title": "群馬コイケ ISO認証状況",
+        "url": "https://www.gunmakoike.co.jp/isojyoukyou.html",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "公式採択一覧で千葉銀行の確認書と、三井住友ファイナンス＆リースの共同申請を確認できる。",
+        "timing": "post_adoption",
+        "source_title": "4次公募 採択案件一覧",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+        "source_type": "government",
+        "published_at": "2025-10-10"
+      }
+    ],
+    "scores": {
+      "demand": 3,
+      "capacity_constraint": 2,
+      "business_transformation": 3,
+      "regional_supply_chain": 2,
+      "policy_fit": 2,
+      "execution_finance": 3,
+      "crisis_or_succession": 1,
+      "external_validation": 3
+    },
+    "plausible_reason": "親会社・顧客の船舶向け増産需要に対し、親会社隣接地への工場新設、自動化、新製品開発で供給能力を増強する案件。長年の製造・認証実績、グループ内需要、共同申請者と銀行確認が実行可能性を補った可能性がある。",
+    "counterevidence": "顧客発注量、契約、既存稼働率は第三者確認できない。親会社依存と造船市況の循環性がある。",
+    "confidence": "Medium",
+    "research_gaps": "親会社発注書、製品別受注残、現設備稼働率、工場用地・設備契約。"
+  },
+  {
+    "case_id": "s2_outline_219",
+    "company": "株式会社ナリコマフード",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "大阪本社で医療・介護給食を製造する同一法人であることを会社資料・認定資料・公式採択一覧で照合。",
+    "web_facts": [
+      {
+        "claim": "2024年5月時点で全国6セントラルキッチンから1日37万食を供給していた。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "ナリコマグループ 37万食供給ニュース",
+        "url": "https://www.narikoma-group.co.jp/information/news-20240524-release.html",
+        "source_type": "company",
+        "published_at": "2024-05-24"
+      },
+      {
+        "claim": "2024年9月時点で供給規模は約42万食へ増え、2028年度約60万食への能力拡大を掲げている。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "ナリコマグループ DX戦略",
+        "url": "https://www.narikoma-group.co.jp/corp/dx/",
+        "source_type": "company",
+        "published_at": "2024"
+      },
+      {
+        "claim": "株式会社ナリコマフードは2022年1月にえるぼし最高位を取得しており、4次公募の加点資格になり得る。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "ナリコマフード えるぼし認定",
+        "url": "https://www.narikoma-group.co.jp/information/news-20220127eruboshi.html",
+        "source_type": "company",
+        "published_at": "2022-01-28"
+      }
+    ],
+    "scores": {
+      "demand": 3,
+      "capacity_constraint": 3,
+      "business_transformation": 3,
+      "regional_supply_chain": 3,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 2,
+      "external_validation": 3
+    },
+    "plausible_reason": "半年弱で37万食から42万食へ増えた観測可能な需要、既存6工場の運営実績、医療介護現場の人手不足という政策課題を背景に、第7工場で60万食体制を構築する案件。えるぼし最高位と三井住友銀行確認も補強材料。",
+    "counterevidence": "80～90%稼働、個別顧客契約、岡山工場向け発注予約は主に申請PDF依存。市場需要が自動的に同社売上になるとは限らない。",
+    "confidence": "High",
+    "research_gaps": "工場別稼働率、施設別契約・解約率、土地売買・施工契約、物流コスト、資金調達条件。"
+  },
+  {
+    "case_id": "s2_outline_158",
+    "company": "株式会社セントラルフード",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "茨城県古河市・結城市で食肉加工を行う同一法人として会社沿革・工場資料・公式採択一覧を照合。",
+    "web_facts": [
+      {
+        "claim": "2023年7月の社内全体会議で、新工場の製造数量を現古河工場の3倍強とし、惣菜加工へ進出する計画を公表していた。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "セントラルフード 第45期経営計画発表会",
+        "url": "https://www.central-food.co.jp/pickup/31",
+        "source_type": "company",
+        "published_at": "2023-07-24"
+      },
+      {
+        "claim": "沿革では2009年に工場稼働率が100%を超え、土地取得・結城工場建設へ進んだ過去の能力制約対応を確認できる。",
+        "timing": "undated",
+        "source_title": "セントラルフード 沿革",
+        "url": "https://www.central-food.co.jp/company/history.html",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "既存工場はIQFライン600～1,000kg/時、自動包装6,000～16,000個/日などの具体的能力を持つ。",
+        "timing": "undated",
+        "source_title": "セントラルフード 工場設備",
+        "url": "https://www.central-food.co.jp/factory/",
+        "source_type": "company",
+        "published_at": "unknown"
+      }
+    ],
+    "scores": {
+      "demand": 3,
+      "capacity_constraint": 3,
+      "business_transformation": 3,
+      "regional_supply_chain": 2,
+      "policy_fit": 2,
+      "execution_finance": 3,
+      "crisis_or_succession": 1,
+      "external_validation": 2
+    },
+    "plausible_reason": "申請の約2年前から現工場3倍超の新工場と惣菜加工進出を公表し、過去にも能力上限から新工場を立ち上げた実績がある。自動搬送による省人化と生産倍増を同時に狙うため、計画成熟度と実行力が評価された可能性がある。",
+    "counterevidence": "顧客名、発注書、最低購入量は未確認。3倍計画は会社自己申告で、原料価格・人手不足リスクもある。",
+    "confidence": "Medium",
+    "research_gaps": "顧客別要請、製品別稼働率、新工場の施工・設備契約、原料調達、採用計画。"
+  },
+  {
+    "case_id": "s2_outline_122",
+    "company": "杉プラスチック工業株式会社",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "福岡県のPETボトル・食品容器メーカーとして会社・県資料・公式採択一覧を照合。",
+    "web_facts": [
+      {
+        "claim": "耐熱PETによるガラス瓶代替、オーダーメイド・小ロット、100種類超の製品実績を持つ。",
+        "timing": "undated",
+        "source_title": "杉プラスチック工業 公式サイト",
+        "url": "https://sugipla.co.jp/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "2021年にISO22000を取得し、植物由来原料、太陽光、食品ロス低減容器にも取り組む。",
+        "timing": "undated",
+        "source_title": "杉プラスチック工業 公式サイト",
+        "url": "https://sugipla.co.jp/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "福岡県の経営革新計画承認企業として過去の公的計画認定実績がある。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "福岡県 経営革新計画承認企業一覧",
+        "url": "https://www.pref.fukuoka.lg.jp/uploaded/attachment/116223.pdf",
+        "source_type": "government",
+        "published_at": "2016"
+      }
+    ],
+    "scores": {
+      "demand": 2,
+      "capacity_constraint": 3,
+      "business_transformation": 3,
+      "regional_supply_chain": 2,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 1,
+      "external_validation": 3
+    },
+    "plausible_reason": "築50年以上の建物・スペース不足という事業継続上の制約を、PETプリフォーム内製化、自動検査、スマート工場へ転換する案件。食品安全認証、多品種開発実績、ガラス代替・循環経済との政策接続が評価候補。",
+    "counterevidence": "実名顧客、契約数量、現工場稼働率は確認できない。プラスチック規制、樹脂価格、需要変動リスクがある。",
+    "confidence": "Medium",
+    "research_gaps": "顧客需要、設備稼働率、建物診断、プリフォーム外注費、施工・設備契約。"
+  },
+  {
+    "case_id": "s2_outline_132",
+    "company": "株式会社コハラ",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "焼津市で1922年創業の機械工具・FA総合商社として会社情報・ロボットSIer協会・公式採択一覧を照合。",
+    "web_facts": [
+      {
+        "claim": "1922年創業、工作機械・工具・FAシステムを扱い、県内に複数拠点と機械器具設置・電気工事等の許可を持つ。",
+        "timing": "undated",
+        "source_title": "コハラ 会社情報",
+        "url": "https://www.kohara.net/information/company",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "2022～2024年にNK-LABで産業用ロボット特別教育、メーカー展示・体験会を継続していた。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "コハラ NK-LAB",
+        "url": "https://www.kohara.net/news/nk-lab",
+        "source_type": "company",
+        "published_at": "2024"
+      },
+      {
+        "claim": "FA・ロボットシステムインテグレータ協会の会員として掲載され、グループ会社をSIerとして地域製造業へ提案している。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "ロボットSIer検索 株式会社コハラ",
+        "url": "https://www.robo-navi.com/sier_search/sier_syousai.php?sier_id=304",
+        "source_type": "other",
+        "published_at": "unknown"
+      }
+    ],
+    "scores": {
+      "demand": 2,
+      "capacity_constraint": 1,
+      "business_transformation": 3,
+      "regional_supply_chain": 3,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 1,
+      "external_validation": 3
+    },
+    "plausible_reason": "100年企業の機械工具商社が、展示、検証、教育、モデルラインを備える本社を核に、地域製造業向けロボットSIerへ転換する案件。申請前からNK-LAB活動と業界会員実績があり、単なる構想ではなく既存活動を拡張する計画だった。",
+    "counterevidence": "顧客の注文、案件パイプライン、SIer売上、ラボ稼働率は公開されない。本社投資額がソフト・統合サービス事業に対して過大となる可能性がある。",
+    "confidence": "Medium",
+    "research_gaps": "顧客別SI案件、受注残、教育受講者数、SIer売上、建設契約、静岡銀行の評価内容。"
+  }
+]

@@ -1,0 +1,1769 @@
+{
+  "record_n": 30,
+  "core28_n": 28,
+  "errors": [],
+  "records": [
+    {
+      "case_id": "s1_outline_77",
+      "company": "千寿製薬株式会社",
+      "population": "core28",
+      "application_round": "1次",
+      "identity_check": "補助事業PDFの申請者名、唐津工場、眼科用医薬品の増産計画を、唐津市の立地協定資料および千寿製薬公式サイトの会社・生産情報と照合した。",
+      "web_facts": [
+        {
+          "claim": "唐津市は2024年5月23日に千寿製薬と立地協定を締結した。公表値は投資額117.1億円、地元新規雇用28人・配置転換2人、操業開始予定2027年1月であり、用地・投資・雇用・工程が自治体資料で具体化している。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "千寿製薬株式会社と立地協定を締結しました",
+          "url": "https://www.city.karatsu.lg.jp/page/1966.html",
+          "source_type": "government",
+          "published_at": "2024-05-23"
+        },
+        {
+          "claim": "同社は点眼剤に注射剤並みの高度な品質管理が必要であると説明し、品質保証と安定供給を生産体制の中核に置いている。一般製造業より設備・バリデーション面の参入障壁が高いことを示す。",
+          "timing": "undated",
+          "source_title": "生産体制｜千寿製薬",
+          "url": "https://www.senju.co.jp/about/rp/production.html",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "千寿製薬は2017年10月に女性活躍推進法のえるぼし3つ星認定を取得している。1次公募時点より前の公的認定である。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "従業員とともに｜千寿製薬",
+          "url": "https://www.senju.co.jp/about/csr/together.html",
+          "source_type": "company",
+          "published_at": "2017-10"
+        },
+        {
+          "claim": "1次公募の公式採択一覧には金融機関確認書提出先として三菱UFJ銀行が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 1次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_1ji.pdf",
+          "source_type": "government",
+          "published_at": "2024"
+        }
+      ],
+      "scores": {
+        "demand": 3,
+        "capacity_constraint": 3,
+        "business_transformation": 2,
+        "regional_supply_chain": 2,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 0,
+        "external_validation": 3
+      },
+      "plausible_reason": "公開PDFの数量計画に加え、自治体立地協定で投資額・雇用・稼働時期が裏付けられ、規制産業である点眼剤の供給能力増強として実行確度と社会的供給価値が高かった可能性がある。",
+      "counterevidence": "外部資料では顧客別の発注書や製品別不足量までは確認できず、需要の強さの大半は補助事業PDFの予測に依存する。えるぼし認定が実際に加点申告されたかも非公開である。",
+      "confidence": "High",
+      "research_gaps": "新製品ごとの承認時期、顧客契約、既存ラインの実稼働率、金融機関確認書の評価内容は未確認。"
+    },
+    {
+      "case_id": "s1_outline_63",
+      "company": "株式会社オティックスホールディングス",
+      "population": "core28",
+      "application_round": "1次",
+      "identity_check": "補助事業PDFのオティックス西尾との共同申請、西浅井地区、電動車部品計画を、オティックス公式サイト、愛知県・西尾市資料および公式採択一覧と照合した。",
+      "web_facts": [
+        {
+          "claim": "愛知県知事会見は2023年7月、オティックスが西尾市で電動車向けアルミダイカスト部品工場を計画していることを公表している。補助申請前から投資対象と電動化用途が外部に示されていた。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "愛知県知事記者会見 2023年7月31日",
+          "url": "https://www.pref.aichi.jp/site/chiji-kaiken/20230731.html",
+          "source_type": "government",
+          "published_at": "2023-07-31"
+        },
+        {
+          "claim": "同社は開発・試作から量産、素材から加工・組付までの一貫体制を公式に掲げており、単純な設備更新ではなく開発提案型サプライヤーとしての能力を持つ。",
+          "timing": "undated",
+          "source_title": "株式会社オティックス 公式サイト",
+          "url": "https://www.otics.co.jp/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "経済産業省の地域未来牽引企業資料は、トヨタ自動車等から開発提案型企業グループとして評価されることを目標とするオティックスを選定企業として掲載している。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "地域未来牽引企業 株式会社オティックス",
+          "url": "https://chiiki-kenin-kigyou.meti.go.jp/pdf/230078.pdf",
+          "source_type": "government",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "オティックスは2021年11月24日付でパートナーシップ構築宣言を公表している。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "パートナーシップ構築宣言 株式会社オティックス",
+          "url": "https://www.biz-partnership.jp/declaration/4758-05-23-aichi.pdf",
+          "source_type": "government",
+          "published_at": "2021-11-24"
+        },
+        {
+          "claim": "1次公募の公式採択一覧には金融機関確認書提出先として西尾信用金庫が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 1次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_1ji.pdf",
+          "source_type": "government",
+          "published_at": "2024"
+        }
+      ],
+      "scores": {
+        "demand": 3,
+        "capacity_constraint": 3,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 2,
+        "external_validation": 3
+      },
+      "plausible_reason": "内燃機関部品から電動車部品への転換が補助申請前から自治体資料で具体化し、一貫開発・量産能力、地域未来牽引企業、取引適正化宣言、地元金融機関確認が重なっていた。産業転換と地域サプライチェーン維持を同時に説明できる案件だった可能性が高い。",
+      "counterevidence": "外部公開資料からは受注数量・顧客契約・採算性を直接確認できない。認定・宣言が実際の審査でどの程度寄与したかは不明。",
+      "confidence": "High",
+      "research_gaps": "電動車部品の顧客別内示、既存第1工場の稼働率、第2工場投資の自己資金・融資条件は未確認。"
+    },
+    {
+      "case_id": "s1_outline_50",
+      "company": "株式会社松尾製作所",
+      "population": "core28",
+      "application_round": "1次",
+      "identity_check": "同名の京都企業ではなく、愛知県大府市に本社を置く自動車部品メーカーであることを、補助事業PDFの所在地・事業内容と公式会社概要・製品ページで照合した。",
+      "web_facts": [
+        {
+          "claim": "同社はBEV用モーターのバスバー、端子、レゾルバなどを設計・製造し、モーター関連部品をユニットとして提供できる技術を公表している。",
+          "timing": "undated",
+          "source_title": "モーター関連製品｜松尾製作所",
+          "url": "https://kk-matsuo-ss.co.jp/motor/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "2023年、松尾製作所は表面処理・導電機能を持つFCMを子会社化し、めっき・化学・電気分野を加えた機能拡張を公表した。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "株式会社FCMの株式取得に関するお知らせ",
+          "url": "https://kk-matsuo-ss.co.jp/wp-corp/wp-content/uploads/2023/04/20230228.pdf",
+          "source_type": "company",
+          "published_at": "2023-02-28"
+        },
+        {
+          "claim": "愛知労働局の認定一覧は、松尾製作所が2023年5月にえるぼし3段階目を取得したと掲載している。1次公募時点より前の認定である。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "女性活躍推進法に基づくえるぼし認定企業名一覧",
+          "url": "https://jsite.mhlw.go.jp/aichi-roudoukyoku/content/contents/002303745.pdf",
+          "source_type": "government",
+          "published_at": "2023-05"
+        },
+        {
+          "claim": "1次公募の公式採択一覧には金融機関確認書提出先として三菱UFJ銀行が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 1次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_1ji.pdf",
+          "source_type": "government",
+          "published_at": "2024"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 3,
+        "business_transformation": 3,
+        "regional_supply_chain": 2,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 1,
+        "external_validation": 3
+      },
+      "plausible_reason": "EV部品を単品でなくユニット化して供給する技術基盤と、M&Aによる機能拡張が既にあり、公開PDFの59品番・複雑工程対応という計画を実行できる蓋然性が高い。自動車産業の電動化転換と雇用・女性活躍の政策適合も補強材料になり得る。",
+      "counterevidence": "外部資料では59品番の顧客内示や量産開始時期を独立確認できず、需要の核心は補助事業PDFに依存する。",
+      "confidence": "Medium",
+      "research_gaps": "顧客名、量産契約、専用ラインの稼働率、えるぼし等の加点申告有無は未確認。"
+    },
+    {
+      "case_id": "s1_outline__181",
+      "company": "株式会社ホテルニューアワジ",
+      "population": "core28",
+      "application_round": "2次",
+      "identity_check": "補助事業PDFのホテルニューアワジ・あわじ浜離宮共同申請、淡路島の2リゾート計画を、企業公式プロフィール、兵庫県資料、2次公募採択一覧と照合した。",
+      "web_facts": [
+        {
+          "claim": "兵庫県の企業紹介資料は、ホテルニューアワジグループが19ブランドを展開し、社員寮約500室、事業所内保育、調理人材育成のキッチンアカデミー等を整備していると紹介する。複数施設運営と人材確保の実績がある。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "兵庫県 地域企業紹介資料（ホテルニューアワジ）",
+          "url": "https://web.pref.hyogo.lg.jp/sr05/r5/documents/awaji2.pdf",
+          "source_type": "government",
+          "published_at": "2023"
+        },
+        {
+          "claim": "公式公開された補助事業資料には、地域未来牽引企業、パートナーシップ構築宣言登録企業、観光庁の高付加価値経営旅館、兵庫県のSDGs・女性活躍等の認証が列挙されている。",
+          "timing": "post_adoption",
+          "source_title": "2次公募 交付決定事業概要 ホテルニューアワジ",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__181.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        },
+        {
+          "claim": "観光庁は高付加価値経営旅館等の登録制度を設け、宿泊業の生産性・高付加価値化を政策的に推進している。ホテルニューアワジの申請資料に記載された登録はこの政策枠組みに接続する。",
+          "timing": "undated",
+          "source_title": "高付加価値経営旅館等登録制度｜観光庁",
+          "url": "https://www.mlit.go.jp/kankocho/page06_00013.html",
+          "source_type": "government",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "2次公募の公式採択一覧には金融機関確認書提出先として三井住友銀行と淡路信用金庫の2行が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 2次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_2ji.pdf",
+          "source_type": "government",
+          "published_at": "2024"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 2,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 1,
+        "external_validation": 3
+      },
+      "plausible_reason": "淡路島の地域観光・一次産業と接続する高付加価値インバウンド施設であり、既存19ブランド運営、人材住宅・保育・育成、複数金融機関の確認、政策認証の蓄積が計画実行力を補強した可能性がある。",
+      "counterevidence": "客室単価・稼働率の目標は補助事業PDF中心で、外部の予約契約や需要調査は確認できない。認証の列挙は申請者自身の記載であり、実際の加点項目・申告状況は公開されていない。",
+      "confidence": "Medium",
+      "research_gaps": "2施設の建築許認可、用地権利、海外販売チャネル契約、自治体との具体的連携協定は未確認。"
+    },
+    {
+      "case_id": "s1_outline_159",
+      "company": "浦島観光ホテル株式会社",
+      "population": "core28",
+      "application_round": "2次",
+      "identity_check": "当初データ上の回次ではなく、2次公募公式採択一覧と公開PDFの共同申請者（丸峰観光ホテル、みちのりホテルズ）で2次案件と確認した。企業法人番号、和歌山県那智勝浦町の所在地もGビズインフォと一致する。",
+      "web_facts": [
+        {
+          "claim": "日本共創プラットフォーム（JPiX）は、2023年12月に浦島観光ホテルの事業承継に参画したとポートフォリオで公表している。長期資本による経営再建・承継の枠組みが申請前に成立していた。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "JPiX Portfolio",
+          "url": "https://j-pix.com/portfolio",
+          "source_type": "finance",
+          "published_at": "2023-12"
+        },
+        {
+          "claim": "Gビズインフォは浦島観光ホテルが2020年10月13日に地域未来牽引企業として選定されたことを掲載している。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "Gビズインフォ 浦島観光ホテル株式会社",
+          "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBango=2190001004269",
+          "source_type": "government",
+          "published_at": "2020-10-13"
+        },
+        {
+          "claim": "2次公募の公式採択一覧には金融機関確認書提出先として紀陽銀行が記載され、丸峰観光ホテル・みちのりホテルズとの共同申請も確認できる。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 2次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_2ji.pdf",
+          "source_type": "government",
+          "published_at": "2024"
+        },
+        {
+          "claim": "内閣官房の国内投資拡大フォーラム資料は、浦島観光ホテルがバックオフィスDX、料理刷新、既存人員で稼働増に対応するオペレーション改善を進めていると記録する。採択後の実行状況を示すが、採択時の直接証拠ではない。",
+          "timing": "post_adoption",
+          "source_title": "国内投資拡大のための官民連携フォーラム 議事要旨",
+          "url": "https://www.cas.go.jp/jp/seisaku/kokunai_toushikakudai_forum/dai6/gijiyousi.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 3,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 3,
+        "external_validation": 3
+      },
+      "plausible_reason": "老朽施設と人手制約を抱える地域の基幹ホテル群に対し、JPiXの長期資本、共同申請、地域未来牽引企業、地銀確認を組み合わせた事業承継・生産性改革である。単純な宿泊設備更新より、地域観光インフラ再生として評価された可能性がある。",
+      "counterevidence": "採択後の官民連携フォーラムでの説明は結果検証には使えるが、採択時評価の直接証拠ではない。インバウンド需要や改修後の収益性は公開情報だけでは十分検証できない。",
+      "confidence": "High",
+      "research_gaps": "JPiXの投資条件、各ホテルの施設別収益、工事許認可、共同申請各社の役割分担の詳細は未確認。"
+    },
+    {
+      "case_id": "s2_outline_72",
+      "company": "ときわ製作所株式会社",
+      "population": "core28",
+      "application_round": "3次",
+      "identity_check": "補助事業PDFの岡山県倉敷市、農業機械部品、旧大企業工場跡地を活用する統合工場計画を、公式会社・製品情報と岡山県の地域経済牽引事業計画資料で照合した。",
+      "web_facts": [
+        {
+          "claim": "岡山県は2024年6月25日、ときわ製作所グループ3社による新生産拠点整備と需要拡大を地域経済牽引事業計画として承認している。用地・事業主体・政策適合が申請前後の自治体資料で確認できる。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "岡山県 地域経済牽引事業計画承認一覧",
+          "url": "https://www.pref.okayama.jp/uploaded/life/897774_9360998_misc.pdf",
+          "source_type": "government",
+          "published_at": "2024-06-25"
+        },
+        {
+          "claim": "同社公式サイトは、大手農機メーカーの純正品製造を担い国内で高いシェアを持つこと、厳格な規格に対応する加工・品質管理能力を説明している。",
+          "timing": "undated",
+          "source_title": "製品紹介｜ときわ製作所",
+          "url": "https://www.okayama-tokiwa.com/product.html",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "会社沿革は2022年にグループ内の金属加工4社を統合してときわ製作所を発足し、自社ブランド水田用除草機「楽とーる」を発売したと記載する。事業再編と製品多角化が投資前に始まっていた。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "会社概要｜ときわ製作所",
+          "url": "https://www.okayama-tokiwa.com/company.html",
+          "source_type": "company",
+          "published_at": "2022"
+        },
+        {
+          "claim": "3次公募の公式採択一覧には金融機関確認書提出先として伊予銀行が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 3次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_3ji.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 3,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 1,
+        "external_validation": 3
+      },
+      "plausible_reason": "分散4拠点の統合という能力制約解消、大手農機純正品の重要供給、地域の加工供給者減少への対応、自社製品展開が一つの新拠点計画に統合され、県の地域経済牽引事業計画承認と金融機関確認で実行可能性も補強された可能性が高い。",
+      "counterevidence": "大手顧客名、増産要請書、受注量は外部資料で確認できず、需要スコアは補助事業PDFへの依存が残る。",
+      "confidence": "High",
+      "research_gaps": "顧客内示、旧工場跡地取得契約、許認可、各社統合後の生産移管計画は未確認。"
+    },
+    {
+      "case_id": "s2_outline_205",
+      "company": "八戸酒造株式会社",
+      "population": "core28",
+      "application_round": "3次",
+      "identity_check": "補助事業PDFの八戸市、八仙ブランド、新工場と旧蔵観光転用計画を、八戸酒造公式サイト、八戸市景観・観光資料、公式採択一覧と照合した。",
+      "web_facts": [
+        {
+          "claim": "八戸市は八戸酒造の歴史的建造物群を市の景観重要建造物第1号として位置づけている。旧蔵は単なる工場資産でなく地域景観・観光資源として公的価値を持つ。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "八戸市 景観重要建造物",
+          "url": "https://www.city.hachinohe.aomori.jp/jigyoshamuke/kenchiku_toshikeikaku/keikan/9621.html",
+          "source_type": "government",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "世界酒蔵ランキング2021で八戸酒造は第1位に選ばれている。輸出・観光展開の前提となるブランド外部評価が申請前から存在した。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "世界酒蔵ランキング2021",
+          "url": "https://www.sakaguraranking.jp/2021/index.html",
+          "source_type": "other",
+          "published_at": "2021"
+        },
+        {
+          "claim": "青森県は2025年2月、韓国バイヤー招聘商談で八戸酒造の蔵見学・商談を組み込み、県産品輸出拡大の対象企業として扱っている。申請と概ね同時期の外部販路支援である。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "韓国バイヤー招聘商談等の実施について",
+          "url": "https://www.pref.aomori.lg.jp/release/2024/77757.html",
+          "source_type": "government",
+          "published_at": "2025-02"
+        },
+        {
+          "claim": "3次公募の公式採択一覧には金融機関確認書提出先として青森みちのく銀行が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 3次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_3ji.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 3,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 1,
+        "external_validation": 3
+      },
+      "plausible_reason": "新工場による製造ボトルネック解消と、景観重要建造物である旧蔵の観光転用を同時に行い、世界的ブランド評価・輸出支援・地域観光ハブ化を結合した案件である。製造KPIが中央値未満でも、地域文化資産と輸出ブランドの波及効果が評価された可能性がある。",
+      "counterevidence": "世界酒蔵ランキングは民間評価であり、将来売上を保証しない。輸出商談は契約成立を示すものではなく、観光客増加の因果も未検証。",
+      "confidence": "High",
+      "research_gaps": "市有地取得契約の最終条件、輸出契約数量、観光転用後の運営主体・収益計画、酒造免許等の移転手続は未確認。"
+    },
+    {
+      "case_id": "s2_outline_95",
+      "company": "山崎商事運輸株式会社",
+      "population": "core28",
+      "application_round": "3次",
+      "identity_check": "補助事業PDFの愛知県、運送業から3PLへの転換、低温物流センター計画を、公式会社情報、公式採択一覧および採択後の建設・融資公表資料で照合した。",
+      "web_facts": [
+        {
+          "claim": "同社公式サイトは自社車両と協力会社網を組み合わせ、安定運行と品質基準を共有して顧客ニーズに対応することを強みとしている。3PL化の基礎となる運送ネットワークが既に存在する。",
+          "timing": "undated",
+          "source_title": "山崎商事運輸 公式サイト",
+          "url": "https://www.y-s-u.co.jp/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "3次公募の公式採択一覧には、物流センター新設による3PLサービス提供計画と、金融機関確認書提出先の商工組合中央金庫が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 3次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_3ji.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        },
+        {
+          "claim": "同社は採択後、低温物流センターの建設概要と2027年完成予定を公表している。計画が具体化した事後証拠だが、採択時の理由を直接示すものではない。",
+          "timing": "post_adoption",
+          "source_title": "山崎商事運輸 新物流センター建設のお知らせ",
+          "url": "https://www.y-s-u.co.jp/news/upload/12-0link_file.pdf",
+          "source_type": "company",
+          "published_at": "2025-11-26"
+        },
+        {
+          "claim": "商工中金は採択後、複数金融機関による総額24億9,200万円のシンジケートローン組成を公表し、3PL機能強化を資金面から支援した。",
+          "timing": "post_adoption",
+          "source_title": "山崎商事運輸株式会社に対するシンジケートローン組成",
+          "url": "https://www.shokochukin.co.jp/assets/pdf/nr_260615_01.pdf",
+          "source_type": "finance",
+          "published_at": "2026-06-15"
+        }
+      ],
+      "scores": {
+        "demand": 1,
+        "capacity_constraint": 2,
+        "business_transformation": 3,
+        "regional_supply_chain": 2,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 0,
+        "external_validation": 2
+      },
+      "plausible_reason": "運送受託から在庫・倉庫・配送を統合する3PLへの事業モデル転換であり、物流2024年問題に対する共同配送・自動化・低温保管の社会的必要性と整合する。採択後の大型融資組成は、少なくとも事業計画の実行可能性が金融機関にも認められたことを示す。",
+      "counterevidence": "申請前の独立資料で具体的顧客、入居予約、需要数量を確認できず、採択後の融資・建設を審査理由へ遡及させることはできない。",
+      "confidence": "Medium",
+      "research_gaps": "アンカーテナント、保管契約、用地取得、稼働率前提、補助申請時の融資コミット内容は未確認。"
+    },
+    {
+      "case_id": "s2_outline_99",
+      "company": "株式会社シュゼット・ホールディングス",
+      "population": "core28",
+      "application_round": "3次",
+      "identity_check": "補助事業PDFのスタジオ・シュゼットとの共同申請、兵庫県西宮市の製造拠点、アンリ・シャルパンティエ等のブランドを、公式会社沿革・受賞資料と公式採択一覧で照合した。",
+      "web_facts": [
+        {
+          "claim": "シュゼットは2022年、アンリ・シャルパンティエのフィナンシェが年間販売個数で8年連続ギネス世界記録認定を受けたと公表している。増産投資の前提となる強い商品ブランドの外部評価がある。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "フィナンシェ 8年連続ギネス世界記録認定",
+          "url": "https://www.suzette.co.jp/wordpress/wp-content/uploads/2022/09/ec0a549de9e3ceeb4e0bf1bda6f4d029.pdf",
+          "source_type": "company",
+          "published_at": "2022-09"
+        },
+        {
+          "claim": "会社沿革は2023年に同社パティシエが世界大会で優勝したこと、製造部門の分社化と持株会社化、海外店舗展開の蓄積を示す。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "企業情報｜シュゼットグループ",
+          "url": "https://www.suzette.co.jp/company/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "2024年にシンガポール出店10周年と6店舗展開を公表しており、国内工場投資が海外販売基盤とも接続する。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "シンガポール出店10周年",
+          "url": "https://www.suzette.co.jp/2024/10/09/6104/",
+          "source_type": "company",
+          "published_at": "2024-10-09"
+        },
+        {
+          "claim": "3次公募の公式採択一覧には金融機関確認書提出先として三井住友銀行が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 3次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_3ji.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        }
+      ],
+      "scores": {
+        "demand": 3,
+        "capacity_constraint": 3,
+        "business_transformation": 2,
+        "regional_supply_chain": 2,
+        "policy_fit": 2,
+        "execution_finance": 3,
+        "crisis_or_succession": 2,
+        "external_validation": 3
+      },
+      "plausible_reason": "8年連続の世界販売記録、海外店舗、国際的製菓技術という需要・ブランドの検証可能性が高く、既存賃貸工場の契約満了、排水能力上限、老朽設備という供給停止リスクを新工場で同時解消する案件だった。数字の中央値より、実需の確度とBCP・供給継続性が評価された可能性がある。",
+      "counterevidence": "ギネス記録や大会受賞はブランド力を示すが、新工場の限界利益や海外需要量を直接証明しない。既存賃貸契約満了条件も外部資料では独立確認できない。",
+      "confidence": "High",
+      "research_gaps": "主要販売先の発注予測、既存工場賃貸契約、排水許容量、移転期間の供給継続計画は未確認。"
+    },
+    {
+      "case_id": "s2_outline_232",
+      "company": "株式会社モリシタ",
+      "population": "core28",
+      "application_round": "3次",
+      "identity_check": "一般名に近い社名のため、広島市のペットフード・用品卸であること、共同申請者ホワイトフォックス、工場・物流統合計画を、両社公式サイト、中国経済産業局記事、公式採択一覧と照合した。",
+      "web_facts": [
+        {
+          "claim": "モリシタ公式サイトは1965年創業のペット用品総合卸で、Amazon Japan、DCM、専門店等を取引先として掲載している。販路基盤が具体的に確認できる。",
+          "timing": "undated",
+          "source_title": "会社概要｜株式会社モリシタ",
+          "url": "https://www.morishita-pet.jp/company/about/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "共同申請者ホワイトフォックスは国産・無添加・素材100％・ヒューマングレードを掲げ、フリーズドライ等の高付加価値ペットフードを開発している。卸売から自社製造へ進む際の既存商品・ブランド基盤がある。",
+          "timing": "undated",
+          "source_title": "事業紹介｜ホワイトフォックス",
+          "url": "https://whitefox.co.jp/business/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "中国経済産業局は、モリシタが補助金申請を契機に2025年4月17日付でパートナーシップ構築宣言を行い、地元仕入先との共存共栄、製造・物流一体のメーカーベンダー化を目指すと紹介している。申請と同時期の事実である。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "人とペットの幸せをカタチに―株式会社モリシタ｜中国経済産業局",
+          "url": "https://chugoku-meti-gov.note.jp/n/n0ab7219bad67",
+          "source_type": "government",
+          "published_at": "2025-09-09"
+        },
+        {
+          "claim": "3次公募の公式採択一覧には金融機関確認書提出先として広島銀行が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 3次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_3ji.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        },
+        {
+          "claim": "採択後の100億企業成長ポータル資料は、自社工場、HACCP対応、輸出、獣医師・大学との連携を含む成長計画を公表している。事後の計画具体化であり採択理由の直接証拠ではない。",
+          "timing": "post_adoption",
+          "source_title": "100億企業成長ポータル 株式会社モリシタ",
+          "url": "https://growth-100-oku.smrj.go.jp/companies/pdf/01299-00.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 2,
+        "business_transformation": 3,
+        "regional_supply_chain": 2,
+        "policy_fit": 2,
+        "execution_finance": 3,
+        "crisis_or_succession": 0,
+        "external_validation": 3
+      },
+      "plausible_reason": "全国販路を持つ卸と既存の高付加価値ブランドを一体化し、外注製造から自社製造・物流までを統合するメーカーベンダー転換である。需要の出口、商品差別化、地元原料調達、金融機関確認が揃い、売上成長率だけでは捉えにくい垂直統合効果が評価された可能性がある。",
+      "counterevidence": "取引先名は確認できるが、新工場製品の購入コミットや数量は公開されていない。パートナーシップ宣言は申請を契機とするため、長期の実績ではなく加点目的を含む可能性がある。",
+      "confidence": "Medium",
+      "research_gaps": "新工場の製造品目別需要、OEM解約条件、HACCP取得時期、輸出契約、広島銀行の融資条件は未確認。"
+    },
+    {
+      "case_id": "s2_outline_35",
+      "company": "株式会社北海道ちぬやファーム",
+      "population": "core28",
+      "application_round": "3次",
+      "identity_check": "補助事業PDFの所在地（北海道足寄郡足寄町）、グループ構成（ちぬや冷食との共同申請）、馬鈴薯保管・選別事業が、味のちぬやグループ公式サイトおよび足寄町基本計画の記載と一致する。",
+      "web_facts": [
+        {
+          "claim": "味のちぬやグループは2013年に北海道ちぬやファームを設立し、2018年に足寄センターを完成させた。補助事業以前から足寄に原料調達・保管拠点を運営していた。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "会社沿革｜味のちぬやグループ",
+          "url": "https://chinuya.com/company/history/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "北海道ちぬやファームは、コロッケ原料である馬鈴薯の調達確保、6,000トン保管、選別、香川県工場への出荷を担う。グループ生産計画と北海道産地をつなぐ実装済みサプライチェーンである。",
+          "timing": "undated",
+          "source_title": "馬鈴薯の管理｜味のちぬやグループ",
+          "url": "https://chinuya.com/safety/potatoes/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "農林水産省北海道農政事務所は、同社を含む足寄町の産地パワーアップ事業について、馬鈴薯の集出荷・貯蔵施設整備と作付・販売額向上を扱う先行事例として公表している。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "産地パワーアップ事業の取組事例（北海道）",
+          "url": "https://www.maff.go.jp/hokkaido/suishin/seisan/attach/pdf/sanchipowerup-37.pdf",
+          "source_type": "government",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "経済産業省掲載の足寄町基本計画は、馬鈴薯を基幹作物としつつ農業従事者減少や資材高騰を課題に挙げ、地域資源を使う食品製造・付加価値向上を促進対象としている。補助計画の産地保管・加工能力増強はこの地域課題と整合する。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "北海道足寄町基本計画",
+          "url": "https://www.meti.go.jp/policy/sme_chiiki/miraitoushi/kihonkeikaku/honbun/477_hokkaido_ashoro_honbun.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        },
+        {
+          "claim": "同社は2025年3月1日付のパートナーシップ構築宣言を公表しており、3次公募締切前に宣言が確認できる。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "パートナーシップ構築宣言（株式会社北海道ちぬやファーム）",
+          "url": "https://www.biz-partnership.jp/declaration/86110-09-00-hokkaido.pdf",
+          "source_type": "government",
+          "published_at": "2025-03-01"
+        },
+        {
+          "claim": "3次公募の公式採択一覧は、ちぬや冷食との共同申請と中国銀行による確認書提出を記録する。これは金融機関による計画確認の存在を示すが、採択理由そのものではない。",
+          "timing": "post_adoption",
+          "source_title": "中堅・中小成長投資補助金 3次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_3ji.pdf",
+          "source_type": "government",
+          "published_at": "2025-06-30"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 3,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 1,
+        "external_validation": 3
+      },
+      "plausible_reason": "申請指標が中央値未満でも、補助事業は単なる設備更新ではなく、北海道の馬鈴薯産地から香川の冷凍食品工場までを結ぶ既存サプライチェーンのボトルネック（長期保管、選別、加工能力）を一体で解く計画である。既存6,000トン拠点、過去の農政事業、共同申請、金融機関確認、締切前のパートナーシップ構築宣言が、需要・供給網・実行可能性の説明を補強した可能性が高い。",
+      "counterevidence": "公開ウェブ資料だけでは、補助投資に対応する顧客の発注書、数量コミット、投資回収計画は確認できない。足寄町基本計画への社名掲載は個別の地域経済牽引事業計画承認を意味せず、採択後の公式一覧も審査得点を示さない。",
+      "confidence": "High",
+      "research_gaps": "補助投資前の外部倉庫費、廃棄率、契約農家数、顧客別需要予測、地域経済牽引事業計画の個別承認有無を確認できれば因果仮説をさらに検証できる。"
+    },
+    {
+      "case_id": "s2_outline_19",
+      "company": "株式会社高木製作所",
+      "population": "core28",
+      "application_round": "3次",
+      "identity_check": "補助事業PDFの本社（名古屋市中区正木）、岡崎・新城の事業実施場所、自動車用小物プレス部品・金型事業が会社公式情報および3次公募一覧の法人番号9180001037718と一致する。",
+      "web_facts": [
+        {
+          "claim": "同社は自動車用小物プレス部品・金型・表面処理を手掛け、トヨタ自動車、デンソー、ダイハツ、日野、トヨタ車体、豊田自動織機など計120社を主な取引先として挙げる。顧客基盤は実名で確認できる。",
+          "timing": "undated",
+          "source_title": "会社概要｜高木製作所",
+          "url": "https://takagi-mfg.co.jp/company",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "会社沿革では1950年にトヨタ協豊会へ加入し、2021年にトヨタ品質管理優秀賞、2024年にトヨタ技術開発賞を受賞した。長期取引と直近の技術評価が補助申請前に存在した。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "会社概要・沿革｜高木製作所",
+          "url": "https://takagi-mfg.co.jp/company",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "愛知県の愛知ブランド認定ページは、同社を自動車用小物プレス部品の世界的トップメーカーとし、独自の高木式生産システム、設計から表面処理までの一貫生産、金型設計のデータベース化、変種変量対応を評価している。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "株式会社高木製作所｜愛知ブランド",
+          "url": "https://www.aichi-brand.jp/corporate/auth-0204/",
+          "source_type": "government",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "3次公募の公式採択一覧は、高木運輸との共同申請、岡崎・新城での多品種少量プレス部品自動化・物流システム構築、三菱UFJ銀行の確認書提出を記録する。",
+          "timing": "post_adoption",
+          "source_title": "中堅・中小成長投資補助金 3次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_3ji.pdf",
+          "source_type": "government",
+          "published_at": "2025-06-30"
+        }
+      ],
+      "scores": {
+        "demand": 3,
+        "capacity_constraint": 2,
+        "business_transformation": 3,
+        "regional_supply_chain": 2,
+        "policy_fit": 2,
+        "execution_finance": 3,
+        "crisis_or_succession": 0,
+        "external_validation": 3
+      },
+      "plausible_reason": "補助事業PDFの自動プレス、AGV、自動倉庫、溶接自動化、金型設計DXは、愛知県が既に確認していた多品種少量・短納期・独自設備という競争力を拡張するものだった。実名の大手完成車・部品顧客、トヨタからの技術・品質評価、高木運輸との共同申請、銀行確認により、単なる設備大型化ではなくEV期の変種変量需要に対応する統合生産物流モデルとして実現可能性が評価された可能性がある。",
+      "counterevidence": "ウェブ上では補助投資に紐づく受注数量、顧客の増産要請書、既存設備稼働率を確認できない。顧客一覧は需要の存在を示すが、新投資による追加売上を保証しない。",
+      "confidence": "High",
+      "research_gaps": "製品別受注見通し、EV化で増減する部品構成、設備稼働率、共同申請者である高木運輸の物流削減KPI、加点認定の有無が未確認。"
+    },
+    {
+      "case_id": "s2_outline_24",
+      "company": "高知食糧株式会社",
+      "population": "core28",
+      "application_round": "3次",
+      "identity_check": "補助事業PDFの本社・精米工場（高知市朝倉南町）、米穀・食品卸・物流事業が会社公式サイトと一致し、3次公募一覧の法人番号4490001000632でも照合した。",
+      "web_facts": [
+        {
+          "claim": "同社公式サイトは、既存精米工場を年間6,000トン超・県内最大級、無洗米県内シェア1位とし、精米HACCP取得も示す。2027年新工場では製造能力、収益性、物流、省力化、データ化、精密選別を改善するとしている。新工場説明は採択後公表である。",
+          "timing": "post_adoption",
+          "source_title": "精米工場｜高知食糧",
+          "url": "https://www.k-shoku.jp/business/rice-milling/factory/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "同社は高知県中心の600人超の米生産者を支援し年間6,000トン超を供給、食品卸では1,200件超の量販店・飲食店・ホテルと取引し、自社物流で四国まで配送する。産地と多数需要先をつなぐ地域基盤が確認できる。",
+          "timing": "undated",
+          "source_title": "事業内容｜高知食糧",
+          "url": "https://www.k-shoku.jp/business/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "Gビズインフォは法人番号4490001000632、本店所在地高知市、政府由来の企業情報を掲載し、補助事業PDFと外部企業の同一性を確認できる。",
+          "timing": "undated",
+          "source_title": "高知食糧株式会社｜Gビズインフォ",
+          "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBango=4490001000632",
+          "source_type": "government",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "3次公募の公式採択一覧は、計画名を「地域の食を支える精米工場・食品卸センター拠点整備」とし、四国銀行による確認書提出を記録する。",
+          "timing": "post_adoption",
+          "source_title": "中堅・中小成長投資補助金 3次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_3ji.pdf",
+          "source_type": "government",
+          "published_at": "2025-06-30"
+        }
+      ],
+      "scores": {
+        "demand": 3,
+        "capacity_constraint": 3,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 1,
+        "external_validation": 2
+      },
+      "plausible_reason": "600人超の生産者、1,200件超の需要先、自社精米・卸・倉庫・物流という既存ネットワークがあり、新拠点は精米だけでなく保管・卸・物流を同時に再設計する。地域食料供給の基盤性、既存6,000トン規模とHACCP運用実績、銀行確認が、中央値未満の成長指標を補う「需要の広がりと実装力」として評価された可能性がある。",
+      "counterevidence": "新工場に関する会社ページは採択後の説明であり、審査時点の受注・能力制約を独立に立証しない。生産者・取引先数は規模を示すが、増産需要や収益改善幅の外部検証はない。",
+      "confidence": "Medium",
+      "research_gaps": "既存工場の稼働率、繁忙期シフト、人手不足数、廃棄・物流コスト、顧客別需要予測、米生産者との長期契約、加点認定の有無が未確認。"
+    },
+    {
+      "case_id": "s2_outline_171",
+      "company": "オギハラ食品株式会社",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの所在地（福岡県大牟田市）、三池高菜・業務用/OEM製品、既存2製造工場という記載が会社公式ページおよび福岡県物産振興会の企業情報と一致する。",
+      "web_facts": [
+        {
+          "claim": "同社は1916年創業の高菜専業メーカーで、製造工場2か所、原料漬込み工場1か所、原料倉庫2か所を運営する。日経POS高菜漬部門売上1位、食品衛生優良施設の厚生労働大臣表彰など、需要と品質の外部評価実績がある。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "会社情報｜オギハラ食品",
+          "url": "https://ogihara-foods.co.jp/company/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "会社沿革は、過去にも増設で生産能力を5倍、2倍、1.5倍へ引き上げ、品質管理改革やX線異物探知を先行導入した経緯を示す。大型投資と衛生高度化を運用した履歴がある。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "オギハラ食品の歩み",
+          "url": "https://ogihara-foods.co.jp/company/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "福岡県物産振興会は、同社を大牟田で大正5年から高菜漬を手掛ける県産品事業者として掲載し、三池高菜という地域ブランドとの結び付きを確認できる。",
+          "timing": "undated",
+          "source_title": "高菜漬 オギハラ食品｜福岡県物産振興会",
+          "url": "https://www.bussanfukuoka.jp/member/member-326/",
+          "source_type": "other",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "農林水産省の伝統食図鑑は高菜漬を九州の伝統食として扱い、三池高菜を含む産地・契約栽培・食文化継承を紹介する。計画は一般食品の増産だけでなく、地域食文化の供給能力と衛生水準を高める性格を持つ。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "高菜漬け｜にっぽん伝統食図鑑",
+          "url": "https://www.maff.go.jp/j/keikaku/syokubunka/traditional-foods/menu/takana_zuke.html",
+          "source_type": "government",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "4次公募の公式採択一覧は、大牟田市内の新拠点計画と福岡銀行による確認書提出を記録する。",
+          "timing": "post_adoption",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025-10-10"
+        }
+      ],
+      "scores": {
+        "demand": 3,
+        "capacity_constraint": 3,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 1,
+        "external_validation": 3
+      },
+      "plausible_reason": "市場での売上1位や長期ブランドが示す需要、分散した2工場を統合する能力制約、FSSC水準を意識したゾーニング・品質保証、テストキッチンによるOEM開発を一体化する計画である。伝統的な三池高菜を全国の量販・外食へ供給する地域産業性と、過去の能力増強を実行した履歴が、定量中央値未満でも成長の蓋然性を支えた可能性がある。",
+      "counterevidence": "POS受賞は既存商品の強さであり、新工場の追加需要を直接保証しない。主要顧客名、受注残、現工場稼働率、FSSC取得予定の第三者資料は公開ウェブでは確認できない。",
+      "confidence": "High",
+      "research_gaps": "量販・外食・コンビニ別の顧客構成、供給制限で失った受注、OEM商談パイプライン、契約高菜農家数、加点認定の有無を追加確認したい。"
+    },
+    {
+      "case_id": "s2_outline_192",
+      "company": "フクビ岡山株式会社",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの岡山市所在地、高性能フェノールフォーム断熱材「フェノバボード」、フクビ化学工業100%子会社という属性を、2018年の親会社開示と会社公式サイトで照合した。",
+      "web_facts": [
+        {
+          "claim": "フクビ化学工業は2018年、積水化学からフェノールフォーム断熱ボード事業を譲り受け、製造子会社フクビ岡山を設立すると開示した。製品は最高クラスの断熱・防火性能を長期維持し、販路拡大を見込むと説明している。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "事業譲受に関するお知らせ｜フクビ化学工業",
+          "url": "https://f.irbank.net/pr/20180910/140120180910405331.pdf",
+          "source_type": "finance",
+          "published_at": "2018-09-10"
+        },
+        {
+          "claim": "親会社の技術・設備ページは、微細気泡に高断熱ガスを封じる独自のフェノール発泡成形技術をフクビ岡山工場で運用し、フェノバボードを製造すると説明する。",
+          "timing": "undated",
+          "source_title": "技術・設備一覧｜フクビ化学工業",
+          "url": "https://www.fukuvi.co.jp/technology/facility",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "国土交通省は、2025年度から原則すべての新築住宅・非住宅に省エネ基準適合を義務付ける制度改正を公表した。高性能断熱材に対する政策起点の市場拡大と整合する。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "建築物省エネ法第10条 省エネ基準適合義務の対象拡大",
+          "url": "https://www.mlit.go.jp/jutakukentiku/house/01.html",
+          "source_type": "government",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "会社公式サイトは、岡山市の26人規模の製造子会社で、業界最高クラスの断熱性能を持つフェノバボードの開発・製造を担うと示す。交付決定の掲載は採択後である。",
+          "timing": "post_adoption",
+          "source_title": "フクビ岡山株式会社 公式サイト",
+          "url": "https://www.fukuvi-okayama.co.jp/",
+          "source_type": "company",
+          "published_at": "2026-02-06"
+        },
+        {
+          "claim": "4次公募の公式採択一覧は、福井県坂井市での事業実施と北陸銀行の確認書提出を記録する。既存岡山拠点から第2拠点へ展開する計画である。",
+          "timing": "post_adoption",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025-10-10"
+        }
+      ],
+      "scores": {
+        "demand": 3,
+        "capacity_constraint": 3,
+        "business_transformation": 3,
+        "regional_supply_chain": 2,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 0,
+        "external_validation": 3
+      },
+      "plausible_reason": "建築物省エネ基準の全面義務化という明確な政策需要に対し、既存1ラインの能力制約を解き、親会社の販売網と独自製法を使って第2拠点化する計画である。2018年の事業譲受から製造を安定運用した履歴、上場親会社の技術・販路、銀行確認が、企業単体の可視指標以上に実行確度と市場タイミングを支えた可能性が高い。",
+      "counterevidence": "省エネ基準義務化は断熱材市場全体の追い風であり、フェノバボード固有の受注増を保証しない。競合能力、市場シェア、既存ライン稼働率、受注残は公開資料で確認できない。",
+      "confidence": "High",
+      "research_gaps": "親会社IRの製品別売上・受注、既存ライン能力と稼働率、第2工場の顧客割当、原料調達リスク、地域経済牽引事業計画等の加点認定を確認したい。"
+    },
+    {
+      "case_id": "s2_outline_194",
+      "company": "リバードコーポレーション株式会社",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの鳥取市賀露町、レトルト系ペットフード、リバードグループという記載を鳥取県公式事例、企業ブランドサイト、4次公募一覧で照合した。",
+      "web_facts": [
+        {
+          "claim": "鳥取県は2019年、同社グループの高品質で独自性のあるレトルトペットフード事業が伸長し、アジア等の海外市場へ販路を拡大していると紹介した。採択より前に成長需要が第三者資料で確認できる。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "リバードコーポレーション株式会社｜鳥取県女性活躍事例",
+          "url": "https://www.pref.tottori.lg.jp/289009.htm",
+          "source_type": "government",
+          "published_at": "2019"
+        },
+        {
+          "claim": "同じ鳥取県資料は、グループ社員の半数が女性で、商品開発・品質管理への女性登用、2019年のえるぼし認定を紹介する。ただし認定主体はグループ内のリバードプロダクションと記載され、申請者本体への加点該当は別途確認が必要である。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "リバードコーポレーション株式会社｜鳥取県女性活躍事例",
+          "url": "https://www.pref.tottori.lg.jp/289009.htm",
+          "source_type": "government",
+          "published_at": "2019"
+        },
+        {
+          "claim": "鳥取県の地方創生予算資料は、同社グループの先行するペットフード工場投資（約22.34億円）と雇用計画（45人、うち正規43人）を支援対象として記録する。大型投資・雇用を実行した前歴がある。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "鳥取県 地方創生による活力ある地域づくり関連資料",
+          "url": "https://www.pref.tottori.lg.jp/secure/1190492/04tihousouseiniyorukaturyoku.pdf",
+          "source_type": "government",
+          "published_at": "2020"
+        },
+        {
+          "claim": "自社ブランドサイトは、鳥取発の犬猫向けピューレ、ミール、健康維持商品など多様なカテゴリーを直販しており、D2Cで商品開発から販売まで接続する事業モデルを確認できる。",
+          "timing": "undated",
+          "source_title": "Brand Story｜RIVERD REPUBLIC",
+          "url": "https://www.riverd-republic.com/pages/brand-story",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "4次公募の公式採択一覧は、鳥取銀行と日本政策金融公庫の2機関による確認書提出を記録する。",
+          "timing": "post_adoption",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025-10-10"
+        }
+      ],
+      "scores": {
+        "demand": 3,
+        "capacity_constraint": 3,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 2,
+        "execution_finance": 3,
+        "crisis_or_succession": 0,
+        "external_validation": 3
+      },
+      "plausible_reason": "採択前から県が確認した国内外需要、過去22億円規模の工場投資と雇用実績、D2Cブランド、品質管理体制がある。補助計画はレトルト工程の回転数と包装ボトルネックを自動化し、商品カテゴリー拡大まで結び付けるため、「既に伸びている事業の明確な制約解除」として高い蓋然性があった可能性がある。",
+      "counterevidence": "県資料の需要・投資実績はグループ単位を含み、申請者単体の損益・設備稼働率とは一致しない。えるぼしも別法人リバードプロダクションの認定で、申請者本体の加点を断定できない。",
+      "confidence": "High",
+      "research_gaps": "申請者と製造子会社の役割・収益帰属、主要OEM顧客、受注残、FSSC認証範囲、地域未来牽引企業の申請者本体での該当、えるぼし加点の適用主体を確認したい。"
+    },
+    {
+      "case_id": "s2_outline_210",
+      "company": "南島酒販株式会社",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの沖縄県西原町本社、泰石酒造の承継、石垣島での清酒蔵新設が、南島酒販公式発表とおきなわアセットブリッジのM&A支援資料で一致する。",
+      "web_facts": [
+        {
+          "claim": "南島酒販は2024年2月、沖縄県唯一・日本最南端の清酒蔵である泰石酒造を子会社化し、石垣島へ移転して請福酒造の協力で再建すると公表した。完全新設のため約2年休業する計画も採択前に明示した。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "泰石酒造のM&Aについて｜南島酒販",
+          "url": "https://nanto-shuhan.com/2024/02/06/%E6%B3%B0%E7%9F%B3%E9%85%92%E9%80%A0%E3%81%AE%EF%BD%8D%EF%BC%86%EF%BD%81%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6/",
+          "source_type": "company",
+          "published_at": "2024-02-06"
+        },
+        {
+          "claim": "M&A支援会社は、泰石酒造が設備老朽化と後継者不在で存続困難だったこと、南島酒販・請福酒造が承継し、石垣米の日本酒と酒粕肥料再利用を提案したことを公表した。事業承継・文化保存・循環型地域産業という特殊事情が第三者資料で確認できる。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "M&Aを活用した事業承継支援について｜おきなわアセットブリッジ",
+          "url": "https://occh.co.jp/wp-content/uploads/2024/02/20240206_NewsRelease_OAB_MA_001-1.pdf",
+          "source_type": "finance",
+          "published_at": "2024-02-07"
+        },
+        {
+          "claim": "同社公式情報は、沖縄県産酒を県内外・国外へ流通させることを使命とし、2024年度売上111億円、県内大手小売と県外酒販卸を含む具体的な取引先を掲載する。承継した酒を販売できる既存販路がある。",
+          "timing": "undated",
+          "source_title": "COMPANY｜南島酒販",
+          "url": "https://nanto-shuhan.com/company/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "Gビズインフォは、同社が2020年の地域未来牽引企業に選定され、2022～2024年に酒類業構造転換・新市場開拓・海外展開等の公的支援実績を持つと記録する。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "南島酒販株式会社｜Gビズインフォ",
+          "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBango=2360001005191",
+          "source_type": "government",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "4次公募の公式採択一覧は、石垣島での事業と三菱UFJ銀行による確認書提出を記録する。",
+          "timing": "post_adoption",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025-10-10"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 2,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 3,
+        "external_validation": 3
+      },
+      "plausible_reason": "この案件の強みは通常の増産指標では捉えにくい。設備老朽化・後継者不在で消滅しかけた沖縄唯一の清酒製造を、強い酒類流通会社が承継し、石垣米・泡盛蔵との協業・酒粕循環を組み込んで再構築する。地域未来牽引企業、既存販路、公的事業の履行歴、銀行確認が、文化・供給網保存と事業化能力の双方を裏付けた可能性が高い。",
+      "counterevidence": "新しい石垣清酒の市場規模、予約・受注、価格受容性は外部資料で十分確認できず、休業を伴う新設は実行リスクが高い。社会的意義が大きくても採算性を自動的に保証しない。",
+      "confidence": "High",
+      "research_gaps": "石垣米の調達契約、清酒免許・製造許可、請福酒造との契約、販売予約、観光連携、投資回収、地域経済牽引事業計画承認の有無を確認したい。"
+    },
+    {
+      "case_id": "s2_outline_116",
+      "company": "奥伊吹観光株式会社",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの滋賀県米原市、グランスノー奥伊吹、宿泊型リゾート化という記載が、奥伊吹グループ公式サイト、米原市PFI資料、滋賀銀行資料と一致する。",
+      "web_facts": [
+        {
+          "claim": "米原市は2021年、奥伊吹SPCにグリーンパーク山東と近江母の郷文化センターの公共施設等運営権を設定した。競争的なPFIで地域観光施設を長期運営する実績がある。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "PFI事業（客観的評価の結果等について）｜米原市",
+          "url": "https://www.city.maibara.lg.jp/boshu/15440.html",
+          "source_type": "government",
+          "published_at": "2021-12-24"
+        },
+        {
+          "claim": "滋賀銀行は2020年、奥伊吹観光のグリーンボンドを引き受け、水力発電所建設を資金使途として公表した。R&Iの最上位GA1評価も取得しており、大型環境投資の資金調達・実行前歴を示す。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "奥伊吹観光株式会社のグリーンボンドを引受｜滋賀銀行",
+          "url": "https://www.shigagin.com/news/topix/2314",
+          "source_type": "finance",
+          "published_at": "2020-12-25"
+        },
+        {
+          "claim": "奥伊吹グループは、スキー場、グランピング、キャンプ・宿泊、モーターパーク、観光リフト、地域施設、水力発電など複数施設を運営し、地域資源を観光に生かし再エネで施設電力を賄う方針を示す。",
+          "timing": "undated",
+          "source_title": "奥伊吹グループサイト",
+          "url": "https://www.okuibuki.jp/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "観光庁のDMO形成・確立計画は、地域観光の宿泊・体験・交通等を担う関係事業者として奥伊吹観光を位置付ける。補助事業は単独ホテルではなく、地域観光ネットワークの滞在化と整合する。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "観光地域づくり法人形成・確立計画",
+          "url": "https://www.mlit.go.jp/kankocho/content/001769472.pdf",
+          "source_type": "government",
+          "published_at": "2024-07-29"
+        },
+        {
+          "claim": "4次公募の公式採択一覧は、滋賀銀行による確認書提出を記録する。",
+          "timing": "post_adoption",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025-10-10"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 3,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 0,
+        "external_validation": 3
+      },
+      "plausible_reason": "多数の日帰り客を持つスキー場に宿泊容量が乏しいという明確な収益制約を、50室ホテルで滞在・消費へ転換する計画である。PFI施設運営、複数観光施設、グリーンボンドによる発電所投資、DMO連携、銀行確認が、観光需要の季節性を越えて地域一体型リゾートを実行できる運営力として評価された可能性がある。",
+      "counterevidence": "補助事業PDF以外の公開資料では25万人という来場者数やホテル稼働率予測を独立確認できず、宿泊需要への転換率は不確実である。スキー需要は天候・季節・インバウンドに左右される。",
+      "confidence": "High",
+      "research_gaps": "来場者の宿泊意向調査、周辺宿泊供給、ADR・稼働率、季節別損益、旅行会社契約、地域経済牽引事業計画や観光関連加点の該当を確認したい。"
+    },
+    {
+      "case_id": "s2_outline_168",
+      "company": "明和工業株式会社",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの新潟市本社、水道・エンジニアリング事業、共同申請者ヨシカワ機械が、会社公式沿革、M&A発表、4次公募一覧と一致する。",
+      "web_facts": [
+        {
+          "claim": "同社は2023年11月、島根県のヨシカワ機械を全株式取得した。ヨシカワの機械加工・生産管理と明和の全国ネットワークを組み合わせ、技術習得・人材育成・品質高度化を進める目的を採択前に公表した。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "株式会社ヨシカワ機械の全株式取得について｜メイワグループ",
+          "url": "https://group.meiwajp.com/news/113/",
+          "source_type": "company",
+          "published_at": "2023-11-28"
+        },
+        {
+          "claim": "会社沿革は、全国工場展開、水道資材製造・レンタル・エンジニアリングへの多角化、2009年の国内初の民間水道事業、2018年の地域未来牽引企業選定を示す。大型拠点と新事業を運営した履歴がある。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "沿革｜明和工業",
+          "url": "https://www.meiwajp.com/company/history/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "新潟県の地域未来牽引企業一覧は、2018年選定企業として明和工業（新潟市西蒲区打越135-1）を掲載し、申請者本体の認定を公的資料で確認できる。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "新潟県 地域未来牽引企業 選定一覧",
+          "url": "https://www.pref.niigata.lg.jp/uploaded/attachment/239583.pdf",
+          "source_type": "government",
+          "published_at": "2018"
+        },
+        {
+          "claim": "同社は全国7工場に約800kmの水道復旧資材を備蓄し、24時間受付で災害時対応するほか、新潟東港の上水道配水を運営する。事業は地域産業・災害レジリエンスに直接関係する。",
+          "timing": "undated",
+          "source_title": "事業概要｜明和工業 東港水道事業部",
+          "url": "https://www.meiwajp.com/water-supply/about/outline/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "4次公募の公式採択一覧は、ヨシカワ機械との共同申請、日本政策金融公庫・山陰合同銀行の2機関による確認書提出を記録する。",
+          "timing": "post_adoption",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025-10-10"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 3,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 3,
+        "external_validation": 3
+      },
+      "plausible_reason": "買収したヨシカワ機械の加工技術を新工場・5軸加工・NC設備・人材育成へ接続し、外注依存を減らして水インフラ機器の国内一貫供給へ転換する計画である。地域未来牽引企業、全国水道ネットワーク、災害対応、M&Aの明確な統合ロジック、2金融機関の確認が、単体指標以上に供給網強靱化と実行可能性を示した可能性が高い。",
+      "counterevidence": "水道の公共性や地域未来牽引企業認定は、補助投資の収益性やM&A統合成功を保証しない。公開資料では受注残、外注費削減額、工場稼働率、買収先の財務状態を確認できない。",
+      "confidence": "High",
+      "research_gaps": "M&A契約の事業承継背景、ヨシカワ機械の顧客・収益、外注内製化KPI、公共水道案件の受注見込み、共同申請内の資産・雇用配分、地域経済牽引事業計画承認を確認したい。"
+    },
+    {
+      "case_id": "s2_outline_159",
+      "company": "株式会社ファーストライン",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの和歌山市、冷凍・冷蔵輸配送、FORWARDグループ、第4低温物流センターという属性が、会社公式サイト、国交省ホワイト物流宣言、過去補助事例と一致する。",
+      "web_facts": [
+        {
+          "claim": "同社は冷凍冷蔵食品の共同配送に特化し、メーカー物流、外食、病院・療養施設向け医療食を扱う。既に3低温物流センターを運営し、和歌山では珍しいスルー型低温センター、アイスクリームを扱える数少ない事業者と説明する。",
+          "timing": "undated",
+          "source_title": "会社概要｜株式会社ファーストライン",
+          "url": "https://firstline.fw-hd.com/about.html",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "FORWARDグループは、ファーストライン、和田物流、佐々木運送を中心に、近畿圏で冷蔵・冷凍輸配送と倉庫管理を提供する。新倉庫を支える既存輸配送ネットワークがある。",
+          "timing": "undated",
+          "source_title": "FORWARDグループ｜フォワードホールディングス",
+          "url": "https://www.fw-hd.com/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "国土交通省等のホワイト物流推進運動への2024年2月20日付宣言で、同社は荷待ち時間、手荷役、付帯業務の削減、パレット活用、労働時間改善等に取り組むとした。物流2024年問題への対応方針を申請前に明文化している。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "ホワイト物流 自主行動宣言（株式会社ファーストライン）",
+          "url": "https://white-logistics-movement.jp/wp-content/themes/white-logistics/docs/declarations/03697.pdf",
+          "source_type": "government",
+          "published_at": "2024-02-20"
+        },
+        {
+          "claim": "和歌山県中小企業団体中央会の成果事例集は、同社が過去に「3温度帯対応物流センターの新設と効率運用」を実施したことを掲載する。今回の5温度帯拠点に先立つ投資・運用実績である。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "わかやま ものづくり補助事業 成果事例集",
+          "url": "https://www.chuokai-wakayama.or.jp/wp/wp-content/uploads/jirei_r0301.pdf",
+          "source_type": "other",
+          "published_at": "2021"
+        },
+        {
+          "claim": "4次公募の公式採択一覧は、紀陽銀行による確認書提出を記録する。",
+          "timing": "post_adoption",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025-10-10"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 2,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 1,
+        "external_validation": 3
+      },
+      "plausible_reason": "既存3拠点と輸配送網を基盤に、超低温を含む5温度帯を一拠点で扱い、食品・医療の厳格な温度管理需要と物流2024年問題を同時に解く。過去の3温度帯センター運用、ホワイト物流宣言、グループ配送網、銀行確認が、新設倉庫を単なる不動産投資ではなく地域コールドチェーンの希少な基盤として説明した可能性がある。",
+      "counterevidence": "会社公式サイトの第4センター記載は採択後更新を含む。医療・食品顧客の契約名、予約面積、既存庫稼働率、和歌山県内での競合・需給ギャップは公開資料で確認できない。",
+      "confidence": "High",
+      "research_gaps": "温度帯別の予約契約、既存倉庫稼働率、荷主集中度、共同配送による車両・CO2・労働時間削減KPI、超低温医療物流の許認可、加点認定の有無を確認したい。"
+    },
+    {
+      "case_id": "s2_outline_137",
+      "company": "株式会社博多屋",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの法人番号、本社所在地、佐世保駅前で既存2ホテルを運営するという記載を、観光庁登録簿、佐世保商工会議所の企業ページ及び4次採択一覧と照合した。",
+      "web_facts": [
+        {
+          "claim": "観光庁の高付加価値経営旅館等登録簿では、佐世保グリーンホテルと佐世保ワシントンホテルの運営者がいずれも株式会社博多屋とされ、登録日はそれぞれ2024年1月19日、1月30日である。申請前から複数ホテルを運営し、高付加価値化制度に登録された実績がある。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "高付加価値経営旅館等登録簿",
+          "url": "https://www.mlit.go.jp/kankocho/content/001980272.pdf",
+          "source_type": "government",
+          "published_at": "2024"
+        },
+        {
+          "claim": "佐世保商工会議所の企業情報は、佐世保ワシントンホテルを190室・従業員90人とし、米海軍佐世保支部との10年以上の取引、SAM登録及び旅館業許可を掲載している。一般観光需要だけでなく基地関連需要への対応経験を持つ。",
+          "timing": "undated",
+          "source_title": "株式会社博多屋（佐世保ワシントンホテル）",
+          "url": "https://sasebo-cci.com/company_01/%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE%E5%8D%9A%E5%A4%9A%E5%B1%8B%EF%BC%88%E4%BD%90%E4%B8%96%E4%BF%9D%E3%83%AF%E3%82%B7%E3%83%B3%E3%83%88%E3%83%B3%E3%83%9B%E3%83%86%E3%83%AB%EF%BC%89/",
+          "source_type": "other",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "4次公募の公式採択一覧には金融機関確認書提出先として日本政策金融公庫が記載されている。計画について金融機関確認書を取得したことは確定できる。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 2,
+        "business_transformation": 2,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 0,
+        "external_validation": 3
+      },
+      "plausible_reason": "既存282室に98室を加える計画は、駅前の既存運営基盤、観光庁登録、基地関連需要への対応実績を利用した地域観光拠点の増強である。数値指標が低くても、既存2館との一体運営、所有地活用、金融機関確認により実行可能性と地域波及を説明できた可能性がある。",
+      "counterevidence": "客室稼働率、予約超過、顧客別需要、佐世保市の宿泊需給ギャップを示す外部資料は確認できない。商工会議所ページの更新時点も不明で、米海軍取引が新館需要にどの程度寄与するかは推論にとどまる。",
+      "confidence": "Medium",
+      "research_gaps": "既存2館の月次稼働率・ADR、新館ブランド契約、建築確認、観光需要予測、中小企業から中堅企業への移行宣誓書の提出有無は未確認。"
+    },
+    {
+      "case_id": "s2_outline_218",
+      "company": "株式会社エム・ケー・ケー",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの松本市深志、旧井上百貨店、既存ホテル事業という記載を、松本市の大規模小売店舗資料、会社概要、取得発表及び4次採択一覧と照合した。",
+      "web_facts": [
+        {
+          "claim": "松本市の大規模小売店舗資料は、深志2丁目3番1号の井上・コングロエムビルについて、建物設置者としてエム・ケー・ケーを掲載している。同社は申請以前から対象街区の大型商業建物に関与していた。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "松本市 都市計画基礎調査・大規模小売店舗等立地状況",
+          "url": "https://www.city.matsumoto.nagano.jp/uploaded/attachment/20431.pdf",
+          "source_type": "government",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "同社は2025年10月10日、閉店した旧井上百貨店本店の土地・建物を取得し、既存建物を全面改修して外資系ホテルを誘致する方針を公表した。採択後の情報であり、申請時の審査理由ではないが、用地・建物取得の実行を裏付ける。",
+          "timing": "post_adoption",
+          "source_title": "旧井上百貨店跡地取得と外資系ホテル誘致計画",
+          "url": "https://www.mkkgroup.com/news-20251010.html",
+          "source_type": "company",
+          "published_at": "2025-10-10"
+        },
+        {
+          "claim": "2026年2月、同社はマリオットとのフランチャイズ契約、222室のモクシー松本を2027年度中に開業する計画を公表した。世界的ホテルブランドと顧客基盤の導入が具体化したが、これは採択後の結果検証である。",
+          "timing": "post_adoption",
+          "source_title": "マリオット・インターナショナルとのフランチャイズ契約締結と「モクシー松本」開業",
+          "url": "https://www.mkkgroup.com/news-20260213.html",
+          "source_type": "company",
+          "published_at": "2026-02-13"
+        },
+        {
+          "claim": "4次公募の公式採択一覧には金融機関確認書提出先として長野県信用組合が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 1,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 2,
+        "external_validation": 3
+      },
+      "plausible_reason": "百貨店閉店後の駅前ランドマークを外資系ライフスタイルホテル・商業複合拠点へ再生する計画は、単なる客室増設ではなく中心市街地の空洞化対策と事業転換を兼ねる。同社の従前からの対象建物への関与と金融機関確認も実行可能性を補った可能性がある。",
+      "counterevidence": "物件取得、ホテルブランド契約及び客室数の確定は採択後である。申請時に契約又は基本合意が存在したかは公表されず、公開PDFにはテナント未定部分もあり、需要・資金計画の事前確度を外部から直接検証できない。",
+      "confidence": "Medium",
+      "research_gaps": "申請時点の不動産売買契約・マリオットLOI、既存ホテル稼働率、テナント予約、改修許認可、中心市街地活性化計画との正式な位置付けは未確認。"
+    },
+    {
+      "case_id": "s2_outline_115",
+      "company": "株式会社コスモス食品",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの兵庫県三田市、フリーズドライ食品、RTE・海外展開という記載を、同社の会社・工場・OEM情報、食品安全認証及び4次採択一覧と照合した。",
+      "web_facts": [
+        {
+          "claim": "会社公式サイトは、三田本社工場を大型連続式フリーズドライ機とFSSC22000認証を備えた大量生産拠点として説明し、岐阜・タイにも加工拠点を持つ。既存技術と海外拠点を新投資に接続できる事業基盤がある。",
+          "timing": "undated",
+          "source_title": "コスモス食品 会社概要・施設紹介",
+          "url": "https://cosmosfoods.co.jp/fd/about-us/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "公式OEM事例は、累計5,000種類のフリーズドライ商品、大企業から地域公社・JAまでの顧客事例、兵庫県産農産物を使った共同商品開発を掲載している。多品種OEMと地域農産物の高付加価値化の実績を示す。",
+          "timing": "undated",
+          "source_title": "コスモス食品 OEM事例",
+          "url": "https://cosmosfoods.co.jp/fd/works/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "同社は三田工場のFSSC22000、岐阜・タイ工場のISO22000を公表し、2010年の工場更新でCO2排出量を80%以上削減したとしている。食品安全・省エネ双方の運用経験がある。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "コスモス食品 安全性対策・環境循環への取組",
+          "url": "https://cosmosfoods.co.jp/fd/safety/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "4次公募の公式採択一覧には金融機関確認書提出先として三菱UFJ銀行が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 2,
+        "business_transformation": 2,
+        "regional_supply_chain": 2,
+        "policy_fit": 2,
+        "execution_finance": 3,
+        "crisis_or_succession": 0,
+        "external_validation": 2
+      },
+      "plausible_reason": "累計5,000品目のOEM開発、食品安全認証、大型連続式設備、地域農産物の商品化及び海外工場という既存資産があり、RTE・海外市場向け能力増強をゼロからの新規事業ではなく実績あるプラットフォームの拡張として評価し得る。",
+      "counterevidence": "補助事業PDFが示す能力40%増、RTE需要及び輸出成長を裏付ける顧客発注・契約・稼働率は外部確認できない。公開された交付資料には「XX」等の編集残りがあり、公開版だけで需要の精度を評価することには限界がある。",
+      "confidence": "Medium",
+      "research_gaps": "既存FD設備の稼働率、顧客別内示、輸出契約、RTE市場に対する具体的受注、追加設備の発注・許認可は未確認。"
+    },
+    {
+      "case_id": "s2_outline_149",
+      "company": "株式会社サン海苔",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの佐賀市、佐賀海苔加工、生産者系企業という記載を、会社概要、輸出協議会、NanoTerasu事例及び4次採択一覧と照合した。",
+      "web_facts": [
+        {
+          "claim": "サン海苔は1964年、佐賀海苔の普及と価格安定を目的に漁協系組織を主要株主として設立され、現在も佐賀県有明海漁協が98.3%を保有する。地域生産者と一体の加工・販売主体である。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "サン海苔 会社案内",
+          "url": "https://sannori.com/company/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "2020年発足の佐賀海苔加工品輸出協議会はサン海苔内に事務局を置き、同社社長が会長を務める。佐賀県産海苔の輸出、商品研究開発、色落ち海苔の高付加価値化を事業目的としている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "佐賀海苔加工品輸出協議会",
+          "url": "https://saga-kyogikai.com/",
+          "source_type": "other",
+          "published_at": "2020-10-09"
+        },
+        {
+          "claim": "令和6年度NanoTerasu事例では、サン海苔、佐賀県有明水産振興センター、九州シンクロトロン光研究センターが共同で色落ち海苔の分析を実施した。2022・2023年度に大規模な色落ちで生産量を確保できなかったという地域課題に対する産学官連携である。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "令和6年度仙台市NanoTerasuトライアルユース事業 事例報告書（サン海苔）",
+          "url": "https://www.city.sendai.jp/research/risakon/trialuse/documents/04_houkokusho_sannori.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        },
+        {
+          "claim": "4次公募の公式採択一覧には金融機関確認書提出先として九州信用漁業協同組合連合会が記載されている。漁業金融を含む地域供給網側の確認が得られている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 2,
+        "business_transformation": 2,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 2,
+        "external_validation": 3
+      },
+      "plausible_reason": "本件は一加工会社の能力増強にとどまらず、漁協が98.3%を保有する地域共同インフラのHACCP対応・自動化・輸出基盤整備と読める。気候変動による色落ちという危機、輸出協議会、産学官研究、漁業系金融機関確認が地域波及と政策整合を強く補った可能性がある。",
+      "counterevidence": "新工場の受注量、既存ライン稼働率、輸出契約及び能力不足量は外部資料で直接確認できない。NanoTerasu研究は品質・原料リスクへの対応を示すが、補助対象設備の採算性を直接保証しない。",
+      "confidence": "High",
+      "research_gaps": "漁協組合員への価格波及、輸出国別契約、HACCP認証取得工程、既存加工能力と原料入荷量のギャップは未確認。"
+    },
+    {
+      "case_id": "s2_outline_221",
+      "company": "株式会社ニシムタ",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの鹿児島市、スーパーセンター、惣菜セントラルキッチンという記載を、会社・店舗情報、鹿児島市協定、パートナーシップ構築宣言及び4次採択一覧と照合した。",
+      "web_facts": [
+        {
+          "claim": "会社公表値では総売上高が2021年2月期800.97億円から2024年2月期860.75億円へ増加し、2024年12月時点で3,598人を雇用する南九州の大規模小売事業者である。既存店舗網と人員基盤を持つ。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "ニシムタ 会社概要",
+          "url": "https://nishimuta.co.jp/about/company/",
+          "source_type": "company",
+          "published_at": "2024"
+        },
+        {
+          "claim": "N'sCITY谷山店は食鮮館とホームセンターを24時間運営し、惣菜・弁当・寿司・揚げ物の多くを店舗内で手作りしている。セントラルキッチン化の対象となる既存の分散厨房オペレーションが確認できる。",
+          "timing": "undated",
+          "source_title": "ニシムタ N'sCITY谷山店 店舗情報",
+          "url": "https://nishimuta.co.jp/shop/taniyama/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "鹿児島市は2009年、ニシムタの大型店舗増床に伴い地域貢献協定を締結している。地域商業、雇用及び地域共生について自治体との継続的な関係がある。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "株式会社ニシムタとの地域貢献協定締結",
+          "url": "https://www.city.kagoshima.lg.jp/san-shien/sangyo/shokogyo/kyote/koken/nishi.html",
+          "source_type": "government",
+          "published_at": "2009-06-05"
+        },
+        {
+          "claim": "ニシムタは2022年12月8日付でパートナーシップ構築宣言を公表している。4次公募開始前に登録済みであり、同公募の地域波及効果に関する加点候補に該当する。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "パートナーシップ構築宣言 株式会社ニシムタ",
+          "url": "https://www.biz-partnership.jp/declaration/21215-10-00-kagoshima.pdf",
+          "source_type": "government",
+          "published_at": "2022-12-08"
+        },
+        {
+          "claim": "4次公募の公式採択一覧には金融機関確認書提出先として鹿児島銀行が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 2,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 0,
+        "external_validation": 3
+      },
+      "plausible_reason": "既存の大規模店舗網と各店手作り惣菜を中央工場へ束ね、小売企業に食品製造・商品開発機能を内製化する垂直統合案件である。地域雇用規模、自治体との地域貢献協定、パートナーシップ宣言、地元銀行確認が、定量中央値以外の地域波及・実行力を補った可能性がある。",
+      "counterevidence": "公開店舗情報だけでは、全店の厨房制約、廃棄率、人手不足、中央工場移管による粗利改善を定量検証できない。会社の従業員3,598人にはパート・アルバイトが多く、補助金上の常時使用従業員数とは定義が異なる可能性がある。",
+      "confidence": "High",
+      "research_gaps": "惣菜カテゴリの既存売上・廃棄率・粗利、移管対象店舗数、工場用地・食品営業許可、パートナーシップ宣言を実際に加点申告したかは未確認。"
+    },
+    {
+      "case_id": "s2_outline_121",
+      "company": "株式会社ヤマキ食品",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの新潟市赤塚、漬物、大根契約農家、新工場という記載を、会社・契約農家情報、食品展示会資料及び4次採択一覧と照合した。",
+      "web_facts": [
+        {
+          "claim": "ヤマキ食品は年間7,000トンの漬物用大根を扱い、その全量を新潟市赤塚地域の契約農家から調達すると公表している。補助事業の成長が地域農業に直接波及する供給網である。",
+          "timing": "undated",
+          "source_title": "ヤマキ食品 公式サイト",
+          "url": "https://www.kk-yamaki.com/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "契約農家の証言では取引関係は20～35年に及び、同社が大根収穫機やフレコンを導入して収穫量増加・負担軽減を支援している。単純な原料購入でなく、生産工程まで共同改善する関係がある。",
+          "timing": "undated",
+          "source_title": "ヤマキ食品 契約農家",
+          "url": "https://www.kk-yamaki.com/keiyakunoka.php",
+          "source_type": "customer_supplier",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "2023年のFood Messe資料は、同社が地域の約20農家と研究会を組織し、大根の生産・加工・販売を一体で進める事業者として紹介している。申請前から六次産業化型の連携基盤があった。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "Food Messe in にいがた2023 六次化大賞出展資料",
+          "url": "https://foodmesse.jp/wp/wp-content/themes/foodmesse/pdf/2023_6jika_fcp.pdf",
+          "source_type": "other",
+          "published_at": "2023-09-27"
+        },
+        {
+          "claim": "4次公募の公式採択一覧には金融機関確認書提出先として第四北越銀行が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        }
+      ],
+      "scores": {
+        "demand": 3,
+        "capacity_constraint": 3,
+        "business_transformation": 2,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 2,
+        "external_validation": 3
+      },
+      "plausible_reason": "競合撤退による需要集中という補助事業PDFの事情に加え、7,000トン全量を地域農家から調達し、収穫機導入まで支援する長期供給網が外部確認できる。多品種・小ロット自動化は自社成長だけでなく地域農業の安定収入と加工機能維持に結び付くため、中央値未満を補う地域波及・代替困難性があった可能性が高い。",
+      "counterevidence": "競合撤退企業名、移管需要量、受注内示及び現工場の稼働率は外部資料で確認できず、需要制約の核心は補助事業PDFに依存する。国内漬物市場全体の縮小リスクもある。",
+      "confidence": "High",
+      "research_gaps": "競合撤退後の顧客契約、PB受注、農家別作付面積、新工場の食品許可・設備発注、価格転嫁・農家所得への波及額は未確認。"
+    },
+    {
+      "case_id": "s2_outline_195",
+      "company": "株式会社レクザム",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの西条工場、電子回路実装基板、自動生産モデル工場という記載を、会社沿革、国内外製造拠点、基板検査装置情報及び4次採択一覧と照合した。",
+      "web_facts": [
+        {
+          "claim": "レクザムは基板設計・実装・組立で50年の歴史、国内四国10拠点・海外6拠点、月産130万枚の生産規模を公表し、ISO14001・ISO13485と医療機器製造関連の許認可を持つ。自動化設備を展開できる多拠点製造基盤がある。",
+          "timing": "undated",
+          "source_title": "レクザム 国内・グローバル製造拠点",
+          "url": "https://www.rexxam.co.jp/products/electronics/base.html",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "同社の基板検査装置Sherlockは、年間1,500万枚を生産する自社工場の要求から開発された。生産設備を購入するだけでなく、自社工程で検証した検査技術を持つことが確認できる。",
+          "timing": "undated",
+          "source_title": "Sherlockシリーズの特長",
+          "url": "https://www.rexxam.co.jp/products/sherlock/features.html",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "会社沿革は2016年にパナソニックヘルスケアの西条地区工場を取得し、2019年に地域未来牽引企業へ選定されたことを掲載している。経済産業省は2025年2月に既存選定の有効期間を当分の間延長しており、4次公募開始時点でも選定は有効と解される。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "レクザム 会社概要・沿革",
+          "url": "https://www.rexxam.co.jp/corporate/overview.html",
+          "source_type": "company",
+          "published_at": "2019"
+        },
+        {
+          "claim": "経済産業省は地域未来牽引企業の従来の有効期限を、更新判断まで当分の間延長した。したがってレクザムの2019年選定は4次公募の地域波及効果加点候補となり得る。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "地域未来牽引企業の有効期間について",
+          "url": "https://www.meti.go.jp/policy/sme_chiiki/chiiki_kenin_kigyou/cdrg_yukoukikan/cdrg_yukoukikan.html",
+          "source_type": "government",
+          "published_at": "2025-02-03"
+        },
+        {
+          "claim": "4次公募の公式採択一覧は三菱HCキャピタルとの共同申請と、金融機関確認書提出先として香川銀行を掲載している。設備調達と金融確認の双方が外部主体を伴う。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 2,
+        "business_transformation": 3,
+        "regional_supply_chain": 2,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 0,
+        "external_validation": 3
+      },
+      "plausible_reason": "本件は自社開発の検査技術と国内外の大量実装経験を西条工場へ組み込み、後工程まで自動化したモデル工場に変える案件である。既存工場取得実績、医療品質認証、地域未来牽引企業、リース会社共同申請、銀行確認が、成長率中央値とは別の技術的模倣困難性と実行可能性を補った可能性がある。",
+      "counterevidence": "西条工場案件に固有の顧客発注、設備稼働率、納期遅延又は能力不足量は外部確認できない。地域未来牽引企業の選定が実際に加点申告されたか、必要な目標設定資料を期限までに提出したかも非公開である。",
+      "confidence": "Medium",
+      "research_gaps": "西条工場の顧客別内示・稼働率、三菱HCキャピタルの設備範囲、香川銀行確認の評価内容、地域未来牽引企業加点申告書類は未確認。"
+    },
+    {
+      "case_id": "s2_outline_172",
+      "company": "株式会社環境整備産業",
+      "population": "core28",
+      "application_round": "4次",
+      "identity_check": "補助事業PDFの大分県、産業廃棄物、焼却・中和施設という記載を、会社の許認可・顧客情報、大分県との協定、県内宣言企業一覧及び4次採択一覧と照合した。",
+      "web_facts": [
+        {
+          "claim": "同社は1970年創業、1994年に特別管理産業廃棄物収集運搬許可、2012年に優良産廃処理業者認定を取得し、2025年4月時点で193人を雇用する。規制産業で長期の許認可・運用実績がある。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "環境整備産業 会社概要・沿革",
+          "url": "https://www.kankyouseibi.com/company/",
+          "source_type": "company",
+          "published_at": "2025"
+        },
+        {
+          "claim": "会社公表値では2023年度売上22.2億円、2024年4月時点で車両85台・従業員194人、法人顧客2,000社超に加え自治体から家庭ごみ回収を受託する。新施設の需要母体となる既存顧客網が確認できる。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "5分でわかる環境整備産業",
+          "url": "https://www.kankyouseibi.com/recruit/about/",
+          "source_type": "company",
+          "published_at": "2024"
+        },
+        {
+          "claim": "大分県、同社、コカ・コーラ ボトラーズジャパンは2023年8月、県内スーパーを介したPETボトル水平リサイクルと環境教育の連携協定を締結した。自治体・大手需要家との地域循環事業の運用実績がある。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "大分県と環境整備産業、コカ・コーラ ボトラーズジャパンの事業連携協定",
+          "url": "https://www.pref.oita.jp/soshiki/13400/20230831kyouteiteiketu.html",
+          "source_type": "government",
+          "published_at": "2023-08-31"
+        },
+        {
+          "claim": "大分県の2024年11月7日現在の一覧に環境整備産業がパートナーシップ構築宣言企業として掲載される。4次公募開始前に登録済みであり、地域波及効果の加点候補に該当する。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "大分県内パートナーシップ構築宣言企業一覧（令和6年11月7日）",
+          "url": "https://www.pref.oita.jp/uploaded/attachment/2227447.pdf",
+          "source_type": "government",
+          "published_at": "2024-11-07"
+        },
+        {
+          "claim": "4次公募の公式採択一覧には金融機関確認書提出先として大分銀行が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+          "source_type": "government",
+          "published_at": "2025"
+        }
+      ],
+      "scores": {
+        "demand": 3,
+        "capacity_constraint": 3,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 1,
+        "external_validation": 3
+      },
+      "plausible_reason": "補助事業PDFが示す県外搬出比率と受入拒否案件に、外部確認できる2,000社超の顧客、自治体回収、特別管理廃棄物許可、循環協定が重なる。県内最大規模の焼却・中和設備で地域内処理を可能にする計画は、成長率だけで測れない許認可型インフラの供給制約解消・地域レジリエンスとして評価された可能性が高い。",
+      "counterevidence": "県外搬出65.8%・61.3%、TSMC視察、受入拒否件数及び施設不足量は補助事業PDF以外で確認できない。焼却施設は環境許可・住民合意・建設工程のリスクが高く、採択時点の許認可進捗も非公開である。",
+      "confidence": "High",
+      "research_gaps": "生活環境影響調査、都市計画・産廃処分業許可、住民説明、顧客予約・持込契約、処理単価、県外搬出量の公的統計との照合は未確認。"
+    },
+    {
+      "case_id": "s1_outline__196",
+      "company": "株式会社八立製作所",
+      "population": "removed_after_round_correction",
+      "application_round": "1次",
+      "identity_check": "補助事業PDFの大阪本社、建設機械用板金、鳥取拠点、ブラケットという記載を、会社公式サイト、鳥取県・鳥取市の企業誘致資料及び1次採択一覧と照合した。保存データの2次表記は公式一覧により1次へ補正した。",
+      "web_facts": [
+        {
+          "claim": "八立製作所は1967年創業で、1.2mmから65mmまでの板金加工設備を持つと公表している。薄板から厚板まで一貫対応する建機部品加工能力がある。",
+          "timing": "undated",
+          "source_title": "株式会社八立製作所 公式サイト",
+          "url": "https://www.hachiritsu.com/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "鳥取県は2014年、同社が大阪府内4工場のリスク分散と量産拠点化を目的に鳥取へ進出し、中国輸入部品の物流に境港活用も検討していたと説明している。鳥取拠点は地域誘致・供給網分散の文脈を持つ。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "平成26年11月27日 鳥取県議会予備調査会議録",
+          "url": "https://www.pref.tottori.lg.jp/item/946087.htm",
+          "source_type": "government",
+          "published_at": "2014-11-27"
+        },
+        {
+          "claim": "鳥取市は近年の誘致企業として八立製作所を掲載し、主な業種を建設機械用板金部品の製造としている。現在も地域の誘致製造拠点として認識されている。",
+          "timing": "undated",
+          "source_title": "鳥取市 主な工業団地と近年の誘致企業",
+          "url": "https://www.city.tottori.lg.jp/page/5290.html",
+          "source_type": "government",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "1次公募の公式採択一覧には金融機関確認書提出先として三井住友銀行が記載されている。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 1次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_1ji.pdf?260107=",
+          "source_type": "government",
+          "published_at": "2024"
+        }
+      ],
+      "scores": {
+        "demand": 3,
+        "capacity_constraint": 2,
+        "business_transformation": 2,
+        "regional_supply_chain": 3,
+        "policy_fit": 2,
+        "execution_finance": 3,
+        "crisis_or_succession": 0,
+        "external_validation": 3
+      },
+      "plausible_reason": "補助事業PDFのコマツ大阪工場向けブラケット約80%シェアと増産要請が事実なら、代替困難な国内建機サプライヤーの供給能力・品質を守る投資である。鳥取への誘致経緯にリスク分散と量産機能が明示され、銀行確認もあり、成長率中央値より顧客固有性と供給網強靱化が重視された可能性がある。",
+      "counterevidence": "80%シェア、顧客の増産要請及び能力不足量は外部公開資料で確認できず、核心は補助事業PDFの自己申告に依存する。鳥取進出資料は2014年で、今回投資との時間差が大きい。現行サイトにパートナーシップ構築宣言へのリンクはあるが、1次公募開始時点での登録日は確認できない。",
+      "confidence": "Medium",
+      "research_gaps": "コマツ又は一次サプライヤーの発注内示、現行の鳥取・大阪工場分担、塗装工程の外注費・リードタイム、宣言日、設備発注は未確認。"
+    },
+    {
+      "case_id": "s1_outline__179",
+      "company": "アサヒセイレン中部株式会社",
+      "population": "removed_after_round_correction",
+      "application_round": "1次",
+      "identity_check": "補助事業PDFの西尾市、アルミニウム二次合金、国内サプライチェーン強靱化、将来の北陸新会社との共同申請という記載を、会社設備情報、経済産業局資料、愛知県の土地売買、廃棄物計画及び1次採択一覧と照合した。保存データの2次表記は1次へ補正した。",
+      "web_facts": [
+        {
+          "claim": "アサヒセイレン中部は既存工場でアルミニウム合金地金を月3,000トン生産し、40トン・25トン反射炉、保持炉、回転炉、分析設備を保有する。既存の大規模アルミ再生操業基盤がある。",
+          "timing": "undated",
+          "source_title": "アサヒセイレン中部 会社・設備紹介",
+          "url": "https://www.asahiseiren.com/company/group/chubu/",
+          "source_type": "company",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "近畿経済産業局資料は、グループが多様なアルミスクラップを原料化し、アルミドロスをアルミ分と灰に分離して再資源化する循環型モデルを構築し、自動車部品・鉄鋼メーカーを顧客層とすることを紹介している。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "関西企業フロントライン アサヒセイレン株式会社",
+          "url": "https://www.kansai.meti.go.jp/2kokuji/glocal_PT/catalog/sheet/57_asahi_seiren_j.pdf",
+          "source_type": "government",
+          "published_at": "unknown"
+        },
+        {
+          "claim": "愛知県は2024年12月、アサヒセイレン中部が約6.7ha・約27.4億円の工業用地を取得し、アルミニウム二次合金工場を建設する計画を公表した。採択後の情報だが、巨額用地取得により投資実行を裏付ける。",
+          "timing": "post_adoption",
+          "source_title": "幸田須美地区工業用地への企業立地について",
+          "url": "https://www.pref.aichi.jp/soshiki/kigyo-yuuchi/koutasumi-3.html",
+          "source_type": "government",
+          "published_at": "2024-12-11"
+        },
+        {
+          "claim": "2024年6月提出の特別管理産業廃棄物処理計画は、既存西尾工場の製造品出荷額約87.6億円、従業員64人、有害ばいじん145トン、スクラップ選別・集塵灰再利用の改善を記載する。規制対応を伴う操業能力と環境負荷の双方が確認できる。",
+          "timing": "post_adoption",
+          "source_title": "特別管理産業廃棄物処理計画書 アサヒセイレン中部",
+          "url": "https://kankyojoho.pref.aichi.jp/junkan/R6todokede/nishimikawa/06n015b.pdf",
+          "source_type": "government",
+          "published_at": "2024-06-25"
+        },
+        {
+          "claim": "1次公募の公式採択一覧はアサヒセイレン北陸（新設）との共同申請と、金融機関確認書提出先として三井住友銀行を掲載している。",
+          "timing": "pre_or_contemporaneous",
+          "source_title": "中堅・中小成長投資補助金 1次公募 採択案件一覧",
+          "url": "https://seichotoushi-hojo.jp/assets/pdf/list_1ji.pdf?260107=",
+          "source_type": "government",
+          "published_at": "2024"
+        }
+      ],
+      "scores": {
+        "demand": 2,
+        "capacity_constraint": 2,
+        "business_transformation": 3,
+        "regional_supply_chain": 3,
+        "policy_fit": 3,
+        "execution_finance": 3,
+        "crisis_or_succession": 0,
+        "external_validation": 3
+      },
+      "plausible_reason": "アルミスクラップを自動車・圧延用途の二次合金へ戻す国内循環拠点は、資源循環、GX、輸入依存低減及び自動車供給網強靱化を同時に説明できる。既存月3,000トン操業、独自ドロス再資源化、共同申請、銀行確認に加え、採択後の6.7ha用地取得が実行力を間接的に裏付ける。",
+      "counterevidence": "用地取得は採択後で、申請時に売買予約や許認可がどこまで進んでいたか不明である。公開PDFの新設北陸会社と、愛知県が公表した中部会社の新工場との対象範囲が完全に一致するか確認を要する。廃棄物・大気排出、巨額投資、原料確保のリスクも大きい。",
+      "confidence": "Medium",
+      "research_gaps": "富山側拠点と愛知側新工場の関係、北陸新会社の設立・法人番号、原料供給契約、顧客オフテイク、環境アセス・炉許可、補助対象資産の所在は未確認。"
+    }
+  ]
+}

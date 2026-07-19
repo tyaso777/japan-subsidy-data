@@ -1,0 +1,497 @@
+[
+  {
+    "case_id": "s1_outline__207",
+    "company": "株式会社ジェイ・イー・ティ",
+    "population": "matched_accepted_control",
+    "application_round": "1次",
+    "identity_check": "補助事業PDFの岡山県浅口郡里庄町における半導体洗浄装置の新本社工場計画を、会社公式サイトの所在地・事業内容および上場会社資料と照合した。なお matched_accepted_pairs.csv は1次とする一方、既存の再判定資料には2次との記載があり、回次不一致を注記する。JSONでは指定どおり matched CSV の1次を採用した。",
+    "web_facts": [
+      {
+        "claim": "補助事業PDFは、顧客からの増産要請、既存工場の作業スペース不足、外部倉庫利用、築27年の研究開発棟、酸洗ラインが1本のみという制約を示し、新本社工場で作業空間を約1.6倍、自動倉庫を導入し、同時評価能力を3件へ増やす計画を掲げる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "中堅・中小成長投資補助金 交付決定事業概要 株式会社ジェイ・イー・ティ",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline__207.pdf",
+        "source_type": "government",
+        "published_at": "2024"
+      },
+      {
+        "claim": "会社公式の事業説明は、半導体前工程の30～40％を占める洗浄工程向けに、顧客仕様へ合わせるカスタム型装置を供給し、韓国・中国・台湾に加え日本・米国へ展開していると説明する。",
+        "timing": "undated",
+        "source_title": "事業内容 株式会社ジェイ・イー・ティ",
+        "url": "https://www.globaljet.jp/service/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "2023年の発行者情報は、中国の半導体ファウンドリー向け売上・受注残を開示しており、申請前から実需を伴う受注基盤があったことを確認できる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "第15期 第2四半期発行者情報 株式会社ジェイ・イー・ティ",
+        "url": "https://www.globaljet.jp/wp-content/uploads/2023/08/%E7%AC%AC15%E6%9C%9F%EF%BC%882023%E5%B9%B412%E6%9C%9F%EF%BC%89%E7%AC%AC2%E5%9B%9B%E5%8D%8A%E6%9C%9F%E7%99%BA%E8%A1%8C%E8%80%85%E6%83%85%E5%A0%B1.pdf",
+        "source_type": "finance",
+        "published_at": "2023"
+      },
+      {
+        "claim": "採択後の専門紙報道では、Rapidusの研究開発向け装置案件が確認され、国内先端半導体投資への接続が結果として具体化した。これは実行後の補強材料であり、採択時の直接根拠ではない。",
+        "timing": "post_adoption",
+        "source_title": "ジェイ・イー・ティ、Rapidus向けで研究開発用装置",
+        "url": "https://www.sangyo-times.jp/article.aspx?ID=13634",
+        "source_type": "media",
+        "published_at": "2024-12-20"
+      }
+    ],
+    "scores": {
+      "demand": 3,
+      "capacity_constraint": 3,
+      "business_transformation": 3,
+      "regional_supply_chain": 2,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 1,
+      "external_validation": 3
+    },
+    "plausible_reason": "顧客増産要請と設備・研究開発上の制約が具体的で、単なる売上目標ではなく、国内先端半導体供給網の設備ボトルネック解消として説明できる。上場企業としての資金調達力、既存の海外販売・受注実績、カスタム装置の技術蓄積も、大型投資の実行確度を補強した可能性が高い。",
+    "counterevidence": "売上・受注は中国を含む少数の半導体顧客と設備投資循環に左右されやすく、受注延期・取消しのリスクがある。Rapidus案件は採択後に確認された事実であり、これを採択理由として逆算してはならない。顧客別の確約数量や新工場稼働率は公開資料から確認できない。",
+    "confidence": "High",
+    "research_gaps": "申請時点の顧客内示・長期契約、自己資金と借入の構成、既存工場の設備別稼働率、回次不一致の最終確認。"
+  },
+  {
+    "case_id": "s1_outline_87",
+    "company": "トーカロ株式会社",
+    "population": "matched_accepted_control",
+    "application_round": "1次",
+    "identity_check": "補助事業PDFの鈴身事業所・北九州工場における半導体製造装置部品向け表面改質処理能力増強を、トーカロ公式IR・会社情報の所在地、事業、建設計画と照合した。",
+    "web_facts": [
+      {
+        "claim": "補助事業PDFは、主要半導体製造装置顧客の発注増を見込み、鈴身事業所と北九州工場に新工場を整備して表面改質処理の供給能力、研究開発、工程自動化を同時に強化する計画を示す。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "中堅・中小成長投資補助金 交付決定事業概要 トーカロ株式会社",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_87.pdf",
+        "source_type": "government",
+        "published_at": "2024"
+      },
+      {
+        "claim": "個人投資家向け会社説明資料は、2024年5月時点で新工場を建設中、2025年3月完成予定とし、半導体製造装置向け受注増への対応を投資目的としている。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "個人投資家向け会社説明資料 2024 トーカロ株式会社",
+        "url": "https://www.tocalo.co.jp/ir/individual/pdf/individual_tocalo2024.pdf",
+        "source_type": "finance",
+        "published_at": "2024"
+      },
+      {
+        "claim": "会社の事業紹介は、溶射を中心とする表面改質分野で国内シェア首位と説明しており、大型投資の前提となる既存技術・顧客基盤がある。",
+        "timing": "undated",
+        "source_title": "数字で見るトーカロ",
+        "url": "https://www.tocalo.co.jp/company/ataglance/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "会社のリスク情報は、半導体・FPD分野の需要変動に加え、東京エレクトロングループへの売上依存を重要リスクとして挙げる。需要の具体性と同時に顧客集中リスクもある。",
+        "timing": "post_adoption",
+        "source_title": "事業等のリスク トーカロ株式会社",
+        "url": "https://www.tocalo.co.jp/ir/management/risk/",
+        "source_type": "finance",
+        "published_at": "unknown"
+      }
+    ],
+    "scores": {
+      "demand": 3,
+      "capacity_constraint": 3,
+      "business_transformation": 2,
+      "regional_supply_chain": 2,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 0,
+      "external_validation": 3
+    },
+    "plausible_reason": "半導体装置メーカーからの需要増に対する供給能力増強であり、既存技術・顧客・用地・建設工程が揃っている。国内半導体製造基盤の強靱化という政策適合性と、上場企業・国内首位事業者としての実行力が評価されやすい案件である。",
+    "counterevidence": "主要顧客への依存と半導体設備投資サイクルへの感応度が高く、需要が後ずれすれば新工場の稼働率が低下する。公開資料では顧客の拘束力ある購入契約や採択審査で用いられた受注見通しを確認できない。",
+    "confidence": "High",
+    "research_gaps": "顧客別内示数量、工場別稼働率、北九州と鈴身への能力配分、補助金を除く投資回収計画。"
+  },
+  {
+    "case_id": "s1_outline_141",
+    "company": "共栄フード株式会社",
+    "population": "matched_accepted_control",
+    "application_round": "2次",
+    "identity_check": "補助事業PDFの群馬県における東日本新工場・業務用パン粉増産計画を、共栄フード公式サイトおよび食品産業センターの海外展開資料と照合した。",
+    "web_facts": [
+      {
+        "claim": "補助事業PDFは、国内競合の撤退と引合い増加を背景に、群馬県で年産約2万3300トンの東日本工場を建設し、自動化と国内外供給を強化して国内シェア40％を目指す計画を示す。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "中堅・中小成長投資補助金 交付決定事業概要 共栄フード株式会社",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_141.pdf",
+        "source_type": "government",
+        "published_at": "2025"
+      },
+      {
+        "claim": "会社公式の代表メッセージは、1988年から海外展開し、タイ・ベトナムを含む複数工場でPANKOを生産し、冷凍食品・外食など広い顧客層に供給してきた実績を説明する。",
+        "timing": "undated",
+        "source_title": "代表メッセージ 共栄フード株式会社",
+        "url": "https://www.kyoeifood.co.jp/corporate/message/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "食品産業センターの事例資料は、同社が早期から海外生産を展開し、日本系冷凍食品メーカー等の需要に対応してPANKO市場を開拓してきた経緯を紹介する。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "食品産業の海外展開事例 共栄フード株式会社",
+        "url": "https://www.shokusan.or.jp/wp-content/uploads/2019/03/166pdf30.pdf",
+        "source_type": "other",
+        "published_at": "2019"
+      },
+      {
+        "claim": "会社は採択後、東日本新工場について国内外の需要に対応する拠点として公表した。建設の具体化は実行力を補強するが、採択時の直接根拠ではない。",
+        "timing": "post_adoption",
+        "source_title": "東日本工場に関するお知らせ 共栄フード株式会社",
+        "url": "https://www.kyoeifood.co.jp/information/2025/02/post-5.php",
+        "source_type": "company",
+        "published_at": "2025-02"
+      }
+    ],
+    "scores": {
+      "demand": 3,
+      "capacity_constraint": 3,
+      "business_transformation": 2,
+      "regional_supply_chain": 2,
+      "policy_fit": 2,
+      "execution_finance": 3,
+      "crisis_or_succession": 0,
+      "external_validation": 2
+    },
+    "plausible_reason": "競合撤退で生じた供給余地と既存顧客からの引合いを、国内最大級の自動化工場で取り込む計画である。長年の海外工場運営と業務用パン粉の販路があり、設備を作ってから市場を探す案件ではなく、既存市場で供給制約を解く投資として評価しやすい。",
+    "counterevidence": "パン粉市場は成熟分野であり、国内需要が長期に拡大し続けるとは限らない。顧客名・購入確約量は公開されず、2万3300トンの新能力をどの程度埋められるかは検証できない。原材料・エネルギー価格と価格転嫁も収益性を左右する。",
+    "confidence": "Medium",
+    "research_gaps": "競合撤退による具体的な需要移管量、顧客別契約、既存工場の稼働率、輸出先別需要と物流費。"
+  },
+  {
+    "case_id": "s1_outline_174",
+    "company": "株式会社Ｐｌａｎ・Ｄｏ・Ｓｅｅ琉球",
+    "population": "matched_accepted_control",
+    "application_round": "2次",
+    "identity_check": "補助事業PDFの那覇市泊ふ頭の旧ホテル再生計画を、Plan・Do・See琉球公式サイト、那覇市議会に関する公開記事、既存ホテル運営実績と照合した。なお matched_accepted_pairs.csv は2次とする一方、既存の再判定資料には1次との記載があり、JSONでは指定どおり matched CSV の2次を採用した。",
+    "web_facts": [
+      {
+        "claim": "補助事業PDFは、2021年から閉館している泊ふ頭の旧ホテルを218室・宴会場6室・最大1200人規模のMICE対応ホテルへ再生し、既存のSouthwest Grand Hotelでは取り込めない団体・MICE需要へ対応する計画を示す。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "中堅・中小成長投資補助金 交付決定事業概要 株式会社Plan・Do・See琉球",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/koufu/outline_174.pdf",
+        "source_type": "government",
+        "published_at": "2025"
+      },
+      {
+        "claim": "那覇市議会に関する2023年の公開記事は、泊ふ頭開発が2022年12月9日にPlan・Do・See琉球とホテル運営契約を締結し、設計作業が進んでいたことを記録する。申請前から施設所有者・運営者間の役割が具体化していた。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "那覇市議会 泊ふ頭再整備・ホテル運営契約に関する報告",
+        "url": "https://jcp-naha.com/parliament/1259/",
+        "source_type": "other",
+        "published_at": "2023"
+      },
+      {
+        "claim": "同社は2023年6月に那覇市でSouthwest Grand Hotelを開業しており、ホテル・宴会・レストランを現地で立ち上げた運営実績がある。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "株式会社Plan・Do・See琉球 公式サイト",
+        "url": "https://www.plandosee-ryukyu.com/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "現在の公式サイトは新ホテルの開業時期を2026年5月としており、補助事業PDFで示された2025年冬頃より後ろ倒しになった可能性がある。採択後の工程遅延を示す反証材料である。",
+        "timing": "post_adoption",
+        "source_title": "株式会社Plan・Do・See琉球 公式サイト",
+        "url": "https://www.plandosee-ryukyu.com/",
+        "source_type": "company",
+        "published_at": "unknown"
+      }
+    ],
+    "scores": {
+      "demand": 2,
+      "capacity_constraint": 2,
+      "business_transformation": 3,
+      "regional_supply_chain": 3,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 2,
+      "external_validation": 2
+    },
+    "plausible_reason": "長期閉鎖された港湾ホテルの再生、MICE受入能力の新設、既存建物活用、離島航路の玄関口活性化を一体で説明できる。既に那覇でホテルを立ち上げた運営会社と泊ふ頭開発の役割分担が申請前から存在し、単独の新規参入より実行確度が高いと評価された可能性がある。",
+    "counterevidence": "MICE・観光需要は外部ショックに弱く、ホテル収益は稼働率と単価に依存する。公開資料では予約・送客契約を確認できず、現在の開業予定は当初工程より遅れている可能性がある。若い現地法人の財務余力はグループ支援に依存する。",
+    "confidence": "Medium",
+    "research_gaps": "建物所有・賃貸・投資負担の契約条件、MICE送客契約、資金保証、工期変更の理由、回次不一致の最終確認。"
+  },
+  {
+    "case_id": "s2_outline_5",
+    "company": "奥長良川名水株式会社",
+    "population": "matched_accepted_control",
+    "application_round": "3次",
+    "identity_check": "補助事業PDFの岐阜県関市洞戸における長期保存水・OEM新工場計画を、自治体の災害時供給協定、岐阜県HACCP認定、会社商品情報と照合した。",
+    "web_facts": [
+      {
+        "claim": "補助事業PDFは、長期保存水のOEM受注残に対し、老朽設備と生産能力が制約となっているため、自動化新工場で生産速度を約2.4倍へ高める計画を示す。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "中堅・中小成長投資補助金 交付決定事業概要 奥長良川名水株式会社",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_5.pdf",
+        "source_type": "government",
+        "published_at": "2025"
+      },
+      {
+        "claim": "本巣市は2024年4月25日に同社と災害時の飲料水・生活用水供給に関する協定を締結した。防災備蓄水の地域需要が企業の自己申告だけでなく自治体協定で確認できる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "奥長良川名水株式会社との災害時協定 本巣市",
+        "url": "https://www.city.motosu.lg.jp/0000002486.html",
+        "source_type": "government",
+        "published_at": "2024-04-25"
+      },
+      {
+        "claim": "瑞穂市の協定一覧にも、2024年8月23日付で同社との災害時物資供給協定が掲載されている。複数自治体との関係が確認できる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "災害時応援協定一覧 瑞穂市",
+        "url": "https://www.city.mizuho.lg.jp/1810.htm",
+        "source_type": "government",
+        "published_at": "2024-08-23"
+      },
+      {
+        "claim": "岐阜県は同社の第一・第二工場を2017年12月27日付でHACCP導入施設として認定しており、飲料製造の品質管理体制に外部認証がある。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "岐阜県HACCP導入施設認定一覧",
+        "url": "https://www.pref.gifu.lg.jp/page/14422.html",
+        "source_type": "government",
+        "published_at": "2017-12-27"
+      }
+    ],
+    "scores": {
+      "demand": 3,
+      "capacity_constraint": 3,
+      "business_transformation": 2,
+      "regional_supply_chain": 3,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 1,
+      "external_validation": 3
+    },
+    "plausible_reason": "受注残と老朽設備という明確な供給制約があり、複数自治体との災害時協定、長期保存という防災政策、既存HACCP認定が需要・品質・社会的必要性を同時に補強する。小規模企業でも、投資対象と売上化経路が単純で説明しやすい。",
+    "counterevidence": "自治体協定は必ずしも最低購入量を保証せず、公開調達の数量も新工場の増産規模に比べ小さい可能性がある。OEM受注残の顧客別数量、価格、継続年数は確認できず、大幅な売上目標の全てを外部根拠で裏付けられない。",
+    "confidence": "High",
+    "research_gaps": "OEM顧客との契約、受注残数量、設備別稼働率、自治体・企業備蓄向け売上構成、原水と物流の上限。"
+  },
+  {
+    "case_id": "s2_outline_13",
+    "company": "フジセイコー株式会社",
+    "population": "matched_accepted_control",
+    "application_round": "3次",
+    "identity_check": "補助事業PDFの群馬県安中市における半導体製造装置向け石英・シリコン等の加工新工場を、法人番号、所在地、会社紹介、求人・産業人材情報と照合した。",
+    "web_facts": [
+      {
+        "claim": "補助事業PDFは、半導体製造装置向け石英・シリコン等の難削材加工について引合い増加に対応し、形状加工・研磨能力を約2.5倍にする新工場、排水処理、自動化を整備する計画を示す。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "中堅・中小成長投資補助金 交付決定事業概要 フジセイコー株式会社",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_13.pdf",
+        "source_type": "government",
+        "published_at": "2025"
+      },
+      {
+        "claim": "群馬県内企業情報は、同社が1981年設立、安中市に所在し、石英・シリコン・セラミックス等の難削材を切断から研削、研磨まで一貫加工する企業であると紹介する。",
+        "timing": "undated",
+        "source_title": "ぐんま de 就活ナビ フジセイコー株式会社",
+        "url": "https://g-jumps.jp/company/34876/",
+        "source_type": "other",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "技術系企業紹介ページも、シリコン・石英・セラミックスの切断、平面研削、外周研削、研磨を社内一貫で行う加工能力を掲載している。投資は既存能力の延長線上にある。",
+        "timing": "undated",
+        "source_title": "フジセイコー株式会社 会社情報 ATENGINEER",
+        "url": "https://www.atengineer.com/pr/fj-seiko/company",
+        "source_type": "other",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "採択後の合同企業説明会資料は新工場と採用を案内しており、設備投資に合わせた人員確保が実行段階へ移ったことを示す。ただし採択後情報である。",
+        "timing": "post_adoption",
+        "source_title": "群馬県若者就職支援 合同企業説明会参加企業資料",
+        "url": "https://www.wakamono.jp/event/list/2929_250617_haiburigousetu_list2.pdf",
+        "source_type": "government",
+        "published_at": "2025-06-17"
+      }
+    ],
+    "scores": {
+      "demand": 2,
+      "capacity_constraint": 3,
+      "business_transformation": 2,
+      "regional_supply_chain": 2,
+      "policy_fit": 3,
+      "execution_finance": 2,
+      "crisis_or_succession": 0,
+      "external_validation": 2
+    },
+    "plausible_reason": "国内半導体装置供給網で必要な難削材加工を、既存の一貫加工技術を基礎に増強する案件である。形状加工・研磨の2.5倍化、排水処理、自動化という制約と解決策が明確で、政策適合性も高い。",
+    "counterevidence": "外部資料では顧客名、発注書、引合い数量を確認できず、需要の具体性は補助事業PDFへの依存が大きい。半導体市況の変動、小規模企業の採用・立上げ能力、2.5倍の能力を埋める受注確度には不確実性が残る。",
+    "confidence": "Medium",
+    "research_gaps": "主要顧客と用途、受注残、既存工程別稼働率、排水許認可、自己資金・借入、採用充足率。"
+  },
+  {
+    "case_id": "s2_outline_78",
+    "company": "株式会社宮古島の雪塩",
+    "population": "matched_accepted_control",
+    "application_round": "3次",
+    "identity_check": "補助事業PDFの旧社名パラダイスプランによる宮古島菓子工場計画を、2024年10月の社名変更、所在地、雪塩・雪塩さんど事業、工場計画の報道と照合した。",
+    "web_facts": [
+      {
+        "claim": "補助事業PDFは、ヒット商品『雪塩さんど』が沖縄県外のOEM工場で製造され、沖縄県内に同等生産能力を持つ工場がないため、宮古島に土産菓子工場を新設して製造を内製化し、付加価値を地域内へ残す計画を示す。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "中堅・中小成長投資補助金 交付決定事業概要 株式会社宮古島の雪塩",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_78.pdf",
+        "source_type": "government",
+        "published_at": "2025"
+      },
+      {
+        "claim": "沖縄タイムスは2024年7月、パラダイスプランと、2018年から雪塩さんどを製造してきた寿製菓が、宮古島で県内最大級となる約3300平方メートルの菓子工場を2026年操業予定として発表したと報じた。OEM先と工場構想が申請前から具体化していた。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "宮古島市に沖縄最大級の菓子工場 雪塩さんど・ふぃなん製造",
+        "url": "https://www.okinawatimes.co.jp/articles/-/1391785",
+        "source_type": "media",
+        "published_at": "2024-07-06"
+      },
+      {
+        "claim": "沖縄県の所得向上応援企業認証ページは、2023年に雪塩さんどが大ヒットし、売上が2021年度13.92億円から2023年度36.91億円、経常利益率が5.6％から28.4％へ上昇したと掲載する。工場投資前に商品市場性と財務余力が確認できる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "沖縄県所得向上応援企業認証 株式会社宮古島の雪塩",
+        "url": "https://www.shotokukojo.okinawa/members/1202/",
+        "source_type": "government",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "会社沿革は、2020～2021年のコロナ禍で東京エリアから撤退し、5店舗・3拠点・1農場を閉鎖した一方、2023年に5年ぶりの新規出店へ転じたと記録する。危機後の再成長・事業再構築という文脈がある。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "会社情報・沿革 株式会社宮古島の雪塩",
+        "url": "https://www.paradise-plan.co.jp/about/",
+        "source_type": "company",
+        "published_at": "unknown"
+      }
+    ],
+    "scores": {
+      "demand": 3,
+      "capacity_constraint": 3,
+      "business_transformation": 3,
+      "regional_supply_chain": 3,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 2,
+      "external_validation": 3
+    },
+    "plausible_reason": "既に大ヒットと高収益化が確認された商品を、県外OEMから宮古島内製へ移す案件である。市場性、製造パートナー、工場規模、地域内付加価値、雇用、観光ブランドが一つの因果鎖になっており、数字が弱くても評価される定性要因というより、定量・定性双方が強い対照例である。",
+    "counterevidence": "土産菓子は観光客数とヒット商品の持続性に左右され、島内製造は人材、原材料、物流、台風等のコスト・BCPリスクを負う。2023年の急成長が平常成長率として継続する保証はなく、新工場の損益分岐点や寿製菓との契約条件は非公開である。",
+    "confidence": "High",
+    "research_gaps": "雪塩さんどの販売数量・粗利、OEM契約と技術移管条件、工場稼働率、島内採用計画、原材料・完成品物流費。"
+  },
+  {
+    "case_id": "s2_outline_68",
+    "company": "三友プラントサービス株式会社",
+    "population": "matched_accepted_control",
+    "application_round": "3次",
+    "identity_check": "補助事業PDFの横浜BAY工場・廃棄物処理能力増強計画を、横浜市の環境影響評価手続、三友グループ再編、NEDO採択事業と照合した。",
+    "web_facts": [
+      {
+        "claim": "補助事業PDFは、既存設備が築20～30年で非効率、2024年の事業承継と地域からの処理要請を背景に、横浜で年間約3万トン・既存比約5倍の焼却能力を持ち、医療系・特殊廃棄物やPFASにも対応する新工場を計画している。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "中堅・中小成長投資補助金 交付決定事業概要 三友プラントサービス株式会社",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_68.pdf",
+        "source_type": "government",
+        "published_at": "2025"
+      },
+      {
+        "claim": "横浜市の環境影響評価ページは、横浜市金沢区福浦で廃棄物処理施設を建設する事業として、2022年12月から条例手続が進められてきたことを公開している。用地・設備・環境対策が申請前から行政審査に乗っていた。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "三友プラントサービス株式会社 横浜BAY工場プロジェクト 環境影響評価手続",
+        "url": "https://www.city.yokohama.lg.jp/kurashi/machizukuri-kankyo/kankyohozen/hozentorikumi/assessment/shinaijigyou/103-mokuji/shinaijigyou-103.html",
+        "source_type": "government",
+        "published_at": "2025-01-27"
+      },
+      {
+        "claim": "NEDOは2024年8月、同社とBiomaterial in Tokyoを助成先として、国産原料パルプからバイオエタノールを経由するSAFサプライチェーン実証を進め、供給元を含む国際認証取得を公表した。廃棄物処理を越える技術・政策実行力が確認できる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "パルプ工場として世界初のISCC-CORSIA認証を取得 NEDO",
+        "url": "https://www.nedo.go.jp/news/press/AA5_101773.html",
+        "source_type": "government",
+        "published_at": "2024-08-26"
+      },
+      {
+        "claim": "三友グループは2024年4月、関東地区の収集運搬・汚染土壌事業を三友プラントサービスへ集約し、同年5月にクリーンネットワークを吸収合併すると公表した。新工場と並行して事業承継・組織再編を進めていた。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "グループ再編ならびに役員新体制のお知らせ 三友グループ",
+        "url": "https://group-sanyu.co.jp/news/104/",
+        "source_type": "company",
+        "published_at": "2024-04-01"
+      }
+    ],
+    "scores": {
+      "demand": 2,
+      "capacity_constraint": 3,
+      "business_transformation": 3,
+      "regional_supply_chain": 3,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 2,
+      "external_validation": 3
+    },
+    "plausible_reason": "老朽設備更新だけでなく、地域の処理能力不足、特殊廃棄物・PFAS対応、関東事業の集約、事業承継を一体化した社会インフラ案件である。環境影響評価を数年前から進め、NEDO事業の実績もあるため、許認可・技術・運営面の実行確度が高いと評価された可能性がある。",
+    "counterevidence": "処理能力5倍は大きく、公開資料だけでは長期搬入契約と稼働率を確認できない。環境・都市計画・廃棄物処理許可の遅延、住民対応、建設費上振れが主要リスクである。NEDOのSAF実証は別事業であり、新焼却炉需要の直接証拠ではない。",
+    "confidence": "High",
+    "research_gaps": "排出事業者との搬入契約、廃棄物種別数量、最終許認可、住民意見と対応、設備建設費、PFAS処理の商用実績。"
+  },
+  {
+    "case_id": "s2_outline_47",
+    "company": "INTLOOP株式会社",
+    "population": "matched_accepted_control",
+    "application_round": "3次",
+    "identity_check": "補助事業PDFの人材データベースとAIエージェント基盤の開発計画を、東証上場会社の2024年決算・統合レポート、提携先Ideinの発表と照合した。",
+    "web_facts": [
+      {
+        "claim": "補助事業PDFは、約5万人規模のフリーランス人材データベースを基盤に、人とAIを組み合わせたAIエージェント・SaaS群を開発し、地方・中小企業を含む顧客へ展開する事業転換を示す。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "中堅・中小成長投資補助金 交付決定事業概要 INTLOOP株式会社",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/koufu_3_4ji/outline_47.pdf",
+        "source_type": "government",
+        "published_at": "2025"
+      },
+      {
+        "claim": "INTLOOP Report 2024は、年間取引企業約500社、2024年7月期売上高270.77億円・前期比51.9％増、営業利益15.06億円を公表する一方、営業担当の戦力化遅れで一度業績予想を下方修正したことも明記する。顧客基盤と組織スケール上の制約の双方が確認できる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "INTLOOP Report 2024",
+        "url": "https://www.intloop.com/ir/library/report/2024yearend/",
+        "source_type": "finance",
+        "published_at": "2024"
+      },
+      {
+        "claim": "提携先Ideinは2024年9月、2024年5月からINTLOOPとエッジAI・LLMのPoC伴走支援を開始し、INTLOOPの約4万1000人の登録プロ人材とActcastを組み合わせる資本業務提携を公表した。AI事業は申請前から外部技術企業との実サービス段階にあった。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "INTLOOP株式会社との資本業務提携について Idein株式会社",
+        "url": "https://www.idein.jp/ja/news/240924-intloop-teikei",
+        "source_type": "customer_supplier",
+        "published_at": "2024-09-24"
+      },
+      {
+        "claim": "東証開示の2024年7月期決算短信は、現金及び現金同等物57.08億円、自己資本比率39.4％、営業キャッシュフロー12.27億円を示し、約15億円規模の補助事業を実行する財務基盤を外部開示で確認できる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "2024年7月期 決算短信 INTLOOP株式会社",
+        "url": "https://www2.jpx.co.jp/disc/95560/140120240913585047.pdf",
+        "source_type": "finance",
+        "published_at": "2024-09-13"
+      }
+    ],
+    "scores": {
+      "demand": 3,
+      "capacity_constraint": 2,
+      "business_transformation": 3,
+      "regional_supply_chain": 2,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 0,
+      "external_validation": 3
+    },
+    "plausible_reason": "既存の顧客500社規模、4万人超のプロ人材、急成長する売上、十分な現預金を持つ企業が、労働集約的な人材マッチング・コンサルからAIエージェントを備えた反復可能なプラットフォームへ転換する案件である。労働力不足と地方・中小企業DXという政策課題に直結し、外部技術パートナーも既に存在する。",
+    "counterevidence": "AIエージェント市場は技術・競争・収益モデルの不確実性が高く、5万人の登録者がそのままデータ品質やAI優位性を保証しない。2024年には営業戦力化の遅れで業績予想を下方修正しており、1000億円売上目標は野心的である。提携やPoCは継続収益・顧客定着の証拠ではない。",
+    "confidence": "High",
+    "research_gaps": "AI製品別の有料顧客、ARR・解約率、データ利用同意と権利処理、モデル開発内製比率、補助対象15億円の費目とマイルストーン。"
+  }
+]

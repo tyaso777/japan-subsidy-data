@@ -1,0 +1,489 @@
+[
+  {
+    "case_id": "s2_outline_69",
+    "company": "松村フーズ株式会社",
+    "population": "matched_accepted_control",
+    "application_round": "3次",
+    "identity_check": "公式採択一覧の法人番号9070001008416、群馬県の本社・事業実施場所、冷凍食品卸・低温物流という事業内容が会社サイトと一致する。",
+    "web_facts": [
+      {
+        "claim": "会社サイトは、北関東を中心に全国へ広がるフローズン物流網、冷凍・冷蔵・超冷凍・常温倉庫、加工施設を備える既存事業基盤を示す。補助事業はゼロからの物流参入ではない。",
+        "timing": "undated",
+        "source_title": "会社概要｜松村フーズ株式会社",
+        "url": "https://matsumura-foods.co.jp/company",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "IHI物流システムの導入事例は、同社の既存物流センターに冷凍移動棚・ピッキング仕分けを導入し、750パレット保管、坪効率向上、取扱量増加、作業時間短縮を実現する設計だったと記載する。自動化物流の実装経験を第三者が確認できる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "冷凍移動棚、デジタルピッキングシステムの事例｜IHI物流システム",
+        "url": "https://www.ihi.co.jp/logistics/examples/matsumurafoods.html",
+        "source_type": "supplier_case",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "3次公募の採択一覧は、計画名を『保税機能を持つスマート冷凍食品自動倉庫の建設』、確認書提出金融機関を群馬銀行と記載する。銀行名は確認書提出の事実であり、採択理由そのものを示すものではない。",
+        "timing": "post_adoption",
+        "source_title": "中堅・中小成長投資補助金 3次公募 採択案件一覧",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/list_3ji.pdf",
+        "source_type": "government",
+        "published_at": "2025-06-30"
+      }
+    ],
+    "scores": {
+      "demand": 2,
+      "capacity_constraint": 2,
+      "business_transformation": 2,
+      "regional_supply_chain": 2,
+      "policy_fit": 2,
+      "execution_finance": 3,
+      "crisis_or_succession": 0,
+      "external_validation": 2
+    },
+    "plausible_reason": "既存の全国低温物流網と自動化設備の運用実績を土台に、過酷な冷凍庫内作業の省人化と保税機能を追加する計画である。採択者側から見れば、技術実証を終えたオペレーターが次の規模へ拡張するため、実行リスクが比較的低かった可能性が高い。",
+    "counterevidence": "公開資料では、補助事業に直結する荷主の発注書、庫腹率、失注額、外部倉庫費用を確認できない。既存物流業の増床という側面も強く、事業転換の新規性は限定的である。",
+    "confidence": "Medium",
+    "research_gaps": "申請時点の荷主別取扱量、冷凍倉庫稼働率、保税需要、採用難・労災データ、群馬銀行確認書の評価内容が必要。"
+  },
+  {
+    "case_id": "s2_outline_62",
+    "company": "株式会社エネルギーギャップ",
+    "population": "matched_accepted_control",
+    "application_round": "3次",
+    "identity_check": "公式採択一覧の法人番号3010001163288、東京都本社、鹿児島県出水市での太陽電池・蓄電池製造という記載が会社サイトおよび出水市資料と一致する。",
+    "web_facts": [
+      {
+        "claim": "出水市議会議事録は、同社が2017年に東京から出水市へ進出し、立地協定を締結した企業であることを示す。今回計画以前から地域に製造拠点を持っていた。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "出水市平成30年第2回定例会 第4日 議会議事録",
+        "url": "https://www.city.kagoshima-izumi.lg.jp/gikai/gijiroku/detail/319/31984",
+        "source_type": "government",
+        "published_at": "2018"
+      },
+      {
+        "claim": "会社サイトは、鹿児島工場で国産太陽電池モジュールを製造し、蓄電池併設型太陽光について開発設計、生産供給、届出支援、保守まで一貫提供すると記載する。計画の太陽電池・蓄電池・EMS統合は既存能力の延長にある。",
+        "timing": "undated",
+        "source_title": "事業案内｜株式会社エネルギーギャップ",
+        "url": "https://www.energygap-jp.com/business/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "3次採択後、出水市は第2工場増設について同社と立地協定を締結した。市は太陽電池の能力増強と蓄電池ライン新設により再エネ製品を一体供給する計画と説明している。これは採択後の実行確認であり、審査時点の独立証拠ではない。",
+        "timing": "post_adoption",
+        "source_title": "株式会社エネルギーギャップと立地協定を締結しました｜出水市",
+        "url": "https://www.city.kagoshima-izumi.lg.jp/page/page_012132.html",
+        "source_type": "government",
+        "published_at": "2025-10"
+      },
+      {
+        "claim": "3次公募採択一覧は、計画名を『EG鹿児島第二工場』、確認書提出金融機関をみずほ銀行と記載する。",
+        "timing": "post_adoption",
+        "source_title": "中堅・中小成長投資補助金 3次公募 採択案件一覧",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/list_3ji.pdf",
+        "source_type": "government",
+        "published_at": "2025-06-30"
+      }
+    ],
+    "scores": {
+      "demand": 2,
+      "capacity_constraint": 2,
+      "business_transformation": 3,
+      "regional_supply_chain": 3,
+      "policy_fit": 3,
+      "execution_finance": 2,
+      "crisis_or_succession": 1,
+      "external_validation": 3
+    },
+    "plausible_reason": "太陽電池・蓄電池・EMSを国内で一体供給する政策適合性が極めて明確で、既存の出水工場と自治体関係もあった。採択者側は、単なる能力増強ではなく、輸入依存の強い蓄電池サプライチェーンを国内化する拠点として評価した可能性がある。",
+    "counterevidence": "公開概要にある国内12GWh・米国20GWh等の案件量は第三者資料で検証できない。約87億円規模の投資に対し、公開された従業員規模は小さく、需要確度・資金調達・立上げ能力のリスクは大きい。出水市との増設協定は採択後であり、採択理由の先行証拠にはできない。",
+    "confidence": "Medium",
+    "research_gaps": "案件パイプラインの顧客名・拘束力、電池セルの調達先、量産歩留まり、運転資金、借入・出資条件、認証取得計画の確認が必要。"
+  },
+  {
+    "case_id": "s2_outline_109",
+    "company": "株式会社ヤマイシ",
+    "population": "matched_accepted_control",
+    "application_round": "3次",
+    "identity_check": "公式採択一覧の法人番号3420001002108、青森市の所在地、食品卸・水産加工・冷凍冷蔵倉庫という複合事業が会社サイトおよび農林水産省資料と一致する。",
+    "web_facts": [
+      {
+        "claim": "会社サイトは、学校給食・外食・高齢者施設向け食材供給、自社物流センターでの温度帯別保管、青森卸売市場との連携を記載する。浜町埠頭冷蔵庫は2019年に対EU輸出水産食品取扱施設へ認定されている。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "事業内容｜株式会社ヤマイシ",
+        "url": "https://www.yamaishi21.co.jp/business.html",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "農林水産省が公表した輸出事業計画は、冷凍ホタテ貝柱の輸出額を2022年1月期2,010万円から2028年1月期5,130万円、輸出量を7.1トンから19トン、生産量を13.5トンから40トンへ伸ばす目標を示す。採択前に外部公表された具体的な成長計画である。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "輸出事業計画 株式会社ヤマイシ 冷凍ホタテ貝柱｜農林水産省",
+        "url": "https://www.maff.go.jp/j/shokusan/export/gfp/attach/pdf/yusyutsu_keikaku_kohyo-344.pdf",
+        "source_type": "government",
+        "published_at": "2022"
+      },
+      {
+        "claim": "会社概要は、1932年創業後、食品卸、水産加工、冷蔵倉庫、ホテル等へ展開し、物流センターを既に運営していたことを示す。大型冷蔵倉庫の実行主体として長い運営歴がある。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "会社概要｜株式会社ヤマイシ",
+        "url": "https://www.yamaishi21.co.jp/company.html",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "3次公募採択一覧は、計画名を『冷凍倉庫増築による東北活性化』、確認書提出金融機関を日本政策金融公庫と記載する。",
+        "timing": "post_adoption",
+        "source_title": "中堅・中小成長投資補助金 3次公募 採択案件一覧",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/list_3ji.pdf",
+        "source_type": "government",
+        "published_at": "2025-06-30"
+      }
+    ],
+    "scores": {
+      "demand": 3,
+      "capacity_constraint": 2,
+      "business_transformation": 2,
+      "regional_supply_chain": 3,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 1,
+      "external_validation": 3
+    },
+    "plausible_reason": "地域の学校給食・外食・水産流通を支える既存インフラであり、対EU認定と農水省の輸出計画も持つ。冷蔵能力の増強は、自社売上だけでなく青森の水産物保管・輸出・地域給食を同時に支えるため、低い可視指標を補う供給網上の重要性が評価された可能性が高い。",
+    "counterevidence": "不足庫腹量、外部倉庫費、入庫拒否・失注量は公開情報で確認できない。輸出計画は目標であり実績保証ではなく、ホタテ供給・輸出規制・漁獲変動の影響を受ける。",
+    "confidence": "High",
+    "research_gaps": "温度帯別稼働率、荷主別契約、学校給食供給量、輸出計画の進捗、冷蔵倉庫増築による第三者便益の定量化が必要。"
+  },
+  {
+    "case_id": "s2_outline_127",
+    "company": "株式会社キィポーション",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "公式採択一覧の法人番号9200001016207、岐阜県池田町の本社、菓子・食品の包装加工という事業内容が会社サイトとGビズインフォで一致する。",
+    "web_facts": [
+      {
+        "claim": "会社沿革は、1991年の食品包装加工参入後、複数工場を開設し、2019～2020年に本社第二・大垣・巣南・揖斐等の工場でJFS-B認証を取得したと記載する。複数拠点の食品製造管理を既に経験している。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "会社概要｜株式会社キィポーション",
+        "url": "https://recruit.keyportion.com/company/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "Gビズインフォは、同一法人番号・本店所在地に加え、職場情報として男性41人、女性92人を掲載する。女性雇用を地域効果として掲げる計画に、採択前後を通じた実在の雇用基盤がある。",
+        "timing": "undated",
+        "source_title": "株式会社キィポーション｜Gビズインフォ",
+        "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBango=9200001016207",
+        "source_type": "government",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "岐阜県のHACCP導入認定施設ページは、同社本社第二工場を菓子製造業の認定施設として掲載する。食品安全管理能力を行政資料で確認できる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "岐阜県HACCP導入認定施設詳細",
+        "url": "https://www.pref.gifu.lg.jp/page/14422.html",
+        "source_type": "government",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "4次公募採択一覧は、計画名を『岐阜県西濃地域・地方菓子製造業者との共存共栄での「総合ODM菓子流通加工業」へのステップアップ事業』、確認書提出金融機関を岐阜信用金庫と記載する。",
+        "timing": "post_adoption",
+        "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+        "source_type": "government",
+        "published_at": "2025-10-10"
+      }
+    ],
+    "scores": {
+      "demand": 2,
+      "capacity_constraint": 2,
+      "business_transformation": 3,
+      "regional_supply_chain": 3,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 2,
+      "external_validation": 3
+    },
+    "plausible_reason": "食品包装の多拠点運営、JFS-B/HACCP、女性中心の雇用という既存資産があり、それを工場統合と企画・追加加工・包装・保管・流通を束ねるODMへ転換する計画である。地域の小規模菓子メーカーの事業承継・販路問題まで解く『産業基盤型』の物語が、単純な企業成長率以上に評価された可能性がある。",
+    "counterevidence": "地域メーカーの廃業回避や大手流通の需要について、相手先名・基本合意・数量は公開されていない。会社サイトの従業員436人とGビズインフォの133人には時点・集計範囲の差があり、雇用効果の基準を慎重に扱う必要がある。",
+    "confidence": "High",
+    "research_gaps": "ODM顧客候補、承継支援対象、SKU・包装ライン稼働率、工場間移動費、女性雇用の常用換算、統合後の品質・物流KPIが必要。"
+  },
+  {
+    "case_id": "s2_outline_134",
+    "company": "池田薬品工業株式会社",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "公式採択一覧の法人番号9230001004720、富山県上市町の所在地、軟膏・クリーム等の外用剤製造が会社サイトと富山県薬業連合会資料で一致する。",
+    "web_facts": [
+      {
+        "claim": "会社サイトは、1944年設立、医療用・一般用医薬品の製造販売と軟膏・クリーム・液剤の受託製造、カイゲンファーマ、ゼリア新薬、日医工、日本新薬、富士製薬等の主要取引先を記載する。2012年にはワムナール関連新工場を完成している。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "会社案内｜池田薬品工業株式会社",
+        "url": "https://ikedayakuhin.co.jp/outline/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "富山県薬業連合会の受託製造データベースは、同社がGMP下で軟膏・クリームを年4万kg、皮膚用液剤を年1万kg受託可能で、商用製造・包装に対応すると掲載する。専門剤形の実装能力が外部業界団体資料で確認できる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "IKEDA Medicine Industrial Co., Ltd.｜Medicine of Toyama",
+        "url": "https://www.toyama-kusuri.jp/en/oem/search/detail0001.html",
+        "source_type": "industry_association",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "日東メディックの2023年新製品案内は、外用合成副腎皮質ホルモン剤のクリーム・軟膏について池田薬品工業を製造販売元として記載する。高薬理活性ステロイド領域の製品実績を具体名で確認できる。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "新製品発売のお知らせ｜日東メディック",
+        "url": "https://www.nittomedic.co.jp/info/images/oshirase_20231010.pdf",
+        "source_type": "customer_or_partner",
+        "published_at": "2023-10"
+      },
+      {
+        "claim": "4次公募採択一覧は、高齢化社会向け皮膚炎用軟膏・クリームの安定供給、製造能力強化、専門人材確保を計画名に掲げ、確認書提出金融機関を北陸銀行と記載する。",
+        "timing": "post_adoption",
+        "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+        "source_type": "government",
+        "published_at": "2025-10-10"
+      }
+    ],
+    "scores": {
+      "demand": 3,
+      "capacity_constraint": 2,
+      "business_transformation": 3,
+      "regional_supply_chain": 3,
+      "policy_fit": 3,
+      "execution_finance": 3,
+      "crisis_or_succession": 2,
+      "external_validation": 3
+    },
+    "plausible_reason": "外用剤に特化した長期のGMP製造能力、実名の製薬取引先・製品実績があり、一般的な新工場より需要と技術の結び付きが強い。高齢者皮膚疾患向け安定供給、競合の少ない高薬理活性剤への集中、若返り・専門人材育成を一つの投資で実現する点が評価された可能性が高い。",
+    "counterevidence": "補助事業に直結する『重要顧客2社の増産要請』の顧客名、数量、拘束力は公開されていない。業界団体が示す年4万kg能力に対する現稼働率も不明で、新工場が不可欠な能力制約かは外部資料だけでは確定できない。",
+    "confidence": "High",
+    "research_gaps": "製品別受注残、既存ライン稼働率、技術移管契約、薬事承認・GMP査察日程、高薬理活性封じ込め能力、顧客集中度、後継人材計画が必要。"
+  },
+  {
+    "case_id": "s2_outline_152",
+    "company": "株式会社大熊製作所",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "公式採択一覧の法人番号2030001074022、埼玉県本社・栃木県工場、トラック・建設機械部品の板金から塗装・組立という事業内容が会社資料と一致する。",
+    "web_facts": [
+      {
+        "claim": "会社概要は、日野自動車、UDトラックス、日立建機、加藤製作所等を主要取引先とし、板金・塗装・アッセンブリの一貫生産、国内外の複数拠点、204人規模の人員を記載する。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "企業情報｜株式会社大熊製作所",
+        "url": "https://www.ohkuma-seisaku.co.jp/company/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "同社の2024年3月ブログは、栃木工場隣接地約3.6万平方メートルを購入し、前年取得の約1万平方メートルの鹿沼工場を部分稼働、栃木地区全体を約6.8万平方メートルへ拡張したと記載する。採択前から用地・拠点を確保していた。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "栃木工場が拡張されました｜大熊製作所",
+        "url": "https://www.ohkuma-seisaku.co.jp/blog/2024/03/523/",
+        "source_type": "company",
+        "published_at": "2024-03-27"
+      },
+      {
+        "claim": "会社の強み紹介は、レーザー・ベンダー・溶接ロボットによる低コスト化、多品種少量対応、デジタル標準化、自動化ロボット導入を既存能力として説明する。補助計画のスマート工場化と連続性がある。",
+        "timing": "undated",
+        "source_title": "大熊製作所の特色",
+        "url": "https://www.ohkuma-seisaku.co.jp/strength/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "4次公募採択一覧は、計画名を『省力化と自動化を融合した次世代型スマート工場』、事業実施場所を栃木・埼玉、確認書提出金融機関を埼玉りそな銀行と記載する。",
+        "timing": "post_adoption",
+        "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+        "source_type": "government",
+        "published_at": "2025-10-10"
+      }
+    ],
+    "scores": {
+      "demand": 3,
+      "capacity_constraint": 3,
+      "business_transformation": 3,
+      "regional_supply_chain": 2,
+      "policy_fit": 2,
+      "execution_finance": 3,
+      "crisis_or_succession": 1,
+      "external_validation": 3
+    },
+    "plausible_reason": "実名の大手OEM顧客、一貫生産、海外展開、自動化実績に加え、採択前に広い隣接用地を取得して部分稼働まで進めていた。審査上は、顧客のサプライヤー集約に応える能力増強と、板金から塗装までを自動接続する具体的な実装準備が、可視指標以上の実現可能性として働いた可能性がある。",
+    "counterevidence": "主要取引先の掲載は補助事業向けの発注保証ではなく、OEM別数量や増産要請は公開されない。トラック・建機市況への集中リスクがあり、スマート工場化が事業モデル変革なのか既存工程の効率化なのかは評価が分かれる。",
+    "confidence": "High",
+    "research_gaps": "OEM別受注残・内示、サプライヤー集約通知、塗装外注費、設備OEE、土地・建物投資の自己資金比率、製品別採算が必要。"
+  },
+  {
+    "case_id": "s2_outline_167",
+    "company": "株式会社カネヒロ",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "公式採択一覧の法人番号3010001014136、東京都本社、熊本県菊池市のアルミ加工工場という記載が会社サイトおよび熊本県・菊池市資料と一致する。",
+    "web_facts": [
+      {
+        "claim": "熊本県産業技術センター系の企業資料は、同社熊本工場が1000～7000系アルミを扱い、材料調達から切削・鍛造・ダイカスト・鋳造・プレス等の加工へ対応すると記載する。補助計画前から素材・試作・量産の一貫能力がある。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "熊本県参加企業 加工状況一覧",
+        "url": "https://www.kmt-ti.or.jp/wp-content/uploads/2025/06/KigyouGaiyou_KumamotoPrif.pdf",
+        "source_type": "industry_public_body",
+        "published_at": "2024"
+      },
+      {
+        "claim": "会社沿革は、2005年に熊本県菊池市へ熊本駐在所を設け、2014年に熊本工場へ変更したと記載する。新工場計画は20年近い地域操業の上にある。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "沿革｜株式会社カネヒロ",
+        "url": "https://www.kanehiro-kk.co.jp/company/evolution/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "菊池市の立地企業一覧は、カネヒロ熊本工場をアルミ素材販売、試作、量産、加工品製造の企業として掲載する。地域の輸送機器・産業機器集積に既に組み込まれている。",
+        "timing": "undated",
+        "source_title": "菊池市内立地企業一覧｜菊池市",
+        "url": "https://www.city.kikuchi.lg.jp/article/view/1225/326.html",
+        "source_type": "government",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "4次公募採択一覧は、計画名を『アルミニウム加工・販売事業拡大のための新工場建設プロジェクト』、確認書提出金融機関をりそな銀行と記載する。",
+        "timing": "post_adoption",
+        "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+        "source_type": "government",
+        "published_at": "2025-10-10"
+      }
+    ],
+    "scores": {
+      "demand": 2,
+      "capacity_constraint": 2,
+      "business_transformation": 3,
+      "regional_supply_chain": 3,
+      "policy_fit": 2,
+      "execution_finance": 3,
+      "crisis_or_succession": 0,
+      "external_validation": 3
+    },
+    "plausible_reason": "熊本で長年操業し、幅広いアルミ材を素材調達から試作・量産加工まで扱う既存能力がある。新工場で企画・設計・試作から量産までの動線と能力を一体化することで、九州の二輪・四輪・半導体等の集積に対する短納期供給拠点になる点が評価された可能性がある。",
+    "counterevidence": "補助事業向けの顧客名、受注内示、現工場の稼働率・狭隘度は外部資料で確認できない。多業種対応は需要分散の強みである一方、どの市場の成長に賭ける計画かが曖昧になりうる。",
+    "confidence": "Medium",
+    "research_gaps": "顧客別内示、機械別稼働率、試作から量産への転換率、現工場の物流ロス、地域調達比率、新規雇用・技能訓練計画が必要。"
+  },
+  {
+    "case_id": "s2_outline_131",
+    "company": "株式会社中村畜産",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "公式採択一覧の法人番号6030001065075、埼玉県越谷市、食肉卸・加工という事業内容が会社サイトとGビズインフォで一致する。",
+    "web_facts": [
+      {
+        "claim": "会社サイトは、1933年創業、東京食肉市場等から枝肉で仕入れ、加工・販売まで一貫管理し、部分肉格付認定工場（G-408）を持つと記載する。補助計画以前から品質管理を伴う加工主体である。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "株式会社中村畜産 公式サイト",
+        "url": "https://www.nakamura-chikusan.com/",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "同社の事業紹介は、全国の契約農家・食肉市場から牛・豚を日量2万kg以上取り扱い、月間1万頭超を目利きすると記載する。数値は会社の自己申告だが、既存の仕入れ・加工ネットワークの規模を示す。",
+        "timing": "undated",
+        "source_title": "中村畜産について",
+        "url": "https://www.nakamura-chikusan.com/%E4%B8%AD%E6%9D%91%E7%95%9C%E7%94%A3%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "Gビズインフォは同一法人番号と越谷市北越谷の本店所在地を確認できる。会社の同一性を公的データで検証できるが、需要・能力の評価情報は乏しい。",
+        "timing": "undated",
+        "source_title": "株式会社中村畜産｜Gビズインフォ",
+        "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBango=6030001065075",
+        "source_type": "government",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "4次公募採択一覧は、計画名を『90年の伝統と最新技術融合による食肉加工リーディングカンパニー構想』、確認書提出金融機関を足利銀行と記載する。",
+        "timing": "post_adoption",
+        "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+        "source_type": "government",
+        "published_at": "2025-10-10"
+      }
+    ],
+    "scores": {
+      "demand": 2,
+      "capacity_constraint": 2,
+      "business_transformation": 3,
+      "regional_supply_chain": 3,
+      "policy_fit": 2,
+      "execution_finance": 3,
+      "crisis_or_succession": 0,
+      "external_validation": 2
+    },
+    "plausible_reason": "90年超の仕入れ・目利き・加工販売実績と全国の調達網を持ち、加工・保管・トレーサビリティを自動化することで、外食・小売の人手不足を上流で吸収する計画である。単なる増産ではなく、枝肉から高付加価値加工品までの垂直統合と安定供給が評価された可能性がある。",
+    "counterevidence": "日量・月間取扱量は会社自己申告で、補助事業の需要増を示す顧客名・注文量・問い合わせ記録は公開されない。部分肉格付認定は品質能力を示すが、新工場の必要性や成長性を直接保証しない。",
+    "confidence": "Medium",
+    "research_gaps": "顧客別受注、加工品比率、歩留まり、冷蔵・加工ライン稼働率、廃棄率、人手作業時間、認証の適用範囲、外食・小売向け長期契約が必要。"
+  },
+  {
+    "case_id": "s2_outline_144",
+    "company": "株式会社シー・エス・ケイ",
+    "population": "matched_accepted_control",
+    "application_round": "4次",
+    "identity_check": "公式採択一覧の法人番号1070001019593、群馬県千代田町、建築・産業機械向け鋼板加工という事業内容が会社サイト・100億宣言・業界誌で一致する。",
+    "web_facts": [
+      {
+        "claim": "2024年の業界誌記事は、同社を北関東有数の鋼板加工業者とし、2025年に8拠点を集約・強化する計画、自動化・省力化・スキルレス化、大板材対応ファイバーレーザの活用を紹介する。採択前から具体的な拠点再編と設備構想が外部に示されていた。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "“拠点集約”と“事業領域拡大”を推進｜Sheetmetal ましん&そふと",
+        "url": "https://www.machinist.co.jp/2024/07/20643/",
+        "source_type": "trade_press",
+        "published_at": "2024-07"
+      },
+      {
+        "claim": "中小機構の100億宣言は、2025年3月期売上90.9億円、常用従業員176人、切断から孔明け・ショットブラスト・開先・曲げ・溶接まで一貫受注できる体制を記載する。売上100億円に近い事業基盤と変革方針が採択前に明示されている。",
+        "timing": "pre_or_contemporaneous",
+        "source_title": "株式会社シー・エス・ケイ 100億宣言｜中小企業基盤整備機構",
+        "url": "https://growth-100-oku.smrj.go.jp/companies/pdf/01248-00.pdf",
+        "source_type": "government_program",
+        "published_at": "2025"
+      },
+      {
+        "claim": "会社概要は、木崎・萱野・新田の国内工場、熊谷営業所、ミャンマーCADセンターを掲載する。設計支援から複数工程までを分担できる既存組織がある。",
+        "timing": "undated",
+        "source_title": "会社概要・アクセス｜株式会社シー・エス・ケイ",
+        "url": "https://csk-steel.co.jp/company/profile",
+        "source_type": "company",
+        "published_at": "unknown"
+      },
+      {
+        "claim": "4次公募採択一覧は、計画名を『自動化設備等の導入による鋼板加工業のスマート工場化への大改革』とし、ぐんぎんリースとの共同申請、群馬銀行の確認書提出を記載する。",
+        "timing": "post_adoption",
+        "source_title": "中堅・中小成長投資補助金 4次公募 採択案件一覧",
+        "url": "https://seichotoushi-hojo.jp/assets/pdf/list_4ji.pdf",
+        "source_type": "government",
+        "published_at": "2025-10-10"
+      }
+    ],
+    "scores": {
+      "demand": 2,
+      "capacity_constraint": 2,
+      "business_transformation": 3,
+      "regional_supply_chain": 2,
+      "policy_fit": 2,
+      "execution_finance": 3,
+      "crisis_or_succession": 1,
+      "external_validation": 3
+    },
+    "plausible_reason": "既に売上約91億円と100億円目前で、複数工程一貫受注と拠点再編の具体案があり、業界誌でも採択前から自動化・スキルレス化が確認できる。リース共同申請を含む実装体制もあり、『成長の蓋を外す最後の大型投資』として説明しやすかった可能性がある。",
+    "counterevidence": "100億宣言は企業自身の宣言で、顧客の発注保証ではない。建設・建機需要の顧客名、受注残、既存設備の稼働率が公開されず、拠点集約効果と新規市場効果を分離できない。",
+    "confidence": "High",
+    "research_gaps": "顧客別受注残、工程別ボトルネック、拠点間物流費、リース条件、自動化前後OEE、建設市況ストレステスト、新製品・新分野の売上計画が必要。"
+  }
+]
