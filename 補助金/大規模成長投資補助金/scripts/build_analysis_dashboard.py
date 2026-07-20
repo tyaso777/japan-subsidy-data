@@ -290,7 +290,7 @@ function setup(){
  for(const [k,v] of Object.entries(SIZE_METRICS)){const total=sizeStats(k).n;sizeMetric.add(new Option(`${v[0]}（${total}件）`,k))}
  for(const [k,v] of Object.entries(COLOR_METRICS))colorMetric.add(new Option(v[0],k));
  xmetric.value='sales_increase_oku_yen_normalized';ymetric.value='employee_pay_total_increase_estimated_oku';sizeMetric.value='project_cost_million_yen_normalized';colorMetric.value='round';
- rounds.innerHTML=['1次','2次','3次','4次'].map(r=>`<label class="check"><input type="checkbox" value="${r}" checked>${r}</label>`).join('');
+  rounds.innerHTML=['1次','2次','3次','4次'].map(r=>`<label class="check"><input type="checkbox" value="${r}"${r==='4次'?' checked':''}>${r}</label>`).join('');
  flagChecks.innerHTML=Object.entries(FLAG).map(([k,v])=>`<label class="check"><input type="checkbox" value="${k}">除外：${v}</label>`).join('');
  [...new Set(DATA.map(d=>d.scope).filter(Boolean))].sort().forEach(v=>scope.add(new Option(v,v)));
  [...new Set(PREF_ECONOMY.map(d=>d.region))].forEach(v=>regionFilter.add(new Option(v,v)));PREF_ECONOMY.forEach(d=>prefectureFilter.add(new Option(d.prefecture,d.prefecture)));
@@ -299,7 +299,7 @@ function setup(){
  document.querySelectorAll('input,select').forEach(e=>{if(!e.matches('[data-median-filter],[data-median-quick],[data-quality-quick]'))e.addEventListener('change',render)});
  document.querySelectorAll('[data-check-all]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll(`${b.dataset.checkAll} input[type="checkbox"]`).forEach(x=>x.checked=b.dataset.checked==='true');render()}));
  search.addEventListener('input',render);
-  reset.onclick=()=>{search.value='';scope.value='';locationTarget.value='project';regionFilter.value='';prefectureFilter.value='';document.querySelectorAll('#rounds input').forEach(x=>x.checked=true);document.querySelectorAll('#flagChecks input').forEach(x=>x.checked=false);xmetric.value='sales_increase_oku_yen_normalized';ymetric.value='employee_pay_total_increase_estimated_oku';sizeMetric.value='project_cost_million_yen_normalized';colorMetric.value='round';colorLocation.value='project';xlog.checked=false;ylog.checked=false;showContextPoints.checked=true;medianPositionFilters={};qualityFilters={};clearBoxSelection(false);render()};
+  reset.onclick=()=>{search.value='';scope.value='';locationTarget.value='project';regionFilter.value='';prefectureFilter.value='';document.querySelectorAll('#rounds input').forEach(x=>x.checked=x.value==='4次');document.querySelectorAll('#flagChecks input').forEach(x=>x.checked=false);xmetric.value='sales_increase_oku_yen_normalized';ymetric.value='employee_pay_total_increase_estimated_oku';sizeMetric.value='project_cost_million_yen_normalized';colorMetric.value='round';colorLocation.value='project';xlog.checked=false;ylog.checked=false;showContextPoints.checked=true;medianPositionFilters={};qualityFilters={};clearBoxSelection(false);render()};
  document.getElementById('export').onclick=exportCsv;render()
 }
 function statusOk(d,key,mode='all'){if(mode==='all'||!key)return true;const s=d[key+'_analysis_status'];return mode==='ready'?s==='ready':['ready','usable_with_caution'].includes(s)}
