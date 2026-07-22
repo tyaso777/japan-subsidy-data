@@ -131,6 +131,13 @@ test("other-business forecast uses separate assumptions before and after the bas
   assert.ok(Math.abs(report3.other.cogs / report3.other.sales - 0.59) < 0.001);
 });
 
+test("sample other-business post-base assumptions include a modest synergy lift", () => {
+  assert.ok(Math.abs(model.sampleDrivers.otherSalesGrowth - model.sampleDrivers.otherSalesGrowthToBase - 0.01) < 1e-9);
+  assert.ok(Math.abs(model.sampleDrivers.otherCogsImprovement - model.sampleDrivers.otherCogsImprovementToBase - 0.005) < 1e-9);
+  assert.ok(Math.abs(model.sampleDrivers.otherPayGrowth - model.sampleDrivers.otherPayGrowthToBase - 0.005) < 1e-9);
+  assert.ok(Math.abs(model.sampleDrivers.otherHeadcountGrowth - model.sampleDrivers.otherHeadcountGrowthToBase - 0.005) < 1e-9);
+});
+
 test("forecast PL values are stored with at most two decimal places", () => {
   const plan = makePlan();
   const numericFields = ["sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga", "headcount", "officerCount"];

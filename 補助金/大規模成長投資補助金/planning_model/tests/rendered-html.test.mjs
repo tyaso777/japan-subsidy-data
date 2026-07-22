@@ -29,6 +29,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /projectSalesGrowth: \{ initial: 0\.22, lower: 0\.15, upper: 0\.30 \}/);
   assert.match(pageSource, /その他事業｜設備導入期間/);
   assert.match(pageSource, /その他事業｜基準年後/);
+  assert.match(pageSource, /applyOtherSynergyLift\("otherSalesGrowth", "otherSalesGrowthToBase", 0\.01\)/);
+  assert.match(pageSource, /補助事業とのシナジーを見込み/);
   assert.match(pageSource, /projectPayGrowth: \{ initial: 0\.07, lower: 0\.05, upper: 0\.10 \}/);
   assert.match(pageSource, /projectCogsImprovementAfterBase: \{ initial: 0\.015, lower: 0, upper: 0\.02 \}/);
   assert.doesNotMatch(pageSource, /原価率改善 1\.5pt［-2～5pt］/);
