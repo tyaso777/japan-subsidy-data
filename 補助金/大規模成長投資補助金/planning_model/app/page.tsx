@@ -520,6 +520,32 @@ export default function Home() {
   const [historicalDefaultsApplied, setHistoricalDefaultsApplied] = useState(false);
   const [proposalTitle, setProposalTitle] = useState("成長投資計画 提案計画");
   const [fileNote, setFileNote] = useState("未保存。ここから出力したHTML・Excelは、同じ画面へ再取込できます。");
+
+  useEffect(() => {
+    const closeProposalMenus = (event: PointerEvent) => {
+      const target = event.target instanceof Node ? event.target : null;
+      document.querySelectorAll<HTMLDetailsElement>(".proposal-action-menu[open]").forEach((menu) => {
+        if (!target || !menu.contains(target)) menu.removeAttribute("open");
+      });
+    };
+    const closeProposalMenusWithEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      document.querySelectorAll<HTMLDetailsElement>(".proposal-action-menu[open]").forEach((menu) => menu.removeAttribute("open"));
+    };
+    document.addEventListener("pointerdown", closeProposalMenus);
+    document.addEventListener("keydown", closeProposalMenusWithEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeProposalMenus);
+      document.removeEventListener("keydown", closeProposalMenusWithEscape);
+    };
+  }, []);
+
+  function keepOnlyProposalMenuOpen(openedMenu: HTMLDetailsElement) {
+    if (!openedMenu.open) return;
+    document.querySelectorAll<HTMLDetailsElement>(".proposal-action-menu[open]").forEach((menu) => {
+      if (menu !== openedMenu) menu.removeAttribute("open");
+    });
+  }
   const sourcePlan = useMemo(() => applyForecastOverrides(autoPlan, forecastOverrides, futureInputBasis), [autoPlan, forecastOverrides, futureInputBasis]);
   const plan = adjustedPlan ?? sourcePlan;
   const calculationDrivers = adjustedDrivers ?? drivers;
@@ -990,7 +1016,7 @@ export default function Home() {
       <section className="proposal-filebar" aria-label="提案計画の保存と取込">
         <label><span>提案計画名</span><input value={proposalTitle} onChange={(event) => setProposalTitle(event.target.value)} /></label>
         <div className="proposal-file-actions">
-          <details className="proposal-action-menu">
+          <details className="proposal-action-menu" onToggle={(event) => keepOnlyProposalMenuOpen(event.currentTarget)}>
             <summary>出力 <span aria-hidden="true">▾</span></summary>
             <div className="proposal-action-menu-items">
               <small>お客さま提示用の提案計画書</small>
@@ -999,7 +1025,7 @@ export default function Home() {
             </div>
           </details>
           <label className="proposal-import-button">ファイル取込<input type="file" accept=".html,.htm,.xlsx" onChange={(event) => { void importProposal(event.target.files?.[0]); event.target.value = ""; }} /></label>
-          <details className="proposal-action-menu sample-menu">
+          <details className="proposal-action-menu sample-menu" onToggle={(event) => keepOnlyProposalMenuOpen(event.currentTarget)}>
             <summary>サンプル <span aria-hidden="true">▾</span></summary>
             <div className="proposal-action-menu-items">
               <small>現在の入力をサンプルで置き換えます</small>

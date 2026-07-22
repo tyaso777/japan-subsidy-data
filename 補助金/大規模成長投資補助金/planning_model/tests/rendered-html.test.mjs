@@ -76,6 +76,9 @@ test("renders the planning model shell", async () => {
   assert.match(proposalSource, /入力データ監査（Null／0区別）/);
   assert.match(pageSource, /metric-group-controls/);
   assert.match(pageSource, /proposal-action-menu/);
+  assert.match(pageSource, /document\.addEventListener\("pointerdown", closeProposalMenus\)/);
+  assert.match(pageSource, /event\.key !== "Escape"/);
+  assert.match(pageSource, /keepOnlyProposalMenuOpen/);
   assert.match(pageSource, />出力 <span aria-hidden="true">▾<\/span>/);
   assert.match(pageSource, />サンプル <span aria-hidden="true">▾<\/span>/);
   assert.doesNotMatch(pageSource, />HTML出力<\/button>/);
