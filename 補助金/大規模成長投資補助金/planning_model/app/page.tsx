@@ -1178,8 +1178,9 @@ export default function Home() {
           <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。空欄は未設定、0は明示的なゼロとして区別して保存します。直前の変更はCtrl＋Zで戻せます。</p>
           <article className="panel application-category-panel">
             <div className="panel-heading"><div><p className="card-kicker">ROUND 6 / APPLICATION CATEGORY</p><h2>申請区分・制度前提</h2></div><span className={`pill ${applicationCategory ? "green" : ""}`}>{applicationCategory ? "選択済み" : "必須選択"}</span></div>
-            <div className="driver-grid timeline-grid">
-              <label><span>申請区分<small>制度上の投資額・賃上げ率を自動設定</small></span><select aria-label="申請区分" required value={applicationCategory} onChange={(event) => { clearAdjustment(); setApplicationCategory(event.target.value as ApplicationCategory); }}><option value="">選択してください</option>{Object.entries(applicationCategoryLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+            <div className="application-category-control">
+              <div className="application-category-copy"><strong>申請区分</strong><small>選択した区分に応じて、制度上の投資額・賃上げ率を自動設定します。</small></div>
+              <select aria-label="申請区分" required value={applicationCategory} onChange={(event) => { clearAdjustment(); setApplicationCategory(event.target.value as ApplicationCategory); }}><option value="">選択してください</option>{Object.entries(applicationCategoryLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
             </div>
             {statutoryRequirements ? <div className="benchmark-note statutory-summary"><strong>自動設定される制度条件</strong><span>補助事業投資額 {statutoryRequirements.investmentMinimum}億円以上</span><span>補助事業1人当たり給与支給総額の年平均上昇率 {statutoryRequirements.projectPayCagrMinimum.toFixed(1)}%以上</span><span>基準年度の1人当たり給与支給総額は最新決算期以上</span><span>申請補助金額は50億円以下かつ投資額の1/3以下</span></div> : <p className="default-note">申請区分を選択するまで、制度上の必須条件は確定しません。</p>}
           </article>

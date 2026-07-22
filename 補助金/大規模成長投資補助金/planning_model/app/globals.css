@@ -112,7 +112,11 @@ input, select { border: 1px solid #d7d2c7; background: #fffefa; color: var(--ink
 .input-list input, .driver-grid input { width: 120px; text-align: right; font-variant-numeric: tabular-nums; }
 .driver-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 24px; }.driver-grid label.movable { background: linear-gradient(90deg, transparent, rgba(247, 232, 201, .38)); }.driver-grid label.fixed { background: linear-gradient(90deg, transparent, rgba(220, 236, 223, .4)); }
 .driver-values { display: flex; width: 100%; align-items: center; justify-content: flex-end; gap: 7px; }.driver-values .adjusted-value { color: var(--green); font-weight: 800; white-space: nowrap; }
-.application-category-panel select { min-width: min(100%, 360px); }
+.application-category-control { display: grid; width: min(100%, 560px); gap: 8px; }
+.application-category-copy { display: flex; align-items: baseline; gap: 12px; white-space: nowrap; }
+.application-category-copy strong { font-size: 12px; }
+.application-category-copy small { color: var(--muted); font-size: 9px; }
+.application-category-control select { width: 100%; min-width: 0; }
 .statutory-summary { margin-top: 16px; }
 .statutory-condition { min-width: 165px; max-width: 230px; color: #315b46; background: #f1f7f3; text-align: left; white-space: normal; line-height: 1.45; }
 .statutory-condition strong { font-size: 9px; }
@@ -186,4 +190,8 @@ thead th:first-child { background: #f3f0e8; }.emphasis th, .emphasis td { font-w
 
 @media (max-width: 720px) {
   main { width: min(100% - 24px, 1460px); padding-top: 18px; }.topbar, .section-intro, .diagnostic-heading, .diagnostic-chart-heading, .target-action-bar, .workflow-actions { align-items: stretch; flex-direction: column; }.proposal-filebar { grid-template-columns: 1fr; }.proposal-file-actions { justify-content: flex-start; }.proposal-action-menu-items { right: auto; left: 0; }.proposal-filebar > small { grid-column: auto; }.header-actions, .target-action-buttons { align-items: stretch; flex-direction: column; }.input-mode-setting, .future-basis-setting { align-items: stretch; flex-direction: column; }.mode-switch button { flex: 1; }.summary-grid, .two-column, .driver-grid, .metric-list, .formula-list, .logic-flow, .diagnostic-chart-grid, .metric-group-controls { grid-template-columns: 1fr; }.hero-card, .metric-overview, .validation-panel { grid-column: span 1; }.hero-card { align-items: flex-start; gap: 20px; }.metric-row { grid-template-columns: 10px 1fr auto; }.metric-target { display: none; }.section-intro h2 { font-size: 26px; }.trend-chart-card { padding: 14px 10px 10px; }
+}
+
+@media (max-width: 560px) {
+  .application-category-copy { display: grid; gap: 3px; white-space: normal; }
 }

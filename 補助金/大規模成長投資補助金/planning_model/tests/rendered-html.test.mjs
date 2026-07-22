@@ -134,6 +134,8 @@ test("renders the planning model shell", async () => {
   assert.match(metricGroupSource, /type MetricGroupBasis = "rate" \| "amount" \| "both"/);
   assert.match(globalStyles, /actuals-three-year-table \{ overflow-x: hidden; overflow-y: auto; \}/);
   assert.match(pageSource, /申請区分・制度前提/);
+  assert.match(pageSource, /className="application-category-copy"/);
+  assert.match(pageSource, /制度上の投資額・賃上げ率を自動設定します/);
   assert.match(pageSource, /制度上の必須条件/);
   assert.match(pageSource, /requiredMetricMinimums\(applicationCategory\)/);
   assert.match(applicationRulesSource, /general: "一般企業（100億宣言企業以外）"/);
@@ -153,5 +155,7 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(modelSource, /drivers\.investment < 15/);
   assert.match(globalStyles, /\.driver-validation-error/);
   assert.match(globalStyles, /\.statutory-condition/);
+  assert.match(globalStyles, /\.application-category-control \{ display: grid; width: min\(100%, 560px\); gap: 8px; \}/);
+  assert.match(globalStyles, /\.application-category-copy \{ display: flex; align-items: baseline;/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
