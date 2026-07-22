@@ -866,6 +866,7 @@ export default function Home() {
           <div className="stat-card"><span>補助事業付加価値増加</span><strong>{number(actual.valueAddedIncrease)} 億円</strong><small>基準年比</small></div>
           <div className="stat-card"><span>補助金1円当たり効果</span><strong>{number(actual.valueAddedSubsidyRatio, 0)}%</strong><small>目標 {number(targets.valueAddedSubsidyRatio.value, 0)}%</small></div>
 
+          <DiagnosticCharts plan={plan} />
           <BehaviorChangeTable plan={plan} balanceSheets={balanceSheets} futureCapex={futureCapex} timeline={timeline} />
           <FinancialDiagnostics plan={plan} balanceSheets={balanceSheets} futureCapex={futureCapex} />
 
@@ -1201,6 +1202,102 @@ function PlTable({ title, plan, sourcePlan, segment }: { title: string; plan: Ye
     { label: "役員数", value: (row) => row[segment].officerCount },
   ];
   return <article className="panel table-panel"><h2>{title}</h2><div className="wide-table"><table><thead><tr><th>億円（人数項目のみ人）</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{rows.map((item) => <tr className={item.emphasis ? "emphasis" : ""} key={item.label}><th>{item.label}</th>{plan.map((row, index) => <td key={row.year}>{sourcePlan && <small className="before-cell">{number(item.value(sourcePlan[index]))} →</small>}<strong className={sourcePlan ? "after-cell" : ""}>{number(item.value(row))}</strong></td>)}</tr>)}</tbody></table></div></article>;
+}
+
+type ChartSeries = {
+  label: string;
+  color: string;
+  values: (number | undefined)[];
+};
+
+function TrendChart({ title, subtitle, unit, plan, series }: { title: string; subtitle: string; unit: string; plan: YearPlan[]; series: ChartSeries[] }) {
+  const width = 720;
+  const height = 270;
+  const margin = { top: 22, right: 22, bottom: 42, left: 54 };
+  const plotWidth = width - margin.left - margin.right;
+  const plotHeight = height - margin.top - margin.bottom;
+  const latestIndex = Math.max(0, plan.findIndex((row) => row.role === "latest"));
+  const baseIndex = plan.findIndex((row) => row.role === "base");
+  const finiteValues = series.flatMap((item) => item.values).filter((value): value is number => value !== undefined && Number.isFinite(value));
+  const rawMin = finiteValues.length ? Math.min(...finiteValues) : 0;
+  const rawMax = finiteValues.length ? Math.max(...finiteValues) : 1;
+  const minValue = rawMin >= 0 ? 0 : rawMin - Math.max((rawMax - rawMin) * 0.12, 1);
+  const maxValue = rawMax <= 0 ? 0 : rawMax + Math.max((rawMax - rawMin) * 0.12, rawMax * 0.06, 1);
+  const span = Math.max(maxValue - minValue, 1);
+  const x = (index: number) => margin.left + (plan.length === 1 ? plotWidth / 2 : plotWidth * index / (plan.length - 1));
+  const y = (value: number) => margin.top + plotHeight * (1 - (value - minValue) / span);
+  const pathFor = (values: (number | undefined)[], start: number, end: number) => {
+    let open = false;
+    return values.slice(start, end + 1).map((value, offset) => {
+      if (value === undefined || !Number.isFinite(value)) { open = false; return ""; }
+      const command = open ? "L" : "M";
+      open = true;
+      return `${command}${x(start + offset).toFixed(1)},${y(value).toFixed(1)}`;
+    }).join(" ");
+  };
+  const axisLabel = (value: number) => Math.abs(value) >= 100 ? number(value, 0) : number(value, 1);
+
+  return <article className="trend-chart-card">
+    <div className="trend-chart-title"><div><h3>{title}</h3><p>{subtitle}</p></div><span>{unit}</span></div>
+    <svg className="trend-chart-svg" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${title}の年度推移。実線は過去実績、破線は将来予測。`}>
+      <rect className="trend-chart-future-area" x={x(latestIndex)} y={margin.top} width={Math.max(0, width - margin.right - x(latestIndex))} height={plotHeight} />
+      {[0, 0.5, 1].map((position) => {
+        const gridValue = maxValue - span * position;
+        return <g key={position}><line className="trend-chart-gridline" x1={margin.left} y1={margin.top + plotHeight * position} x2={width - margin.right} y2={margin.top + plotHeight * position} /><text className="trend-chart-axis-label" x={margin.left - 9} y={margin.top + plotHeight * position + 4} textAnchor="end">{axisLabel(gridValue)}</text></g>;
+      })}
+      {baseIndex >= 0 && <g><line className="trend-chart-base-line" x1={x(baseIndex)} y1={margin.top} x2={x(baseIndex)} y2={margin.top + plotHeight} /><text className="trend-chart-boundary-label" x={x(baseIndex)} y={margin.top + 12} textAnchor="middle">基準年</text></g>}
+      <text className="trend-chart-boundary-label" x={x(latestIndex) + 7} y={margin.top + plotHeight - 8}>予測</text>
+      {series.map((item) => <g key={item.label}>
+        <path className="trend-chart-line actual" d={pathFor(item.values, 0, latestIndex)} stroke={item.color} />
+        <path className="trend-chart-line forecast" d={pathFor(item.values, latestIndex, plan.length - 1)} stroke={item.color} />
+        {item.values.map((value, index) => value === undefined || !Number.isFinite(value) ? null : <circle key={`${item.label}-${plan[index].year}`} className={index <= latestIndex ? "trend-chart-point actual" : "trend-chart-point forecast"} cx={x(index)} cy={y(value)} r="3.3" stroke={item.color} fill={index <= latestIndex ? item.color : "var(--panel)"} />)}
+      </g>)}
+      {plan.map((row, index) => <text className="trend-chart-year" key={row.year} x={x(index)} y={height - 15} textAnchor="middle">{row.year}</text>)}
+    </svg>
+    <div className="trend-chart-legend" aria-label="系列凡例">{series.map((item) => {
+      const lastValue = [...item.values].reverse().find((value) => value !== undefined && Number.isFinite(value));
+      return <span key={item.label}><i style={{ background: item.color }} />{item.label}<strong>{lastValue === undefined ? "—" : number(lastValue, unit === "億円" ? 2 : 1)}</strong></span>;
+    })}</div>
+  </article>;
+}
+
+function DiagnosticCharts({ plan }: { plan: YearPlan[] }) {
+  const company = plan.map((row) => total(row.project, row.other));
+  const chartRate = (numerator: number, denominator: number) => denominator ? numerator / denominator * 100 : undefined;
+  const perEmployee = (segment: SegmentPlan) => segment.headcount ? segment.employeePay / segment.headcount : undefined;
+  const productivity = (segment: SegmentPlan) => segment.headcount + segment.officerCount ? valueAdded(segment) / (segment.headcount + segment.officerCount) : undefined;
+  const latestIndex = Math.max(0, plan.findIndex((row) => row.role === "latest"));
+  const indexed = (values: (number | undefined)[]) => {
+    const base = values[latestIndex];
+    return base && Number.isFinite(base) ? values.map((value) => value === undefined ? undefined : value / base * 100) : values.map(() => undefined);
+  };
+  const colors = { company: "var(--chart-company)", project: "var(--chart-project)", other: "var(--chart-other)" };
+
+  return <section className="diagnostic-charts" aria-labelledby="diagnostic-chart-heading">
+    <div className="diagnostic-chart-heading"><div><p className="card-kicker">TREND CHECK</p><h2 id="diagnostic-chart-heading">主要指標の推移チャート</h2></div><p>過去実績から将来予測へのつながり、基準年の段差、事業間の乖離を視覚的に確認します。</p></div>
+    <div className="diagnostic-chart-grid">
+      <TrendChart title="売上高" subtitle="全社と事業別の規模・成長ペース" unit="億円" plan={plan} series={[
+        { label: "全社", color: colors.company, values: company.map((segment) => segment.sales) },
+        { label: "補助事業", color: colors.project, values: plan.map((row) => row.project.sales) },
+        { label: "その他事業", color: colors.other, values: plan.map((row) => row.other.sales) },
+      ]} />
+      <TrendChart title="収益性（全社）" subtitle="原価・その他販管費・営業利益の率" unit="%" plan={plan} series={[
+        { label: "売上原価率", color: colors.project, values: company.map((segment) => chartRate(segment.cogs, segment.sales)) },
+        { label: "その他販管費率", color: colors.other, values: company.map((segment) => chartRate(segment.otherSga, segment.sales)) },
+        { label: "営業利益率", color: colors.company, values: company.map((segment) => chartRate(operatingProfit(segment), segment.sales)) },
+      ]} />
+      <TrendChart title="人員・1人当たり給与" subtitle="最新決算期を100とした全社指数" unit="指数" plan={plan} series={[
+        { label: "従業員数", color: colors.other, values: indexed(company.map((segment) => segment.headcount)) },
+        { label: "従業員1人当たり給与", color: colors.company, values: indexed(company.map(perEmployee)) },
+      ]} />
+      <TrendChart title="労働生産性" subtitle="付加価値額÷（従業員数＋役員数）" unit="億円/人" plan={plan} series={[
+        { label: "全社", color: colors.company, values: company.map(productivity) },
+        { label: "補助事業", color: colors.project, values: plan.map((row) => productivity(row.project)) },
+        { label: "その他事業", color: colors.other, values: plan.map((row) => productivity(row.other)) },
+      ]} />
+    </div>
+    <p className="trend-chart-note"><span className="solid-sample" />実線：過去実績 <span className="dash-sample" />破線：将来予測。チャートは診断用であり、数値の編集は「将来データ入力」で行います。</p>
+  </section>;
 }
 
 function BehaviorChangeTable({ plan, balanceSheets, futureCapex, timeline }: { plan: YearPlan[]; balanceSheets: BalanceSheetPlan[]; futureCapex: { year: number; value: number }[]; timeline: TimelineSettings }) {
