@@ -990,11 +990,23 @@ export default function Home() {
       <section className="proposal-filebar" aria-label="提案計画の保存と取込">
         <label><span>提案計画名</span><input value={proposalTitle} onChange={(event) => setProposalTitle(event.target.value)} /></label>
         <div className="proposal-file-actions">
-          <button onClick={exportHtml}>HTML出力</button>
-          <button onClick={exportExcel}>Excel出力</button>
-          <label className="proposal-import-button">HTML・Excel取込<input type="file" accept=".html,.htm,.xlsx" onChange={(event) => { void importProposal(event.target.files?.[0]); event.target.value = ""; }} /></label>
-          <button className="sample-load-button" onClick={loadSampleProposal}>サンプル提案を読込</button>
-          <button className="sample-load-button" onClick={loadBaseYearLaunchSample}>基準年売上開始サンプル</button>
+          <details className="proposal-action-menu">
+            <summary>出力 <span aria-hidden="true">▾</span></summary>
+            <div className="proposal-action-menu-items">
+              <small>お客さま提示用の提案計画書</small>
+              <button onClick={(event) => { exportHtml(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>提案書HTML</button>
+              <button onClick={(event) => { exportExcel(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>提案書Excel</button>
+            </div>
+          </details>
+          <label className="proposal-import-button">ファイル取込<input type="file" accept=".html,.htm,.xlsx" onChange={(event) => { void importProposal(event.target.files?.[0]); event.target.value = ""; }} /></label>
+          <details className="proposal-action-menu sample-menu">
+            <summary>サンプル <span aria-hidden="true">▾</span></summary>
+            <div className="proposal-action-menu-items">
+              <small>現在の入力をサンプルで置き換えます</small>
+              <button onClick={(event) => { loadSampleProposal(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>標準提案</button>
+              <button onClick={(event) => { loadBaseYearLaunchSample(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>基準年売上開始</button>
+            </div>
+          </details>
         </div>
         <small>{fileNote}</small>
       </section>

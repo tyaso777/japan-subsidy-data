@@ -58,7 +58,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /function roundedInput\(value: number, digits = 2\)/);
   assert.match(pageSource, /上書き内容を反映して再最適化/);
   assert.match(pageSource, /15指標・目標へ戻る/);
-  assert.match(pageSource, /基準年売上開始サンプル/);
+  assert.match(pageSource, />基準年売上開始<\/button>/);
   assert.match(pageSource, /window\.scrollTo\(\{ top: 0, left: 0, behavior: "auto" \}\)/);
   assert.match(pageSource, /function DiagnosticCharts\(\{ plan \}/);
   assert.match(pageSource, /主要指標の推移チャート/);
@@ -75,6 +75,11 @@ test("renders the planning model shell", async () => {
   assert.match(inputValueSource, /else next\[key\] = value/);
   assert.match(proposalSource, /入力データ監査（Null／0区別）/);
   assert.match(pageSource, /metric-group-controls/);
+  assert.match(pageSource, /proposal-action-menu/);
+  assert.match(pageSource, />出力 <span aria-hidden="true">▾<\/span>/);
+  assert.match(pageSource, />サンプル <span aria-hidden="true">▾<\/span>/);
+  assert.doesNotMatch(pageSource, />HTML出力<\/button>/);
+  assert.match(globalStyles, /proposal-action-menu-items/);
   assert.match(globalStyles, /grid-template-columns: repeat\(auto-fit, minmax\(230px, 300px\)\)/);
   assert.match(globalStyles, /metric-group-control select \{ width: 100%; max-width: none;/);
   assert.match(pageSource, /に目標設定/);
