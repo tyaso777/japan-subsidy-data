@@ -153,6 +153,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /title: "制度上の必須条件に違反"/);
   assert.doesNotMatch(pageSource, /applicationCategory === "startupException"/);
   assert.doesNotMatch(modelSource, /drivers\.investment < 15/);
+  assert.match(modelSource, /projectPayGrowthToBase: \[0, 0\.1\]/);
+  assert.match(modelSource, /latestPayPerEmployee \/ 1\.02 \*\* yearsBeforeLatest/);
   assert.match(globalStyles, /\.driver-validation-error/);
   assert.match(globalStyles, /\.statutory-condition/);
   assert.match(globalStyles, /\.application-category-control \{ display: grid; width: min\(100%, 560px\); gap: 8px; \}/);

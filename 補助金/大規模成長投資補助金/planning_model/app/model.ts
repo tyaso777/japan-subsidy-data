@@ -291,7 +291,7 @@ export const driverBounds: Record<keyof Drivers, [number, number]> = {
   projectMarketGrowth: [-0.05, 0.3],
   projectSalesGrowthToBase: [-0.05, 0.4],
   projectCogsImprovementToBase: [0, 0.02],
-  projectPayGrowthToBase: [-0.05, 0.1],
+  projectPayGrowthToBase: [0, 0.1],
   projectHeadcountGrowthToBase: [-0.03, 0.2],
   projectSgaImprovementToBase: [0, 0.02],
   projectOfficerPayGrowthToBase: [0, 0.1],
@@ -435,11 +435,20 @@ function scaleSegment(segment: SegmentPlan, factor: number): SegmentPlan {
   };
 }
 
+function historicalSegmentWithPayGrowth(segment: SegmentPlan, factor: number, yearsBeforeLatest: number): SegmentPlan {
+  const scaled = scaleSegment(segment, factor);
+  if (segment.headcount > 0) {
+    const latestPayPerEmployee = segment.employeePay / segment.headcount;
+    scaled.employeePay = round(scaled.headcount * latestPayPerEmployee / 1.02 ** yearsBeforeLatest);
+  }
+  return scaled;
+}
+
 export function createHistoricalPlan(latest: YearPlan = basePlan, settings: TimelineSettings = DEFAULT_TIMELINE): YearPlan[] {
   const timeline = normalizeTimeline(settings);
   return [
-    { year: timeline.latestYear - 2, role: "prePrevious", project: scaleSegment(latest.project, 0.9), other: scaleSegment(latest.other, 0.92) },
-    { year: timeline.latestYear - 1, role: "previous", project: scaleSegment(latest.project, 0.95), other: scaleSegment(latest.other, 0.96) },
+    { year: timeline.latestYear - 2, role: "prePrevious", project: historicalSegmentWithPayGrowth(latest.project, 0.9, 2), other: historicalSegmentWithPayGrowth(latest.other, 0.92, 2) },
+    { year: timeline.latestYear - 1, role: "previous", project: historicalSegmentWithPayGrowth(latest.project, 0.95, 1), other: historicalSegmentWithPayGrowth(latest.other, 0.96, 1) },
     { ...structuredClone(latest), year: timeline.latestYear, role: "latest" },
   ];
 }

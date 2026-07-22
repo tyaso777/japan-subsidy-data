@@ -120,7 +120,10 @@ test("historical target references compare the two actual-year intervals", () =>
   assert.equal(driverSeries.projectCogsImprovementToBase.referenceLevels.length, 3);
   assert.equal(driverSeries.projectSgaImprovementToBase.mode, "change");
   assert.equal(driverSeries.projectSgaImprovementToBase.referenceLevels.length, 3);
-  assert.ok(model.driverBounds.projectPayGrowthToBase[0] <= 0);
+  assert.equal(model.driverBounds.projectPayGrowthToBase[0], 0);
+  const projectPayHistory = driverSeries.projectPayGrowthToBase.values.filter(Number.isFinite);
+  assert.equal(projectPayHistory.length, 2);
+  assert.ok(projectPayHistory.every((value) => value > 0.015 && value < 0.025));
   assert.deepEqual(model.driverBounds.projectCogsImprovementToBase, [0, 0.02]);
   assert.deepEqual(model.driverBounds.projectSgaImprovementToBase, [0, 0.02]);
   assert.deepEqual(model.driverBounds.otherCogsImprovementToBase, [0, 0.02]);
