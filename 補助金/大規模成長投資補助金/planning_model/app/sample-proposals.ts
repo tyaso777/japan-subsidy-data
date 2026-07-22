@@ -16,6 +16,7 @@ import {
 } from "./model";
 import { PROPOSAL_FORMAT, type ProposalData } from "./proposal-io";
 import { inputKey, type InputValues } from "./input-values";
+import { defaultMetricGroupBases } from "./metric-groups";
 
 const clone = <T,>(value: T): T => structuredClone(value);
 const round = (value: number) => Number(value.toFixed(2));
@@ -84,6 +85,7 @@ const commonProposal = (title: string, exportedAt: string, historicalPlan: YearP
     forecastOverrides: {},
     futureInputBasis: "other",
     inputValues,
+    metricGroupBases: { ...defaultMetricGroupBases },
   };
 };
 

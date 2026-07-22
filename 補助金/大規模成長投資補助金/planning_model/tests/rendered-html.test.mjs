@@ -25,6 +25,7 @@ test("renders the planning model shell", async () => {
   assert.match(html, /15指標・目標/);
   const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   const inputValueSource = await readFile(new URL("../app/input-values.ts", import.meta.url), "utf8");
+  const metricGroupSource = await readFile(new URL("../app/metric-groups.ts", import.meta.url), "utf8");
   const proposalSource = await readFile(new URL("../app/proposal-io.ts", import.meta.url), "utf8");
   const globalStyles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(pageSource, /設定した目標に近づける/);
@@ -72,6 +73,12 @@ test("renders the planning model shell", async () => {
   assert.match(inputValueSource, /A missing key means "not entered"/);
   assert.match(inputValueSource, /else next\[key\] = value/);
   assert.match(proposalSource, /入力データ監査（Null／0区別）/);
+  assert.match(pageSource, /metric-group-controls/);
+  assert.match(pageSource, /結果指標/);
+  assert.match(pageSource, /metricBasisRole\(key, metricGroupBases\) !== "result"/);
+  assert.match(metricGroupSource, /companySalesCagr/);
+  assert.match(metricGroupSource, /companySalesIncrease/);
+  assert.match(metricGroupSource, /type MetricGroupBasis = "rate" \| "amount" \| "both"/);
   assert.match(globalStyles, /actuals-three-year-table \{ overflow-x: hidden; overflow-y: auto; \}/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });

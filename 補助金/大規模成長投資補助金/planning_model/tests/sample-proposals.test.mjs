@@ -17,6 +17,7 @@ test("base-year launch sample has no project sales before the base year", async 
   assert.ok(proposal.historicalPlan.every((row) => row.project.sales === 0));
   assert.equal(proposal.inputValues["actual:project:2025:7-1"], 0, "explicit zero must survive export");
   assert.equal(Object.hasOwn(proposal.inputValues, "actual:project:2099:7-1"), false, "missing input must remain absent");
+  assert.equal(proposal.metricGroupBases.companySales, "rate");
   assert.equal(proposal.forecastOverrides["2026:project:7-1"], 0);
   assert.equal(proposal.forecastOverrides["2027:project:7-1"], 0);
   assert.equal(proposal.forecastOverrides["2028:project:7-1"], 60);

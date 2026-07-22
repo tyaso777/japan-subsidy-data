@@ -2,6 +2,7 @@ import { strToU8, unzipSync, zipSync } from "fflate";
 import type { BalanceSheetPlan, Drivers, MetricKey, Target, TimelineSettings, YearPlan } from "./model";
 import { buildBalanceSheetRows, buildCompanyPlRows, buildDiagnosticGroups, buildProjectPlRows, periodLabels, type ReportRow } from "./report-data";
 import { hasInputValue, inputKey, type InputValues } from "./input-values";
+import { defaultMetricGroupBases, metricBasisRole, type MetricGroupBasis, type MetricGroupKey } from "./metric-groups";
 
 export const PROPOSAL_FORMAT = "growth-investment-proposal/v1";
 
@@ -20,6 +21,7 @@ export type ProposalData = {
   futureInputBasis: "company" | "other";
   /** Optional for compatibility with proposal files created before null/zero separation. */
   inputValues?: InputValues;
+  metricGroupBases?: Record<MetricGroupKey, MetricGroupBasis>;
 };
 
 export type ProposalExportContext = {
@@ -124,6 +126,10 @@ const proposalInput = (proposal: ProposalData, key: string, legacyValue: number 
 const inputAuditRows = (proposal: ProposalData) =>
   Object.entries(proposal.inputValues ?? {}).sort(([left], [right]) => left.localeCompare(right, "ja"));
 
+const proposalMetricBases = (proposal: ProposalData) => ({ ...defaultMetricGroupBases, ...(proposal.metricGroupBases ?? {}) });
+const metricHandling = (proposal: ProposalData, key: MetricKey, policy: string) =>
+  metricBasisRole(key, proposalMetricBases(proposal)) === "result" ? "結果指標（自動計算）" : policyLabel(policy);
+
 export function buildProposalHtml({ proposal, effectivePlan, metricRows }: ProposalExportContext) {
   const payload = encodeBase64(JSON.stringify(proposal));
   const parts = reportParts({ proposal, effectivePlan, metricRows });
@@ -131,7 +137,7 @@ export function buildProposalHtml({ proposal, effectivePlan, metricRows }: Propo
   const balanceHeader = htmlPeriodHeader(effectivePlan.slice(0, proposal.balanceSheets.length));
   const metricBody = metricRows.map((row) => row.key === "localBenchmark"
     ? `<tr><th>${htmlEscape(row.label)}</th><td>${display(proposalInput(proposal, inputKey.driver("localBenchmark"), row.actual), row.unit)}</td><td>—</td><td>—</td><td>固定入力・判定対象外</td></tr>`
-    : `<tr><th>${htmlEscape(row.label)}</th><td>${Number.isFinite(row.actual) ? row.actual.toFixed(2) : "—"} ${htmlEscape(row.unit)}</td><td>${display(proposalInput(proposal, inputKey.target(row.key, "value"), row.target), row.unit)}</td><td>${display(proposalInput(proposal, inputKey.target(row.key, "max"), row.max), row.unit)}</td><td>${htmlEscape(policyLabel(row.policy))}</td></tr>`).join("");
+    : `<tr><th>${htmlEscape(row.label)}</th><td>${Number.isFinite(row.actual) ? row.actual.toFixed(2) : "—"} ${htmlEscape(row.unit)}</td><td>${display(proposalInput(proposal, inputKey.target(row.key, "value"), row.target), row.unit)}</td><td>${display(proposalInput(proposal, inputKey.target(row.key, "max"), row.max), row.unit)}</td><td>${htmlEscape(metricHandling(proposal, row.key, row.policy))}</td></tr>`).join("");
   const diagnosticSections = parts.diagnostics.map((group) => htmlSection(`基本指標による妥当性チェック｜${group.title}`, `<th>指標名</th><th>計算式</th><th>主な確認点</th>${planHeader}`, group.rows.map((row) => `<tr><th>${htmlEscape(row.name)}<small>${htmlEscape(row.unit)}</small></th><td class="copy">${htmlEscape(row.formula)}</td><td class="copy">${htmlEscape(row.check)}</td>${row.values.map((period) => `<td>${period.map((entry) => `<span class="diagnostic-value"><small>${htmlEscape(entry.label)}</small>${display(entry.value, row.unit)}</span>`).join("")}</td>`).join("")}</tr>`).join(""))).join("");
   const auditRows = inputAuditRows(proposal).map(([key, value]) => `<tr><th>${htmlEscape(key)}</th><td>${display(value, "")}</td><td>${value === 0 ? "明示的な0" : "入力済み"}</td><td>—</td></tr>`).join("");
   const driverRows = (Object.keys(proposal.drivers) as (keyof Drivers)[]).filter((key) => key !== "localBenchmark").map((key) => { const percent = !["usefulLife", "investment", "subsidy"].includes(key); const factor = percent ? 100 : 1; const range = ["investment", "usefulLife", "projectMarketGrowth"].includes(key) ? undefined : proposal.driverRanges[key]; const value = proposalInput(proposal, inputKey.driver(key), proposal.drivers[key]); const lower = range ? proposalInput(proposal, inputKey.driverRange(key, 0), range[0]) : undefined; const upper = range ? proposalInput(proposal, inputKey.driverRange(key, 1), range[1]) : undefined; return `<tr><th>${htmlEscape(driverNames[key] ?? key)}</th><td>${display(value === undefined ? undefined : value * factor, percent ? "%" : key === "usefulLife" ? "年" : "億円")}</td><td>${display(lower === undefined ? undefined : lower * factor, percent ? "%" : "")}</td><td>${display(upper === undefined ? undefined : upper * factor, percent ? "%" : "")}</td></tr>`; }).join("") + `<tr class="emphasis"><th colspan="4">入力データ監査（一覧にないキーは未設定／Null）</th></tr>${auditRows}`;
@@ -151,7 +157,7 @@ export function buildProposalXlsx({ proposal, effectivePlan, metricRows }: Propo
     rowXml(3, ["基準年", String(proposal.timeline.baseYear)]),
     rowXml(4, ["出力日時", proposal.exportedAt]),
     rowXml(6, ["15指標・目標", "計画値", "単位", "目標下限", "計画上限", "扱い"], "header"),
-    ...metricRows.map((item, index) => rowXml(index + 7, item.key === "localBenchmark" ? [item.label, proposalInput(proposal, inputKey.driver("localBenchmark"), item.actual), item.unit, undefined, undefined, "固定入力・判定対象外"] : [item.label, item.actual, item.unit, proposalInput(proposal, inputKey.target(item.key, "value"), item.target), proposalInput(proposal, inputKey.target(item.key, "max"), item.max), policyLabel(item.policy)])),
+    ...metricRows.map((item, index) => rowXml(index + 7, item.key === "localBenchmark" ? [item.label, proposalInput(proposal, inputKey.driver("localBenchmark"), item.actual), item.unit, undefined, undefined, "固定入力・判定対象外"] : [item.label, item.actual, item.unit, proposalInput(proposal, inputKey.target(item.key, "value"), item.target), proposalInput(proposal, inputKey.target(item.key, "max"), item.max), metricHandling(proposal, item.key, item.policy)])),
   ];
   const diagnosticRows: string[] = [rowXml(1, ["基本指標によるシミュレーション妥当性チェック", "計算式", "主な確認点", ...parts.periods], "title"), rowXml(2, ["指標名", "計算式", "主な確認点", ...parts.periods], "header")];
   let diagnosticRow = 3;
