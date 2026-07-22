@@ -200,7 +200,7 @@ export const sampleDrivers: Drivers = {
   otherHeadcountGrowthToBase: 0.01,
   otherSgaImprovementToBase: 0.005,
   projectSalesGrowth: 0.21,
-  otherSalesGrowth: 0.05,
+  otherSalesGrowth: 0.06,
   projectCogsImprovementAfterBase: 0,
   otherCogsImprovement: 0.01,
   projectPayGrowth: 0.07,

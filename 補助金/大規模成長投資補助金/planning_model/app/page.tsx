@@ -151,7 +151,7 @@ const historicalFallbackDefaults: Partial<Record<keyof Drivers, { initial: numbe
   otherPayGrowthToBase: { initial: 0.03, lower: 0, upper: 0.06 },
   otherHeadcountGrowthToBase: { initial: 0.01, lower: -0.03, upper: 0.05 },
   otherSgaImprovementToBase: { initial: 0, lower: 0, upper: 0.02 },
-  otherSalesGrowth: { initial: 0.03, lower: -0.03, upper: 0.08 },
+  otherSalesGrowth: { initial: 0.05, lower: -0.01, upper: 0.10 },
   otherCogsImprovement: { initial: 0, lower: 0, upper: 0.03 },
   otherPayGrowth: { initial: 0.03, lower: 0, upper: 0.06 },
   otherHeadcountGrowth: { initial: 0.01, lower: -0.03, upper: 0.05 },
@@ -902,7 +902,7 @@ export default function Home() {
         Math.max(nextDrivers[afterBaseKey], clamp(nextRanges[toBaseKey][1] + lift, technicalLower, technicalUpper)),
       ];
     };
-    applyOtherSynergyLift("otherSalesGrowth", "otherSalesGrowthToBase", 0.01);
+    applyOtherSynergyLift("otherSalesGrowth", "otherSalesGrowthToBase", 0.02);
     applyOtherSynergyLift("otherCogsImprovement", "otherCogsImprovementToBase", 0.005);
     applyOtherSynergyLift("otherPayGrowth", "otherPayGrowthToBase", 0.005);
     applyOtherSynergyLift("otherHeadcountGrowth", "otherHeadcountGrowthToBase", 0.005);
@@ -949,7 +949,7 @@ export default function Home() {
       return next;
     });
     setHistoricalDefaultsApplied(true);
-    setDefaultNote("すべての計画初期値を設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目は保守的な補完値を使用しています。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。その他事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を1.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、耐用年数は10年、市場伸び率は5%で仮置きしています。");
+    setDefaultNote("すべての計画初期値を設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目は保守的な補完値を使用しています。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。その他事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、耐用年数は10年、市場伸び率は5%で仮置きしています。");
   }
 
   function solve() {
@@ -1148,7 +1148,7 @@ export default function Home() {
               ])}
             </tbody></table></div>
             <p className="footnote">2023～2025年の各列は、計画値ではなく過去実績の参考値です。現実的な計画初期値・許容範囲を決める材料として表示しています。「過去3期からデフォルト設定」では、補助事業の設備導入期間は過去実績の単純平均を計画初期値、平均±2標準偏差を許容下限・上限とします（技術的な絶対範囲内に制限）。基準年後は、第5次採択者中央値を直接使える項目と、過去採択統計・利益構造から補完する項目を分けています。その他事業は直近を重めにした初期値と過去変動幅から設定します。市場伸び率・補助事業投資額・耐用年数は固定入力のため、許容下限・上限を設けません。</p>
-            <div className="benchmark-note"><strong>基準年後のデフォルト</strong><span>売上高成長率 22%［15～30%］</span><span>補助事業1人当たり給与支給総額の年平均上昇率 7%［5～10%］</span><span>常時使用する従業員数（就業時間換算）の成長率 4%［0～8%］</span><span>原価率改善 1.5pt［0～2pt］</span><span>その他販管費率 過去平均-1.5pt［過去平均-4～+1pt］</span><span>役員1人当たり給与支給総額の年平均上昇率 7%［5～10%］（従業員と同水準・参考管理）</span><span>その他事業はシナジーを見込み、基準年後の売上成長率を設備導入期間＋1.0pt、原価率改善・給与・人員成長率を＋0.5pt</span><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公募・採択者中央値PDF ↗</a></div>
+            <div className="benchmark-note"><strong>基準年後のデフォルト</strong><span>売上高成長率 22%［15～30%］</span><span>補助事業1人当たり給与支給総額の年平均上昇率 7%［5～10%］</span><span>常時使用する従業員数（就業時間換算）の成長率 4%［0～8%］</span><span>原価率改善 1.5pt［0～2pt］</span><span>その他販管費率 過去平均-1.5pt［過去平均-4～+1pt］</span><span>役員1人当たり給与支給総額の年平均上昇率 7%［5～10%］（従業員と同水準・参考管理）</span><span>その他事業はシナジーを見込み、基準年後の売上成長率を設備導入期間＋2.0pt、原価率改善・給与・人員成長率を＋0.5pt</span><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公募・採択者中央値PDF ↗</a></div>
             {defaultNote && <p className="default-note">{defaultNote}</p>}
           </article>
           <article className="panel table-panel">
