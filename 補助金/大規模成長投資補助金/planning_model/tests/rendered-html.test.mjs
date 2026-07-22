@@ -100,6 +100,14 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /<th>調整項目<small>A～Z<\/small><\/th>/);
   assert.match(pageSource, /className="driver-item-code">\{driverItemCodes\[key\]\}:/);
   assert.match(globalStyles, /\.driver-item-code/);
+  assert.match(pageSource, /const round5Benchmarks/);
+  assert.match(pageSource, /companySalesCagr: \{ applicant: 20, accepted: 21, statistic: "中央値" \}/);
+  assert.match(pageSource, /projectSalesShare: \{ applicant: 80, accepted: 89, statistic: "平均値" \}/);
+  assert.match(pageSource, /valueAddedSubsidyRatio: \{ applicant: 171, accepted: 213, statistic: "中央値" \}/);
+  assert.match(pageSource, /第5次公式参考値/);
+  assert.match(pageSource, /<Round5BenchmarkCell metricKey=\{definition\.key\} unit=\{definition\.unit\} \/>/);
+  assert.match(pageSource, /役員関連2指標は第5次に公表値がありません/);
+  assert.match(globalStyles, /\.round5-benchmark/);
   assert.match(pageSource, /自動算出/);
   assert.match(pageSource, /個別に目標設定/);
   assert.match(globalStyles, /metric-independent-row/);
