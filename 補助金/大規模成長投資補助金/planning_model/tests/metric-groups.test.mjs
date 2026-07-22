@@ -27,4 +27,7 @@ test("a metric group activates only the selected optimization basis", () => {
   assert.equal(groups.metricBasisRole("companySalesCagr", bases), "basis");
   assert.equal(groups.metricBasisRole("companySalesIncrease", bases), "basis");
   assert.equal(groups.metricBasisRole("projectSalesShare", bases), "independent");
+  assert.equal(groups.metricBasisRole("officerPayCagr", bases), "independent");
+  assert.equal(groups.metricBasisRole("officerPayIncrease", bases), "independent");
+  assert.equal(groups.metricLinkGroups.length, 4);
 });

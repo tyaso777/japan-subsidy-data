@@ -49,6 +49,15 @@ test("relative planning metrics have fixed ceilings while absolute amounts are s
   assert.equal(summary.hardCount, 0);
 });
 
+test("round-six officer metrics are reference-only and displayed last", () => {
+  assert.deepEqual(model.metrics.slice(-2).map((item) => item.key), ["officerPayCagr", "officerPayIncrease"]);
+  assert.equal(model.defaultTargets.officerPayCagr.policy, "monitor");
+  assert.equal(model.defaultTargets.officerPayIncrease.policy, "monitor");
+  assert.equal(model.isOptimizationExcludedMetric("officerPayCagr"), true);
+  assert.equal(model.isOptimizationExcludedMetric("officerPayIncrease"), true);
+  assert.equal(model.isOptimizationExcludedMetric("employeePayCagr"), false);
+});
+
 test("absolute-amount target defaults scale with the underlying company", () => {
   const plan = makePlan();
   const baseTargets = model.calculateScaleDependentTargetDefaults(plan, model.defaultTargets);
@@ -59,12 +68,13 @@ test("absolute-amount target defaults scale with the underlying company", () => 
     }
   }
   const doubledTargets = model.calculateScaleDependentTargetDefaults(doubledPlan, model.defaultTargets);
-  for (const key of ["companySalesIncrease", "projectSalesIncrease", "valueAddedIncrease", "employeePayIncrease", "officerPayIncrease"]) {
+  for (const key of ["companySalesIncrease", "projectSalesIncrease", "valueAddedIncrease", "employeePayIncrease"]) {
     assert.ok(baseTargets[key].value >= 0);
     assert.ok(baseTargets[key].max >= baseTargets[key].value);
     assert.ok(Math.abs(doubledTargets[key].value - baseTargets[key].value * 2) < 0.02);
     assert.ok(Math.abs(doubledTargets[key].max - baseTargets[key].max * 2) < 0.02);
   }
+  assert.equal(baseTargets.officerPayIncrease, undefined);
 });
 
 test("sixth-round periods drive all current metrics", () => {

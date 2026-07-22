@@ -101,6 +101,10 @@ export type MetricKey =
   | "valueAddedSubsidyRatio"
   | "localBenchmark";
 
+export const sixthRoundReferenceMetricKeys = new Set<MetricKey>(["officerPayCagr", "officerPayIncrease"]);
+export const isSixthRoundReferenceMetric = (key: MetricKey) => sixthRoundReferenceMetricKeys.has(key);
+export const isOptimizationExcludedMetric = (key: MetricKey) => key === "localBenchmark" || isSixthRoundReferenceMetric(key);
+
 export type MetricDefinition = {
   key: MetricKey;
   label: string;
@@ -324,11 +328,11 @@ export const metrics: MetricDefinition[] = [
   { key: "valueAddedIncrease", label: "補助事業付加価値増加額", unit: "億円", round3Formula: "3年目付加価値額 − 基準年付加価値額", round6Formula: "3年目付加価値額 − 基準年付加価値額", defaultTarget: 0, direction: "min", sourceRound: "労働生産性目標と基準年付加価値・人員計画から規模連動で設定" },
   { key: "employeePayCagr", label: "補助事業1人当たり給与支給総額の年平均上昇率", unit: "%/年", round3Formula: "従業員給与支給総額÷常時使用する従業員数（就業時間換算）の基準年度→事業化報告3年目（本モデルの最終年度）CAGR", round6Formula: "補助事業1人当たり給与支給総額の基準年度→事業化報告3年目（本モデルの最終年度）の年平均上昇率（基準年度の常時使用する従業員数（就業時間換算）が0の場合のみ役員で代替）", defaultTarget: 7, rangeMax: 10, direction: "min", sourceRound: "第6次要件は一般5.0%・100億宣言4.5%以上" },
   { key: "employeePayIncrease", label: "補助事業従業員給与支給総額の増加額", unit: "億円", round3Formula: "3年目従業員給与総額 − 基準年総額", round6Formula: "3年目従業員給与総額 − 基準年総額", defaultTarget: 0, direction: "min", sourceRound: "1人当たり給与上昇率目標と基準年給与・人員計画から規模連動で設定" },
-  { key: "officerPayCagr", label: "年平均役員目標賃上げ率", unit: "%/年", round3Formula: "役員給与総額÷役員数の基準年→3年目CAGR", round6Formula: "役員給与総額÷役員数の基準年→3年目CAGR（参考管理）", defaultTarget: 6, rangeMax: 10, direction: "min", sourceRound: "第4次採択者中央値（第6次要件対象外）" },
-  { key: "officerPayIncrease", label: "役員給与支給総額の増加額", unit: "億円", round3Formula: "3年目役員給与総額 − 基準年総額", round6Formula: "3年目役員給与総額 − 基準年総額（参考管理）", defaultTarget: 0, direction: "min", sourceRound: "役員1人当たり給与上昇率目標と基準年報酬・役員数から規模連動で設定" },
   { key: "investmentSalesRatio", label: "投資額／全社売上高", unit: "%", round3Formula: "補助事業投資額 ÷ 最新決算期全社売上高", round6Formula: "補助事業投資額 ÷ 最新決算期全社売上高", defaultTarget: 30, rangeMax: 70, direction: "range", sourceRound: "第5次中央値61%を参考に範囲管理" },
   { key: "valueAddedSubsidyRatio", label: "付加価値増加額／補助金額", unit: "%", round3Formula: "基準年→3年目の付加価値増加額 ÷ 補助金額", round6Formula: "基準年→3年目の付加価値増加額 ÷ 補助金額", defaultTarget: 213, rangeMax: 350, direction: "min", sourceRound: "第5次採択者中央値" },
   { key: "localBenchmark", label: "ローカルベンチマーク財務分析結果", unit: "点", round3Formula: "ローカルベンチマーク入力値", round6Formula: "ローカルベンチマーク入力値", defaultTarget: 23, rangeMax: 40, direction: "min", sourceRound: "第5次採択者中央値" },
+  { key: "officerPayCagr", label: "年平均役員目標賃上げ率", unit: "%/年", round3Formula: "役員給与総額÷役員数の基準年→3年目CAGR", round6Formula: "役員給与総額÷役員数の基準年→3年目CAGR（参考管理）", defaultTarget: 6, rangeMax: 10, direction: "min", sourceRound: "第6次評価対象外・参考値" },
+  { key: "officerPayIncrease", label: "役員給与支給総額の増加額", unit: "億円", round3Formula: "3年目役員給与総額 − 基準年総額", round6Formula: "3年目役員給与総額 − 基準年総額（参考管理）", defaultTarget: 0, direction: "min", sourceRound: "第6次評価対象外・参考値" },
 ];
 
 export const defaultTargets = Object.fromEntries(
@@ -337,7 +341,7 @@ export const defaultTargets = Object.fromEntries(
     {
       value: metric.defaultTarget,
       max: metric.rangeMax,
-      policy: metric.key === "investmentSalesRatio" || metric.key === "projectSalesShare" || metric.key === "localBenchmark" ? "monitor" : "soft",
+      policy: metric.key === "investmentSalesRatio" || metric.key === "projectSalesShare" || isOptimizationExcludedMetric(metric.key) ? "monitor" : "soft",
       weight: 1,
     },
   ]),
@@ -391,16 +395,11 @@ export function calculateScaleDependentTargetDefaults(
   const employeePayIncrease = (annualRate: number) => base.project.headcount
     ? Math.max(0, base.project.employeePay / base.project.headcount * (1 + annualRate / 100) ** years * report3.project.headcount - base.project.employeePay)
     : 0;
-  const officerPayIncrease = (annualRate: number) => base.project.officerCount
-    ? Math.max(0, base.project.officerPay / base.project.officerCount * (1 + annualRate / 100) ** years * report3.project.officerCount - base.project.officerPay)
-    : 0;
-
   return {
     companySalesIncrease: pair((rate) => increaseByRate(companyBase.sales, rate), "companySalesCagr"),
     projectSalesIncrease: pair((rate) => increaseByRate(base.project.sales, rate), "projectSalesCagr"),
     valueAddedIncrease: pair(valueAddedIncrease, "laborProductivityCagr"),
     employeePayIncrease: pair(employeePayIncrease, "employeePayCagr"),
-    officerPayIncrease: pair(officerPayIncrease, "officerPayCagr"),
   };
 }
 
@@ -905,7 +904,7 @@ export function objective(
   const actual = calculateMetrics(plan, drivers);
   let score = 0;
   for (const definition of metrics) {
-    if (definition.key === "localBenchmark") continue;
+    if (isOptimizationExcludedMetric(definition.key)) continue;
     const target = targets[definition.key];
     const miss = normalizedShortfall(definition, actual[definition.key], target);
     const policyMultiplier = target.policy === "hard" ? 5000 : 250;
@@ -980,7 +979,7 @@ export function optimizeDrivers(
   const hardViolation = (drivers: Drivers) => {
     const actual = calculateMetrics(transformedPlan(drivers), drivers);
     return metrics.reduce((sum, definition) => {
-      if (definition.key === "localBenchmark") return sum;
+      if (isOptimizationExcludedMetric(definition.key)) return sum;
       const target = targets[definition.key];
       if (target.policy !== "hard") return sum;
       const status = targetStatus(definition, actual[definition.key], target);
@@ -1067,7 +1066,7 @@ export function optimizeDrivers(
 }
 
 export function hardTargetSummary(actual: Record<MetricKey, number>, targets: Record<MetricKey, Target>) {
-  const hard = metrics.filter((definition) => definition.key !== "localBenchmark" && targets[definition.key].policy === "hard");
+  const hard = metrics.filter((definition) => !isOptimizationExcludedMetric(definition.key) && targets[definition.key].policy === "hard");
   const failed = hard.filter((definition) => !targetStatus(definition, actual[definition.key], targets[definition.key]).ok);
   return { hardCount: hard.length, failed };
 }

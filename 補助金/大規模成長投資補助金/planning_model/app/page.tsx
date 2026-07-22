@@ -19,6 +19,8 @@ import {
   Drivers,
   generatePlan,
   hardTargetSummary,
+  isOptimizationExcludedMetric,
+  isSixthRoundReferenceMetric,
   MetricKey,
   metrics,
   objective,
@@ -203,7 +205,7 @@ const forecastOverrideKey = (year: number, segment: ForecastSegment, item: strin
 function createInitialInputValues(): InputValues {
   let values: InputValues = {};
   for (const definition of metrics) {
-    if (definition.key === "localBenchmark" || scaleDependentMetricKeys.has(definition.key)) continue;
+    if (isOptimizationExcludedMetric(definition.key) || scaleDependentMetricKeys.has(definition.key)) continue;
     values = setInputValue(values, inputKey.target(definition.key, "value"), defaultTargets[definition.key].value);
     if (defaultTargets[definition.key].max !== undefined) values = setInputValue(values, inputKey.target(definition.key, "max"), defaultTargets[definition.key].max!);
   }
@@ -532,9 +534,9 @@ export default function Home() {
     [historicalPlan, balanceSheets],
   );
   const validations = useMemo(() => validatePlan(plan, calculationDrivers), [plan, calculationDrivers]);
-  const optimizationTargets = useMemo(() => Object.fromEntries((Object.keys(targets) as MetricKey[]).map((key) => [key, hasInputValue(inputValues, inputKey.target(key, "value")) && metricBasisRole(key, metricGroupBases) !== "result" ? targets[key] : { ...targets[key], policy: "monitor", max: undefined }])) as Record<MetricKey, Target>, [targets, inputValues, metricGroupBases]);
+  const optimizationTargets = useMemo(() => Object.fromEntries((Object.keys(targets) as MetricKey[]).map((key) => [key, !isOptimizationExcludedMetric(key) && hasInputValue(inputValues, inputKey.target(key, "value")) && metricBasisRole(key, metricGroupBases) !== "result" ? targets[key] : { ...targets[key], policy: "monitor", max: undefined }])) as Record<MetricKey, Target>, [targets, inputValues, metricGroupBases]);
   const hardSummary = useMemo(() => hardTargetSummary(actual, optimizationTargets), [actual, optimizationTargets]);
-  const targetManagedMetrics = metrics.filter((definition) => definition.key !== "localBenchmark" && metricBasisRole(definition.key, metricGroupBases) !== "result");
+  const targetManagedMetrics = metrics.filter((definition) => !isOptimizationExcludedMetric(definition.key) && metricBasisRole(definition.key, metricGroupBases) !== "result");
   const achieved = targetManagedMetrics.filter((definition) => hasInputValue(inputValues, inputKey.target(definition.key, "value")) && targetStatus(definition, actual[definition.key], targets[definition.key]).ok).length;
   const basePlanYear = plan.find((row) => row.role === "base")!;
   const report3 = plan.find((row) => row.role === "report3")!;
@@ -1030,14 +1032,15 @@ export default function Home() {
                 const target = targets[definition.key];
                 const status = targetStatus(definition, actual[definition.key], target);
                 const fixedInput = definition.key === "localBenchmark";
+                const referenceMetric = isSixthRoundReferenceMetric(definition.key);
                 const targetSet = hasInputValue(inputValues, inputKey.target(definition.key, "value"));
                 const basisRole = metricBasisRole(definition.key, metricGroupBases);
                 return (
                   <div className="metric-row" key={definition.key}>
-                    <span className={`status-dot ${fixedInput || basisRole === "result" || !targetSet || status.ok ? "ok" : target.policy === "hard" ? "bad" : "warn"}`} />
+                    <span className={`status-dot ${fixedInput || referenceMetric || basisRole === "result" || !targetSet || status.ok ? "ok" : target.policy === "hard" ? "bad" : "warn"}`} />
                     <div><strong>{definition.label}</strong><small>{definition.sourceRound}</small></div>
                     <span className="metric-value">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key])} →</small>}{number(actual[definition.key])}{definition.unit}</span>
-                    <span className="metric-target">{fixedInput ? "固定入力・判定対象外" : basisRole === "result" ? "自動算出" : targetSet ? `目標 ${number(target.value)}${definition.unit}` : "目標 未設定"}</span>
+                    <span className="metric-target">{fixedInput ? "固定入力・判定対象外" : referenceMetric ? "参考値・第6次評価対象外" : basisRole === "result" ? "自動算出" : targetSet ? `目標 ${number(target.value)}${definition.unit}` : "目標 未設定"}</span>
                   </div>
                 );
               })}
@@ -1163,12 +1166,13 @@ export default function Home() {
                 const scaleDependent = scaleDependentMetricKeys.has(definition.key);
                 const basisRole = metricBasisRole(definition.key, metricGroupBases);
                 if (definition.key === "localBenchmark") return <tr className="fixed-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small>外部で算出した点数を転記する固定値</small></td>{history.values.map((_value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>—</td>)}<td><input aria-label="ローカルベンチマーク固定値" type="number" step="1" value={getInputValue(inputValues, inputKey.driver("localBenchmark"))} placeholder="未入力" onChange={(event) => updateDriver("localBenchmark", event.target.value === "" ? null : Number(event.target.value))} /></td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="driver-policy">入力値を固定</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">判定対象外</span></td></tr>;
+                if (isSixthRoundReferenceMetric(definition.key)) return <tr className="reference-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small>第6次評価対象外</small><span className="metric-role-badge reference">参考値</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{historicalPlan[historyIndex - 1]?.year}→{historicalPlan[historyIndex].year}（1年間）／{definition.unit}</small>{scaleDependent && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears)} {definition.unit}</small>}</> : "—"}</td>)}<td className="numeric">{number(actual[definition.key])} {definition.unit}</td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="driver-policy">参考値</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">判定対象外</span></td></tr>;
                 const rowClass = basisRole === "result" ? "metric-result-row" : basisRole === "basis" ? "metric-basis-row" : "metric-independent-row";
                 const roleLabel = basisRole === "result" ? "自動算出" : basisRole === "basis" ? "目標設定" : "個別に目標設定";
                 return <tr className={rowClass} key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small>{definition.sourceRound}</small><span className={`metric-role-badge ${basisRole}`}>{roleLabel}</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{history.mode === "change" ? `${historicalPlan[historyIndex - 1]?.year}→${historicalPlan[historyIndex].year}（1年間）／${definition.unit}` : definition.unit}</small>{scaleDependent && history.mode === "change" && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears)} {definition.unit}</small>}</> : "—"}</td>)}<td className="numeric">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key])} →</small>}{number(actual[definition.key])} {definition.unit}</td><td><input disabled={basisRole === "result"} aria-label={`${definition.label}目標下限`} type="number" step="0.1" value={getInputValue(inputValues, inputKey.target(definition.key, "value"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "value", event.target.value === "" ? null : Number(event.target.value))} /></td><td><input disabled={basisRole === "result"} aria-label={`${definition.label}計画上限`} type="number" step="0.1" value={getInputValue(inputValues, inputKey.target(definition.key, "max"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "max", event.target.value === "" ? null : Number(event.target.value))} /></td><td><select disabled={basisRole === "result"} value={target.policy} onChange={(event) => updateTarget(definition.key, { policy: event.target.value as Target["policy"] })}><option value="hard">必達</option><option value="soft">努力</option><option value="monitor">参考</option></select></td><td><input disabled={basisRole === "result"} type="number" min="1" max="10" step="1" value={integerPriority(target.weight)} onChange={(event) => updateTarget(definition.key, { weight: integerPriority(Number(event.target.value)) })} /></td><td><span className={`result-badge ${basisRole === "result" || !targetSet || status.ok ? "ok" : target.policy === "hard" ? "bad" : "warn"}`}>{basisRole === "result" ? "自動算出" : !targetSet ? "未設定" : status.ok ? "範囲内" : target.policy === "hard" ? "必達範囲外" : "範囲外"}</span></td></tr>;
               })}
             </tbody></table></div>
-            <p className="footnote">連動する指標はグループ単位で目標設定方法を選びます。「自動算出」の指標はPLから計算して確認する項目で、保存済みの目標値は切替時のため保持しますが現在の最適化には使いません。「両方に目標設定」では2指標を同時に評価し、調整水準を許容範囲内で最適化します。過去の成長率・増加額は各1年間、計画の増加額は基準年から事業化報告3年目までの{targetComparisonYears}年間です。金額指標の「単純換算」は過去1年間の増加額が同額で続く場合の比較用参考値であり、複利予測ではありません。補助事業売上構成比と投資額比率は、前々期・前期・最新期それぞれの水準です。ローカルベンチマークは外部で算出した点数の固定入力であり、目標判定・最適化・PL計算の対象外です。</p>
+            <p className="footnote">連動する指標はグループ単位で目標設定方法を選びます。「自動算出」の指標はPLから計算して確認する項目で、保存済みの目標値は切替時のため保持しますが現在の最適化には使いません。「両方に目標設定」では2指標を同時に評価し、調整水準を許容範囲内で最適化します。過去の成長率・増加額は各1年間、計画の増加額は基準年から事業化報告3年目までの{targetComparisonYears}年間です。金額指標の「単純換算」は過去1年間の増加額が同額で続く場合の比較用参考値であり、複利予測ではありません。補助事業売上構成比と投資額比率は、前々期・前期・最新期それぞれの水準です。14・15の役員関連2指標は第6次の評価対象外であり、計算結果の参考表示に限定します。ローカルベンチマークは外部で算出した点数の固定入力であり、目標判定・最適化・PL計算の対象外です。</p>
             <div className="target-action-bar">
               <div>
                 <strong>15指標の設定後に実行</strong>

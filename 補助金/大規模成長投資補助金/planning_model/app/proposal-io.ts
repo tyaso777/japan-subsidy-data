@@ -1,5 +1,5 @@
 import { strToU8, unzipSync, zipSync } from "fflate";
-import type { BalanceSheetPlan, Drivers, MetricKey, Target, TimelineSettings, YearPlan } from "./model";
+import { isSixthRoundReferenceMetric, type BalanceSheetPlan, type Drivers, type MetricKey, type Target, type TimelineSettings, type YearPlan } from "./model";
 import { buildBalanceSheetRows, buildCompanyPlRows, buildDiagnosticGroups, buildProjectPlRows, periodLabels, type ReportRow } from "./report-data";
 import { hasInputValue, inputKey, type InputValues } from "./input-values";
 import { defaultMetricGroupBases, metricBasisRole, type MetricGroupBasis, type MetricGroupKey } from "./metric-groups";
@@ -138,6 +138,8 @@ export function buildProposalHtml({ proposal, effectivePlan, metricRows }: Propo
   const balanceHeader = htmlPeriodHeader(effectivePlan.slice(0, proposal.balanceSheets.length));
   const metricBody = metricRows.map((row) => row.key === "localBenchmark"
     ? `<tr><th>${htmlEscape(row.label)}</th><td>${display(proposalInput(proposal, inputKey.driver("localBenchmark"), row.actual), row.unit)}</td><td>—</td><td>—</td><td>固定入力・判定対象外</td></tr>`
+    : isSixthRoundReferenceMetric(row.key)
+      ? `<tr><th>${htmlEscape(row.label)}<small>第6次評価対象外・参考値</small></th><td>${display(row.actual, row.unit)}</td><td>—</td><td>—</td><td>参考値・判定対象外</td></tr>`
     : `<tr><th>${htmlEscape(row.label)}</th><td>${Number.isFinite(row.actual) ? row.actual.toFixed(2) : "—"} ${htmlEscape(row.unit)}</td><td>${display(proposalInput(proposal, inputKey.target(row.key, "value"), row.target), row.unit)}</td><td>${display(proposalInput(proposal, inputKey.target(row.key, "max"), row.max), row.unit)}</td><td>${htmlEscape(metricHandling(proposal, row.key, row.policy))}</td></tr>`).join("");
   const diagnosticSections = parts.diagnostics.map((group) => htmlSection(`基本指標による妥当性チェック｜${group.title}`, `<th>指標名</th><th>計算式</th><th>主な確認点</th>${planHeader}`, group.rows.map((row) => `<tr><th>${htmlEscape(row.name)}<small>${htmlEscape(row.unit)}</small></th><td class="copy">${htmlEscape(row.formula)}</td><td class="copy">${htmlEscape(row.check)}</td>${row.values.map((period) => `<td>${period.map((entry) => `<span class="diagnostic-value"><small>${htmlEscape(entry.label)}</small>${display(entry.value, row.unit)}</span>`).join("")}</td>`).join("")}</tr>`).join(""))).join("");
   const auditRows = inputAuditRows(proposal).map(([key, value]) => `<tr><th>${htmlEscape(key)}</th><td>${display(value, "")}</td><td>${value === 0 ? "明示的な0" : "入力済み"}</td><td>—</td></tr>`).join("");
@@ -158,7 +160,7 @@ export function buildProposalXlsx({ proposal, effectivePlan, metricRows }: Propo
     rowXml(3, ["基準年", String(proposal.timeline.baseYear)]),
     rowXml(4, ["出力日時", proposal.exportedAt]),
     rowXml(6, ["15指標・目標", "計画値（基準年→事業化報告3年目・3年間）", "単位", "目標下限（3年間）", "計画上限（3年間）", "扱い"], "header"),
-    ...metricRows.map((item, index) => rowXml(index + 7, item.key === "localBenchmark" ? [item.label, proposalInput(proposal, inputKey.driver("localBenchmark"), item.actual), item.unit, undefined, undefined, "固定入力・判定対象外"] : [item.label, item.actual, item.unit, proposalInput(proposal, inputKey.target(item.key, "value"), item.target), proposalInput(proposal, inputKey.target(item.key, "max"), item.max), metricHandling(proposal, item.key, item.policy)])),
+    ...metricRows.map((item, index) => rowXml(index + 7, item.key === "localBenchmark" ? [item.label, proposalInput(proposal, inputKey.driver("localBenchmark"), item.actual), item.unit, undefined, undefined, "固定入力・判定対象外"] : isSixthRoundReferenceMetric(item.key) ? [item.label, item.actual, item.unit, undefined, undefined, "参考値・第6次評価対象外"] : [item.label, item.actual, item.unit, proposalInput(proposal, inputKey.target(item.key, "value"), item.target), proposalInput(proposal, inputKey.target(item.key, "max"), item.max), metricHandling(proposal, item.key, item.policy)])),
   ];
   const diagnosticRows: string[] = [rowXml(1, ["基本指標によるシミュレーション妥当性チェック", "計算式", "主な確認点", ...parts.periods], "title"), rowXml(2, ["指標名", "計算式", "主な確認点", ...parts.periods], "header")];
   let diagnosticRow = 3;
