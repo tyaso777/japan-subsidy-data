@@ -688,6 +688,11 @@ export default function Home() {
       const upper = Math.min(technicalUpper, Math.max(technicalLower, Math.max(...importedRange)));
       importedRanges[key] = [lower, upper];
     }
+    for (const key of Object.keys(driverBounds) as (keyof Drivers)[]) {
+      const [technicalLower, technicalUpper] = driverBounds[key];
+      const importedRange = importedRanges[key] ?? driverBounds[key];
+      importedRanges[key] = importedRange.map((value) => Math.min(technicalUpper, Math.max(technicalLower, value))) as [number, number];
+    }
     setProposalTitle(proposal.title || "成長投資計画 提案計画");
     setTimeline(normalizeTimeline(proposal.timeline));
     setHistoricalPlan(clone(proposal.historicalPlan));
@@ -701,7 +706,13 @@ export default function Home() {
     setMetricGroupBases({ ...defaultMetricGroupBases, ...(proposal.metricGroupBases ?? {}) });
     setApplicationCategory(proposal.applicationCategory ?? defaultApplicationCategory);
     if (proposal.inputValues) {
-      setInputValues(clone(proposal.inputValues));
+      let normalizedInputs = clone(proposal.inputValues);
+      for (const key of Object.keys(driverBounds) as (keyof Drivers)[]) {
+        for (const bound of [0, 1] as const) {
+          if (hasInputValue(normalizedInputs, inputKey.driverRange(key, bound))) normalizedInputs = setInputValue(normalizedInputs, inputKey.driverRange(key, bound), importedRanges[key][bound]);
+        }
+      }
+      setInputValues(normalizedInputs);
     } else {
       // Legacy v1 files had numeric models only.  Treat their saved cells as
       // explicitly entered because the old format cannot recover blanks.
@@ -889,7 +900,9 @@ export default function Home() {
   function updateDriverRange(key: keyof Drivers, boundIndex: 0 | 1, displayValue: number | null) {
     clearAdjustment();
     const fallback = driverBounds[key][boundIndex];
-    const value = displayValue === null ? fallback : percentDriver(key) ? displayValue / 100 : displayValue;
+    const enteredValue = displayValue === null ? fallback : percentDriver(key) ? displayValue / 100 : displayValue;
+    const [technicalLower, technicalUpper] = driverBounds[key];
+    const value = Math.min(technicalUpper, Math.max(technicalLower, enteredValue));
     setInputValues((current) => setInputValue(current, inputKey.driverRange(key, boundIndex), displayValue === null ? null : value));
     setDriverRanges((current) => {
       const next: [number, number] = [...current[key]];
@@ -1249,6 +1262,9 @@ export default function Home() {
                   const raw = getInputValue(inputValues, inputKey.driverRange(key, bound));
                   return raw === "" ? "" : roundedInput(percentDriver(key) ? raw * 100 : raw);
                 }) as [number | "", number | ""];
+                const rangeInputFactor = percentDriver(key) ? 100 : 1;
+                const rangeInputMin = driverBounds[key][0] * rangeInputFactor;
+                const rangeInputMax = driverBounds[key][1] * rangeInputFactor;
                 const rangeOrdered = driverRanges[key][0] <= driverRanges[key][1];
                 const rangeValid = noRange || (rangeOrdered && drivers[key] >= driverRanges[key][0] && drivers[key] <= driverRanges[key][1]);
                 const rangeStatus = noRange ? "入力値を固定" : !rangeOrdered ? "下限＞上限" : movable ? rangeValid ? "範囲内で調整" : "初期値が範囲外" : rangeValid ? "入力値を固定" : "固定値が範囲外";
@@ -1260,7 +1276,7 @@ export default function Home() {
                     return <td className="driver-history driver-rate-history" key={`${key}-${historicalPlan[index].year}`}><strong>{improvementLabel}</strong><small>当期率 {number(referenceLevel * 100, 2)}%</small></td>;
                   }
                   return <td className="driver-history" key={`${key}-${historicalPlan[index].year}`}>{Number.isFinite(value) ? <><strong>{number(percentDriver(key) ? value * 100 : value, 2)}</strong><small>{history.mode === "change" ? `${historicalPlan[index - 1]?.year}→${historicalPlan[index].year}` : info.unit}</small></> : "—"}</td>;
-                })}<td><span className="driver-values"><input type="number" min={key === "investment" || key === "subsidy" ? 0 : undefined} aria-invalid={constraintError ? "true" : undefined} step={info.step} value={displayedInputValue} placeholder="未設定" onChange={(event) => updateDriver(key, event.target.value === "" ? null : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))} />{resultValue !== null && <small className="adjusted-value">→ 最適化結果 {number(resultValue, 2)}</small>}</span>{constraintError && <small className="field-error" role="alert">{constraintError}</small>}</td><td className="statutory-condition"><strong>{driverRequirementLabel(key, applicationCategory, drivers.investment)}</strong></td><td>{noRange ? <span className="no-range">—</span> : <input type="number" step={info.step} value={rangeValues[0]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />}</td><td>{noRange ? <span className="no-range">—</span> : <input type="number" step={info.step} value={rangeValues[1]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />}</td><td><span className={`driver-policy ${rangeValid ? "" : "out-of-range"}`}>{rangeStatus}</span></td></tr>;
+                })}<td><span className="driver-values"><input type="number" min={key === "investment" || key === "subsidy" ? 0 : undefined} aria-invalid={constraintError ? "true" : undefined} step={info.step} value={displayedInputValue} placeholder="未設定" onChange={(event) => updateDriver(key, event.target.value === "" ? null : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))} />{resultValue !== null && <small className="adjusted-value">→ 最適化結果 {number(resultValue, 2)}</small>}</span>{constraintError && <small className="field-error" role="alert">{constraintError}</small>}</td><td className="statutory-condition"><strong>{driverRequirementLabel(key, applicationCategory, drivers.investment)}</strong></td><td>{noRange ? <span className="no-range">—</span> : <input type="number" min={rangeInputMin} max={rangeInputMax} step={info.step} value={rangeValues[0]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />}</td><td>{noRange ? <span className="no-range">—</span> : <input type="number" min={rangeInputMin} max={rangeInputMax} step={info.step} value={rangeValues[1]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />}</td><td><span className={`driver-policy ${rangeValid ? "" : "out-of-range"}`}>{rangeStatus}</span></td></tr>;
               }),
               ])}
             </tbody></table></div>
