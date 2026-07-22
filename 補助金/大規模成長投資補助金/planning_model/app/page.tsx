@@ -783,6 +783,11 @@ export default function Home() {
     );
   }
 
+  function solveAndOpenAnnualPl() {
+    solve();
+    setView("pl");
+  }
+
   return (
     <main>
       <header className="topbar">
@@ -897,7 +902,7 @@ export default function Home() {
           <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。直前の変更はCtrl＋Zで戻せます。</p>
           <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">ROUND 6 / FUTURE CAPEX</p><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">将来合計 {number(futureCapex.reduce((sum, row) => sum + row.value, 0), 2)} 億円</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。将来各年度の入力合計は「15指標・目標」の補助事業投資額と連動し、投資額／全社売上高や将来減価償却費の自動予測へ反映します。</p></article>
           <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">PL FORECAST</p><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>全社PLとその他事業PLのどちらか一方だけを入力します</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>その他事業PLを入力</button></div></div><FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} futureInputBasis={futureInputBasis} onForecastChange={updateForecastOverride} /><p className="footnote">補助事業PLは共通です。「全社PLを入力」ではその他事業PLを差額計算し、「その他事業PLを入力」では全社PLを合算計算します。</p></article>
-          <div className="workflow-actions"><span>自動予測と手入力値を合算した結果を、第6次様式の並びで確認します。</span><button className="solve-button" onClick={() => setView("pl")}>年度別PLを確認 →</button></div>
+          <div className="workflow-actions"><span>上書きしたセルは固定したまま再最適化できます。調整不要なら、そのまま年度別PLへ進めます。</span><div className="target-action-buttons"><button className="reset-button" onClick={() => setView("pl")}>そのまま年度別PLへ</button><button className="solve-button" onClick={solveAndOpenAnnualPl}>上書き内容を反映して再最適化 →</button></div></div>
         </section>
       )}
 

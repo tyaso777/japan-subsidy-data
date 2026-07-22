@@ -39,6 +39,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /actuals-three-year-table/);
   assert.match(pageSource, /content-stack history-actuals-view/);
   assert.match(pageSource, /function roundedInput\(value: number, digits = 2\)/);
+  assert.match(pageSource, /上書き内容を反映して再最適化/);
+  assert.match(pageSource, /function solveAndOpenAnnualPl\(\)/);
   assert.doesNotMatch(pageSource, /toFixed\(6\)/);
   assert.match(globalStyles, /actuals-three-year-table \{ overflow-x: hidden; overflow-y: auto; \}/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
