@@ -74,7 +74,11 @@ test("renders the planning model shell", async () => {
   assert.match(inputValueSource, /else next\[key\] = value/);
   assert.match(proposalSource, /入力データ監査（Null／0区別）/);
   assert.match(pageSource, /metric-group-controls/);
-  assert.match(pageSource, /結果指標/);
+  assert.match(pageSource, /に目標設定/);
+  assert.match(pageSource, /2指標を同時に最適化/);
+  assert.match(pageSource, /最適化結果/);
+  assert.match(pageSource, /自動算出/);
+  assert.doesNotMatch(pageSource, />両方を制約</);
   assert.match(pageSource, /metricBasisRole\(key, metricGroupBases\) !== "result"/);
   assert.match(metricGroupSource, /companySalesCagr/);
   assert.match(metricGroupSource, /companySalesIncrease/);

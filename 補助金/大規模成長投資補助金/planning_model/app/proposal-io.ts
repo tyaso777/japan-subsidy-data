@@ -128,7 +128,7 @@ const inputAuditRows = (proposal: ProposalData) =>
 
 const proposalMetricBases = (proposal: ProposalData) => ({ ...defaultMetricGroupBases, ...(proposal.metricGroupBases ?? {}) });
 const metricHandling = (proposal: ProposalData, key: MetricKey, policy: string) =>
-  metricBasisRole(key, proposalMetricBases(proposal)) === "result" ? "結果指標（自動計算）" : policyLabel(policy);
+  metricBasisRole(key, proposalMetricBases(proposal)) === "result" ? "自動算出" : policyLabel(policy);
 
 export function buildProposalHtml({ proposal, effectivePlan, metricRows }: ProposalExportContext) {
   const payload = encodeBase64(JSON.stringify(proposal));
