@@ -3,7 +3,7 @@ import { isSixthRoundReferenceMetric, type BalanceSheetPlan, type Drivers, type 
 import { buildBalanceSheetRows, buildCompanyPlRows, buildDiagnosticGroups, buildProjectPlRows, periodLabels, type ReportRow } from "./report-data";
 import { hasInputValue, inputKey, type InputValues } from "./input-values";
 import { defaultMetricGroupBases, metricBasisRole, type MetricGroupBasis, type MetricGroupKey } from "./metric-groups";
-import { applicationCategoryLabels, driverRequirementLabel, metricRequirementLabel, type ApplicationCategory } from "./application-rules";
+import { applicationCategoryLabels, defaultApplicationCategory, driverRequirementLabel, metricRequirementLabel, type ApplicationCategory } from "./application-rules";
 
 export const PROPOSAL_FORMAT = "growth-investment-proposal/v1";
 
@@ -138,7 +138,7 @@ export function buildProposalHtml({ proposal, effectivePlan, metricRows }: Propo
   const parts = reportParts({ proposal, effectivePlan, metricRows });
   const planHeader = htmlPeriodHeader(effectivePlan);
   const balanceHeader = htmlPeriodHeader(effectivePlan.slice(0, proposal.balanceSheets.length));
-  const category = proposal.applicationCategory ?? "";
+  const category = proposal.applicationCategory ?? defaultApplicationCategory;
   const categoryLabel = category ? applicationCategoryLabels[category] : "未選択";
   const metricBody = metricRows.map((row) => row.key === "localBenchmark"
     ? `<tr><th>${htmlEscape(row.label)}<small>第6次定義：${htmlEscape(row.round6Formula)}</small></th><td>${display(proposalInput(proposal, inputKey.driver("localBenchmark"), row.actual), row.unit)}</td><td>—</td><td>—</td><td>—</td><td>固定入力・判定対象外</td></tr>`
@@ -153,7 +153,7 @@ export function buildProposalHtml({ proposal, effectivePlan, metricRows }: Propo
 
 export function buildProposalXlsx({ proposal, effectivePlan, metricRows }: ProposalExportContext) {
   const parts = reportParts({ proposal, effectivePlan, metricRows });
-  const category = proposal.applicationCategory ?? "";
+  const category = proposal.applicationCategory ?? defaultApplicationCategory;
   const reportSheet = (title: string, periods: string[], rows: ReportRow[]) => [
     rowXml(1, [title, ...Array(periods.length).fill("")], "title"),
     rowXml(2, ["第6次様式項目", ...periods], "header"),

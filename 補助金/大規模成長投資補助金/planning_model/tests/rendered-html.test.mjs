@@ -137,6 +137,11 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /制度上の必須条件/);
   assert.match(pageSource, /requiredMetricMinimums\(applicationCategory\)/);
   assert.match(applicationRulesSource, /general: "一般企業（100億宣言企業以外）"/);
+  assert.match(applicationRulesSource, /defaultApplicationCategory[^=]*= "general"/);
+  assert.match(pageSource, /useState<ApplicationCategory>\(defaultApplicationCategory\)/);
+  assert.match(pageSource, /proposal\.applicationCategory \?\? defaultApplicationCategory/);
+  assert.match(modelSource, /sweep < 10/);
+  assert.doesNotMatch(modelSource, /sweep < 4/);
   assert.match(applicationRulesSource, /investmentMinimum: category === "hundredBillion" \? 15 : 20/);
   assert.match(applicationRulesSource, /projectPayCagrMinimum: category === "general" \? 5 : 4\.5/);
   assert.match(applicationRulesSource, /drivers\.subsidy > 50/);

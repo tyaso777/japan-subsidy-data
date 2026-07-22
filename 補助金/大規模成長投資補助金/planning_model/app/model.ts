@@ -1051,7 +1051,7 @@ export function optimizeDrivers(
   for (const seed of seeds.slice(0, 8)) {
     let current = seed;
     for (const fraction of [0.12, 0.04, 0.012, 0.003]) {
-      for (let sweep = 0; sweep < 4; sweep += 1) {
+      for (let sweep = 0; sweep < 10; sweep += 1) {
         let improved = false;
         for (const key of keys) {
           const [minimum, maximum] = bounds[key];
@@ -1074,7 +1074,8 @@ export function optimizeDrivers(
   let best = finalists[0];
 
   // The coarse multi-start search can stop just short of a hard boundary because
-  // each step size is allowed only four coordinate sweeps.  When that happens,
+  // each step size can still stop just short of a hard boundary after ten
+  // coordinate sweeps. When that happens,
   // continue from the deterministic best candidate and give the hard constraints
   // lexical priority until no neighbouring coordinate can reduce their violation.
   // This pass is deliberately skipped for already-feasible solutions so normal

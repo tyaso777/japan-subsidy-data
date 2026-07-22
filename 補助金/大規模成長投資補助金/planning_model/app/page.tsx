@@ -47,6 +47,7 @@ import { defaultMetricGroupBases, metricBasisRole, metricLinkGroups, type Metric
 import {
   applicationCategoryLabels,
   applicationRequirements,
+  defaultApplicationCategory,
   driverConstraintFailure,
   driverRequirementLabel,
   metricRequirementLabel,
@@ -544,7 +545,7 @@ export default function Home() {
   const [targets, setTargets] = useState<Record<MetricKey, Target>>(clone(defaultTargets));
   const [inputValues, setInputValues] = useState<InputValues>(() => createInitialInputValues());
   const [metricGroupBases, setMetricGroupBases] = useState<Record<MetricGroupKey, MetricGroupBasis>>({ ...defaultMetricGroupBases });
-  const [applicationCategory, setApplicationCategory] = useState<ApplicationCategory>("");
+  const [applicationCategory, setApplicationCategory] = useState<ApplicationCategory>(defaultApplicationCategory);
   const [forecastOverrides, setForecastOverrides] = useState<ForecastOverrides>({});
   const [futureInputBasis, setFutureInputBasis] = useState<FutureInputBasis>("other");
   const projectPeriodInputs = useMemo(
@@ -698,7 +699,7 @@ export default function Home() {
     setForecastOverrides(clone(proposal.forecastOverrides ?? {}));
     setFutureInputBasis(proposal.futureInputBasis ?? "other");
     setMetricGroupBases({ ...defaultMetricGroupBases, ...(proposal.metricGroupBases ?? {}) });
-    setApplicationCategory(proposal.applicationCategory ?? "");
+    setApplicationCategory(proposal.applicationCategory ?? defaultApplicationCategory);
     if (proposal.inputValues) {
       setInputValues(clone(proposal.inputValues));
     } else {

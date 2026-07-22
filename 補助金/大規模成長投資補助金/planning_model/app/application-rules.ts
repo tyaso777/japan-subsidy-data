@@ -1,6 +1,7 @@
 import type { Drivers, MetricKey, YearPlan } from "./model";
 
 export type ApplicationCategory = "" | "general" | "hundredBillion";
+export const defaultApplicationCategory: Exclude<ApplicationCategory, ""> = "general";
 
 export const applicationCategoryLabels: Record<Exclude<ApplicationCategory, "">, string> = {
   general: "一般企業（100億宣言企業以外）",
