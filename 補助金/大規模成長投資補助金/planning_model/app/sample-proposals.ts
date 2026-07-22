@@ -86,6 +86,7 @@ const commonProposal = (title: string, exportedAt: string, historicalPlan: YearP
     futureInputBasis: "other",
     inputValues,
     metricGroupBases: { ...defaultMetricGroupBases },
+    applicationCategory: "general",
   };
 };
 

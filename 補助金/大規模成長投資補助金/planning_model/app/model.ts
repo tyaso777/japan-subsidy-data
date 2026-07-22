@@ -951,6 +951,7 @@ export function optimizeDrivers(
   bounds: Record<keyof Drivers, [number, number]> = driverBounds,
   rebuildProjectPeriod = false,
   planTransform?: (plan: YearPlan[]) => YearPlan[],
+  requiredMinimums: Partial<Record<MetricKey, number>> = {},
 ) {
   const original = { ...initial };
   const keys: (keyof Drivers)[] = [
@@ -976,9 +977,9 @@ export function optimizeDrivers(
     const generated = generatePlan(historical, drivers, settings, effectiveProjectPeriodInput);
     return planTransform ? planTransform(generated) : generated;
   };
-  const hardViolation = (drivers: Drivers) => {
+  const constraintViolations = (drivers: Drivers) => {
     const actual = calculateMetrics(transformedPlan(drivers), drivers);
-    return metrics.reduce((sum, definition) => {
+    const hardViolation = metrics.reduce((sum, definition) => {
       if (isOptimizationExcludedMetric(definition.key)) return sum;
       const target = targets[definition.key];
       if (target.policy !== "hard") return sum;
@@ -988,20 +989,31 @@ export function optimizeDrivers(
       const miss = Number.isFinite(status.gap) ? Math.abs(status.gap) / scale : 1e6;
       return sum + target.weight * miss ** 2;
     }, 0);
+    const requiredViolation = Object.entries(requiredMinimums).reduce((sum, [key, minimum]) => {
+      const actualValue = actual[key as MetricKey];
+      if (minimum === undefined || (Number.isFinite(actualValue) && actualValue >= minimum)) return sum;
+      const scale = Math.max(Math.abs(minimum), 1);
+      const miss = Number.isFinite(actualValue) ? (minimum - actualValue) / scale : 1e6;
+      return sum + miss ** 2;
+    }, 0);
+    return { requiredViolation, hardViolation };
   };
-  type Candidate = { drivers: Drivers; hardViolation: number; score: number };
+  type Candidate = { drivers: Drivers; requiredViolation: number; hardViolation: number; score: number };
   const evaluate = (drivers: Drivers): Candidate => {
     const candidate = clampDrivers(drivers);
+    const violations = constraintViolations(candidate);
     return {
       drivers: candidate,
-      hardViolation: hardViolation(candidate),
+      ...violations,
       score: objective(candidate, original, historical, settings, targets, projectPeriodInput, referencePlan, bounds, rebuildProjectPeriod, planTransform),
     };
   };
+  const constraintTolerance = 1e-15;
   const better = (left: Candidate, right: Candidate) => {
-    const hardTolerance = 1e-12;
-    if (left.hardViolation + hardTolerance < right.hardViolation) return true;
-    if (right.hardViolation + hardTolerance < left.hardViolation) return false;
+    if (left.requiredViolation + constraintTolerance < right.requiredViolation) return true;
+    if (right.requiredViolation + constraintTolerance < left.requiredViolation) return false;
+    if (left.hardViolation + constraintTolerance < right.hardViolation) return true;
+    if (right.hardViolation + constraintTolerance < left.hardViolation) return false;
     return left.score + 1e-9 < right.score;
   };
   const halton = (index: number, base: number) => {
@@ -1069,7 +1081,7 @@ export function optimizeDrivers(
   // lexical priority until no neighbouring coordinate can reduce their violation.
   // This pass is deliberately skipped for already-feasible solutions so normal
   // optimizations do not pay the extra cost.
-  if (best.hardViolation > 1e-12) {
+  if (best.requiredViolation > constraintTolerance || best.hardViolation > constraintTolerance) {
     hardRepair: for (const fraction of [0.003, 0.001, 0.0003, 0.0001, 0.00003]) {
       for (let sweep = 0; sweep < 64; sweep += 1) {
         let next = best;
@@ -1083,11 +1095,17 @@ export function optimizeDrivers(
         }
         if (next === best) break;
         best = next;
-        if (best.hardViolation <= 1e-12) break hardRepair;
+        if (best.requiredViolation <= constraintTolerance && best.hardViolation <= constraintTolerance) break hardRepair;
       }
     }
   }
-  return { drivers: best.drivers, score: best.score, hardViolation: best.hardViolation, hardFeasible: best.hardViolation <= 1e-12 };
+  return {
+    drivers: best.drivers,
+    score: best.score,
+    requiredViolation: best.requiredViolation,
+    hardViolation: best.hardViolation,
+    hardFeasible: best.requiredViolation <= constraintTolerance && best.hardViolation <= constraintTolerance,
+  };
 }
 
 export function hardTargetSummary(actual: Record<MetricKey, number>, targets: Record<MetricKey, Target>) {

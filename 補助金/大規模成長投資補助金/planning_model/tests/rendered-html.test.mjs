@@ -27,6 +27,7 @@ test("renders the planning model shell", async () => {
   const inputValueSource = await readFile(new URL("../app/input-values.ts", import.meta.url), "utf8");
   const metricGroupSource = await readFile(new URL("../app/metric-groups.ts", import.meta.url), "utf8");
   const proposalSource = await readFile(new URL("../app/proposal-io.ts", import.meta.url), "utf8");
+  const applicationRulesSource = await readFile(new URL("../app/application-rules.ts", import.meta.url), "utf8");
   const globalStyles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(pageSource, /設定した目標に近づける/);
   assert.match(pageSource, /projectSalesGrowth: \{ initial: 0\.22, lower: 0\.15, upper: 0\.30 \}/);
@@ -130,5 +131,12 @@ test("renders the planning model shell", async () => {
   assert.match(metricGroupSource, /companySalesIncrease/);
   assert.match(metricGroupSource, /type MetricGroupBasis = "rate" \| "amount" \| "both"/);
   assert.match(globalStyles, /actuals-three-year-table \{ overflow-x: hidden; overflow-y: auto; \}/);
+  assert.match(pageSource, /申請区分・制度前提/);
+  assert.match(pageSource, /制度上の必須条件/);
+  assert.match(pageSource, /requiredMetricMinimums\(applicationCategory\)/);
+  assert.match(applicationRulesSource, /general: "一般企業（100億宣言企業以外）"/);
+  assert.match(applicationRulesSource, /investmentMinimum: category === "hundredBillion" \? 15 : 20/);
+  assert.match(applicationRulesSource, /projectPayCagrMinimum: category === "general" \? 5 : 4\.5/);
+  assert.match(globalStyles, /\.statutory-condition/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });

@@ -14,6 +14,7 @@ await mkdir(path.join(buildDirectory, "app"), { recursive: true });
 await Promise.all([
   copyFile(path.join(projectDirectory, "app", "standalone-entry.tsx"), path.join(buildDirectory, "app", "standalone-entry.tsx")),
   copyFile(path.join(projectDirectory, "app", "page.tsx"), path.join(buildDirectory, "app", "page.tsx")),
+  copyFile(path.join(projectDirectory, "app", "application-rules.ts"), path.join(buildDirectory, "app", "application-rules.ts")),
   copyFile(path.join(projectDirectory, "app", "model.ts"), path.join(buildDirectory, "app", "model.ts")),
   copyFile(path.join(projectDirectory, "app", "input-values.ts"), path.join(buildDirectory, "app", "input-values.ts")),
   copyFile(path.join(projectDirectory, "app", "metric-groups.ts"), path.join(buildDirectory, "app", "metric-groups.ts")),

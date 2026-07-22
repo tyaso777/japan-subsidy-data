@@ -277,6 +277,34 @@ test("optimizer reaches the standard sample company sales hard target with a ref
   assert.equal(model.targetStatus(model.metrics.find((metric) => metric.key === "companySalesCagr"), actual.companySalesCagr, targets.companySalesCagr).ok, true);
 });
 
+test("optimizer gives statutory metric minimums lexical priority over conflicting user hard targets", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  const initial = { ...model.sampleDrivers, projectPayGrowth: 0.01 };
+  const targets = Object.fromEntries(Object.entries(model.defaultTargets).map(([key, target]) => [key, { ...target, policy: "monitor" }]));
+  targets.employeePayCagr = { value: 0, max: 1, policy: "hard", weight: 10 };
+  const bounds = { ...model.driverBounds, projectPayGrowth: [0, 0.1] };
+  const result = model.optimizeDrivers(
+    initial,
+    historical,
+    model.DEFAULT_TIMELINE,
+    targets,
+    model.defaultProjectBasePlan,
+    undefined,
+    bounds,
+    true,
+    undefined,
+    { employeePayCagr: 5 },
+  );
+  const periodInputs = model.createForecastProjectPeriodInputs(historical.at(-1), result.drivers, model.DEFAULT_TIMELINE);
+  const plan = model.generatePlan(historical, result.drivers, model.DEFAULT_TIMELINE, periodInputs);
+  const actual = model.calculateMetrics(plan, result.drivers);
+
+  assert.ok(result.requiredViolation <= 1e-12);
+  assert.ok(result.hardViolation > 0);
+  assert.equal(result.hardFeasible, false);
+  assert.ok(actual.employeePayCagr >= 5 - 1e-8, `employeePayCagr was ${actual.employeePayCagr}`);
+});
+
 test("productivity and officer pay use officer counts", () => {
   const plan = makePlan();
   plan.find((row) => row.role === "report3").project.officerCount *= 2;

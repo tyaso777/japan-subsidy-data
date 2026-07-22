@@ -112,6 +112,11 @@ input, select { border: 1px solid #d7d2c7; background: #fffefa; color: var(--ink
 .input-list input, .driver-grid input { width: 120px; text-align: right; font-variant-numeric: tabular-nums; }
 .driver-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 24px; }.driver-grid label.movable { background: linear-gradient(90deg, transparent, rgba(247, 232, 201, .38)); }.driver-grid label.fixed { background: linear-gradient(90deg, transparent, rgba(220, 236, 223, .4)); }
 .driver-values { display: flex; width: 100%; align-items: center; justify-content: flex-end; gap: 7px; }.driver-values .adjusted-value { color: var(--green); font-weight: 800; white-space: nowrap; }
+.application-category-panel select { min-width: min(100%, 360px); }
+.statutory-summary { margin-top: 16px; }
+.statutory-condition { min-width: 165px; max-width: 230px; color: #315b46; background: #f1f7f3; text-align: left; white-space: normal; line-height: 1.45; }
+.statutory-condition strong { font-size: 9px; }
+.statutory-failure { color: var(--red); background: var(--red-soft); border-left-color: var(--red); }
 .pill { background: var(--amber-soft); color: #7b5212; border-radius: 999px; padding: 6px 10px; font-size: 9px; font-weight: 800; }.pill.green { background: var(--green-soft); color: var(--green); }
 .pill.blue-pill { background: #e8f1ff; color: #245ea8; }.forecast-override { border: 2px solid #4b8edb; background: #f7fbff; }.forecast-override::placeholder { color: #6b86a5; opacity: 1; }.forecast-override.is-fixed { border-color: #245ea8; background: #dceaff; color: #173f72; font-weight: 800; }
 .historical-heading { background: #ebe8df !important; color: #67716c !important; }.historical-reference { background: #f4f2eb; color: #68716d; }.historical-reference strong { font-weight: 650; }
