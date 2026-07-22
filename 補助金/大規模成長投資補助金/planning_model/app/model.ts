@@ -62,6 +62,11 @@ export type Drivers = {
   projectHeadcountGrowthToBase: number;
   projectSgaImprovementToBase: number;
   projectOfficerPayGrowthToBase: number;
+  otherSalesGrowthToBase: number;
+  otherCogsImprovementToBase: number;
+  otherPayGrowthToBase: number;
+  otherHeadcountGrowthToBase: number;
+  otherSgaImprovementToBase: number;
   projectSalesGrowth: number;
   otherSalesGrowth: number;
   projectCogsImprovementAfterBase: number;
@@ -185,6 +190,11 @@ export const sampleDrivers: Drivers = {
   projectHeadcountGrowthToBase: 0.04,
   projectSgaImprovementToBase: 0.01,
   projectOfficerPayGrowthToBase: 0.06,
+  otherSalesGrowthToBase: 0.04,
+  otherCogsImprovementToBase: 0.005,
+  otherPayGrowthToBase: 0.04,
+  otherHeadcountGrowthToBase: 0.01,
+  otherSgaImprovementToBase: 0.005,
   projectSalesGrowth: 0.21,
   otherSalesGrowth: 0.04,
   projectCogsImprovementAfterBase: 0,
@@ -251,6 +261,11 @@ export const defaultDrivers: Drivers = {
   projectHeadcountGrowthToBase: 0,
   projectSgaImprovementToBase: 0,
   projectOfficerPayGrowthToBase: 0,
+  otherSalesGrowthToBase: 0,
+  otherCogsImprovementToBase: 0,
+  otherPayGrowthToBase: 0,
+  otherHeadcountGrowthToBase: 0,
+  otherSgaImprovementToBase: 0,
   projectSalesGrowth: 0,
   otherSalesGrowth: 0,
   projectCogsImprovementAfterBase: 0,
@@ -276,6 +291,11 @@ export const driverBounds: Record<keyof Drivers, [number, number]> = {
   projectHeadcountGrowthToBase: [-0.03, 0.2],
   projectSgaImprovementToBase: [-0.15, 0.25],
   projectOfficerPayGrowthToBase: [0, 0.1],
+  otherSalesGrowthToBase: [-0.1, 0.2],
+  otherCogsImprovementToBase: [-0.15, 0.25],
+  otherPayGrowthToBase: [0, 0.08],
+  otherHeadcountGrowthToBase: [-0.05, 0.1],
+  otherSgaImprovementToBase: [-0.15, 0.25],
   projectSalesGrowth: [-0.05, 0.4],
   otherSalesGrowth: [-0.1, 0.2],
   projectCogsImprovementAfterBase: [-0.15, 0.25],
@@ -487,12 +507,19 @@ export function generatePlan(
   const n = timeline.baseYear + 3 - timeline.latestYear;
   const baseProjectCogsRate = projectBase.sales ? projectBase.cogs / projectBase.sales : 0.68;
   const baseOtherCogsRate = latest.other.sales ? latest.other.cogs / latest.other.sales : 0.68;
+  const yearsToBase = timeline.baseYear - timeline.latestYear;
+  const otherBaseSales = latest.other.sales * (1 + drivers.otherSalesGrowthToBase) ** yearsToBase;
+  const otherBaseHeadcount = latest.other.headcount * (1 + drivers.otherHeadcountGrowthToBase) ** yearsToBase;
+  const otherBasePayPerHead = latest.other.headcount ? latest.other.employeePay / latest.other.headcount : 0;
+  const otherBaseEmployeePay = otherBasePayPerHead * (1 + drivers.otherPayGrowthToBase) ** yearsToBase * otherBaseHeadcount;
+  const otherBaseOfficerPay = latest.other.officerPay * (1 + Math.min(drivers.otherPayGrowthToBase, 0.05)) ** yearsToBase;
+  const otherBaseCogsRate = Math.min(0.99, Math.max(0.01, baseOtherCogsRate - drivers.otherCogsImprovementToBase));
+  const latestOtherSgaRate = latest.other.sales ? latest.other.otherSga / latest.other.sales : drivers.otherSgaRateEnd;
+  const otherBaseSgaRate = Math.min(0.99, Math.max(0, latestOtherSgaRate - drivers.otherSgaImprovementToBase));
   const projectCogsRateEnd = Math.min(0.99, Math.max(0.01, baseProjectCogsRate - drivers.projectCogsImprovementAfterBase));
-  const otherCogsRateEnd = Math.min(0.99, Math.max(0.01, baseOtherCogsRate - drivers.otherCogsImprovement));
+  const otherCogsRateEnd = Math.min(0.99, Math.max(0.01, otherBaseCogsRate - drivers.otherCogsImprovement));
   const baseProjectSgaRate = projectBase.sales ? projectBase.otherSga / projectBase.sales : drivers.projectSgaRateEnd;
-  const baseOtherSgaRate = latest.other.sales ? latest.other.otherSga / latest.other.sales : drivers.otherSgaRateEnd;
   const baseProjectPayPerHead = projectBase.headcount ? projectBase.employeePay / projectBase.headcount : 0;
-  const baseOtherPayPerHead = latest.other.headcount ? latest.other.employeePay / latest.other.headcount : 0;
   const emptyProject: SegmentPlan = { sales: 0, cogs: 0, employeePay: 0, officerPay: 0, depreciation: 0, otherSga: 0, headcount: 0, officerCount: 0 };
 
   for (let i = 1; i <= n; i += 1) {
@@ -500,11 +527,28 @@ export function generatePlan(
     const role = roleForYear(year, timeline);
     const yearsAfterBase = Math.max(0, year - timeline.baseYear);
     const projectProgress = yearsAfterBase / 3;
-    const otherProgress = i / n;
+    const beforeOrAtBase = year <= timeline.baseYear;
+    const otherProgress = beforeOrAtBase ? i / yearsToBase : yearsAfterBase / 3;
     const projectHeadcount = projectBase.headcount * (1 + drivers.projectHeadcountGrowth) ** yearsAfterBase;
-    const otherHeadcount = latest.other.headcount * (1 + drivers.otherHeadcountGrowth) ** i;
+    const otherHeadcount = beforeOrAtBase
+      ? latest.other.headcount * (1 + drivers.otherHeadcountGrowthToBase) ** i
+      : otherBaseHeadcount * (1 + drivers.otherHeadcountGrowth) ** yearsAfterBase;
     const projectSales = projectBase.sales * (1 + drivers.projectSalesGrowth) ** yearsAfterBase;
-    const otherSales = latest.other.sales * (1 + drivers.otherSalesGrowth) ** i;
+    const otherSales = beforeOrAtBase
+      ? latest.other.sales * (1 + drivers.otherSalesGrowthToBase) ** i
+      : otherBaseSales * (1 + drivers.otherSalesGrowth) ** yearsAfterBase;
+    const otherCogsRate = beforeOrAtBase
+      ? lerp(baseOtherCogsRate, otherBaseCogsRate, otherProgress)
+      : lerp(otherBaseCogsRate, otherCogsRateEnd, otherProgress);
+    const otherEmployeePay = beforeOrAtBase
+      ? otherBasePayPerHead * (1 + drivers.otherPayGrowthToBase) ** i * otherHeadcount
+      : (otherBaseHeadcount ? otherBaseEmployeePay / otherBaseHeadcount : 0) * (1 + drivers.otherPayGrowth) ** yearsAfterBase * otherHeadcount;
+    const otherOfficerPay = beforeOrAtBase
+      ? latest.other.officerPay * (1 + Math.min(drivers.otherPayGrowthToBase, 0.05)) ** i
+      : otherBaseOfficerPay * (1 + Math.min(drivers.otherPayGrowth, 0.05)) ** yearsAfterBase;
+    const otherSgaRate = beforeOrAtBase
+      ? lerp(latestOtherSgaRate, otherBaseSgaRate, otherProgress)
+      : lerp(otherBaseSgaRate, drivers.otherSgaRateEnd, otherProgress);
     const enteredProject = periodInputs.find((row) => row.year === year)?.project;
     const project = year <= timeline.baseYear ? structuredClone(enteredProject ?? emptyProject) : {
       sales: round(projectSales),
@@ -522,11 +566,11 @@ export function generatePlan(
       project,
       other: {
         sales: round(otherSales),
-        cogs: round(otherSales * lerp(baseOtherCogsRate, otherCogsRateEnd, otherProgress)),
-        employeePay: round(baseOtherPayPerHead * (1 + drivers.otherPayGrowth) ** i * otherHeadcount),
-        officerPay: round(latest.other.officerPay * (1 + Math.min(drivers.otherPayGrowth, 0.05)) ** i),
+        cogs: round(otherSales * otherCogsRate),
+        employeePay: round(otherEmployeePay),
+        officerPay: round(otherOfficerPay),
         depreciation: round(latest.other.depreciation),
-        otherSga: round(otherSales * lerp(baseOtherSgaRate, drivers.otherSgaRateEnd, otherProgress)),
+        otherSga: round(otherSales * otherSgaRate),
         headcount: round(otherHeadcount, 2),
         officerCount: latest.other.officerCount,
       },
@@ -704,6 +748,19 @@ export function calculateHistoricalDriverSeries(
       referenceLevels: levels((row) => ratio(row.project.otherSga, row.project.sales)),
     },
     projectOfficerPayGrowthToBase: { mode: "change", values: changes((row) => perOfficer(row.project)) },
+    otherSalesGrowthToBase: { mode: "change", values: changes((row) => row.other.sales) },
+    otherCogsImprovementToBase: {
+      mode: "change",
+      values: improvements((row) => ratio(row.other.cogs, row.other.sales)),
+      referenceLevels: levels((row) => ratio(row.other.cogs, row.other.sales)),
+    },
+    otherPayGrowthToBase: { mode: "change", values: changes((row) => perEmployee(row.other)) },
+    otherHeadcountGrowthToBase: { mode: "change", values: changes((row) => row.other.headcount) },
+    otherSgaImprovementToBase: {
+      mode: "change",
+      values: improvements((row) => ratio(row.other.otherSga, row.other.sales)),
+      referenceLevels: levels((row) => ratio(row.other.otherSga, row.other.sales)),
+    },
     projectSalesGrowth: { mode: "change", values: changes((row) => row.project.sales) },
     otherSalesGrowth: { mode: "change", values: changes((row) => row.other.sales) },
     projectCogsImprovementAfterBase: {
@@ -818,6 +875,7 @@ export function objective(
   }
   const adjustable: (keyof Drivers)[] = [
     "projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase", "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase",
+    "otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase",
     "projectSalesGrowth", "otherSalesGrowth", "projectCogsImprovementAfterBase", "otherCogsImprovement",
     "projectPayGrowth", "otherPayGrowth", "projectHeadcountGrowth", "otherHeadcountGrowth",
     "projectSgaRateEnd", "otherSgaRateEnd", "projectOfficerPayGrowth",
@@ -860,11 +918,12 @@ export function optimizeDrivers(
   const original = { ...initial };
   const keys: (keyof Drivers)[] = [
     "projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase", "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase",
+    "otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase",
     "projectSalesGrowth", "otherSalesGrowth", "projectCogsImprovementAfterBase", "otherCogsImprovement",
     "projectPayGrowth", "otherPayGrowth", "projectHeadcountGrowth", "otherHeadcountGrowth",
     "projectSgaRateEnd", "otherSgaRateEnd", "projectOfficerPayGrowth",
   ];
-  const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59];
+  const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79];
   const clampDrivers = (candidate: Drivers) => {
     const result = { ...candidate };
     for (const key of keys) {

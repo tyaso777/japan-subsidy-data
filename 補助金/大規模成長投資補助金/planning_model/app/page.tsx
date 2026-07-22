@@ -44,6 +44,7 @@ type View = "summary" | "history" | "future" | "pl" | "targets" | "logic";
 
 const adjustableDriverKeys: (keyof Drivers)[] = [
   "projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase", "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase",
+  "otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase",
   "projectSalesGrowth", "otherSalesGrowth", "projectCogsImprovementAfterBase", "otherCogsImprovement",
   "projectPayGrowth", "otherPayGrowth", "projectHeadcountGrowth", "otherHeadcountGrowth",
   "projectSgaRateEnd", "otherSgaRateEnd", "projectOfficerPayGrowth",
@@ -57,16 +58,21 @@ const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string;
   projectHeadcountGrowthToBase: { label: "補助事業 常時使用する従業員数（就業時間換算）の成長率", unit: "%/年", step: 0.5 },
   projectSgaImprovementToBase: { label: "補助事業 その他販管費率改善ポイント", unit: "pt", step: 0.5 },
   projectOfficerPayGrowthToBase: { label: "役員1人当たり給与支給総額の年平均上昇率（モデル内管理）", unit: "%/年", step: 0.25 },
+  otherSalesGrowthToBase: { label: "その他事業 売上成長率", unit: "%/年", step: 0.5 },
+  otherCogsImprovementToBase: { label: "その他事業 原価率改善ポイント", unit: "pt", step: 0.5 },
+  otherPayGrowthToBase: { label: "その他事業の従業員1人当たり給与支給総額の年平均上昇率（モデル内管理）", unit: "%/年", step: 0.25 },
+  otherHeadcountGrowthToBase: { label: "その他事業 常時使用する従業員数（就業時間換算）の成長率", unit: "%/年", step: 0.5 },
+  otherSgaImprovementToBase: { label: "その他事業 その他販管費率改善ポイント", unit: "pt", step: 0.5 },
   projectSalesGrowth: { label: "補助事業 売上成長率", unit: "%/年", step: 0.5 },
   otherSalesGrowth: { label: "その他事業 売上成長率", unit: "%/年", step: 0.5 },
   projectCogsImprovementAfterBase: { label: "補助事業 原価率改善ポイント", unit: "pt", step: 0.5 },
-  otherCogsImprovement: { label: "その他事業 原価率改善ポイント（最新決算期→事業化報告3年目）", unit: "pt", step: 0.5 },
+  otherCogsImprovement: { label: "その他事業 原価率改善ポイント", unit: "pt", step: 0.5 },
   projectPayGrowth: { label: "補助事業1人当たり給与支給総額の年平均上昇率", unit: "%/年", step: 0.25 },
   otherPayGrowth: { label: "その他事業の従業員1人当たり給与支給総額の年平均上昇率（モデル内管理）", unit: "%/年", step: 0.25 },
   projectHeadcountGrowth: { label: "補助事業 常時使用する従業員数（就業時間換算）の成長率", unit: "%/年", step: 0.5 },
   otherHeadcountGrowth: { label: "その他事業 常時使用する従業員数（就業時間換算）の成長率", unit: "%/年", step: 0.5 },
   projectSgaRateEnd: { label: "補助事業 その他販管費率（事業化報告3年目到達値）", unit: "%", step: 0.5 },
-  otherSgaRateEnd: { label: "その他事業 その他販管費率（最新決算期→事業化報告3年目：3年目到達値）", unit: "%", step: 0.5 },
+  otherSgaRateEnd: { label: "その他事業 その他販管費率（事業化報告3年目到達値）", unit: "%", step: 0.5 },
   projectOfficerPayGrowth: { label: "役員1人当たり給与支給総額の年平均上昇率（モデル内管理）", unit: "%/年", step: 0.25 },
   usefulLife: { label: "新規投資の耐用年数", unit: "年", step: 1 },
   investment: { label: "補助事業投資額", unit: "億円", step: 1 },
@@ -86,8 +92,13 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
     keys: ["projectSalesGrowth", "projectCogsImprovementAfterBase", "projectPayGrowth", "projectHeadcountGrowth", "projectSgaRateEnd", "projectOfficerPayGrowth"],
   },
   {
-    label: "その他事業｜将来期間",
-    detail: "最新決算期 → 事業化報告3年目",
+    label: "その他事業｜設備導入期間",
+    detail: "最新決算期 → 基準年",
+    keys: ["otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase"],
+  },
+  {
+    label: "その他事業｜基準年後",
+    detail: "基準年度 → 事業化報告3年目",
     keys: ["otherSalesGrowth", "otherCogsImprovement", "otherPayGrowth", "otherHeadcountGrowth", "otherSgaRateEnd"],
   },
   {
@@ -100,6 +111,8 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
 const equipmentPeriodStatisticalKeys = new Set<keyof Drivers>([
   "projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase",
   "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase",
+  "otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase",
+  "otherHeadcountGrowthToBase", "otherSgaImprovementToBase",
 ]);
 
 const postBaseBenchmarkDefaults: Partial<Record<keyof Drivers, { initial: number; lower: number; upper: number }>> = {
@@ -117,6 +130,11 @@ const historicalFallbackDefaults: Partial<Record<keyof Drivers, { initial: numbe
   projectHeadcountGrowthToBase: { initial: 0.02, lower: -0.03, upper: 0.08 },
   projectSgaImprovementToBase: { initial: 0, lower: 0, upper: 0.02 },
   projectOfficerPayGrowthToBase: { initial: 0.03, lower: 0, upper: 0.06 },
+  otherSalesGrowthToBase: { initial: 0.03, lower: -0.03, upper: 0.08 },
+  otherCogsImprovementToBase: { initial: 0, lower: -0.02, upper: 0.02 },
+  otherPayGrowthToBase: { initial: 0.03, lower: 0, upper: 0.06 },
+  otherHeadcountGrowthToBase: { initial: 0.01, lower: -0.03, upper: 0.05 },
+  otherSgaImprovementToBase: { initial: 0, lower: -0.02, upper: 0.02 },
   otherSalesGrowth: { initial: 0.03, lower: -0.03, upper: 0.08 },
   otherCogsImprovement: { initial: 0, lower: -0.02, upper: 0.02 },
   otherPayGrowth: { initial: 0.03, lower: 0, upper: 0.06 },
@@ -550,8 +568,8 @@ export default function Home() {
     setHistoricalPlan(clone(proposal.historicalPlan));
     setBalanceSheets(clone(proposal.balanceSheets));
     setFutureCapex(clone(proposal.futureCapex));
-    setDrivers(clone(proposal.drivers));
-    setDriverRanges(clone(proposal.driverRanges));
+    setDrivers({ ...defaultDrivers, ...clone(proposal.drivers) });
+    setDriverRanges({ ...clone(driverBounds), ...clone(proposal.driverRanges) });
     setTargets(Object.fromEntries(Object.entries(proposal.targets).map(([key, target]) => [key, { ...target, max: target.max ?? defaultTargets[key as MetricKey].max, weight: integerPriority(target.weight) }])) as Record<MetricKey, Target>);
     setForecastOverrides(clone(proposal.forecastOverrides ?? {}));
     setFutureInputBasis(proposal.futureInputBasis ?? "other");

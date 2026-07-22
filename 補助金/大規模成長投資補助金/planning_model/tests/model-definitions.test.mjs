@@ -110,6 +110,27 @@ test("project sales uses separate growth rates before and after the base year", 
   assert.equal(report1.project.sales, 138.42);
 });
 
+test("other-business forecast uses separate assumptions before and after the base year", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  const drivers = {
+    ...model.sampleDrivers,
+    otherSalesGrowthToBase: 0.1,
+    otherSalesGrowth: 0.2,
+    otherCogsImprovementToBase: 0.03,
+    otherCogsImprovement: 0.06,
+  };
+  const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE);
+  const latest = plan.find((row) => row.role === "latest");
+  const base = plan.find((row) => row.role === "base");
+  const report1 = plan.find((row) => row.role === "report1");
+  const report3 = plan.find((row) => row.role === "report3");
+
+  assert.equal(base.other.sales, Number((latest.other.sales * 1.1 ** 3).toFixed(2)));
+  assert.equal(report1.other.sales, Number((base.other.sales * 1.2).toFixed(2)));
+  assert.ok(Math.abs(base.other.cogs / base.other.sales - 0.65) < 0.001);
+  assert.ok(Math.abs(report3.other.cogs / report3.other.sales - 0.59) < 0.001);
+});
+
 test("forecast PL values are stored with at most two decimal places", () => {
   const plan = makePlan();
   const numericFields = ["sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga", "headcount", "officerCount"];
