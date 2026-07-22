@@ -24,6 +24,7 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(html, /目標に近づける/);
   assert.match(html, /15指標・目標/);
   const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const modelSource = await readFile(new URL("../app/model.ts", import.meta.url), "utf8");
   const inputValueSource = await readFile(new URL("../app/input-values.ts", import.meta.url), "utf8");
   const metricGroupSource = await readFile(new URL("../app/metric-groups.ts", import.meta.url), "utf8");
   const proposalSource = await readFile(new URL("../app/proposal-io.ts", import.meta.url), "utf8");
@@ -44,7 +45,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /projectCogsImprovementAfterBase: \{ initial: 0\.015, lower: 0, upper: 0\.03 \}/);
   assert.match(pageSource, /設備導入期間0～2pt、基準年後0～3pt/);
   assert.match(pageSource, /const improvementDriverKeys/);
-  assert.match(pageSource, /keys: \["projectMarketGrowth", "subsidy"\]/);
+  assert.match(pageSource, /"investment", "subsidy", "usefulLife"/);
+  assert.match(pageSource, /keys: \["projectMarketGrowth"\]/);
   assert.match(pageSource, /ローカルベンチマーク固定値/);
   assert.match(pageSource, /固定入力・判定対象外/);
   assert.match(pageSource, /key === "investment" \|\| key === "subsidy" \|\| key === "usefulLife" \|\| key === "projectMarketGrowth"/);
@@ -137,6 +139,14 @@ test("renders the planning model shell", async () => {
   assert.match(applicationRulesSource, /general: "一般企業（100億宣言企業以外）"/);
   assert.match(applicationRulesSource, /investmentMinimum: category === "hundredBillion" \? 15 : 20/);
   assert.match(applicationRulesSource, /projectPayCagrMinimum: category === "general" \? 5 : 4\.5/);
+  assert.match(applicationRulesSource, /drivers\.subsidy > 50/);
+  assert.match(applicationRulesSource, /drivers\.subsidy > drivers\.investment \/ 3/);
+  assert.match(pageSource, /driverConstraintFailure\(key, applicationCategory, drivers\)/);
+  assert.match(pageSource, /aria-invalid=\{constraintError \? "true" : undefined\}/);
+  assert.match(pageSource, /title: "制度上の必須条件に違反"/);
+  assert.doesNotMatch(pageSource, /applicationCategory === "startupException"/);
+  assert.doesNotMatch(modelSource, /drivers\.investment < 15/);
+  assert.match(globalStyles, /\.driver-validation-error/);
   assert.match(globalStyles, /\.statutory-condition/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });

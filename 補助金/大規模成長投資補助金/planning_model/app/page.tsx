@@ -47,6 +47,7 @@ import { defaultMetricGroupBases, metricBasisRole, metricLinkGroups, type Metric
 import {
   applicationCategoryLabels,
   applicationRequirements,
+  driverConstraintFailure,
   driverRequirementLabel,
   metricRequirementLabel,
   requiredMetricMinimums,
@@ -98,7 +99,7 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
   {
     label: "補助事業｜設備導入期間",
     detail: "最新決算期 → 基準年",
-    keys: ["projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase", "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase", "investment", "usefulLife"],
+    keys: ["projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase", "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase", "investment", "subsidy", "usefulLife"],
   },
   {
     label: "補助事業｜基準年後",
@@ -118,7 +119,7 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
   {
     label: "共通・固定前提",
     detail: "申請・外部前提",
-    keys: ["projectMarketGrowth", "subsidy"],
+    keys: ["projectMarketGrowth"],
   },
 ];
 
@@ -603,7 +604,11 @@ export default function Home() {
     () => calculateHistoricalDriverSeries(historicalPlan, balanceSheets),
     [historicalPlan, balanceSheets],
   );
-  const validations = useMemo(() => validatePlan(plan, calculationDrivers), [plan, calculationDrivers]);
+  const validations = useMemo(() => {
+    const modelValidations = validatePlan(plan, calculationDrivers);
+    const statutoryValidations = statutoryFailures.map((detail) => ({ level: "error" as const, title: "制度上の必須条件に違反", detail }));
+    return statutoryValidations.length ? [...statutoryValidations, ...modelValidations.filter((item) => item.level !== "info")] : modelValidations;
+  }, [plan, calculationDrivers, statutoryFailures]);
   const optimizationTargets = useMemo(() => Object.fromEntries((Object.keys(targets) as MetricKey[]).map((key) => [key, !isOptimizationExcludedMetric(key) && hasInputValue(inputValues, inputKey.target(key, "value")) && metricBasisRole(key, metricGroupBases) !== "result" ? targets[key] : { ...targets[key], policy: "monitor", max: undefined }])) as Record<MetricKey, Target>, [targets, inputValues, metricGroupBases]);
   const hardSummary = useMemo(() => hardTargetSummary(actual, optimizationTargets), [actual, optimizationTargets]);
   const targetManagedMetrics = metrics.filter((definition) => !isOptimizationExcludedMetric(definition.key) && metricBasisRole(definition.key, metricGroupBases) !== "result");
@@ -1232,6 +1237,7 @@ export default function Home() {
                 const info = driverLabels[key]!;
                 const movable = !["projectMarketGrowth", "usefulLife", "investment", "subsidy", "localBenchmark"].includes(key);
                 const noRange = key === "investment" || key === "subsidy" || key === "usefulLife" || key === "projectMarketGrowth";
+                const constraintError = driverConstraintFailure(key, applicationCategory, drivers);
                 const history = historicalDriverSeries[key];
                 const inputValue = percentDriver(key) ? Number((drivers[key] * 100).toFixed(2)) : drivers[key];
                 const rawDriverValue = getInputValue(inputValues, inputKey.driver(key));
@@ -1244,7 +1250,7 @@ export default function Home() {
                 const rangeOrdered = driverRanges[key][0] <= driverRanges[key][1];
                 const rangeValid = noRange || (rangeOrdered && drivers[key] >= driverRanges[key][0] && drivers[key] <= driverRanges[key][1]);
                 const rangeStatus = noRange ? "入力値を固定" : !rangeOrdered ? "下限＞上限" : movable ? rangeValid ? "範囲内で調整" : "初期値が範囲外" : rangeValid ? "入力値を固定" : "固定値が範囲外";
-                return <tr className={movable ? "driver-adjustable" : "driver-fixed"} key={key}><th><span className="driver-item-code">{driverItemCodes[key]}:</span> {info.label}<small>{info.unit}／{history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>{history.values.map((value, index) => {
+                return <tr className={`${movable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={key}><th><span className="driver-item-code">{driverItemCodes[key]}:</span> {info.label}<small>{info.unit}／{history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>{history.values.map((value, index) => {
                   const referenceLevel = history.referenceLevels?.[index];
                   if (referenceLevel !== undefined && Number.isFinite(referenceLevel)) {
                     const improvement = Number.isFinite(value) ? value * 100 : undefined;
@@ -1252,7 +1258,7 @@ export default function Home() {
                     return <td className="driver-history driver-rate-history" key={`${key}-${historicalPlan[index].year}`}><strong>{improvementLabel}</strong><small>当期率 {number(referenceLevel * 100, 2)}%</small></td>;
                   }
                   return <td className="driver-history" key={`${key}-${historicalPlan[index].year}`}>{Number.isFinite(value) ? <><strong>{number(percentDriver(key) ? value * 100 : value, 2)}</strong><small>{history.mode === "change" ? `${historicalPlan[index - 1]?.year}→${historicalPlan[index].year}` : info.unit}</small></> : "—"}</td>;
-                })}<td><span className="driver-values"><input type="number" step={info.step} value={displayedInputValue} placeholder="未設定" onChange={(event) => updateDriver(key, event.target.value === "" ? null : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))} />{resultValue !== null && <small className="adjusted-value">→ 最適化結果 {number(resultValue, 2)}</small>}</span></td><td className="statutory-condition"><strong>{driverRequirementLabel(key, applicationCategory, drivers.investment)}</strong></td><td>{noRange ? <span className="no-range">—</span> : <input type="number" step={info.step} value={rangeValues[0]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />}</td><td>{noRange ? <span className="no-range">—</span> : <input type="number" step={info.step} value={rangeValues[1]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />}</td><td><span className={`driver-policy ${rangeValid ? "" : "out-of-range"}`}>{rangeStatus}</span></td></tr>;
+                })}<td><span className="driver-values"><input type="number" min={key === "investment" || key === "subsidy" ? 0 : undefined} aria-invalid={constraintError ? "true" : undefined} step={info.step} value={displayedInputValue} placeholder="未設定" onChange={(event) => updateDriver(key, event.target.value === "" ? null : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))} />{resultValue !== null && <small className="adjusted-value">→ 最適化結果 {number(resultValue, 2)}</small>}</span>{constraintError && <small className="field-error" role="alert">{constraintError}</small>}</td><td className="statutory-condition"><strong>{driverRequirementLabel(key, applicationCategory, drivers.investment)}</strong></td><td>{noRange ? <span className="no-range">—</span> : <input type="number" step={info.step} value={rangeValues[0]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />}</td><td>{noRange ? <span className="no-range">—</span> : <input type="number" step={info.step} value={rangeValues[1]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />}</td><td><span className={`driver-policy ${rangeValid ? "" : "out-of-range"}`}>{rangeStatus}</span></td></tr>;
               }),
               ])}
             </tbody></table></div>

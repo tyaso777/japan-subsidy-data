@@ -871,8 +871,6 @@ export function validatePlan(plan: YearPlan[], drivers: Drivers): Validation[] {
     }
   }
 
-  if (drivers.investment < 15) results.push({ level: "error", title: "投資額要件を要確認", detail: "100億宣言企業の扱いを含め、第6次正式版の投資額要件と照合してください。" });
-  if (drivers.subsidy > drivers.investment / 3) results.push({ level: "error", title: "補助率が1/3を超過", detail: "補助金額は投資額の3分の1以下にしてください。" });
   if (!results.length) results.push({ level: "info", title: "暫定検証を通過", detail: "汎用レンジ内です。業種別・社内実績による根拠確認は別途必要です。" });
   return results;
 }

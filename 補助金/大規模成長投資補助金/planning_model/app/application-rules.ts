@@ -18,9 +18,24 @@ export function applicationRequirements(category: ApplicationCategory) {
 export function driverRequirementLabel(key: keyof Drivers, category: ApplicationCategory, investment: number) {
   const requirements = applicationRequirements(category);
   if (key === "projectPayGrowthToBase") return "基準年度額が最新決算期額以上（成長率0%以上）";
-  if (key === "investment") return requirements ? `${requirements.investmentMinimum}億円以上` : "申請区分の選択後に確定";
+  if (key === "investment") return requirements ? `${requirements.investmentMinimum}億円以上（専門家経費・外注費を除く補助対象経費）` : "申請区分の選択後に確定";
   if (key === "subsidy") return `50億円以下、かつ投資額の1/3以下（現在上限${Math.min(50, Math.max(0, investment) / 3).toFixed(2)}億円）`;
   return "—";
+}
+
+export function driverConstraintFailure(key: keyof Drivers, category: ApplicationCategory, drivers: Drivers) {
+  const requirements = applicationRequirements(category);
+  if (key === "projectPayGrowthToBase" && drivers.projectPayGrowthToBase < 0) return "基準年度額が最新決算期額以上となるよう、0%以上で入力してください";
+  if (key === "investment") {
+    if (!requirements) return "申請区分を先に選択してください";
+    if (drivers.investment < requirements.investmentMinimum) return `制度下限${requirements.investmentMinimum}億円以上で入力してください`;
+  }
+  if (key === "subsidy") {
+    if (drivers.subsidy < 0) return "0億円以上で入力してください";
+    if (drivers.subsidy > 50) return "制度上限50億円以下で入力してください";
+    if (drivers.subsidy > drivers.investment / 3) return `投資額の1/3以下（現在${Math.max(0, drivers.investment / 3).toFixed(2)}億円以下）で入力してください`;
+  }
+  return null;
 }
 
 export function metricRequirementLabel(key: MetricKey, category: ApplicationCategory) {
@@ -39,9 +54,10 @@ export function systemConstraintFailures(category: ApplicationCategory, drivers:
   const requirements = applicationRequirements(category);
   if (!requirements) return ["申請区分が未選択です"];
   const failures: string[] = [];
-  if (drivers.investment < requirements.investmentMinimum) failures.push(`補助事業投資額が制度下限${requirements.investmentMinimum}億円を下回っています`);
-  if (drivers.subsidy > 50) failures.push("申請補助金額が上限50億円を超えています");
-  if (drivers.subsidy > drivers.investment / 3) failures.push("申請補助金額が投資額の1/3を超えています");
+  const investmentFailure = driverConstraintFailure("investment", category, drivers);
+  const subsidyFailure = driverConstraintFailure("subsidy", category, drivers);
+  if (investmentFailure) failures.push(`補助事業投資額：${investmentFailure}`);
+  if (subsidyFailure) failures.push(`申請補助金額：${subsidyFailure}`);
   const latest = plan?.find((row) => row.role === "latest")?.project;
   const base = plan?.find((row) => row.role === "base")?.project;
   const usesEmployees = (base?.headcount ?? 0) > 0;
