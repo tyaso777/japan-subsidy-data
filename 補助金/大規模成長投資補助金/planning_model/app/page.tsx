@@ -115,9 +115,15 @@ const equipmentPeriodStatisticalKeys = new Set<keyof Drivers>([
   "otherHeadcountGrowthToBase", "otherSgaImprovementToBase",
 ]);
 
+const improvementDriverKeys: (keyof Drivers)[] = [
+  "projectCogsImprovementToBase", "projectSgaImprovementToBase",
+  "otherCogsImprovementToBase", "otherSgaImprovementToBase",
+  "projectCogsImprovementAfterBase", "otherCogsImprovement",
+];
+
 const postBaseBenchmarkDefaults: Partial<Record<keyof Drivers, { initial: number; lower: number; upper: number }>> = {
   projectSalesGrowth: { initial: 0.22, lower: 0.15, upper: 0.30 },
-  projectCogsImprovementAfterBase: { initial: 0.015, lower: 0, upper: 0.02 },
+  projectCogsImprovementAfterBase: { initial: 0.015, lower: 0, upper: 0.03 },
   projectPayGrowth: { initial: 0.07, lower: 0.05, upper: 0.10 },
   projectHeadcountGrowth: { initial: 0.04, lower: 0, upper: 0.08 },
   projectOfficerPayGrowth: { initial: 0.07, lower: 0.05, upper: 0.10 },
@@ -131,12 +137,12 @@ const historicalFallbackDefaults: Partial<Record<keyof Drivers, { initial: numbe
   projectSgaImprovementToBase: { initial: 0, lower: 0, upper: 0.02 },
   projectOfficerPayGrowthToBase: { initial: 0.03, lower: 0, upper: 0.06 },
   otherSalesGrowthToBase: { initial: 0.03, lower: -0.03, upper: 0.08 },
-  otherCogsImprovementToBase: { initial: 0, lower: -0.02, upper: 0.02 },
+  otherCogsImprovementToBase: { initial: 0, lower: 0, upper: 0.02 },
   otherPayGrowthToBase: { initial: 0.03, lower: 0, upper: 0.06 },
   otherHeadcountGrowthToBase: { initial: 0.01, lower: -0.03, upper: 0.05 },
-  otherSgaImprovementToBase: { initial: 0, lower: -0.02, upper: 0.02 },
+  otherSgaImprovementToBase: { initial: 0, lower: 0, upper: 0.02 },
   otherSalesGrowth: { initial: 0.03, lower: -0.03, upper: 0.08 },
-  otherCogsImprovement: { initial: 0, lower: -0.02, upper: 0.02 },
+  otherCogsImprovement: { initial: 0, lower: 0, upper: 0.03 },
   otherPayGrowth: { initial: 0.03, lower: 0, upper: 0.06 },
   otherHeadcountGrowth: { initial: 0.01, lower: -0.03, upper: 0.05 },
   projectSgaRateEnd: { initial: 0.10, lower: 0.06, upper: 0.15 },
@@ -563,13 +569,23 @@ export default function Home() {
 
   function applyProposal(proposal: ProposalData) {
     clearAdjustment();
+    const importedDrivers = { ...defaultDrivers, ...clone(proposal.drivers) };
+    const importedRanges = { ...clone(driverBounds), ...clone(proposal.driverRanges) };
+    for (const key of improvementDriverKeys) {
+      const [technicalLower, technicalUpper] = driverBounds[key];
+      importedDrivers[key] = Math.min(technicalUpper, Math.max(technicalLower, importedDrivers[key]));
+      const importedRange = importedRanges[key] ?? driverBounds[key];
+      const lower = Math.min(technicalUpper, Math.max(technicalLower, Math.min(...importedRange)));
+      const upper = Math.min(technicalUpper, Math.max(technicalLower, Math.max(...importedRange)));
+      importedRanges[key] = [lower, upper];
+    }
     setProposalTitle(proposal.title || "成長投資計画 提案計画");
     setTimeline(normalizeTimeline(proposal.timeline));
     setHistoricalPlan(clone(proposal.historicalPlan));
     setBalanceSheets(clone(proposal.balanceSheets));
     setFutureCapex(clone(proposal.futureCapex));
-    setDrivers({ ...defaultDrivers, ...clone(proposal.drivers) });
-    setDriverRanges({ ...clone(driverBounds), ...clone(proposal.driverRanges) });
+    setDrivers(importedDrivers);
+    setDriverRanges(importedRanges);
     setTargets(Object.fromEntries(Object.entries(proposal.targets).map(([key, target]) => [key, { ...target, max: target.max ?? defaultTargets[key as MetricKey].max, weight: integerPriority(target.weight) }])) as Record<MetricKey, Target>);
     setForecastOverrides(clone(proposal.forecastOverrides ?? {}));
     setFutureInputBasis(proposal.futureInputBasis ?? "other");
@@ -793,7 +809,7 @@ export default function Home() {
     setDriverRanges(nextRanges);
     if (!enteredInvestment) setFutureCapex(createFutureCapex(timeline, nextDrivers.investment));
     setHistoricalDefaultsApplied(true);
-    setDefaultNote("すべての計画初期値を設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目は保守的な補完値を使用しています。その他事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を1.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、耐用年数は10年、市場伸び率は5%、ローカルベンチマークは23点で仮置きしています。");
+    setDefaultNote("すべての計画初期値を設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目は保守的な補完値を使用しています。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。その他事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を1.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、耐用年数は10年、市場伸び率は5%、ローカルベンチマークは23点で仮置きしています。");
   }
 
   function solve() {

@@ -82,6 +82,12 @@ test("historical target references compare the two actual-year intervals", () =>
   assert.equal(driverSeries.projectSgaImprovementToBase.mode, "change");
   assert.equal(driverSeries.projectSgaImprovementToBase.referenceLevels.length, 3);
   assert.ok(model.driverBounds.projectPayGrowthToBase[0] <= 0);
+  assert.deepEqual(model.driverBounds.projectCogsImprovementToBase, [0, 0.02]);
+  assert.deepEqual(model.driverBounds.projectSgaImprovementToBase, [0, 0.02]);
+  assert.deepEqual(model.driverBounds.otherCogsImprovementToBase, [0, 0.02]);
+  assert.deepEqual(model.driverBounds.otherSgaImprovementToBase, [0, 0.02]);
+  assert.deepEqual(model.driverBounds.projectCogsImprovementAfterBase, [0, 0.03]);
+  assert.deepEqual(model.driverBounds.otherCogsImprovement, [0, 0.03]);
   assert.deepEqual(driverSeries.investment.values, model.sampleBalanceSheets.map((row) => row.capex));
   assert.ok(model.defaultBalanceSheets.every((row) => row.capex === 0));
 });
