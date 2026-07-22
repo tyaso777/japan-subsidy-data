@@ -42,6 +42,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /上書き内容を反映して再最適化/);
   assert.match(pageSource, /15指標・目標へ戻る/);
   assert.match(pageSource, /基準年売上開始サンプル/);
+  assert.match(pageSource, /window\.scrollTo\(\{ top: 0, left: 0, behavior: "auto" \}\)/);
+  assert.doesNotMatch(pageSource, /onClick=\{\(\) => setView\(/);
   assert.doesNotMatch(pageSource, /function solveAndOpenAnnualPl\(\)/);
   assert.doesNotMatch(pageSource, /toFixed\(6\)/);
   assert.match(globalStyles, /actuals-three-year-table \{ overflow-x: hidden; overflow-y: auto; \}/);

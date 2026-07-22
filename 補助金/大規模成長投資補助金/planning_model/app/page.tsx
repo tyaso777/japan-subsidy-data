@@ -446,6 +446,11 @@ function useSpreadsheetGrid() {
 export default function Home() {
   useSpreadsheetGrid();
   const [view, setView] = useState<View>("history");
+
+  function goToView(nextView: View) {
+    setView(nextView);
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }
   const [timeline, setTimeline] = useState<TimelineSettings>({ ...DEFAULT_TIMELINE });
   const [historicalPlan, setHistoricalPlan] = useState<YearPlan[]>(() => createHistoricalPlan(basePlan, DEFAULT_TIMELINE));
   const [balanceSheets, setBalanceSheets] = useState<BalanceSheetPlan[]>(() => retimeBalanceSheets(defaultBalanceSheets, DEFAULT_TIMELINE));
@@ -798,7 +803,7 @@ export default function Home() {
         {([
           ["history", "過去データ入力"], ["targets", "15指標・目標"], ["future", "将来データ入力"], ["pl", "年度別PL"], ["summary", "診断"], ["logic", "数式・ロジック"],
         ] as [View, string][]).map(([key, label]) => (
-          <button key={key} className={view === key ? "active" : ""} onClick={() => setView(key)}>{label}</button>
+          <button key={key} className={view === key ? "active" : ""} onClick={() => goToView(key)}>{label}</button>
         ))}
       </nav>
 
@@ -821,7 +826,7 @@ export default function Home() {
           <FinancialDiagnostics plan={plan} balanceSheets={balanceSheets} futureCapex={futureCapex} />
 
           <article className="panel metric-overview">
-            <div className="panel-heading"><div><p className="card-kicker">目標ギャップ</p><h2>優先して直す指標</h2></div><button className="text-button" onClick={() => setView("targets")}>15指標を編集 →</button></div>
+            <div className="panel-heading"><div><p className="card-kicker">目標ギャップ</p><h2>優先して直す指標</h2></div><button className="text-button" onClick={() => goToView("targets")}>15指標を編集 →</button></div>
             <div className="metric-list">
               {metrics.map((definition) => {
                 const target = targets[definition.key];
@@ -877,7 +882,7 @@ export default function Home() {
             <p>実務上は連動しますが、第6次の公式Excel自体はB/S残高から減価償却費や支払利息を自動算定していません。公式上の直接参照は主に、P/LのEBITDAを使う1-25 EBITDA有利子負債倍率です。本モデルでも、過去B/Sを入力しただけで手入力P/Lを上書きしません。将来の減価償却費・支払利息まで自動連動させるには、次段階で「固定資産台帳」と「借入返済表」を年度別に設けます。</p>
           </article>
           <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">PL ACTUALS</p><h2>会社全体PL・補助事業PL（過去3期）</h2></div><span className="pill green">必須手入力</span></div><HistoricalInputsEditor historical={historicalPlan} onHistoricalCompanyChange={updateHistoricalCompanyOfficial} onHistoricalProjectChange={updateHistoricalProjectOfficial} /></article>
-          <div className="workflow-actions"><span>過去実績を入力できたら、次に現実的な将来水準を設定します。</span><button className="solve-button" onClick={() => setView("targets")}>15指標・目標へ →</button></div>
+          <div className="workflow-actions"><span>過去実績を入力できたら、次に現実的な将来水準を設定します。</span><button className="solve-button" onClick={() => goToView("targets")}>15指標・目標へ →</button></div>
         </section>
       )}
 
@@ -887,7 +892,7 @@ export default function Home() {
           <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。直前の変更はCtrl＋Zで戻せます。</p>
           <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">ROUND 6 / FUTURE CAPEX</p><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">将来合計 {number(futureCapex.reduce((sum, row) => sum + row.value, 0), 2)} 億円</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。将来各年度の入力合計は「15指標・目標」の補助事業投資額と連動し、投資額／全社売上高や将来減価償却費の自動予測へ反映します。</p></article>
           <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">PL FORECAST</p><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>全社PLとその他事業PLのどちらか一方だけを入力します</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>その他事業PLを入力</button></div></div><FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} futureInputBasis={futureInputBasis} onForecastChange={updateForecastOverride} /><p className="footnote">補助事業PLは共通です。「全社PLを入力」ではその他事業PLを差額計算し、「その他事業PLを入力」では全社PLを合算計算します。</p></article>
-          <div className="workflow-actions"><div><span>上書きしたセルを固定して再最適化できます。再最適化後もこの画面に留まります。</span>{adjustedPlan && <p className="solve-note">{solveNote}</p>}</div><div className="target-action-buttons"><button className="reset-button" onClick={() => setView("targets")}>← 15指標・目標へ戻る</button><button className="solve-button" onClick={solve}>上書き内容を反映して再最適化</button><button className="reset-button" onClick={() => setView("pl")}>年度別PLへ →</button></div></div>
+          <div className="workflow-actions"><div><span>上書きしたセルを固定して再最適化できます。再最適化後もこの画面に留まります。</span>{adjustedPlan && <p className="solve-note">{solveNote}</p>}</div><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("targets")}>← 15指標・目標へ戻る</button><button className="solve-button" onClick={solve}>上書き内容を反映して再最適化</button><button className="reset-button" onClick={() => goToView("pl")}>年度別PLへ →</button></div></div>
         </section>
       )}
 
@@ -959,7 +964,7 @@ export default function Home() {
               </div>
             </div>
           </article>
-          <div className="workflow-actions"><span>水準と15指標を確認したら、将来PLの自動予測をセル単位で確認・上書きします。</span><button className="solve-button" onClick={() => setView("future")}>将来データ入力へ →</button></div>
+          <div className="workflow-actions"><span>水準と15指標を確認したら、将来PLの自動予測をセル単位で確認・上書きします。</span><button className="solve-button" onClick={() => goToView("future")}>将来データ入力へ →</button></div>
         </section>
       )}
 
