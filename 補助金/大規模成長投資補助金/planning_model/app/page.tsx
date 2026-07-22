@@ -113,6 +113,10 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
   },
 ];
 
+const driverItemCodes = Object.fromEntries(
+  driverGroups.flatMap((group) => group.keys).map((key, index) => [key, String.fromCharCode(65 + index)]),
+) as Partial<Record<keyof Drivers, string>>;
+
 const equipmentPeriodStatisticalKeys = new Set<keyof Drivers>([
   "projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase",
   "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase",
@@ -516,6 +520,7 @@ export default function Home() {
   const [adjustedPlan, setAdjustedPlan] = useState<YearPlan[] | null>(null);
   const [adjustedDrivers, setAdjustedDrivers] = useState<Drivers | null>(null);
   const [solveNote, setSolveNote] = useState("未実行");
+  const [isSolving, setIsSolving] = useState(false);
   const [defaultNote, setDefaultNote] = useState("");
   const [historicalDefaultsApplied, setHistoricalDefaultsApplied] = useState(false);
   const [proposalTitle, setProposalTitle] = useState("成長投資計画 提案計画");
@@ -976,29 +981,40 @@ export default function Home() {
     setDefaultNote("すべての計画初期値を設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目は保守的な補完値を使用しています。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。その他事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、耐用年数は10年、市場伸び率は5%で仮置きしています。");
   }
 
-  function solve() {
-    const startDrivers = { ...drivers };
-    const sourceHistorical = sourcePlan.slice(0, 3);
-    const periodInput = projectPeriodInputs;
-    const optimizationBounds = Object.fromEntries((Object.keys(driverRanges) as (keyof Drivers)[]).map((key) => {
-      const [first, second] = driverRanges[key];
-      return [key, [Math.min(first, second), Math.max(first, second)]];
-    })) as Record<keyof Drivers, [number, number]>;
-    const planTransform = (candidate: YearPlan[]) => applyForecastOverrides(candidate, forecastOverrides, futureInputBasis);
-    const before = objective(startDrivers, startDrivers, sourceHistorical, timeline, optimizationTargets, periodInput, sourcePlan, optimizationBounds, true, planTransform);
-    const result = optimizeDrivers(startDrivers, sourceHistorical, timeline, optimizationTargets, periodInput, sourcePlan, optimizationBounds, true, planTransform);
-    const solvedPeriodInput = createForecastProjectPeriodInputs(sourceHistorical[2], result.drivers, timeline);
-    const solvedPlan = applyForecastOverrides(generatePlan(sourceHistorical, result.drivers, timeline, solvedPeriodInput), forecastOverrides, futureInputBasis);
-    const solvedActual = calculateMetrics(solvedPlan, result.drivers);
-    const failed = hardTargetSummary(solvedActual, optimizationTargets).failed;
-    setAdjustedDrivers(result.drivers);
-    setAdjustedPlan(solvedPlan);
-    const scoreDrop = before > 0 ? Math.max(0, (1 - result.score / before) * 100) : 0;
-    setSolveNote(
-      failed.length
-        ? `固定入力と現在の許容範囲を守ると必達条件を同時達成できません。必達違反が最小になる決定論的な最接近案を表示しています（未達${failed.length}件、総合目的関数${scoreDrop.toFixed(0)}%改善）。`
-        : `入力値を保持したまま調整案を作成。目的関数は${scoreDrop.toFixed(0)}%改善し、指定した必達目標は同時達成しています。`,
-    );
+  async function solve() {
+    if (isSolving) return;
+    setIsSolving(true);
+    setSolveNote("計算中…");
+    // Let React paint the busy state before the synchronous optimizer starts.
+    await new Promise<void>((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
+    try {
+      const startDrivers = { ...drivers };
+      const sourceHistorical = sourcePlan.slice(0, 3);
+      const periodInput = projectPeriodInputs;
+      const optimizationBounds = Object.fromEntries((Object.keys(driverRanges) as (keyof Drivers)[]).map((key) => {
+        const [first, second] = driverRanges[key];
+        return [key, [Math.min(first, second), Math.max(first, second)]];
+      })) as Record<keyof Drivers, [number, number]>;
+      const planTransform = (candidate: YearPlan[]) => applyForecastOverrides(candidate, forecastOverrides, futureInputBasis);
+      const before = objective(startDrivers, startDrivers, sourceHistorical, timeline, optimizationTargets, periodInput, sourcePlan, optimizationBounds, true, planTransform);
+      const result = optimizeDrivers(startDrivers, sourceHistorical, timeline, optimizationTargets, periodInput, sourcePlan, optimizationBounds, true, planTransform);
+      const solvedPeriodInput = createForecastProjectPeriodInputs(sourceHistorical[2], result.drivers, timeline);
+      const solvedPlan = applyForecastOverrides(generatePlan(sourceHistorical, result.drivers, timeline, solvedPeriodInput), forecastOverrides, futureInputBasis);
+      const solvedActual = calculateMetrics(solvedPlan, result.drivers);
+      const failed = hardTargetSummary(solvedActual, optimizationTargets).failed;
+      setAdjustedDrivers(result.drivers);
+      setAdjustedPlan(solvedPlan);
+      const scoreDrop = before > 0 ? Math.max(0, (1 - result.score / before) * 100) : 0;
+      setSolveNote(
+        failed.length
+          ? `固定入力と現在の許容範囲を守ると必達条件を同時達成できません。必達違反が最小になる決定論的な最接近案を表示しています（未達${failed.length}件、総合目的関数${scoreDrop.toFixed(0)}%改善）。`
+          : `入力値を保持したまま調整案を作成。目的関数は${scoreDrop.toFixed(0)}%改善し、指定した必達目標は同時達成しています。`,
+      );
+    } catch (error) {
+      setSolveNote(error instanceof Error ? `計算に失敗しました：${error.message}` : "計算に失敗しました。");
+    } finally {
+      setIsSolving(false);
+    }
   }
 
   return (
@@ -1133,7 +1149,7 @@ export default function Home() {
           <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。直前の変更はCtrl＋Zで戻せます。</p>
           <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">ROUND 6 / FUTURE CAPEX</p><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">将来合計 {number(futureCapex.reduce((sum, row) => sum + row.value, 0), 2)} 億円</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} inputValues={inputValues} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。将来各年度の入力合計は「15指標・目標」の補助事業投資額と連動し、投資額／全社売上高や将来減価償却費の自動予測へ反映します。</p></article>
           <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">PL FORECAST</p><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>全社PLとその他事業PLのどちらか一方だけを入力します</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>その他事業PLを入力</button></div></div><FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} onForecastChange={updateForecastOverride} /><p className="footnote">補助事業PLは共通です。「全社PLを入力」ではその他事業PLを差額計算し、「その他事業PLを入力」では全社PLを合算計算します。</p></article>
-          <div className="workflow-actions"><div><span>上書きしたセルを固定して再最適化できます。再最適化後もこの画面に留まります。</span>{adjustedPlan && <p className="solve-note">{solveNote}</p>}</div><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("targets")}>← 15指標・目標へ戻る</button><button className="solve-button" onClick={solve}>上書き内容を反映して再最適化</button><button className="reset-button" onClick={() => goToView("pl")}>年度別PLへ →</button></div></div>
+          <div className="workflow-actions"><div><span>上書きしたセルを固定して再最適化できます。再最適化後もこの画面に留まります。</span>{adjustedPlan && <p className="solve-note">{solveNote}</p>}</div><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("targets")}>← 15指標・目標へ戻る</button><button className="solve-button" disabled={isSolving} aria-busy={isSolving} onClick={() => void solve()}>{isSolving ? "計算中…" : "上書き内容を反映して再最適化"}</button><button className="reset-button" onClick={() => goToView("pl")}>年度別PLへ →</button></div></div>
         </section>
       )}
 
@@ -1152,7 +1168,7 @@ export default function Home() {
           <div className="section-intro"><div><p className="eyebrow">15 METRICS</p><h2>目標・必達条件・競合管理</h2></div><p>計画値・判定・自動調整には第6次定義を使用します。目標値は固定し、複数の必達目標が矛盾する場合は未達を残して明示します。</p></div>
           <article className="panel">
             <div className="panel-heading"><div><p className="card-kicker">STEP 2 / FORECAST DRIVERS</p><h2>将来予測・調整水準</h2></div><button className="default-button" onClick={applyHistoricalDefaults}>過去3期からデフォルト設定</button></div>
-            <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th>調整項目</th>{historicalPlan.map((row) => <th className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>計画初期値</th><th>許容下限</th><th>許容上限</th><th>最適化での扱い</th></tr></thead><tbody>
+            <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th>調整項目<small>A～Z</small></th>{historicalPlan.map((row) => <th className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>計画初期値</th><th>許容下限</th><th>許容上限</th><th>最適化での扱い</th></tr></thead><tbody>
               {driverGroups.flatMap((group) => [
                 <tr className="driver-group-heading" key={`group-${group.label}`}><th colSpan={historicalPlan.length + 5}><strong>{group.label}</strong><small>{group.detail}</small></th></tr>,
                 ...group.keys.map((key) => {
@@ -1171,7 +1187,7 @@ export default function Home() {
                 const rangeOrdered = driverRanges[key][0] <= driverRanges[key][1];
                 const rangeValid = noRange || (rangeOrdered && drivers[key] >= driverRanges[key][0] && drivers[key] <= driverRanges[key][1]);
                 const rangeStatus = noRange ? "入力値を固定" : !rangeOrdered ? "下限＞上限" : movable ? rangeValid ? "範囲内で調整" : "初期値が範囲外" : rangeValid ? "入力値を固定" : "固定値が範囲外";
-                return <tr className={movable ? "driver-adjustable" : "driver-fixed"} key={key}><th>{info.label}<small>{info.unit}／{history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>{history.values.map((value, index) => {
+                return <tr className={movable ? "driver-adjustable" : "driver-fixed"} key={key}><th><span className="driver-item-code">{driverItemCodes[key]}:</span> {info.label}<small>{info.unit}／{history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>{history.values.map((value, index) => {
                   const referenceLevel = history.referenceLevels?.[index];
                   if (referenceLevel !== undefined && Number.isFinite(referenceLevel)) {
                     const improvement = Number.isFinite(value) ? value * 100 : undefined;
@@ -1217,7 +1233,7 @@ export default function Home() {
                 {solveNote !== "未実行" && <p className="solve-note">{solveNote}</p>}
               </div>
               <div className="target-action-buttons">
-                <button className="solve-button" onClick={solve}>設定した目標に近づける</button>
+                <button className="solve-button" disabled={isSolving} aria-busy={isSolving} onClick={() => void solve()}>{isSolving ? "計算中…" : "設定した目標に近づける"}</button>
                 {adjustedPlan && <button className="reset-button" onClick={clearAdjustment}>入力値表示に戻す</button>}
               </div>
             </div>

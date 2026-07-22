@@ -92,6 +92,14 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /に目標設定/);
   assert.match(pageSource, /2指標を同時に最適化/);
   assert.match(pageSource, /最適化結果/);
+  assert.match(pageSource, /const \[isSolving, setIsSolving\] = useState\(false\)/);
+  assert.match(pageSource, /requestAnimationFrame\(\(\) => setTimeout\(resolve, 0\)\)/);
+  assert.match(pageSource, /isSolving \? "計算中…" : "設定した目標に近づける"/);
+  assert.match(pageSource, /disabled=\{isSolving\} aria-busy=\{isSolving\}/);
+  assert.match(pageSource, /const driverItemCodes = Object\.fromEntries/);
+  assert.match(pageSource, /<th>調整項目<small>A～Z<\/small><\/th>/);
+  assert.match(pageSource, /className="driver-item-code">\{driverItemCodes\[key\]\}:/);
+  assert.match(globalStyles, /\.driver-item-code/);
   assert.match(pageSource, /自動算出/);
   assert.match(pageSource, /個別に目標設定/);
   assert.match(globalStyles, /metric-independent-row/);
