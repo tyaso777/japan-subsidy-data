@@ -36,6 +36,10 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /設備導入期間＋2\.0pt/);
   assert.match(pageSource, /補助事業とのシナジーを見込み/);
   assert.match(pageSource, /projectPayGrowth: \{ initial: 0\.07, lower: 0\.05, upper: 0\.10 \}/);
+  assert.match(pageSource, /benchmark && key !== "projectOfficerPayGrowth"/);
+  assert.doesNotMatch(pageSource, /nextDrivers\.projectOfficerPayGrowth = nextDrivers\.projectPayGrowth/);
+  assert.doesNotMatch(pageSource, /nextDrivers\.projectOfficerPayGrowthToBase = nextDrivers\.projectPayGrowthToBase/);
+  assert.match(pageSource, /過去3期の役員1人当たり給与から推計/);
   assert.match(pageSource, /projectCogsImprovementAfterBase: \{ initial: 0\.015, lower: 0, upper: 0\.03 \}/);
   assert.match(pageSource, /設備導入期間0～2pt、基準年後0～3pt/);
   assert.match(pageSource, /const improvementDriverKeys/);

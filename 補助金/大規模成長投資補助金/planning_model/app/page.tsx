@@ -878,7 +878,10 @@ export default function Home() {
       const mean = observed.reduce((sum, value) => sum + value, 0) / observed.length;
       const standardDeviation = Math.sqrt(observed.reduce((sum, value) => sum + (value - mean) ** 2, 0) / observed.length);
       const benchmark = postBaseBenchmarkDefaults[key];
-      if (benchmark) {
+      // Officer pay is independently estimated from the historical per-officer
+      // pay series.  The benchmark remains only as a fallback when no usable
+      // officer history exists.
+      if (benchmark && key !== "projectOfficerPayGrowth") {
         nextDrivers[key] = clamp(benchmark.initial, technicalLower, technicalUpper);
         nextRanges[key] = [
           clamp(benchmark.lower, technicalLower, technicalUpper),
@@ -910,11 +913,6 @@ export default function Home() {
       nextDrivers[key] = boundedInitial;
       nextRanges[key] = [lower, upper];
     }
-
-    nextDrivers.projectOfficerPayGrowthToBase = nextDrivers.projectPayGrowthToBase;
-    nextRanges.projectOfficerPayGrowthToBase = [...nextRanges.projectPayGrowthToBase];
-    nextDrivers.projectOfficerPayGrowth = nextDrivers.projectPayGrowth;
-    nextRanges.projectOfficerPayGrowth = [...nextRanges.projectPayGrowth];
 
     const applyOtherSynergyLift = (
       afterBaseKey: keyof Drivers,
@@ -1186,7 +1184,7 @@ export default function Home() {
               ])}
             </tbody></table></div>
             <p className="footnote">2023～2025年の各列は、計画値ではなく過去実績の参考値です。現実的な計画初期値・許容範囲を決める材料として表示しています。「過去3期からデフォルト設定」では、補助事業の設備導入期間は過去実績の単純平均を計画初期値、平均±2標準偏差を許容下限・上限とします（技術的な絶対範囲内に制限）。基準年後は、第5次採択者中央値を直接使える項目と、過去採択統計・利益構造から補完する項目を分けています。その他事業は直近を重めにした初期値と過去変動幅から設定します。市場伸び率・補助事業投資額・耐用年数は固定入力のため、許容下限・上限を設けません。</p>
-            <div className="benchmark-note"><strong>基準年後のデフォルト</strong><span>売上高成長率 22%［15～30%］</span><span>補助事業1人当たり給与支給総額の年平均上昇率 7%［5～10%］</span><span>常時使用する従業員数（就業時間換算）の成長率 4%［0～8%］</span><span>原価率改善 1.5pt［0～2pt］</span><span>その他販管費率 過去平均-1.5pt［過去平均-4～+1pt］</span><span>役員1人当たり給与支給総額の年平均上昇率 7%［5～10%］（従業員と同水準・参考管理）</span><span>その他事業はシナジーを見込み、基準年後の売上成長率を設備導入期間＋2.0pt、原価率改善・給与・人員成長率を＋0.5pt</span><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公募・採択者中央値PDF ↗</a></div>
+            <div className="benchmark-note"><strong>基準年後のデフォルト</strong><span>売上高成長率 22%［15～30%］</span><span>補助事業1人当たり給与支給総額の年平均上昇率 7%［5～10%］</span><span>常時使用する従業員数（就業時間換算）の成長率 4%［0～8%］</span><span>原価率改善 1.5pt［0～2pt］</span><span>その他販管費率 過去平均-1.5pt［過去平均-4～+1pt］</span><span>役員1人当たり給与支給総額の年平均上昇率は過去3期の役員1人当たり給与から推計（計算不能時のみ7%［5～10%］）</span><span>その他事業はシナジーを見込み、基準年後の売上成長率を設備導入期間＋2.0pt、原価率改善・給与・人員成長率を＋0.5pt</span><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公募・採択者中央値PDF ↗</a></div>
             {defaultNote && <p className="default-note">{defaultNote}</p>}
           </article>
           <article className="panel table-panel">
