@@ -28,14 +28,20 @@ test("application starts without sample company, project, balance-sheet, or driv
   assert.equal(model.sampleDrivers.investment, 45);
 });
 
-test("all fifteen metrics have editable planning ceilings and treat excess as out of range", () => {
+test("fourteen planning metrics have ceilings and local benchmark is a fixed reference", () => {
   assert.equal(model.metrics.length, 15);
-  for (const definition of model.metrics) {
+  for (const definition of model.metrics.filter((item) => item.key !== "localBenchmark")) {
     const target = model.defaultTargets[definition.key];
     assert.ok(Number.isFinite(target.max));
     assert.ok(target.max > target.value);
     assert.equal(model.targetStatus(definition, target.max + 1, target).ok, false);
   }
+  assert.equal(model.defaultTargets.localBenchmark.policy, "monitor");
+  const localHardTargets = structuredClone(model.defaultTargets);
+  localHardTargets.localBenchmark.policy = "hard";
+  localHardTargets.localBenchmark.value = 100;
+  const summary = model.hardTargetSummary(model.calculateMetrics(makePlan(), model.sampleDrivers), localHardTargets);
+  assert.equal(summary.hardCount, 0);
 });
 
 test("sixth-round periods drive all current metrics", () => {

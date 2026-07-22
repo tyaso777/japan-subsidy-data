@@ -104,7 +104,7 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
   {
     label: "共通・固定前提",
     detail: "申請・外部前提",
-    keys: ["projectMarketGrowth", "subsidy", "localBenchmark"],
+    keys: ["projectMarketGrowth", "subsidy"],
   },
 ];
 
@@ -511,7 +511,8 @@ export default function Home() {
   );
   const validations = useMemo(() => validatePlan(plan, calculationDrivers), [plan, calculationDrivers]);
   const hardSummary = useMemo(() => hardTargetSummary(actual, targets), [actual, targets]);
-  const achieved = metrics.filter((definition) => targetStatus(definition, actual[definition.key], targets[definition.key]).ok).length;
+  const targetManagedMetrics = metrics.filter((definition) => definition.key !== "localBenchmark");
+  const achieved = targetManagedMetrics.filter((definition) => targetStatus(definition, actual[definition.key], targets[definition.key]).ok).length;
   const report3 = plan.find((row) => row.role === "report3")!;
 
   function clearAdjustment() {
@@ -542,6 +543,7 @@ export default function Home() {
       proposal: currentProposal(),
       effectivePlan: clone(plan),
       metricRows: metrics.map((definition) => ({
+        key: definition.key,
         label: definition.label,
         unit: definition.unit,
         actual: actual[definition.key],
@@ -722,7 +724,6 @@ export default function Home() {
     const estimatedInvestment = annualHistoricalCapex * Math.max(1, timeline.baseYear - timeline.latestYear);
     nextDrivers.investment = enteredInvestment || drivers.investment || clamp(estimatedInvestment || 15, driverBounds.investment[0], driverBounds.investment[1]);
     nextDrivers.subsidy = drivers.subsidy || clamp(nextDrivers.investment / 3, driverBounds.subsidy[0], driverBounds.subsidy[1]);
-    nextDrivers.localBenchmark = drivers.localBenchmark || 23;
 
     for (const key of adjustableDriverKeys) {
       const history = historicalDriverSeries[key];
@@ -875,7 +876,7 @@ export default function Home() {
               <h2>{hardSummary.failed.length === 0 ? "必達目標は両立可能" : "必達目標に競合・未達あり"}</h2>
               <p>{hardSummary.hardCount === 0 ? "現在、必達指定はありません。15指標画面で指定してください。" : `${hardSummary.hardCount}件中${hardSummary.hardCount - hardSummary.failed.length}件を達成。`}</p>
             </div>
-            <div className="score-ring"><strong>{achieved}</strong><span>/ 15</span><small>範囲内</small></div>
+            <div className="score-ring"><strong>{achieved}</strong><span>/ {targetManagedMetrics.length}</span><small>範囲内・固定1項目除く</small></div>
           </div>
 
           <div className="stat-card"><span>全社売上高</span><strong>{number(total(report3.project, report3.other).sales)} 億円</strong><small>事業化報告3年目 {report3.year}</small></div>
@@ -892,12 +893,13 @@ export default function Home() {
               {metrics.map((definition) => {
                 const target = targets[definition.key];
                 const status = targetStatus(definition, actual[definition.key], target);
+                const fixedInput = definition.key === "localBenchmark";
                 return (
                   <div className="metric-row" key={definition.key}>
-                    <span className={`status-dot ${status.ok ? "ok" : target.policy === "hard" ? "bad" : "warn"}`} />
+                    <span className={`status-dot ${fixedInput || status.ok ? "ok" : target.policy === "hard" ? "bad" : "warn"}`} />
                     <div><strong>{definition.label}</strong><small>{definition.sourceRound}</small></div>
                     <span className="metric-value">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key])} →</small>}{number(actual[definition.key])}{definition.unit}</span>
-                    <span className="metric-target">目標 {number(target.value)}{definition.unit}</span>
+                    <span className="metric-target">{fixedInput ? "固定入力・判定対象外" : `目標 ${number(target.value)}${definition.unit}`}</span>
                   </div>
                 );
               })}
@@ -978,7 +980,7 @@ export default function Home() {
                 ...group.keys.map((key) => {
                 const info = driverLabels[key]!;
                 const movable = !["projectMarketGrowth", "usefulLife", "investment", "subsidy", "localBenchmark"].includes(key);
-                const noRange = key === "investment" || key === "usefulLife";
+                const noRange = key === "investment" || key === "usefulLife" || key === "projectMarketGrowth";
                 const history = historicalDriverSeries[key];
                 const inputValue = percentDriver(key) ? Number((drivers[key] * 100).toFixed(2)) : drivers[key];
                 const displayedInputValue = historicalDefaultsApplied ? roundedInput(Math.abs(inputValue) < 1e-9 ? 0 : inputValue) : blankableInput(inputValue);
@@ -999,7 +1001,7 @@ export default function Home() {
               }),
               ])}
             </tbody></table></div>
-            <p className="footnote">2023～2025年の各列は、計画値ではなく過去実績の参考値です。現実的な計画初期値・許容範囲を決める材料として表示しています。「過去3期からデフォルト設定」では、補助事業の設備導入期間は過去実績の単純平均を計画初期値、平均±2標準偏差を許容下限・上限とします（技術的な絶対範囲内に制限）。基準年後は、第5次採択者中央値を直接使える項目と、過去採択統計・利益構造から補完する項目を分けています。その他事業は直近を重めにした初期値と過去変動幅から設定します。補助事業投資額と耐用年数は固定入力のため、許容下限・上限を設けません。</p>
+            <p className="footnote">2023～2025年の各列は、計画値ではなく過去実績の参考値です。現実的な計画初期値・許容範囲を決める材料として表示しています。「過去3期からデフォルト設定」では、補助事業の設備導入期間は過去実績の単純平均を計画初期値、平均±2標準偏差を許容下限・上限とします（技術的な絶対範囲内に制限）。基準年後は、第5次採択者中央値を直接使える項目と、過去採択統計・利益構造から補完する項目を分けています。その他事業は直近を重めにした初期値と過去変動幅から設定します。市場伸び率・補助事業投資額・耐用年数は固定入力のため、許容下限・上限を設けません。</p>
             <div className="benchmark-note"><strong>基準年後のデフォルト</strong><span>売上高成長率 22%［15～30%］</span><span>補助事業1人当たり給与支給総額の年平均上昇率 7%［5～10%］</span><span>常時使用する従業員数（就業時間換算）の成長率 4%［0～8%］</span><span>原価率改善 1.5pt［0～2pt］</span><span>その他販管費率 過去平均-1.5pt［過去平均-4～+1pt］</span><span>役員1人当たり給与支給総額の年平均上昇率 7%［5～10%］（従業員と同水準・参考管理）</span><span>その他事業はシナジーを見込み、基準年後の売上成長率を設備導入期間＋1.0pt、原価率改善・給与・人員成長率を＋0.5pt</span><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公募・採択者中央値PDF ↗</a></div>
             {defaultNote && <p className="default-note">{defaultNote}</p>}
           </article>
@@ -1009,10 +1011,11 @@ export default function Home() {
                 const target = targets[definition.key];
                 const status = targetStatus(definition, actual[definition.key], target);
                 const history = historicalMetricSeries[definition.key];
+                if (definition.key === "localBenchmark") return <tr className="fixed-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small>外部で算出した点数を転記する固定値</small></td>{history.values.map((_value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>—</td>)}<td><input aria-label="ローカルベンチマーク固定値" type="number" step="1" value={blankableInput(drivers.localBenchmark)} placeholder="未入力" onChange={(event) => updateDriver("localBenchmark", event.target.value === "" ? 0 : Number(event.target.value))} /></td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="driver-policy">入力値を固定</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">判定対象外</span></td></tr>;
                 return <tr key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small>{definition.sourceRound}</small></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{history.mode === "change" ? `${historicalPlan[historyIndex - 1]?.year}→${historicalPlan[historyIndex].year}／${definition.unit}` : definition.unit}</small></> : "—"}</td>)}<td className="numeric">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key])} →</small>}{number(actual[definition.key])} {definition.unit}</td><td><input aria-label={`${definition.label}目標下限`} type="number" step="0.1" value={target.value} onChange={(event) => updateTarget(definition.key, { value: Number(event.target.value) })} /></td><td><input aria-label={`${definition.label}計画上限`} type="number" step="0.1" value={target.max ?? ""} onChange={(event) => updateTarget(definition.key, { max: event.target.value === "" ? undefined : Number(event.target.value) })} /></td><td><select value={target.policy} onChange={(event) => updateTarget(definition.key, { policy: event.target.value as Target["policy"] })}><option value="hard">必達</option><option value="soft">努力</option><option value="monitor">参考</option></select></td><td><input type="number" min="1" max="10" step="1" value={integerPriority(target.weight)} onChange={(event) => updateTarget(definition.key, { weight: integerPriority(Number(event.target.value)) })} /></td><td><span className={`result-badge ${status.ok ? "ok" : target.policy === "hard" ? "bad" : "warn"}`}>{status.ok ? "範囲内" : target.policy === "hard" ? "必達範囲外" : "範囲外"}</span></td></tr>;
               })}
             </tbody></table></div>
-            <p className="footnote">成長率・増加額は2024列と2025列に直前期からの変化を表示します。補助事業売上構成比と投資額比率は、前々期・前期・最新期それぞれの水準です。補助金1円当たり効果とローカルベンチマークは比較可能な過去入力がないため「—」と表示します。</p>
+            <p className="footnote">成長率・増加額は2024列と2025列に直前期からの変化を表示します。補助事業売上構成比と投資額比率は、前々期・前期・最新期それぞれの水準です。ローカルベンチマークは外部で算出した点数の固定入力であり、目標判定・最適化・PL計算の対象外です。</p>
             <div className="target-action-bar">
               <div>
                 <strong>15指標の設定後に実行</strong>

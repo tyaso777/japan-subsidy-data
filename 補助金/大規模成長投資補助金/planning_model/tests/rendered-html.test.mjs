@@ -35,6 +35,10 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /projectCogsImprovementAfterBase: \{ initial: 0\.015, lower: 0, upper: 0\.03 \}/);
   assert.match(pageSource, /設備導入期間0～2pt、基準年後0～3pt/);
   assert.match(pageSource, /const improvementDriverKeys/);
+  assert.match(pageSource, /keys: \["projectMarketGrowth", "subsidy"\]/);
+  assert.match(pageSource, /ローカルベンチマーク固定値/);
+  assert.match(pageSource, /固定入力・判定対象外/);
+  assert.match(pageSource, /key === "investment" \|\| key === "usefulLife" \|\| key === "projectMarketGrowth"/);
   assert.doesNotMatch(pageSource, /原価率改善 1\.5pt［-2～5pt］/);
   assert.match(pageSource, /5ji_median\.pdf/);
   assert.match(pageSource, /補助事業1人当たり給与支給総額の年平均上昇率/);

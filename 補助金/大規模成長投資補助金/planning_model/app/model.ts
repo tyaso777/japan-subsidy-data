@@ -337,7 +337,7 @@ export const defaultTargets = Object.fromEntries(
     {
       value: metric.defaultTarget,
       max: metric.rangeMax,
-      policy: metric.key === "investmentSalesRatio" || metric.key === "projectSalesShare" ? "monitor" : "soft",
+      policy: metric.key === "investmentSalesRatio" || metric.key === "projectSalesShare" || metric.key === "localBenchmark" ? "monitor" : "soft",
       weight: 1,
     },
   ]),
@@ -868,6 +868,7 @@ export function objective(
   const actual = calculateMetrics(plan, drivers);
   let score = 0;
   for (const definition of metrics) {
+    if (definition.key === "localBenchmark") continue;
     const target = targets[definition.key];
     const miss = normalizedShortfall(definition, actual[definition.key], target);
     const policyMultiplier = target.policy === "hard" ? 5000 : 250;
@@ -942,6 +943,7 @@ export function optimizeDrivers(
   const hardViolation = (drivers: Drivers) => {
     const actual = calculateMetrics(transformedPlan(drivers), drivers);
     return metrics.reduce((sum, definition) => {
+      if (definition.key === "localBenchmark") return sum;
       const target = targets[definition.key];
       if (target.policy !== "hard") return sum;
       const status = targetStatus(definition, actual[definition.key], target);
@@ -1028,7 +1030,7 @@ export function optimizeDrivers(
 }
 
 export function hardTargetSummary(actual: Record<MetricKey, number>, targets: Record<MetricKey, Target>) {
-  const hard = metrics.filter((definition) => targets[definition.key].policy === "hard");
+  const hard = metrics.filter((definition) => definition.key !== "localBenchmark" && targets[definition.key].policy === "hard");
   const failed = hard.filter((definition) => !targetStatus(definition, actual[definition.key], targets[definition.key]).ok);
   return { hardCount: hard.length, failed };
 }
