@@ -251,6 +251,32 @@ test("optimizer is deterministic and gives feasible hard targets lexical priorit
   assert.equal(model.targetStatus(model.metrics.find((metric) => metric.key === "companySalesCagr"), actual.companySalesCagr, targets.companySalesCagr).ok, true);
 });
 
+test("optimizer reaches the standard sample company sales hard target with a reference plan", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  const periodInputs = model.createForecastProjectPeriodInputs(historical.at(-1), model.sampleDrivers, model.DEFAULT_TIMELINE);
+  const referencePlan = model.generatePlan(historical, model.sampleDrivers, model.DEFAULT_TIMELINE, periodInputs);
+  const targets = structuredClone(model.defaultTargets);
+  for (const target of Object.values(targets)) target.policy = "monitor";
+  targets.companySalesCagr = { value: 21, max: 35, policy: "hard", weight: 1 };
+
+  const result = model.optimizeDrivers(
+    model.sampleDrivers,
+    historical,
+    model.DEFAULT_TIMELINE,
+    targets,
+    periodInputs,
+    referencePlan,
+    model.driverBounds,
+    true,
+  );
+  const solvedInputs = model.createForecastProjectPeriodInputs(historical.at(-1), result.drivers, model.DEFAULT_TIMELINE);
+  const solvedPlan = model.generatePlan(historical, result.drivers, model.DEFAULT_TIMELINE, solvedInputs);
+  const actual = model.calculateMetrics(solvedPlan, result.drivers);
+
+  assert.equal(result.hardFeasible, true);
+  assert.equal(model.targetStatus(model.metrics.find((metric) => metric.key === "companySalesCagr"), actual.companySalesCagr, targets.companySalesCagr).ok, true);
+});
+
 test("productivity and officer pay use officer counts", () => {
   const plan = makePlan();
   plan.find((row) => row.role === "report3").project.officerCount *= 2;

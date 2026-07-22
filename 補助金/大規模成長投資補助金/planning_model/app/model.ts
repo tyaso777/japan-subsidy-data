@@ -1061,7 +1061,32 @@ export function optimizeDrivers(
     finalists.push(current);
   }
   finalists.sort((left, right) => better(left, right) ? -1 : better(right, left) ? 1 : 0);
-  const best = finalists[0];
+  let best = finalists[0];
+
+  // The coarse multi-start search can stop just short of a hard boundary because
+  // each step size is allowed only four coordinate sweeps.  When that happens,
+  // continue from the deterministic best candidate and give the hard constraints
+  // lexical priority until no neighbouring coordinate can reduce their violation.
+  // This pass is deliberately skipped for already-feasible solutions so normal
+  // optimizations do not pay the extra cost.
+  if (best.hardViolation > 1e-12) {
+    hardRepair: for (const fraction of [0.003, 0.001, 0.0003, 0.0001, 0.00003]) {
+      for (let sweep = 0; sweep < 64; sweep += 1) {
+        let next = best;
+        for (const key of keys) {
+          const [minimum, maximum] = bounds[key];
+          const step = Math.max((maximum - minimum) * fraction, 0.000001);
+          for (const direction of [-1, 1]) {
+            const candidate = evaluate({ ...best.drivers, [key]: best.drivers[key] + direction * step });
+            if (better(candidate, next)) next = candidate;
+          }
+        }
+        if (next === best) break;
+        best = next;
+        if (best.hardViolation <= 1e-12) break hardRepair;
+      }
+    }
+  }
   return { drivers: best.drivers, score: best.score, hardViolation: best.hardViolation, hardFeasible: best.hardViolation <= 1e-12 };
 }
 
