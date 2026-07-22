@@ -85,7 +85,11 @@ test("renders the planning model shell", async () => {
   assert.match(proposalSource, /参考値・第6次評価対象外/);
   assert.match(pageSource, /同額ペースの\{targetComparisonYears\}年単純換算/);
   assert.match(pageSource, /基準年→事業化報告3年目/);
-  assert.match(proposalSource, /計画値（基準年→事業化報告3年目・3年間）/);
+  assert.match(pageSource, /指標・第6次定義/);
+  assert.match(pageSource, /第6次定義：\{definition\.round6Formula\}/);
+  assert.match(proposalSource, /指標・第6次定義/);
+  assert.match(proposalSource, /item\.round6Formula/);
+  assert.doesNotMatch(proposalSource, /目標下限（3年間）/);
   assert.doesNotMatch(pageSource, />両方を制約</);
   assert.match(pageSource, /metricBasisRole\(key, metricGroupBases\) !== "result"/);
   assert.match(metricGroupSource, /companySalesCagr/);
