@@ -39,6 +39,9 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /ローカルベンチマーク固定値/);
   assert.match(pageSource, /固定入力・判定対象外/);
   assert.match(pageSource, /key === "investment" \|\| key === "usefulLife" \|\| key === "projectMarketGrowth"/);
+  assert.match(pageSource, /calculateScaleDependentTargetDefaults/);
+  assert.match(pageSource, /15指標の増加額5項目は固定中央値を使わず/);
+  assert.match(pageSource, /デフォルト設定後に算出/);
   assert.doesNotMatch(pageSource, /原価率改善 1\.5pt［-2～5pt］/);
   assert.match(pageSource, /5ji_median\.pdf/);
   assert.match(pageSource, /補助事業1人当たり給与支給総額の年平均上昇率/);

@@ -315,17 +315,17 @@ export const driverBounds: Record<keyof Drivers, [number, number]> = {
 
 export const metrics: MetricDefinition[] = [
   { key: "companySalesCagr", label: "全社年平均売上高成長率", unit: "%/年", round3Formula: "基準年前年→事業化報告3年目（4年CAGR）", round6Formula: "基準年→事業化報告3年目（3年CAGR）", defaultTarget: 21, rangeMax: 35, direction: "min", sourceRound: "過去中央値は第5次採択者21%（期間差に注意）" },
-  { key: "companySalesIncrease", label: "全社売上高増加額", unit: "億円", round3Formula: "事業化報告3年目 − 基準年前年", round6Formula: "事業化報告3年目 − 基準年", defaultTarget: 82.4, rangeMax: 150, direction: "min", sourceRound: "過去中央値は第5次採択者82.4億円（期間差に注意）" },
+  { key: "companySalesIncrease", label: "全社売上高増加額", unit: "億円", round3Formula: "事業化報告3年目 − 基準年前年", round6Formula: "事業化報告3年目 − 基準年", defaultTarget: 0, direction: "min", sourceRound: "全社売上高成長率の目標と基準年売上高から規模連動で設定" },
   { key: "companyPaySchedule", label: "全社の従業員1人当たり給与支給総額の年平均上昇率（最新決算期→基準年度）", unit: "%/年", round3Formula: "従業員＋役員の合算1人当たり給与支給総額：最新決算期→基準年度の年率", round6Formula: "全社の従業員1人当たり給与支給総額：最新決算期→基準年度の年平均上昇率（基準年度の常時使用する従業員数（就業時間換算）が0の場合のみ役員で代替）", defaultTarget: 3.5, rangeMax: 7, direction: "min", sourceRound: "第6次の足下賃上げ評価" },
   { key: "projectSalesShare", label: "補助事業売上高／全社売上高", unit: "%", round3Formula: "事業化報告3年目の補助事業売上高 ÷ 同年全社売上高", round6Formula: "事業化報告3年目の補助事業売上高 ÷ 同年全社売上高", defaultTarget: 70, rangeMax: 95, direction: "range", sourceRound: "第5次平均89%を参考に範囲管理" },
   { key: "projectSalesCagr", label: "補助事業年平均売上高成長率", unit: "%/年", round3Formula: "基準年→事業化報告3年目（3年CAGR）", round6Formula: "基準年→事業化報告3年目（3年CAGR）", defaultTarget: 22, rangeMax: 35, direction: "min", sourceRound: "第5次採択者中央値" },
-  { key: "projectSalesIncrease", label: "補助事業売上高増加額", unit: "億円", round3Formula: "事業化報告3年目 − 基準年", round6Formula: "事業化報告3年目 − 基準年", defaultTarget: 74.8, rangeMax: 150, direction: "min", sourceRound: "第5次採択者中央値" },
+  { key: "projectSalesIncrease", label: "補助事業売上高増加額", unit: "億円", round3Formula: "事業化報告3年目 − 基準年", round6Formula: "事業化報告3年目 − 基準年", defaultTarget: 0, direction: "min", sourceRound: "補助事業売上高成長率の目標と基準年売上高から規模連動で設定" },
   { key: "laborProductivityCagr", label: "補助事業年平均労働生産性の伸び", unit: "%/年", round3Formula: "付加価値額÷（常時使用する従業員数（就業時間換算）＋役員数）の基準年→3年目CAGR", round6Formula: "付加価値額÷（常時使用する従業員数（就業時間換算）＋役員数）の基準年→3年目CAGR", defaultTarget: 21, rangeMax: 35, direction: "min", sourceRound: "第5次採択者中央値" },
-  { key: "valueAddedIncrease", label: "補助事業付加価値増加額", unit: "億円", round3Formula: "3年目付加価値額 − 基準年付加価値額", round6Formula: "3年目付加価値額 − 基準年付加価値額", defaultTarget: 28.1, rangeMax: 50, direction: "min", sourceRound: "第5次採択者中央値" },
+  { key: "valueAddedIncrease", label: "補助事業付加価値増加額", unit: "億円", round3Formula: "3年目付加価値額 − 基準年付加価値額", round6Formula: "3年目付加価値額 − 基準年付加価値額", defaultTarget: 0, direction: "min", sourceRound: "労働生産性目標と基準年付加価値・人員計画から規模連動で設定" },
   { key: "employeePayCagr", label: "補助事業1人当たり給与支給総額の年平均上昇率", unit: "%/年", round3Formula: "従業員給与支給総額÷常時使用する従業員数（就業時間換算）の基準年度→事業化報告3年目（本モデルの最終年度）CAGR", round6Formula: "補助事業1人当たり給与支給総額の基準年度→事業化報告3年目（本モデルの最終年度）の年平均上昇率（基準年度の常時使用する従業員数（就業時間換算）が0の場合のみ役員で代替）", defaultTarget: 7, rangeMax: 10, direction: "min", sourceRound: "第6次要件は一般5.0%・100億宣言4.5%以上" },
-  { key: "employeePayIncrease", label: "補助事業従業員給与支給総額の増加額", unit: "億円", round3Formula: "3年目従業員給与総額 − 基準年総額", round6Formula: "3年目従業員給与総額 − 基準年総額", defaultTarget: 3.9, rangeMax: 7, direction: "min", sourceRound: "第5次採択者中央値" },
+  { key: "employeePayIncrease", label: "補助事業従業員給与支給総額の増加額", unit: "億円", round3Formula: "3年目従業員給与総額 − 基準年総額", round6Formula: "3年目従業員給与総額 − 基準年総額", defaultTarget: 0, direction: "min", sourceRound: "1人当たり給与上昇率目標と基準年給与・人員計画から規模連動で設定" },
   { key: "officerPayCagr", label: "年平均役員目標賃上げ率", unit: "%/年", round3Formula: "役員給与総額÷役員数の基準年→3年目CAGR", round6Formula: "役員給与総額÷役員数の基準年→3年目CAGR（参考管理）", defaultTarget: 6, rangeMax: 10, direction: "min", sourceRound: "第4次採択者中央値（第6次要件対象外）" },
-  { key: "officerPayIncrease", label: "役員給与支給総額の増加額", unit: "億円", round3Formula: "3年目役員給与総額 − 基準年総額", round6Formula: "3年目役員給与総額 − 基準年総額（参考管理）", defaultTarget: 0.1, rangeMax: 0.2, direction: "min", sourceRound: "第4次採択者中央値（第6次要件対象外）" },
+  { key: "officerPayIncrease", label: "役員給与支給総額の増加額", unit: "億円", round3Formula: "3年目役員給与総額 − 基準年総額", round6Formula: "3年目役員給与総額 − 基準年総額（参考管理）", defaultTarget: 0, direction: "min", sourceRound: "役員1人当たり給与上昇率目標と基準年報酬・役員数から規模連動で設定" },
   { key: "investmentSalesRatio", label: "投資額／全社売上高", unit: "%", round3Formula: "補助事業投資額 ÷ 最新決算期全社売上高", round6Formula: "補助事業投資額 ÷ 最新決算期全社売上高", defaultTarget: 30, rangeMax: 70, direction: "range", sourceRound: "第5次中央値61%を参考に範囲管理" },
   { key: "valueAddedSubsidyRatio", label: "付加価値増加額／補助金額", unit: "%", round3Formula: "基準年→3年目の付加価値増加額 ÷ 補助金額", round6Formula: "基準年→3年目の付加価値増加額 ÷ 補助金額", defaultTarget: 213, rangeMax: 350, direction: "min", sourceRound: "第5次採択者中央値" },
   { key: "localBenchmark", label: "ローカルベンチマーク財務分析結果", unit: "点", round3Formula: "ローカルベンチマーク入力値", round6Formula: "ローカルベンチマーク入力値", defaultTarget: 23, rangeMax: 40, direction: "min", sourceRound: "第5次採択者中央値" },
@@ -364,6 +364,43 @@ export function total(a: SegmentPlan, b: SegmentPlan): SegmentPlan {
     otherSga: a.otherSga + b.otherSga,
     headcount: a.headcount + b.headcount,
     officerCount: a.officerCount + b.officerCount,
+  };
+}
+
+export function calculateScaleDependentTargetDefaults(
+  plan: YearPlan[],
+  targets: Record<MetricKey, Target>,
+): Partial<Record<MetricKey, { value: number; max: number }>> {
+  const base = plan.find((row) => row.role === "base");
+  const report3 = plan.find((row) => row.role === "report3");
+  if (!base || !report3) return {};
+  const companyBase = total(base.project, base.other);
+  const years = Math.max(1, report3.year - base.year);
+  const increaseByRate = (baseValue: number, annualRate: number) => Math.max(0, baseValue * ((1 + annualRate / 100) ** years - 1));
+  const ratePair = (key: MetricKey) => [targets[key].value, targets[key].max ?? targets[key].value] as const;
+  const pair = (calculator: (annualRate: number) => number, rateKey: MetricKey) => {
+    const [lowerRate, upperRate] = ratePair(rateKey);
+    const value = round(calculator(lowerRate));
+    const max = round(Math.max(value, calculator(upperRate)));
+    return { value, max };
+  };
+  const projectBasePeople = base.project.headcount + base.project.officerCount;
+  const projectReportPeople = report3.project.headcount + report3.project.officerCount;
+  const baseProductivity = projectBasePeople ? valueAdded(base.project) / projectBasePeople : 0;
+  const valueAddedIncrease = (annualRate: number) => Math.max(0, baseProductivity * (1 + annualRate / 100) ** years * projectReportPeople - valueAdded(base.project));
+  const employeePayIncrease = (annualRate: number) => base.project.headcount
+    ? Math.max(0, base.project.employeePay / base.project.headcount * (1 + annualRate / 100) ** years * report3.project.headcount - base.project.employeePay)
+    : 0;
+  const officerPayIncrease = (annualRate: number) => base.project.officerCount
+    ? Math.max(0, base.project.officerPay / base.project.officerCount * (1 + annualRate / 100) ** years * report3.project.officerCount - base.project.officerPay)
+    : 0;
+
+  return {
+    companySalesIncrease: pair((rate) => increaseByRate(companyBase.sales, rate), "companySalesCagr"),
+    projectSalesIncrease: pair((rate) => increaseByRate(base.project.sales, rate), "projectSalesCagr"),
+    valueAddedIncrease: pair(valueAddedIncrease, "laborProductivityCagr"),
+    employeePayIncrease: pair(employeePayIncrease, "employeePayCagr"),
+    officerPayIncrease: pair(officerPayIncrease, "officerPayCagr"),
   };
 }
 

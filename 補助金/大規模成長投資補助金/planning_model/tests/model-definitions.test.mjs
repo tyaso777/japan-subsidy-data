@@ -28,13 +28,18 @@ test("application starts without sample company, project, balance-sheet, or driv
   assert.equal(model.sampleDrivers.investment, 45);
 });
 
-test("fourteen planning metrics have ceilings and local benchmark is a fixed reference", () => {
+test("relative planning metrics have fixed ceilings while absolute amounts are scale dependent", () => {
   assert.equal(model.metrics.length, 15);
-  for (const definition of model.metrics.filter((item) => item.key !== "localBenchmark")) {
+  const scaleDependent = new Set(["companySalesIncrease", "projectSalesIncrease", "valueAddedIncrease", "employeePayIncrease", "officerPayIncrease"]);
+  for (const definition of model.metrics.filter((item) => item.key !== "localBenchmark" && !scaleDependent.has(item.key))) {
     const target = model.defaultTargets[definition.key];
     assert.ok(Number.isFinite(target.max));
     assert.ok(target.max > target.value);
     assert.equal(model.targetStatus(definition, target.max + 1, target).ok, false);
+  }
+  for (const key of scaleDependent) {
+    assert.equal(model.defaultTargets[key].value, 0);
+    assert.equal(model.defaultTargets[key].max, undefined);
   }
   assert.equal(model.defaultTargets.localBenchmark.policy, "monitor");
   const localHardTargets = structuredClone(model.defaultTargets);
@@ -42,6 +47,24 @@ test("fourteen planning metrics have ceilings and local benchmark is a fixed ref
   localHardTargets.localBenchmark.value = 100;
   const summary = model.hardTargetSummary(model.calculateMetrics(makePlan(), model.sampleDrivers), localHardTargets);
   assert.equal(summary.hardCount, 0);
+});
+
+test("absolute-amount target defaults scale with the underlying company", () => {
+  const plan = makePlan();
+  const baseTargets = model.calculateScaleDependentTargetDefaults(plan, model.defaultTargets);
+  const doubledPlan = structuredClone(plan);
+  for (const row of doubledPlan) {
+    for (const segment of [row.project, row.other]) {
+      for (const key of ["sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga"]) segment[key] *= 2;
+    }
+  }
+  const doubledTargets = model.calculateScaleDependentTargetDefaults(doubledPlan, model.defaultTargets);
+  for (const key of ["companySalesIncrease", "projectSalesIncrease", "valueAddedIncrease", "employeePayIncrease", "officerPayIncrease"]) {
+    assert.ok(baseTargets[key].value >= 0);
+    assert.ok(baseTargets[key].max >= baseTargets[key].value);
+    assert.ok(Math.abs(doubledTargets[key].value - baseTargets[key].value * 2) < 0.02);
+    assert.ok(Math.abs(doubledTargets[key].max - baseTargets[key].max * 2) < 0.02);
+  }
 });
 
 test("sixth-round periods drive all current metrics", () => {
