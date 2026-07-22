@@ -46,7 +46,9 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /keys: \["projectMarketGrowth", "subsidy"\]/);
   assert.match(pageSource, /ローカルベンチマーク固定値/);
   assert.match(pageSource, /固定入力・判定対象外/);
-  assert.match(pageSource, /key === "investment" \|\| key === "usefulLife" \|\| key === "projectMarketGrowth"/);
+  assert.match(pageSource, /key === "investment" \|\| key === "subsidy" \|\| key === "usefulLife" \|\| key === "projectMarketGrowth"/);
+  assert.match(pageSource, /市場伸び率・補助事業投資額・申請補助金額・耐用年数は固定入力/);
+  assert.match(proposalSource, /\["investment", "subsidy", "usefulLife", "projectMarketGrowth"\]\.includes\(key\) \? undefined/);
   assert.match(pageSource, /calculateScaleDependentTargetDefaults/);
   assert.match(pageSource, /15指標の増加額5項目は固定中央値を使わず/);
   assert.match(pageSource, /デフォルト設定後に算出/);
