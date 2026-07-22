@@ -80,6 +80,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /自動算出/);
   assert.match(pageSource, /個別に目標設定/);
   assert.match(globalStyles, /metric-independent-row/);
+  assert.match(globalStyles, /targets-table thead th:nth-child\(2\), \.targets-table td:nth-child\(2\) \{ text-align: left; \}/);
   assert.match(pageSource, /14・15の役員関連2指標は第6次の評価対象外/);
   assert.match(pageSource, /reference-metric-row/);
   assert.match(proposalSource, /参考値・第6次評価対象外/);
