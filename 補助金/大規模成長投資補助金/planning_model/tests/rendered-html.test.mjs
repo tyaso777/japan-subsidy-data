@@ -40,7 +40,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /content-stack history-actuals-view/);
   assert.match(pageSource, /function roundedInput\(value: number, digits = 2\)/);
   assert.match(pageSource, /上書き内容を反映して再最適化/);
-  assert.match(pageSource, /function solveAndOpenAnnualPl\(\)/);
+  assert.match(pageSource, /15指標・目標へ戻る/);
+  assert.doesNotMatch(pageSource, /function solveAndOpenAnnualPl\(\)/);
   assert.doesNotMatch(pageSource, /toFixed\(6\)/);
   assert.match(globalStyles, /actuals-three-year-table \{ overflow-x: hidden; overflow-y: auto; \}/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
