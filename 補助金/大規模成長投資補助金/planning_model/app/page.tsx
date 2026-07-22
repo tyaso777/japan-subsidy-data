@@ -15,9 +15,6 @@ import {
   defaultBalanceSheets,
   driverBounds,
   defaultTargets,
-  sampleBalanceSheets,
-  sampleBasePlan,
-  sampleDrivers,
   Drivers,
   generatePlan,
   hardTargetSummary,
@@ -41,6 +38,7 @@ import {
   YearPlan,
 } from "./model";
 import { buildProposalHtml, buildProposalXlsx, downloadBlob, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
+import { createBaseYearLaunchSample, createStandardSampleProposal } from "./sample-proposals";
 
 type View = "summary" | "history" | "future" | "pl" | "targets" | "logic";
 
@@ -567,22 +565,13 @@ export default function Home() {
   }
 
   function loadSampleProposal() {
-    const sampleTimeline = { ...DEFAULT_TIMELINE };
-    applyProposal({
-      format: PROPOSAL_FORMAT,
-      title: "成長投資計画 提案計画サンプル",
-      exportedAt: new Date().toISOString(),
-      timeline: sampleTimeline,
-      historicalPlan: createHistoricalPlan(sampleBasePlan, sampleTimeline),
-      balanceSheets: retimeBalanceSheets(sampleBalanceSheets, sampleTimeline),
-      futureCapex: createFutureCapex(sampleTimeline, sampleDrivers.investment),
-      drivers: clone(sampleDrivers),
-      driverRanges: clone(driverBounds),
-      targets: clone(defaultTargets),
-      forecastOverrides: {},
-      futureInputBasis: "other",
-    });
+    applyProposal(createStandardSampleProposal(new Date().toISOString()));
     setFileNote("サンプル提案計画を読み込みました");
+  }
+
+  function loadBaseYearLaunchSample() {
+    applyProposal(createBaseYearLaunchSample(new Date().toISOString()).proposal);
+    setFileNote("基準年に補助事業売上を初計上するサンプルを読み込みました");
   }
 
   function updateHistorical(yearIndex: number, segment: SegmentKey, field: keyof SegmentPlan, value: number) {
@@ -800,6 +789,7 @@ export default function Home() {
           <button onClick={exportExcel}>Excel出力</button>
           <label className="proposal-import-button">HTML・Excel取込<input type="file" accept=".html,.htm,.xlsx" onChange={(event) => { void importProposal(event.target.files?.[0]); event.target.value = ""; }} /></label>
           <button className="sample-load-button" onClick={loadSampleProposal}>サンプル提案を読込</button>
+          <button className="sample-load-button" onClick={loadBaseYearLaunchSample}>基準年売上開始サンプル</button>
         </div>
         <small>{fileNote}</small>
       </section>
