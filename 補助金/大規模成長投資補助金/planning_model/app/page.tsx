@@ -40,6 +40,7 @@ import {
 } from "./model";
 import { buildProposalHtml, buildProposalXlsx, downloadBlob, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
 import { createBaseYearLaunchSample, createStandardSampleProposal } from "./sample-proposals";
+import { getInputValue, hasInputValue, inputKey, setInputValue, type InputValues } from "./input-values";
 
 type View = "summary" | "history" | "future" | "pl" | "targets" | "logic";
 
@@ -181,8 +182,6 @@ function roundedInput(value: number, digits = 2) {
 
 const integerPriority = (value: number) => Math.min(10, Math.max(1, Math.round(Number.isFinite(value) ? value : 1)));
 
-const blankableInput = (value: number) => value === 0 || !Number.isFinite(value) ? "" : roundedInput(value);
-
 function clone<T>(value: T): T {
   return structuredClone(value);
 }
@@ -199,6 +198,20 @@ type ForecastOverrides = Record<string, number>;
 type FutureInputBasis = "company" | "other";
 type ForecastSegment = SegmentKey | "company";
 const forecastOverrideKey = (year: number, segment: ForecastSegment, item: string) => `${year}:${segment}:${item}`;
+
+function createInitialInputValues(): InputValues {
+  let values: InputValues = {};
+  for (const definition of metrics) {
+    if (definition.key === "localBenchmark" || scaleDependentMetricKeys.has(definition.key)) continue;
+    values = setInputValue(values, inputKey.target(definition.key, "value"), defaultTargets[definition.key].value);
+    if (defaultTargets[definition.key].max !== undefined) values = setInputValue(values, inputKey.target(definition.key, "max"), defaultTargets[definition.key].max!);
+  }
+  for (const key of Object.keys(driverBounds) as (keyof Drivers)[]) {
+    values = setInputValue(values, inputKey.driverRange(key, 0), driverBounds[key][0]);
+    values = setInputValue(values, inputKey.driverRange(key, 1), driverBounds[key][1]);
+  }
+  return values;
+}
 
 function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, inputBasis: FutureInputBasis) {
   const result = clone(plan);
@@ -488,6 +501,7 @@ export default function Home() {
   const [drivers, setDrivers] = useState<Drivers>({ ...defaultDrivers });
   const [driverRanges, setDriverRanges] = useState<Record<keyof Drivers, [number, number]>>(() => clone(driverBounds));
   const [targets, setTargets] = useState<Record<MetricKey, Target>>(clone(defaultTargets));
+  const [inputValues, setInputValues] = useState<InputValues>(() => createInitialInputValues());
   const [forecastOverrides, setForecastOverrides] = useState<ForecastOverrides>({});
   const [futureInputBasis, setFutureInputBasis] = useState<FutureInputBasis>("other");
   const projectPeriodInputs = useMemo(
@@ -516,9 +530,10 @@ export default function Home() {
     [historicalPlan, balanceSheets],
   );
   const validations = useMemo(() => validatePlan(plan, calculationDrivers), [plan, calculationDrivers]);
-  const hardSummary = useMemo(() => hardTargetSummary(actual, targets), [actual, targets]);
+  const optimizationTargets = useMemo(() => Object.fromEntries((Object.keys(targets) as MetricKey[]).map((key) => [key, hasInputValue(inputValues, inputKey.target(key, "value")) ? targets[key] : { ...targets[key], policy: "monitor", max: undefined }])) as Record<MetricKey, Target>, [targets, inputValues]);
+  const hardSummary = useMemo(() => hardTargetSummary(actual, optimizationTargets), [actual, optimizationTargets]);
   const targetManagedMetrics = metrics.filter((definition) => definition.key !== "localBenchmark");
-  const achieved = targetManagedMetrics.filter((definition) => targetStatus(definition, actual[definition.key], targets[definition.key]).ok).length;
+  const achieved = targetManagedMetrics.filter((definition) => hasInputValue(inputValues, inputKey.target(definition.key, "value")) && targetStatus(definition, actual[definition.key], targets[definition.key]).ok).length;
   const report3 = plan.find((row) => row.role === "report3")!;
 
   function clearAdjustment() {
@@ -541,6 +556,7 @@ export default function Home() {
       targets: clone(targets),
       forecastOverrides: clone(forecastOverrides),
       futureInputBasis,
+      inputValues: clone(inputValues),
     };
   }
 
@@ -597,6 +613,31 @@ export default function Home() {
     setTargets(Object.fromEntries(Object.entries(proposal.targets).map(([key, target]) => [key, { ...target, max: target.max ?? defaultTargets[key as MetricKey].max, weight: integerPriority(target.weight) }])) as Record<MetricKey, Target>);
     setForecastOverrides(clone(proposal.forecastOverrides ?? {}));
     setFutureInputBasis(proposal.futureInputBasis ?? "other");
+    if (proposal.inputValues) {
+      setInputValues(clone(proposal.inputValues));
+    } else {
+      // Legacy v1 files had numeric models only.  Treat their saved cells as
+      // explicitly entered because the old format cannot recover blanks.
+      let inferred = createInitialInputValues();
+      proposal.historicalPlan.forEach((row) => {
+        companyActualInputRows.filter((item) => item.set).forEach((item) => { inferred[inputKey.companyActual(row.year, item.code)] = roundedInput(item.get(proposal.historicalPlan, proposal.historicalPlan.indexOf(row)) ?? 0); });
+        projectOfficialInputRows.forEach((item) => { inferred[inputKey.projectActual(row.year, item.code)] = roundedInput(item.get(row.project)); });
+      });
+      proposal.balanceSheets.forEach((row) => {
+        (Object.keys(row) as (keyof BalanceSheetPlan)[]).filter((field) => field !== "year").forEach((field) => { inferred[inputKey.balanceSheet(row.year, field)] = roundedInput(row[field]); });
+      });
+      proposal.futureCapex.forEach((row) => { inferred[inputKey.futureCapex(row.year)] = roundedInput(row.value); });
+      (Object.keys(importedDrivers) as (keyof Drivers)[]).forEach((key) => {
+        inferred[inputKey.driver(key)] = importedDrivers[key];
+        inferred[inputKey.driverRange(key, 0)] = importedRanges[key][0];
+        inferred[inputKey.driverRange(key, 1)] = importedRanges[key][1];
+      });
+      (Object.keys(proposal.targets) as MetricKey[]).forEach((key) => {
+        inferred[inputKey.target(key, "value")] = roundedInput(proposal.targets[key].value);
+        if (proposal.targets[key].max !== undefined) inferred[inputKey.target(key, "max")] = roundedInput(proposal.targets[key].max!);
+      });
+      setInputValues(inferred);
+    }
     setDefaultNote("");
     setHistoricalDefaultsApplied(false);
     setFileNote("提案計画を取り込みました");
@@ -634,37 +675,47 @@ export default function Home() {
     }));
   }
 
-  function updateHistoricalProjectOfficial(yearIndex: number, item: ProjectOfficialInputRow, inputValue: number) {
+  function updateHistoricalProjectOfficial(yearIndex: number, item: ProjectOfficialInputRow, inputValue: number | null) {
     clearAdjustment();
+    setInputValues((current) => setInputValue(current, inputKey.projectActual(historicalPlan[yearIndex].year, item.code), inputValue === null ? null : roundedInput(inputValue)));
     setHistoricalPlan((current) => current.map((row, index) => {
       if (index !== yearIndex) return row;
-      const [field, value] = item.set(row.project, roundedInput(inputValue));
+      const [field, value] = item.set(row.project, roundedInput(inputValue ?? 0));
       const companyValue = row.project[field] + row.other[field];
       const roundedValue = roundedInput(value);
       return { ...row, project: { ...row.project, [field]: roundedValue }, other: { ...row.other, [field]: roundedInput(companyValue - roundedValue) } };
     }));
   }
 
-  function updateHistoricalCompanyOfficial(yearIndex: number, item: CompanyActualInputRow, inputValue: number) {
+  function updateHistoricalCompanyOfficial(yearIndex: number, item: CompanyActualInputRow, inputValue: number | null) {
     if (!item.set) return;
     clearAdjustment();
+    setInputValues((current) => setInputValue(current, inputKey.companyActual(historicalPlan[yearIndex].year, item.code), inputValue === null ? null : roundedInput(inputValue)));
     setHistoricalPlan((current) => current.map((row, index) => {
       if (index !== yearIndex) return row;
-      const [field, residual] = item.set!(row, roundedInput(inputValue));
+      const [field, residual] = item.set!(row, roundedInput(inputValue ?? 0));
       return { ...row, other: { ...row.other, [field]: roundedInput(residual) } };
     }));
   }
 
-  function updateBalanceSheet(yearIndex: number, field: keyof BalanceSheetPlan, value: number) {
+  function updateBalanceSheet(yearIndex: number, field: keyof BalanceSheetPlan, value: number | null) {
     clearAdjustment();
-    setBalanceSheets((current) => current.map((row, index) => index === yearIndex ? { ...row, [field]: roundedInput(value) } : row));
+    setInputValues((current) => setInputValue(current, inputKey.balanceSheet(balanceSheets[yearIndex].year, field), value === null ? null : roundedInput(value)));
+    setBalanceSheets((current) => current.map((row, index) => index === yearIndex ? { ...row, [field]: roundedInput(value ?? 0) } : row));
   }
 
-  function updateFutureCapex(yearIndex: number, value: number) {
+  function updateFutureCapex(yearIndex: number, value: number | null) {
     clearAdjustment();
     setFutureCapex((current) => {
-      const next = current.map((row, index) => index === yearIndex ? { ...row, value: roundedInput(value) } : row);
-      setDrivers((driver) => ({ ...driver, investment: roundedInput(next.reduce((sum, row) => sum + row.value, 0)) }));
+      const next = current.map((row, index) => index === yearIndex ? { ...row, value: roundedInput(value ?? 0) } : row);
+      const investment = roundedInput(next.reduce((sum, row) => sum + row.value, 0));
+      setDrivers((driver) => ({ ...driver, investment }));
+      setInputValues((values) => {
+        let updated = setInputValue(values, inputKey.futureCapex(next[yearIndex].year), value === null ? null : roundedInput(value));
+        const anyCapexEntered = next.some((row) => hasInputValue(updated, inputKey.futureCapex(row.year)));
+        updated = setInputValue(updated, inputKey.driver("investment"), anyCapexEntered ? investment : null);
+        return updated;
+      });
       return next;
     });
   }
@@ -673,10 +724,36 @@ export default function Home() {
     clearAdjustment();
     const next = normalizeTimeline({ ...timeline, ...patch });
     const nextHistorical = retimeHistoricalPlan(historicalPlan, next);
+    const nextBalanceSheets = retimeBalanceSheets(balanceSheets, next);
+    const nextFutureCapex = createFutureCapex(next, futureCapex.reduce((sum, row) => sum + row.value, 0));
+    setInputValues((current) => {
+      const remapped: InputValues = Object.fromEntries(Object.entries(current).filter(([key]) => !key.startsWith("actual:") && !key.startsWith("balance-sheet:") && !key.startsWith("future-capex:")));
+      historicalPlan.forEach((oldRow, index) => {
+        const newRow = nextHistorical[index];
+        companyActualInputRows.filter((item) => item.set).forEach((item) => {
+          const oldKey = inputKey.companyActual(oldRow.year, item.code);
+          if (hasInputValue(current, oldKey)) remapped[inputKey.companyActual(newRow.year, item.code)] = current[oldKey];
+        });
+        projectOfficialInputRows.forEach((item) => {
+          const oldKey = inputKey.projectActual(oldRow.year, item.code);
+          if (hasInputValue(current, oldKey)) remapped[inputKey.projectActual(newRow.year, item.code)] = current[oldKey];
+        });
+        (Object.keys(balanceSheets[index]) as (keyof BalanceSheetPlan)[]).filter((field) => field !== "year").forEach((field) => {
+          const oldKey = inputKey.balanceSheet(balanceSheets[index].year, field);
+          if (hasInputValue(current, oldKey)) remapped[inputKey.balanceSheet(nextBalanceSheets[index].year, field)] = current[oldKey];
+        });
+      });
+      futureCapex.forEach((oldRow, index) => {
+        if (!nextFutureCapex[index]) return;
+        const oldKey = inputKey.futureCapex(oldRow.year);
+        if (hasInputValue(current, oldKey)) remapped[inputKey.futureCapex(nextFutureCapex[index].year)] = current[oldKey];
+      });
+      return remapped;
+    });
     setTimeline(next);
     setHistoricalPlan(nextHistorical);
-    setBalanceSheets((current) => retimeBalanceSheets(current, next));
-    setFutureCapex((current) => createFutureCapex(next, current.reduce((sum, row) => sum + row.value, 0)));
+    setBalanceSheets(nextBalanceSheets);
+    setFutureCapex(nextFutureCapex);
     setForecastOverrides({});
   }
 
@@ -701,15 +778,32 @@ export default function Home() {
     setTargets((current) => ({ ...current, [key]: { ...current[key], ...patch } }));
   }
 
-  function updateDriver(key: keyof Drivers, value: number) {
+  function updateTargetBound(key: MetricKey, bound: "value" | "max", value: number | null) {
     clearAdjustment();
-    setDrivers((current) => ({ ...current, [key]: value }));
-    if (key === "investment") setFutureCapex(createFutureCapex(timeline, value));
+    setInputValues((current) => setInputValue(current, inputKey.target(key, bound), value === null ? null : roundedInput(value)));
+    setTargets((current) => ({
+      ...current,
+      [key]: { ...current[key], [bound]: value === null ? (bound === "max" ? undefined : 0) : roundedInput(value) },
+    }));
   }
 
-  function updateDriverRange(key: keyof Drivers, boundIndex: 0 | 1, displayValue: number) {
+  function updateDriver(key: keyof Drivers, value: number | null) {
     clearAdjustment();
-    const value = percentDriver(key) ? displayValue / 100 : displayValue;
+    const numericValue = value ?? 0;
+    setInputValues((current) => setInputValue(current, inputKey.driver(key), value === null ? null : numericValue));
+    setDrivers((current) => ({ ...current, [key]: numericValue }));
+    if (key === "investment") {
+      const capex = createFutureCapex(timeline, numericValue);
+      setFutureCapex(capex);
+      setInputValues((current) => capex.reduce((next, row) => setInputValue(next, inputKey.futureCapex(row.year), value === null ? null : roundedInput(row.value)), current));
+    }
+  }
+
+  function updateDriverRange(key: keyof Drivers, boundIndex: 0 | 1, displayValue: number | null) {
+    clearAdjustment();
+    const fallback = driverBounds[key][boundIndex];
+    const value = displayValue === null ? fallback : percentDriver(key) ? displayValue / 100 : displayValue;
+    setInputValues((current) => setInputValue(current, inputKey.driverRange(key, boundIndex), displayValue === null ? null : value));
     setDriverRanges((current) => {
       const next: [number, number] = [...current[key]];
       next[boundIndex] = value;
@@ -722,14 +816,16 @@ export default function Home() {
     const nextRanges = clone(driverRanges);
     const clamp = (value: number, lower: number, upper: number) => Math.min(upper, Math.max(lower, value));
 
-    nextDrivers.projectMarketGrowth = drivers.projectMarketGrowth || 0.05;
-    nextDrivers.usefulLife = drivers.usefulLife || 10;
+    nextDrivers.projectMarketGrowth = hasInputValue(inputValues, inputKey.driver("projectMarketGrowth")) ? drivers.projectMarketGrowth : 0.05;
+    nextDrivers.usefulLife = hasInputValue(inputValues, inputKey.driver("usefulLife")) ? drivers.usefulLife : 10;
     const enteredInvestment = futureCapex.reduce((sum, row) => sum + row.value, 0);
+    const capexEntered = futureCapex.some((row) => hasInputValue(inputValues, inputKey.futureCapex(row.year)));
+    const investmentEntered = capexEntered || hasInputValue(inputValues, inputKey.driver("investment"));
     const historicalCapex = balanceSheets.map((row) => row.capex).filter((value) => Number.isFinite(value) && value > 0);
     const annualHistoricalCapex = historicalCapex.length ? historicalCapex.reduce((sum, value) => sum + value, 0) / historicalCapex.length : 0;
     const estimatedInvestment = annualHistoricalCapex * Math.max(1, timeline.baseYear - timeline.latestYear);
-    nextDrivers.investment = enteredInvestment || drivers.investment || clamp(estimatedInvestment || 15, driverBounds.investment[0], driverBounds.investment[1]);
-    nextDrivers.subsidy = drivers.subsidy || clamp(nextDrivers.investment / 3, driverBounds.subsidy[0], driverBounds.subsidy[1]);
+    nextDrivers.investment = investmentEntered ? (capexEntered ? enteredInvestment : drivers.investment) : clamp(estimatedInvestment || 15, driverBounds.investment[0], driverBounds.investment[1]);
+    nextDrivers.subsidy = hasInputValue(inputValues, inputKey.driver("subsidy")) ? drivers.subsidy : clamp(nextDrivers.investment / 3, driverBounds.subsidy[0], driverBounds.subsidy[1]);
 
     for (const key of adjustableDriverKeys) {
       const history = historicalDriverSeries[key];
@@ -825,7 +921,24 @@ export default function Home() {
       }
       return next;
     });
-    if (!enteredInvestment) setFutureCapex(createFutureCapex(timeline, nextDrivers.investment));
+    const nextCapex = investmentEntered ? futureCapex : createFutureCapex(timeline, nextDrivers.investment);
+    if (!investmentEntered) setFutureCapex(nextCapex);
+    setInputValues((current) => {
+      let next = { ...current };
+      for (const key of Object.keys(nextDrivers) as (keyof Drivers)[]) {
+        if (key !== "localBenchmark") next = setInputValue(next, inputKey.driver(key), nextDrivers[key]);
+      }
+      for (const key of Object.keys(nextRanges) as (keyof Drivers)[]) {
+        next = setInputValue(next, inputKey.driverRange(key, 0), nextRanges[key][0]);
+        next = setInputValue(next, inputKey.driverRange(key, 1), nextRanges[key][1]);
+      }
+      for (const [key, values] of Object.entries(scaleDependentTargets) as [MetricKey, { value: number; max: number }][]) {
+        next = setInputValue(next, inputKey.target(key, "value"), roundedInput(values.value));
+        next = setInputValue(next, inputKey.target(key, "max"), roundedInput(values.max));
+      }
+      for (const row of nextCapex) next = setInputValue(next, inputKey.futureCapex(row.year), roundedInput(row.value));
+      return next;
+    });
     setHistoricalDefaultsApplied(true);
     setDefaultNote("すべての計画初期値を設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目は保守的な補完値を使用しています。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。その他事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を1.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、耐用年数は10年、市場伸び率は5%で仮置きしています。");
   }
@@ -839,12 +952,12 @@ export default function Home() {
       return [key, [Math.min(first, second), Math.max(first, second)]];
     })) as Record<keyof Drivers, [number, number]>;
     const planTransform = (candidate: YearPlan[]) => applyForecastOverrides(candidate, forecastOverrides, futureInputBasis);
-    const before = objective(startDrivers, startDrivers, sourceHistorical, timeline, targets, periodInput, sourcePlan, optimizationBounds, true, planTransform);
-    const result = optimizeDrivers(startDrivers, sourceHistorical, timeline, targets, periodInput, sourcePlan, optimizationBounds, true, planTransform);
+    const before = objective(startDrivers, startDrivers, sourceHistorical, timeline, optimizationTargets, periodInput, sourcePlan, optimizationBounds, true, planTransform);
+    const result = optimizeDrivers(startDrivers, sourceHistorical, timeline, optimizationTargets, periodInput, sourcePlan, optimizationBounds, true, planTransform);
     const solvedPeriodInput = createForecastProjectPeriodInputs(sourceHistorical[2], result.drivers, timeline);
     const solvedPlan = applyForecastOverrides(generatePlan(sourceHistorical, result.drivers, timeline, solvedPeriodInput), forecastOverrides, futureInputBasis);
     const solvedActual = calculateMetrics(solvedPlan, result.drivers);
-    const failed = hardTargetSummary(solvedActual, targets).failed;
+    const failed = hardTargetSummary(solvedActual, optimizationTargets).failed;
     setAdjustedDrivers(result.drivers);
     setAdjustedPlan(solvedPlan);
     const scoreDrop = before > 0 ? Math.max(0, (1 - result.score / before) * 100) : 0;
@@ -898,7 +1011,7 @@ export default function Home() {
 
           <div className="stat-card"><span>全社売上高</span><strong>{number(total(report3.project, report3.other).sales)} 億円</strong><small>事業化報告3年目 {report3.year}</small></div>
           <div className="stat-card"><span>補助事業付加価値増加</span><strong>{number(actual.valueAddedIncrease)} 億円</strong><small>基準年比</small></div>
-          <div className="stat-card"><span>補助金1円当たり効果</span><strong>{number(actual.valueAddedSubsidyRatio, 0)}%</strong><small>目標 {number(targets.valueAddedSubsidyRatio.value, 0)}%</small></div>
+          <div className="stat-card"><span>補助金1円当たり効果</span><strong>{number(actual.valueAddedSubsidyRatio, 0)}%</strong><small>{hasInputValue(inputValues, inputKey.target("valueAddedSubsidyRatio", "value")) ? `目標 ${number(targets.valueAddedSubsidyRatio.value, 0)}%` : "目標 未設定"}</small></div>
 
           <DiagnosticCharts plan={plan} />
           <BehaviorChangeTable plan={plan} balanceSheets={balanceSheets} futureCapex={futureCapex} timeline={timeline} />
@@ -911,12 +1024,13 @@ export default function Home() {
                 const target = targets[definition.key];
                 const status = targetStatus(definition, actual[definition.key], target);
                 const fixedInput = definition.key === "localBenchmark";
+                const targetSet = hasInputValue(inputValues, inputKey.target(definition.key, "value"));
                 return (
                   <div className="metric-row" key={definition.key}>
-                    <span className={`status-dot ${fixedInput || status.ok ? "ok" : target.policy === "hard" ? "bad" : "warn"}`} />
+                    <span className={`status-dot ${fixedInput || !targetSet || status.ok ? "ok" : target.policy === "hard" ? "bad" : "warn"}`} />
                     <div><strong>{definition.label}</strong><small>{definition.sourceRound}</small></div>
                     <span className="metric-value">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key])} →</small>}{number(actual[definition.key])}{definition.unit}</span>
-                    <span className="metric-target">{fixedInput ? "固定入力・判定対象外" : `目標 ${number(target.value)}${definition.unit}`}</span>
+                    <span className="metric-target">{fixedInput ? "固定入力・判定対象外" : targetSet ? `目標 ${number(target.value)}${definition.unit}` : "目標 未設定"}</span>
                   </div>
                 );
               })}
@@ -942,7 +1056,7 @@ export default function Home() {
       {view === "history" && (
         <section className="content-stack history-actuals-view">
           <div className="section-intro"><div><p className="eyebrow">STEP 1 / ACTUALS</p><h2>過去3期の実績を入力</h2></div><p>まずB/S、会社全体PL、補助事業PLの過去3期を入力します。その他事業の過去実績は「全社－補助事業」で自動算出します。</p></div>
-          <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。直前の変更はCtrl＋Zで戻せます。</p>
+          <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。空欄は未設定、0は明示的なゼロとして区別して保存します。直前の変更はCtrl＋Zで戻せます。</p>
           <article className="panel">
             <div className="panel-heading"><div><p className="card-kicker">APPLICATION PERIOD</p><h2>申請書の年度設定</h2></div><span className="pill">過去3期＋将来{timeline.baseYear + 3 - timeline.latestYear}期</span></div>
             <div className="driver-grid timeline-grid">
@@ -953,7 +1067,7 @@ export default function Home() {
           </article>
           <article className="panel table-panel">
             <div className="panel-heading"><div><p className="card-kicker">ROUND 6 / B/S REQUIRED INPUT</p><h2>1-1～1-25 貸借対照表等（過去3期）</h2></div><span className="pill green">公式番号に準拠</span></div>
-            <BalanceSheetEditor balanceSheets={balanceSheets} historical={historicalPlan} onChange={updateBalanceSheet} />
+            <BalanceSheetEditor balanceSheets={balanceSheets} historical={historicalPlan} inputValues={inputValues} onChange={updateBalanceSheet} />
             <p className="footnote">B/S残高の1-1～1-23・1-25と、過去実績の1-24を入力します。将来の1-24 新規設備投資による支出は「将来データ入力」の冒頭へ移しました。金額単位は億円です。</p>
           </article>
           <article className="panel formula-panel">
@@ -961,7 +1075,7 @@ export default function Home() {
             <code>設備投資 → 固定資産 → 減価償却費（P/L）　／　借入金 → 支払利息 → 経常利益（P/L）</code>
             <p>実務上は連動しますが、第6次の公式Excel自体はB/S残高から減価償却費や支払利息を自動算定していません。公式上の直接参照は主に、P/LのEBITDAを使う1-25 EBITDA有利子負債倍率です。本モデルでも、過去B/Sを入力しただけで手入力P/Lを上書きしません。将来の減価償却費・支払利息まで自動連動させるには、次段階で「固定資産台帳」と「借入返済表」を年度別に設けます。</p>
           </article>
-          <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">PL ACTUALS</p><h2>会社全体PL・補助事業PL（過去3期）</h2></div><span className="pill green">必須手入力</span></div><HistoricalInputsEditor historical={historicalPlan} onHistoricalCompanyChange={updateHistoricalCompanyOfficial} onHistoricalProjectChange={updateHistoricalProjectOfficial} /></article>
+          <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">PL ACTUALS</p><h2>会社全体PL・補助事業PL（過去3期）</h2></div><span className="pill green">必須手入力</span></div><HistoricalInputsEditor historical={historicalPlan} inputValues={inputValues} onHistoricalCompanyChange={updateHistoricalCompanyOfficial} onHistoricalProjectChange={updateHistoricalProjectOfficial} /></article>
           <div className="workflow-actions"><span>過去実績を入力できたら、次に現実的な将来水準を設定します。</span><button className="solve-button" onClick={() => goToView("targets")}>15指標・目標へ →</button></div>
         </section>
       )}
@@ -970,8 +1084,8 @@ export default function Home() {
         <section className="content-stack">
           <div className="section-intro"><div><p className="eyebrow">STEP 3 / FORECAST INPUT</p><h2>自動予測を確認し、必要なセルだけ上書き</h2></div><p>青枠の空欄には、過去実績と「15指標・目標」の調整水準から計算した値を表示します。入力したセルは太字で固定し、それ以降の空欄年度を再予測します。</p></div>
           <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。直前の変更はCtrl＋Zで戻せます。</p>
-          <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">ROUND 6 / FUTURE CAPEX</p><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">将来合計 {number(futureCapex.reduce((sum, row) => sum + row.value, 0), 2)} 億円</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。将来各年度の入力合計は「15指標・目標」の補助事業投資額と連動し、投資額／全社売上高や将来減価償却費の自動予測へ反映します。</p></article>
-          <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">PL FORECAST</p><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>全社PLとその他事業PLのどちらか一方だけを入力します</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>その他事業PLを入力</button></div></div><FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} futureInputBasis={futureInputBasis} onForecastChange={updateForecastOverride} /><p className="footnote">補助事業PLは共通です。「全社PLを入力」ではその他事業PLを差額計算し、「その他事業PLを入力」では全社PLを合算計算します。</p></article>
+          <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">ROUND 6 / FUTURE CAPEX</p><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">将来合計 {number(futureCapex.reduce((sum, row) => sum + row.value, 0), 2)} 億円</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} inputValues={inputValues} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。将来各年度の入力合計は「15指標・目標」の補助事業投資額と連動し、投資額／全社売上高や将来減価償却費の自動予測へ反映します。</p></article>
+          <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">PL FORECAST</p><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>全社PLとその他事業PLのどちらか一方だけを入力します</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>その他事業PLを入力</button></div></div><FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} onForecastChange={updateForecastOverride} /><p className="footnote">補助事業PLは共通です。「全社PLを入力」ではその他事業PLを差額計算し、「その他事業PLを入力」では全社PLを合算計算します。</p></article>
           <div className="workflow-actions"><div><span>上書きしたセルを固定して再最適化できます。再最適化後もこの画面に留まります。</span>{adjustedPlan && <p className="solve-note">{solveNote}</p>}</div><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("targets")}>← 15指標・目標へ戻る</button><button className="solve-button" onClick={solve}>上書き内容を反映して再最適化</button><button className="reset-button" onClick={() => goToView("pl")}>年度別PLへ →</button></div></div>
         </section>
       )}
@@ -1000,9 +1114,13 @@ export default function Home() {
                 const noRange = key === "investment" || key === "usefulLife" || key === "projectMarketGrowth";
                 const history = historicalDriverSeries[key];
                 const inputValue = percentDriver(key) ? Number((drivers[key] * 100).toFixed(2)) : drivers[key];
-                const displayedInputValue = historicalDefaultsApplied ? roundedInput(Math.abs(inputValue) < 1e-9 ? 0 : inputValue) : blankableInput(inputValue);
+                const rawDriverValue = getInputValue(inputValues, inputKey.driver(key));
+                const displayedInputValue = rawDriverValue === "" ? "" : roundedInput(percentDriver(key) ? rawDriverValue * 100 : rawDriverValue);
                 const resultValue = adjustedDrivers ? (percentDriver(key) ? adjustedDrivers[key] * 100 : adjustedDrivers[key]) : null;
-                const rangeValues = driverRanges[key].map((value) => percentDriver(key) ? Number((value * 100).toFixed(2)) : value) as [number, number];
+                const rangeValues = ([0, 1] as const).map((bound) => {
+                  const raw = getInputValue(inputValues, inputKey.driverRange(key, bound));
+                  return raw === "" ? "" : roundedInput(percentDriver(key) ? raw * 100 : raw);
+                }) as [number | "", number | ""];
                 const rangeOrdered = driverRanges[key][0] <= driverRanges[key][1];
                 const rangeValid = noRange || (rangeOrdered && drivers[key] >= driverRanges[key][0] && drivers[key] <= driverRanges[key][1]);
                 const rangeStatus = noRange ? "入力値を固定" : !rangeOrdered ? "下限＞上限" : movable ? rangeValid ? "範囲内で調整" : "初期値が範囲外" : rangeValid ? "入力値を固定" : "固定値が範囲外";
@@ -1014,7 +1132,7 @@ export default function Home() {
                     return <td className="driver-history driver-rate-history" key={`${key}-${historicalPlan[index].year}`}><strong>{improvementLabel}</strong><small>当期率 {number(referenceLevel * 100, 2)}%</small></td>;
                   }
                   return <td className="driver-history" key={`${key}-${historicalPlan[index].year}`}>{Number.isFinite(value) ? <><strong>{number(percentDriver(key) ? value * 100 : value, 2)}</strong><small>{history.mode === "change" ? `${historicalPlan[index - 1]?.year}→${historicalPlan[index].year}` : info.unit}</small></> : "—"}</td>;
-                })}<td><span className="driver-values"><input type="number" step={info.step} value={displayedInputValue} placeholder="未設定" onChange={(event) => updateDriver(key, event.target.value === "" ? 0 : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))} />{resultValue !== null && <small className="adjusted-value">→ {number(resultValue, 2)}</small>}</span></td><td>{noRange ? <span className="no-range">—</span> : <input type="number" step={info.step} value={rangeValues[0]} onChange={(event) => updateDriverRange(key, 0, Number(event.target.value))} />}</td><td>{noRange ? <span className="no-range">—</span> : <input type="number" step={info.step} value={rangeValues[1]} onChange={(event) => updateDriverRange(key, 1, Number(event.target.value))} />}</td><td><span className={`driver-policy ${rangeValid ? "" : "out-of-range"}`}>{rangeStatus}</span></td></tr>;
+                })}<td><span className="driver-values"><input type="number" step={info.step} value={displayedInputValue} placeholder="未設定" onChange={(event) => updateDriver(key, event.target.value === "" ? null : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))} />{resultValue !== null && <small className="adjusted-value">→ {number(resultValue, 2)}</small>}</span></td><td>{noRange ? <span className="no-range">—</span> : <input type="number" step={info.step} value={rangeValues[0]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />}</td><td>{noRange ? <span className="no-range">—</span> : <input type="number" step={info.step} value={rangeValues[1]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />}</td><td><span className={`driver-policy ${rangeValid ? "" : "out-of-range"}`}>{rangeStatus}</span></td></tr>;
               }),
               ])}
             </tbody></table></div>
@@ -1027,10 +1145,11 @@ export default function Home() {
               {metrics.map((definition, index) => {
                 const target = targets[definition.key];
                 const status = targetStatus(definition, actual[definition.key], target);
+                const targetSet = hasInputValue(inputValues, inputKey.target(definition.key, "value"));
                 const history = historicalMetricSeries[definition.key];
                 const scaleDependent = scaleDependentMetricKeys.has(definition.key);
-                if (definition.key === "localBenchmark") return <tr className="fixed-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small>外部で算出した点数を転記する固定値</small></td>{history.values.map((_value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>—</td>)}<td><input aria-label="ローカルベンチマーク固定値" type="number" step="1" value={blankableInput(drivers.localBenchmark)} placeholder="未入力" onChange={(event) => updateDriver("localBenchmark", event.target.value === "" ? 0 : Number(event.target.value))} /></td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="driver-policy">入力値を固定</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">判定対象外</span></td></tr>;
-                return <tr key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small>{definition.sourceRound}</small></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{history.mode === "change" ? `${historicalPlan[historyIndex - 1]?.year}→${historicalPlan[historyIndex].year}／${definition.unit}` : definition.unit}</small></> : "—"}</td>)}<td className="numeric">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key])} →</small>}{number(actual[definition.key])} {definition.unit}</td><td><input aria-label={`${definition.label}目標下限`} type="number" step="0.1" value={scaleDependent ? blankableInput(target.value) : target.value} placeholder={scaleDependent ? "デフォルト設定後に算出" : undefined} onChange={(event) => updateTarget(definition.key, { value: Number(event.target.value) })} /></td><td><input aria-label={`${definition.label}計画上限`} type="number" step="0.1" value={target.max ?? ""} placeholder={scaleDependent ? "デフォルト設定後に算出" : undefined} onChange={(event) => updateTarget(definition.key, { max: event.target.value === "" ? undefined : Number(event.target.value) })} /></td><td><select value={target.policy} onChange={(event) => updateTarget(definition.key, { policy: event.target.value as Target["policy"] })}><option value="hard">必達</option><option value="soft">努力</option><option value="monitor">参考</option></select></td><td><input type="number" min="1" max="10" step="1" value={integerPriority(target.weight)} onChange={(event) => updateTarget(definition.key, { weight: integerPriority(Number(event.target.value)) })} /></td><td><span className={`result-badge ${status.ok ? "ok" : target.policy === "hard" ? "bad" : "warn"}`}>{status.ok ? "範囲内" : target.policy === "hard" ? "必達範囲外" : "範囲外"}</span></td></tr>;
+                if (definition.key === "localBenchmark") return <tr className="fixed-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small>外部で算出した点数を転記する固定値</small></td>{history.values.map((_value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>—</td>)}<td><input aria-label="ローカルベンチマーク固定値" type="number" step="1" value={getInputValue(inputValues, inputKey.driver("localBenchmark"))} placeholder="未入力" onChange={(event) => updateDriver("localBenchmark", event.target.value === "" ? null : Number(event.target.value))} /></td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="driver-policy">入力値を固定</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">判定対象外</span></td></tr>;
+                return <tr key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small>{definition.sourceRound}</small></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{history.mode === "change" ? `${historicalPlan[historyIndex - 1]?.year}→${historicalPlan[historyIndex].year}／${definition.unit}` : definition.unit}</small></> : "—"}</td>)}<td className="numeric">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key])} →</small>}{number(actual[definition.key])} {definition.unit}</td><td><input aria-label={`${definition.label}目標下限`} type="number" step="0.1" value={getInputValue(inputValues, inputKey.target(definition.key, "value"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "value", event.target.value === "" ? null : Number(event.target.value))} /></td><td><input aria-label={`${definition.label}計画上限`} type="number" step="0.1" value={getInputValue(inputValues, inputKey.target(definition.key, "max"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "max", event.target.value === "" ? null : Number(event.target.value))} /></td><td><select value={target.policy} onChange={(event) => updateTarget(definition.key, { policy: event.target.value as Target["policy"] })}><option value="hard">必達</option><option value="soft">努力</option><option value="monitor">参考</option></select></td><td><input type="number" min="1" max="10" step="1" value={integerPriority(target.weight)} onChange={(event) => updateTarget(definition.key, { weight: integerPriority(Number(event.target.value)) })} /></td><td><span className={`result-badge ${!targetSet || status.ok ? "ok" : target.policy === "hard" ? "bad" : "warn"}`}>{!targetSet ? "未設定" : status.ok ? "範囲内" : target.policy === "hard" ? "必達範囲外" : "範囲外"}</span></td></tr>;
               })}
             </tbody></table></div>
             <p className="footnote">成長率・増加額は2024列と2025列に直前期からの変化を表示します。補助事業売上構成比と投資額比率は、前々期・前期・最新期それぞれの水準です。ローカルベンチマークは外部で算出した点数の固定入力であり、目標判定・最適化・PL計算の対象外です。</p>
@@ -1096,7 +1215,7 @@ export default function Home() {
 
 type BalanceSheetField = Exclude<keyof BalanceSheetPlan, "year">;
 
-function BalanceSheetEditor({ balanceSheets, historical, onChange }: { balanceSheets: BalanceSheetPlan[]; historical: YearPlan[]; onChange: (yearIndex: number, field: keyof BalanceSheetPlan, value: number) => void }) {
+function BalanceSheetEditor({ balanceSheets, historical, inputValues, onChange }: { balanceSheets: BalanceSheetPlan[]; historical: YearPlan[]; inputValues: InputValues; onChange: (yearIndex: number, field: keyof BalanceSheetPlan, value: number | null) => void }) {
   const rows: { code: string; label: string; field?: BalanceSheetField; percent?: boolean; multiple?: boolean; value?: (row: BalanceSheetPlan, index: number) => number }[] = [
     { code: "1-1", label: "資産総額", field: "assets" },
     { code: "1-2", label: "うち流動資産", field: "currentAssets" },
@@ -1124,11 +1243,11 @@ function BalanceSheetEditor({ balanceSheets, historical, onChange }: { balanceSh
     { code: "1-24", label: "新規設備投資による支出", field: "capex" },
     { code: "1-25", label: "EBITDA有利子負債倍率（自動計算）", multiple: true, value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).ebitdaDebtMultiple },
   ];
-  return <div className="wide-table balance-sheet-table spreadsheet-grid actuals-three-year-table"><table><thead><tr><th>第6次様式項目（億円）</th>{balanceSheets.map((row, index) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[historical[index].role]}</small></th>)}</tr></thead><tbody>{rows.map((item) => <tr className={!item.field ? "emphasis" : ""} key={item.code}><th>{item.code} {item.label}{item.percent && <small>%</small>}{item.multiple && <small>倍</small>}</th>{balanceSheets.map((row, index) => <td key={row.year}>{item.field ? <input type="number" step="0.01" value={blankableInput(row[item.field])} placeholder="未入力" onChange={(event) => onChange(index, item.field!, event.target.value === "" ? 0 : Number(event.target.value))} /> : <strong>{number(item.value!(row, index), 2)}</strong>}</td>)}</tr>)}</tbody></table></div>;
+  return <div className="wide-table balance-sheet-table spreadsheet-grid actuals-three-year-table"><table><thead><tr><th>第6次様式項目（億円）</th>{balanceSheets.map((row, index) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[historical[index].role]}</small></th>)}</tr></thead><tbody>{rows.map((item) => <tr className={!item.field ? "emphasis" : ""} key={item.code}><th>{item.code} {item.label}{item.percent && <small>%</small>}{item.multiple && <small>倍</small>}</th>{balanceSheets.map((row, index) => <td key={row.year}>{item.field ? <input type="number" step="0.01" value={getInputValue(inputValues, inputKey.balanceSheet(row.year, item.field))} placeholder="未入力" onChange={(event) => onChange(index, item.field!, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{number(item.value!(row, index), 2)}</strong>}</td>)}</tr>)}</tbody></table></div>;
 }
 
-function FutureCapexEditor({ balanceSheets, historical, futureCapex, onChange }: { balanceSheets: BalanceSheetPlan[]; historical: YearPlan[]; futureCapex: { year: number; value: number }[]; onChange: (yearIndex: number, value: number) => void }) {
-  return <div className="wide-table spreadsheet-grid future-capex-table"><table><thead><tr><th>第6次様式項目（億円）</th>{balanceSheets.map((row, index) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[historical[index].role]}・参照</small></th>)}{futureCapex.map((row) => <th className="forecast-heading" key={row.year}>{row.year}<small>将来計画・入力</small></th>)}</tr></thead><tbody><tr><th>1-24 新規設備投資による支出</th>{balanceSheets.map((row) => <td className="historical-reference" key={row.year}><strong>{row.capex > 0 ? number(row.capex, 2) : "—"}</strong></td>)}{futureCapex.map((row, index) => <td key={row.year}><input type="number" step="0.01" value={blankableInput(row.value)} placeholder="未入力" onChange={(event) => onChange(index, event.target.value === "" ? 0 : Number(event.target.value))} /></td>)}</tr></tbody></table></div>;
+function FutureCapexEditor({ balanceSheets, historical, futureCapex, inputValues, onChange }: { balanceSheets: BalanceSheetPlan[]; historical: YearPlan[]; futureCapex: { year: number; value: number }[]; inputValues: InputValues; onChange: (yearIndex: number, value: number | null) => void }) {
+  return <div className="wide-table spreadsheet-grid future-capex-table"><table><thead><tr><th>第6次様式項目（億円）</th>{balanceSheets.map((row, index) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[historical[index].role]}・参照</small></th>)}{futureCapex.map((row) => <th className="forecast-heading" key={row.year}>{row.year}<small>将来計画・入力</small></th>)}</tr></thead><tbody><tr><th>1-24 新規設備投資による支出</th>{balanceSheets.map((row) => <td className="historical-reference" key={row.year}><strong>{hasInputValue(inputValues, inputKey.balanceSheet(row.year, "capex")) ? number(row.capex, 2) : "—"}</strong></td>)}{futureCapex.map((row, index) => <td key={row.year}><input type="number" step="0.01" value={getInputValue(inputValues, inputKey.futureCapex(row.year))} placeholder="未入力" onChange={(event) => onChange(index, event.target.value === "" ? null : Number(event.target.value))} /></td>)}</tr></tbody></table></div>;
 }
 
 function companyEbitda(row: YearPlan) {
@@ -1182,23 +1301,25 @@ const companyActualInputRows: CompanyActualInputRow[] = [
   { code: "2-18", label: "経常利益", get: (rows, index) => operatingProfit(companySegment(rows, index)) },
 ];
 
-function HistoricalInputsEditor({ historical, onHistoricalCompanyChange, onHistoricalProjectChange }: {
+function HistoricalInputsEditor({ historical, inputValues, onHistoricalCompanyChange, onHistoricalProjectChange }: {
   historical: YearPlan[];
-  onHistoricalCompanyChange: (yearIndex: number, item: CompanyActualInputRow, value: number) => void;
-  onHistoricalProjectChange: (yearIndex: number, item: ProjectOfficialInputRow, value: number) => void;
+  inputValues: InputValues;
+  onHistoricalCompanyChange: (yearIndex: number, item: CompanyActualInputRow, value: number | null) => void;
+  onHistoricalProjectChange: (yearIndex: number, item: ProjectOfficialInputRow, value: number | null) => void;
 }) {
   return <div className="manual-sections spreadsheet-grid">
-    <div><h3>会社全体にかかる損益計算書（過去3期実績）</h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{companyActualInputRows.map((item) => <tr className={!item.set ? "emphasis" : ""} key={item.code}><th>{item.code} {item.label}{item.unit && <small>{item.unit}</small>}</th>{historical.map((row, index) => { const value = item.get(historical, index); return <td key={row.year}>{item.set ? <input type="number" step="0.01" value={blankableInput(value ?? 0)} placeholder="未入力" onChange={(event) => onHistoricalCompanyChange(index, item, event.target.value === "" ? 0 : Number(event.target.value))} /> : <strong>{value === undefined ? "—" : number(value, 2)}</strong>}</td>; })}</tr>)}</tbody></table></div></div>
-    <div><h3>補助事業PL（過去3期実績）</h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{projectOfficialInputRows.map((item) => <tr key={item.code}><th>{item.code} {item.label}<small>{item.unit}</small></th>{historical.map((row, index) => <td key={row.year}><input type="number" step="0.01" value={blankableInput(item.get(row.project))} placeholder="未入力" onChange={(event) => onHistoricalProjectChange(index, item, event.target.value === "" ? 0 : Number(event.target.value))} /></td>)}</tr>)}</tbody></table></div></div>
+    <div><h3>会社全体にかかる損益計算書（過去3期実績）</h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{companyActualInputRows.map((item) => <tr className={!item.set ? "emphasis" : ""} key={item.code}><th>{item.code} {item.label}{item.unit && <small>{item.unit}</small>}</th>{historical.map((row, index) => { const value = item.get(historical, index); return <td key={row.year}>{item.set ? <input type="number" step="0.01" value={getInputValue(inputValues, inputKey.companyActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalCompanyChange(index, item, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{value === undefined ? "—" : number(value, 2)}</strong>}</td>; })}</tr>)}</tbody></table></div></div>
+    <div><h3>補助事業PL（過去3期実績）</h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{projectOfficialInputRows.map((item) => <tr key={item.code}><th>{item.code} {item.label}<small>{item.unit}</small></th>{historical.map((row, index) => <td key={row.year}><input type="number" step="0.01" value={getInputValue(inputValues, inputKey.projectActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalProjectChange(index, item, event.target.value === "" ? null : Number(event.target.value))} /></td>)}</tr>)}</tbody></table></div></div>
     <p className="footnote">その他事業の過去3期は「会社全体－補助事業」で自動算出するため、重複入力しません。</p>
   </div>;
 }
 
-function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, futureInputBasis, onForecastChange }: {
+function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, inputValues, futureInputBasis, onForecastChange }: {
   historical: YearPlan[];
   autoPlan: YearPlan[];
   effectivePlan: YearPlan[];
   overrides: ForecastOverrides;
+  inputValues: InputValues;
   futureInputBasis: FutureInputBasis;
   onForecastChange: (year: number, segment: ForecastSegment, item: string, value: number | null) => void;
 }) {
@@ -1206,7 +1327,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, fu
   const effectiveByYear = new Map(effectivePlan.map((row) => [row.year, row]));
   const rawPlaceholder = (value: number) => String(roundedInput(value));
   return <div className="manual-sections spreadsheet-grid">
-    <div><h3>補助事業PL（過去3期参照 → 補助事業期間 → 基準年 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は自動予測</small></th>)}</tr></thead><tbody>{projectOfficialInputRows.map((item) => <tr key={item.code}><th>{item.code} {item.label}<small>{item.unit}</small></th>{historical.map((row) => <td className="historical-reference" key={row.year}><strong>{number(item.get(row.project), 2)}</strong></td>)}{futureRows.map((row) => { const key = forecastOverrideKey(row.year, "project", item.code); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); const effective = effectiveByYear.get(row.year)!.project; return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="0.1" value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(item.get(effective))} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div></div>
+    <div><h3>補助事業PL（過去3期参照 → 補助事業期間 → 基準年 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は自動予測</small></th>)}</tr></thead><tbody>{projectOfficialInputRows.map((item) => <tr key={item.code}><th>{item.code} {item.label}<small>{item.unit}</small></th>{historical.map((row) => <td className="historical-reference" key={row.year}><strong>{hasInputValue(inputValues, inputKey.projectActual(row.year, item.code)) ? number(item.get(row.project), 2) : "—"}</strong></td>)}{futureRows.map((row) => { const key = forecastOverrideKey(row.year, "project", item.code); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); const effective = effectiveByYear.get(row.year)!.project; return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="0.1" value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(item.get(effective))} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div></div>
     <div><h3>会社全体にかかる損益計算書（過去3期参照 → 将来）</h3><div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{companyActualInputRows.map((item) => <tr className={!item.set ? "emphasis" : ""} key={item.code}><th>{item.code} {item.label}{item.unit && <small>{item.unit}</small>}</th>{historical.map((row, index) => { const value = item.get(historical, index); return <td className="historical-reference" key={row.year}><strong>{value === undefined ? "—" : number(value, 2)}</strong></td>; })}{futureRows.map((row) => { const effectiveRows = effectivePlan; const index = effectiveRows.findIndex((candidate) => candidate.year === row.year); const value = item.get(effectiveRows, index); if (futureInputBasis !== "company") return <td key={row.year}><strong>{value === undefined ? "—" : number(value, 2)}</strong></td>; if (!item.set) return <td key={row.year}><strong>{value === undefined ? "—" : number(value, 2)}</strong></td>; const key = forecastOverrideKey(row.year, "company", item.code); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="0.1" value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "company", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div></div>
     <div><h3>その他事業PL（過去3期参照 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>内部管理番号・項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・自動算出参照</small></th>)}{futureRows.map((row) => <th key={row.year} className={futureInputBasis === "other" ? "forecast-heading" : undefined}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・{futureInputBasis === "other" ? "空欄は自動予測" : "自動算出"}</small></th>)}</tr></thead><tbody>{plFields.map((item) => <tr key={item.key}><th>{item.modelCode} {item.label}<small>{item.unit}</small></th>{historical.map((row) => <td className="historical-reference" key={row.year}><strong>{number(row.other[item.key], 2)}</strong></td>)}{futureRows.map((row) => { const effective = effectiveByYear.get(row.year)!.other; if (futureInputBasis === "company") return <td key={row.year}><strong>{number(effective[item.key], 2)}</strong></td>; const key = forecastOverrideKey(row.year, "other", item.key); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="0.1" value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(effective[item.key])} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "other", item.key, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div></div>
   </div>;

@@ -15,6 +15,7 @@ import {
   type YearPlan,
 } from "./model";
 import { PROPOSAL_FORMAT, type ProposalData } from "./proposal-io";
+import { inputKey, type InputValues } from "./input-values";
 
 const clone = <T,>(value: T): T => structuredClone(value);
 const round = (value: number) => Number(value.toFixed(2));
@@ -38,20 +39,53 @@ const futureCapex = (investment: number) => {
   }));
 };
 
-const commonProposal = (title: string, exportedAt: string, historicalPlan: YearPlan[]): ProposalData => ({
-  format: PROPOSAL_FORMAT,
-  title,
-  exportedAt,
-  timeline: { ...DEFAULT_TIMELINE },
-  historicalPlan,
-  balanceSheets: retimeBalanceSheets(sampleBalanceSheets, DEFAULT_TIMELINE),
-  futureCapex: futureCapex(sampleDrivers.investment),
-  drivers: clone(sampleDrivers),
-  driverRanges: clone(driverBounds),
-  targets: clone(defaultTargets),
-  forecastOverrides: {},
-  futureInputBasis: "other",
-});
+const commonProposal = (title: string, exportedAt: string, historicalPlan: YearPlan[]): ProposalData => {
+  const balanceSheets = retimeBalanceSheets(sampleBalanceSheets, DEFAULT_TIMELINE);
+  const capex = futureCapex(sampleDrivers.investment);
+  const inputValues: InputValues = {};
+  historicalPlan.forEach((row) => {
+    const company = total(row.project, row.other);
+    const companyInputs: Record<string, number> = {
+      "2-1": company.sales, "2-3": company.cogs,
+      "2-7": company.employeePay + company.officerPay + company.depreciation + company.otherSga,
+      "2-8": company.officerPay, "2-11": company.employeePay, "2-14": company.depreciation,
+    };
+    const projectInputs: Record<string, number> = {
+      "7-1": row.project.sales, "7-4": row.project.sales - row.project.cogs,
+      "7-6": operatingProfit(row.project), "7-8": row.project.employeePay,
+      "7-9": row.project.officerPay, "7-10": row.project.depreciation,
+      "7-13": row.project.headcount, "7-14": row.project.officerCount,
+    };
+    Object.entries(companyInputs).forEach(([code, value]) => { inputValues[inputKey.companyActual(row.year, code)] = round(value); });
+    Object.entries(projectInputs).forEach(([code, value]) => { inputValues[inputKey.projectActual(row.year, code)] = round(value); });
+  });
+  balanceSheets.forEach((row) => (Object.keys(row) as (keyof typeof row)[]).filter((field) => field !== "year").forEach((field) => { inputValues[inputKey.balanceSheet(row.year, field)] = round(row[field]); }));
+  capex.forEach((row) => { inputValues[inputKey.futureCapex(row.year)] = round(row.value); });
+  (Object.keys(sampleDrivers) as (keyof typeof sampleDrivers)[]).forEach((key) => {
+    inputValues[inputKey.driver(key)] = sampleDrivers[key];
+    inputValues[inputKey.driverRange(key, 0)] = driverBounds[key][0];
+    inputValues[inputKey.driverRange(key, 1)] = driverBounds[key][1];
+  });
+  (Object.keys(defaultTargets) as (keyof typeof defaultTargets)[]).forEach((key) => {
+    inputValues[inputKey.target(key, "value")] = round(defaultTargets[key].value);
+    if (defaultTargets[key].max !== undefined) inputValues[inputKey.target(key, "max")] = round(defaultTargets[key].max!);
+  });
+  return {
+    format: PROPOSAL_FORMAT,
+    title,
+    exportedAt,
+    timeline: { ...DEFAULT_TIMELINE },
+    historicalPlan,
+    balanceSheets,
+    futureCapex: capex,
+    drivers: clone(sampleDrivers),
+    driverRanges: clone(driverBounds),
+    targets: clone(defaultTargets),
+    forecastOverrides: {},
+    futureInputBasis: "other",
+    inputValues,
+  };
+};
 
 export function createStandardSampleProposal(exportedAt: string): ProposalData {
   return commonProposal(

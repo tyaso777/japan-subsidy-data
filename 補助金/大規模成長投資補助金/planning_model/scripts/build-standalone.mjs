@@ -15,6 +15,7 @@ await Promise.all([
   copyFile(path.join(projectDirectory, "app", "standalone-entry.tsx"), path.join(buildDirectory, "app", "standalone-entry.tsx")),
   copyFile(path.join(projectDirectory, "app", "page.tsx"), path.join(buildDirectory, "app", "page.tsx")),
   copyFile(path.join(projectDirectory, "app", "model.ts"), path.join(buildDirectory, "app", "model.ts")),
+  copyFile(path.join(projectDirectory, "app", "input-values.ts"), path.join(buildDirectory, "app", "input-values.ts")),
   copyFile(path.join(projectDirectory, "app", "proposal-io.ts"), path.join(buildDirectory, "app", "proposal-io.ts")),
   copyFile(path.join(projectDirectory, "app", "report-data.ts"), path.join(buildDirectory, "app", "report-data.ts")),
   copyFile(path.join(projectDirectory, "app", "sample-proposals.ts"), path.join(buildDirectory, "app", "sample-proposals.ts")),

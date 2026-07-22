@@ -24,6 +24,8 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(html, /目標に近づける/);
   assert.match(html, /15指標・目標/);
   const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const inputValueSource = await readFile(new URL("../app/input-values.ts", import.meta.url), "utf8");
+  const proposalSource = await readFile(new URL("../app/proposal-io.ts", import.meta.url), "utf8");
   const globalStyles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(pageSource, /設定した目標に近づける/);
   assert.match(pageSource, /projectSalesGrowth: \{ initial: 0\.22, lower: 0\.15, upper: 0\.30 \}/);
@@ -64,6 +66,12 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(pageSource, /onClick=\{\(\) => setView\(/);
   assert.doesNotMatch(pageSource, /function solveAndOpenAnnualPl\(\)/);
   assert.doesNotMatch(pageSource, /toFixed\(6\)/);
+  assert.doesNotMatch(pageSource, /blankableInput/);
+  assert.match(pageSource, /inputValues: clone\(inputValues\)/);
+  assert.match(pageSource, /event\.target\.value === "" \? null/);
+  assert.match(inputValueSource, /A missing key means "not entered"/);
+  assert.match(inputValueSource, /else next\[key\] = value/);
+  assert.match(proposalSource, /入力データ監査（Null／0区別）/);
   assert.match(globalStyles, /actuals-three-year-table \{ overflow-x: hidden; overflow-y: auto; \}/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
