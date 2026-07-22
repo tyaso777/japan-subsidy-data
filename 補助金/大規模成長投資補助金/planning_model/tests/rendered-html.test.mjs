@@ -78,6 +78,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /2指標を同時に最適化/);
   assert.match(pageSource, /最適化結果/);
   assert.match(pageSource, /自動算出/);
+  assert.match(pageSource, /個別に目標設定/);
+  assert.match(globalStyles, /metric-independent-row/);
   assert.match(pageSource, /同額ペースの\{targetComparisonYears\}年単純換算/);
   assert.match(pageSource, /基準年→事業化報告3年目/);
   assert.match(proposalSource, /計画値（基準年→事業化報告3年目・3年間）/);
