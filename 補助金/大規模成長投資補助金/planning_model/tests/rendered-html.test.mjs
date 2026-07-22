@@ -75,6 +75,8 @@ test("renders the planning model shell", async () => {
   assert.match(inputValueSource, /else next\[key\] = value/);
   assert.match(proposalSource, /入力データ監査（Null／0区別）/);
   assert.match(pageSource, /metric-group-controls/);
+  assert.match(globalStyles, /grid-template-columns: repeat\(auto-fit, minmax\(230px, 300px\)\)/);
+  assert.match(globalStyles, /metric-group-control select \{ width: 100%; max-width: none;/);
   assert.match(pageSource, /に目標設定/);
   assert.match(pageSource, /2指標を同時に最適化/);
   assert.match(pageSource, /最適化結果/);
