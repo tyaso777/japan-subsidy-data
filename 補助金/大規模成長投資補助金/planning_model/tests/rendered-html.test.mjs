@@ -56,10 +56,13 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.manual-sections > div > h3 \{ position: sticky; top: 46px; z-index: 18;/);
   assert.match(globalStyles, /\.wide-table, \.targets-table-wrap \{[^}]*overflow-x: auto; overflow-y: visible;/);
   assert.match(globalStyles, /\.balance-sheet-table \{[^}]*overflow-x: auto; overflow-y: visible;/);
-  assert.match(globalStyles, /\.wide-table\.page-sticky-table-header thead th, \.targets-table-wrap\.page-sticky-table-header thead th \{ transform: translateY\(var\(--page-sticky-header-offset, 0\)\);/);
+  assert.match(globalStyles, /\.historical-pl-panel > \.panel-heading \{ position: static;/);
+  assert.match(globalStyles, /\.page-sticky-header-overlay \{ position: fixed; z-index: 17; overflow: hidden;/);
+  assert.match(globalStyles, /\.page-sticky-header-overlay thead th:first-child \{ position: sticky; left: 0;/);
   assert.doesNotMatch(globalStyles, /max-height: min\(76vh, 860px\)/);
   assert.match(pageSource, /function usePageStickyTableHeaders\(\)/);
-  assert.match(pageSource, /targetTop - wrapperRect\.top/);
+  assert.match(pageSource, /overlay\.style\.top = `\$\{Math\.min\(targetTop, wrapperRect\.bottom - headerHeight\)\}px`/);
+  assert.doesNotMatch(pageSource, /page-sticky-header-offset/);
   assert.match(pageSource, /type View = [^;]*"io"/);
   assert.match(pageSource, /goToView\("io"\)\}>データ入出力<\/button>/);
   assert.equal(pageSource.match(/className="tab-group-separator" aria-hidden="true">\|<\/span>/g)?.length, 2);

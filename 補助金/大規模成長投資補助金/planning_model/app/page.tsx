@@ -551,16 +551,21 @@ function useSpreadsheetGrid() {
 
 function usePageStickyTableHeaders() {
   useEffect(() => {
+    const overlays = new Map<HTMLElement, HTMLDivElement>();
     let animationFrame = 0;
+    const removeOverlay = (wrapper: HTMLElement) => {
+      overlays.get(wrapper)?.remove();
+      overlays.delete(wrapper);
+    };
     const updateHeaders = () => {
       animationFrame = 0;
       const tabsBottom = document.querySelector<HTMLElement>(".tabs")?.getBoundingClientRect().bottom ?? 0;
+      const visibleWrappers = new Set<HTMLElement>();
       document.querySelectorAll<HTMLElement>(".wide-table, .targets-table-wrap").forEach((wrapper) => {
         const table = wrapper.querySelector<HTMLTableElement>(":scope > table");
         const header = table?.tHead;
         if (!table || !header || wrapper.offsetParent === null) {
-          wrapper.classList.remove("page-sticky-table-header");
-          wrapper.style.removeProperty("--page-sticky-header-offset");
+          removeOverlay(wrapper);
           return;
         }
 
@@ -575,11 +580,50 @@ function usePageStickyTableHeaders() {
 
         const wrapperRect = wrapper.getBoundingClientRect();
         const headerHeight = header.getBoundingClientRect().height;
-        const maximumOffset = Math.max(0, wrapperRect.height - headerHeight);
-        const offset = Math.min(maximumOffset, Math.max(0, targetTop - wrapperRect.top));
-        wrapper.style.setProperty("--page-sticky-header-offset", `${offset}px`);
-        wrapper.classList.toggle("page-sticky-table-header", offset > 0);
+        if (wrapperRect.top >= targetTop || wrapperRect.bottom <= 0) {
+          removeOverlay(wrapper);
+          return;
+        }
+
+        visibleWrappers.add(wrapper);
+        let overlay = overlays.get(wrapper);
+        if (!overlay) {
+          overlay = document.createElement("div");
+          overlay.className = "page-sticky-header-overlay";
+          overlay.setAttribute("aria-hidden", "true");
+          document.body.append(overlay);
+          overlays.set(wrapper, overlay);
+        }
+
+        const signature = header.innerHTML;
+        if (overlay.dataset.signature !== signature) {
+          const overlayTable = table.cloneNode(false) as HTMLTableElement;
+          overlayTable.removeAttribute("id");
+          overlayTable.append(header.cloneNode(true));
+          overlay.replaceChildren(overlayTable);
+          overlay.dataset.signature = signature;
+        }
+        const overlayTable = overlay.querySelector("table")!;
+        const sourceCells = Array.from(header.querySelectorAll<HTMLTableCellElement>("th, td"));
+        const overlayCells = Array.from(overlayTable.querySelectorAll<HTMLTableCellElement>("th, td"));
+        sourceCells.forEach((cell, index) => {
+          const width = cell.getBoundingClientRect().width;
+          if (overlayCells[index]) {
+            overlayCells[index].style.width = `${width}px`;
+            overlayCells[index].style.minWidth = `${width}px`;
+            overlayCells[index].style.maxWidth = `${width}px`;
+          }
+        });
+        overlayTable.style.width = `${table.scrollWidth}px`;
+        overlay.style.left = `${wrapperRect.left}px`;
+        overlay.style.top = `${Math.min(targetTop, wrapperRect.bottom - headerHeight)}px`;
+        overlay.style.width = `${wrapperRect.width}px`;
+        overlay.style.height = `${headerHeight}px`;
+        overlay.scrollLeft = wrapper.scrollLeft;
       });
+      for (const wrapper of overlays.keys()) {
+        if (!visibleWrappers.has(wrapper)) removeOverlay(wrapper);
+      }
     };
     const scheduleUpdate = () => {
       if (!animationFrame) animationFrame = window.requestAnimationFrame(updateHeaders);
@@ -588,10 +632,13 @@ function usePageStickyTableHeaders() {
     updateHeaders();
     window.addEventListener("scroll", scheduleUpdate, { passive: true });
     window.addEventListener("resize", scheduleUpdate);
+    document.addEventListener("scroll", scheduleUpdate, { capture: true, passive: true });
     return () => {
       if (animationFrame) window.cancelAnimationFrame(animationFrame);
       window.removeEventListener("scroll", scheduleUpdate);
       window.removeEventListener("resize", scheduleUpdate);
+      document.removeEventListener("scroll", scheduleUpdate, { capture: true });
+      overlays.forEach((overlay) => overlay.remove());
     };
   }, []);
 }
@@ -1499,7 +1546,7 @@ export default function Home() {
             <code>設備投資 → 固定資産 → 減価償却費（P/L）　／　借入金 → 支払利息 → 経常利益（P/L）</code>
             <p>実務上は連動しますが、第6次の公式Excel自体はB/S残高から減価償却費や支払利息を自動算定していません。公式上の直接参照は主に、P/LのEBITDAを使う1-25 EBITDA有利子負債倍率です。本モデルでも、過去B/Sを入力しただけで手入力P/Lを上書きしません。将来の減価償却費・支払利息まで自動連動させるには、次段階で「固定資産台帳」と「借入返済表」を年度別に設けます。</p>
           </article>
-          <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">PL ACTUALS</p><h2>会社全体PL・補助事業PL（過去3期）</h2></div><span className="pill green">必須手入力</span></div><HistoricalInputsEditor historical={historicalPlan} inputValues={inputValues} onHistoricalCompanyChange={updateHistoricalCompanyOfficial} onHistoricalProjectChange={updateHistoricalProjectOfficial} /></article>
+          <article className="panel table-panel historical-pl-panel"><div className="panel-heading"><div><p className="card-kicker">PL ACTUALS</p><h2>会社全体PL・補助事業PL（過去3期）</h2></div><span className="pill green">必須手入力</span></div><HistoricalInputsEditor historical={historicalPlan} inputValues={inputValues} onHistoricalCompanyChange={updateHistoricalCompanyOfficial} onHistoricalProjectChange={updateHistoricalProjectOfficial} /></article>
           <div className="workflow-actions"><span>過去実績を入力できたら、次に現実的な将来水準を設定します。</span><button className="solve-button" onClick={() => goToView("targets")}>15指標・目標へ →</button></div>
         </section>
       )}
