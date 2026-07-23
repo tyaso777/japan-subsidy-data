@@ -159,6 +159,7 @@ thead th { color: var(--muted); font-size: 9px; text-transform: uppercase; lette
 thead th:first-child { background: #f3f0e8; }.emphasis th, .emphasis td { font-weight: 800; background: #f7f5ee; }.company-table { border-top: 4px solid var(--green); }
 .wide-table:not(.balance-sheet-table) thead th, .targets-table-wrap thead th { position: sticky; top: 0; z-index: 3; background: #f3f0e8; }
 .wide-table:not(.balance-sheet-table) thead th:first-child, .targets-table-wrap thead th:first-child { left: 0; z-index: 5; }
+.wide-table.page-sticky-table-header thead th, .targets-table-wrap.page-sticky-table-header thead th { transform: translateY(var(--page-sticky-header-offset, 0)); box-shadow: 0 1px 0 #d8d3c7; }
 .wide-table:not(.balance-sheet-table) table, .targets-table-wrap table { border-collapse: separate; border-spacing: 0; }
 .wide-table:not(.balance-sheet-table) table { width: 100%; min-width: max-content; }
 .wide-table:not(.balance-sheet-table) th:first-child { width: 280px; min-width: 280px; }

@@ -549,8 +549,56 @@ function useSpreadsheetGrid() {
   }, []);
 }
 
+function usePageStickyTableHeaders() {
+  useEffect(() => {
+    let animationFrame = 0;
+    const updateHeaders = () => {
+      animationFrame = 0;
+      const tabsBottom = document.querySelector<HTMLElement>(".tabs")?.getBoundingClientRect().bottom ?? 0;
+      document.querySelectorAll<HTMLElement>(".wide-table, .targets-table-wrap").forEach((wrapper) => {
+        const table = wrapper.querySelector<HTMLTableElement>(":scope > table");
+        const header = table?.tHead;
+        if (!table || !header || wrapper.offsetParent === null) {
+          wrapper.classList.remove("page-sticky-table-header");
+          wrapper.style.removeProperty("--page-sticky-header-offset");
+          return;
+        }
+
+        let targetTop = tabsBottom;
+        const panelHeading = wrapper.closest(".table-panel")?.querySelector<HTMLElement>(":scope > .panel-heading");
+        const sectionHeading = wrapper.parentElement?.querySelector<HTMLElement>(":scope > h3");
+        for (const heading of [panelHeading, sectionHeading]) {
+          if (!heading) continue;
+          const headingRect = heading.getBoundingClientRect();
+          if (headingRect.top <= tabsBottom + 2 && headingRect.bottom > targetTop) targetTop = headingRect.bottom;
+        }
+
+        const wrapperRect = wrapper.getBoundingClientRect();
+        const headerHeight = header.getBoundingClientRect().height;
+        const maximumOffset = Math.max(0, wrapperRect.height - headerHeight);
+        const offset = Math.min(maximumOffset, Math.max(0, targetTop - wrapperRect.top));
+        wrapper.style.setProperty("--page-sticky-header-offset", `${offset}px`);
+        wrapper.classList.toggle("page-sticky-table-header", offset > 0);
+      });
+    };
+    const scheduleUpdate = () => {
+      if (!animationFrame) animationFrame = window.requestAnimationFrame(updateHeaders);
+    };
+
+    updateHeaders();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    return () => {
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+    };
+  }, []);
+}
+
 export default function Home() {
   useSpreadsheetGrid();
+  usePageStickyTableHeaders();
   const [view, setView] = useState<View>("history");
 
   function goToView(nextView: View) {
