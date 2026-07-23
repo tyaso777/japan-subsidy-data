@@ -1034,6 +1034,7 @@ export function optimizeDrivers(
   rebuildProjectPeriod = false,
   planTransform?: (plan: YearPlan[]) => YearPlan[],
   requiredMinimums: Partial<Record<MetricKey, number>> = {},
+  hardRepairStrategy: "full-range" | "legacy-fixed-step" = "full-range",
 ) {
   const original = { ...initial };
   const keys: (keyof Drivers)[] = [
@@ -1157,23 +1158,44 @@ export function optimizeDrivers(
   finalists.sort((left, right) => better(left, right) ? -1 : better(right, left) ? 1 : 0);
   let best = finalists[0];
 
-  // When hard constraints remain, search each coordinate across its entire
-  // user-specified range instead of taking another fixed-width local step.
-  // Forecast values are stored to two decimals, so the objective contains flat
-  // sections where several small moves appear to do nothing. A full-range scan
-  // crosses those plateaus and evaluates both boundaries on every sweep.
-  if (best.requiredViolation > constraintTolerance || best.hardViolation > constraintTolerance) {
-    hardRepair: for (let sweep = 0; sweep < 10; sweep += 1) {
-      const sweepStart = best;
+  const legacyRepair = (start: Candidate) => {
+    let repaired = start;
+    legacyRepairLoop: for (const fraction of [0.003, 0.001, 0.0003, 0.0001, 0.00003]) {
+      for (let sweep = 0; sweep < 64; sweep += 1) {
+        let next = repaired;
+        for (const key of keys) {
+          const [minimum, maximum] = bounds[key];
+          const step = Math.max((maximum - minimum) * fraction, 0.000001);
+          for (const direction of [-1, 1]) {
+            const candidate = evaluate({ ...repaired.drivers, [key]: repaired.drivers[key] + direction * step });
+            if (better(candidate, next)) next = candidate;
+          }
+        }
+        if (next === repaired) break;
+        repaired = next;
+        if (repaired.requiredViolation <= constraintTolerance && repaired.hardViolation <= constraintTolerance) break legacyRepairLoop;
+      }
+    }
+    return repaired;
+  };
+
+  // Search each coordinate across its entire user-specified range. Forecast
+  // values are stored to two decimals, so the objective contains flat sections
+  // where several small moves appear to do nothing. A full-range scan crosses
+  // those plateaus and evaluates both boundaries on every sweep.
+  const fullRangeRepair = (start: Candidate) => {
+    let repaired = start;
+    fullRangeRepairLoop: for (let sweep = 0; sweep < 10; sweep += 1) {
+      const sweepStart = repaired;
       for (const key of keys) {
         const [minimum, maximum] = bounds[key];
         if (!(maximum > minimum)) continue;
         const divisions = 16;
-        let coordinateBest = best;
+        let coordinateBest = repaired;
         let bestIndex = 0;
         for (let index = 0; index <= divisions; index += 1) {
           const value = minimum + (maximum - minimum) * index / divisions;
-          const candidate = evaluate({ ...best.drivers, [key]: value });
+          const candidate = evaluate({ ...repaired.drivers, [key]: value });
           if (better(candidate, coordinateBest)) {
             coordinateBest = candidate;
             bestIndex = index;
@@ -1187,7 +1209,7 @@ export function optimizeDrivers(
           let refinedIndex = 0;
           for (let index = 0; index <= refinementDivisions; index += 1) {
             const value = intervalLower + (intervalUpper - intervalLower) * index / refinementDivisions;
-            const candidate = evaluate({ ...best.drivers, [key]: value });
+            const candidate = evaluate({ ...repaired.drivers, [key]: value });
             if (better(candidate, coordinateBest)) {
               coordinateBest = candidate;
               refinedIndex = index;
@@ -1198,10 +1220,21 @@ export function optimizeDrivers(
           intervalLower = previousLower + (previousUpper - previousLower) * Math.max(0, refinedIndex - 1) / refinementDivisions;
           intervalUpper = previousLower + (previousUpper - previousLower) * Math.min(refinementDivisions, refinedIndex + 1) / refinementDivisions;
         }
-        best = coordinateBest;
-        if (best.requiredViolation <= constraintTolerance && best.hardViolation <= constraintTolerance) break hardRepair;
+        repaired = coordinateBest;
+        if (repaired.requiredViolation <= constraintTolerance && repaired.hardViolation <= constraintTolerance) break fullRangeRepairLoop;
       }
-      if (!better(best, sweepStart)) break;
+      if (!better(repaired, sweepStart)) break;
+    }
+    return repaired;
+  };
+
+  if (best.requiredViolation > constraintTolerance || best.hardViolation > constraintTolerance) {
+    const legacyCandidate = legacyRepair(best);
+    if (hardRepairStrategy === "legacy-fixed-step") {
+      best = legacyCandidate;
+    } else {
+      const fullRangeCandidate = fullRangeRepair(best);
+      best = better(fullRangeCandidate, legacyCandidate) ? fullRangeCandidate : legacyCandidate;
     }
   }
   return {

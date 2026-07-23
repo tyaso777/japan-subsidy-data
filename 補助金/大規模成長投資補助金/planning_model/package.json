@@ -10,6 +10,7 @@
     "build": "vinext build",
     "build:standalone": "node scripts/build-standalone.mjs",
     "build:sample": "node scripts/build-sample-proposal.mjs",
+    "benchmark:optimizer": "node scripts/benchmark-optimizer.mjs",
     "start": "vinext start",
     "test": "npm run build && node --test tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
