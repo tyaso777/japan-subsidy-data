@@ -89,8 +89,8 @@ test("renders the planning model shell", async () => {
   assert.match(modelSource, /headcount: Math\.max\(0, Math\.round\(projectHeadcount\)\)/);
   assert.match(reportDataSource, /code: "2-36", label: "EBITDA増加率"/);
   assert.match(pageSource, /15指標・目標へ戻る/);
-  assert.match(pageSource, />基準年売上開始（過去3期入力済み）<\/button>/);
-  assert.match(pageSource, />過去3期入力済み<\/button>/);
+  assert.match(pageSource, />基準年売上開始ケース（過去3期入力済み）<\/button>/);
+  assert.match(pageSource, />標準ケース（過去3期入力済み）<\/button>/);
   assert.match(pageSource, /createHistoricalOnlySampleProposal/);
   assert.match(pageSource, /createBaseYearLaunchHistoricalOnlySampleProposal/);
   assert.match(sampleProposalSource, /基準年売上開始・過去3期入力済みサンプル/);
@@ -212,6 +212,10 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /historicalPlan\.slice\(1\)\.map/);
   assert.match(pageSource, /history\.values\.slice\(1\)\.map/);
   assert.match(globalStyles, /\.driver-target-table table \{ width: max-content !important; min-width: 1220px !important; \}/);
+  assert.match(pageSource, />使い方を試す<\/strong>/);
+  assert.match(pageSource, />シミュレーション結果を見る<\/strong>/);
+  assert.match(pageSource, />最適化済み標準提案<\/button>/);
+  assert.match(globalStyles, /\.sample-menu-section \+ \.sample-menu-section/);
   assert.match(pageSource, /aria-invalid=\{constraintError \? "true" : undefined\}/);
   assert.match(pageSource, /title: "制度上の必須条件に違反"/);
   assert.doesNotMatch(pageSource, /applicationCategory === "startupException"/);

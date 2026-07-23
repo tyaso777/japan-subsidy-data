@@ -1318,9 +1318,17 @@ export default function Home() {
             <summary>サンプル <span aria-hidden="true">▾</span></summary>
             <div className="proposal-action-menu-items">
               <small>現在の入力をサンプルで置き換えます</small>
-              <button onClick={(event) => { loadHistoricalOnlySample(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>過去3期入力済み</button>
-              <button onClick={(event) => { loadSampleProposal(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>標準提案</button>
-              <button onClick={(event) => { loadBaseYearLaunchSample(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>基準年売上開始（過去3期入力済み）</button>
+              <div className="sample-menu-section">
+                <strong>使い方を試す</strong>
+                <span>過去データ入力後から、設定・最適化を自分で進めます</span>
+                <button onClick={(event) => { loadHistoricalOnlySample(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>標準ケース（過去3期入力済み）</button>
+                <button onClick={(event) => { loadBaseYearLaunchSample(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>基準年売上開始ケース（過去3期入力済み）</button>
+              </div>
+              <div className="sample-menu-section result-sample-section">
+                <strong>シミュレーション結果を見る</strong>
+                <span>調整水準設定・将来入力・再最適化後の完成例です</span>
+                <button className="sample-result-button" onClick={(event) => { loadSampleProposal(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>最適化済み標準提案</button>
+              </div>
             </div>
           </details>
         </div>
