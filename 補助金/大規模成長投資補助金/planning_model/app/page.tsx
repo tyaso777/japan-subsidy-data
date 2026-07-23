@@ -1315,11 +1315,9 @@ export default function Home() {
           <button key={key} className={view === key ? "active" : ""} onClick={() => goToView(key)}>{label}</button>
         ))}
         <span className="tab-group-separator" aria-hidden="true">|</span>
-        {([
-          ["logic", "数式・ロジック"], ["io", "データ入出力"],
-        ] as [View, string][]).map(([key, label]) => (
-          <button key={key} className={view === key ? "active" : ""} onClick={() => goToView(key)}>{label}</button>
-        ))}
+        <button className={view === "logic" ? "active" : ""} onClick={() => goToView("logic")}>数式・ロジック</button>
+        <span className="tab-group-separator" aria-hidden="true">|</span>
+        <button className={view === "io" ? "active" : ""} onClick={() => goToView("io")}>データ入出力</button>
       </nav>
 
       {view === "io" && (

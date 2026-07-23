@@ -48,8 +48,8 @@ test("renders the planning model shell", async () => {
   const suggestionSource = pageSource.match(/const targetAdjustmentSuggestions = useMemo\([\s\S]*?\n  \}, \[adjustedDrivers,[\s\S]*?\]\);/)?.[0] ?? "";
   assert.match(globalStyles, /\.tabs \{ position: sticky; top: 0; z-index: 25;/);
   assert.match(pageSource, /type View = [^;]*"io"/);
-  assert.match(pageSource, /\["io", "データ入出力"\]/);
-  assert.match(pageSource, /className="tab-group-separator" aria-hidden="true">\|<\/span>/);
+  assert.match(pageSource, /goToView\("io"\)\}>データ入出力<\/button>/);
+  assert.equal(pageSource.match(/className="tab-group-separator" aria-hidden="true">\|<\/span>/g)?.length, 2);
   assert.match(globalStyles, /\.tab-group-separator \{/);
   assert.match(pageSource, /\{view === "io" && \(/);
   assert.ok(pageSource.indexOf('<nav className="tabs"') < pageSource.indexOf('<section className="proposal-filebar"'));
