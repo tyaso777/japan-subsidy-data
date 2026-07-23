@@ -54,6 +54,7 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.table-panel \{ overflow: visible;/);
   assert.match(globalStyles, /\.table-panel > \.panel-heading \{ position: sticky; top: 46px; z-index: 18;/);
   assert.match(globalStyles, /\.manual-sections > div > h3 \{ position: sticky; top: 46px; z-index: 18;/);
+  assert.match(globalStyles, /\.diagnostic-panel > h3 \{ position: sticky; top: 46px; z-index: 18;/);
   assert.match(globalStyles, /\.wide-table, \.targets-table-wrap \{[^}]*overflow-x: auto; overflow-y: visible;/);
   assert.match(globalStyles, /\.balance-sheet-table \{[^}]*overflow-x: auto; overflow-y: visible;/);
   assert.match(globalStyles, /\.historical-pl-panel > \.panel-heading \{ position: static;/);
