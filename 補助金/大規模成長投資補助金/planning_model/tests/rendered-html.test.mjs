@@ -51,7 +51,9 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /label="損益計算書" range="2-1～2-20"/);
   assert.match(pageSource, /label="P\/L関連計算項目" range="2-21～2-36"/);
   assert.match(globalStyles, /\.official-section-heading th, \.official-section-heading td \{ position: sticky; top: 56px;/);
-  assert.doesNotMatch(globalStyles, /\.manual-sections > div > h3 \{ position: sticky/);
+  assert.match(globalStyles, /\.table-panel \{ overflow: visible;/);
+  assert.match(globalStyles, /\.table-panel > \.panel-heading \{ position: sticky; top: 46px; z-index: 18;/);
+  assert.match(globalStyles, /\.manual-sections > div > h3 \{ position: sticky; top: 46px; z-index: 18;/);
   assert.match(pageSource, /type View = [^;]*"io"/);
   assert.match(pageSource, /goToView\("io"\)\}>データ入出力<\/button>/);
   assert.equal(pageSource.match(/className="tab-group-separator" aria-hidden="true">\|<\/span>/g)?.length, 2);
