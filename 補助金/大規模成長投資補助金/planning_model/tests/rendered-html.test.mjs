@@ -62,6 +62,8 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.page-sticky-header-overlay thead th:first-child \{ position: sticky; left: 0;/);
   assert.match(globalStyles, /\.floating-table-scrollbar \{ position: fixed; bottom: 0; z-index: 24; display: none;/);
   assert.match(globalStyles, /\.floating-table-scrollbar\.is-visible \{ display: block;/);
+  assert.match(globalStyles, /\.data-io-view \.proposal-action-menu-items \{ right: auto; left: 0;/);
+  assert.match(globalStyles, /\.data-io-view \.proposal-filebar:has\(\.proposal-action-menu\[open\]\) \{ padding-bottom: 140px;/);
   assert.doesNotMatch(globalStyles, /max-height: min\(76vh, 860px\)/);
   assert.match(pageSource, /function usePageStickyTableHeaders\(\)/);
   assert.match(pageSource, /function useFloatingHorizontalTableScrollbar\(\)/);
