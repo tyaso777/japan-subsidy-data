@@ -213,6 +213,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /historicalPlan\.slice\(1\)\.map/);
   assert.match(pageSource, /history\.values\.slice\(1\)\.map/);
   assert.match(globalStyles, /\.driver-target-table table \{ width: max-content !important; min-width: 1220px !important; \}/);
+  assert.match(globalStyles, /\.driver-target-table tbody tr:not\(\.driver-group-heading\) th:first-child \{ white-space: normal; overflow-wrap: anywhere; line-height: 1\.45; \}/);
   assert.match(pageSource, />使い方を試す<\/strong>/);
   assert.match(pageSource, />シミュレーション結果を見る<\/strong>/);
   assert.match(pageSource, />最適化済み標準提案<\/button>/);
