@@ -1300,7 +1300,10 @@ export default function Home() {
       <header className="topbar">
         <div>
           <p className="eyebrow">第6次・事前公開版定義で計算 / 第3次定義を比較表示</p>
-          <h1>成長投資計画シミュレーター（Ver.大規模成長投資補助金第6次）</h1>
+          <h1 className="product-title">
+            <span>成長投資計画シミュレーター</span>
+            <small>Ver. 大規模成長投資補助金 第6次</small>
+          </h1>
           <p className="subtitle">過去実績と目標値を入力し、補助事業＋その他事業＝全社 の将来PLをシミュレーションします。</p>
         </div>
       </header>

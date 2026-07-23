@@ -35,6 +35,9 @@ test("renders the planning model shell", async () => {
   const applicationRulesSource = await readFile(new URL("../app/application-rules.ts", import.meta.url), "utf8");
   const proposalOptimizationSource = await readFile(new URL("../app/proposal-optimization.ts", import.meta.url), "utf8");
   const globalStyles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(pageSource, /<h1 className="product-title">/);
+  assert.match(pageSource, /<small>Ver\. 大規模成長投資補助金 第6次<\/small>/);
+  assert.match(globalStyles, /font-size: clamp\(28px, 3vw, 40px\)/);
   const initialInputFunction = pageSource.match(/function createInitialInputValues\(\): InputValues \{[\s\S]*?\n\}/)?.[0] ?? "";
   const suggestionSource = pageSource.match(/const targetAdjustmentSuggestions = useMemo\([\s\S]*?\n  \}, \[adjustedDrivers,[\s\S]*?\]\);/)?.[0] ?? "";
   assert.match(globalStyles, /\.tabs \{ position: sticky; top: 0; z-index: 25;/);

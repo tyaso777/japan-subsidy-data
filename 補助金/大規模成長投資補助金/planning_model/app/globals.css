@@ -39,7 +39,8 @@ button { cursor: pointer; }
 main { width: calc(100% - 48px); margin: 0 auto; padding: 34px 0 80px; }
 
 .topbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; padding: 10px 0 28px; }
-.topbar h1 { margin: 4px 0 6px; font-family: var(--display-serif); font-size: clamp(30px, 4vw, 52px); letter-spacing: -.03em; font-weight: 500; font-variant-numeric: lining-nums; }
+.topbar h1 { margin: 4px 0 6px; font-family: var(--display-serif); font-size: clamp(28px, 3vw, 40px); letter-spacing: -.03em; font-weight: 500; font-variant-numeric: lining-nums; }
+.product-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px 16px; }.product-title small { color: var(--muted); font-family: var(--sans); font-size: clamp(12px, 1.2vw, 16px); font-weight: 700; letter-spacing: .01em; white-space: nowrap; }
 .subtitle { margin: 0; color: var(--muted); font-size: 14px; }
 .proposal-filebar { display: grid; grid-template-columns: minmax(260px, 1fr) auto; align-items: end; gap: 8px 18px; margin: -12px 0 18px; padding: 13px 15px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255, 253, 248, .75); }
 .proposal-filebar > label span { display: block; margin-bottom: 4px; color: var(--muted); font-size: 9px; font-weight: 800; }
