@@ -34,10 +34,15 @@ test("renders the planning model shell", async () => {
   const standardWorkflowSource = await readFile(new URL("../scripts/derive-standard-workflow.ts", import.meta.url), "utf8");
   const applicationRulesSource = await readFile(new URL("../app/application-rules.ts", import.meta.url), "utf8");
   const proposalOptimizationSource = await readFile(new URL("../app/proposal-optimization.ts", import.meta.url), "utf8");
+  const standaloneBuildSource = await readFile(new URL("../scripts/build-standalone.mjs", import.meta.url), "utf8");
   const globalStyles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(pageSource, /<h1 className="product-title">/);
   assert.match(pageSource, /<small>Ver\. 大規模成長投資補助金 6次公募<\/small>/);
   assert.doesNotMatch(pageSource, /第3次定義を比較表示/);
+  assert.match(standaloneBuildSource, /成長投資計画シミュレーター_大規模成長投資補助金6次公募\.html/);
+  assert.match(standaloneBuildSource, /<title>成長投資計画シミュレーター（Ver\. 大規模成長投資補助金 6次公募）<\/title>/);
+  assert.match(standaloneBuildSource, /成長投資計画シミュレーターを読み込んでいます…/);
+  assert.doesNotMatch(standaloneBuildSource, /数値設計ラボ/);
   assert.match(globalStyles, /font-size: clamp\(28px, 3vw, 40px\)/);
   const initialInputFunction = pageSource.match(/function createInitialInputValues\(\): InputValues \{[\s\S]*?\n\}/)?.[0] ?? "";
   const suggestionSource = pageSource.match(/const targetAdjustmentSuggestions = useMemo\([\s\S]*?\n  \}, \[adjustedDrivers,[\s\S]*?\]\);/)?.[0] ?? "";

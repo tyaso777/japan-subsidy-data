@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const projectDirectory = path.resolve(scriptDirectory, "..");
 const cssPath = path.join(projectDirectory, "app", "globals.css");
-const outputPath = path.join(projectDirectory, "成長投資計画_数値設計ラボ.html");
+const outputPath = path.join(projectDirectory, "成長投資計画シミュレーター_大規模成長投資補助金6次公募.html");
 const buildDirectory = path.join(projectDirectory, ".standalone-build");
 
 await rm(buildDirectory, { recursive: true, force: true });
@@ -59,12 +59,12 @@ const html = `<!doctype html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="大規模成長投資補助金のPL・15指標・目標競合を検証する単一HTMLモデル">
-  <title>成長投資計画 数値設計ラボ</title>
+  <meta name="description" content="大規模成長投資補助金6次公募の成長投資計画・将来PL・評価指標を検証する単独HTMLシミュレーター">
+  <title>成長投資計画シミュレーター（Ver. 大規模成長投資補助金 6次公募）</title>
   <style>${css}</style>
 </head>
 <body>
-  <div id="root"><main style="padding:2rem">数値設計ラボを読み込んでいます…</main></div>
+  <div id="root"><main style="padding:2rem">成長投資計画シミュレーターを読み込んでいます…</main></div>
   <noscript>このHTMLの計算機能を使うにはJavaScriptを有効にしてください。</noscript>
   <script>${script}</script>
 </body>
