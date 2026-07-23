@@ -144,9 +144,10 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /の許容上限を.*へ引き上げる/);
   assert.match(pageSource, /の許容下限を.*へ引き下げる/);
   assert.match(pageSource, /type DriverRangeSuggestion =/);
-  assert.match(pageSource, /function applyDriverRangeSuggestion\(suggestion: DriverRangeSuggestion\)/);
-  assert.match(pageSource, /onClick=\{\(\) => applyDriverRangeSuggestion\(suggestion\)\}>適用<\/button>/);
-  assert.match(globalStyles, /\.target-adjustment-suggestion button/);
+  assert.match(pageSource, /function applySelectedDriverRangeSuggestions\(metricKey: MetricKey, suggestions: DriverRangeSuggestion\[\]\)/);
+  assert.match(pageSource, /type="checkbox" checked=\{Boolean\(selectedAdjustmentSuggestions/);
+  assert.match(pageSource, />選択した候補を一括適用<\/button>/);
+  assert.match(globalStyles, /\.apply-selected-suggestions/);
   assert.match(pageSource, /slice\(0, 3\)/);
   assert.match(proposalSource, /<th>目標値<\/th><th>判定<\/th>/);
   assert.match(pageSource, /<Round5BenchmarkCell metricKey=\{definition\.key\} unit=\{definition\.unit\} \/>/);
