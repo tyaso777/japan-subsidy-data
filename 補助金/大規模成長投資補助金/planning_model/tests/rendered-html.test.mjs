@@ -144,6 +144,9 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /の許容上限を.*へ引き上げる/);
   assert.match(pageSource, /の許容下限を.*へ引き下げる/);
   assert.match(pageSource, /type DriverRangeSuggestion =/);
+  assert.match(pageSource, /projectSalesGrowthToBase: \{ label: "補助事業 売上成長率（設備導入期間）"/);
+  assert.match(pageSource, /projectSalesGrowth: \{ label: "補助事業 売上成長率（基準年→事業化報告3年目）"/);
+  assert.match(pageSource, /otherSalesGrowthToBase: \{ label: "その他事業 売上成長率（最新決算期→基準年）"/);
   assert.match(pageSource, /const improvesTargetGap = \(probeValue: number\)/);
   assert.doesNotMatch(pageSource, /Math\.abs\(current - rangeUpper\)/);
   assert.match(pageSource, /function applySelectedDriverRangeSuggestions\(metricKey: MetricKey, suggestions: DriverRangeSuggestion\[\]\)/);
