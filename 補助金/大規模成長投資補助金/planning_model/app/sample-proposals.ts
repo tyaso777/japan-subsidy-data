@@ -30,7 +30,38 @@ import { defaultMetricGroupBases } from "./metric-groups";
 const clone = <T,>(value: T): T => structuredClone(value);
 const round = (value: number) => Number(value.toFixed(2));
 
-const standardWorkflowDrivers = {
+const standardWorkflowInitialDrivers = {
+  ...sampleDrivers,
+  projectMarketGrowth: 0.05,
+  projectSalesGrowthToBase: 0.05409356725146197,
+  projectCogsImprovementToBase: 5.551115123125783e-17,
+  projectPayGrowthToBase: 0.020030662342518046,
+  projectHeadcountGrowthToBase: 0.05409356725146197,
+  projectSgaImprovementToBase: 0,
+  projectOfficerPayGrowthToBase: 0.05409356725146197,
+  otherSalesGrowthToBase: 0.042572463768115854,
+  otherCogsImprovementToBase: 0,
+  otherPayGrowthToBase: 0.01984645846924027,
+  otherHeadcountGrowthToBase: 0.04083333333333339,
+  otherSgaImprovementToBase: 0,
+  projectSalesGrowth: 0.22,
+  otherSalesGrowth: 0.06257246376811586,
+  projectCogsImprovementAfterBase: 0.015,
+  otherCogsImprovement: 0.005,
+  projectPayGrowth: 0.07,
+  otherPayGrowth: 0.02484645846924027,
+  projectHeadcountGrowth: 0.04,
+  otherHeadcountGrowth: 0.045833333333333386,
+  projectSgaRateEnd: 0.11,
+  otherSgaRateEnd: 0.10928571428571428,
+  projectOfficerPayGrowth: 0.05380116959064325,
+  usefulLife: 10,
+  investment: 23,
+  subsidy: 7.66,
+  localBenchmark: 23,
+};
+
+const standardWorkflowAdjustedDrivers = {
   ...sampleDrivers,
   projectSalesGrowthToBase: 0.05407072368421051,
   projectCogsImprovementToBase: 1.174186491064466e-16,
@@ -179,13 +210,14 @@ export function createStandardSampleProposal(exportedAt: string): ProposalData {
     exportedAt,
     createHistoricalPlan(sampleBasePlan, DEFAULT_TIMELINE),
   );
-  proposal.drivers = clone(standardWorkflowDrivers);
+  proposal.drivers = clone(standardWorkflowInitialDrivers);
+  proposal.adjustedDrivers = clone(standardWorkflowAdjustedDrivers);
   proposal.driverRanges = clone(standardWorkflowRanges);
   proposal.targets = clone(standardWorkflowTargets);
   proposal.forecastOverrides = clone(standardWorkflowOverrides);
   proposal.futureInputBasis = "other";
-  for (const key of Object.keys(standardWorkflowDrivers) as (keyof typeof standardWorkflowDrivers)[]) {
-    proposal.inputValues![inputKey.driver(key)] = standardWorkflowDrivers[key];
+  for (const key of Object.keys(standardWorkflowInitialDrivers) as (keyof typeof standardWorkflowInitialDrivers)[]) {
+    proposal.inputValues![inputKey.driver(key)] = standardWorkflowInitialDrivers[key];
     proposal.inputValues![inputKey.driverRange(key, 0)] = standardWorkflowRanges[key][0];
     proposal.inputValues![inputKey.driverRange(key, 1)] = standardWorkflowRanges[key][1];
   }
@@ -200,8 +232,9 @@ export function createStandardSampleProposal(exportedAt: string): ProposalData {
 
 export function createStandardSampleEffectivePlan(proposal: ProposalData) {
   const historical = proposal.historicalPlan;
-  const periodInputs = createForecastProjectPeriodInputs(historical[2], proposal.drivers, proposal.timeline);
-  const plan = generatePlan(historical, proposal.drivers, proposal.timeline, periodInputs);
+  const calculationDrivers = proposal.adjustedDrivers ?? proposal.drivers;
+  const periodInputs = createForecastProjectPeriodInputs(historical[2], calculationDrivers, proposal.timeline);
+  const plan = generatePlan(historical, calculationDrivers, proposal.timeline, periodInputs);
   const result = clone(plan);
   const anchored = new Set<keyof SegmentPlan>();
   for (let index = 3; index < result.length; index += 1) {

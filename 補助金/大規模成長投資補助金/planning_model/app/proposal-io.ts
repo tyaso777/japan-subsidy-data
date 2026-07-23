@@ -16,6 +16,8 @@ export type ProposalData = {
   balanceSheets: BalanceSheetPlan[];
   futureCapex: { year: number; value: number }[];
   drivers: Drivers;
+  /** Optional saved optimization result. `drivers` remains the pre-optimization planning input. */
+  adjustedDrivers?: Drivers;
   driverRanges: Record<keyof Drivers, [number, number]>;
   targets: Record<MetricKey, Target>;
   forecastOverrides: Record<string, number>;

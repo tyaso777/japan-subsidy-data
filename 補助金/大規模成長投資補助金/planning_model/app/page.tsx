@@ -48,7 +48,7 @@ import {
   YearPlan,
 } from "./model";
 import { buildProposalHtml, buildProposalXlsx, downloadBlob, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
-import { createBaseYearLaunchHistoricalOnlySampleProposal, createHistoricalOnlySampleProposal, createStandardSampleEffectivePlan, createStandardSampleProposal } from "./sample-proposals";
+import { createBaseYearLaunchHistoricalOnlySampleProposal, createHistoricalOnlySampleProposal, createStandardSampleProposal } from "./sample-proposals";
 import { getInputValue, hasInputValue, inputKey, setInputValue, type InputValues } from "./input-values";
 import { defaultMetricGroupBases, metricBasisRole, metricLinkGroups, type MetricGroupBasis, type MetricGroupKey } from "./metric-groups";
 import {
@@ -760,6 +760,7 @@ export default function Home() {
       balanceSheets: clone(balanceSheets),
       futureCapex: clone(futureCapex),
       drivers: clone(drivers),
+      adjustedDrivers: adjustedDrivers ? clone(adjustedDrivers) : undefined,
       driverRanges: clone(driverRanges),
       targets: clone(targets),
       forecastOverrides: clone(forecastOverrides),
@@ -805,6 +806,13 @@ export default function Home() {
   function applyProposal(proposal: ProposalData) {
     clearAdjustment();
     const importedDrivers = { ...defaultDrivers, ...clone(proposal.drivers) };
+    const importedAdjustedDrivers = proposal.adjustedDrivers
+      ? { ...defaultDrivers, ...clone(proposal.adjustedDrivers) }
+      : null;
+    const importedTimeline = normalizeTimeline(proposal.timeline);
+    const importedHistoricalPlan = clone(proposal.historicalPlan);
+    const importedForecastOverrides = clone(proposal.forecastOverrides ?? {});
+    const importedFutureInputBasis = proposal.futureInputBasis ?? "other";
     const importedRanges = { ...clone(driverBounds), ...clone(proposal.driverRanges) };
     for (const key of Object.keys(driverBounds) as (keyof Drivers)[]) {
       const importedRange = importedRanges[key] ?? driverBounds[key];
@@ -812,15 +820,15 @@ export default function Home() {
       importedRanges[key] = [Math.min(...validRange), Math.max(...validRange)];
     }
     setProposalTitle(proposal.title || "成長投資計画 提案計画");
-    setTimeline(normalizeTimeline(proposal.timeline));
-    setHistoricalPlan(clone(proposal.historicalPlan));
+    setTimeline(importedTimeline);
+    setHistoricalPlan(importedHistoricalPlan);
     setBalanceSheets(clone(proposal.balanceSheets));
     setFutureCapex(clone(proposal.futureCapex));
     setDrivers(importedDrivers);
     setDriverRanges(importedRanges);
     setTargets(Object.fromEntries(Object.entries(proposal.targets).map(([key, target]) => [key, { ...target, max: target.max ?? defaultTargets[key as MetricKey].max, weight: integerPriority(target.weight) }])) as Record<MetricKey, Target>);
-    setForecastOverrides(clone(proposal.forecastOverrides ?? {}));
-    setFutureInputBasis(proposal.futureInputBasis ?? "other");
+    setForecastOverrides(importedForecastOverrides);
+    setFutureInputBasis(importedFutureInputBasis);
     setMetricGroupBases({ ...defaultMetricGroupBases, ...(proposal.metricGroupBases ?? {}) });
     setApplicationCategory(proposal.applicationCategory ?? defaultApplicationCategory);
     if (proposal.inputValues) {
@@ -871,6 +879,13 @@ export default function Home() {
       });
       setInputValues(inferred);
     }
+    if (importedAdjustedDrivers) {
+      const adjustedPeriodInputs = createForecastProjectPeriodInputs(importedHistoricalPlan[2], importedAdjustedDrivers, importedTimeline);
+      const adjustedAutoPlan = generatePlan(importedHistoricalPlan, importedAdjustedDrivers, importedTimeline, adjustedPeriodInputs);
+      setAdjustedDrivers(importedAdjustedDrivers);
+      setAdjustedPlan(applyForecastOverrides(adjustedAutoPlan, importedForecastOverrides, importedFutureInputBasis));
+      setSolveNote("保存済みの最適化結果を表示しています。");
+    }
     setDefaultNote("");
     setHistoricalDefaultsApplied(false);
     setFileNote("提案計画を取り込みました");
@@ -888,8 +903,6 @@ export default function Home() {
   function loadSampleProposal() {
     const proposal = createStandardSampleProposal(new Date().toISOString());
     applyProposal(proposal);
-    setAdjustedDrivers(clone(proposal.drivers));
-    setAdjustedPlan(createStandardSampleEffectivePlan(proposal));
     setHistoricalDefaultsApplied(true);
     setDefaultNote("過去3期実績から調整水準を設定し、初回最適化後に2029年のその他事業売上高・補助事業の従業員給与支給総額を上書きして、再最適化したサンプルです。");
     setSolveNote("標準提案サンプル：一部将来データ入力後の再最適化まで実行済みです。");

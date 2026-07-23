@@ -17,8 +17,9 @@ test("standard sample represents the completed two-pass planning workflow", asyn
   assert.equal(proposal.forecastOverrides["2029:other:sales"], 85.13);
   assert.equal(proposal.forecastOverrides["2029:project:7-8"], 7.89);
   assert.equal(proposal.futureInputBasis, "other");
-  assert.ok(proposal.drivers.projectPayGrowth > 0.088, "second optimization should lift project pay growth after the manual future input");
-  assert.ok(proposal.drivers.projectSalesGrowth <= proposal.driverRanges.projectSalesGrowth[1]);
+  assert.equal(proposal.drivers.projectPayGrowth, 0.07, "planning input should retain the pre-optimization default");
+  assert.ok(proposal.adjustedDrivers.projectPayGrowth > 0.088, "second optimization should lift project pay growth after the manual future input");
+  assert.ok(proposal.adjustedDrivers.projectSalesGrowth <= proposal.driverRanges.projectSalesGrowth[1]);
   assert.equal(proposal.drivers.subsidy, 7.66);
   assert.equal(proposal.targets.companySalesIncrease.value, 133.5);
   assert.equal(proposal.targets.companySalesCagr.value, 20);

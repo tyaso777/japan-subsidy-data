@@ -207,8 +207,8 @@ test("renders the planning model shell", async () => {
   assert.match(applicationRulesSource, /maximumSubsidyAmount\(drivers\.investment\)/);
   assert.match(applicationRulesSource, /Math\.floor\(\(exactMaximum \+ Number\.EPSILON\) \* 100\) \/ 100/);
   assert.match(pageSource, /driverConstraintFailure\(key, applicationCategory, drivers\)/);
-  assert.match(pageSource, /setAdjustedDrivers\(clone\(proposal\.drivers\)\)/);
-  assert.match(pageSource, /setAdjustedPlan\(createStandardSampleEffectivePlan\(proposal\)\)/);
+  assert.match(pageSource, /proposal\.adjustedDrivers/);
+  assert.match(pageSource, /setAdjustedDrivers\(importedAdjustedDrivers\)/);
   assert.match(pageSource, /aria-invalid=\{constraintError \? "true" : undefined\}/);
   assert.match(pageSource, /title: "制度上の必須条件に違反"/);
   assert.doesNotMatch(pageSource, /applicationCategory === "startupException"/);

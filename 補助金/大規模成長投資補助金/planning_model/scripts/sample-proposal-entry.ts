@@ -15,7 +15,7 @@ const standardProposal = createStandardSampleProposal(exportedAt);
 const launchSample = createBaseYearLaunchSample(exportedAt);
 
 async function buildAndVerify(proposal: ProposalData, effectivePlan: ReturnType<typeof generatePlan>, baseName: string) {
-  const actual = calculateMetrics(effectivePlan, proposal.drivers);
+  const actual = calculateMetrics(effectivePlan, proposal.adjustedDrivers ?? proposal.drivers);
   const metricRows = metrics.map((definition) => ({
     label: definition.label,
     unit: definition.unit,
@@ -33,7 +33,7 @@ async function buildAndVerify(proposal: ProposalData, effectivePlan: ReturnType<
 }
 
 const standardPlan = createStandardSampleEffectivePlan(standardProposal);
-const standardActuals = calculateMetrics(standardPlan, standardProposal.drivers);
+const standardActuals = calculateMetrics(standardPlan, standardProposal.adjustedDrivers ?? standardProposal.drivers);
 const standardRequiredTargets = [
   "companySalesCagr",
   "companyPaySchedule",
