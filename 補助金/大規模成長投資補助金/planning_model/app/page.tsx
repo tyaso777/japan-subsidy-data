@@ -1372,7 +1372,7 @@ export default function Home() {
 
       {view === "history" && (
         <section className="content-stack history-actuals-view">
-          <div className="section-intro"><div><p className="eyebrow">STEP 1 / ACTUALS</p><h2>過去3期の実績を入力</h2></div><p>まずB/S、会社全体PL、補助事業PLの過去3期を入力します。その他事業の過去実績は「全社－補助事業」で自動算出します。</p></div>
+          <div className="section-intro"><div><p className="eyebrow">STEP 1 / ACTUALS</p><h2>過去3期の実績を入力</h2></div><p>まずB/S、会社全体PL、補助事業PLの過去3期を入力します。</p></div>
           <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。空欄は未設定、0は明示的なゼロとして区別して保存します。直前の変更はCtrl＋Zで戻せます。</p>
           <article className="panel application-category-panel">
             <div className="panel-heading"><div><p className="card-kicker">ROUND 6 / APPLICATION CATEGORY</p><h2>申請区分・制度前提</h2></div><span className={`pill ${applicationCategory ? "green" : ""}`}>{applicationCategory ? "選択済み" : "必須選択"}</span></div>
