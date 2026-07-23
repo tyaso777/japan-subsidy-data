@@ -16,11 +16,16 @@ export function applicationRequirements(category: ApplicationCategory) {
   };
 }
 
+export function maximumSubsidyAmount(investment: number) {
+  const exactMaximum = Math.min(50, Math.max(0, investment) / 3);
+  return Math.floor((exactMaximum + Number.EPSILON) * 100) / 100;
+}
+
 export function driverRequirementLabel(key: keyof Drivers, category: ApplicationCategory, investment: number) {
   const requirements = applicationRequirements(category);
   if (key === "projectPayGrowthToBase") return "基準年度額が最新決算期額以上（成長率0%以上）";
   if (key === "investment") return requirements ? `${requirements.investmentMinimum}億円以上（専門家経費・外注費を除く補助対象経費）` : "申請区分の選択後に確定";
-  if (key === "subsidy") return `50億円以下、かつ投資額の1/3以下（現在上限${Math.min(50, Math.max(0, investment) / 3).toFixed(2)}億円）`;
+  if (key === "subsidy") return `50億円以下、かつ投資額の1/3以下（現在上限${maximumSubsidyAmount(investment).toFixed(2)}億円）`;
   return "—";
 }
 
@@ -34,7 +39,8 @@ export function driverConstraintFailure(key: keyof Drivers, category: Applicatio
   if (key === "subsidy") {
     if (drivers.subsidy < 0) return "0億円以上で入力してください";
     if (drivers.subsidy > 50) return "制度上限50億円以下で入力してください";
-    if (drivers.subsidy > drivers.investment / 3) return `投資額の1/3以下（現在${Math.max(0, drivers.investment / 3).toFixed(2)}億円以下）で入力してください`;
+    const maximum = maximumSubsidyAmount(drivers.investment);
+    if (drivers.subsidy > maximum + 1e-9) return `投資額の1/3以下（現在${maximum.toFixed(2)}億円以下）で入力してください`;
   }
   return null;
 }

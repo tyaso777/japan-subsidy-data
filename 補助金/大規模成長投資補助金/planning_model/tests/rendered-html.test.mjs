@@ -204,7 +204,8 @@ test("renders the planning model shell", async () => {
   assert.match(applicationRulesSource, /investmentMinimum: category === "hundredBillion" \? 15 : 20/);
   assert.match(applicationRulesSource, /projectPayCagrMinimum: category === "general" \? 5 : 4\.5/);
   assert.match(applicationRulesSource, /drivers\.subsidy > 50/);
-  assert.match(applicationRulesSource, /drivers\.subsidy > drivers\.investment \/ 3/);
+  assert.match(applicationRulesSource, /maximumSubsidyAmount\(drivers\.investment\)/);
+  assert.match(applicationRulesSource, /Math\.floor\(\(exactMaximum \+ Number\.EPSILON\) \* 100\) \/ 100/);
   assert.match(pageSource, /driverConstraintFailure\(key, applicationCategory, drivers\)/);
   assert.match(pageSource, /aria-invalid=\{constraintError \? "true" : undefined\}/);
   assert.match(pageSource, /title: "制度上の必須条件に違反"/);

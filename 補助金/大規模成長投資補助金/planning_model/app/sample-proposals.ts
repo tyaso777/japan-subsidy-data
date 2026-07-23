@@ -55,7 +55,7 @@ const standardWorkflowDrivers = {
   otherSgaRateEnd: 0.10922616465163659,
   projectOfficerPayGrowth: 0.05371923167958349,
   investment: 23,
-  subsidy: 7.67,
+  subsidy: 7.66,
 };
 
 const standardWorkflowRanges: typeof driverBounds = {

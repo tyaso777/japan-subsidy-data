@@ -57,6 +57,7 @@ import {
   defaultApplicationCategory,
   driverConstraintFailure,
   driverRequirementLabel,
+  maximumSubsidyAmount,
   metricRequirementLabel,
   requiredMetricMinimums,
   systemConstraintFailures,
@@ -109,7 +110,7 @@ const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string;
   projectOfficerPayGrowth: { label: "役員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
   usefulLife: { label: "新規投資の耐用年数", unit: "年", step: 1 },
   investment: { label: "補助事業投資額", unit: "億円", step: 1 },
-  subsidy: { label: "申請補助金額", unit: "億円", step: 1 },
+  subsidy: { label: "申請補助金額", unit: "億円", step: 0.01 },
   localBenchmark: { label: "ローカルベンチマーク", unit: "点", step: 1 },
 };
 
@@ -1103,7 +1104,9 @@ export default function Home() {
     const annualHistoricalCapex = historicalCapex.length ? historicalCapex.reduce((sum, value) => sum + value, 0) / historicalCapex.length : 0;
     const estimatedInvestment = annualHistoricalCapex * Math.max(1, timeline.baseYear - timeline.latestYear);
     nextDrivers.investment = investmentEntered ? (capexEntered ? enteredInvestment : drivers.investment) : clamp(estimatedInvestment || 15, driverBounds.investment[0], driverBounds.investment[1]);
-    nextDrivers.subsidy = hasInputValue(inputValues, inputKey.driver("subsidy")) ? drivers.subsidy : clamp(nextDrivers.investment / 3, driverBounds.subsidy[0], driverBounds.subsidy[1]);
+    nextDrivers.subsidy = hasInputValue(inputValues, inputKey.driver("subsidy"))
+      ? drivers.subsidy
+      : clamp(maximumSubsidyAmount(nextDrivers.investment), driverBounds.subsidy[0], driverBounds.subsidy[1]);
 
     for (const key of adjustableDriverKeys) {
       const history = historicalDriverSeries[key];

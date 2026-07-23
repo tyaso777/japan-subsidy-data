@@ -22,6 +22,7 @@ import {
   type Target,
   type YearPlan,
 } from "../app/model";
+import { maximumSubsidyAmount } from "../app/application-rules";
 import { requiredMetricMinimums } from "../app/application-rules";
 import { defaultMetricGroupBases, metricBasisRole } from "../app/metric-groups";
 
@@ -68,7 +69,7 @@ initialDrivers.projectMarketGrowth = 0.05;
 initialDrivers.usefulLife = 10;
 const annualCapex = sampleBalanceSheets.reduce((sum, row) => sum + row.capex, 0) / sampleBalanceSheets.length;
 initialDrivers.investment = round(annualCapex * (DEFAULT_TIMELINE.baseYear - DEFAULT_TIMELINE.latestYear));
-initialDrivers.subsidy = round(initialDrivers.investment / 3);
+initialDrivers.subsidy = maximumSubsidyAmount(initialDrivers.investment);
 initialDrivers.localBenchmark = sampleDrivers.localBenchmark;
 const historicalSeries = calculateHistoricalDriverSeries(historical, sampleBalanceSheets);
 for (const key of adjustable) {
