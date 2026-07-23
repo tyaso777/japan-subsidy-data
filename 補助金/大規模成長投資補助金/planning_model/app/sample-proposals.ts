@@ -1,5 +1,6 @@
 import {
   createHistoricalPlan,
+  createForecastProjectPeriodInputs,
   cogsDepreciation,
   DEFAULT_TIMELINE,
   defaultDrivers,
@@ -28,6 +29,77 @@ import { defaultMetricGroupBases } from "./metric-groups";
 
 const clone = <T,>(value: T): T => structuredClone(value);
 const round = (value: number) => Number(value.toFixed(2));
+
+const standardWorkflowDrivers = {
+  ...sampleDrivers,
+  projectSalesGrowthToBase: 0.05407072368421051,
+  projectCogsImprovementToBase: 1.174186491064466e-16,
+  projectPayGrowthToBase: 0.020019816287178877,
+  projectHeadcountGrowthToBase: 0.054448536306753274,
+  projectSgaImprovementToBase: 0,
+  projectOfficerPayGrowthToBase: 0.054060933702789804,
+  otherSalesGrowthToBase: 0.04260731658392249,
+  otherCogsImprovementToBase: 0,
+  otherPayGrowthToBase: 0.019809059504605663,
+  otherHeadcountGrowthToBase: 0.041493777249306446,
+  otherSgaImprovementToBase: 0,
+  projectSalesGrowth: 0.29613714390065743,
+  otherSalesGrowth: 0.062495258171033366,
+  projectCogsImprovementAfterBase: 0.015550427257977284,
+  otherCogsImprovement: 0.005,
+  projectPayGrowth: 0.08894384122463511,
+  otherPayGrowth: 0.024842152906941306,
+  projectHeadcountGrowth: 0.026240752485890893,
+  otherHeadcountGrowth: 0.04587237692136338,
+  projectSgaRateEnd: 0.10315299543741321,
+  otherSgaRateEnd: 0.10922616465163659,
+  projectOfficerPayGrowth: 0.05371923167958349,
+  investment: 23,
+  subsidy: 7.67,
+};
+
+const standardWorkflowRanges: typeof driverBounds = {
+  ...clone(driverBounds),
+  projectSalesGrowthToBase: [0.051169590643274754, 0.05701754385964919],
+  projectCogsImprovementToBase: [0, 1.6653345369377348e-16],
+  projectPayGrowthToBase: [0.019325330501846927, 0.020735994183189166],
+  projectHeadcountGrowthToBase: [0.051169590643274754, 0.05701754385964919],
+  projectSgaImprovementToBase: [0, 0],
+  projectOfficerPayGrowthToBase: [0.051169590643274754, 0.05701754385964919],
+  otherSalesGrowthToBase: [0.040760869565217184, 0.04438405797101452],
+  otherCogsImprovementToBase: [0, 0.00013457556935819737],
+  otherPayGrowthToBase: [0.019139457023717443, 0.020553459914763095],
+  otherHeadcountGrowthToBase: [0.03916666666666668, 0.04250000000000009],
+  otherSgaImprovementToBase: [0, 0],
+  projectSalesGrowth: [0.15, 0.3],
+  otherSalesGrowth: [0.06076086956521719, 0.06438405797101453],
+  projectCogsImprovementAfterBase: [0, 0.03],
+  otherCogsImprovement: [0.005, 0.0051345755693581975],
+  projectPayGrowth: [0.05, 0.1],
+  otherPayGrowth: [0.024139457023717444, 0.025553459914763096],
+  projectHeadcountGrowth: [0, 0.08],
+  otherHeadcountGrowth: [0.04416666666666668, 0.04750000000000009],
+  projectSgaRateEnd: [0.08499999999999999, 0.135],
+  otherSgaRateEnd: [0.08928571428571427, 0.11928571428571427],
+  projectOfficerPayGrowth: [0.04263157894736836, 0.06555555555555558],
+};
+
+const standardWorkflowTargets = clone(defaultTargets);
+Object.assign(standardWorkflowTargets, {
+  companySalesCagr: { ...standardWorkflowTargets.companySalesCagr, value: 20 },
+  companySalesIncrease: { ...standardWorkflowTargets.companySalesIncrease, value: 133.5, max: 252.69 },
+  companyPaySchedule: { ...standardWorkflowTargets.companyPaySchedule, value: 2 },
+  projectSalesShare: { ...standardWorkflowTargets.projectSalesShare, value: 65 },
+  projectSalesIncrease: { ...standardWorkflowTargets.projectSalesIncrease, value: 76.44, max: 136.84 },
+  valueAddedIncrease: { ...standardWorkflowTargets.valueAddedIncrease, value: 18.78, max: 33.43 },
+  employeePayIncrease: { ...standardWorkflowTargets.employeePayIncrease, value: 2.85, max: 3.74 },
+  investmentSalesRatio: { ...standardWorkflowTargets.investmentSalesRatio, value: 15 },
+});
+
+const standardWorkflowOverrides: Record<string, number> = {
+  "2029:other:sales": 85.13,
+  "2029:project:7-8": 7.89,
+};
 
 const emptySegment = (): SegmentPlan => ({
   sales: 0,
@@ -102,11 +174,68 @@ const commonProposal = (title: string, exportedAt: string, historicalPlan: YearP
 };
 
 export function createStandardSampleProposal(exportedAt: string): ProposalData {
-  return commonProposal(
+  const proposal = commonProposal(
     "成長投資計画 提案計画サンプル",
     exportedAt,
     createHistoricalPlan(sampleBasePlan, DEFAULT_TIMELINE),
   );
+  proposal.drivers = clone(standardWorkflowDrivers);
+  proposal.driverRanges = clone(standardWorkflowRanges);
+  proposal.targets = clone(standardWorkflowTargets);
+  proposal.forecastOverrides = clone(standardWorkflowOverrides);
+  proposal.futureInputBasis = "other";
+  for (const key of Object.keys(standardWorkflowDrivers) as (keyof typeof standardWorkflowDrivers)[]) {
+    proposal.inputValues![inputKey.driver(key)] = standardWorkflowDrivers[key];
+    proposal.inputValues![inputKey.driverRange(key, 0)] = standardWorkflowRanges[key][0];
+    proposal.inputValues![inputKey.driverRange(key, 1)] = standardWorkflowRanges[key][1];
+  }
+  for (const key of Object.keys(standardWorkflowTargets) as (keyof typeof standardWorkflowTargets)[]) {
+    proposal.inputValues![inputKey.target(key, "value")] = round(standardWorkflowTargets[key].value);
+    if (standardWorkflowTargets[key].max !== undefined) {
+      proposal.inputValues![inputKey.target(key, "max")] = round(standardWorkflowTargets[key].max!);
+    }
+  }
+  return proposal;
+}
+
+export function createStandardSampleEffectivePlan(proposal: ProposalData) {
+  const historical = proposal.historicalPlan;
+  const periodInputs = createForecastProjectPeriodInputs(historical[2], proposal.drivers, proposal.timeline);
+  const plan = generatePlan(historical, proposal.drivers, proposal.timeline, periodInputs);
+  const result = clone(plan);
+  const anchored = new Set<keyof SegmentPlan>();
+  for (let index = 3; index < result.length; index += 1) {
+    for (const field of ["sales", "employeePay"] as (keyof SegmentPlan)[]) {
+      const key = `${result[index].year}:other:${field}`;
+      if (Object.prototype.hasOwnProperty.call(proposal.forecastOverrides, key)) {
+        result[index].other[field] = round(proposal.forecastOverrides[key]);
+        anchored.add(field);
+      } else if (anchored.has(field)) {
+        const previousAuto = plan[index - 1].other[field];
+        const previousEffective = result[index - 1].other[field];
+        const currentAuto = plan[index].other[field];
+        result[index].other[field] = round(Math.abs(previousAuto) > 1e-9
+          ? previousEffective * currentAuto / previousAuto
+          : previousEffective + currentAuto - previousAuto);
+      }
+    }
+  }
+  let projectPayAnchored = false;
+  for (let index = 3; index < result.length; index += 1) {
+    const key = `${result[index].year}:project:7-8`;
+    if (Object.prototype.hasOwnProperty.call(proposal.forecastOverrides, key)) {
+      result[index].project.employeePay = round(proposal.forecastOverrides[key]);
+      projectPayAnchored = true;
+    } else if (projectPayAnchored) {
+      const previousAuto = plan[index - 1].project.employeePay;
+      const previousEffective = result[index - 1].project.employeePay;
+      const currentAuto = plan[index].project.employeePay;
+      result[index].project.employeePay = round(Math.abs(previousAuto) > 1e-9
+        ? previousEffective * currentAuto / previousAuto
+        : previousEffective + currentAuto - previousAuto);
+    }
+  }
+  return result;
 }
 
 export function createHistoricalOnlySampleProposal(exportedAt: string): ProposalData {

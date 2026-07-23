@@ -886,7 +886,10 @@ export default function Home() {
 
   function loadSampleProposal() {
     applyProposal(createStandardSampleProposal(new Date().toISOString()));
-    setFileNote("サンプル提案計画を読み込みました");
+    setHistoricalDefaultsApplied(true);
+    setDefaultNote("過去3期実績から調整水準を設定し、初回最適化後に2029年のその他事業売上高・補助事業の従業員給与支給総額を上書きして、再最適化したサンプルです。");
+    setSolveNote("標準提案サンプル：一部将来データ入力後の再最適化まで実行済みです。");
+    setFileNote("過去入力・調整水準設定・2段階最適化済みの標準提案を読み込みました");
   }
 
   function loadHistoricalOnlySample() {

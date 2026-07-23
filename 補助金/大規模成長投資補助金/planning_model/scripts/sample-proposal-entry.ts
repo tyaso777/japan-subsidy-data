@@ -7,7 +7,7 @@ import {
   metrics,
 } from "../app/model";
 import { buildProposalHtml, buildProposalXlsx, parseProposalFile, type ProposalData } from "../app/proposal-io";
-import { createBaseYearLaunchSample, createStandardSampleProposal } from "../app/sample-proposals";
+import { createBaseYearLaunchSample, createStandardSampleEffectivePlan, createStandardSampleProposal } from "../app/sample-proposals";
 
 const outputDirectory = path.resolve(process.cwd(), "examples");
 const exportedAt = "2026-07-22T00:00:00.000Z";
@@ -32,7 +32,27 @@ async function buildAndVerify(proposal: ProposalData, effectivePlan: ReturnType<
   return { html, xlsx };
 }
 
-const standardPlan = generatePlan(standardProposal.historicalPlan, standardProposal.drivers, standardProposal.timeline);
+const standardPlan = createStandardSampleEffectivePlan(standardProposal);
+const standardActuals = calculateMetrics(standardPlan, standardProposal.drivers);
+const standardRequiredTargets = [
+  "companySalesCagr",
+  "companyPaySchedule",
+  "projectSalesShare",
+  "projectSalesCagr",
+  "laborProductivityCagr",
+  "employeePayCagr",
+  "investmentSalesRatio",
+  "valueAddedSubsidyRatio",
+] as const;
+for (const key of standardRequiredTargets) {
+  const actual = standardActuals[key];
+  const target = standardProposal.targets[key].value;
+  if (!Number.isFinite(actual) || actual + 1e-8 < target) {
+    throw new Error(
+      `標準提案の再最適化結果が目標未達です: ${key}（計画値 ${actual} / 目標値 ${target}）`,
+    );
+  }
+}
 const standardOutput = await buildAndVerify(standardProposal, standardPlan, "成長投資計画_提案計画サンプル");
 const launchOutput = await buildAndVerify(launchSample.proposal, launchSample.effectivePlan, "成長投資計画_提案計画サンプル_基準年売上開始");
 

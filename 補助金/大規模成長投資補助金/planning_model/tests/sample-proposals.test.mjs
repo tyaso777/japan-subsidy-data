@@ -6,6 +6,22 @@ import { fileURLToPath } from "node:url";
 
 const projectDirectory = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const baseName = "成長投資計画_提案計画サンプル_基準年売上開始";
+const standardBaseName = "成長投資計画_提案計画サンプル";
+
+test("standard sample represents the completed two-pass planning workflow", async () => {
+  const html = await readFile(path.join(projectDirectory, "examples", `${standardBaseName}.html`), "utf8");
+  const payload = html.match(/<script id="growth-proposal-data" type="application\/json">([^<]+)<\/script>/)?.[1];
+  assert.ok(payload, "proposal payload should be embedded for reimport");
+  const proposal = JSON.parse(Buffer.from(payload, "base64").toString("utf8"));
+
+  assert.equal(proposal.forecastOverrides["2029:other:sales"], 85.13);
+  assert.equal(proposal.forecastOverrides["2029:project:7-8"], 7.89);
+  assert.equal(proposal.futureInputBasis, "other");
+  assert.ok(proposal.drivers.projectPayGrowth > 0.088, "second optimization should lift project pay growth after the manual future input");
+  assert.ok(proposal.drivers.projectSalesGrowth <= proposal.driverRanges.projectSalesGrowth[1]);
+  assert.equal(proposal.targets.companySalesIncrease.value, 133.5);
+  assert.equal(proposal.targets.companySalesCagr.value, 20);
+});
 
 test("base-year launch sample has no project sales before the base year", async () => {
   const html = await readFile(path.join(projectDirectory, "examples", `${baseName}.html`), "utf8");
