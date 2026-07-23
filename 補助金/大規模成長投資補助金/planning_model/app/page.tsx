@@ -610,13 +610,64 @@ export default function Home() {
     const statutoryValidations = statutoryFailures.map((detail) => ({ level: "error" as const, title: "制度上の必須条件に違反", detail }));
     return statutoryValidations.length ? [...statutoryValidations, ...modelValidations.filter((item) => item.level !== "info")] : modelValidations;
   }, [plan, calculationDrivers, statutoryFailures]);
-  const optimizationTargets = useMemo(() => Object.fromEntries((Object.keys(targets) as MetricKey[]).map((key) => [key, !isOptimizationExcludedMetric(key) && hasInputValue(inputValues, inputKey.target(key, "value")) && metricBasisRole(key, metricGroupBases) !== "result" ? targets[key] : { ...targets[key], policy: "monitor", max: undefined }])) as Record<MetricKey, Target>, [targets, inputValues, metricGroupBases]);
+  const optimizationTargets = useMemo(() => Object.fromEntries((Object.keys(targets) as MetricKey[]).map((key) => [key, !isOptimizationExcludedMetric(key) && hasInputValue(inputValues, inputKey.target(key, "value")) && metricBasisRole(key, metricGroupBases) !== "result" ? { ...targets[key], policy: "hard", max: undefined } : { ...targets[key], policy: "monitor", max: undefined }])) as Record<MetricKey, Target>, [targets, inputValues, metricGroupBases]);
   const hardSummary = useMemo(() => hardTargetSummary(actual, optimizationTargets), [actual, optimizationTargets]);
   const targetManagedMetrics = metrics.filter((definition) => !isOptimizationExcludedMetric(definition.key) && metricBasisRole(definition.key, metricGroupBases) !== "result");
   const achieved = targetManagedMetrics.filter((definition) => hasInputValue(inputValues, inputKey.target(definition.key, "value")) && targetStatus(definition, actual[definition.key], targets[definition.key]).ok).length;
   const basePlanYear = plan.find((row) => row.role === "base")!;
   const report3 = plan.find((row) => row.role === "report3")!;
   const targetComparisonYears = Math.max(1, report3.year - basePlanYear.year);
+  const targetAdjustmentSuggestions = useMemo(() => {
+    const suggestions: Partial<Record<MetricKey, string[]>> = {};
+    if (!adjustedDrivers) return suggestions;
+    const sourceHistorical = sourcePlan.slice(0, 3);
+    const candidateActual = (candidateDrivers: Drivers) => {
+      const period = createForecastProjectPeriodInputs(sourceHistorical[2], candidateDrivers, timeline);
+      const candidatePlan = applyForecastOverrides(generatePlan(sourceHistorical, candidateDrivers, timeline, period), forecastOverrides, futureInputBasis);
+      return calculateMetrics(candidatePlan, candidateDrivers);
+    };
+    for (const definition of targetManagedMetrics) {
+      const target = optimizationTargets[definition.key];
+      if (target.policy !== "hard" || targetStatus(definition, actual[definition.key], target).ok) continue;
+      const candidates: { score: number; text: string }[] = [];
+      for (const key of adjustableDriverKeys) {
+        const [rangeLower, rangeUpper] = driverRanges[key];
+        const [technicalLower, technicalUpper] = driverBounds[key];
+        const rangeSpan = Math.max(rangeUpper - rangeLower, 0.0001);
+        const technicalSpan = Math.max(technicalUpper - technicalLower, 0.0001);
+        const tolerance = Math.max(rangeSpan * 0.01, 0.00001);
+        const current = adjustedDrivers[key];
+        const displayBound = (value: number) => `${number(percentDriver(key) ? value * 100 : value, 2)}${driverLabels[key]!.unit}`;
+        const probes: { value: number; text: string; technicalLimit: boolean }[] = [];
+        if (Math.abs(current - rangeUpper) <= tolerance) {
+          const technicalLimit = rangeUpper >= technicalUpper - tolerance;
+          const value = technicalLimit
+            ? Math.max(technicalLower, current - Math.max(technicalSpan * 0.01, 0.00001))
+            : Math.min(technicalUpper, rangeUpper + Math.max(technicalSpan * 0.03, 0.0001));
+          probes.push({ value, technicalLimit, text: technicalLimit ? `${driverItemCodes[key]}：${driverLabels[key]!.label}は技術上限${displayBound(technicalUpper)}に到達（モデル前提の見直しが必要）` : `${driverItemCodes[key]}：${driverLabels[key]!.label}の許容上限を${displayBound(rangeUpper)}から${displayBound(value)}へ引き上げる` });
+        }
+        if (Math.abs(current - rangeLower) <= tolerance) {
+          const technicalLimit = rangeLower <= technicalLower + tolerance;
+          const value = technicalLimit
+            ? Math.min(technicalUpper, current + Math.max(technicalSpan * 0.01, 0.00001))
+            : Math.max(technicalLower, rangeLower - Math.max(technicalSpan * 0.03, 0.0001));
+          probes.push({ value, technicalLimit, text: technicalLimit ? `${driverItemCodes[key]}：${driverLabels[key]!.label}は技術下限${displayBound(technicalLower)}に到達（モデル前提の見直しが必要）` : `${driverItemCodes[key]}：${driverLabels[key]!.label}の許容下限を${displayBound(rangeLower)}から${displayBound(value)}へ引き下げる` });
+        }
+        for (const probe of probes) {
+          if (Math.abs(probe.value - current) < 1e-12) continue;
+          const probeValue = candidateActual({ ...adjustedDrivers, [key]: probe.value })[definition.key];
+          const rawChange = probeValue - actual[definition.key];
+          const improvement = probe.technicalLimit ? -rawChange : rawChange;
+          if (Number.isFinite(improvement) && improvement > 1e-8) candidates.push({ score: improvement / Math.abs(probe.value - current), text: probe.text });
+        }
+      }
+      suggestions[definition.key] = candidates
+        .sort((left, right) => right.score - left.score || left.text.localeCompare(right.text, "ja"))
+        .slice(0, 3)
+        .map((candidate) => candidate.text);
+    }
+    return suggestions;
+  }, [adjustedDrivers, actual, driverRanges, forecastOverrides, futureInputBasis, optimizationTargets, sourcePlan, targetManagedMetrics, timeline]);
 
   function clearAdjustment() {
     setAdjustedPlan(null);
@@ -1076,8 +1127,8 @@ export default function Home() {
         failedStatutory.length
           ? `制度上の必須条件を満たせません：${failedStatutory.join("／")}。固定入力と許容範囲を確認してください。最接近案を表示しています。`
           : failed.length
-          ? `固定入力と現在の許容範囲を守るとユーザー指定の必達条件を同時達成できません。必達違反が最小になる決定論的な最接近案を表示しています（未達${failed.length}件、総合目的関数${scoreDrop.toFixed(0)}%改善）。`
-          : `入力値を保持したまま調整案を作成。目的関数は${scoreDrop.toFixed(0)}%改善し、指定した必達目標は同時達成しています。`,
+          ? `固定入力と現在の許容範囲を守ると設定した目標を同時達成できません。目標違反が最小になる決定論的な最接近案を表示しています（未達${failed.length}件、総合目的関数${scoreDrop.toFixed(0)}%改善）。未達行に許容範囲の修正候補を表示します。`
+          : `入力値を保持したまま調整案を作成。目的関数は${scoreDrop.toFixed(0)}%改善し、設定した目標を同時達成しています。`,
       );
     } catch (error) {
       setSolveNote(error instanceof Error ? `計算に失敗しました：${error.message}` : "計算に失敗しました。");
@@ -1133,8 +1184,8 @@ export default function Home() {
           <div className="hero-card dark-card">
             <div>
               <p className="card-kicker">同時達成判定</p>
-              <h2>{hardSummary.failed.length === 0 ? "必達目標は両立可能" : "必達目標に競合・未達あり"}</h2>
-              <p>{hardSummary.hardCount === 0 ? "現在、必達指定はありません。15指標画面で指定してください。" : `${hardSummary.hardCount}件中${hardSummary.hardCount - hardSummary.failed.length}件を達成。`}</p>
+              <h2>{hardSummary.failed.length === 0 ? "設定目標は両立可能" : "設定目標に競合・未達あり"}</h2>
+              <p>{hardSummary.hardCount === 0 ? "現在、目標値は設定されていません。15指標画面で入力してください。" : `${hardSummary.hardCount}件中${hardSummary.hardCount - hardSummary.failed.length}件を達成。`}</p>
             </div>
             <div className="score-ring"><strong>{achieved}</strong><span>/ {targetManagedMetrics.length}</span><small>最適化対象の範囲内</small></div>
           </div>
@@ -1151,7 +1202,7 @@ export default function Home() {
             <div className="panel-heading"><div><p className="card-kicker">目標ギャップ</p><h2>優先して直す指標</h2></div><button className="text-button" onClick={() => goToView("targets")}>15指標を編集 →</button></div>
             <div className="metric-list">
               {metrics.map((definition) => {
-                const target = targets[definition.key];
+                const target = optimizationTargets[definition.key];
                 const status = targetStatus(definition, actual[definition.key], target);
                 const fixedInput = definition.key === "localBenchmark";
                 const referenceMetric = isSixthRoundReferenceMetric(definition.key);
@@ -1159,7 +1210,7 @@ export default function Home() {
                 const basisRole = metricBasisRole(definition.key, metricGroupBases);
                 return (
                   <div className="metric-row" key={definition.key}>
-                    <span className={`status-dot ${fixedInput || referenceMetric || basisRole === "result" || !targetSet || status.ok ? "ok" : target.policy === "hard" ? "bad" : "warn"}`} />
+                    <span className={`status-dot ${fixedInput || referenceMetric || basisRole === "result" || !targetSet || status.ok ? "ok" : "bad"}`} />
                     <div><strong>{definition.label}</strong><small>{definition.sourceRound}</small></div>
                     <span className="metric-value">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key])} →</small>}{number(actual[definition.key])}{definition.unit}</span>
                     <span className="metric-target">{fixedInput ? "固定入力・判定対象外" : referenceMetric ? "参考値・第6次評価対象外" : basisRole === "result" ? "自動算出" : targetSet ? `目標 ${number(target.value)}${definition.unit}` : "目標 未設定"}</span>
@@ -1242,7 +1293,7 @@ export default function Home() {
 
       {view === "targets" && (
         <section className="content-stack">
-          <div className="section-intro"><div><p className="eyebrow">15 METRICS</p><h2>目標・必達条件・競合管理</h2></div><p>計画値・判定・自動調整には第6次定義を使用します。目標値は固定し、複数の必達目標が矛盾する場合は未達を残して明示します。</p></div>
+          <div className="section-intro"><div><p className="eyebrow">15 METRICS</p><h2>目標・制度条件・競合管理</h2></div><p>計画値・判定・自動調整には第6次定義を使用します。入力した目標値を最適化対象とし、複数目標が矛盾する場合は未達と修正候補を明示します。</p></div>
           <article className="panel">
             <div className="panel-heading"><div><p className="card-kicker">STEP 2 / FORECAST DRIVERS</p><h2>将来予測・調整水準</h2></div><button className="default-button" onClick={applyHistoricalDefaults}>過去3期からデフォルト設定</button></div>
             <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th>調整項目<small>A～Z</small></th>{historicalPlan.map((row) => <th className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>計画初期値</th><th>制度上の必須条件<small>編集不可</small></th><th>許容下限</th><th>許容上限</th><th>最適化での扱い</th></tr></thead><tbody>
@@ -1291,27 +1342,29 @@ export default function Home() {
                 return <label className="metric-group-control" key={group.key}><span><strong>{group.label}</strong><small>{group.relation}</small></span><select aria-label={`${group.label}の目標設定方法`} value={basis} onChange={(event) => { clearAdjustment(); setMetricGroupBases((current) => ({ ...current, [group.key]: event.target.value as MetricGroupBasis })); }}><option value="rate">{group.rateLabel}に目標設定（{group.amountLabel}は自動算出）</option><option value="amount">{group.amountLabel}に目標設定（{group.rateLabel}は自動算出）</option><option value="both">両方に目標設定（2指標を同時に最適化）</option></select></label>;
               })}
             </div>
-            <div className="targets-table-wrap"><table className="targets-table"><thead><tr><th>No.</th><th>指標・第6次定義</th>{historicalPlan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>第5次公式参考値<small>採択者／申請者</small></th><th>第6次定義：計画値<small>{adjustedPlan ? "入力 → 調整案" : "計算結果"}</small></th><th>制度上の必須条件<small>編集不可</small></th><th>目標下限</th><th>計画上限</th><th>扱い</th><th>優先度</th><th>判定</th></tr></thead><tbody>
+            <div className="targets-table-wrap"><table className="targets-table"><thead><tr><th>No.</th><th>指標・第6次定義</th>{historicalPlan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>第5次公式参考値<small>採択者／申請者</small></th><th>第6次定義：計画値<small>{adjustedPlan ? "入力 → 調整案" : "計算結果"}</small></th><th>制度上の必須条件<small>編集不可</small></th><th>目標値</th><th>優先度</th><th>判定・未達時の修正候補</th></tr></thead><tbody>
               {metrics.map((definition, index) => {
                 const target = targets[definition.key];
-                const status = targetStatus(definition, actual[definition.key], target);
+                const effectiveTarget = optimizationTargets[definition.key];
+                const status = targetStatus(definition, actual[definition.key], effectiveTarget);
                 const targetSet = hasInputValue(inputValues, inputKey.target(definition.key, "value"));
                 const history = historicalMetricSeries[definition.key];
                 const scaleDependent = scaleDependentMetricKeys.has(definition.key);
                 const basisRole = metricBasisRole(definition.key, metricGroupBases);
-                if (definition.key === "localBenchmark") return <tr className="fixed-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>外部で算出した点数を転記する固定値</small></td>{history.values.map((_value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>—</td>)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td><input aria-label="ローカルベンチマーク固定値" type="number" step="1" value={getInputValue(inputValues, inputKey.driver("localBenchmark"))} placeholder="未入力" onChange={(event) => updateDriver("localBenchmark", event.target.value === "" ? null : Number(event.target.value))} /></td><td className="statutory-condition">—</td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="driver-policy">入力値を固定</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">判定対象外</span></td></tr>;
-                if (isSixthRoundReferenceMetric(definition.key)) return <tr className="reference-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>第6次評価対象外</small><span className="metric-role-badge reference">参考値</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{historicalPlan[historyIndex - 1]?.year}→{historicalPlan[historyIndex].year}（1年間）／{definition.unit}</small>{scaleDependent && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears)} {definition.unit}</small>}</> : "—"}</td>)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{number(actual[definition.key])} {definition.unit}</td><td className="statutory-condition">—</td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="driver-policy">参考値</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">判定対象外</span></td></tr>;
+                if (definition.key === "localBenchmark") return <tr className="fixed-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>外部で算出した点数を転記する固定値</small></td>{history.values.map((_value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>—</td>)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td><input aria-label="ローカルベンチマーク固定値" type="number" step="1" value={getInputValue(inputValues, inputKey.driver("localBenchmark"))} placeholder="未入力" onChange={(event) => updateDriver("localBenchmark", event.target.value === "" ? null : Number(event.target.value))} /></td><td className="statutory-condition">—</td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">判定対象外</span></td></tr>;
+                if (isSixthRoundReferenceMetric(definition.key)) return <tr className="reference-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>第6次評価対象外</small><span className="metric-role-badge reference">参考値</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{historicalPlan[historyIndex - 1]?.year}→{historicalPlan[historyIndex].year}（1年間）／{definition.unit}</small>{scaleDependent && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears)} {definition.unit}</small>}</> : "—"}</td>)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{number(actual[definition.key])} {definition.unit}</td><td className="statutory-condition">—</td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">参考値</span></td></tr>;
                 const rowClass = basisRole === "result" ? "metric-result-row" : basisRole === "basis" ? "metric-basis-row" : "metric-independent-row";
                 const roleLabel = basisRole === "result" ? "自動算出" : basisRole === "basis" ? "目標設定" : "個別に目標設定";
-                return <tr className={rowClass} key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>{definition.sourceRound}</small><span className={`metric-role-badge ${basisRole}`}>{roleLabel}</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{history.mode === "change" ? `${historicalPlan[historyIndex - 1]?.year}→${historicalPlan[historyIndex].year}（1年間）／${definition.unit}` : definition.unit}</small>{scaleDependent && history.mode === "change" && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears)} {definition.unit}</small>}</> : "—"}</td>)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key])} →</small>}{number(actual[definition.key])} {definition.unit}</td><td className="statutory-condition"><strong>{metricRequirementLabel(definition.key, applicationCategory)}</strong></td><td><input disabled={basisRole === "result"} aria-label={`${definition.label}目標下限`} type="number" step="0.1" value={getInputValue(inputValues, inputKey.target(definition.key, "value"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "value", event.target.value === "" ? null : Number(event.target.value))} /></td><td><input disabled={basisRole === "result"} aria-label={`${definition.label}計画上限`} type="number" step="0.1" value={getInputValue(inputValues, inputKey.target(definition.key, "max"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "max", event.target.value === "" ? null : Number(event.target.value))} /></td><td><select disabled={basisRole === "result"} value={target.policy} onChange={(event) => updateTarget(definition.key, { policy: event.target.value as Target["policy"] })}><option value="hard">必達</option><option value="soft">努力</option><option value="monitor">参考</option></select></td><td><input disabled={basisRole === "result"} type="number" min="1" max="10" step="1" value={integerPriority(target.weight)} onChange={(event) => updateTarget(definition.key, { weight: integerPriority(Number(event.target.value)) })} /></td><td><span className={`result-badge ${basisRole === "result" || !targetSet || status.ok ? "ok" : target.policy === "hard" ? "bad" : "warn"}`}>{basisRole === "result" ? "自動算出" : !targetSet ? "未設定" : status.ok ? "範囲内" : target.policy === "hard" ? "必達範囲外" : "範囲外"}</span></td></tr>;
+                const suggestions = targetAdjustmentSuggestions[definition.key] ?? [];
+                return <tr className={rowClass} key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>{definition.sourceRound}</small><span className={`metric-role-badge ${basisRole}`}>{roleLabel}</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{history.mode === "change" ? `${historicalPlan[historyIndex - 1]?.year}→${historicalPlan[historyIndex].year}（1年間）／${definition.unit}` : definition.unit}</small>{scaleDependent && history.mode === "change" && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears)} {definition.unit}</small>}</> : "—"}</td>)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key])} →</small>}{number(actual[definition.key])} {definition.unit}</td><td className="statutory-condition"><strong>{metricRequirementLabel(definition.key, applicationCategory)}</strong></td><td><input disabled={basisRole === "result"} aria-label={`${definition.label}目標値`} type="number" step="0.1" value={getInputValue(inputValues, inputKey.target(definition.key, "value"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "value", event.target.value === "" ? null : Number(event.target.value))} /></td><td><input disabled={basisRole === "result"} type="number" min="1" max="10" step="1" value={integerPriority(target.weight)} onChange={(event) => updateTarget(definition.key, { weight: integerPriority(Number(event.target.value)) })} /></td><td className="target-judgement"><span className={`result-badge ${basisRole === "result" || !targetSet || status.ok ? "ok" : "bad"}`}>{basisRole === "result" ? "自動算出" : !targetSet ? "未設定" : status.ok ? "目標達成" : "目標未達"}</span>{adjustedPlan && targetSet && !status.ok && <small className="target-adjustment-advice">{suggestions.length ? <><strong>達成に向けた修正候補</strong>{suggestions.map((suggestion) => <span key={suggestion}>{suggestion}</span>)}</> : <span>現在の許容範囲では有効な拡張候補を特定できません。入力済み将来PLまたは目標値との整合を確認してください。</span>}</small>}</td></tr>;
               })}
             </tbody></table></div>
             <p className="footnote round5-source-note">第5次公式参考値は、申請者全体と採択者の公表代表値です。原則は中央値ですが、「補助事業売上高／全社売上高」のみ平均値です。役員関連2指標は第5次に公表値がありません。<a href="https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公式資料 ↗</a></p>
-            <p className="footnote">連動する指標はグループ単位で目標設定方法を選びます。「自動算出」の指標はPLから計算して確認する項目で、保存済みの目標値は切替時のため保持しますが現在の最適化には使いません。「両方に目標設定」では2指標を同時に評価し、調整水準を許容範囲内で最適化します。過去の成長率・増加額は各1年間、計画の増加額は基準年から事業化報告3年目までの{targetComparisonYears}年間です。金額指標の「単純換算」は過去1年間の増加額が同額で続く場合の比較用参考値であり、複利予測ではありません。補助事業売上構成比と投資額比率は、前々期・前期・最新期それぞれの水準です。14・15の役員関連2指標は第6次の評価対象外であり、計算結果の参考表示に限定します。ローカルベンチマークは外部で算出した点数の固定入力であり、目標判定・最適化・PL計算の対象外です。</p>
+            <p className="footnote">目標値を入力した指標はすべて最適化対象となり、未入力の指標は診断表示だけに使います。上振れの現実性は「将来予測・調整水準」の許容下限・上限で管理するため、指標側の計画上限と扱い区分は設けません。「自動算出」の指標はPLから計算して確認する項目で、保存済みの目標値は切替時のため保持しますが現在の最適化には使いません。「両方に目標設定」では2指標を同時に評価し、調整水準を許容範囲内で最適化します。過去の成長率・増加額は各1年間、計画の増加額は基準年から事業化報告3年目までの{targetComparisonYears}年間です。金額指標の「単純換算」は過去1年間の増加額が同額で続く場合の比較用参考値であり、複利予測ではありません。14・15の役員関連2指標は第6次の評価対象外であり、計算結果の参考表示に限定します。ローカルベンチマークは外部で算出した点数の固定入力であり、目標判定・最適化・PL計算の対象外です。</p>
             <div className="target-action-bar">
               <div>
                 <strong>15指標の設定後に実行</strong>
-                <small>目標下限・上限、必達／努力、優先度を確認してから、PLを目標へ近づけます。</small>
+                <small>目標値と優先度を確認してから、調整水準の許容範囲内でPLを目標へ近づけます。</small>
                 <p className={`solve-note ${statutoryFailures.length ? "statutory-failure" : ""}`}>{statutoryFailures.length ? `制度条件：${statutoryFailures.join("／")}` : "制度上の必須条件を満たしています。"}</p>
                 {solveNote !== "未実行" && <p className="solve-note">{solveNote}</p>}
               </div>
@@ -1329,7 +1382,7 @@ export default function Home() {
         <section className="content-stack">
           <div className="section-intro"><div><p className="eyebrow">AUDIT TRAIL</p><h2>数式と調整ロジック</h2></div><p>Excel化するときも、この順序と依存関係をそのままシートに移します。</p></div>
           <div className="logic-flow">
-            <div><span>01</span><strong>実績・根拠</strong><p>過去PL、顧客別数量、単価、能力、常時使用する従業員数、賃金表</p></div><i>→</i><div><span>02</span><strong>補助事業／その他事業PL</strong><p>売上・原価・給与・減価償却・販管費を年度別生成</p></div><i>→</i><div><span>03</span><strong>全社合算</strong><p>二つの事業区分を同じ年度・単位で足し上げる</p></div><i>→</i><div><span>04</span><strong>15指標</strong><p>計画値を算出し、必達・努力・参考目標と照合</p></div>
+            <div><span>01</span><strong>実績・根拠</strong><p>過去PL、顧客別数量、単価、能力、常時使用する従業員数、賃金表</p></div><i>→</i><div><span>02</span><strong>補助事業／その他事業PL</strong><p>売上・原価・給与・減価償却・販管費を年度別生成</p></div><i>→</i><div><span>03</span><strong>全社合算</strong><p>二つの事業区分を同じ年度・単位で足し上げる</p></div><i>→</i><div><span>04</span><strong>15指標</strong><p>計画値を算出し、設定した目標値と照合</p></div>
           </div>
           <article className="panel formula-panel">
             <h2>PLと付加価値の恒等式</h2>
@@ -1356,8 +1409,8 @@ export default function Home() {
           </article>
           <article className="panel formula-panel">
             <h2>近似調整の目的関数</h2>
-            <code>総損失 = 5,000×必達未達² + 250×努力目標未達² + ドライバー変更幅² + 入力済み年度値からの乖離² + 現実性違反ペナルティ</code>
-            <p>入力値は上書きせず、別の調整案を生成します。必達目標を最優先しつつ、原価率・販管費率・人員・給与・売上成長率を暫定レンジ内で動かし、全年度手入力モードでは入力済み各年度からの乖離も抑えます。</p>
+            <code>総損失 = 5,000×目標未達²（優先度で加重） + ドライバー変更幅² + 入力済み年度値からの乖離² + 現実性違反ペナルティ</code>
+            <p>入力値は上書きせず、別の調整案を生成します。入力された目標値を優先度に応じて評価し、原価率・販管費率・人員・給与・売上成長率を許容範囲内で動かします。未達時は境界感度を調べ、どの許容下限・上限を見直すと改善するかを表示します。</p>
           </article>
           <article className="panel">
             <div className="formula-list">{metrics.map((definition, index) => <div key={definition.key}><span>{String(index + 1).padStart(2, "0")}</span><div><strong>{definition.label}</strong><small>第3次定義</small><code>{definition.round3Formula}</code><small>第6次定義（現在の計算・最適化に使用）</small><code>{definition.round6Formula}</code><small>{definition.sourceRound}</small></div></div>)}</div>

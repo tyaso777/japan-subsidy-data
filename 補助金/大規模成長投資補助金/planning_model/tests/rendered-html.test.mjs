@@ -110,6 +110,14 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /projectSalesShare: \{ applicant: 80, accepted: 89, statistic: "平均値" \}/);
   assert.match(pageSource, /valueAddedSubsidyRatio: \{ applicant: 171, accepted: 213, statistic: "中央値" \}/);
   assert.match(pageSource, /第5次公式参考値/);
+  assert.match(pageSource, /<th>目標値<\/th><th>優先度<\/th><th>判定・未達時の修正候補<\/th>/);
+  assert.doesNotMatch(pageSource, /aria-label=\{`\$\{definition\.label\}計画上限`\}/);
+  assert.doesNotMatch(pageSource, /<option value="hard">必達<\/option>/);
+  assert.match(pageSource, /達成に向けた修正候補/);
+  assert.match(pageSource, /の許容上限を.*へ引き上げる/);
+  assert.match(pageSource, /の許容下限を.*へ引き下げる/);
+  assert.match(pageSource, /slice\(0, 3\)/);
+  assert.match(proposalSource, /<th>目標値<\/th><th>判定<\/th>/);
   assert.match(pageSource, /<Round5BenchmarkCell metricKey=\{definition\.key\} unit=\{definition\.unit\} \/>/);
   assert.match(pageSource, /役員関連2指標は第5次に公表値がありません/);
   assert.match(globalStyles, /\.round5-benchmark/);
