@@ -1157,29 +1157,51 @@ export function optimizeDrivers(
   finalists.sort((left, right) => better(left, right) ? -1 : better(right, left) ? 1 : 0);
   let best = finalists[0];
 
-  // The coarse multi-start search can stop just short of a hard boundary because
-  // each step size can still stop just short of a hard boundary after ten
-  // coordinate sweeps. When that happens,
-  // continue from the deterministic best candidate and give the hard constraints
-  // lexical priority until no neighbouring coordinate can reduce their violation.
-  // This pass is deliberately skipped for already-feasible solutions so normal
-  // optimizations do not pay the extra cost.
+  // When hard constraints remain, search each coordinate across its entire
+  // user-specified range instead of taking another fixed-width local step.
+  // Forecast values are stored to two decimals, so the objective contains flat
+  // sections where several small moves appear to do nothing. A full-range scan
+  // crosses those plateaus and evaluates both boundaries on every sweep.
   if (best.requiredViolation > constraintTolerance || best.hardViolation > constraintTolerance) {
-    hardRepair: for (const fraction of [0.003, 0.001, 0.0003, 0.0001, 0.00003]) {
-      for (let sweep = 0; sweep < 64; sweep += 1) {
-        let next = best;
-        for (const key of keys) {
-          const [minimum, maximum] = bounds[key];
-          const step = Math.max((maximum - minimum) * fraction, 0.000001);
-          for (const direction of [-1, 1]) {
-            const candidate = evaluate({ ...best.drivers, [key]: best.drivers[key] + direction * step });
-            if (better(candidate, next)) next = candidate;
+    hardRepair: for (let sweep = 0; sweep < 10; sweep += 1) {
+      const sweepStart = best;
+      for (const key of keys) {
+        const [minimum, maximum] = bounds[key];
+        if (!(maximum > minimum)) continue;
+        const divisions = 16;
+        let coordinateBest = best;
+        let bestIndex = 0;
+        for (let index = 0; index <= divisions; index += 1) {
+          const value = minimum + (maximum - minimum) * index / divisions;
+          const candidate = evaluate({ ...best.drivers, [key]: value });
+          if (better(candidate, coordinateBest)) {
+            coordinateBest = candidate;
+            bestIndex = index;
           }
         }
-        if (next === best) break;
-        best = next;
+
+        let intervalLower = minimum + (maximum - minimum) * Math.max(0, bestIndex - 1) / divisions;
+        let intervalUpper = minimum + (maximum - minimum) * Math.min(divisions, bestIndex + 1) / divisions;
+        for (let refinement = 0; refinement < 2; refinement += 1) {
+          const refinementDivisions = 8;
+          let refinedIndex = 0;
+          for (let index = 0; index <= refinementDivisions; index += 1) {
+            const value = intervalLower + (intervalUpper - intervalLower) * index / refinementDivisions;
+            const candidate = evaluate({ ...best.drivers, [key]: value });
+            if (better(candidate, coordinateBest)) {
+              coordinateBest = candidate;
+              refinedIndex = index;
+            }
+          }
+          const previousLower = intervalLower;
+          const previousUpper = intervalUpper;
+          intervalLower = previousLower + (previousUpper - previousLower) * Math.max(0, refinedIndex - 1) / refinementDivisions;
+          intervalUpper = previousLower + (previousUpper - previousLower) * Math.min(refinementDivisions, refinedIndex + 1) / refinementDivisions;
+        }
+        best = coordinateBest;
         if (best.requiredViolation <= constraintTolerance && best.hardViolation <= constraintTolerance) break hardRepair;
       }
+      if (!better(best, sweepStart)) break;
     }
   }
   return {

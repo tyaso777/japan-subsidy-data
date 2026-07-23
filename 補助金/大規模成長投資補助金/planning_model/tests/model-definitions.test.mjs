@@ -315,6 +315,51 @@ test("optimizer reaches the standard sample company sales hard target with a ref
   assert.equal(model.targetStatus(model.metrics.find((metric) => metric.key === "companySalesCagr"), actual.companySalesCagr, targets.companySalesCagr).ok, true);
 });
 
+test("hard-target repair crosses rounded PL plateaus and exhausts the useful pay-growth range", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  const bounds = structuredClone(model.driverBounds);
+  bounds.projectPayGrowthToBase = [0.019325330501846927, 0.020735994183189166];
+  bounds.otherPayGrowthToBase = [0.019139457023717443, 0.020553459914763095];
+  const initial = {
+    ...model.sampleDrivers,
+    projectPayGrowthToBase: 0.020030662342518046,
+    otherPayGrowthToBase: 0.01984645846924027,
+  };
+  const targets = structuredClone(model.defaultTargets);
+  for (const target of Object.values(targets)) target.policy = "monitor";
+  targets.companyPaySchedule = { value: 3.5, policy: "hard", weight: 1 };
+  const periodInputs = model.createForecastProjectPeriodInputs(historical.at(-1), initial, model.DEFAULT_TIMELINE);
+  const referencePlan = model.generatePlan(historical, initial, model.DEFAULT_TIMELINE, periodInputs);
+
+  const result = model.optimizeDrivers(
+    initial,
+    historical,
+    model.DEFAULT_TIMELINE,
+    targets,
+    periodInputs,
+    referencePlan,
+    bounds,
+    true,
+  );
+  const metricValue = (drivers) => model.calculateMetrics(
+    model.generatePlan(
+      historical,
+      drivers,
+      model.DEFAULT_TIMELINE,
+      model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE),
+    ),
+    drivers,
+  ).companyPaySchedule;
+  const upperDrivers = {
+    ...result.drivers,
+    projectPayGrowthToBase: bounds.projectPayGrowthToBase[1],
+    otherPayGrowthToBase: bounds.otherPayGrowthToBase[1],
+  };
+
+  assert.equal(result.hardFeasible, false);
+  assert.equal(metricValue(result.drivers), metricValue(upperDrivers));
+});
+
 test("optimizer gives statutory metric minimums lexical priority over conflicting user hard targets", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   const initial = { ...model.sampleDrivers, projectPayGrowth: 0.01 };

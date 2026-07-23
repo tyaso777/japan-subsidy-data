@@ -144,6 +144,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /の許容上限を.*へ引き上げる/);
   assert.match(pageSource, /の許容下限を.*へ引き下げる/);
   assert.match(pageSource, /type DriverRangeSuggestion =/);
+  assert.match(pageSource, /const improvesTargetGap = \(probeValue: number\)/);
+  assert.doesNotMatch(pageSource, /Math\.abs\(current - rangeUpper\)/);
   assert.match(pageSource, /function applySelectedDriverRangeSuggestions\(metricKey: MetricKey, suggestions: DriverRangeSuggestion\[\]\)/);
   assert.match(pageSource, /type="checkbox" checked=\{Boolean\(selectedAdjustmentSuggestions/);
   assert.match(pageSource, />選択した候補を一括適用<\/button>/);

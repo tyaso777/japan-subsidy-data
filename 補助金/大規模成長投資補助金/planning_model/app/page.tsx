@@ -667,7 +667,6 @@ export default function Home() {
       for (const key of adjustableDriverKeys) {
         const [rangeLower, rangeUpper] = driverRanges[key];
         const rangeSpan = Math.max(rangeUpper - rangeLower, 0.0001);
-        const tolerance = Math.max(rangeSpan * 0.01, 0.00001);
         const current = adjustedDrivers[key];
         const displayBound = (value: number) => `${number(percentDriver(key) ? value * 100 : value, 2)}${driverLabels[key]!.unit}`;
         const extension = Math.max(rangeSpan * 0.15, Math.abs(current) * 0.05, percentDriver(key) ? 0.005 : 0.1);
@@ -704,11 +703,19 @@ export default function Home() {
           return { value: roundedValue, actual: roundedActual };
         };
         const probes: { value: number; actual: number; text: string }[] = [];
-        if (Math.abs(current - rangeUpper) <= tolerance) {
+        const currentStatus = targetStatus(definition, actual[definition.key], target);
+        const improvesTargetGap = (probeValue: number) => {
+          const probeStatus = targetStatus(definition, probeValue, target);
+          return Number.isFinite(probeStatus.gap)
+            && Math.abs(probeStatus.gap) + 1e-8 < Math.abs(currentStatus.gap);
+        };
+        const upperProbeActual = candidateActual({ ...adjustedDrivers, [key]: rangeUpper + extension })[definition.key];
+        if (improvesTargetGap(upperProbeActual)) {
           const required = findRequiredBound(1, rangeUpper);
           if (required) probes.push({ ...required, text: `${driverItemCodes[key]}：${driverLabels[key]!.label}の許容上限を${displayBound(rangeUpper)}から少なくとも${displayBound(required.value)}へ引き上げる` });
         }
-        if (Math.abs(current - rangeLower) <= tolerance) {
+        const lowerProbeActual = candidateActual({ ...adjustedDrivers, [key]: rangeLower - extension })[definition.key];
+        if (improvesTargetGap(lowerProbeActual)) {
           const required = findRequiredBound(-1, rangeLower);
           if (required) probes.push({ ...required, text: `${driverItemCodes[key]}：${driverLabels[key]!.label}の許容下限を${displayBound(rangeLower)}から少なくとも${displayBound(required.value)}へ引き下げる` });
         }
