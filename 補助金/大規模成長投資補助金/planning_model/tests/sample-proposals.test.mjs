@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 const projectDirectory = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const baseName = "成長投資計画_提案計画サンプル_基準年売上開始";
 const standardBaseName = "成長投資計画_提案計画サンプル";
+const partiallyUnmetBaseName = "成長投資計画_提案計画サンプル_一部目標未達";
 
 test("standard sample represents the completed two-pass planning workflow", async () => {
   const html = await readFile(path.join(projectDirectory, "examples", `${standardBaseName}.html`), "utf8");
@@ -24,6 +25,18 @@ test("standard sample represents the completed two-pass planning workflow", asyn
   assert.equal(proposal.drivers.subsidy, 7.66);
   assert.equal(proposal.targets.companySalesIncrease.value, 133.5);
   assert.equal(proposal.targets.companySalesCagr.value, 20);
+});
+
+test("partially unmet sample retains a visibly unattainable pay target", async () => {
+  const html = await readFile(path.join(projectDirectory, "examples", `${partiallyUnmetBaseName}.html`), "utf8");
+  const payload = html.match(/<script id="growth-proposal-data" type="application\/json">([^<]+)<\/script>/)?.[1];
+  assert.ok(payload, "proposal payload should be embedded for reimport");
+  const proposal = JSON.parse(Buffer.from(payload, "base64").toString("utf8"));
+
+  assert.equal(proposal.title, "成長投資計画 一部目標未達サンプル");
+  assert.equal(proposal.targets.companyPaySchedule.value, 3.5);
+  assert.equal(proposal.adjustedDrivers.projectPayGrowthToBase, proposal.driverRanges.projectPayGrowthToBase[1]);
+  assert.equal(proposal.adjustedDrivers.otherPayGrowthToBase, proposal.driverRanges.otherPayGrowthToBase[1]);
 });
 
 test("base-year launch sample has no project sales before the base year", async () => {

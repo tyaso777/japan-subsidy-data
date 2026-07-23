@@ -48,7 +48,7 @@ import {
   YearPlan,
 } from "./model";
 import { buildProposalHtml, buildProposalXlsx, downloadBlob, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
-import { createBaseYearLaunchHistoricalOnlySampleProposal, createHistoricalOnlySampleProposal, createStandardSampleProposal } from "./sample-proposals";
+import { createBaseYearLaunchHistoricalOnlySampleProposal, createHistoricalOnlySampleProposal, createPartiallyUnmetSampleProposal, createStandardSampleProposal } from "./sample-proposals";
 import { getInputValue, hasInputValue, inputKey, setInputValue, type InputValues } from "./input-values";
 import { defaultMetricGroupBases, metricBasisRole, metricLinkGroups, type MetricGroupBasis, type MetricGroupKey } from "./metric-groups";
 import {
@@ -909,6 +909,14 @@ export default function Home() {
     setFileNote("過去入力・調整水準設定・2段階最適化済みの標準提案を読み込みました");
   }
 
+  function loadPartiallyUnmetSample() {
+    applyProposal(createPartiallyUnmetSampleProposal(new Date().toISOString()));
+    setHistoricalDefaultsApplied(true);
+    setDefaultNote("現実的な許容範囲を維持したため、一部指標が目標に届かなかった最接近案です。未達判定と許容範囲の修正候補を確認できます。");
+    setSolveNote("一部目標未達サンプル：許容範囲内で最適化した最接近案を表示しています。");
+    setFileNote("最適化後も一部指標が未達となる確認用サンプルを読み込みました");
+  }
+
   function loadHistoricalOnlySample() {
     applyProposal(createHistoricalOnlySampleProposal(new Date().toISOString()));
     setFileNote("過去3期入力済み・将来予測未設定のサンプルを読み込みました");
@@ -1328,6 +1336,7 @@ export default function Home() {
                 <strong>シミュレーション結果を見る</strong>
                 <span>調整水準設定・将来入力・再最適化後の完成例です</span>
                 <button className="sample-result-button" onClick={(event) => { loadSampleProposal(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>最適化済み標準提案</button>
+                <button onClick={(event) => { loadPartiallyUnmetSample(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>一部目標未達ケース</button>
               </div>
             </div>
           </details>

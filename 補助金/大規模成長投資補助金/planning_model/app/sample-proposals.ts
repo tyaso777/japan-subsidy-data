@@ -230,6 +230,22 @@ export function createStandardSampleProposal(exportedAt: string): ProposalData {
   return proposal;
 }
 
+export function createPartiallyUnmetSampleProposal(exportedAt: string): ProposalData {
+  const proposal = createStandardSampleProposal(exportedAt);
+  proposal.title = "成長投資計画 一部目標未達サンプル";
+  proposal.targets.companyPaySchedule = {
+    ...proposal.targets.companyPaySchedule,
+    value: 3.5,
+  };
+  proposal.inputValues![inputKey.target("companyPaySchedule", "value")] = 3.5;
+  proposal.adjustedDrivers = {
+    ...proposal.adjustedDrivers!,
+    projectPayGrowthToBase: proposal.driverRanges.projectPayGrowthToBase[1],
+    otherPayGrowthToBase: proposal.driverRanges.otherPayGrowthToBase[1],
+  };
+  return proposal;
+}
+
 export function createStandardSampleEffectivePlan(proposal: ProposalData) {
   const historical = proposal.historicalPlan;
   const calculationDrivers = proposal.adjustedDrivers ?? proposal.drivers;

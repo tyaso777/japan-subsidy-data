@@ -223,6 +223,10 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, />使い方を試す<\/strong>/);
   assert.match(pageSource, />シミュレーション結果を見る<\/strong>/);
   assert.match(pageSource, />最適化済み標準提案<\/button>/);
+  assert.match(pageSource, />一部目標未達ケース<\/button>/);
+  assert.match(sampleProposalSource, /createPartiallyUnmetSampleProposal/);
+  assert.match(sampleProposalSource, /inputKey\.target\("companyPaySchedule", "value"\)\] = 3\.5/);
+  assert.match(sampleProposalSource, /projectPayGrowthToBase: proposal\.driverRanges\.projectPayGrowthToBase\[1\]/);
   assert.match(globalStyles, /\.sample-menu-section \+ \.sample-menu-section/);
   assert.doesNotMatch(globalStyles, /\.sample-menu-section \.sample-result-button \{ background: var\(--green-soft\);/);
   assert.match(standardWorkflowSource, /const initialPlanWithInputs = applyOverrides\(initialPlan\)/);
