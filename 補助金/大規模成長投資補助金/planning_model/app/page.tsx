@@ -1427,7 +1427,7 @@ export default function Home() {
 
       {view === "targets" && (
         <section className="content-stack">
-          <div className="section-intro"><div><p className="eyebrow">15 METRICS</p><h2>目標・制度条件・競合管理</h2></div><p>計画値・判定・自動調整には第6次定義を使用します。入力した目標値を最適化対象とし、複数目標が矛盾する場合は未達と修正候補を明示します。</p></div>
+          <div className="section-intro"><div><p className="eyebrow">15 METRICS</p><h2>目標・制度条件・競合管理</h2></div><p>事業を「補助事業」と「その他事業」に分け、それぞれに目標数値・水準を設定します。計画値・判定・自動調整には第6次定義を使用し、複数目標が矛盾する場合は未達と修正候補を明示します。</p></div>
           <article className="panel">
             <div className="panel-heading"><div><p className="card-kicker">STEP 2 / FORECAST DRIVERS</p><h2>将来予測・調整水準</h2><span className={`pill ${forecastSettingsReady ? "green" : ""}`}>{forecastSettingsReady ? "設定済み" : "未設定"}</span></div><button className="default-button" onClick={confirmAndApplyHistoricalDefaults}>{forecastSettingsStarted ? "過去3期から再設定" : "過去3期からデフォルト設定"}</button></div>
             <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th>調整項目<small>A～Z</small></th>{historicalPlan.map((row) => <th className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>計画初期値</th><th>制度上の必須条件<small>編集不可</small></th><th>許容下限</th><th>許容上限</th><th>最適化での扱い</th></tr></thead><tbody>
