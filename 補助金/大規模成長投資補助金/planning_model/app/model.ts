@@ -1229,12 +1229,10 @@ export function optimizeDrivers(
   };
 
   if (best.requiredViolation > constraintTolerance || best.hardViolation > constraintTolerance) {
-    const legacyCandidate = legacyRepair(best);
     if (hardRepairStrategy === "legacy-fixed-step") {
-      best = legacyCandidate;
+      best = legacyRepair(best);
     } else {
-      const fullRangeCandidate = fullRangeRepair(best);
-      best = better(fullRangeCandidate, legacyCandidate) ? fullRangeCandidate : legacyCandidate;
+      best = fullRangeRepair(best);
     }
   }
   return {
