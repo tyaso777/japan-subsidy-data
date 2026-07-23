@@ -89,9 +89,11 @@ test("renders the planning model shell", async () => {
   assert.match(modelSource, /headcount: Math\.max\(0, Math\.round\(projectHeadcount\)\)/);
   assert.match(reportDataSource, /code: "2-36", label: "EBITDA増加率"/);
   assert.match(pageSource, /15指標・目標へ戻る/);
-  assert.match(pageSource, />基準年売上開始<\/button>/);
+  assert.match(pageSource, />基準年売上開始（過去3期入力済み）<\/button>/);
   assert.match(pageSource, />過去3期入力済み<\/button>/);
   assert.match(pageSource, /createHistoricalOnlySampleProposal/);
+  assert.match(pageSource, /createBaseYearLaunchHistoricalOnlySampleProposal/);
+  assert.match(sampleProposalSource, /基準年売上開始・過去3期入力済みサンプル/);
   assert.match(sampleProposalSource, /proposal\.drivers = clone\(defaultDrivers\)/);
   assert.match(sampleProposalSource, /delete proposal\.inputValues\?\.\[inputKey\.driver\(key\)\]/);
   assert.match(sampleProposalSource, /delete proposal\.inputValues\?\.\[inputKey\.driverRange\(key, 0\)\]/);

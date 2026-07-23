@@ -48,7 +48,7 @@ import {
   YearPlan,
 } from "./model";
 import { buildProposalHtml, buildProposalXlsx, downloadBlob, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
-import { createBaseYearLaunchSample, createHistoricalOnlySampleProposal, createStandardSampleProposal } from "./sample-proposals";
+import { createBaseYearLaunchHistoricalOnlySampleProposal, createHistoricalOnlySampleProposal, createStandardSampleProposal } from "./sample-proposals";
 import { getInputValue, hasInputValue, inputKey, setInputValue, type InputValues } from "./input-values";
 import { defaultMetricGroupBases, metricBasisRole, metricLinkGroups, type MetricGroupBasis, type MetricGroupKey } from "./metric-groups";
 import {
@@ -895,8 +895,8 @@ export default function Home() {
   }
 
   function loadBaseYearLaunchSample() {
-    applyProposal(createBaseYearLaunchSample(new Date().toISOString()).proposal);
-    setFileNote("基準年に補助事業売上を初計上するサンプルを読み込みました");
+    applyProposal(createBaseYearLaunchHistoricalOnlySampleProposal(new Date().toISOString()));
+    setFileNote("補助事業の過去3期実績が0で、将来予測未設定のサンプルを読み込みました");
   }
 
   function updateHistorical(yearIndex: number, segment: SegmentKey, field: keyof SegmentPlan, value: number) {
@@ -1298,7 +1298,7 @@ export default function Home() {
               <small>現在の入力をサンプルで置き換えます</small>
               <button onClick={(event) => { loadHistoricalOnlySample(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>過去3期入力済み</button>
               <button onClick={(event) => { loadSampleProposal(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>標準提案</button>
-              <button onClick={(event) => { loadBaseYearLaunchSample(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>基準年売上開始</button>
+              <button onClick={(event) => { loadBaseYearLaunchSample(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>基準年売上開始（過去3期入力済み）</button>
             </div>
           </details>
         </div>

@@ -115,6 +115,10 @@ export function createHistoricalOnlySampleProposal(exportedAt: string): Proposal
     exportedAt,
     createHistoricalPlan(sampleBasePlan, DEFAULT_TIMELINE),
   );
+  return clearFutureSettings(proposal);
+}
+
+function clearFutureSettings(proposal: ProposalData): ProposalData {
   proposal.drivers = clone(defaultDrivers);
   proposal.futureCapex = futureCapex(0);
   (Object.keys(sampleDrivers) as (keyof typeof sampleDrivers)[]).forEach((key) => {
@@ -126,6 +130,21 @@ export function createHistoricalOnlySampleProposal(exportedAt: string): Proposal
     delete proposal.inputValues?.[inputKey.futureCapex(row.year)];
   });
   return proposal;
+}
+
+export function createBaseYearLaunchHistoricalOnlySampleProposal(exportedAt: string): ProposalData {
+  const latestCompany = total(sampleBasePlan.project, sampleBasePlan.other);
+  const latest: YearPlan = {
+    year: DEFAULT_TIMELINE.latestYear,
+    role: "latest",
+    project: emptySegment(),
+    other: latestCompany,
+  };
+  return clearFutureSettings(commonProposal(
+    "成長投資計画 基準年売上開始・過去3期入力済みサンプル",
+    exportedAt,
+    createHistoricalPlan(latest, DEFAULT_TIMELINE),
+  ));
 }
 
 export function createBaseYearLaunchSample(exportedAt: string) {
