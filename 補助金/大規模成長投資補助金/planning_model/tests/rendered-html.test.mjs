@@ -160,7 +160,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, />選択した候補を一括適用<\/button>/);
   assert.match(globalStyles, /\.apply-selected-suggestions/);
   assert.match(pageSource, /className="driver-group-heading"[\s\S]*?<th><strong>\{group\.label\}<\/strong>/);
-  assert.match(pageSource, /<td aria-hidden="true" colSpan=\{historicalPlan\.length \+ 5\}><\/td>/);
+  assert.match(pageSource, /<td aria-hidden="true" colSpan=\{historicalPlan\.length \+ 4\}><\/td>/);
   assert.match(globalStyles, /\.driver-target-table \.driver-group-heading th \{ position: sticky; left: 0;/);
   assert.match(globalStyles, /\.driver-target-table \.driver-group-heading th, \.driver-target-table \.driver-group-heading td \{[^}]*background: #e2ece6;[^}]*color: #28483a;/);
   assert.match(globalStyles, /\.driver-target-table tr\.driver-adjustable th:first-child \{ background: #fcf8ed; \}/);
@@ -209,6 +209,9 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /driverConstraintFailure\(key, applicationCategory, drivers\)/);
   assert.match(pageSource, /proposal\.adjustedDrivers/);
   assert.match(pageSource, /setAdjustedDrivers\(importedAdjustedDrivers\)/);
+  assert.match(pageSource, /historicalPlan\.slice\(1\)\.map/);
+  assert.match(pageSource, /history\.values\.slice\(1\)\.map/);
+  assert.match(globalStyles, /\.driver-target-table table \{ width: max-content !important; min-width: 1220px !important; \}/);
   assert.match(pageSource, /aria-invalid=\{constraintError \? "true" : undefined\}/);
   assert.match(pageSource, /title: "制度上の必須条件に違反"/);
   assert.doesNotMatch(pageSource, /applicationCategory === "startupException"/);
