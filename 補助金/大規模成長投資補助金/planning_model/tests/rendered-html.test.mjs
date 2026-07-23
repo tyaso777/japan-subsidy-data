@@ -21,6 +21,7 @@ test("renders the planning model shell", async () => {
   assert.match(html, /<html lang="ja">/i);
   assert.match(html, /<title>成長投資計画 数値設計ラボ<\/title>/i);
   assert.match(html, /成長投資計画 数値設計ラボ/);
+  assert.match(html, /過去実績と目標値を入力し、補助事業＋その他事業＝全社 の将来PLをシミュレーションします。/);
   assert.doesNotMatch(html, /目標に近づける/);
   assert.match(html, /15指標・目標/);
   const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");

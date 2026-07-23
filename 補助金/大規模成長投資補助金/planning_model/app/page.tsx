@@ -1301,7 +1301,7 @@ export default function Home() {
         <div>
           <p className="eyebrow">第6次・事前公開版定義で計算 / 第3次定義を比較表示</p>
           <h1>成長投資計画 数値設計ラボ</h1>
-          <p className="subtitle">補助事業とその他事業を分け、全社PL・過去15指標・目標競合を一つの前提でつなぐ。</p>
+          <p className="subtitle">過去実績と目標値を入力し、補助事業＋その他事業＝全社 の将来PLをシミュレーションします。</p>
         </div>
       </header>
 
