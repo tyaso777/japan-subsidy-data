@@ -1772,6 +1772,13 @@ function HistoricalInputsEditor({ historical, inputValues, onHistoricalCompanyCh
   </div>;
 }
 
+function OfficialSectionHeading({ label, range, columns }: { label: string; range: string; columns: number }) {
+  return <tr className="official-section-heading">
+    <th><strong>{label}</strong><small>{range}</small></th>
+    <td aria-hidden="true" colSpan={columns}></td>
+  </tr>;
+}
+
 function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, inputValues, futureInputBasis, drivers, onForecastChange }: {
   historical: YearPlan[];
   autoPlan: YearPlan[];
@@ -1812,8 +1819,12 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
     <div>
       <h3>会社全体の損益計算書・関連計算項目（2-1～2-36：過去3期参照 → 将来）</h3>
       <div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead>
-        <tbody>{companyActualInputRows.map((item) => <tr className={`${!item.set ? "emphasis" : ""}${item.groupStart ? " official-related-start" : ""}`} key={item.code}>
-          <th>{item.code} {item.label}{item.groupStart && <small>P/L関連計算項目</small>}{item.unit && <small>{item.unit}</small>}</th>
+        <tbody>
+          <OfficialSectionHeading label="損益計算書" range="2-1～2-20" columns={historical.length + futureRows.length} />
+          {companyActualInputRows.flatMap((item) => [
+          item.groupStart ? <OfficialSectionHeading key="section-related" label="P/L関連計算項目" range="2-21～2-36" columns={historical.length + futureRows.length} /> : null,
+          <tr className={!item.set ? "emphasis" : ""} key={item.code}>
+          <th>{item.code} {item.label}{item.unit && <small>{item.unit}</small>}</th>
           {historical.map((row, index) => { const value = item.get(historical, index); return <td className="historical-reference" key={row.year}><strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong></td>; })}
           {futureRows.map((row) => {
             const index = effectivePlan.findIndex((candidate) => candidate.year === row.year);
@@ -1823,7 +1834,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
             const overridden = Object.prototype.hasOwnProperty.call(overrides, key);
             return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="0.1" value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "company", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>;
           })}
-        </tr>)}</tbody>
+        </tr>])}</tbody>
       </table></div>
       <p className="footnote">2-1～2-20を損益計算書、2-21～2-36を給与・付加価値・人数・EBITDAの「P/L関連計算項目」として区切っています。2-19・2-20は税金・特別損益の前提がないため、現時点ではモデル未対応です。</p>
     </div>
@@ -2110,7 +2121,14 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
 
 function OfficialRowsTable({ title, kicker, pill, plan, sourcePlan, rows, note }: { title: string; kicker: string; pill: string; plan: YearPlan[]; sourcePlan?: YearPlan[]; rows: OfficialRow[]; note?: string }) {
   const formatted = (value: number | undefined, unit?: OfficialRow["unit"]) => value === undefined ? "—" : `${number(value, unit === "%" ? 1 : 2)}${unit ? ` ${unit}` : ""}`;
-  return <article className="panel table-panel company-table"><div className="panel-heading"><div><p className="card-kicker">{kicker}</p><h2>{title}</h2></div><span className="pill green">{pill}</span></div><div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{rows.map((item) => <tr className={`${item.emphasis ? "emphasis" : ""}${item.groupStart ? " official-related-start" : ""}`} key={item.code}><th>{item.code} {item.label}{item.groupStart && <small>P/L関連計算項目</small>}</th>{plan.map((year, index) => { const value = item.value(plan, index); const before = sourcePlan ? item.value(sourcePlan, index) : undefined; return <td key={year.year}>{sourcePlan && <small className="before-cell">{formatted(before, item.unit)} →</small>}<strong className={sourcePlan ? "after-cell" : ""}>{formatted(value, item.unit)}</strong></td>; })}</tr>)}</tbody></table></div>{note && <p className="footnote">{note}</p>}</article>;
+  const hasSections = rows.some((item) => item.groupStart);
+  return <article className="panel table-panel company-table"><div className="panel-heading"><div><p className="card-kicker">{kicker}</p><h2>{title}</h2></div><span className="pill green">{pill}</span></div><div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>
+    {hasSections && <OfficialSectionHeading label="損益計算書" range="2-1～2-20" columns={plan.length} />}
+    {rows.flatMap((item) => [
+      item.groupStart ? <OfficialSectionHeading key="section-related" label="P/L関連計算項目" range="2-21～2-36" columns={plan.length} /> : null,
+      <tr className={item.emphasis ? "emphasis" : ""} key={item.code}><th>{item.code} {item.label}</th>{plan.map((year, index) => { const value = item.value(plan, index); const before = sourcePlan ? item.value(sourcePlan, index) : undefined; return <td key={year.year}>{sourcePlan && <small className="before-cell">{formatted(before, item.unit)} →</small>}<strong className={sourcePlan ? "after-cell" : ""}>{formatted(value, item.unit)}</strong></td>; })}</tr>,
+    ])}
+  </tbody></table></div>{note && <p className="footnote">{note}</p>}</article>;
 }
 
 function CompanyTable({ plan, sourcePlan }: { plan: YearPlan[]; sourcePlan?: YearPlan[] }) {

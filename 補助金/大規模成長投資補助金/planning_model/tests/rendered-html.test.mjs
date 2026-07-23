@@ -47,7 +47,11 @@ test("renders the planning model shell", async () => {
   const initialInputFunction = pageSource.match(/function createInitialInputValues\(\): InputValues \{[\s\S]*?\n\}/)?.[0] ?? "";
   const suggestionSource = pageSource.match(/const targetAdjustmentSuggestions = useMemo\([\s\S]*?\n  \}, \[adjustedDrivers,[\s\S]*?\]\);/)?.[0] ?? "";
   assert.match(globalStyles, /\.tabs \{ position: sticky; top: 0; z-index: 25;/);
-  assert.match(globalStyles, /\.manual-sections > div > h3 \{ position: sticky; top: 46px; z-index: 12;/);
+  assert.match(pageSource, /className="official-section-heading"/);
+  assert.match(pageSource, /label="損益計算書" range="2-1～2-20"/);
+  assert.match(pageSource, /label="P\/L関連計算項目" range="2-21～2-36"/);
+  assert.match(globalStyles, /\.official-section-heading th, \.official-section-heading td \{ position: sticky; top: 56px;/);
+  assert.doesNotMatch(globalStyles, /\.manual-sections > div > h3 \{ position: sticky/);
   assert.match(pageSource, /type View = [^;]*"io"/);
   assert.match(pageSource, /goToView\("io"\)\}>データ入出力<\/button>/);
   assert.equal(pageSource.match(/className="tab-group-separator" aria-hidden="true">\|<\/span>/g)?.length, 2);
