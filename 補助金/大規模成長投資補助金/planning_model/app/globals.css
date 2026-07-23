@@ -79,6 +79,7 @@ main { width: calc(100% - 48px); margin: 0 auto; padding: 34px 0 80px; }
 .tabs { position: sticky; top: 0; z-index: 25; display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 24px; overflow-x: auto; background: rgba(248, 246, 240, .96); backdrop-filter: blur(10px); }
 .tabs button { background: transparent; border: 0; color: var(--muted); padding: 13px 18px; font-size: 13px; font-weight: 700; white-space: nowrap; border-bottom: 3px solid transparent; }
 .tabs button.active { color: var(--green); border-color: var(--green); }
+.tab-group-separator { align-self: center; flex: 0 0 auto; margin: 0 8px; color: #b8b3a8; font-size: 16px; line-height: 1; }
 
 .page-grid { display: grid; gap: 18px; }
 .summary-grid { grid-template-columns: 1.4fr repeat(3, 1fr); align-items: stretch; }

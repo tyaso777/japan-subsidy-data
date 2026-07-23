@@ -49,6 +49,8 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.tabs \{ position: sticky; top: 0; z-index: 25;/);
   assert.match(pageSource, /type View = [^;]*"io"/);
   assert.match(pageSource, /\["io", "データ入出力"\]/);
+  assert.match(pageSource, /className="tab-group-separator" aria-hidden="true">\|<\/span>/);
+  assert.match(globalStyles, /\.tab-group-separator \{/);
   assert.match(pageSource, /\{view === "io" && \(/);
   assert.ok(pageSource.indexOf('<nav className="tabs"') < pageSource.indexOf('<section className="proposal-filebar"'));
   assert.match(pageSource, /className="sample-library-panel"/);

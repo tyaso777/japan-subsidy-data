@@ -1310,7 +1310,13 @@ export default function Home() {
 
       <nav className="tabs" aria-label="画面切替">
         {([
-          ["history", "過去データ入力"], ["targets", "15指標・目標"], ["future", "将来データ入力"], ["pl", "年度別PL"], ["summary", "診断"], ["logic", "数式・ロジック"], ["io", "データ入出力"],
+          ["history", "過去データ入力"], ["targets", "15指標・目標"], ["future", "将来データ入力"], ["pl", "年度別PL"], ["summary", "診断"],
+        ] as [View, string][]).map(([key, label]) => (
+          <button key={key} className={view === key ? "active" : ""} onClick={() => goToView(key)}>{label}</button>
+        ))}
+        <span className="tab-group-separator" aria-hidden="true">|</span>
+        {([
+          ["logic", "数式・ロジック"], ["io", "データ入出力"],
         ] as [View, string][]).map(([key, label]) => (
           <button key={key} className={view === key ? "active" : ""} onClick={() => goToView(key)}>{label}</button>
         ))}
