@@ -124,8 +124,11 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
   },
 ];
 
+const forecastDriverKeys = driverGroups.flatMap((group) => group.keys);
+const fixedForecastDriverKeys = new Set<keyof Drivers>(["investment", "subsidy", "usefulLife", "projectMarketGrowth"]);
+
 const driverItemCodes = Object.fromEntries(
-  driverGroups.flatMap((group) => group.keys).map((key, index) => [key, String.fromCharCode(65 + index)]),
+  forecastDriverKeys.map((key, index) => [key, String.fromCharCode(65 + index)]),
 ) as Partial<Record<keyof Drivers, string>>;
 
 const equipmentPeriodStatisticalKeys = new Set<keyof Drivers>([
@@ -247,10 +250,6 @@ function createInitialInputValues(): InputValues {
     if (isOptimizationExcludedMetric(definition.key) || scaleDependentMetricKeys.has(definition.key)) continue;
     values = setInputValue(values, inputKey.target(definition.key, "value"), defaultTargets[definition.key].value);
     if (defaultTargets[definition.key].max !== undefined) values = setInputValue(values, inputKey.target(definition.key, "max"), defaultTargets[definition.key].max!);
-  }
-  for (const key of Object.keys(driverBounds) as (keyof Drivers)[]) {
-    values = setInputValue(values, inputKey.driverRange(key, 0), driverBounds[key][0]);
-    values = setInputValue(values, inputKey.driverRange(key, 1), driverBounds[key][1]);
   }
   return values;
 }
@@ -544,6 +543,17 @@ export default function Home() {
   const [driverRanges, setDriverRanges] = useState<Record<keyof Drivers, [number, number]>>(() => clone(driverBounds));
   const [targets, setTargets] = useState<Record<MetricKey, Target>>(clone(defaultTargets));
   const [inputValues, setInputValues] = useState<InputValues>(() => createInitialInputValues());
+  const forecastSettingsStarted = useMemo(() => forecastDriverKeys.some((key) =>
+    hasInputValue(inputValues, inputKey.driver(key))
+    || hasInputValue(inputValues, inputKey.driverRange(key, 0))
+    || hasInputValue(inputValues, inputKey.driverRange(key, 1)),
+  ), [inputValues]);
+  const forecastSettingsReady = useMemo(() => forecastDriverKeys.every((key) =>
+    hasInputValue(inputValues, inputKey.driver(key))
+    && (fixedForecastDriverKeys.has(key)
+      || (hasInputValue(inputValues, inputKey.driverRange(key, 0))
+        && hasInputValue(inputValues, inputKey.driverRange(key, 1)))),
+  ), [inputValues]);
   const [metricGroupBases, setMetricGroupBases] = useState<Record<MetricGroupKey, MetricGroupBasis>>({ ...defaultMetricGroupBases });
   const [applicationCategory, setApplicationCategory] = useState<ApplicationCategory>(defaultApplicationCategory);
   const [forecastOverrides, setForecastOverrides] = useState<ForecastOverrides>({});
@@ -1104,10 +1114,19 @@ export default function Home() {
     setDefaultNote("すべての計画初期値を設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目は保守的な補完値を使用しています。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。その他事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、耐用年数は10年、市場伸び率は5%で仮置きしています。");
   }
 
+  function confirmAndApplyHistoricalDefaults() {
+    if (forecastSettingsStarted && !window.confirm("将来予測の水準が指定済みです。過去データを基にした推奨値に変更してよろしいですか？")) return;
+    applyHistoricalDefaults();
+  }
+
   async function solve() {
     if (isSolving) return;
     if (!applicationCategory) {
       setSolveNote("申請区分が未選択です。過去データ入力の先頭で申請区分を選択してください。");
+      return;
+    }
+    if (!forecastSettingsReady) {
+      setSolveNote("将来予測・調整水準が未設定です。「過去3期からデフォルト設定」で推奨値を作成するか、すべての項目を入力してください。");
       return;
     }
     setIsSolving(true);
@@ -1307,7 +1326,7 @@ export default function Home() {
         <section className="content-stack">
           <div className="section-intro"><div><p className="eyebrow">15 METRICS</p><h2>目標・制度条件・競合管理</h2></div><p>計画値・判定・自動調整には第6次定義を使用します。入力した目標値を最適化対象とし、複数目標が矛盾する場合は未達と修正候補を明示します。</p></div>
           <article className="panel">
-            <div className="panel-heading"><div><p className="card-kicker">STEP 2 / FORECAST DRIVERS</p><h2>将来予測・調整水準</h2></div><button className="default-button" onClick={applyHistoricalDefaults}>過去3期からデフォルト設定</button></div>
+            <div className="panel-heading"><div><p className="card-kicker">STEP 2 / FORECAST DRIVERS</p><h2>将来予測・調整水準</h2><span className={`pill ${forecastSettingsReady ? "green" : ""}`}>{forecastSettingsReady ? "設定済み" : "未設定"}</span></div><button className="default-button" onClick={confirmAndApplyHistoricalDefaults}>{forecastSettingsStarted ? "過去3期から再設定" : "過去3期からデフォルト設定"}</button></div>
             <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th>調整項目<small>A～Z</small></th>{historicalPlan.map((row) => <th className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>計画初期値</th><th>制度上の必須条件<small>編集不可</small></th><th>許容下限</th><th>許容上限</th><th>最適化での扱い</th></tr></thead><tbody>
               {driverGroups.flatMap((group) => [
                 <tr className="driver-group-heading" key={`group-${group.label}`}><th colSpan={historicalPlan.length + 6}><strong>{group.label}</strong><small>{group.detail}</small></th></tr>,

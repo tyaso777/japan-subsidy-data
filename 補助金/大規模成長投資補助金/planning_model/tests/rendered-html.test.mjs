@@ -30,6 +30,12 @@ test("renders the planning model shell", async () => {
   const proposalSource = await readFile(new URL("../app/proposal-io.ts", import.meta.url), "utf8");
   const applicationRulesSource = await readFile(new URL("../app/application-rules.ts", import.meta.url), "utf8");
   const globalStyles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  const initialInputFunction = pageSource.match(/function createInitialInputValues\(\): InputValues \{[\s\S]*?\n\}/)?.[0] ?? "";
+  assert.doesNotMatch(initialInputFunction, /driverRange/);
+  assert.match(pageSource, /forecastSettingsStarted/);
+  assert.match(pageSource, /forecastSettingsReady/);
+  assert.match(pageSource, /将来予測の水準が指定済みです。過去データを基にした推奨値に変更してよろしいですか？/);
+  assert.match(pageSource, /将来予測・調整水準が未設定です。/);
   assert.match(pageSource, /設定した目標に近づける/);
   assert.match(pageSource, /projectSalesGrowth: \{ initial: 0\.22, lower: 0\.15, upper: 0\.30 \}/);
   assert.match(pageSource, /その他事業｜設備導入期間/);
