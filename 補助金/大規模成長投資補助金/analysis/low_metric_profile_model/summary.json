@@ -1,0 +1,15 @@
+{
+  "scope": "accepted/grant-decided public company records only",
+  "n_records": 381,
+  "accepted_score_eligible_n": 357,
+  "applicant_score_eligible_n": 357,
+  "accepted_lagging_dedup7_n": 128,
+  "applicant_lagging_dedup7_n": 30,
+  "primary_score": "negative mean of domain-median log(company / same-round benchmark), excluding No.13 and No.14",
+  "not_identified": [
+    "acceptance probability",
+    "causal preferential treatment",
+    "review weights"
+  ],
+  "random_seed": 20260721
+}

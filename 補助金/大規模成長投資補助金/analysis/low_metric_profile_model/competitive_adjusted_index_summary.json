@@ -1,0 +1,25 @@
+{
+  "recommended_candidate": "efficiency_scale_sufficiency_top2",
+  "recommended_label": "補助金効率＋率・規模再調整・上位2領域充足型",
+  "raw_group_definition": "within-round bottom/top quartiles of low_score_accepted",
+  "recommendation_constraints": {
+    "eligible_n_min": 300,
+    "spearman_with_raw_competitiveness_min": 0.2,
+    "candidate_formulas_fixed_before_comparison": true
+  },
+  "proposed_metric_set": {
+    "continuous_score": "efficiency_scale_sufficiency_top2",
+    "niche_competitive": "at least one adjusted domain at or above within-round accepted-company 25th percentile",
+    "broad_competitive": "at least two adjusted domains at or above within-round accepted-company 25th percentile",
+    "domains": [
+      "growth",
+      "productivity_value",
+      "wage"
+    ]
+  },
+  "not_identified": [
+    "acceptance probability",
+    "official review score",
+    "causal preferential treatment"
+  ]
+}

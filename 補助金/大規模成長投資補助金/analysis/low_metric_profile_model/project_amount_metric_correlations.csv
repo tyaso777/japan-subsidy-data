@@ -1,0 +1,15 @@
+﻿amount,amount_label,metric,metric_label,n,within_round_spearman
+project_cost_oku,事業費,sales_cagr_pct,売上高CAGR,99,-0.14105153128034373
+project_cost_oku,事業費,labor_annual_rate_pct,労働生産性上昇率,375,-0.0926241016084792
+project_cost_oku,事業費,employee_pay_annual_rate_pct,1人当たり従業員給与上昇率,380,-0.07368017211631761
+project_cost_oku,事業費,officer_pay_annual_rate_pct,役員給与上昇率,312,-0.023521718921120968
+project_cost_oku,事業費,sales_increase_oku_yen_normalized,売上増加額,338,0.46736114143190294
+project_cost_oku,事業費,value_added_increase_estimated_oku,付加価値増加額,372,0.48295366473683676
+project_cost_oku,事業費,employee_pay_total_increase_estimated_oku,給与総額増加額,372,0.3896057297093749
+subsidy_oku,補助金額,sales_cagr_pct,売上高CAGR,99,-0.14117392380279925
+subsidy_oku,補助金額,labor_annual_rate_pct,労働生産性上昇率,375,-0.10544759216775346
+subsidy_oku,補助金額,employee_pay_annual_rate_pct,1人当たり従業員給与上昇率,380,-0.07086808543315924
+subsidy_oku,補助金額,officer_pay_annual_rate_pct,役員給与上昇率,312,-0.00604737559341195
+subsidy_oku,補助金額,sales_increase_oku_yen_normalized,売上増加額,338,0.44642735475700984
+subsidy_oku,補助金額,value_added_increase_estimated_oku,付加価値増加額,372,0.47904045583439925
+subsidy_oku,補助金額,employee_pay_total_increase_estimated_oku,給与総額増加額,372,0.39868425394981016

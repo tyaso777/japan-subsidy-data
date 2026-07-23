@@ -1,0 +1,10 @@
+﻿metric_key,metric_label,comparability,unit,observed_n,coverage_pct,weighted_below_accepted_pct,median_abs_pdf_vs_official_gap_pct
+company_sales_cagr,全社年平均売上高成長率,proxy,%/年,99,25.984251968503937,56.56565656565657,14.191176470588236
+company_sales_increase,全社売上高増加額,proxy,億円,338,88.71391076115485,42.89940828402367,16.037530871097673
+labor_cagr,補助事業年平均労働生産性の伸び,comparable,%/年,375,98.4251968503937,61.6,12.666666666666664
+value_added_increase,補助事業付加価値増加額（簡易補正推計）,proxy,億円,372,97.63779527559055,53.225806451612904,6.717567501130755
+employee_pay_rate,年平均従業員目標賃上げ率,comparable,%/年,380,99.73753280839895,35.78947368421053,4.472934472934476
+employee_pay_total_increase,従業員給与支給総額の増加額（推計）,proxy,億円,372,97.63779527559055,49.46236559139785,5.2862111801242335
+officer_pay_rate,年平均役員目標賃上げ率,comparable,%/年,312,81.88976377952756,38.782051282051285,6.886792452830187
+investment_sales_ratio,全社売上高に対する投資額割合（近似）,proxy,%,178,46.71916010498688,47.752808988764045,7.798192940660909
+value_added_subsidy_ratio,補助金額に対する付加価値増加額割合（推計）,proxy,%,372,97.63779527559055,49.193548387096776,3.4076954735418443

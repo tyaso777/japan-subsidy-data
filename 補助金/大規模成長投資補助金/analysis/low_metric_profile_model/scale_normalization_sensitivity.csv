@@ -1,0 +1,8 @@
+﻿score_key,score_label,outcome,eligible_n,baseline_sales_n,baseline_sales_within_round_spearman,baseline_employees_n,baseline_employees_within_round_spearman
+accepted_deduplicated_domain,採択者中央値比・重複調整3領域,low_score_accepted,357,171,-0.5543256249324965,357,-0.22523835182441304
+applicant_deduplicated_domain,申請者中央値比・重複調整3領域,low_score_applicant,357,171,-0.5304443831079215,357,-0.19923928389468296
+accepted_absolute_amounts,採択者中央値比・絶対額3指標,low_score_absolute_accepted,372,175,-0.6987028486741476,372,-0.5616788250163741
+applicant_absolute_amounts,申請者中央値比・絶対額3指標,low_score_absolute_applicant,372,175,-0.6988304813785728,372,-0.5617344213464571
+accepted_rates,採択者中央値比・率4指標,low_score_rate_accepted,314,152,0.3595311996734267,310,0.48491865121177297
+applicant_rates,申請者中央値比・率4指標,low_score_rate_applicant,314,152,0.35446403474835586,310,0.4896526985662583
+per_subsidy_public_median,補助金当たり3指標・同回公開企業中央値比,low_score_efficiency_public_median,372,175,-0.26327939918649773,372,-0.3053930305065359
