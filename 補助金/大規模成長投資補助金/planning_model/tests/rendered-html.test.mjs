@@ -224,6 +224,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, />シミュレーション結果を見る<\/strong>/);
   assert.match(pageSource, />最適化済み標準提案<\/button>/);
   assert.match(globalStyles, /\.sample-menu-section \+ \.sample-menu-section/);
+  assert.doesNotMatch(globalStyles, /\.sample-menu-section \.sample-result-button \{ background: var\(--green-soft\);/);
   assert.match(standardWorkflowSource, /const initialPlanWithInputs = applyOverrides\(initialPlan\)/);
   assert.match(standardWorkflowSource, /const second = optimizeDrivers\(\s*initialDrivers,/);
   assert.match(pageSource, /aria-invalid=\{constraintError \? "true" : undefined\}/);
