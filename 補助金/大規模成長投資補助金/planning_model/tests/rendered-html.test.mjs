@@ -178,6 +178,8 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /targets-table tr\.metric-basis-row td:nth-child\(-n\+2\).*background: #f4f8f2/);
   assert.match(pageSource, /historicalPlan\.slice\(1\)\.map\(\(row\) => <th key=\{row\.year\}>/);
   assert.match(globalStyles, /\.targets-table th:nth-child\(7\), \.targets-table td:nth-child\(7\) \{ width: 145px; min-width: 145px; max-width: 145px; white-space: normal;/);
+  assert.match(globalStyles, /\.targets-table \{ width: max\(100%, 1400px\) !important; table-layout: fixed; \}/);
+  assert.match(globalStyles, /\.targets-table th:nth-child\(10\), \.targets-table td:nth-child\(10\), \.target-judgement \{ width: 250px; min-width: 250px; max-width: 250px; \}/);
   assert.match(pageSource, /14・15の役員関連2指標は第6次の評価対象外/);
   assert.match(pageSource, /reference-metric-row/);
   assert.match(proposalSource, /参考値・第6次評価対象外/);
@@ -216,6 +218,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /historicalPlan\.slice\(1\)\.map/);
   assert.match(pageSource, /history\.values\.slice\(1\)\.map/);
   assert.match(globalStyles, /\.driver-target-table table \{ width: max-content !important; min-width: 1220px !important; \}/);
+  assert.match(globalStyles, /\.driver-target-table table \{ width: max\(100%, 1220px\) !important; table-layout: fixed; \}/);
   assert.match(globalStyles, /\.driver-target-table tbody tr:not\(\.driver-group-heading\) th:first-child \{ white-space: normal; overflow-wrap: anywhere; line-height: 1\.45; \}/);
   assert.match(pageSource, />使い方を試す<\/strong>/);
   assert.match(pageSource, />シミュレーション結果を見る<\/strong>/);
