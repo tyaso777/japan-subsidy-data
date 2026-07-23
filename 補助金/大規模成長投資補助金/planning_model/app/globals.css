@@ -103,7 +103,7 @@ main { width: calc(100% - 48px); margin: 0 auto; padding: 34px 0 80px; }
 
 .content-stack { display: grid; gap: 18px; }
 .section-intro { display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; padding: 9px 4px 13px; }
-.section-intro h2 { margin: 5px 0 0; font-family: Georgia, "Yu Mincho", serif; font-size: 32px; font-weight: 500; }.section-intro > p { color: var(--muted); max-width: 550px; font-size: 12px; line-height: 1.7; margin: 0; }
+.section-intro h2 { margin: 5px 0 0; font-family: "Yu Mincho", "YuMincho", Georgia, serif; font-size: 32px; font-weight: 500; font-variant-numeric: lining-nums; }.section-intro > p { color: var(--muted); max-width: 550px; font-size: 12px; line-height: 1.7; margin: 0; }
 .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .input-list { display: grid; gap: 1px; }
 .input-list label, .driver-grid label { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 9px 10px; border-bottom: 1px solid #ece8df; }
