@@ -57,7 +57,7 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.diagnostic-panel > h3 \{ position: sticky; top: 46px; z-index: 18;/);
   assert.match(globalStyles, /\.wide-table, \.targets-table-wrap \{[^}]*overflow-x: auto; overflow-y: visible;/);
   assert.match(globalStyles, /\.balance-sheet-table \{[^}]*overflow-x: auto; overflow-y: visible;/);
-  assert.match(globalStyles, /\.historical-pl-panel > \.panel-heading \{ position: static;/);
+  assert.match(globalStyles, /\.table-panel:has\(> \.manual-sections\) > \.panel-heading \{ position: static;/);
   assert.match(globalStyles, /\.page-sticky-header-overlay \{ position: fixed; z-index: 17; overflow: hidden;/);
   assert.match(globalStyles, /\.page-sticky-header-overlay thead th:first-child \{ position: sticky; left: 0;/);
   assert.match(globalStyles, /\.floating-table-scrollbar \{ position: fixed; bottom: 0; z-index: 24; display: none;/);

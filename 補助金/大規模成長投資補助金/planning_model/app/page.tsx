@@ -1623,7 +1623,7 @@ export default function Home() {
             <code>設備投資 → 固定資産 → 減価償却費（P/L）　／　借入金 → 支払利息 → 経常利益（P/L）</code>
             <p>実務上は連動しますが、第6次の公式Excel自体はB/S残高から減価償却費や支払利息を自動算定していません。公式上の直接参照は主に、P/LのEBITDAを使う1-25 EBITDA有利子負債倍率です。本モデルでも、過去B/Sを入力しただけで手入力P/Lを上書きしません。将来の減価償却費・支払利息まで自動連動させるには、次段階で「固定資産台帳」と「借入返済表」を年度別に設けます。</p>
           </article>
-          <article className="panel table-panel historical-pl-panel"><div className="panel-heading"><div><p className="card-kicker">PL ACTUALS</p><h2>会社全体PL・補助事業PL（過去3期）</h2></div><span className="pill green">必須手入力</span></div><HistoricalInputsEditor historical={historicalPlan} inputValues={inputValues} onHistoricalCompanyChange={updateHistoricalCompanyOfficial} onHistoricalProjectChange={updateHistoricalProjectOfficial} /></article>
+          <article className="panel table-panel"><div className="panel-heading"><div><p className="card-kicker">PL ACTUALS</p><h2>会社全体PL・補助事業PL（過去3期）</h2></div><span className="pill green">必須手入力</span></div><HistoricalInputsEditor historical={historicalPlan} inputValues={inputValues} onHistoricalCompanyChange={updateHistoricalCompanyOfficial} onHistoricalProjectChange={updateHistoricalProjectOfficial} /></article>
           <div className="workflow-actions"><span>過去実績を入力できたら、次に現実的な将来水準を設定します。</span><button className="solve-button" onClick={() => goToView("targets")}>15指標・目標へ →</button></div>
         </section>
       )}
