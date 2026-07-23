@@ -41,7 +41,11 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /\["io", "データ入出力"\]/);
   assert.match(pageSource, /\{view === "io" && \(/);
   assert.ok(pageSource.indexOf('<nav className="tabs"') < pageSource.indexOf('<section className="proposal-filebar"'));
-  assert.match(globalStyles, /\.data-io-view \.proposal-filebar \{ margin: 0; \}/);
+  assert.match(pageSource, /className="sample-library-panel"/);
+  assert.match(pageSource, /SAMPLE LIBRARY/);
+  assert.doesNotMatch(pageSource, /<summary>サンプル/);
+  assert.match(globalStyles, /\.data-io-grid \{ display: grid; grid-template-columns:/);
+  assert.match(globalStyles, /\.sample-library-grid \{ display: grid; grid-template-columns: repeat\(2,/);
   assert.doesNotMatch(initialInputFunction, /driverRange/);
   assert.match(pageSource, /forecastSettingsStarted/);
   assert.match(pageSource, /forecastSettingsReady/);
@@ -131,10 +135,11 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /event\.key !== "Escape"/);
   assert.match(pageSource, /keepOnlyProposalMenuOpen/);
   assert.match(pageSource, />出力 <span aria-hidden="true">▾<\/span>/);
-  assert.match(pageSource, />サンプル <span aria-hidden="true">▾<\/span>/);
+  assert.doesNotMatch(pageSource, />サンプル <span aria-hidden="true">▾<\/span>/);
+  assert.match(pageSource, /<button onClick=\{loadHistoricalOnlySample\}>標準ケース/);
+  assert.match(pageSource, /<button className="sample-result-button" onClick=\{loadSampleProposal\}>最適化済み標準提案/);
   assert.doesNotMatch(pageSource, />HTML出力<\/button>/);
   assert.match(globalStyles, /proposal-action-menu-items/);
-  assert.match(globalStyles, /\.proposal-action-menu\.sample-menu:not\(\[open\]\) > summary \{ color: var\(--ink\); border-color: #c9c4b8; background: var\(--panel\); \}/);
   assert.match(globalStyles, /grid-template-columns: repeat\(auto-fit, minmax\(230px, 300px\)\)/);
   assert.match(globalStyles, /metric-group-control select \{ width: 100%; max-width: none;/);
   assert.match(pageSource, /に目標設定/);

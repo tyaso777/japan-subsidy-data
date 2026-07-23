@@ -1319,39 +1319,41 @@ export default function Home() {
             <div><p className="eyebrow">DATA MANAGEMENT</p><h2>データ入出力</h2></div>
             <p>提案計画の保存・取込と、確認用サンプルの読込をここで管理します。</p>
           </div>
-          <section className="proposal-filebar" aria-label="提案計画の保存と取込">
-            <label><span>提案計画名</span><input value={proposalTitle} onChange={(event) => setProposalTitle(event.target.value)} /></label>
-            <div className="proposal-file-actions">
-              <details className="proposal-action-menu" onToggle={(event) => keepOnlyProposalMenuOpen(event.currentTarget)}>
-                <summary>出力 <span aria-hidden="true">▾</span></summary>
-                <div className="proposal-action-menu-items">
-                  <small>お客さま提示用の提案計画書</small>
-                  <button onClick={(event) => { exportHtml(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>提案書HTML</button>
-                  <button onClick={(event) => { exportExcel(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>提案書Excel</button>
-                </div>
-              </details>
-              <label className="proposal-import-button">ファイル取込<input type="file" accept=".html,.htm,.xlsx" onChange={(event) => { void importProposal(event.target.files?.[0]); event.target.value = ""; }} /></label>
-              <details className="proposal-action-menu sample-menu" onToggle={(event) => keepOnlyProposalMenuOpen(event.currentTarget)}>
-                <summary>サンプル <span aria-hidden="true">▾</span></summary>
-                <div className="proposal-action-menu-items">
-                  <small>現在の入力をサンプルで置き換えます</small>
-                  <div className="sample-menu-section">
-                    <strong>使い方を試す</strong>
-                    <span>過去データ入力後から、設定・最適化を自分で進めます</span>
-                    <button onClick={(event) => { loadHistoricalOnlySample(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>標準ケース（過去3期入力済み）</button>
-                    <button onClick={(event) => { loadBaseYearLaunchSample(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>基準年売上開始ケース（過去3期入力済み）</button>
+          <div className="data-io-grid">
+            <section className="proposal-filebar" aria-label="提案計画の保存と取込">
+              <div className="data-io-panel-heading"><p className="card-kicker">PLAN FILE</p><h3>提案計画を保存・取り込む</h3></div>
+              <label><span>提案計画名</span><input value={proposalTitle} onChange={(event) => setProposalTitle(event.target.value)} /></label>
+              <div className="proposal-file-actions">
+                <details className="proposal-action-menu" onToggle={(event) => keepOnlyProposalMenuOpen(event.currentTarget)}>
+                  <summary>出力 <span aria-hidden="true">▾</span></summary>
+                  <div className="proposal-action-menu-items">
+                    <small>お客さま提示用の提案計画書</small>
+                    <button onClick={(event) => { exportHtml(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>提案書HTML</button>
+                    <button onClick={(event) => { exportExcel(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>提案書Excel</button>
                   </div>
-                  <div className="sample-menu-section result-sample-section">
-                    <strong>シミュレーション結果を見る</strong>
-                    <span>調整水準設定・将来入力・再最適化後の完成例です</span>
-                    <button className="sample-result-button" onClick={(event) => { loadSampleProposal(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>最適化済み標準提案</button>
-                    <button onClick={(event) => { loadPartiallyUnmetSample(); event.currentTarget.closest("details")?.removeAttribute("open"); }}>一部目標未達ケース</button>
-                  </div>
-                </div>
-              </details>
-            </div>
-            <small>{fileNote}</small>
-          </section>
+                </details>
+                <label className="proposal-import-button">ファイル取込<input type="file" accept=".html,.htm,.xlsx" onChange={(event) => { void importProposal(event.target.files?.[0]); event.target.value = ""; }} /></label>
+              </div>
+            </section>
+            <article className="sample-library-panel" aria-label="確認用サンプル">
+              <div className="data-io-panel-heading"><p className="card-kicker">SAMPLE LIBRARY</p><h3>確認用サンプルを読み込む</h3><small>現在の入力は選択したサンプルで置き換わります。</small></div>
+              <div className="sample-library-grid">
+                <section>
+                  <strong>使い方を試す</strong>
+                  <span>過去データ入力後から、設定・最適化を自分で進めます。</span>
+                  <button onClick={loadHistoricalOnlySample}>標準ケース（過去3期入力済み）</button>
+                  <button onClick={loadBaseYearLaunchSample}>基準年売上開始ケース（過去3期入力済み）</button>
+                </section>
+                <section className="result-sample-section">
+                  <strong>シミュレーション結果を見る</strong>
+                  <span>調整水準設定・将来入力・再最適化後の完成例です。</span>
+                  <button className="sample-result-button" onClick={loadSampleProposal}>最適化済み標準提案</button>
+                  <button onClick={loadPartiallyUnmetSample}>一部目標未達ケース</button>
+                </section>
+              </div>
+            </article>
+          </div>
+          <p className="data-io-status" aria-live="polite">{fileNote}</p>
         </section>
       )}
 
