@@ -19,8 +19,8 @@ test("renders the planning model shell", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
   const html = await response.text();
   assert.match(html, /<html lang="ja">/i);
-  assert.match(html, /<title>成長投資計画シミュレーター（Ver.大規模成長投資補助金第6次）<\/title>/i);
-  assert.match(html, /成長投資計画シミュレーター（Ver.大規模成長投資補助金第6次）/);
+  assert.match(html, /<title>成長投資計画シミュレーター（Ver. 大規模成長投資補助金 6次公募）<\/title>/i);
+  assert.match(html, /成長投資計画シミュレーター（Ver. 大規模成長投資補助金 6次公募）/);
   assert.match(html, /過去実績と目標値を入力し、補助事業＋その他事業＝全社 の将来PLをシミュレーションします。/);
   assert.doesNotMatch(html, /目標に近づける/);
   assert.match(html, /15指標・目標/);
@@ -36,7 +36,8 @@ test("renders the planning model shell", async () => {
   const proposalOptimizationSource = await readFile(new URL("../app/proposal-optimization.ts", import.meta.url), "utf8");
   const globalStyles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(pageSource, /<h1 className="product-title">/);
-  assert.match(pageSource, /<small>Ver\. 大規模成長投資補助金 第6次<\/small>/);
+  assert.match(pageSource, /<small>Ver\. 大規模成長投資補助金 6次公募<\/small>/);
+  assert.doesNotMatch(pageSource, /第3次定義を比較表示/);
   assert.match(globalStyles, /font-size: clamp\(28px, 3vw, 40px\)/);
   const initialInputFunction = pageSource.match(/function createInitialInputValues\(\): InputValues \{[\s\S]*?\n\}/)?.[0] ?? "";
   const suggestionSource = pageSource.match(/const targetAdjustmentSuggestions = useMemo\([\s\S]*?\n  \}, \[adjustedDrivers,[\s\S]*?\]\);/)?.[0] ?? "";
