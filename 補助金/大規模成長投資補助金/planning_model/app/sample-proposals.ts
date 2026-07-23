@@ -1,15 +1,22 @@
 import {
   createHistoricalPlan,
+  cogsDepreciation,
   DEFAULT_TIMELINE,
   defaultDrivers,
   defaultTargets,
   driverBounds,
   generatePlan,
+  employeeBonus,
+  employeeSalary,
   operatingProfit,
+  officerBonus,
+  officerCompensation,
   retimeBalanceSheets,
+  researchDevelopment,
   sampleBalanceSheets,
   sampleBasePlan,
   sampleDrivers,
+  sgaDepreciation,
   total,
   type ProjectPeriodInput,
   type SegmentPlan,
@@ -49,8 +56,11 @@ const commonProposal = (title: string, exportedAt: string, historicalPlan: YearP
     const company = total(row.project, row.other);
     const companyInputs: Record<string, number> = {
       "2-1": company.sales, "2-3": company.cogs,
-      "2-7": company.employeePay + company.officerPay + company.depreciation + company.otherSga,
-      "2-8": company.officerPay, "2-11": company.employeePay, "2-14": company.depreciation,
+      "2-4": cogsDepreciation(company),
+      "2-7": company.employeePay + company.officerPay + sgaDepreciation(company) + researchDevelopment(company) + company.otherSga,
+      "2-9": officerCompensation(company), "2-10": officerBonus(company),
+      "2-12": employeeSalary(company), "2-13": employeeBonus(company),
+      "2-14": sgaDepreciation(company), "2-15": researchDevelopment(company),
     };
     const projectInputs: Record<string, number> = {
       "7-1": row.project.sales, "7-4": row.project.sales - row.project.cogs,

@@ -10,6 +10,13 @@ export type SegmentPlan = {
   otherSga: number;
   headcount: number;
   officerCount: number;
+  employeeSalary?: number;
+  employeeBonus?: number;
+  officerCompensation?: number;
+  officerBonus?: number;
+  cogsDepreciation?: number;
+  sgaDepreciation?: number;
+  researchDevelopment?: number;
 };
 
 export type YearPlan = {
@@ -151,8 +158,15 @@ export const sampleBasePlan: YearPlan = {
     sales: 80,
     cogs: 54.4,
     employeePay: 6,
+    employeeSalary: 5.7,
+    employeeBonus: 0.3,
     officerPay: 0.4,
+    officerCompensation: 0.36,
+    officerBonus: 0.04,
     depreciation: 2,
+    cogsDepreciation: 0.5,
+    sgaDepreciation: 1.5,
+    researchDevelopment: 0.4,
     otherSga: 10,
     headcount: 100,
     officerCount: 2,
@@ -161,8 +175,15 @@ export const sampleBasePlan: YearPlan = {
     sales: 70,
     cogs: 47.6,
     employeePay: 8,
+    employeeSalary: 7.6,
+    employeeBonus: 0.4,
     officerPay: 0.6,
+    officerCompensation: 0.54,
+    officerBonus: 0.06,
     depreciation: 1.5,
+    cogsDepreciation: 0.3,
+    sgaDepreciation: 1.2,
+    researchDevelopment: 0.3,
     otherSga: 8,
     headcount: 130,
     officerCount: 3,
@@ -350,8 +371,17 @@ export const defaultTargets = Object.fromEntries(
 const lerp = (start: number, end: number, progress: number) => start + (end - start) * progress;
 const round = (value: number, digits = 2) => Number(value.toFixed(digits));
 
+export const employeeSalary = (segment: SegmentPlan) => segment.employeeSalary ?? segment.employeePay;
+export const employeeBonus = (segment: SegmentPlan) => segment.employeeBonus ?? 0;
+export const officerCompensation = (segment: SegmentPlan) => segment.officerCompensation ?? segment.officerPay;
+export const officerBonus = (segment: SegmentPlan) => segment.officerBonus ?? 0;
+export const cogsDepreciation = (segment: SegmentPlan) => segment.cogsDepreciation ?? 0;
+export const sgaDepreciation = (segment: SegmentPlan) => segment.sgaDepreciation ?? segment.depreciation;
+export const researchDevelopment = (segment: SegmentPlan) => segment.researchDevelopment ?? 0;
+
 export function operatingProfit(segment: SegmentPlan) {
-  return segment.sales - segment.cogs - segment.employeePay - segment.officerPay - segment.depreciation - segment.otherSga;
+  return segment.sales - segment.cogs - segment.employeePay - segment.officerPay
+    - sgaDepreciation(segment) - researchDevelopment(segment) - segment.otherSga;
 }
 
 export function valueAdded(segment: SegmentPlan) {
@@ -368,6 +398,13 @@ export function total(a: SegmentPlan, b: SegmentPlan): SegmentPlan {
     otherSga: a.otherSga + b.otherSga,
     headcount: a.headcount + b.headcount,
     officerCount: a.officerCount + b.officerCount,
+    employeeSalary: employeeSalary(a) + employeeSalary(b),
+    employeeBonus: employeeBonus(a) + employeeBonus(b),
+    officerCompensation: officerCompensation(a) + officerCompensation(b),
+    officerBonus: officerBonus(a) + officerBonus(b),
+    cogsDepreciation: cogsDepreciation(a) + cogsDepreciation(b),
+    sgaDepreciation: sgaDepreciation(a) + sgaDepreciation(b),
+    researchDevelopment: researchDevelopment(a) + researchDevelopment(b),
   };
 }
 
@@ -423,7 +460,7 @@ export function roleForYear(year: number, settings: TimelineSettings): YearRole 
 }
 
 function scaleSegment(segment: SegmentPlan, factor: number): SegmentPlan {
-  return {
+  const scaled: SegmentPlan = {
     sales: round(segment.sales * factor),
     cogs: round(segment.cogs * factor),
     employeePay: round(segment.employeePay * factor),
@@ -433,6 +470,44 @@ function scaleSegment(segment: SegmentPlan, factor: number): SegmentPlan {
     headcount: Math.max(0, Math.round(segment.headcount * factor)),
     officerCount: Math.max(0, Math.round(segment.officerCount)),
   };
+  if (segment.employeeSalary !== undefined || segment.employeeBonus !== undefined) {
+    scaled.employeeSalary = round(employeeSalary(segment) * factor);
+    scaled.employeeBonus = round(employeeBonus(segment) * factor);
+  }
+  if (segment.officerCompensation !== undefined || segment.officerBonus !== undefined) {
+    scaled.officerCompensation = round(officerCompensation(segment) * factor);
+    scaled.officerBonus = round(officerBonus(segment) * factor);
+  }
+  if (segment.cogsDepreciation !== undefined || segment.sgaDepreciation !== undefined) {
+    scaled.cogsDepreciation = round(cogsDepreciation(segment) * factor);
+    scaled.sgaDepreciation = round(sgaDepreciation(segment) * factor);
+  }
+  if (segment.researchDevelopment !== undefined) scaled.researchDevelopment = round(researchDevelopment(segment) * factor);
+  return scaled;
+}
+
+function withProportionalBreakdown(source: SegmentPlan, target: SegmentPlan): SegmentPlan {
+  const result = { ...target };
+  if (source.employeeSalary !== undefined || source.employeeBonus !== undefined) {
+    const salaryShare = source.employeePay ? employeeSalary(source) / source.employeePay : 1;
+    result.employeeSalary = round(target.employeePay * salaryShare);
+    result.employeeBonus = round(target.employeePay - result.employeeSalary);
+  }
+  if (source.officerCompensation !== undefined || source.officerBonus !== undefined) {
+    const compensationShare = source.officerPay ? officerCompensation(source) / source.officerPay : 1;
+    result.officerCompensation = round(target.officerPay * compensationShare);
+    result.officerBonus = round(target.officerPay - result.officerCompensation);
+  }
+  if (source.cogsDepreciation !== undefined || source.sgaDepreciation !== undefined) {
+    const cogsShare = source.depreciation ? cogsDepreciation(source) / source.depreciation : 0;
+    result.cogsDepreciation = round(target.depreciation * cogsShare);
+    result.sgaDepreciation = round(target.depreciation - result.cogsDepreciation);
+  }
+  if (source.researchDevelopment !== undefined) {
+    const salesFactor = source.sales ? target.sales / source.sales : 1;
+    result.researchDevelopment = round(researchDevelopment(source) * salesFactor);
+  }
+  return result;
 }
 
 function historicalSegmentWithPayGrowth(segment: SegmentPlan, factor: number, yearsBeforeLatest: number): SegmentPlan {
@@ -441,7 +516,7 @@ function historicalSegmentWithPayGrowth(segment: SegmentPlan, factor: number, ye
     const latestPayPerEmployee = segment.employeePay / segment.headcount;
     scaled.employeePay = round(scaled.headcount * latestPayPerEmployee / 1.02 ** yearsBeforeLatest);
   }
-  return scaled;
+  return withProportionalBreakdown(segment, scaled);
 }
 
 export function createHistoricalPlan(latest: YearPlan = basePlan, settings: TimelineSettings = DEFAULT_TIMELINE): YearPlan[] {
@@ -516,7 +591,7 @@ export function createForecastProjectPeriodInputs(
     const headcount = start.headcount * (1 + drivers.projectHeadcountGrowthToBase) ** elapsed;
     return {
       year: timeline.latestYear + elapsed,
-      project: {
+      project: withProportionalBreakdown(start, {
         sales: round(sales),
         cogs: round(sales * lerp(startCogsRate, targetCogsRate, progress)),
         employeePay: round(startPayPerHead * (1 + drivers.projectPayGrowthToBase) ** elapsed * headcount),
@@ -525,7 +600,7 @@ export function createForecastProjectPeriodInputs(
         otherSga: round(sales * lerp(startSgaRate, Math.max(0, startSgaRate - drivers.projectSgaImprovementToBase), progress)),
         headcount: Math.max(0, Math.round(headcount)),
         officerCount: Math.max(0, Math.round(start.officerCount)),
-      },
+      }),
     };
   });
 }
@@ -595,7 +670,7 @@ export function generatePlan(
       ? lerp(latestOtherSgaRate, otherBaseSgaRate, otherProgress)
       : lerp(otherBaseSgaRate, drivers.otherSgaRateEnd, otherProgress);
     const enteredProject = periodInputs.find((row) => row.year === year)?.project;
-    const project = year <= timeline.baseYear ? structuredClone(enteredProject ?? emptyProject) : {
+    const project = year <= timeline.baseYear ? structuredClone(enteredProject ?? emptyProject) : withProportionalBreakdown(projectBase, {
       sales: round(projectSales),
       cogs: round(projectSales * lerp(baseProjectCogsRate, projectCogsRateEnd, projectProgress)),
       employeePay: round(baseProjectPayPerHead * (1 + drivers.projectPayGrowth) ** yearsAfterBase * projectHeadcount),
@@ -604,12 +679,12 @@ export function generatePlan(
       otherSga: round(projectSales * lerp(baseProjectSgaRate, drivers.projectSgaRateEnd, projectProgress)),
       headcount: Math.max(0, Math.round(projectHeadcount)),
       officerCount: Math.max(0, Math.round(projectBase.officerCount)),
-    };
+    });
     plan.push({
       year,
       role,
       project,
-      other: {
+      other: withProportionalBreakdown(latest.other, {
         sales: round(otherSales),
         cogs: round(otherSales * otherCogsRate),
         employeePay: round(otherEmployeePay),
@@ -618,7 +693,7 @@ export function generatePlan(
         otherSga: round(otherSales * otherSgaRate),
         headcount: Math.max(0, Math.round(otherHeadcount)),
         officerCount: Math.max(0, Math.round(latest.other.officerCount)),
-      },
+      }),
     });
   }
   return plan;

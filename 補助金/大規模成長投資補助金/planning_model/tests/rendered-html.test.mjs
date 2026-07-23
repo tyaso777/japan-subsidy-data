@@ -77,6 +77,13 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /補助事業収支計画（7-1～7-20/);
   assert.match(pageSource, /7-11・7-12・7-15～7-19は第6次Excelと同じ関係式で自動計算/);
   assert.match(pageSource, /2-21～2-36を給与・付加価値・人数・EBITDA/);
+  assert.match(pageSource, /うち役員の人件費（自動計算）/);
+  assert.match(pageSource, /うち従業員の人件費（自動計算）/);
+  assert.match(pageSource, /employeeSalary: next, employeePay: nextPay/);
+  assert.match(pageSource, /officerBonus: next, officerPay: nextPay/);
+  assert.match(pageSource, /researchDevelopment: next/);
+  assert.match(modelSource, /segment\.employeeSalary \?\? segment\.employeePay/);
+  assert.match(modelSource, /segment\.sgaDepreciation \?\? segment\.depreciation/);
   assert.match(pageSource, /step=\{item\.digits === 0 \? 1 : 0\.1\}/);
   assert.match(modelSource, /headcount: Math\.max\(0, Math\.round\(projectHeadcount\)\)/);
   assert.match(reportDataSource, /code: "2-36", label: "EBITDA増加率"/);

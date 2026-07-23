@@ -9,6 +9,7 @@ import {
   calculateHistoricalMetricSeries,
   calculateMetrics,
   calculateScaleDependentTargetDefaults,
+  cogsDepreciation,
   createForecastProjectPeriodInputs,
   createHistoricalPlan,
   DEFAULT_TIMELINE,
@@ -17,6 +18,8 @@ import {
   driverBounds,
   defaultTargets,
   Drivers,
+  employeeBonus,
+  employeeSalary,
   generatePlan,
   hardTargetSummary,
   isOptimizationExcludedMetric,
@@ -25,12 +28,16 @@ import {
   metrics,
   objective,
   operatingProfit,
+  officerBonus,
+  officerCompensation,
   optimizeDrivers,
   normalizeTimeline,
   retimeHistoricalPlan,
   retimeBalanceSheets,
+  researchDevelopment,
   SegmentKey,
   SegmentPlan,
+  sgaDepreciation,
   Target,
   targetStatus,
   TimelineSettings,
@@ -287,13 +294,17 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
     for (const item of projectOfficialInputRows) {
       const key = forecastOverrideKey(row.year, "project", item.code);
       if (Object.prototype.hasOwnProperty.call(overrides, key)) {
-        const [field, value] = item.set(row.project, overrides[key]);
-        row.project[field] = roundedInput(value, item.digits ?? 2);
+        const patch = item.set(row.project, overrides[key]);
+        Object.entries(patch).forEach(([field, value]) => {
+          row.project[field as keyof SegmentPlan] = roundedInput(value ?? 0, item.digits ?? 2);
+        });
         projectAnchors.add(item.code);
       } else if (projectAnchors.has(item.code)) {
         const projected = cascade(item.get(previousEffective.project), item.get(previousAuto.project), item.get(autoRow.project));
-        const [field, value] = item.set(row.project, projected);
-        row.project[field] = roundedInput(value, item.digits ?? 2);
+        const patch = item.set(row.project, projected);
+        Object.entries(patch).forEach(([field, value]) => {
+          row.project[field as keyof SegmentPlan] = roundedInput(value ?? 0, item.digits ?? 2);
+        });
       }
     }
 
@@ -308,8 +319,10 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
           companyValue = cascade(item.get(result, index - 1)!, item.get(plan, index - 1)!, item.get(plan, index)!);
         }
         if (companyValue !== undefined) {
-          const [field, residual] = item.set!(row, companyValue);
-          row.other[field] = roundedInput(residual);
+          const patch = item.set!(row, companyValue);
+          Object.entries(patch).forEach(([field, residual]) => {
+            row.other[field as keyof SegmentPlan] = roundedInput(residual ?? 0);
+          });
         }
       }
     }
@@ -782,6 +795,23 @@ export default function Home() {
     setApplicationCategory(proposal.applicationCategory ?? defaultApplicationCategory);
     if (proposal.inputValues) {
       let normalizedInputs = clone(proposal.inputValues);
+      proposal.historicalPlan.forEach((row) => {
+        const migrateBreakdown = (legacyCode: string, primaryCode: string, secondaryCode: string) => {
+          const legacyKey = inputKey.companyActual(row.year, legacyCode);
+          const primaryKey = inputKey.companyActual(row.year, primaryCode);
+          const secondaryKey = inputKey.companyActual(row.year, secondaryCode);
+          if (hasInputValue(normalizedInputs, legacyKey) && !hasInputValue(normalizedInputs, primaryKey) && !hasInputValue(normalizedInputs, secondaryKey)) {
+            normalizedInputs = setInputValue(normalizedInputs, primaryKey, Number(normalizedInputs[legacyKey]));
+            normalizedInputs = setInputValue(normalizedInputs, secondaryKey, 0);
+          }
+        };
+        migrateBreakdown("2-8", "2-9", "2-10");
+        migrateBreakdown("2-11", "2-12", "2-13");
+        const cogsDepreciationKey = inputKey.companyActual(row.year, "2-4");
+        if (hasInputValue(normalizedInputs, inputKey.companyActual(row.year, "2-14")) && !hasInputValue(normalizedInputs, cogsDepreciationKey)) {
+          normalizedInputs = setInputValue(normalizedInputs, cogsDepreciationKey, 0);
+        }
+      });
       for (const key of Object.keys(driverBounds) as (keyof Drivers)[]) {
         for (const bound of [0, 1] as const) {
           if (hasInputValue(normalizedInputs, inputKey.driverRange(key, bound))) normalizedInputs = setInputValue(normalizedInputs, inputKey.driverRange(key, bound), importedRanges[key][bound]);
@@ -859,10 +889,18 @@ export default function Home() {
     setInputValues((current) => setInputValue(current, inputKey.projectActual(historicalPlan[yearIndex].year, item.code), inputValue === null ? null : roundedInput(inputValue, item.digits ?? 2)));
     setHistoricalPlan((current) => current.map((row, index) => {
       if (index !== yearIndex) return row;
-      const [field, value] = item.set(row.project, roundedInput(inputValue ?? 0, item.digits ?? 2));
-      const companyValue = row.project[field] + row.other[field];
-      const roundedValue = roundedInput(value, item.digits ?? 2);
-      return { ...row, project: { ...row.project, [field]: roundedValue }, other: { ...row.other, [field]: roundedInput(companyValue - roundedValue, item.digits ?? 2) } };
+      const patch = item.set(row.project, roundedInput(inputValue ?? 0, item.digits ?? 2));
+      const nextProject = { ...row.project };
+      const nextOther = { ...row.other };
+      Object.entries(patch).forEach(([rawField, rawValue]) => {
+        const field = rawField as keyof SegmentPlan;
+        const digits = field === "headcount" || field === "officerCount" ? 0 : 2;
+        const previousProjectValue = Number(row.project[field] ?? 0);
+        const nextProjectValue = roundedInput(rawValue ?? 0, digits);
+        nextProject[field] = nextProjectValue;
+        nextOther[field] = roundedInput(Number(row.other[field] ?? 0) + previousProjectValue - nextProjectValue, digits);
+      });
+      return { ...row, project: nextProject, other: nextOther };
     }));
   }
 
@@ -872,8 +910,14 @@ export default function Home() {
     setInputValues((current) => setInputValue(current, inputKey.companyActual(historicalPlan[yearIndex].year, item.code), inputValue === null ? null : roundedInput(inputValue)));
     setHistoricalPlan((current) => current.map((row, index) => {
       if (index !== yearIndex) return row;
-      const [field, residual] = item.set!(row, roundedInput(inputValue ?? 0));
-      return { ...row, other: { ...row.other, [field]: roundedInput(residual) } };
+      const patch = item.set!(row, roundedInput(inputValue ?? 0));
+      return {
+        ...row,
+        other: {
+          ...row.other,
+          ...Object.fromEntries(Object.entries(patch).map(([field, residual]) => [field, roundedInput(residual ?? 0)])),
+        },
+      };
     }));
   }
 
@@ -1423,9 +1467,10 @@ export default function Home() {
           </div>
           <article className="panel formula-panel">
             <h2>PLと付加価値の恒等式</h2>
-            <code>営業利益 = 売上高 − 売上原価 − 従業員給与 − 役員給与 − 減価償却費 − その他販管費</code>
-            <code>付加価値額 = 営業利益 + 従業員給与 + 役員給与 + 減価償却費</code>
-            <p>したがって、この簡易モデルでは付加価値額は「売上高 − 売上原価 − その他販管費」とも一致します。公式様式の勘定科目定義に合わせ、Excel化時に対応表を確定します。</p>
+            <code>役員人件費 = 役員報酬 + 役員賞与　／　従業員人件費 = 従業員給与 + 従業員賞与</code>
+            <code>営業利益 = 売上総利益 − 販管費（役員・従業員人件費、販管費内減価償却費、研究開発費、その他販管費）</code>
+            <code>付加価値額 = 営業利益 + 従業員給与支給総額 + 役員給与支給総額 + 減価償却費合計</code>
+            <p>売上原価内と販管費内の減価償却費を分離し、付加価値額・EBITDAでは両者の合計を使います。</p>
           </article>
           <article className="panel formula-panel">
             <h2>過去3期から将来PLを作る順序</h2>
@@ -1505,17 +1550,17 @@ function ManualEditor({ plan, onChange }: { plan: YearPlan[]; onChange: (yearInd
   return <div className="manual-sections">{(["project", "other"] as SegmentKey[]).map((segment) => <div key={segment}><h3>{segment === "project" ? "補助事業PL" : "その他事業PL"}</h3><div className="wide-table"><table><thead><tr><th>{segment === "other" ? "内部管理番号・項目" : "モデル入力項目"}</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{plFields.map((field) => <tr key={field.key}><th>{segment === "other" ? `${field.modelCode} ` : ""}{field.label}<small>{field.unit}</small></th>{plan.map((row, index) => <td key={row.year}><input type="number" step="0.1" value={row[segment][field.key]} onChange={(event) => onChange(index, segment, field.key, Number(event.target.value))} /></td>)}</tr>)}</tbody></table></div></div>)}</div>;
 }
 
-type ProjectOfficialInputRow = { code: string; label: string; unit: string; digits?: number; get: (segment: SegmentPlan) => number; set: (segment: SegmentPlan, value: number) => [keyof SegmentPlan, number] };
+type ProjectOfficialInputRow = { code: string; label: string; unit: string; digits?: number; get: (segment: SegmentPlan) => number; set: (segment: SegmentPlan, value: number) => Partial<SegmentPlan> };
 
 const projectOfficialInputRows: ProjectOfficialInputRow[] = [
-  { code: "7-1", label: "売上高", unit: "億円", get: (s) => s.sales, set: (_s, v) => ["sales", v] },
-  { code: "7-4", label: "売上総利益", unit: "億円", get: (s) => s.sales - s.cogs, set: (s, v) => ["cogs", s.sales - v] },
-  { code: "7-6", label: "営業利益", unit: "億円", get: operatingProfit, set: (s, v) => ["otherSga", s.sales - s.cogs - s.employeePay - s.officerPay - s.depreciation - v] },
-  { code: "7-8", label: "従業員給与支給総額", unit: "億円", get: (s) => s.employeePay, set: (_s, v) => ["employeePay", v] },
-  { code: "7-9", label: "役員給与支給総額", unit: "億円", get: (s) => s.officerPay, set: (_s, v) => ["officerPay", v] },
-  { code: "7-10", label: "減価償却費", unit: "億円", get: (s) => s.depreciation, set: (_s, v) => ["depreciation", v] },
-  { code: "7-13", label: "常時使用する従業員数（就業時間換算）", unit: "人", digits: 0, get: (s) => s.headcount, set: (_s, v) => ["headcount", Math.max(0, Math.round(v))] },
-  { code: "7-14", label: "役員数", unit: "人", digits: 0, get: (s) => s.officerCount, set: (_s, v) => ["officerCount", Math.max(0, Math.round(v))] },
+  { code: "7-1", label: "売上高", unit: "億円", get: (s) => s.sales, set: (_s, v) => ({ sales: v }) },
+  { code: "7-4", label: "売上総利益", unit: "億円", get: (s) => s.sales - s.cogs, set: (s, v) => ({ cogs: s.sales - v }) },
+  { code: "7-6", label: "営業利益", unit: "億円", get: operatingProfit, set: (s, v) => ({ otherSga: s.sales - s.cogs - s.employeePay - s.officerPay - sgaDepreciation(s) - researchDevelopment(s) - v }) },
+  { code: "7-8", label: "従業員給与支給総額", unit: "億円", get: (s) => s.employeePay, set: (s, v) => { if (s.employeeSalary === undefined && s.employeeBonus === undefined) return { employeePay: v }; const salary = s.employeePay ? v * employeeSalary(s) / s.employeePay : v; return { employeePay: v, employeeSalary: salary, employeeBonus: v - salary }; } },
+  { code: "7-9", label: "役員給与支給総額", unit: "億円", get: (s) => s.officerPay, set: (s, v) => { if (s.officerCompensation === undefined && s.officerBonus === undefined) return { officerPay: v }; const compensation = s.officerPay ? v * officerCompensation(s) / s.officerPay : v; return { officerPay: v, officerCompensation: compensation, officerBonus: v - compensation }; } },
+  { code: "7-10", label: "減価償却費", unit: "億円", get: (s) => s.depreciation, set: (s, v) => { if (s.cogsDepreciation === undefined && s.sgaDepreciation === undefined) return { depreciation: v }; const cogsAmount = s.depreciation ? v * cogsDepreciation(s) / s.depreciation : 0; return { depreciation: v, cogsDepreciation: cogsAmount, sgaDepreciation: v - cogsAmount }; } },
+  { code: "7-13", label: "常時使用する従業員数（就業時間換算）", unit: "人", digits: 0, get: (s) => s.headcount, set: (_s, v) => ({ headcount: Math.max(0, Math.round(v)) }) },
+  { code: "7-14", label: "役員数", unit: "人", digits: 0, get: (s) => s.officerCount, set: (_s, v) => ({ officerCount: Math.max(0, Math.round(v)) }) },
 ];
 
 type ProjectOfficialDisplayRow = {
@@ -1561,25 +1606,33 @@ type CompanyActualInputRow = {
   unit?: string;
   groupStart?: boolean;
   get: (rows: YearPlan[], index: number) => number | undefined;
-  set?: (row: YearPlan, value: number) => [keyof SegmentPlan, number];
+  set?: (row: YearPlan, value: number) => Partial<SegmentPlan>;
 };
 
+const companySgaTotal = (segment: SegmentPlan) =>
+  segment.employeePay + segment.officerPay + sgaDepreciation(segment) + researchDevelopment(segment) + segment.otherSga;
+
+const preserveSgaTotal = (segment: SegmentPlan, patch: Partial<SegmentPlan>, componentDelta: number): Partial<SegmentPlan> => ({
+  ...patch,
+  otherSga: segment.otherSga - componentDelta,
+});
+
 const companyActualInputRows: CompanyActualInputRow[] = [
-  { code: "2-1", label: "売上高", get: (rows, index) => companySegment(rows, index).sales, set: (row, value) => ["sales", value - row.project.sales] },
+  { code: "2-1", label: "売上高", get: (rows, index) => companySegment(rows, index).sales, set: (row, value) => ({ sales: value - row.project.sales }) },
   { code: "2-2", label: "売上高成長率", unit: "%", get: (rows, index) => growth(companySegment(rows, index).sales, index ? companySegment(rows, index - 1).sales : undefined) },
-  { code: "2-3", label: "売上原価", get: (rows, index) => companySegment(rows, index).cogs, set: (row, value) => ["cogs", value - row.project.cogs] },
-  { code: "2-4", label: "うち減価償却費", get: () => 0 },
+  { code: "2-3", label: "売上原価", get: (rows, index) => companySegment(rows, index).cogs, set: (row, value) => ({ cogs: value - row.project.cogs }) },
+  { code: "2-4", label: "うち減価償却費", get: (rows, index) => cogsDepreciation(companySegment(rows, index)), set: (row, value) => { const next = value - cogsDepreciation(row.project); return { cogsDepreciation: next, depreciation: next + sgaDepreciation(row.other) }; } },
   { code: "2-5", label: "売上総利益", get: (rows, index) => { const company = companySegment(rows, index); return company.sales - company.cogs; } },
   { code: "2-6", label: "売上総利益率", unit: "%", get: (rows, index) => { const company = companySegment(rows, index); return rate(company.sales - company.cogs, company.sales); } },
-  { code: "2-7", label: "販売費及び一般管理費", get: (rows, index) => sgaTotal(companySegment(rows, index)), set: (row, value) => ["otherSga", value - sgaTotal(row.project) - row.other.employeePay - row.other.officerPay - row.other.depreciation] },
-  { code: "2-8", label: "うち役員の人件費", get: (rows, index) => companySegment(rows, index).officerPay, set: (row, value) => ["officerPay", value - row.project.officerPay] },
-  { code: "2-9", label: "うち役員報酬", get: (rows, index) => companySegment(rows, index).officerPay },
-  { code: "2-10", label: "うち役員賞与", get: () => 0 },
-  { code: "2-11", label: "うち従業員の人件費", get: (rows, index) => companySegment(rows, index).employeePay, set: (row, value) => ["employeePay", value - row.project.employeePay] },
-  { code: "2-12", label: "うち従業員の給与", get: (rows, index) => companySegment(rows, index).employeePay },
-  { code: "2-13", label: "うち従業員の賞与", get: () => 0 },
-  { code: "2-14", label: "うち減価償却費", get: (rows, index) => companySegment(rows, index).depreciation, set: (row, value) => ["depreciation", value - row.project.depreciation] },
-  { code: "2-15", label: "うち研究開発費", get: () => 0 },
+  { code: "2-7", label: "販売費及び一般管理費", get: (rows, index) => companySgaTotal(companySegment(rows, index)), set: (row, value) => ({ otherSga: value - companySgaTotal(row.project) - row.other.employeePay - row.other.officerPay - sgaDepreciation(row.other) - researchDevelopment(row.other) }) },
+  { code: "2-8", label: "うち役員の人件費（自動計算）", get: (rows, index) => companySegment(rows, index).officerPay },
+  { code: "2-9", label: "うち役員報酬", get: (rows, index) => officerCompensation(companySegment(rows, index)), set: (row, value) => { const next = value - officerCompensation(row.project); const nextPay = next + officerBonus(row.other); return preserveSgaTotal(row.other, { officerCompensation: next, officerPay: nextPay }, nextPay - row.other.officerPay); } },
+  { code: "2-10", label: "うち役員賞与", get: (rows, index) => officerBonus(companySegment(rows, index)), set: (row, value) => { const next = value - officerBonus(row.project); const nextPay = officerCompensation(row.other) + next; return preserveSgaTotal(row.other, { officerBonus: next, officerPay: nextPay }, nextPay - row.other.officerPay); } },
+  { code: "2-11", label: "うち従業員の人件費（自動計算）", get: (rows, index) => companySegment(rows, index).employeePay },
+  { code: "2-12", label: "うち従業員の給与", get: (rows, index) => employeeSalary(companySegment(rows, index)), set: (row, value) => { const next = value - employeeSalary(row.project); const nextPay = next + employeeBonus(row.other); return preserveSgaTotal(row.other, { employeeSalary: next, employeePay: nextPay }, nextPay - row.other.employeePay); } },
+  { code: "2-13", label: "うち従業員の賞与", get: (rows, index) => employeeBonus(companySegment(rows, index)), set: (row, value) => { const next = value - employeeBonus(row.project); const nextPay = employeeSalary(row.other) + next; return preserveSgaTotal(row.other, { employeeBonus: next, employeePay: nextPay }, nextPay - row.other.employeePay); } },
+  { code: "2-14", label: "うち減価償却費", get: (rows, index) => sgaDepreciation(companySegment(rows, index)), set: (row, value) => { const next = value - sgaDepreciation(row.project); return preserveSgaTotal(row.other, { sgaDepreciation: next, depreciation: cogsDepreciation(row.other) + next }, next - sgaDepreciation(row.other)); } },
+  { code: "2-15", label: "うち研究開発費", get: (rows, index) => researchDevelopment(companySegment(rows, index)), set: (row, value) => { const next = value - researchDevelopment(row.project); return preserveSgaTotal(row.other, { researchDevelopment: next }, next - researchDevelopment(row.other)); } },
   { code: "2-16", label: "営業利益", get: (rows, index) => operatingProfit(companySegment(rows, index)) },
   { code: "2-17", label: "営業利益率", unit: "%", get: (rows, index) => { const company = companySegment(rows, index); return rate(operatingProfit(company), company.sales); } },
   { code: "2-18", label: "経常利益", get: (rows, index) => operatingProfit(companySegment(rows, index)) },
@@ -1842,7 +1895,7 @@ type OfficialRow = {
 const rate = (numerator: number, denominator: number) => denominator ? numerator / denominator * 100 : 0;
 const growth = (current: number, previous: number | undefined) => previous ? (current / previous - 1) * 100 : undefined;
 const companySegment = (rows: YearPlan[], index: number) => total(rows[index].project, rows[index].other);
-const sgaTotal = (segment: SegmentPlan) => segment.employeePay + segment.officerPay + segment.depreciation + segment.otherSga;
+const sgaTotal = companySgaTotal;
 
 type DiagnosticValue = { label: string; value: number | undefined };
 type DiagnosticRow = {
@@ -1967,7 +2020,7 @@ function CompanyTable({ plan, sourcePlan }: { plan: YearPlan[]; sourcePlan?: Yea
     groupStart: item.groupStart,
     value: item.get,
   }));
-  return <OfficialRowsTable title="会社全体にかかる損益計算書・関連計算項目" kicker="ROUND 6 / SECTION 2" pill="2-1～2-36" plan={plan} sourcePlan={sourcePlan} rows={rows} note="2-1～2-20が損益計算書、2-21～2-36が給与・付加価値・人数・EBITDAの関連計算項目です。現在の簡易モデルでは、2-4・2-10・2-13・2-15は0、2-18は営業利益と同額、2-19・2-20はモデル未対応として表示します。" />;
+  return <OfficialRowsTable title="会社全体にかかる損益計算書・関連計算項目" kicker="ROUND 6 / SECTION 2" pill="2-1～2-36" plan={plan} sourcePlan={sourcePlan} rows={rows} note="2-1～2-20が損益計算書、2-21～2-36が給与・付加価値・人数・EBITDAの関連計算項目です。2-8は2-9＋2-10、2-11は2-12＋2-13、2-23は2-4＋2-14で自動計算します。2-18は営業利益と同額、2-19・2-20はモデル未対応です。" />;
 }
 
 function OfficialProjectTable({ plan, sourcePlan, drivers }: { plan: YearPlan[]; sourcePlan?: YearPlan[]; drivers: Drivers }) {

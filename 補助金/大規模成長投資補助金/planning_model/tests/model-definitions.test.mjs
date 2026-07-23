@@ -208,6 +208,31 @@ test("forecast employee and officer counts are stored as whole people", () => {
   }
 });
 
+test("round-six payroll and depreciation breakdowns reconcile to their calculated totals", () => {
+  const segment = {
+    sales: 100,
+    cogs: 60,
+    employeePay: 12,
+    employeeSalary: 10,
+    employeeBonus: 2,
+    officerPay: 3,
+    officerCompensation: 2.5,
+    officerBonus: 0.5,
+    depreciation: 5,
+    cogsDepreciation: 2,
+    sgaDepreciation: 3,
+    researchDevelopment: 1,
+    otherSga: 4,
+    headcount: 20,
+    officerCount: 2,
+  };
+  assert.equal(model.employeeSalary(segment) + model.employeeBonus(segment), segment.employeePay);
+  assert.equal(model.officerCompensation(segment) + model.officerBonus(segment), segment.officerPay);
+  assert.equal(model.cogsDepreciation(segment) + model.sgaDepreciation(segment), segment.depreciation);
+  assert.equal(model.operatingProfit(segment), 17);
+  assert.equal(model.valueAdded(segment), 37);
+});
+
 test("cogs assumptions are period improvement points rather than terminal rates", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   const drivers = {

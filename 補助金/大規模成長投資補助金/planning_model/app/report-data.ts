@@ -1,4 +1,20 @@
-import { balanceSheetDerived, operatingProfit, total, valueAdded, YEAR_ROLE_LABELS, type BalanceSheetPlan, type SegmentPlan, type YearPlan } from "./model";
+import {
+  balanceSheetDerived,
+  cogsDepreciation,
+  employeeBonus,
+  employeeSalary,
+  officerBonus,
+  officerCompensation,
+  operatingProfit,
+  researchDevelopment,
+  sgaDepreciation,
+  total,
+  valueAdded,
+  YEAR_ROLE_LABELS,
+  type BalanceSheetPlan,
+  type SegmentPlan,
+  type YearPlan,
+} from "./model";
 
 export type ReportRow = { code: string; label: string; unit: string; values: (number | undefined)[]; emphasis?: boolean };
 export type DiagnosticReportRow = { name: string; formula: string; check: string; unit: string; values: { label: string; value: number | undefined }[][] };
@@ -8,7 +24,7 @@ const rate = (numerator: number, denominator: number) => denominator ? numerator
 const multiple = (numerator: number, denominator: number) => denominator ? numerator / denominator : undefined;
 const growth = (current: number, previous?: number) => previous ? (current / previous - 1) * 100 : undefined;
 const company = (row: YearPlan) => total(row.project, row.other);
-const sga = (segment: SegmentPlan) => segment.employeePay + segment.officerPay + segment.depreciation + segment.otherSga;
+const sga = (segment: SegmentPlan) => segment.employeePay + segment.officerPay + sgaDepreciation(segment) + researchDevelopment(segment) + segment.otherSga;
 const ebitda = (segment: SegmentPlan) => operatingProfit(segment) + segment.depreciation;
 
 export function buildBalanceSheetRows(balanceSheets: BalanceSheetPlan[], plan: YearPlan[]): ReportRow[] {
@@ -49,18 +65,18 @@ export function buildCompanyPlRows(plan: YearPlan[]): ReportRow[] {
     { code: "2-1", label: "売上高", unit: "億円", values: values((row) => company(row).sales), emphasis: true },
     { code: "2-2", label: "売上高成長率", unit: "%", values: values((row, index) => growth(company(row).sales, index ? company(plan[index - 1]).sales : undefined)) },
     { code: "2-3", label: "売上原価", unit: "億円", values: values((row) => company(row).cogs) },
-    { code: "2-4", label: "うち減価償却費", unit: "億円", values: values(() => 0) },
+    { code: "2-4", label: "うち減価償却費", unit: "億円", values: values((row) => cogsDepreciation(company(row))) },
     { code: "2-5", label: "売上総利益", unit: "億円", values: values((row) => company(row).sales - company(row).cogs), emphasis: true },
     { code: "2-6", label: "売上総利益率", unit: "%", values: values((row) => rate(company(row).sales - company(row).cogs, company(row).sales)) },
     { code: "2-7", label: "販売費及び一般管理費", unit: "億円", values: values((row) => sga(company(row))) },
-    { code: "2-8", label: "うち役員の人件費", unit: "億円", values: values((row) => company(row).officerPay) },
-    { code: "2-9", label: "うち役員報酬", unit: "億円", values: values((row) => company(row).officerPay) },
-    { code: "2-10", label: "うち役員賞与", unit: "億円", values: values(() => 0) },
-    { code: "2-11", label: "うち従業員の人件費", unit: "億円", values: values((row) => company(row).employeePay) },
-    { code: "2-12", label: "うち従業員の給与", unit: "億円", values: values((row) => company(row).employeePay) },
-    { code: "2-13", label: "うち従業員の賞与", unit: "億円", values: values(() => 0) },
-    { code: "2-14", label: "うち減価償却費", unit: "億円", values: values((row) => company(row).depreciation) },
-    { code: "2-15", label: "うち研究開発費", unit: "億円", values: values(() => 0) },
+    { code: "2-8", label: "うち役員の人件費（自動計算）", unit: "億円", values: values((row) => company(row).officerPay) },
+    { code: "2-9", label: "うち役員報酬", unit: "億円", values: values((row) => officerCompensation(company(row))) },
+    { code: "2-10", label: "うち役員賞与", unit: "億円", values: values((row) => officerBonus(company(row))) },
+    { code: "2-11", label: "うち従業員の人件費（自動計算）", unit: "億円", values: values((row) => company(row).employeePay) },
+    { code: "2-12", label: "うち従業員の給与", unit: "億円", values: values((row) => employeeSalary(company(row))) },
+    { code: "2-13", label: "うち従業員の賞与", unit: "億円", values: values((row) => employeeBonus(company(row))) },
+    { code: "2-14", label: "うち減価償却費", unit: "億円", values: values((row) => sgaDepreciation(company(row))) },
+    { code: "2-15", label: "うち研究開発費", unit: "億円", values: values((row) => researchDevelopment(company(row))) },
     { code: "2-16", label: "営業利益", unit: "億円", values: values((row) => operatingProfit(company(row))), emphasis: true },
     { code: "2-17", label: "営業利益率", unit: "%", values: values((row) => rate(operatingProfit(company(row)), company(row).sales)) },
     { code: "2-18", label: "経常利益", unit: "億円", values: values((row) => operatingProfit(company(row))), emphasis: true },
