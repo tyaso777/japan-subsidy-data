@@ -74,15 +74,15 @@ const standardWorkflowAdjustedDrivers = {
   otherPayGrowthToBase: 0.019809059504605663,
   otherHeadcountGrowthToBase: 0.041493777249306446,
   otherSgaImprovementToBase: 0,
-  projectSalesGrowth: 0.2938871439006574,
+  projectSalesGrowth: 0.22,
   otherSalesGrowth: 0.06254018570726526,
   projectCogsImprovementAfterBase: 0.015550427257977284,
   otherCogsImprovement: 0.005,
-  projectPayGrowth: 0.08894384122463511,
-  otherPayGrowth: 0.024811833253866787,
-  projectHeadcountGrowth: 0.026240752485890893,
+  projectPayGrowth: 0.1,
+  otherPayGrowth: 0.025553459914763096,
+  projectHeadcountGrowth: 0.04,
   otherHeadcountGrowth: 0.04587237692136338,
-  projectSgaRateEnd: 0.10300299543741322,
+  projectSgaRateEnd: 0.11,
   otherSgaRateEnd: 0.1093261646516366,
   projectOfficerPayGrowth: 0.053819231679583496,
   investment: 23,
@@ -117,11 +117,11 @@ const standardWorkflowRanges: typeof driverBounds = {
 
 const standardWorkflowTargets = clone(defaultTargets);
 Object.assign(standardWorkflowTargets, {
-  companySalesCagr: { ...standardWorkflowTargets.companySalesCagr, value: 20 },
-  companySalesIncrease: { ...standardWorkflowTargets.companySalesIncrease, value: 133.5, max: 252.69 },
+  companySalesCagr: { ...standardWorkflowTargets.companySalesCagr, value: 15 },
+  companySalesIncrease: { ...standardWorkflowTargets.companySalesIncrease, value: 82.4, max: 252.69 },
   companyPaySchedule: { ...standardWorkflowTargets.companyPaySchedule, value: 2 },
-  projectSalesShare: { ...standardWorkflowTargets.projectSalesShare, value: 65 },
-  projectSalesIncrease: { ...standardWorkflowTargets.projectSalesIncrease, value: 76.44, max: 136.84 },
+  projectSalesShare: { ...standardWorkflowTargets.projectSalesShare, value: 60 },
+  projectSalesIncrease: { ...standardWorkflowTargets.projectSalesIncrease, value: 74.8, max: 136.84 },
   valueAddedIncrease: { ...standardWorkflowTargets.valueAddedIncrease, value: 18.78, max: 33.43 },
   employeePayIncrease: { ...standardWorkflowTargets.employeePayIncrease, value: 2.85, max: 3.74 },
   investmentSalesRatio: { ...standardWorkflowTargets.investmentSalesRatio, value: 15 },
@@ -129,7 +129,7 @@ Object.assign(standardWorkflowTargets, {
 
 const standardWorkflowOverrides: Record<string, number> = {
   "2029:other:sales": 85.13,
-  "2029:project:7-8": 7.89,
+  "2029:project:7-8": 7.9,
 };
 
 const emptySegment = (): SegmentPlan => ({

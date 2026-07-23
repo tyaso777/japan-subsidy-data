@@ -16,15 +16,15 @@ test("standard sample represents the completed two-pass planning workflow", asyn
   const proposal = JSON.parse(Buffer.from(payload, "base64").toString("utf8"));
 
   assert.equal(proposal.forecastOverrides["2029:other:sales"], 85.13);
-  assert.equal(proposal.forecastOverrides["2029:project:7-8"], 7.89);
+  assert.equal(proposal.forecastOverrides["2029:project:7-8"], 7.9);
   assert.equal(proposal.futureInputBasis, "other");
   assert.equal(proposal.drivers.projectPayGrowth, 0.07, "planning input should retain the pre-optimization default");
-  assert.ok(proposal.adjustedDrivers.projectPayGrowth > 0.088, "second optimization should lift project pay growth after the manual future input");
-  assert.equal(proposal.adjustedDrivers.projectSalesGrowth, 0.2938871439006574, "saved result should match a rerun from planning inputs plus future overrides");
+  assert.ok(proposal.adjustedDrivers.projectPayGrowth > 0.088, "future pay override should be offset so the official pay-growth metric remains near the median");
+  assert.equal(proposal.adjustedDrivers.projectSalesGrowth, 0.22, "saved result should match the fifth-round accepted-company median");
   assert.ok(proposal.adjustedDrivers.projectSalesGrowth <= proposal.driverRanges.projectSalesGrowth[1]);
   assert.equal(proposal.drivers.subsidy, 7.66);
-  assert.equal(proposal.targets.companySalesIncrease.value, 133.5);
-  assert.equal(proposal.targets.companySalesCagr.value, 20);
+  assert.equal(proposal.targets.companySalesIncrease.value, 82.4);
+  assert.equal(proposal.targets.companySalesCagr.value, 15);
 });
 
 test("partially unmet sample retains a visibly unattainable pay target", async () => {
