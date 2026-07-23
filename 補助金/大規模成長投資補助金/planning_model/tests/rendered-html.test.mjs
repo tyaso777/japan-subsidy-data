@@ -123,6 +123,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, />サンプル <span aria-hidden="true">▾<\/span>/);
   assert.doesNotMatch(pageSource, />HTML出力<\/button>/);
   assert.match(globalStyles, /proposal-action-menu-items/);
+  assert.match(globalStyles, /\.proposal-action-menu\.sample-menu:not\(\[open\]\) > summary \{ color: var\(--ink\); border-color: #c9c4b8; background: var\(--panel\); \}/);
   assert.match(globalStyles, /grid-template-columns: repeat\(auto-fit, minmax\(230px, 300px\)\)/);
   assert.match(globalStyles, /metric-group-control select \{ width: 100%; max-width: none;/);
   assert.match(pageSource, /に目標設定/);
