@@ -37,6 +37,11 @@ test("renders the planning model shell", async () => {
   const initialInputFunction = pageSource.match(/function createInitialInputValues\(\): InputValues \{[\s\S]*?\n\}/)?.[0] ?? "";
   const suggestionSource = pageSource.match(/const targetAdjustmentSuggestions = useMemo\([\s\S]*?\n  \}, \[adjustedDrivers,[\s\S]*?\]\);/)?.[0] ?? "";
   assert.match(globalStyles, /\.tabs \{ position: sticky; top: 0; z-index: 25;/);
+  assert.match(pageSource, /type View = [^;]*"io"/);
+  assert.match(pageSource, /\["io", "データ入出力"\]/);
+  assert.match(pageSource, /\{view === "io" && \(/);
+  assert.ok(pageSource.indexOf('<nav className="tabs"') < pageSource.indexOf('<section className="proposal-filebar"'));
+  assert.match(globalStyles, /\.data-io-view \.proposal-filebar \{ margin: 0; \}/);
   assert.doesNotMatch(initialInputFunction, /driverRange/);
   assert.match(pageSource, /forecastSettingsStarted/);
   assert.match(pageSource, /forecastSettingsReady/);
