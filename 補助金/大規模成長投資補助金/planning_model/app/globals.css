@@ -68,7 +68,7 @@ main { width: calc(100% - 48px); margin: 0 auto; padding: 34px 0 80px; }
 .benchmark-note { display: flex; flex-wrap: wrap; align-items: center; gap: 7px 12px; margin-top: 12px; padding: 11px 13px; background: #f2efe7; border-left: 3px solid var(--amber); font-size: 9px; }.benchmark-note strong { margin-right: 4px; }.benchmark-note span { color: #525e58; }.benchmark-note a { margin-left: auto; color: var(--green); font-weight: 800; }
 .workflow-actions { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 16px 18px; border: 1px solid #d6d1c5; border-radius: 14px; background: rgba(255, 253, 248, .72); color: var(--muted); font-size: 11px; }
 
-.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 24px; overflow-x: auto; }
+.tabs { position: sticky; top: 0; z-index: 25; display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 24px; overflow-x: auto; background: rgba(248, 246, 240, .96); backdrop-filter: blur(10px); }
 .tabs button { background: transparent; border: 0; color: var(--muted); padding: 13px 18px; font-size: 13px; font-weight: 700; white-space: nowrap; border-bottom: 3px solid transparent; }
 .tabs button.active { color: var(--green); border-color: var(--green); }
 
