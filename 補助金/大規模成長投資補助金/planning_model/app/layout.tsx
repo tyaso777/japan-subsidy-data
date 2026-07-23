@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "成長投資計画 数値設計ラボ",
+  title: "成長投資計画シミュレーター（Ver.大規模成長投資補助金第6次）",
   description: "大規模成長投資補助金のPL・15指標・目標競合を検証するローカルモデル",
 };
 
