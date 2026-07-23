@@ -28,6 +28,7 @@ test("renders the planning model shell", async () => {
   const inputValueSource = await readFile(new URL("../app/input-values.ts", import.meta.url), "utf8");
   const metricGroupSource = await readFile(new URL("../app/metric-groups.ts", import.meta.url), "utf8");
   const proposalSource = await readFile(new URL("../app/proposal-io.ts", import.meta.url), "utf8");
+  const sampleProposalSource = await readFile(new URL("../app/sample-proposals.ts", import.meta.url), "utf8");
   const applicationRulesSource = await readFile(new URL("../app/application-rules.ts", import.meta.url), "utf8");
   const globalStyles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   const initialInputFunction = pageSource.match(/function createInitialInputValues\(\): InputValues \{[\s\S]*?\n\}/)?.[0] ?? "";
@@ -74,6 +75,12 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /上書き内容を反映して再最適化/);
   assert.match(pageSource, /15指標・目標へ戻る/);
   assert.match(pageSource, />基準年売上開始<\/button>/);
+  assert.match(pageSource, />過去3期入力済み<\/button>/);
+  assert.match(pageSource, /createHistoricalOnlySampleProposal/);
+  assert.match(sampleProposalSource, /proposal\.drivers = clone\(defaultDrivers\)/);
+  assert.match(sampleProposalSource, /delete proposal\.inputValues\?\.\[inputKey\.driver\(key\)\]/);
+  assert.match(sampleProposalSource, /delete proposal\.inputValues\?\.\[inputKey\.driverRange\(key, 0\)\]/);
+  assert.match(sampleProposalSource, /delete proposal\.inputValues\?\.\[inputKey\.futureCapex\(row\.year\)\]/);
   assert.match(pageSource, /window\.scrollTo\(\{ top: 0, left: 0, behavior: "auto" \}\)/);
   assert.match(pageSource, /function DiagnosticCharts\(\{ plan \}/);
   assert.match(pageSource, /主要指標の推移チャート/);

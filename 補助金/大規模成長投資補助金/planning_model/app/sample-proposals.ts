@@ -1,6 +1,7 @@
 import {
   createHistoricalPlan,
   DEFAULT_TIMELINE,
+  defaultDrivers,
   defaultTargets,
   driverBounds,
   generatePlan,
@@ -96,6 +97,25 @@ export function createStandardSampleProposal(exportedAt: string): ProposalData {
     exportedAt,
     createHistoricalPlan(sampleBasePlan, DEFAULT_TIMELINE),
   );
+}
+
+export function createHistoricalOnlySampleProposal(exportedAt: string): ProposalData {
+  const proposal = commonProposal(
+    "成長投資計画 過去3期入力済みサンプル",
+    exportedAt,
+    createHistoricalPlan(sampleBasePlan, DEFAULT_TIMELINE),
+  );
+  proposal.drivers = clone(defaultDrivers);
+  proposal.futureCapex = futureCapex(0);
+  (Object.keys(sampleDrivers) as (keyof typeof sampleDrivers)[]).forEach((key) => {
+    delete proposal.inputValues?.[inputKey.driver(key)];
+    delete proposal.inputValues?.[inputKey.driverRange(key, 0)];
+    delete proposal.inputValues?.[inputKey.driverRange(key, 1)];
+  });
+  proposal.futureCapex.forEach((row) => {
+    delete proposal.inputValues?.[inputKey.futureCapex(row.year)];
+  });
+  return proposal;
 }
 
 export function createBaseYearLaunchSample(exportedAt: string) {
