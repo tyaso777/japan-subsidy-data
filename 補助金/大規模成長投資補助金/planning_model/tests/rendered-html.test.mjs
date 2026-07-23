@@ -33,6 +33,7 @@ test("renders the planning model shell", async () => {
   const applicationRulesSource = await readFile(new URL("../app/application-rules.ts", import.meta.url), "utf8");
   const globalStyles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   const initialInputFunction = pageSource.match(/function createInitialInputValues\(\): InputValues \{[\s\S]*?\n\}/)?.[0] ?? "";
+  const suggestionSource = pageSource.match(/const targetAdjustmentSuggestions = useMemo\([\s\S]*?\n  \}, \[adjustedDrivers,[\s\S]*?\]\);/)?.[0] ?? "";
   assert.doesNotMatch(initialInputFunction, /driverRange/);
   assert.match(pageSource, /forecastSettingsStarted/);
   assert.match(pageSource, /forecastSettingsReady/);
@@ -148,6 +149,9 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /projectSalesGrowth: \{ label: "補助事業 売上成長率（基準年→事業化報告3年目）"/);
   assert.match(pageSource, /otherSalesGrowthToBase: \{ label: "その他事業 売上成長率（最新決算期→基準年）"/);
   assert.match(pageSource, /const improvesTargetGap = \(probeValue: number\)/);
+  assert.match(suggestionSource, /for \(const key of adjustableDriverKeys\)/);
+  assert.doesNotMatch(suggestionSource, /projectPayGrowthToBase|otherPayGrowthToBase/);
+  assert.match(pageSource, /basisRole !== "result" && adjustedPlan && targetSet && !status\.ok/);
   assert.doesNotMatch(pageSource, /Math\.abs\(current - rangeUpper\)/);
   assert.match(pageSource, /function applySelectedDriverRangeSuggestions\(metricKey: MetricKey, suggestions: DriverRangeSuggestion\[\]\)/);
   assert.match(pageSource, /type="checkbox" checked=\{Boolean\(selectedAdjustmentSuggestions/);
