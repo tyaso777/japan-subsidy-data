@@ -100,6 +100,8 @@ test("renders the planning model shell", async () => {
   assert.match(sampleProposalSource, /delete proposal\.inputValues\?\.\[inputKey\.driverRange\(key, 0\)\]/);
   assert.match(sampleProposalSource, /delete proposal\.inputValues\?\.\[inputKey\.futureCapex\(row\.year\)\]/);
   assert.match(pageSource, /window\.scrollTo\(\{ top: 0, left: 0, behavior: "auto" \}\)/);
+  assert.match(pageSource, /← 将来データ入力に戻る/);
+  assert.match(pageSource, /診断タブに進む →/);
   assert.match(pageSource, /function DiagnosticCharts\(\{ plan \}/);
   assert.match(pageSource, /主要指標の推移チャート/);
   assert.match(pageSource, /人員・1人当たり給与/);

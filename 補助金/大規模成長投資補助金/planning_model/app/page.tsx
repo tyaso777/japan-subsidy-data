@@ -1461,6 +1461,7 @@ export default function Home() {
           <CompanyTable plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} />
           <OfficialProjectTable plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} drivers={calculationDrivers} />
           <PlTable title="その他事業PL（モデル内訳・申請書外）" plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} segment="other" />
+          <div className="workflow-actions"><span>年度別PLを確認したら、診断画面で計画推移と妥当性を確認します。</span><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("future")}>← 将来データ入力に戻る</button><button className="solve-button" onClick={() => goToView("summary")}>診断タブに進む →</button></div></div>
         </section>
       )}
 
