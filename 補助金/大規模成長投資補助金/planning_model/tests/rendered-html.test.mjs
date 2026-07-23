@@ -160,6 +160,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /className="driver-group-heading"[\s\S]*?<th><strong>\{group\.label\}<\/strong>/);
   assert.match(pageSource, /<td aria-hidden="true" colSpan=\{historicalPlan\.length \+ 5\}><\/td>/);
   assert.match(globalStyles, /\.driver-target-table \.driver-group-heading th \{ position: sticky; left: 0;/);
+  assert.match(globalStyles, /\.driver-target-table \.driver-group-heading th, \.driver-target-table \.driver-group-heading td \{[^}]*background: #e2ece6;[^}]*color: #28483a;/);
   assert.match(globalStyles, /\.driver-target-table tr\.driver-adjustable th:first-child \{ background: #fcf8ed; \}/);
   assert.match(pageSource, /slice\(0, 3\)/);
   assert.match(proposalSource, /<th>目標値<\/th><th>判定<\/th>/);
