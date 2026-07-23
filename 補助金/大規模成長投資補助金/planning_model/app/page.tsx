@@ -26,11 +26,9 @@ import {
   isSixthRoundReferenceMetric,
   MetricKey,
   metrics,
-  objective,
   operatingProfit,
   officerBonus,
   officerCompensation,
-  optimizeDrivers,
   normalizeTimeline,
   retimeHistoricalPlan,
   retimeBalanceSheets,
@@ -59,10 +57,10 @@ import {
   driverRequirementLabel,
   maximumSubsidyAmount,
   metricRequirementLabel,
-  requiredMetricMinimums,
   systemConstraintFailures,
   type ApplicationCategory,
 } from "./application-rules";
+import { createOptimizationTargets, runPlanningOptimization } from "./proposal-optimization";
 
 type View = "summary" | "history" | "future" | "pl" | "targets" | "logic";
 
@@ -645,7 +643,10 @@ export default function Home() {
     const statutoryValidations = statutoryFailures.map((detail) => ({ level: "error" as const, title: "制度上の必須条件に違反", detail }));
     return statutoryValidations.length ? [...statutoryValidations, ...modelValidations.filter((item) => item.level !== "info")] : modelValidations;
   }, [plan, calculationDrivers, statutoryFailures]);
-  const optimizationTargets = useMemo(() => Object.fromEntries((Object.keys(targets) as MetricKey[]).map((key) => [key, !isOptimizationExcludedMetric(key) && hasInputValue(inputValues, inputKey.target(key, "value")) && metricBasisRole(key, metricGroupBases) !== "result" ? { ...targets[key], policy: "hard", max: undefined } : { ...targets[key], policy: "monitor", max: undefined }])) as Record<MetricKey, Target>, [targets, inputValues, metricGroupBases]);
+  const optimizationTargets = useMemo(
+    () => createOptimizationTargets(targets, inputValues, metricGroupBases),
+    [targets, inputValues, metricGroupBases],
+  );
   const hardSummary = useMemo(() => hardTargetSummary(actual, optimizationTargets), [actual, optimizationTargets]);
   const targetManagedMetrics = metrics.filter((definition) => !isOptimizationExcludedMetric(definition.key) && metricBasisRole(definition.key, metricGroupBases) !== "result");
   const achieved = targetManagedMetrics.filter((definition) => hasInputValue(inputValues, inputKey.target(definition.key, "value")) && targetStatus(definition, actual[definition.key], targets[definition.key]).ok).length;
@@ -1266,31 +1267,25 @@ export default function Home() {
     // Let React paint the busy state before the synchronous optimizer starts.
     await new Promise<void>((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
     try {
-      const startDrivers = { ...drivers };
-      const sourceHistorical = sourcePlan.slice(0, 3);
-      const periodInput = projectPeriodInputs;
-      const optimizationBounds = Object.fromEntries((Object.keys(driverRanges) as (keyof Drivers)[]).map((key) => {
-        const [first, second] = driverRanges[key];
-        const lower = Math.min(first, second);
-        const upper = Math.max(first, second);
-        return [key, key === "projectPayGrowthToBase" ? [Math.max(0, lower), Math.max(0, upper)] : [lower, upper]];
-      })) as Record<keyof Drivers, [number, number]>;
       const planTransform = (candidate: YearPlan[]) => applyForecastOverrides(candidate, forecastOverrides, futureInputBasis);
-      const before = objective(startDrivers, startDrivers, sourceHistorical, timeline, optimizationTargets, periodInput, sourcePlan, optimizationBounds, true, planTransform);
-      const result = optimizeDrivers(startDrivers, sourceHistorical, timeline, optimizationTargets, periodInput, sourcePlan, optimizationBounds, true, planTransform, requiredMetricMinimums(applicationCategory));
-      const solvedPeriodInput = createForecastProjectPeriodInputs(sourceHistorical[2], result.drivers, timeline);
-      const solvedPlan = applyForecastOverrides(generatePlan(sourceHistorical, result.drivers, timeline, solvedPeriodInput), forecastOverrides, futureInputBasis);
-      const solvedActual = calculateMetrics(solvedPlan, result.drivers);
-      const failed = hardTargetSummary(solvedActual, optimizationTargets).failed;
-      const failedStatutory = systemConstraintFailures(applicationCategory, result.drivers, solvedActual, solvedPlan);
+      const result = runPlanningOptimization({
+        drivers,
+        historicalPlan,
+        timeline,
+        optimizationTargets,
+        driverRanges,
+        applicationCategory,
+        planTransform,
+      });
+      const failedStatutory = systemConstraintFailures(applicationCategory, result.drivers, result.actual, result.plan);
       setAdjustedDrivers(result.drivers);
-      setAdjustedPlan(solvedPlan);
-      const scoreDrop = before > 0 ? Math.max(0, (1 - result.score / before) * 100) : 0;
+      setAdjustedPlan(result.plan);
+      const scoreDrop = result.beforeScore > 0 ? Math.max(0, (1 - result.score / result.beforeScore) * 100) : 0;
       setSolveNote(
         failedStatutory.length
           ? `制度上の必須条件を満たせません：${failedStatutory.join("／")}。固定入力と許容範囲を確認してください。最接近案を表示しています。`
-          : failed.length
-          ? `固定入力と現在の許容範囲を守ると設定した目標を同時達成できません。目標違反が最小になる決定論的な最接近案を表示しています（未達${failed.length}件、総合目的関数${scoreDrop.toFixed(0)}%改善）。未達行に許容範囲の修正候補を表示します。`
+          : result.failed.length
+          ? `固定入力と現在の許容範囲を守ると設定した目標を同時達成できません。目標違反が最小になる決定論的な最接近案を表示しています（未達${result.failed.length}件、総合目的関数${scoreDrop.toFixed(0)}%改善）。未達行に許容範囲の修正候補を表示します。`
           : `入力値を保持したまま調整案を作成。目的関数は${scoreDrop.toFixed(0)}%改善し、設定した目標を同時達成しています。`,
       );
     } catch (error) {

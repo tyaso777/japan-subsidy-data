@@ -32,6 +32,7 @@ test("renders the planning model shell", async () => {
   const sampleProposalSource = await readFile(new URL("../app/sample-proposals.ts", import.meta.url), "utf8");
   const standardWorkflowSource = await readFile(new URL("../scripts/derive-standard-workflow.ts", import.meta.url), "utf8");
   const applicationRulesSource = await readFile(new URL("../app/application-rules.ts", import.meta.url), "utf8");
+  const proposalOptimizationSource = await readFile(new URL("../app/proposal-optimization.ts", import.meta.url), "utf8");
   const globalStyles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   const initialInputFunction = pageSource.match(/function createInitialInputValues\(\): InputValues \{[\s\S]*?\n\}/)?.[0] ?? "";
   const suggestionSource = pageSource.match(/const targetAdjustmentSuggestions = useMemo\([\s\S]*?\n  \}, \[adjustedDrivers,[\s\S]*?\]\);/)?.[0] ?? "";
@@ -195,7 +196,7 @@ test("renders the planning model shell", async () => {
   assert.match(proposalSource, /item\.round6Formula/);
   assert.doesNotMatch(proposalSource, /目標下限（3年間）/);
   assert.doesNotMatch(pageSource, />両方を制約</);
-  assert.match(pageSource, /metricBasisRole\(key, metricGroupBases\) !== "result"/);
+  assert.match(proposalOptimizationSource, /metricBasisRole\(key, metricGroupBases\) !== "result"/);
   assert.match(metricGroupSource, /companySalesCagr/);
   assert.match(metricGroupSource, /companySalesIncrease/);
   assert.match(metricGroupSource, /type MetricGroupBasis = "rate" \| "amount" \| "both"/);
@@ -204,7 +205,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /className="application-category-copy"/);
   assert.match(pageSource, /制度上の投資額・賃上げ率を自動設定します/);
   assert.match(pageSource, /制度上の必須条件/);
-  assert.match(pageSource, /requiredMetricMinimums\(applicationCategory\)/);
+  assert.match(pageSource, /runPlanningOptimization/);
+  assert.match(proposalOptimizationSource, /requiredMetricMinimums\(applicationCategory\)/);
   assert.match(applicationRulesSource, /general: "一般企業（100億宣言企業以外）"/);
   assert.match(applicationRulesSource, /defaultApplicationCategory[^=]*= "general"/);
   assert.match(pageSource, /useState<ApplicationCategory>\(defaultApplicationCategory\)/);
@@ -230,7 +232,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, />一部目標未達ケース<\/button>/);
   assert.match(sampleProposalSource, /createPartiallyUnmetSampleProposal/);
   assert.match(sampleProposalSource, /inputKey\.target\("companyPaySchedule", "value"\)\] = 3\.5/);
-  assert.match(sampleProposalSource, /projectPayGrowthToBase: proposal\.driverRanges\.projectPayGrowthToBase\[1\]/);
+  assert.match(sampleProposalSource, /proposal\.adjustedDrivers = clone\(partiallyUnmetAdjustedDrivers\)/);
+  assert.match(sampleProposalSource, /reoptimizeSampleProposal/);
   assert.match(globalStyles, /\.sample-menu-section \+ \.sample-menu-section/);
   assert.doesNotMatch(globalStyles, /\.sample-menu-section \.sample-result-button \{ background: var\(--green-soft\);/);
   assert.match(standardWorkflowSource, /const initialPlanWithInputs = applyOverrides\(initialPlan\)/);

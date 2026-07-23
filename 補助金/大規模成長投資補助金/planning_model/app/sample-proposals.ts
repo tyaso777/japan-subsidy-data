@@ -26,6 +26,7 @@ import {
 import { PROPOSAL_FORMAT, type ProposalData } from "./proposal-io";
 import { inputKey, type InputValues } from "./input-values";
 import { defaultMetricGroupBases } from "./metric-groups";
+import { createOptimizationTargets, runPlanningOptimization } from "./proposal-optimization";
 
 const clone = <T,>(value: T): T => structuredClone(value);
 const round = (value: number) => Number(value.toFixed(2));
@@ -63,28 +64,28 @@ const standardWorkflowInitialDrivers = {
 
 const standardWorkflowAdjustedDrivers = {
   ...sampleDrivers,
-  projectSalesGrowthToBase: 0.05403680555555554,
+  projectSalesGrowthToBase: 0.05410595760233916,
   projectCogsImprovementToBase: 1.174186491064466e-16,
-  projectPayGrowthToBase: 0.020019816287178877,
-  projectHeadcountGrowthToBase: 0.054448536306753274,
+  projectPayGrowthToBase: 0.019982135511879873,
+  projectHeadcountGrowthToBase: 0.054063901249722934,
   projectSgaImprovementToBase: 0,
-  projectOfficerPayGrowthToBase: 0.054060933702789804,
-  otherSalesGrowthToBase: 0.04260731658392249,
+  projectOfficerPayGrowthToBase: 0.05412045133315763,
+  otherSalesGrowthToBase: 0.04260551627300527,
   otherCogsImprovementToBase: 0,
-  otherPayGrowthToBase: 0.019809059504605663,
-  otherHeadcountGrowthToBase: 0.041493777249306446,
+  otherPayGrowthToBase: 0.019881367500917117,
+  otherHeadcountGrowthToBase: 0.040609353943717855,
   otherSgaImprovementToBase: 0,
-  projectSalesGrowth: 0.22,
-  otherSalesGrowth: 0.06254018570726526,
-  projectCogsImprovementAfterBase: 0.015550427257977284,
+  projectSalesGrowth: 0.22022487216946673,
+  otherSalesGrowth: 0.06256517859452179,
+  projectCogsImprovementAfterBase: 0.01499048134126555,
   otherCogsImprovement: 0.005,
-  projectPayGrowth: 0.1,
-  otherPayGrowth: 0.025553459914763096,
-  projectHeadcountGrowth: 0.04,
-  otherHeadcountGrowth: 0.04587237692136338,
-  projectSgaRateEnd: 0.11,
-  otherSgaRateEnd: 0.1093261646516366,
-  projectOfficerPayGrowth: 0.053819231679583496,
+  projectPayGrowth: 0.0890062299750801,
+  otherPayGrowth: 0.02488776171033303,
+  projectHeadcountGrowth: 0.029045482397205055,
+  otherHeadcountGrowth: 0.045784814732308665,
+  projectSgaRateEnd: 0.10993180916484824,
+  otherSgaRateEnd: 0.10927258987212823,
+  projectOfficerPayGrowth: 0.05377805762871632,
   investment: 23,
   subsidy: 7.66,
 };
@@ -130,6 +131,27 @@ Object.assign(standardWorkflowTargets, {
 const standardWorkflowOverrides: Record<string, number> = {
   "2029:other:sales": 85.13,
   "2029:project:7-8": 7.9,
+};
+
+const partiallyUnmetAdjustedDrivers = {
+  ...standardWorkflowAdjustedDrivers,
+  projectSalesGrowthToBase: 0.05409356725146197,
+  projectPayGrowthToBase: 0.020361286642832634,
+  projectHeadcountGrowthToBase: 0.05219255622048311,
+  projectOfficerPayGrowthToBase: 0.05409356725146197,
+  otherSalesGrowthToBase: 0.042572463768115854,
+  otherPayGrowthToBase: 0.020288334372692035,
+  otherHeadcountGrowthToBase: 0.04062500000000005,
+  projectSalesGrowth: 0.22022487216946673,
+  otherSalesGrowth: 0.06257246376811586,
+  projectCogsImprovementAfterBase: 0.015,
+  projectPayGrowth: 0.0917562299750801,
+  otherPayGrowth: 0.02484645846924027,
+  projectHeadcountGrowth: 0.03720548239720505,
+  otherHeadcountGrowth: 0.045833333333333386,
+  projectSgaRateEnd: 0.11,
+  otherSgaRateEnd: 0.10927258987212823,
+  projectOfficerPayGrowth: 0.05377805762871632,
 };
 
 const emptySegment = (): SegmentPlan => ({
@@ -238,19 +260,11 @@ export function createPartiallyUnmetSampleProposal(exportedAt: string): Proposal
     value: 3.5,
   };
   proposal.inputValues![inputKey.target("companyPaySchedule", "value")] = 3.5;
-  proposal.adjustedDrivers = {
-    ...proposal.adjustedDrivers!,
-    projectPayGrowthToBase: proposal.driverRanges.projectPayGrowthToBase[1],
-    otherPayGrowthToBase: proposal.driverRanges.otherPayGrowthToBase[1],
-  };
+  proposal.adjustedDrivers = clone(partiallyUnmetAdjustedDrivers);
   return proposal;
 }
 
-export function createStandardSampleEffectivePlan(proposal: ProposalData) {
-  const historical = proposal.historicalPlan;
-  const calculationDrivers = proposal.adjustedDrivers ?? proposal.drivers;
-  const periodInputs = createForecastProjectPeriodInputs(historical[2], calculationDrivers, proposal.timeline);
-  const plan = generatePlan(historical, calculationDrivers, proposal.timeline, periodInputs);
+function applySampleForecastOverrides(plan: YearPlan[], proposal: ProposalData) {
   const result = clone(plan);
   const anchored = new Set<keyof SegmentPlan>();
   for (let index = 3; index < result.length; index += 1) {
@@ -285,6 +299,31 @@ export function createStandardSampleEffectivePlan(proposal: ProposalData) {
     }
   }
   return result;
+}
+
+export function reoptimizeSampleProposal(proposal: ProposalData) {
+  const optimizationTargets = createOptimizationTargets(
+    proposal.targets,
+    proposal.inputValues ?? {},
+    proposal.metricGroupBases ?? defaultMetricGroupBases,
+  );
+  return runPlanningOptimization({
+    drivers: proposal.drivers,
+    historicalPlan: proposal.historicalPlan,
+    timeline: proposal.timeline,
+    optimizationTargets,
+    driverRanges: proposal.driverRanges,
+    applicationCategory: proposal.applicationCategory ?? "general",
+    planTransform: (plan) => applySampleForecastOverrides(plan, proposal),
+  });
+}
+
+export function createStandardSampleEffectivePlan(proposal: ProposalData) {
+  const historical = proposal.historicalPlan;
+  const calculationDrivers = proposal.adjustedDrivers ?? proposal.drivers;
+  const periodInputs = createForecastProjectPeriodInputs(historical[2], calculationDrivers, proposal.timeline);
+  const plan = generatePlan(historical, calculationDrivers, proposal.timeline, periodInputs);
+  return applySampleForecastOverrides(plan, proposal);
 }
 
 export function createHistoricalOnlySampleProposal(exportedAt: string): ProposalData {
