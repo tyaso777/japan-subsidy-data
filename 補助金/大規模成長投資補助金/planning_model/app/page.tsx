@@ -637,19 +637,49 @@ export default function Home() {
         const current = adjustedDrivers[key];
         const displayBound = (value: number) => `${number(percentDriver(key) ? value * 100 : value, 2)}${driverLabels[key]!.unit}`;
         const extension = Math.max(rangeSpan * 0.15, Math.abs(current) * 0.05, percentDriver(key) ? 0.005 : 0.1);
-        const probes: { value: number; text: string }[] = [];
+        const findRequiredBound = (direction: -1 | 1, boundary: number) => {
+          let failedDistance = 0;
+          let achievedDistance: number | null = null;
+          let distance = extension;
+          for (let bracket = 0; bracket < 16; bracket += 1) {
+            const value = boundary + direction * distance;
+            const probeActual = candidateActual({ ...adjustedDrivers, [key]: value });
+            if (!Number.isFinite(probeActual[definition.key])) break;
+            if (targetStatus(definition, probeActual[definition.key], target).ok) {
+              achievedDistance = distance;
+              break;
+            }
+            failedDistance = distance;
+            distance *= 2;
+          }
+          if (achievedDistance === null) return null;
+          for (let iteration = 0; iteration < 24; iteration += 1) {
+            const middleDistance = (failedDistance + achievedDistance) / 2;
+            const value = boundary + direction * middleDistance;
+            const probeActual = candidateActual({ ...adjustedDrivers, [key]: value });
+            if (targetStatus(definition, probeActual[definition.key], target).ok) achievedDistance = middleDistance;
+            else failedDistance = middleDistance;
+          }
+          const inputStep = driverLabels[key]!.step / (percentDriver(key) ? 100 : 1);
+          const rawValue = boundary + direction * achievedDistance;
+          const roundedValue = direction > 0
+            ? Math.ceil((rawValue - 1e-10) / inputStep) * inputStep
+            : Math.floor((rawValue + 1e-10) / inputStep) * inputStep;
+          const roundedActual = candidateActual({ ...adjustedDrivers, [key]: roundedValue })[definition.key];
+          if (!targetStatus(definition, roundedActual, target).ok) return null;
+          return { value: roundedValue, actual: roundedActual };
+        };
+        const probes: { value: number; actual: number; text: string }[] = [];
         if (Math.abs(current - rangeUpper) <= tolerance) {
-          const value = rangeUpper + extension;
-          probes.push({ value, text: `${driverItemCodes[key]}：${driverLabels[key]!.label}の許容上限を${displayBound(rangeUpper)}から${displayBound(value)}へ引き上げる` });
+          const required = findRequiredBound(1, rangeUpper);
+          if (required) probes.push({ ...required, text: `${driverItemCodes[key]}：${driverLabels[key]!.label}の許容上限を${displayBound(rangeUpper)}から少なくとも${displayBound(required.value)}へ引き上げる` });
         }
         if (Math.abs(current - rangeLower) <= tolerance) {
-          const value = rangeLower - extension;
-          probes.push({ value, text: `${driverItemCodes[key]}：${driverLabels[key]!.label}の許容下限を${displayBound(rangeLower)}から${displayBound(value)}へ引き下げる` });
+          const required = findRequiredBound(-1, rangeLower);
+          if (required) probes.push({ ...required, text: `${driverItemCodes[key]}：${driverLabels[key]!.label}の許容下限を${displayBound(rangeLower)}から少なくとも${displayBound(required.value)}へ引き下げる` });
         }
         for (const probe of probes) {
-          if (Math.abs(probe.value - current) < 1e-12) continue;
-          const probeValue = candidateActual({ ...adjustedDrivers, [key]: probe.value })[definition.key];
-          const improvement = probeValue - actual[definition.key];
+          const improvement = probe.actual - actual[definition.key];
           if (Number.isFinite(improvement) && improvement > 1e-8) candidates.push({ score: improvement / Math.abs(probe.value - current), text: probe.text });
         }
       }

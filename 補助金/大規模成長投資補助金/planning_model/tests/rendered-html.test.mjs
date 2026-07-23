@@ -167,8 +167,11 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(pageSource, /min=\{rangeInputMin\} max=\{rangeInputMax\}/);
   assert.doesNotMatch(pageSource, /技術上限|技術下限|技術的な絶対範囲/);
   assert.match(pageSource, /別の非表示上限は設けません/);
-  assert.match(pageSource, /rangeUpper \+ extension/);
-  assert.match(pageSource, /rangeLower - extension/);
+  assert.match(pageSource, /findRequiredBound/);
+  assert.match(pageSource, /iteration < 24/);
+  assert.match(pageSource, /targetStatus\(definition, probeActual\[definition\.key\], target\)\.ok/);
+  assert.match(pageSource, /から少なくとも.*へ引き上げる/);
+  assert.match(pageSource, /から少なくとも.*へ引き下げる/);
   assert.match(pageSource, /normalizedInputs = setInputValue\(normalizedInputs, inputKey\.driverRange/);
   assert.match(globalStyles, /\.driver-validation-error/);
   assert.match(globalStyles, /\.statutory-condition/);
