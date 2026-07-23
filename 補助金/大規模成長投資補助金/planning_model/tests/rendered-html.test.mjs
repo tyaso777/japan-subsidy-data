@@ -54,6 +54,9 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.table-panel \{ overflow: visible;/);
   assert.match(globalStyles, /\.table-panel > \.panel-heading \{ position: sticky; top: 46px; z-index: 18;/);
   assert.match(globalStyles, /\.manual-sections > div > h3 \{ position: sticky; top: 46px; z-index: 18;/);
+  assert.match(globalStyles, /\.wide-table, \.targets-table-wrap \{[^}]*overflow-x: auto; overflow-y: visible;/);
+  assert.match(globalStyles, /\.balance-sheet-table \{[^}]*overflow-x: auto; overflow-y: visible;/);
+  assert.doesNotMatch(globalStyles, /max-height: min\(76vh, 860px\)/);
   assert.match(pageSource, /type View = [^;]*"io"/);
   assert.match(pageSource, /goToView\("io"\)\}>データ入出力<\/button>/);
   assert.equal(pageSource.match(/className="tab-group-separator" aria-hidden="true">\|<\/span>/g)?.length, 2);
@@ -230,7 +233,7 @@ test("renders the planning model shell", async () => {
   assert.match(metricGroupSource, /companySalesCagr/);
   assert.match(metricGroupSource, /companySalesIncrease/);
   assert.match(metricGroupSource, /type MetricGroupBasis = "rate" \| "amount" \| "both"/);
-  assert.match(globalStyles, /actuals-three-year-table \{ overflow-x: hidden; overflow-y: auto; \}/);
+  assert.match(globalStyles, /actuals-three-year-table \{ overflow-x: hidden; overflow-y: visible; \}/);
   assert.match(pageSource, /申請区分・制度前提/);
   assert.match(pageSource, /className="application-category-copy"/);
   assert.match(pageSource, /制度上の投資額・賃上げ率を自動設定します/);
