@@ -28,6 +28,7 @@ test("renders the planning model shell", async () => {
   const inputValueSource = await readFile(new URL("../app/input-values.ts", import.meta.url), "utf8");
   const metricGroupSource = await readFile(new URL("../app/metric-groups.ts", import.meta.url), "utf8");
   const proposalSource = await readFile(new URL("../app/proposal-io.ts", import.meta.url), "utf8");
+  const reportDataSource = await readFile(new URL("../app/report-data.ts", import.meta.url), "utf8");
   const sampleProposalSource = await readFile(new URL("../app/sample-proposals.ts", import.meta.url), "utf8");
   const applicationRulesSource = await readFile(new URL("../app/application-rules.ts", import.meta.url), "utf8");
   const globalStyles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
@@ -73,6 +74,12 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /content-stack history-actuals-view/);
   assert.match(pageSource, /function roundedInput\(value: number, digits = 2\)/);
   assert.match(pageSource, /上書き内容を反映して再最適化/);
+  assert.match(pageSource, /補助事業収支計画（7-1～7-20/);
+  assert.match(pageSource, /7-11・7-12・7-15～7-19は第6次Excelと同じ関係式で自動計算/);
+  assert.match(pageSource, /2-21～2-36を給与・付加価値・人数・EBITDA/);
+  assert.match(pageSource, /step=\{item\.digits === 0 \? 1 : 0\.1\}/);
+  assert.match(modelSource, /headcount: Math\.max\(0, Math\.round\(projectHeadcount\)\)/);
+  assert.match(reportDataSource, /code: "2-36", label: "EBITDA増加率"/);
   assert.match(pageSource, /15指標・目標へ戻る/);
   assert.match(pageSource, />基準年売上開始<\/button>/);
   assert.match(pageSource, />過去3期入力済み<\/button>/);

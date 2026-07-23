@@ -198,6 +198,16 @@ test("forecast PL values are stored with at most two decimal places", () => {
   }
 });
 
+test("forecast employee and officer counts are stored as whole people", () => {
+  const plan = makePlan();
+  for (const row of plan.slice(3)) {
+    for (const segment of [row.project, row.other]) {
+      assert.ok(Number.isInteger(segment.headcount), `${row.year} headcount=${segment.headcount}`);
+      assert.ok(Number.isInteger(segment.officerCount), `${row.year} officerCount=${segment.officerCount}`);
+    }
+  }
+});
+
 test("cogs assumptions are period improvement points rather than terminal rates", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   const drivers = {

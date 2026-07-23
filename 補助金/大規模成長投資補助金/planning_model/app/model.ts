@@ -430,8 +430,8 @@ function scaleSegment(segment: SegmentPlan, factor: number): SegmentPlan {
     officerPay: round(segment.officerPay * factor),
     depreciation: round(segment.depreciation * factor),
     otherSga: round(segment.otherSga * factor),
-    headcount: round(segment.headcount * factor, 2),
-    officerCount: segment.officerCount,
+    headcount: Math.max(0, Math.round(segment.headcount * factor)),
+    officerCount: Math.max(0, Math.round(segment.officerCount)),
   };
 }
 
@@ -523,8 +523,8 @@ export function createForecastProjectPeriodInputs(
         officerPay: round(start.officerPay * (1 + drivers.projectOfficerPayGrowthToBase) ** elapsed),
         depreciation: round(start.depreciation + annualNewDepreciation * progress),
         otherSga: round(sales * lerp(startSgaRate, Math.max(0, startSgaRate - drivers.projectSgaImprovementToBase), progress)),
-        headcount: round(headcount, 2),
-        officerCount: start.officerCount,
+        headcount: Math.max(0, Math.round(headcount)),
+        officerCount: Math.max(0, Math.round(start.officerCount)),
       },
     };
   });
@@ -602,8 +602,8 @@ export function generatePlan(
       officerPay: round(projectBase.officerPay * (1 + drivers.projectOfficerPayGrowth) ** yearsAfterBase),
       depreciation: round(projectBase.depreciation),
       otherSga: round(projectSales * lerp(baseProjectSgaRate, drivers.projectSgaRateEnd, projectProgress)),
-      headcount: round(projectHeadcount, 2),
-      officerCount: projectBase.officerCount,
+      headcount: Math.max(0, Math.round(projectHeadcount)),
+      officerCount: Math.max(0, Math.round(projectBase.officerCount)),
     };
     plan.push({
       year,
@@ -616,8 +616,8 @@ export function generatePlan(
         officerPay: round(otherOfficerPay),
         depreciation: round(latest.other.depreciation),
         otherSga: round(otherSales * otherSgaRate),
-        headcount: round(otherHeadcount, 2),
-        officerCount: latest.other.officerCount,
+        headcount: Math.max(0, Math.round(otherHeadcount)),
+        officerCount: Math.max(0, Math.round(latest.other.officerCount)),
       },
     });
   }
