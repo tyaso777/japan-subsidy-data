@@ -30,6 +30,7 @@ test("renders the planning model shell", async () => {
   const proposalSource = await readFile(new URL("../app/proposal-io.ts", import.meta.url), "utf8");
   const reportDataSource = await readFile(new URL("../app/report-data.ts", import.meta.url), "utf8");
   const sampleProposalSource = await readFile(new URL("../app/sample-proposals.ts", import.meta.url), "utf8");
+  const standardWorkflowSource = await readFile(new URL("../scripts/derive-standard-workflow.ts", import.meta.url), "utf8");
   const applicationRulesSource = await readFile(new URL("../app/application-rules.ts", import.meta.url), "utf8");
   const globalStyles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   const initialInputFunction = pageSource.match(/function createInitialInputValues\(\): InputValues \{[\s\S]*?\n\}/)?.[0] ?? "";
@@ -216,6 +217,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, />シミュレーション結果を見る<\/strong>/);
   assert.match(pageSource, />最適化済み標準提案<\/button>/);
   assert.match(globalStyles, /\.sample-menu-section \+ \.sample-menu-section/);
+  assert.match(standardWorkflowSource, /const initialPlanWithInputs = applyOverrides\(initialPlan\)/);
+  assert.match(standardWorkflowSource, /const second = optimizeDrivers\(\s*initialDrivers,/);
   assert.match(pageSource, /aria-invalid=\{constraintError \? "true" : undefined\}/);
   assert.match(pageSource, /title: "制度上の必須条件に違反"/);
   assert.doesNotMatch(pageSource, /applicationCategory === "startupException"/);

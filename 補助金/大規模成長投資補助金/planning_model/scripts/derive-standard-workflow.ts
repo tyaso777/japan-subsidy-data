@@ -206,14 +206,14 @@ const applyOverrides = (plan: YearPlan[]) => {
   return result;
 };
 
-const firstPlanWithInputs = applyOverrides(firstPlan);
+const initialPlanWithInputs = applyOverrides(initialPlan);
 const second = optimizeDrivers(
-  first.drivers,
+  initialDrivers,
   historical,
   DEFAULT_TIMELINE,
   optimizationTargets,
-  firstPeriod,
-  firstPlanWithInputs,
+  initialPeriod,
+  initialPlanWithInputs,
   workflowBounds,
   true,
   applyOverrides,
