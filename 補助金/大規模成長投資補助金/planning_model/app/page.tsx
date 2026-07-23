@@ -1425,7 +1425,7 @@ export default function Home() {
             <div className="panel-heading"><div><p className="card-kicker">STEP 2 / FORECAST DRIVERS</p><h2>将来予測・調整水準</h2><span className={`pill ${forecastSettingsReady ? "green" : ""}`}>{forecastSettingsReady ? "設定済み" : "未設定"}</span></div><button className="default-button" onClick={confirmAndApplyHistoricalDefaults}>{forecastSettingsStarted ? "過去3期から再設定" : "過去3期からデフォルト設定"}</button></div>
             <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th>調整項目<small>A～Z</small></th>{historicalPlan.map((row) => <th className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>計画初期値</th><th>制度上の必須条件<small>編集不可</small></th><th>許容下限</th><th>許容上限</th><th>最適化での扱い</th></tr></thead><tbody>
               {driverGroups.flatMap((group) => [
-                <tr className="driver-group-heading" key={`group-${group.label}`}><th colSpan={historicalPlan.length + 6}><strong>{group.label}</strong><small>{group.detail}</small></th></tr>,
+                <tr className="driver-group-heading" key={`group-${group.label}`}><th><strong>{group.label}</strong><small>{group.detail}</small></th><td aria-hidden="true" colSpan={historicalPlan.length + 5}></td></tr>,
                 ...group.keys.map((key) => {
                 const info = driverLabels[key]!;
                 const movable = !["projectMarketGrowth", "usefulLife", "investment", "subsidy", "localBenchmark"].includes(key);
