@@ -632,32 +632,24 @@ export default function Home() {
       const candidates: { score: number; text: string }[] = [];
       for (const key of adjustableDriverKeys) {
         const [rangeLower, rangeUpper] = driverRanges[key];
-        const [technicalLower, technicalUpper] = driverBounds[key];
         const rangeSpan = Math.max(rangeUpper - rangeLower, 0.0001);
-        const technicalSpan = Math.max(technicalUpper - technicalLower, 0.0001);
         const tolerance = Math.max(rangeSpan * 0.01, 0.00001);
         const current = adjustedDrivers[key];
         const displayBound = (value: number) => `${number(percentDriver(key) ? value * 100 : value, 2)}${driverLabels[key]!.unit}`;
-        const probes: { value: number; text: string; technicalLimit: boolean }[] = [];
+        const extension = Math.max(rangeSpan * 0.15, Math.abs(current) * 0.05, percentDriver(key) ? 0.005 : 0.1);
+        const probes: { value: number; text: string }[] = [];
         if (Math.abs(current - rangeUpper) <= tolerance) {
-          const technicalLimit = rangeUpper >= technicalUpper - tolerance;
-          const value = technicalLimit
-            ? Math.max(technicalLower, current - Math.max(technicalSpan * 0.01, 0.00001))
-            : Math.min(technicalUpper, rangeUpper + Math.max(technicalSpan * 0.03, 0.0001));
-          probes.push({ value, technicalLimit, text: technicalLimit ? `${driverItemCodes[key]}：${driverLabels[key]!.label}は技術上限${displayBound(technicalUpper)}に到達（モデル前提の見直しが必要）` : `${driverItemCodes[key]}：${driverLabels[key]!.label}の許容上限を${displayBound(rangeUpper)}から${displayBound(value)}へ引き上げる` });
+          const value = rangeUpper + extension;
+          probes.push({ value, text: `${driverItemCodes[key]}：${driverLabels[key]!.label}の許容上限を${displayBound(rangeUpper)}から${displayBound(value)}へ引き上げる` });
         }
         if (Math.abs(current - rangeLower) <= tolerance) {
-          const technicalLimit = rangeLower <= technicalLower + tolerance;
-          const value = technicalLimit
-            ? Math.min(technicalUpper, current + Math.max(technicalSpan * 0.01, 0.00001))
-            : Math.max(technicalLower, rangeLower - Math.max(technicalSpan * 0.03, 0.0001));
-          probes.push({ value, technicalLimit, text: technicalLimit ? `${driverItemCodes[key]}：${driverLabels[key]!.label}は技術下限${displayBound(technicalLower)}に到達（モデル前提の見直しが必要）` : `${driverItemCodes[key]}：${driverLabels[key]!.label}の許容下限を${displayBound(rangeLower)}から${displayBound(value)}へ引き下げる` });
+          const value = rangeLower - extension;
+          probes.push({ value, text: `${driverItemCodes[key]}：${driverLabels[key]!.label}の許容下限を${displayBound(rangeLower)}から${displayBound(value)}へ引き下げる` });
         }
         for (const probe of probes) {
           if (Math.abs(probe.value - current) < 1e-12) continue;
           const probeValue = candidateActual({ ...adjustedDrivers, [key]: probe.value })[definition.key];
-          const rawChange = probeValue - actual[definition.key];
-          const improvement = probe.technicalLimit ? -rawChange : rawChange;
+          const improvement = probeValue - actual[definition.key];
           if (Number.isFinite(improvement) && improvement > 1e-8) candidates.push({ score: improvement / Math.abs(probe.value - current), text: probe.text });
         }
       }
@@ -731,18 +723,10 @@ export default function Home() {
     clearAdjustment();
     const importedDrivers = { ...defaultDrivers, ...clone(proposal.drivers) };
     const importedRanges = { ...clone(driverBounds), ...clone(proposal.driverRanges) };
-    for (const key of improvementDriverKeys) {
-      const [technicalLower, technicalUpper] = driverBounds[key];
-      importedDrivers[key] = Math.min(technicalUpper, Math.max(technicalLower, importedDrivers[key]));
-      const importedRange = importedRanges[key] ?? driverBounds[key];
-      const lower = Math.min(technicalUpper, Math.max(technicalLower, Math.min(...importedRange)));
-      const upper = Math.min(technicalUpper, Math.max(technicalLower, Math.max(...importedRange)));
-      importedRanges[key] = [lower, upper];
-    }
     for (const key of Object.keys(driverBounds) as (keyof Drivers)[]) {
-      const [technicalLower, technicalUpper] = driverBounds[key];
       const importedRange = importedRanges[key] ?? driverBounds[key];
-      importedRanges[key] = importedRange.map((value) => Math.min(technicalUpper, Math.max(technicalLower, value))) as [number, number];
+      const validRange = importedRange.every(Number.isFinite) ? importedRange : driverBounds[key];
+      importedRanges[key] = [Math.min(...validRange), Math.max(...validRange)];
     }
     setProposalTitle(proposal.title || "成長投資計画 提案計画");
     setTimeline(normalizeTimeline(proposal.timeline));
@@ -951,9 +935,7 @@ export default function Home() {
   function updateDriverRange(key: keyof Drivers, boundIndex: 0 | 1, displayValue: number | null) {
     clearAdjustment();
     const fallback = driverBounds[key][boundIndex];
-    const enteredValue = displayValue === null ? fallback : percentDriver(key) ? displayValue / 100 : displayValue;
-    const [technicalLower, technicalUpper] = driverBounds[key];
-    const value = Math.min(technicalUpper, Math.max(technicalLower, enteredValue));
+    const value = displayValue === null ? fallback : percentDriver(key) ? displayValue / 100 : displayValue;
     setInputValues((current) => setInputValue(current, inputKey.driverRange(key, boundIndex), displayValue === null ? null : value));
     setDriverRanges((current) => {
       const next: [number, number] = [...current[key]];
@@ -981,12 +963,12 @@ export default function Home() {
     for (const key of adjustableDriverKeys) {
       const history = historicalDriverSeries[key];
       const observed = history.values.filter(Number.isFinite);
-      const [technicalLower, technicalUpper] = driverBounds[key];
+      const [defaultLower, defaultUpper] = driverBounds[key];
       if (!observed.length) {
         const fallback = historicalFallbackDefaults[key] ?? postBaseBenchmarkDefaults[key];
         if (fallback) {
-          nextDrivers[key] = clamp(fallback.initial, technicalLower, technicalUpper);
-          nextRanges[key] = [clamp(fallback.lower, technicalLower, technicalUpper), clamp(fallback.upper, technicalLower, technicalUpper)];
+          nextDrivers[key] = clamp(fallback.initial, defaultLower, defaultUpper);
+          nextRanges[key] = [clamp(fallback.lower, defaultLower, defaultUpper), clamp(fallback.upper, defaultLower, defaultUpper)];
         }
         continue;
       }
@@ -998,18 +980,18 @@ export default function Home() {
       // pay series.  The benchmark remains only as a fallback when no usable
       // officer history exists.
       if (benchmark && key !== "projectOfficerPayGrowth") {
-        nextDrivers[key] = clamp(benchmark.initial, technicalLower, technicalUpper);
+        nextDrivers[key] = clamp(benchmark.initial, defaultLower, defaultUpper);
         nextRanges[key] = [
-          clamp(benchmark.lower, technicalLower, technicalUpper),
-          clamp(benchmark.upper, technicalLower, technicalUpper),
+          clamp(benchmark.lower, defaultLower, defaultUpper),
+          clamp(benchmark.upper, defaultLower, defaultUpper),
         ];
         continue;
       }
       if (key === "projectSgaRateEnd") {
-        nextDrivers[key] = clamp(mean - 0.015, technicalLower, technicalUpper);
+        nextDrivers[key] = clamp(mean - 0.015, defaultLower, defaultUpper);
         nextRanges[key] = [
-          clamp(mean - 0.04, technicalLower, technicalUpper),
-          clamp(mean + 0.01, technicalLower, technicalUpper),
+          clamp(mean - 0.04, defaultLower, defaultUpper),
+          clamp(mean + 0.01, defaultLower, defaultUpper),
         ];
         continue;
       }
@@ -1019,13 +1001,13 @@ export default function Home() {
       const observedLower = Math.min(...observed);
       const observedUpper = Math.max(...observed);
       const buffer = Math.max((observedUpper - observedLower) * 0.5, history.mode === "change" ? 0.01 : 0.02);
-      const boundedInitial = clamp(initial, technicalLower, technicalUpper);
+      const boundedInitial = clamp(initial, defaultLower, defaultUpper);
       const lower = useMeanAndDeviation
-        ? clamp(mean - 2 * standardDeviation, technicalLower, technicalUpper)
-        : Math.min(boundedInitial, clamp(observedLower - buffer, technicalLower, technicalUpper));
+        ? clamp(mean - 2 * standardDeviation, defaultLower, defaultUpper)
+        : Math.min(boundedInitial, clamp(observedLower - buffer, defaultLower, defaultUpper));
       const upper = useMeanAndDeviation
-        ? clamp(mean + 2 * standardDeviation, technicalLower, technicalUpper)
-        : Math.max(boundedInitial, clamp(observedUpper + buffer, technicalLower, technicalUpper));
+        ? clamp(mean + 2 * standardDeviation, defaultLower, defaultUpper)
+        : Math.max(boundedInitial, clamp(observedUpper + buffer, defaultLower, defaultUpper));
       nextDrivers[key] = boundedInitial;
       nextRanges[key] = [lower, upper];
     }
@@ -1035,11 +1017,11 @@ export default function Home() {
       toBaseKey: keyof Drivers,
       lift: number,
     ) => {
-      const [technicalLower, technicalUpper] = driverBounds[afterBaseKey];
-      nextDrivers[afterBaseKey] = clamp(nextDrivers[toBaseKey] + lift, technicalLower, technicalUpper);
+      const [defaultLower, defaultUpper] = driverBounds[afterBaseKey];
+      nextDrivers[afterBaseKey] = clamp(nextDrivers[toBaseKey] + lift, defaultLower, defaultUpper);
       nextRanges[afterBaseKey] = [
-        Math.min(nextDrivers[afterBaseKey], clamp(nextRanges[toBaseKey][0] + lift, technicalLower, technicalUpper)),
-        Math.max(nextDrivers[afterBaseKey], clamp(nextRanges[toBaseKey][1] + lift, technicalLower, technicalUpper)),
+        Math.min(nextDrivers[afterBaseKey], clamp(nextRanges[toBaseKey][0] + lift, defaultLower, defaultUpper)),
+        Math.max(nextDrivers[afterBaseKey], clamp(nextRanges[toBaseKey][1] + lift, defaultLower, defaultUpper)),
       ];
     };
     applyOtherSynergyLift("otherSalesGrowth", "otherSalesGrowthToBase", 0.02);
@@ -1313,9 +1295,6 @@ export default function Home() {
                   const raw = getInputValue(inputValues, inputKey.driverRange(key, bound));
                   return raw === "" ? "" : roundedInput(percentDriver(key) ? raw * 100 : raw);
                 }) as [number | "", number | ""];
-                const rangeInputFactor = percentDriver(key) ? 100 : 1;
-                const rangeInputMin = driverBounds[key][0] * rangeInputFactor;
-                const rangeInputMax = driverBounds[key][1] * rangeInputFactor;
                 const rangeOrdered = driverRanges[key][0] <= driverRanges[key][1];
                 const rangeValid = noRange || (rangeOrdered && drivers[key] >= driverRanges[key][0] && drivers[key] <= driverRanges[key][1]);
                 const rangeStatus = noRange ? "入力値を固定" : !rangeOrdered ? "下限＞上限" : movable ? rangeValid ? "範囲内で調整" : "初期値が範囲外" : rangeValid ? "入力値を固定" : "固定値が範囲外";
@@ -1327,11 +1306,11 @@ export default function Home() {
                     return <td className="driver-history driver-rate-history" key={`${key}-${historicalPlan[index].year}`}><strong>{improvementLabel}</strong><small>当期率 {number(referenceLevel * 100, 2)}%</small></td>;
                   }
                   return <td className="driver-history" key={`${key}-${historicalPlan[index].year}`}>{Number.isFinite(value) ? <><strong>{number(percentDriver(key) ? value * 100 : value, 2)}</strong><small>{history.mode === "change" ? `${historicalPlan[index - 1]?.year}→${historicalPlan[index].year}` : info.unit}</small></> : "—"}</td>;
-                })}<td><span className="driver-values"><input type="number" min={key === "investment" || key === "subsidy" ? 0 : undefined} aria-invalid={constraintError ? "true" : undefined} step={info.step} value={displayedInputValue} placeholder="未設定" onChange={(event) => updateDriver(key, event.target.value === "" ? null : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))} />{resultValue !== null && <small className="adjusted-value">→ 最適化結果 {number(resultValue, 2)}</small>}</span>{constraintError && <small className="field-error" role="alert">{constraintError}</small>}</td><td className="statutory-condition"><strong>{driverRequirementLabel(key, applicationCategory, drivers.investment)}</strong></td><td>{noRange ? <span className="no-range">—</span> : <input type="number" min={rangeInputMin} max={rangeInputMax} step={info.step} value={rangeValues[0]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />}</td><td>{noRange ? <span className="no-range">—</span> : <input type="number" min={rangeInputMin} max={rangeInputMax} step={info.step} value={rangeValues[1]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />}</td><td><span className={`driver-policy ${rangeValid ? "" : "out-of-range"}`}>{rangeStatus}</span></td></tr>;
+                })}<td><span className="driver-values"><input type="number" min={key === "investment" || key === "subsidy" ? 0 : undefined} aria-invalid={constraintError ? "true" : undefined} step={info.step} value={displayedInputValue} placeholder="未設定" onChange={(event) => updateDriver(key, event.target.value === "" ? null : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))} />{resultValue !== null && <small className="adjusted-value">→ 最適化結果 {number(resultValue, 2)}</small>}</span>{constraintError && <small className="field-error" role="alert">{constraintError}</small>}</td><td className="statutory-condition"><strong>{driverRequirementLabel(key, applicationCategory, drivers.investment)}</strong></td><td>{noRange ? <span className="no-range">—</span> : <input type="number" step={info.step} value={rangeValues[0]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />}</td><td>{noRange ? <span className="no-range">—</span> : <input type="number" step={info.step} value={rangeValues[1]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />}</td><td><span className={`driver-policy ${rangeValid ? "" : "out-of-range"}`}>{rangeStatus}</span></td></tr>;
               }),
               ])}
             </tbody></table></div>
-            <p className="footnote">2023～2025年の各列は、計画値ではなく過去実績の参考値です。現実的な計画初期値・許容範囲を決める材料として表示しています。「過去3期からデフォルト設定」では、補助事業の設備導入期間は過去実績の単純平均を計画初期値、平均±2標準偏差を許容下限・上限とします（技術的な絶対範囲内に制限）。基準年後は、第5次採択者中央値を直接使える項目と、過去採択統計・利益構造から補完する項目を分けています。その他事業は直近を重めにした初期値と過去変動幅から設定します。市場伸び率・補助事業投資額・申請補助金額・耐用年数は固定入力のため、許容下限・上限を設けません。</p>
+            <p className="footnote">2023～2025年の各列は、計画値ではなく過去実績の参考値です。現実的な計画初期値・許容範囲を決める材料として表示しています。「過去3期からデフォルト設定」では、補助事業の設備導入期間は過去実績の単純平均を計画初期値、平均±2標準偏差を許容下限・上限とします。表示されている許容下限・上限がそのまま最適化の探索範囲であり、別の非表示上限は設けません。制度条件や計算上成立しない値は別途バリデーションします。基準年後は、第5次採択者中央値を直接使える項目と、過去採択統計・利益構造から補完する項目を分けています。市場伸び率・補助事業投資額・申請補助金額・耐用年数は固定入力のため、許容下限・上限を設けません。</p>
             <div className="benchmark-note"><strong>基準年後のデフォルト</strong><span>売上高成長率 22%［15～30%］</span><span>補助事業1人当たり給与支給総額の年平均上昇率 7%［5～10%］</span><span>常時使用する従業員数（就業時間換算）の成長率 4%［0～8%］</span><span>原価率改善 1.5pt［0～2pt］</span><span>その他販管費率 過去平均-1.5pt［過去平均-4～+1pt］</span><span>役員1人当たり給与支給総額の年平均上昇率は過去3期の役員1人当たり給与から推計（計算不能時のみ7%［5～10%］）</span><span>その他事業はシナジーを見込み、基準年後の売上成長率を設備導入期間＋2.0pt、原価率改善・給与・人員成長率を＋0.5pt</span><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公募・採択者中央値PDF ↗</a></div>
             {defaultNote && <p className="default-note">{defaultNote}</p>}
           </article>

@@ -163,8 +163,12 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(modelSource, /drivers\.investment < 15/);
   assert.match(modelSource, /projectPayGrowthToBase: \[0, 0\.1\]/);
   assert.match(modelSource, /latestPayPerEmployee \/ 1\.02 \*\* yearsBeforeLatest/);
-  assert.match(pageSource, /const value = Math\.min\(technicalUpper, Math\.max\(technicalLower, enteredValue\)\)/);
-  assert.match(pageSource, /min=\{rangeInputMin\} max=\{rangeInputMax\}/);
+  assert.doesNotMatch(pageSource, /Math\.min\(technicalUpper, Math\.max\(technicalLower, enteredValue\)\)/);
+  assert.doesNotMatch(pageSource, /min=\{rangeInputMin\} max=\{rangeInputMax\}/);
+  assert.doesNotMatch(pageSource, /技術上限|技術下限|技術的な絶対範囲/);
+  assert.match(pageSource, /別の非表示上限は設けません/);
+  assert.match(pageSource, /rangeUpper \+ extension/);
+  assert.match(pageSource, /rangeLower - extension/);
   assert.match(pageSource, /normalizedInputs = setInputValue\(normalizedInputs, inputKey\.driverRange/);
   assert.match(globalStyles, /\.driver-validation-error/);
   assert.match(globalStyles, /\.statutory-condition/);
