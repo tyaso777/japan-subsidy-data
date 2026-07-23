@@ -59,8 +59,13 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.historical-pl-panel > \.panel-heading \{ position: static;/);
   assert.match(globalStyles, /\.page-sticky-header-overlay \{ position: fixed; z-index: 17; overflow: hidden;/);
   assert.match(globalStyles, /\.page-sticky-header-overlay thead th:first-child \{ position: sticky; left: 0;/);
+  assert.match(globalStyles, /\.floating-table-scrollbar \{ position: fixed; bottom: 0; z-index: 24; display: none;/);
+  assert.match(globalStyles, /\.floating-table-scrollbar\.is-visible \{ display: block;/);
   assert.doesNotMatch(globalStyles, /max-height: min\(76vh, 860px\)/);
   assert.match(pageSource, /function usePageStickyTableHeaders\(\)/);
+  assert.match(pageSource, /function useFloatingHorizontalTableScrollbar\(\)/);
+  assert.match(pageSource, /activeWrapper\.scrollLeft = scrollbar\.scrollLeft/);
+  assert.match(pageSource, /rect\.bottom > window\.innerHeight/);
   assert.match(pageSource, /overlay\.style\.top = `\$\{Math\.min\(targetTop, wrapperRect\.bottom - headerHeight\)\}px`/);
   assert.doesNotMatch(pageSource, /page-sticky-header-offset/);
   assert.match(pageSource, /type View = [^;]*"io"/);

@@ -643,9 +643,86 @@ function usePageStickyTableHeaders() {
   }, []);
 }
 
+function useFloatingHorizontalTableScrollbar() {
+  useEffect(() => {
+    const scrollbar = document.createElement("div");
+    const spacer = document.createElement("div");
+    scrollbar.className = "floating-table-scrollbar";
+    scrollbar.setAttribute("role", "scrollbar");
+    scrollbar.setAttribute("aria-label", "表示中の表を横スクロール");
+    spacer.className = "floating-table-scrollbar-spacer";
+    scrollbar.append(spacer);
+    document.body.append(scrollbar);
+
+    let activeWrapper: HTMLElement | null = null;
+    let animationFrame = 0;
+    let syncing = false;
+    const updateScrollbar = () => {
+      animationFrame = 0;
+      const tabsBottom = document.querySelector<HTMLElement>(".tabs")?.getBoundingClientRect().bottom ?? 0;
+      const candidates = Array.from(document.querySelectorAll<HTMLElement>(".wide-table, .targets-table-wrap"))
+        .filter((wrapper) => {
+          const rect = wrapper.getBoundingClientRect();
+          return wrapper.offsetParent !== null
+            && wrapper.scrollWidth > wrapper.clientWidth + 1
+            && rect.top < window.innerHeight
+            && rect.bottom > window.innerHeight;
+        })
+        .sort((left, right) => {
+          const leftRect = left.getBoundingClientRect();
+          const rightRect = right.getBoundingClientRect();
+          const leftCurrent = leftRect.top <= tabsBottom && leftRect.bottom > tabsBottom;
+          const rightCurrent = rightRect.top <= tabsBottom && rightRect.bottom > tabsBottom;
+          if (leftCurrent !== rightCurrent) return leftCurrent ? -1 : 1;
+          return Math.abs(leftRect.top - tabsBottom) - Math.abs(rightRect.top - tabsBottom);
+        });
+      const wrapper = candidates[0] ?? null;
+      const wrapperRect = wrapper?.getBoundingClientRect();
+      if (!wrapper || !wrapperRect) {
+        activeWrapper = null;
+        scrollbar.classList.remove("is-visible");
+        return;
+      }
+
+      activeWrapper = wrapper;
+      scrollbar.style.left = `${wrapperRect.left}px`;
+      scrollbar.style.width = `${wrapperRect.width}px`;
+      spacer.style.width = `${wrapper.scrollWidth}px`;
+      syncing = true;
+      scrollbar.scrollLeft = wrapper.scrollLeft;
+      syncing = false;
+      scrollbar.classList.add("is-visible");
+    };
+    const scheduleUpdate = () => {
+      if (!animationFrame) animationFrame = window.requestAnimationFrame(updateScrollbar);
+    };
+    const scrollTable = () => {
+      if (!activeWrapper || syncing) return;
+      syncing = true;
+      activeWrapper.scrollLeft = scrollbar.scrollLeft;
+      syncing = false;
+    };
+
+    scrollbar.addEventListener("scroll", scrollTable, { passive: true });
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    document.addEventListener("scroll", scheduleUpdate, { capture: true, passive: true });
+    updateScrollbar();
+    return () => {
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+      scrollbar.removeEventListener("scroll", scrollTable);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      document.removeEventListener("scroll", scheduleUpdate, { capture: true });
+      scrollbar.remove();
+    };
+  }, []);
+}
+
 export default function Home() {
   useSpreadsheetGrid();
   usePageStickyTableHeaders();
+  useFloatingHorizontalTableScrollbar();
   const [view, setView] = useState<View>("history");
 
   function goToView(nextView: View) {

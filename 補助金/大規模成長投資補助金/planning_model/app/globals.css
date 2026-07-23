@@ -165,6 +165,13 @@ thead th:first-child { background: #f3f0e8; }.emphasis th, .emphasis td { font-w
 .page-sticky-header-overlay thead th { position: static; height: 56px; box-sizing: border-box; background: #f3f0e8; }
 .page-sticky-header-overlay thead th small { display: block; margin-top: 3px; color: var(--muted); font-size: 8px; }
 .page-sticky-header-overlay thead th:first-child { position: sticky; left: 0; z-index: 2; background: #f3f0e8; }
+.floating-table-scrollbar { position: fixed; bottom: 0; z-index: 24; display: none; height: 17px; overflow-x: auto; overflow-y: hidden; border-top: 1px solid #d3cec1; background: rgba(248, 246, 240, .98); box-shadow: 0 -2px 8px rgba(36, 46, 40, .08); }
+.floating-table-scrollbar.is-visible { display: block; }
+.floating-table-scrollbar::-webkit-scrollbar { display: block; height: 14px; }
+.floating-table-scrollbar::-webkit-scrollbar-track { background: #e5e2d9; }
+.floating-table-scrollbar::-webkit-scrollbar-thumb { min-width: 44px; border: 2px solid #e5e2d9; border-radius: 999px; background: #8d908e; }
+.floating-table-scrollbar::-webkit-scrollbar-thumb:hover { background: #6f7471; }
+.floating-table-scrollbar-spacer { height: 1px; }
 .wide-table:not(.balance-sheet-table) table, .targets-table-wrap table { border-collapse: separate; border-spacing: 0; }
 .wide-table:not(.balance-sheet-table) table { width: 100%; min-width: max-content; }
 .wide-table:not(.balance-sheet-table) th:first-child { width: 280px; min-width: 280px; }
