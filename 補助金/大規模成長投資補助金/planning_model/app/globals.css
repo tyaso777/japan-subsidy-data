@@ -119,8 +119,8 @@ input, select { border: 1px solid #d7d2c7; background: #fffefa; color: var(--ink
 .application-category-copy small { color: var(--muted); font-size: 9px; }
 .application-category-control select { width: 100%; min-width: 0; }
 .statutory-summary { margin-top: 16px; }
-.statutory-condition { min-width: 165px; max-width: 230px; color: #315b46; background: #f1f7f3; text-align: left; white-space: normal; line-height: 1.45; }
-.statutory-condition strong { font-size: 9px; }
+.statutory-condition { min-width: 165px; max-width: 230px; color: #315b46; background: #f1f7f3; text-align: center; white-space: normal; line-height: 1.45; }
+.statutory-condition strong { display: block; margin-inline: auto; font-size: 9px; }
 .statutory-failure { color: var(--red); background: var(--red-soft); border-left-color: var(--red); }
 .driver-validation-error th, .driver-validation-error td { background-color: #fff8f6; }
 .driver-validation-error input[aria-invalid="true"] { border-color: var(--red); background: #fff7f5; box-shadow: inset 0 0 0 1px rgba(183, 67, 53, .18); }
