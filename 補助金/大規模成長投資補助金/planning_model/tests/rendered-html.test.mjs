@@ -45,6 +45,11 @@ test("renders the planning model shell", async () => {
   assert.match(standaloneBuildSource, /成長投資計画シミュレーターを読み込んでいます…/);
   assert.doesNotMatch(standaloneBuildSource, /数値設計ラボ/);
   assert.match(globalStyles, /font-size: clamp\(28px, 3vw, 40px\)/);
+  assert.doesNotMatch(globalStyles, /font-size:\s*[1-9](?:\.\d+)?px\b/);
+  assert.match(globalStyles, /table \{[^}]*font-size: 13px;/);
+  assert.match(globalStyles, /thead th \{[^}]*font-size: 11px;/);
+  assert.match(globalStyles, /th, td \{ padding: 7px 10px;/);
+  assert.doesNotMatch(globalStyles, /font-size:\s*(?:10|11)px(?:\s*!important)?;[^}]*font-weight:\s*800/);
   const initialInputFunction = pageSource.match(/function createInitialInputValues\(\): InputValues \{[\s\S]*?\n\}/)?.[0] ?? "";
   const suggestionSource = pageSource.match(/const targetAdjustmentSuggestions = useMemo\([\s\S]*?\n  \}, \[adjustedDrivers,[\s\S]*?\]\);/)?.[0] ?? "";
   assert.match(globalStyles, /\.tabs \{ position: sticky; top: 0; z-index: 25;/);
