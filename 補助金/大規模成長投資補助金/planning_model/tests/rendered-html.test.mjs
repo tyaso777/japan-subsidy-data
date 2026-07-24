@@ -125,11 +125,14 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.table-panel \{ overflow: visible;/);
   assert.match(globalStyles, /\.table-panel > \.panel-heading \{ position: sticky; top: 46px; z-index: 18;/);
   assert.match(globalStyles, /\.manual-sections > div > h3 \{ position: sticky; top: 46px; z-index: 18;/);
-  assert.match(globalStyles, /\.diagnostic-panel > h3 \{ position: sticky; top: 0; z-index: 18;/);
-  assert.match(globalStyles, /\.diagnostic-groups-scroll \{[^}]*height: clamp\(360px, 46vh, 520px\);[^}]*overflow-y: auto;/);
+  assert.match(globalStyles, /\.diagnostic-panel > h3 \{ position: sticky; top: calc\(46px \+ var\(--diagnostic-sticky-chart-height, 0px\)\); z-index: 18;/);
+  assert.match(globalStyles, /\.diagnostic-selected-chart \{ position: sticky; top: 46px; z-index: 20;/);
+  assert.match(globalStyles, /\.diagnostic-groups \{[^}]*overflow: visible;/);
   assert.match(pageSource, /function DiagnosticSparkline\(/);
-  assert.match(pageSource, /className="diagnostic-groups-scroll" aria-label="診断指標一覧"/);
-  assert.match(pageSource, /wrapper\.closest\("\.diagnostic-groups-scroll"\)/);
+  assert.match(pageSource, /className="diagnostic-groups" aria-label="診断指標一覧"/);
+  assert.doesNotMatch(pageSource, /className="diagnostic-groups-scroll"/);
+  assert.match(pageSource, /--diagnostic-sticky-chart-height/);
+  assert.match(pageSource, /diagnosticChart\.getBoundingClientRect\(\)/);
   assert.match(pageSource, /<th className="diagnostic-sparkline-column">推移<\/th>/);
   assert.match(pageSource, /setSelectedKey\(itemKey\)/);
   assert.match(pageSource, /<TrendChart title=\{selected\.row\.name\}/);
