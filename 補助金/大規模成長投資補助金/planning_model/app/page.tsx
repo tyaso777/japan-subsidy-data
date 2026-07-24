@@ -80,6 +80,7 @@ import { createOptimizationTargets, runPlanningOptimization } from "./proposal-o
 import { niceChartScale } from "./chart-scale";
 
 type View = "summary" | "history" | "future" | "pl" | "targets" | "logic" | "io";
+const emptyDrivers = defaultDrivers;
 
 type DriverRangeSuggestion = {
   key: keyof Drivers;
@@ -106,8 +107,6 @@ const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string;
   otherEmployeeSalaryShare: { label: "ベース事業 従業員給与支給総額のうち給与として計上する割合", unit: "%", step: 0.5 },
   projectOfficerCompensationShare: { label: "補助事業 役員給与支給総額のうち役員報酬として計上する割合", unit: "%", step: 0.5 },
   otherOfficerCompensationShare: { label: "ベース事業 役員給与支給総額のうち役員報酬として計上する割合", unit: "%", step: 0.5 },
-  projectCogsDepreciationShare: { label: "補助事業 減価償却費のうち売上原価に計上する割合", unit: "%", step: 0.5 },
-  otherCogsDepreciationShare: { label: "ベース事業 減価償却費のうち売上原価に計上する割合", unit: "%", step: 0.5 },
   projectResearchDevelopmentRate: { label: "補助事業 研究開発費の売上高比率", unit: "%", step: 0.1 },
   otherResearchDevelopmentRate: { label: "ベース事業 研究開発費の売上高比率", unit: "%", step: 0.1 },
   projectNonOperatingRate: { label: "補助事業 営業外損益の売上高比率", unit: "%", step: 0.1 },
@@ -140,7 +139,6 @@ const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string;
   projectSgaRateEnd: { label: "補助事業 その他販管費率（事業化報告3年目到達値）", unit: "%", step: 0.5 },
   otherSgaRateEnd: { label: "ベース事業 その他販管費率（事業化報告3年目到達値）", unit: "%", step: 0.5 },
   projectOfficerPayGrowth: { label: "役員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
-  usefulLife: { label: "新規投資の平均耐用年数（減価償却費の自動予測用・モデル内管理）", unit: "年", step: 1 },
   investment: { label: "補助事業投資額", unit: "億円", step: 1 },
   subsidy: { label: "申請補助金額", unit: "億円", step: 0.01 },
   localBenchmark: { label: "ローカルベンチマーク", unit: "点", step: 1 },
@@ -152,8 +150,6 @@ const driverTablePresentation = (key: keyof Drivers, label: string) => {
     otherEmployeeSalaryShare: "残額を従業員賞与として計算",
     projectOfficerCompensationShare: "残額を役員賞与として計算",
     otherOfficerCompensationShare: "残額を役員賞与として計算",
-    projectCogsDepreciationShare: "残額を販管費の減価償却費として計算",
-    otherCogsDepreciationShare: "残額を販管費の減価償却費として計算",
     projectResearchDevelopmentRate: "研究開発費＝売上高×設定率",
     otherResearchDevelopmentRate: "研究開発費＝売上高×設定率",
     projectNonOperatingRate: "経常利益＝営業利益＋売上高×設定率",
@@ -162,12 +158,6 @@ const driverTablePresentation = (key: keyof Drivers, label: string) => {
     otherExtraordinaryRate: "税引前当期純利益＝経常利益＋売上高×設定率",
     effectiveTaxRate: "当期純利益＝税引前当期純利益×（100%－設定率）",
   };
-  if (key === "usefulLife") {
-    return {
-      label: "新規投資の平均耐用年数（モデル内管理）",
-      note: "減価償却費の自動予測用・第6次公式様式外",
-    };
-  }
   const modelManaged = label.includes("モデル内管理");
   const terminalRate = key === "projectSgaRateEnd" || key === "otherSgaRateEnd";
   const shortLabel = label
@@ -196,7 +186,7 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
   {
     label: "補助事業｜設備導入期間",
     detail: "最新決算期 → 基準年",
-    keys: ["projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase", "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase", "investment", "subsidy", "usefulLife"],
+    keys: ["projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase", "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase", "investment", "subsidy"],
   },
   {
     label: "補助事業｜基準年後",
@@ -216,12 +206,12 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
   {
     label: "補助事業｜会計内訳・利益前提",
     detail: "将来各年度に固定適用",
-    keys: ["projectEmployeeSalaryShare", "projectOfficerCompensationShare", "projectCogsDepreciationShare", "projectResearchDevelopmentRate", "projectNonOperatingRate", "projectExtraordinaryRate"],
+    keys: ["projectEmployeeSalaryShare", "projectOfficerCompensationShare", "projectResearchDevelopmentRate", "projectNonOperatingRate", "projectExtraordinaryRate"],
   },
   {
     label: "ベース事業｜会計内訳・利益前提",
     detail: "将来各年度に固定適用",
-    keys: ["otherEmployeeSalaryShare", "otherOfficerCompensationShare", "otherCogsDepreciationShare", "otherResearchDevelopmentRate", "otherNonOperatingRate", "otherExtraordinaryRate"],
+    keys: ["otherEmployeeSalaryShare", "otherOfficerCompensationShare", "otherResearchDevelopmentRate", "otherNonOperatingRate", "otherExtraordinaryRate"],
   },
   {
     label: "共通・外部前提",
@@ -234,17 +224,15 @@ const forecastDriverKeys = driverGroups.flatMap((group) => group.keys);
 const accountingAssumptionDriverKeys: (keyof Drivers)[] = [
   "projectEmployeeSalaryShare", "otherEmployeeSalaryShare",
   "projectOfficerCompensationShare", "otherOfficerCompensationShare",
-  "projectCogsDepreciationShare", "otherCogsDepreciationShare",
   "projectResearchDevelopmentRate", "otherResearchDevelopmentRate",
   "projectNonOperatingRate", "otherNonOperatingRate",
   "projectExtraordinaryRate", "otherExtraordinaryRate",
   "effectiveTaxRate",
 ];
 const fixedForecastDriverKeys = new Set<keyof Drivers>([
-  "investment", "subsidy", "usefulLife", "projectCogsRateWhenSalesZero",
+  "investment", "subsidy", "projectCogsRateWhenSalesZero",
   "otherCogsRateWhenSalesZero", "projectEmployeeSalaryShare", "otherEmployeeSalaryShare",
   "projectOfficerCompensationShare", "otherOfficerCompensationShare",
-  "projectCogsDepreciationShare", "otherCogsDepreciationShare",
   "projectResearchDevelopmentRate", "otherResearchDevelopmentRate",
   "projectNonOperatingRate", "otherNonOperatingRate",
   "projectExtraordinaryRate", "otherExtraordinaryRate",
@@ -1922,7 +1910,6 @@ export default function Home() {
     const segmentAccountingDefaults = (segment: SegmentPlan, segmentKey: "project" | "other") => {
       const employeeBreakdownEntered = segment.employeeSalary !== undefined || segment.employeeBonus !== undefined;
       const officerBreakdownEntered = segment.officerCompensation !== undefined || segment.officerBonus !== undefined;
-      const depreciationBreakdownEntered = segment.cogsDepreciation !== undefined || segment.sgaDepreciation !== undefined;
       setAccountingDefault(
         segmentKey === "project" ? "projectEmployeeSalaryShare" : "otherEmployeeSalaryShare",
         employeeBreakdownEntered && segment.employeePay ? employeeSalary(segment) / segment.employeePay : 1,
@@ -1930,10 +1917,6 @@ export default function Home() {
       setAccountingDefault(
         segmentKey === "project" ? "projectOfficerCompensationShare" : "otherOfficerCompensationShare",
         officerBreakdownEntered && segment.officerPay ? officerCompensation(segment) / segment.officerPay : 1,
-      );
-      setAccountingDefault(
-        segmentKey === "project" ? "projectCogsDepreciationShare" : "otherCogsDepreciationShare",
-        depreciationBreakdownEntered && segment.depreciation ? cogsDepreciation(segment) / segment.depreciation : 0,
       );
       setAccountingDefault(
         segmentKey === "project" ? "projectResearchDevelopmentRate" : "otherResearchDevelopmentRate",
@@ -2076,7 +2059,7 @@ export default function Home() {
       return next;
     });
     setHistoricalDefaultsApplied(true);
-    setDefaultNote("すべての計画初期値を入力欄へ設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目も採用値を入力欄に明示しています。会計内訳・利益前提は、実績内訳がない場合のみ、給与100%・賞与0%、役員報酬100%・役員賞与0%、減価償却費の原価配賦0%・販管費配賦100%、研究開発費率0%、営業外損益率0%、特別損益率0%、実効税率30%を表示値として設定します。これらは非表示の補完規則ではなく、表示された調整水準として計算に使用します。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。ベース事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、市場伸び率は5%で仮置きしています。新規投資の平均耐用年数は、第6次公式様式の入力項目ではなく、減価償却費を自動予測するためのモデル内前提として10年で仮置きしています。");
+    setDefaultNote("すべての計画初期値を入力欄へ設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目も採用値を入力欄に明示しています。会計内訳・利益前提は、実績内訳がない場合のみ、給与100%・賞与0%、役員報酬100%・役員賞与0%、研究開発費率0%、営業外損益率0%、特別損益率0%、実効税率30%を表示値として設定します。減価償却費は配賦率や耐用年数から作らず、P2-4（売上原価内）とP2-14（販管費内）を年度別に直接入力します。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。ベース事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、市場伸び率は5%で仮置きしています。");
   }
 
   function confirmAndApplyHistoricalDefaults() {
@@ -2362,7 +2345,7 @@ export default function Home() {
           <div className="section-intro"><div><h2>自動予測を確認し、必要なセルだけ上書き</h2></div><p>青枠の空欄には、過去実績と「15指標・目標」の調整水準から計算した値を表示します。入力したセルは太字で固定し、それ以降の空欄年度を再予測します。</p></div>
           <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。直前の変更はCtrl＋Zで戻せます。</p>
           <article className="panel table-panel"><div className="panel-heading"><div><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">{futureCapex.some((row) => hasInputValue(inputValues, inputKey.futureCapex(row.year))) ? `入力合計 ${number(futureCapex.reduce((sum, row) => sum + row.value, 0), 2)} 億円` : "年度別計画 未入力"}</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} inputValues={inputValues} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。年度別設備投資は補助事業投資額から自動配分しません。事業計画に基づく各年度の金額を入力してください。入力値は設備投資に関する診断へ反映します。</p></article>
-          <article className="panel table-panel"><div className="panel-heading"><div><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>公式様式を直接作るか、事業別の詳細PLを積み上げるかを選びます</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>ベース事業PLを入力</button></div></div>{missingAccountingAssumptions.length ? <p className="default-note" role="alert">②15指標・目標で「会計内訳・利益前提」を設定してください。給与・賞与、役員報酬・賞与、減価償却費配賦、研究開発費、営業外損益、特別損益、税率が未設定のまま将来PLを補完することはありません。</p> : <FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} drivers={calculationDrivers} onForecastChange={updateForecastOverride} />}<p className="footnote">「全社PLを入力」は、会社全体2-1～2-36と補助事業7-1～7-20を入力して公式Excelを完成させる方式です。「ベース事業PLを入力」は、補助事業とベース事業を同じ詳細項目で入力し、合計から会社全体PLを作る方式です。</p></article>
+          <article className="panel table-panel"><div className="panel-heading"><div><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>公式様式を直接作るか、事業別の詳細PLを積み上げるかを選びます</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>ベース事業PLを入力</button></div></div>{missingAccountingAssumptions.length ? <p className="default-note" role="alert">②15指標・目標で「会計内訳・利益前提」を設定してください。給与・賞与、役員報酬・賞与、研究開発費、営業外損益、特別損益、税率が未設定のまま将来PLを補完することはありません。減価償却費は③将来データ入力でP2-4とP2-14を直接入力します。</p> : <FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} drivers={calculationDrivers} onForecastChange={updateForecastOverride} />}<p className="footnote">「全社PLを入力」は、会社全体2-1～2-36と補助事業7-1～7-20・内部管理P2-Xを入力して公式Excelを完成させる方式です。「ベース事業PLを入力」は、補助事業とベース事業を同じ詳細項目で入力し、合計から会社全体PLを作る方式です。</p></article>
           <div className="workflow-actions"><div><span>上書きしたセルを固定して再最適化できます。再最適化後もこの画面に留まります。</span>{adjustedPlan && <p className="solve-note">{solveNote}</p>}</div><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("targets")}>← 15指標・目標へ戻る</button><button className="solve-button" disabled={isSolving} aria-busy={isSolving} onClick={() => void solve()}>{isSolving ? "計算中…" : "上書き内容を反映して再最適化"}</button><button className="reset-button" onClick={() => goToView("pl")}>年度別PLへ →</button></div></div>
         </section>
       )}
@@ -2418,7 +2401,7 @@ export default function Home() {
               }),
               ])}
             </tbody></table></div>
-            <p className="footnote">前期・最新決算期の各列は、計画値ではなく過去実績の参考値です。前々期もデフォルト計算には使用しますが、参考値がほぼないため表では省略しています。「過去3期からデフォルト設定」では、補助事業の設備導入期間は過去実績の単純平均を計画初期値、平均±2標準偏差を許容下限・上限とします。表示されている許容下限・上限がそのまま最適化の探索範囲であり、別の非表示上限は設けません。制度条件や計算上成立しない値は別途バリデーションします。基準年後は、第5次採択者中央値を直接使える項目と、過去採択統計・利益構造から補完する項目を分けています。市場伸び率・補助事業投資額・申請補助金額・新規投資の平均耐用年数は固定入力のため、許容下限・上限を設けません。平均耐用年数は第6次公式様式の入力項目ではなく、減価償却費の自動予測だけに使うモデル内前提です。</p>
+            <p className="footnote">前期・最新決算期の各列は、計画値ではなく過去実績の参考値です。前々期もデフォルト計算には使用しますが、参考値がほぼないため表では省略しています。「過去3期からデフォルト設定」では、補助事業の設備導入期間は過去実績の単純平均を計画初期値、平均±2標準偏差を許容下限・上限とします。表示されている許容下限・上限がそのまま最適化の探索範囲であり、別の非表示上限は設けません。制度条件や計算上成立しない値は別途バリデーションします。基準年後は、第5次採択者中央値を直接使える項目と、過去採択統計・利益構造から補完する項目を分けています。市場伸び率・補助事業投資額・申請補助金額は固定入力のため、許容下限・上限を設けません。減価償却費は調整水準では生成せず、③将来データ入力のP2-4・P2-14で年度別に入力します。</p>
             <div className="benchmark-note"><strong>基準年後のデフォルト</strong><span>売上高成長率 22%［15～30%］</span><span>補助事業1人当たり給与支給総額の年平均上昇率 7%［5～10%］</span><span>常時使用する従業員数（就業時間換算）の成長率 4%［0～8%］</span><span>原価率改善 1.5pt［0～2pt］</span><span>その他販管費率 過去平均-1.5pt［過去平均-4～+1pt］</span><span>役員1人当たり給与支給総額の年平均上昇率は過去3期の役員1人当たり給与から推計（計算不能時のみ7%［5～10%］）</span><span>ベース事業はシナジーを見込み、基準年後の売上成長率を設備導入期間＋2.0pt、原価率改善・給与・人員成長率を＋0.5pt</span><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公募・採択者中央値PDF ↗</a></div>
             {defaultNote && <p className="default-note">{defaultNote}</p>}
           </article>
@@ -2518,7 +2501,7 @@ export default function Home() {
             <code>各年度原価率 = 期間開始時原価率と期間末原価率を、経過年数に応じて直線補間</code>
             <code>設備導入期間末のその他販管費率 = 最新決算期のその他販管費率 − 改善ポイント（プラスは改善、マイナスは悪化）</code>
             <code>基準年後の各年度その他販管費率 = 基準年度の実績率と事業化報告3年目の到達値を直線補間</code>
-            <p>許容下限・上限は、過去3期の最小・最大に変動幅の50%（最低1pt、率水準は最低2pt）を加え、技術的な上下限内に収めます。過去実績から決められない投資額・補助金額・新規投資の平均耐用年数などは自動変更しません。平均耐用年数は公式様式外のモデル内前提で、投資額÷平均耐用年数により減価償却費を簡易予測します。公式様式へ転記する際は、7-10「減価償却費（合計）」の年度別計画値を確認・上書きしてください。従来の固定サンプル120億円からの割戻しは、画面の自動予測では使用しません。</p>
+            <p>許容下限・上限は、過去3期の最小・最大に変動幅の50%（最低1pt、率水準は最低2pt）を加え、技術的な上下限内に収めます。過去実績から決められない投資額・補助金額などは自動変更しません。減価償却費は投資額や耐用年数から作らず、③将来データ入力で売上原価内P2-4と販管費内P2-14を年度別に入力します。公式7-10は両項目の合計として自動計算します。</p>
           </article>
           <article className="panel formula-panel">
             <h2>近似調整の目的関数</h2>
@@ -2597,7 +2580,8 @@ const projectOfficialInputRows: ProjectOfficialInputRow[] = [
   { code: "7-6", label: "営業利益", unit: "億円", get: operatingProfit, set: (s, v) => ({ otherSga: s.sales - s.cogs - s.employeePay - s.officerPay - sgaDepreciation(s) - researchDevelopment(s) - v }) },
   { code: "7-8", label: "従業員給与支給総額", unit: "億円", get: (s) => s.employeePay, set: (s, v) => { if (s.employeeSalary === undefined && s.employeeBonus === undefined) return { employeePay: v }; const salary = s.employeePay ? v * employeeSalary(s) / s.employeePay : v; return { employeePay: v, employeeSalary: salary, employeeBonus: v - salary }; } },
   { code: "7-9", label: "役員給与支給総額", unit: "億円", get: (s) => s.officerPay, set: (s, v) => { if (s.officerCompensation === undefined && s.officerBonus === undefined) return { officerPay: v }; const compensation = s.officerPay ? v * officerCompensation(s) / s.officerPay : v; return { officerPay: v, officerCompensation: compensation, officerBonus: v - compensation }; } },
-  { code: "7-10", label: "減価償却費", unit: "億円", get: (s) => s.depreciation, set: (s, v) => { if (s.cogsDepreciation === undefined && s.sgaDepreciation === undefined) return { depreciation: v }; const cogsAmount = s.depreciation ? v * cogsDepreciation(s) / s.depreciation : 0; return { depreciation: v, cogsDepreciation: cogsAmount, sgaDepreciation: v - cogsAmount }; } },
+  { code: "P2-4", label: "売上原価に含まれる減価償却費", unit: "億円", indentLevel: 1, get: cogsDepreciation, set: (s, v) => ({ cogsDepreciation: v, depreciation: v + sgaDepreciation(s) }) },
+  { code: "P2-14", label: "販管費に含まれる減価償却費", unit: "億円", indentLevel: 1, get: sgaDepreciation, set: (s, v) => ({ sgaDepreciation: v, depreciation: cogsDepreciation(s) + v }) },
   { code: "7-13", label: "常時使用する従業員数（就業時間換算）", unit: "人", digits: 0, get: (s) => s.headcount, set: (_s, v) => ({ headcount: Math.max(0, Math.round(v)) }) },
   { code: "7-14", label: "役員数", unit: "人", digits: 0, get: (s) => s.officerCount, set: (_s, v) => ({ officerCount: Math.max(0, Math.round(v)) }) },
 ];
@@ -2621,13 +2605,15 @@ const projectOfficialDisplayRows: ProjectOfficialDisplayRow[] = [
   { code: "7-1", label: "売上高", unit: "億円", input: projectInputByCode.get("7-1"), get: (rows, index) => rows[index].project.sales },
   { code: "7-2", label: "売上高成長率", unit: "%", indentLevel: 1, get: (rows, index) => growth(rows[index].project.sales, index ? rows[index - 1].project.sales : undefined) },
   { code: "7-3", label: "全社売上高に占める補助事業売上高の割合", unit: "%", indentLevel: 1, get: (rows, index) => rate(rows[index].project.sales, companySegment(rows, index).sales) },
+  { code: "P2-4", label: "売上原価に含まれる減価償却費", unit: "億円", indentLevel: 1, input: projectInputByCode.get("P2-4"), get: (rows, index) => cogsDepreciation(rows[index].project) },
   { code: "7-4", label: "売上総利益", unit: "億円", input: projectInputByCode.get("7-4"), get: (rows, index) => rows[index].project.sales - rows[index].project.cogs },
   { code: "7-5", label: "売上総利益率", unit: "%", indentLevel: 1, get: (rows, index) => rate(rows[index].project.sales - rows[index].project.cogs, rows[index].project.sales) },
   { code: "7-6", label: "営業利益", unit: "億円", input: projectInputByCode.get("7-6"), get: (rows, index) => operatingProfit(rows[index].project) },
   { code: "7-7", label: "営業利益率", unit: "%", indentLevel: 1, get: (rows, index) => rate(operatingProfit(rows[index].project), rows[index].project.sales) },
   { code: "7-8", label: "給与支給総額（常時使用する従業員）", unit: "億円", input: projectInputByCode.get("7-8"), get: (rows, index) => rows[index].project.employeePay },
   { code: "7-9", label: "給与支給総額（役員）", unit: "億円", input: projectInputByCode.get("7-9"), get: (rows, index) => rows[index].project.officerPay },
-  { code: "7-10", label: "減価償却費（合計）", unit: "億円", input: projectInputByCode.get("7-10"), get: (rows, index) => rows[index].project.depreciation },
+  { code: "P2-14", label: "販管費に含まれる減価償却費", unit: "億円", indentLevel: 1, input: projectInputByCode.get("P2-14"), get: (rows, index) => sgaDepreciation(rows[index].project) },
+  { code: "7-10", label: "減価償却費（合計）", unit: "億円", get: (rows, index) => cogsDepreciation(rows[index].project) + sgaDepreciation(rows[index].project) },
   { code: "7-11", label: "付加価値額", unit: "億円", get: (rows, index) => valueAdded(rows[index].project) },
   { code: "7-12", label: "付加価値増加率", unit: "%", indentLevel: 1, get: (rows, index) => growth(valueAdded(rows[index].project), index ? valueAdded(rows[index - 1].project) : undefined) },
   { code: "7-13", label: "常時使用する従業員数（就業時間換算）", unit: "人", digits: 0, input: projectInputByCode.get("7-13"), get: (rows, index) => rows[index].project.headcount },
@@ -2709,7 +2695,7 @@ function HistoricalInputsEditor({ historical, inputValues, onHistoricalCompanyCh
 }) {
   return <div className="manual-sections spreadsheet-grid">
     <div><h3>会社全体にかかる損益計算書・関連計算項目（過去3期実績）</h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{companyActualInputRows.map((item) => <tr className={`${!item.set ? "emphasis" : ""}${item.groupStart ? " official-related-start" : ""}`} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.groupStart && <small>P/L関連計算項目</small>}{item.unit && <small>{item.unit}</small>}</th>{historical.map((row, index) => { const value = item.get(historical, index); return <td key={row.year}>{item.set ? <input type="number" step={item.unit === "人" ? 1 : 0.01} value={getInputValue(inputValues, inputKey.companyActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalCompanyChange(index, item, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong>}</td>; })}</tr>)}</tbody></table></div></div>
-    <div><h3>補助事業PL（過去3期実績）</h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{projectOfficialInputRows.map((item) => <tr key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}</small></th>{historical.map((row, index) => <td key={row.year}><input type="number" step={item.digits === 0 ? 1 : 0.01} value={getInputValue(inputValues, inputKey.projectActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalProjectChange(index, item, event.target.value === "" ? null : Number(event.target.value))} /></td>)}</tr>)}</tbody></table></div></div>
+    <div><h3>補助事業PL（過去3期実績）</h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目／補足項目（P2-Xは内部管理用）</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{projectOfficialDisplayRows.filter((item) => item.input || item.code === "7-10").map((item) => <tr className={!item.input ? "calculated-row" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}／{item.input ? "必須入力" : "自動計算"}</small></th>{historical.map((row, index) => <td className={!item.input ? "calculated-cell" : undefined} key={row.year}>{item.input ? <input type="number" step={item.digits === 0 ? 1 : 0.01} value={getInputValue(inputValues, inputKey.projectActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalProjectChange(index, item.input!, event.target.value === "" ? null : Number(event.target.value))} /> : <><strong>{number(item.get(historical, index, emptyDrivers) ?? 0, item.digits ?? 2)}</strong><small>P2-4＋P2-14</small></>}</td>)}</tr>)}</tbody></table></div><p className="footnote">P2-4とP2-14は補助事業の詳細PLを作るための必須入力です。公式7-10「減価償却費（合計）」は、各年度のP2-4＋P2-14として自動計算し、直接入力や配賦による補完は行いません。</p></div>
     <p className="footnote">ベース事業の過去3期は「会社全体－補助事業」で自動算出するため、重複入力しません。</p>
   </div>;
 }
@@ -2803,7 +2789,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
           })}
         </tr>)}</tbody>
       </table></div>
-      <p className="footnote">7-1・7-4・7-6・7-8～7-10・7-13・7-14は入力値です。7-2・7-3・7-5・7-7・7-11・7-12・7-15～7-19は第6次Excelと同じ関係式で自動計算し、7-20は「15指標・目標」の市場伸び率を参照します。</p>
+      <p className="footnote">7-1・7-4・7-6・7-8・7-9・7-13・7-14と、内部管理用のP2-4・P2-14が入力値です。7-10はP2-4＋P2-14として自動計算します。7-2・7-3・7-5・7-7・7-11・7-12・7-15～7-19は第6次Excelと同じ関係式で自動計算し、7-20は「15指標・目標」の市場伸び率を参照します。</p>
     </div> : <DetailedProjectInputsTable historical={historical} effectivePlan={effectivePlan} overrides={overrides} omitCalculated={omitProjectCalculated} onToggleCalculated={() => setOmitProjectCalculated((current) => !current)} onForecastChange={onForecastChange} />}
     <div>
       <h3 className="manual-table-heading"><span>会社全体の損益計算書・関連計算項目（2-1～2-36：過去3期参照 → 将来）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCompanyCalculated} onClick={() => setOmitCompanyCalculated((current) => !current)}>{omitCompanyCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
@@ -3253,15 +3239,17 @@ function CompanyTable({ plan, sourcePlan }: { plan: YearPlan[]; sourcePlan?: Yea
 function OfficialProjectTable({ plan, sourcePlan, drivers }: { plan: YearPlan[]; sourcePlan?: YearPlan[]; drivers: Drivers }) {
   const rows: OfficialRow[] = [
     { code: "7-1", label: "売上高", emphasis: true, value: (p, i) => p[i].project.sales },
-    { code: "7-2", label: "売上高成長率", unit: "%", indentLevel: 1, value: (p, i) => growth(p[i].project.sales, i ? p[i - 1].project.sales : undefined) },
-    { code: "7-3", label: "全社売上高に占める補助事業売上高の割合", unit: "%", indentLevel: 1, value: (p, i) => rate(p[i].project.sales, companySegment(p, i).sales) },
-    { code: "7-4", label: "売上総利益", emphasis: true, value: (p, i) => p[i].project.sales - p[i].project.cogs },
+        { code: "7-2", label: "売上高成長率", unit: "%", indentLevel: 1, value: (p, i) => growth(p[i].project.sales, i ? p[i - 1].project.sales : undefined) },
+        { code: "7-3", label: "全社売上高に占める補助事業売上高の割合", unit: "%", indentLevel: 1, value: (p, i) => rate(p[i].project.sales, companySegment(p, i).sales) },
+        { code: "P2-4", label: "売上原価に含まれる減価償却費（内部管理用）", indentLevel: 1, value: (p, i) => cogsDepreciation(p[i].project) },
+        { code: "7-4", label: "売上総利益", emphasis: true, value: (p, i) => p[i].project.sales - p[i].project.cogs },
     { code: "7-5", label: "売上総利益率", unit: "%", indentLevel: 1, value: (p, i) => rate(p[i].project.sales - p[i].project.cogs, p[i].project.sales) },
     { code: "7-6", label: "営業利益", emphasis: true, value: (p, i) => operatingProfit(p[i].project) },
     { code: "7-7", label: "営業利益率", unit: "%", indentLevel: 1, value: (p, i) => rate(operatingProfit(p[i].project), p[i].project.sales) },
-    { code: "7-8", label: "給与支給総額（常時使用する従業員）", value: (p, i) => p[i].project.employeePay },
-    { code: "7-9", label: "給与支給総額（役員）", value: (p, i) => p[i].project.officerPay },
-    { code: "7-10", label: "減価償却費（合計）", value: (p, i) => p[i].project.depreciation },
+        { code: "7-8", label: "給与支給総額（常時使用する従業員）", value: (p, i) => p[i].project.employeePay },
+        { code: "7-9", label: "給与支給総額（役員）", value: (p, i) => p[i].project.officerPay },
+        { code: "P2-14", label: "販管費に含まれる減価償却費（内部管理用）", indentLevel: 1, value: (p, i) => sgaDepreciation(p[i].project) },
+        { code: "7-10", label: "減価償却費（合計）", value: (p, i) => cogsDepreciation(p[i].project) + sgaDepreciation(p[i].project) },
     { code: "7-11", label: "付加価値", emphasis: true, value: (p, i) => valueAdded(p[i].project) },
     { code: "7-12", label: "付加価値増加率", unit: "%", indentLevel: 1, value: (p, i) => growth(valueAdded(p[i].project), i ? valueAdded(p[i - 1].project) : undefined) },
     { code: "7-13", label: "常時使用する従業員数（就業時間換算）", unit: "人", value: (p, i) => p[i].project.headcount },
@@ -3273,5 +3261,5 @@ function OfficialProjectTable({ plan, sourcePlan, drivers }: { plan: YearPlan[];
     { code: "7-19", label: "労働生産性", unit: "億円/人", value: (p, i) => { const s = p[i].project; return s.headcount + s.officerCount ? valueAdded(s) / (s.headcount + s.officerCount) : 0; } },
     { code: "7-20", label: "市場伸び率（年あたり）", unit: "%", value: (_p, i) => i === 0 ? drivers.projectMarketGrowth * 100 : undefined },
   ];
-  return <OfficialRowsTable title="補助事業にかかる収支計画" pill="7-1～7-20" plan={plan} sourcePlan={sourcePlan} rows={rows} note="7-20市場伸び率は、第6次Excelと同じく単一の入力値として最初の列に表示しています。" />;
+      return <OfficialRowsTable title="補助事業にかかる収支計画" pill="7-1～7-20" plan={plan} sourcePlan={sourcePlan} rows={rows} note="P2-4・P2-14は詳細PLを整合させる内部管理項目です。7-10は両項目の合計です。7-20市場伸び率は、第6次Excelと同じく単一の入力値として最初の列に表示しています。" />;
 }

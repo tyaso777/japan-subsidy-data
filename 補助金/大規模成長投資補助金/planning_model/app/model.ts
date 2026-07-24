@@ -222,6 +222,8 @@ export const defaultProjectBasePlan: SegmentPlan = {
   employeePay: 10,
   officerPay: 0.6,
   depreciation: 6.5,
+  cogsDepreciation: 1.63,
+  sgaDepreciation: 4.87,
   otherSga: 12,
   headcount: 115,
   officerCount: 2,
@@ -280,6 +282,8 @@ const emptySegment = (): SegmentPlan => ({
   employeePay: 0,
   officerPay: 0,
   depreciation: 0,
+  cogsDepreciation: 0,
+  sgaDepreciation: 0,
   otherSga: 0,
   headcount: 0,
   officerCount: 0,
@@ -447,7 +451,7 @@ export const employeeBonus = (segment: SegmentPlan) => segment.employeeBonus ?? 
 export const officerCompensation = (segment: SegmentPlan) => segment.officerCompensation ?? segment.officerPay;
 export const officerBonus = (segment: SegmentPlan) => segment.officerBonus ?? 0;
 export const cogsDepreciation = (segment: SegmentPlan) => segment.cogsDepreciation ?? 0;
-export const sgaDepreciation = (segment: SegmentPlan) => segment.sgaDepreciation ?? segment.depreciation;
+export const sgaDepreciation = (segment: SegmentPlan) => segment.sgaDepreciation ?? 0;
 export const researchDevelopment = (segment: SegmentPlan) => segment.researchDevelopment ?? 0;
 export const ordinaryIncome = (segment: SegmentPlan) => segment.ordinaryIncome ?? operatingProfit(segment);
 export const preTaxIncome = (segment: SegmentPlan) => segment.preTaxIncome ?? ordinaryIncome(segment);
@@ -597,7 +601,6 @@ function withProportionalBreakdown(source: SegmentPlan, target: SegmentPlan): Se
 function withDriverBreakdowns(segment: SegmentPlan, drivers: Drivers, segmentKey: SegmentKey): SegmentPlan {
   const employeeSalaryShare = segmentKey === "project" ? drivers.projectEmployeeSalaryShare : drivers.otherEmployeeSalaryShare;
   const officerCompensationShare = segmentKey === "project" ? drivers.projectOfficerCompensationShare : drivers.otherOfficerCompensationShare;
-  const cogsDepreciationShare = segmentKey === "project" ? drivers.projectCogsDepreciationShare : drivers.otherCogsDepreciationShare;
   const researchDevelopmentRate = segmentKey === "project" ? drivers.projectResearchDevelopmentRate : drivers.otherResearchDevelopmentRate;
   const nonOperatingRate = segmentKey === "project" ? drivers.projectNonOperatingRate : drivers.otherNonOperatingRate;
   const extraordinaryRate = segmentKey === "project" ? drivers.projectExtraordinaryRate : drivers.otherExtraordinaryRate;
@@ -607,10 +610,11 @@ function withDriverBreakdowns(segment: SegmentPlan, drivers: Drivers, segmentKey
     employeeBonus: round(segment.employeePay * (1 - employeeSalaryShare)),
     officerCompensation: round(segment.officerPay * officerCompensationShare),
     officerBonus: round(segment.officerPay * (1 - officerCompensationShare)),
-    cogsDepreciation: round(segment.depreciation * cogsDepreciationShare),
-    sgaDepreciation: round(segment.depreciation * (1 - cogsDepreciationShare)),
+    cogsDepreciation: round(cogsDepreciation(segment)),
+    sgaDepreciation: round(sgaDepreciation(segment)),
     researchDevelopment: round(segment.sales * researchDevelopmentRate),
   };
+  result.depreciation = round(result.cogsDepreciation + result.sgaDepreciation);
   result.ordinaryIncome = round(operatingProfit(result) + result.sales * nonOperatingRate);
   result.preTaxIncome = round(result.ordinaryIncome + result.sales * extraordinaryRate);
   result.netIncome = round(result.preTaxIncome * (1 - drivers.effectiveTaxRate));
@@ -689,7 +693,6 @@ export function createForecastProjectPeriodInputs(
   const targetCogsRate = Math.min(0.99, Math.max(0.01, startCogsRate - drivers.projectCogsImprovementToBase));
   const startSgaRate = start.sales ? start.otherSga / start.sales : drivers.projectSgaRateEnd;
   const startPayPerHead = start.headcount ? start.employeePay / start.headcount : 0;
-  const annualNewDepreciation = drivers.usefulLife > 0 ? drivers.investment / drivers.usefulLife : 0;
 
   return Array.from({ length: years }, (_, index) => {
     const elapsed = index + 1;
@@ -703,7 +706,7 @@ export function createForecastProjectPeriodInputs(
         cogs: round(sales * lerp(startCogsRate, targetCogsRate, progress)),
         employeePay: round(startPayPerHead * (1 + drivers.projectPayGrowthToBase) ** elapsed * headcount),
         officerPay: round(start.officerPay * (1 + drivers.projectOfficerPayGrowthToBase) ** elapsed),
-        depreciation: round(start.depreciation + annualNewDepreciation * progress),
+        depreciation: round(cogsDepreciation(start) + sgaDepreciation(start)),
         otherSga: round(sales * lerp(startSgaRate, Math.max(0, startSgaRate - drivers.projectSgaImprovementToBase), progress)),
         headcount: Math.max(0, Math.round(headcount)),
         officerCount: Math.max(0, Math.round(start.officerCount)),
@@ -747,7 +750,7 @@ export function generatePlan(
   const otherCogsRateEnd = Math.min(0.99, Math.max(0.01, otherBaseCogsRate - drivers.otherCogsImprovement));
   const baseProjectSgaRate = projectBase.sales ? projectBase.otherSga / projectBase.sales : drivers.projectSgaRateEnd;
   const baseProjectPayPerHead = projectBase.headcount ? projectBase.employeePay / projectBase.headcount : 0;
-  const emptyProject: SegmentPlan = { sales: 0, cogs: 0, employeePay: 0, officerPay: 0, depreciation: 0, otherSga: 0, headcount: 0, officerCount: 0 };
+  const emptyProject: SegmentPlan = { sales: 0, cogs: 0, employeePay: 0, officerPay: 0, depreciation: 0, cogsDepreciation: 0, sgaDepreciation: 0, otherSga: 0, headcount: 0, officerCount: 0 };
 
   for (let i = 1; i <= n; i += 1) {
     const year = timeline.latestYear + i;

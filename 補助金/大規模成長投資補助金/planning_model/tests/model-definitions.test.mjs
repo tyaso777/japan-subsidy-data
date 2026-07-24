@@ -79,8 +79,18 @@ test("accounting breakdowns and profit stages use explicit adjustment levels", (
   assert.ok(Math.abs(model.employeeSalary(report3.other) / report3.other.employeePay - 0.75) < 0.002);
   assert.equal(model.officerCompensation(report3.project), Number((report3.project.officerPay * 0.70).toFixed(2)));
   assert.equal(model.officerCompensation(report3.other), Number((report3.other.officerPay * 0.65).toFixed(2)));
-  assert.equal(model.cogsDepreciation(report3.project), Number((report3.project.depreciation * 0.30).toFixed(2)));
-  assert.equal(model.cogsDepreciation(report3.other), Number((report3.other.depreciation * 0.40).toFixed(2)));
+  assert.equal(model.cogsDepreciation(report3.project) + model.sgaDepreciation(report3.project), report3.project.depreciation);
+  assert.equal(model.cogsDepreciation(report3.other) + model.sgaDepreciation(report3.other), report3.other.depreciation);
+  const changedLegacyShares = model.generatePlan(historical, {
+    ...drivers,
+    projectCogsDepreciationShare: 0.99,
+    otherCogsDepreciationShare: 0.01,
+  }, model.DEFAULT_TIMELINE);
+  const changedReport3 = changedLegacyShares.find((row) => row.role === "report3");
+  assert.equal(model.cogsDepreciation(changedReport3.project), model.cogsDepreciation(report3.project));
+  assert.equal(model.sgaDepreciation(changedReport3.project), model.sgaDepreciation(report3.project));
+  assert.equal(model.cogsDepreciation(changedReport3.other), model.cogsDepreciation(report3.other));
+  assert.equal(model.sgaDepreciation(changedReport3.other), model.sgaDepreciation(report3.other));
   assert.ok(Math.abs(model.researchDevelopment(report3.project) / report3.project.sales - 0.02) < 0.002);
   assert.ok(Math.abs(model.researchDevelopment(report3.other) / report3.other.sales - 0.03) < 0.002);
   assert.ok(Math.abs(model.nonOperatingProfitLoss(report3.project) / report3.project.sales - 0.01) < 0.002);
@@ -128,6 +138,8 @@ test("non-operating and extraordinary profit/loss reconcile the three profit lev
     employeePay: 10,
     officerPay: 2,
     depreciation: 3,
+    cogsDepreciation: 0,
+    sgaDepreciation: 3,
     otherSga: 5,
     headcount: 10,
     officerCount: 1,
@@ -585,7 +597,9 @@ test("project-period inputs are preserved and report years start from the manual
   for (const key of ["sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga", "headcount", "officerCount"]) {
     assert.equal(base.project[key], projectBase[key]);
   }
-  assert.ok(Math.abs(model.cogsDepreciation(base.project) / base.project.depreciation - model.sampleDrivers.projectCogsDepreciationShare) < 0.002);
+  assert.equal(model.cogsDepreciation(base.project), projectBase.cogsDepreciation);
+  assert.equal(model.sgaDepreciation(base.project), projectBase.sgaDepreciation);
+  assert.equal(model.cogsDepreciation(base.project) + model.sgaDepreciation(base.project), base.project.depreciation);
   assert.equal(report1.project.sales, 192.5);
 });
 

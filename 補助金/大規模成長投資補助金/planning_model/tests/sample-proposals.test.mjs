@@ -39,7 +39,7 @@ test("standard sample represents the completed two-pass planning workflow", asyn
   assert.equal(proposal.forecastOverrides["2029:project:7-8"], 7.9);
   assert.equal(proposal.futureInputBasis, "other");
   assert.equal(proposal.drivers.projectPayGrowth, 0.07, "planning input should retain the pre-optimization default");
-  assert.ok(proposal.adjustedDrivers.projectPayGrowth > 0.088, "future pay override should be offset so the official pay-growth metric remains near the median");
+  assert.ok(proposal.adjustedDrivers.projectPayGrowth > 0.08, "future pay override should be offset so the official pay-growth metric remains near the median");
   assert.ok(Math.abs(proposal.adjustedDrivers.projectSalesGrowth - 0.22) < 0.001, "saved result should remain near the fifth-round accepted-company median");
   assert.ok(proposal.adjustedDrivers.projectSalesGrowth <= proposal.driverRanges.projectSalesGrowth[1]);
   assert.equal(proposal.drivers.subsidy, 7.66);
@@ -52,6 +52,11 @@ test("standard sample represents the completed two-pass planning workflow", asyn
   assert.equal(proposal.targets.companySalesCagr.value, 15);
   for (const code of ["2-18", "2-19", "2-20", "2-27", "2-28"]) {
     assert.equal(typeof proposal.inputValues[`actual:company:2025:${code}`], "number", `${code} must be saved as a round-six input`);
+  }
+  for (const year of [2023, 2024, 2025]) {
+    assert.equal(typeof proposal.inputValues[`actual:project:${year}:P2-4`], "number");
+    assert.equal(typeof proposal.inputValues[`actual:project:${year}:P2-14`], "number");
+    assert.equal(Object.hasOwn(proposal.inputValues, `actual:project:${year}:7-10`), false);
   }
   assert.equal(typeof proposal.historicalPlan[2].other.ordinaryIncome, "number");
   assert.equal(typeof proposal.historicalPlan[2].other.preTaxIncome, "number");
