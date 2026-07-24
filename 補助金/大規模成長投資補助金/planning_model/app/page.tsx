@@ -748,6 +748,10 @@ function usePageStickyTableHeaders() {
       document.querySelectorAll<HTMLElement>(".wide-table, .targets-table-wrap").forEach((wrapper) => {
         const table = wrapper.querySelector<HTMLTableElement>(":scope > table");
         const header = table?.tHead;
+        if (wrapper.closest(".diagnostic-groups-scroll")) {
+          removeOverlay(wrapper);
+          return;
+        }
         if (!table || !header || wrapper.offsetParent === null) {
           removeOverlay(wrapper);
           return;
@@ -2951,11 +2955,11 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
   return <section className="financial-diagnostics" aria-label="PL妥当性診断">
     <div className="diagnostic-heading"><div><h2>基本指標によるシミュレーション妥当性チェック</h2></div><p>「推移」の小さなチャートを選ぶと、詳細チャートが切り替わります。年度別数値は全社・補助事業・その他事業の順です。</p></div>
     {selected && <div className="diagnostic-selected-chart"><TrendChart title={selected.row.name} subtitle={`${selected.row.formula}｜${selected.row.check}`} unit={selected.row.unit} plan={plan} zeroBaseline series={diagnosticChartSeries(plan, selected.row)} /></div>}
-    {groups.map((group) => <article className="panel table-panel diagnostic-panel" key={group.title}><h3>{group.title}</h3><div className="wide-table diagnostic-table"><table><thead><tr><th>指標名</th><th>計算式</th><th>主な確認点</th><th className="diagnostic-sparkline-column">推移</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{group.rows.map((item) => {
+    <div className="diagnostic-groups-scroll" aria-label="診断指標一覧">{groups.map((group) => <article className="panel table-panel diagnostic-panel" key={group.title}><h3>{group.title}</h3><div className="wide-table diagnostic-table"><table><thead><tr><th>指標名</th><th>計算式</th><th>主な確認点</th><th className="diagnostic-sparkline-column">推移</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{group.rows.map((item) => {
       const itemKey = `${group.title}:${item.name}`;
       const isSelected = itemKey === selected?.key;
       return <tr className={isSelected ? "diagnostic-selected-row" : undefined} key={item.name}><th>{item.name}<small>{item.unit}</small></th><td className="diagnostic-copy">{item.formula}</td><td className="diagnostic-copy">{item.check}</td><td className="diagnostic-sparkline-cell"><DiagnosticSparkline plan={plan} row={item} selected={isSelected} onSelect={() => setSelectedKey(itemKey)} /></td>{plan.map((row, index) => <td key={row.year}><div className="diagnostic-values">{item.values(row, index).map((entry) => <span key={entry.label}><small>{entry.label}</small><strong>{formatted(entry.value, item.unit)}</strong></span>)}</div></td>)}</tr>;
-    })}</tbody></table></div></article>)}
+    })}</tbody></table></div></article>)}</div>
   </section>;
 }
 
