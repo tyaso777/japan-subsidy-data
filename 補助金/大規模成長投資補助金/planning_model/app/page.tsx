@@ -273,22 +273,30 @@ type OtherPlInputField = {
   set: (segment: SegmentPlan, value: number) => Partial<SegmentPlan>;
 };
 
+const otherSgaTotal = (segment: SegmentPlan) =>
+  segment.employeePay + segment.officerPay + sgaDepreciation(segment) + researchDevelopment(segment) + segment.otherSga;
+
+const preserveOtherSgaTotal = (segment: SegmentPlan, patch: Partial<SegmentPlan>, componentDelta: number): Partial<SegmentPlan> => ({
+  ...patch,
+  otherSga: segment.otherSga - componentDelta,
+});
+
 const otherPlInputFields: OtherPlInputField[] = [
-  { key: "sales", modelCode: "M-1", label: "売上高", unit: "億円", get: (s) => s.sales, set: (_s, v) => ({ sales: v }) },
-  { key: "cogs", modelCode: "M-2", label: "売上原価", unit: "億円", get: (s) => s.cogs, set: (_s, v) => ({ cogs: v }) },
-  { key: "employeeSalary", modelCode: "M-3", label: "従業員給与", unit: "億円", indentLevel: 1, get: employeeSalary, set: (s, v) => ({ employeeSalary: v, employeePay: v + employeeBonus(s) }) },
-  { key: "employeeBonus", modelCode: "M-4", label: "従業員賞与", unit: "億円", indentLevel: 1, get: employeeBonus, set: (s, v) => ({ employeeBonus: v, employeePay: employeeSalary(s) + v }) },
-  { key: "officerCompensation", modelCode: "M-5", label: "役員報酬", unit: "億円", indentLevel: 1, get: officerCompensation, set: (s, v) => ({ officerCompensation: v, officerPay: v + officerBonus(s) }) },
-  { key: "officerBonus", modelCode: "M-6", label: "役員賞与", unit: "億円", indentLevel: 1, get: officerBonus, set: (s, v) => ({ officerBonus: v, officerPay: officerCompensation(s) + v }) },
-  { key: "cogsDepreciation", modelCode: "M-7", label: "売上原価に含まれる減価償却費", unit: "億円", indentLevel: 1, get: cogsDepreciation, set: (s, v) => ({ cogsDepreciation: v, depreciation: v + sgaDepreciation(s) }) },
-  { key: "sgaDepreciation", modelCode: "M-8", label: "販管費に含まれる減価償却費", unit: "億円", indentLevel: 1, get: sgaDepreciation, set: (s, v) => ({ sgaDepreciation: v, depreciation: cogsDepreciation(s) + v }) },
-  { key: "researchDevelopment", modelCode: "M-9", label: "研究開発費", unit: "億円", indentLevel: 1, get: researchDevelopment, set: (_s, v) => ({ researchDevelopment: v }) },
-  { key: "otherSga", modelCode: "M-10", label: "その他販管費", unit: "億円", indentLevel: 1, get: (s) => s.otherSga, set: (_s, v) => ({ otherSga: v }) },
-  { key: "ordinaryIncome", modelCode: "M-11", label: "経常利益", unit: "億円", get: ordinaryIncome, set: (_s, v) => ({ ordinaryIncome: v }) },
-  { key: "preTaxIncome", modelCode: "M-12", label: "税引前当期純利益", unit: "億円", get: preTaxIncome, set: (_s, v) => ({ preTaxIncome: v }) },
-  { key: "netIncome", modelCode: "M-13", label: "当期純利益", unit: "億円", get: netIncome, set: (_s, v) => ({ netIncome: v }) },
-  { key: "headcount", modelCode: "M-14", label: "常時使用する従業員数（就業時間換算）", unit: "人", digits: 0, get: (s) => s.headcount, set: (_s, v) => ({ headcount: Math.max(0, Math.round(v)) }) },
-  { key: "officerCount", modelCode: "M-15", label: "役員数", unit: "人", digits: 0, get: (s) => s.officerCount, set: (_s, v) => ({ officerCount: Math.max(0, Math.round(v)) }) },
+  { key: "sales", modelCode: "M2-1", label: "売上高", unit: "億円", get: (s) => s.sales, set: (_s, v) => ({ sales: v }) },
+  { key: "cogs", modelCode: "M2-3", label: "売上原価", unit: "億円", get: (s) => s.cogs, set: (_s, v) => ({ cogs: v }) },
+  { key: "cogsDepreciation", modelCode: "M2-4", label: "うち減価償却費", unit: "億円", indentLevel: 1, get: cogsDepreciation, set: (s, v) => ({ cogsDepreciation: v, depreciation: v + sgaDepreciation(s) }) },
+  { key: "sgaTotal", modelCode: "M2-7", label: "販売費及び一般管理費", unit: "億円", get: otherSgaTotal, set: (s, v) => ({ otherSga: v - s.employeePay - s.officerPay - sgaDepreciation(s) - researchDevelopment(s) }) },
+  { key: "officerCompensation", modelCode: "M2-9", label: "うち役員報酬", unit: "億円", indentLevel: 2, get: officerCompensation, set: (s, v) => { const nextPay = v + officerBonus(s); return preserveOtherSgaTotal(s, { officerCompensation: v, officerPay: nextPay }, nextPay - s.officerPay); } },
+  { key: "officerBonus", modelCode: "M2-10", label: "うち役員賞与", unit: "億円", indentLevel: 2, get: officerBonus, set: (s, v) => { const nextPay = officerCompensation(s) + v; return preserveOtherSgaTotal(s, { officerBonus: v, officerPay: nextPay }, nextPay - s.officerPay); } },
+  { key: "employeeSalary", modelCode: "M2-12", label: "うち従業員の給与", unit: "億円", indentLevel: 2, get: employeeSalary, set: (s, v) => { const nextPay = v + employeeBonus(s); return preserveOtherSgaTotal(s, { employeeSalary: v, employeePay: nextPay }, nextPay - s.employeePay); } },
+  { key: "employeeBonus", modelCode: "M2-13", label: "うち従業員の賞与", unit: "億円", indentLevel: 2, get: employeeBonus, set: (s, v) => { const nextPay = employeeSalary(s) + v; return preserveOtherSgaTotal(s, { employeeBonus: v, employeePay: nextPay }, nextPay - s.employeePay); } },
+  { key: "sgaDepreciation", modelCode: "M2-14", label: "うち減価償却費", unit: "億円", indentLevel: 1, get: sgaDepreciation, set: (s, v) => preserveOtherSgaTotal(s, { sgaDepreciation: v, depreciation: cogsDepreciation(s) + v }, v - sgaDepreciation(s)) },
+  { key: "researchDevelopment", modelCode: "M2-15", label: "うち研究開発費", unit: "億円", indentLevel: 1, get: researchDevelopment, set: (s, v) => preserveOtherSgaTotal(s, { researchDevelopment: v }, v - researchDevelopment(s)) },
+  { key: "ordinaryIncome", modelCode: "M2-18", label: "経常利益", unit: "億円", get: ordinaryIncome, set: (_s, v) => ({ ordinaryIncome: v }) },
+  { key: "preTaxIncome", modelCode: "M2-19", label: "税引前当期純利益", unit: "億円", get: preTaxIncome, set: (_s, v) => ({ preTaxIncome: v }) },
+  { key: "netIncome", modelCode: "M2-20", label: "当期純利益", unit: "億円", get: netIncome, set: (_s, v) => ({ netIncome: v }) },
+  { key: "headcount", modelCode: "M2-27", label: "常時使用する従業員数（就業時間換算）", unit: "人", digits: 0, get: (s) => s.headcount, set: (_s, v) => ({ headcount: Math.max(0, Math.round(v)) }) },
+  { key: "officerCount", modelCode: "M2-28", label: "役員数", unit: "人", digits: 0, get: (s) => s.officerCount, set: (_s, v) => ({ officerCount: Math.max(0, Math.round(v)) }) },
 ];
 
 type OtherPlCalculatedField = {
@@ -310,23 +318,58 @@ const segmentSgaTotal = (segment: SegmentPlan) =>
 const segmentEbitda = (segment: SegmentPlan) => operatingProfit(segment) + segment.depreciation;
 
 const otherPlCalculatedFields: OtherPlCalculatedField[] = [
-  { key: "salesGrowth", modelCode: "M-C1", label: "売上高成長率", unit: "%", indentLevel: 1, get: (rows, index) => segmentGrowth(rows[index].other.sales, index ? rows[index - 1].other.sales : undefined) },
-  { key: "grossProfit", modelCode: "M-C2", label: "売上総利益", unit: "億円", get: (rows, index) => rows[index].other.sales - rows[index].other.cogs },
-  { key: "grossProfitMargin", modelCode: "M-C3", label: "売上総利益率", unit: "%", indentLevel: 1, get: (rows, index) => { const segment = rows[index].other; return segmentRate(segment.sales - segment.cogs, segment.sales); } },
-  { key: "sgaTotal", modelCode: "M-C4", label: "販売費及び一般管理費", unit: "億円", get: (rows, index) => segmentSgaTotal(rows[index].other) },
-  { key: "operatingProfit", modelCode: "M-C5", label: "営業利益", unit: "億円", get: (rows, index) => operatingProfit(rows[index].other) },
-  { key: "operatingProfitMargin", modelCode: "M-C6", label: "営業利益率", unit: "%", indentLevel: 1, get: (rows, index) => { const segment = rows[index].other; return segmentRate(operatingProfit(segment), segment.sales); } },
-  { key: "valueAdded", modelCode: "M-C7", label: "付加価値額", unit: "億円", get: (rows, index) => valueAdded(rows[index].other) },
-  { key: "valueAddedGrowth", modelCode: "M-C8", label: "付加価値増加率", unit: "%", indentLevel: 1, get: (rows, index) => segmentGrowth(valueAdded(rows[index].other), index ? valueAdded(rows[index - 1].other) : undefined) },
-  { key: "employeePayPerPerson", modelCode: "M-C9", label: "従業員1人当たり給与支給総額", unit: "億円/人", get: (rows, index) => { const segment = rows[index].other; return segment.headcount ? segment.employeePay / segment.headcount : 0; } },
-  { key: "employeePayPerPersonGrowth", modelCode: "M-C10", label: "従業員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = rows[index].other; const previous = index ? rows[index - 1].other : undefined; return segmentGrowth(current.headcount ? current.employeePay / current.headcount : 0, previous?.headcount ? previous.employeePay / previous.headcount : undefined); } },
-  { key: "officerPayPerPerson", modelCode: "M-C11", label: "役員1人当たり給与支給総額", unit: "億円/人", get: (rows, index) => { const segment = rows[index].other; return segment.officerCount ? segment.officerPay / segment.officerCount : 0; } },
-  { key: "officerPayPerPersonGrowth", modelCode: "M-C12", label: "役員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = rows[index].other; const previous = index ? rows[index - 1].other : undefined; return segmentGrowth(current.officerCount ? current.officerPay / current.officerCount : 0, previous?.officerCount ? previous.officerPay / previous.officerCount : undefined); } },
-  { key: "laborProductivity", modelCode: "M-C13", label: "労働生産性", unit: "億円/人", get: (rows, index) => { const segment = rows[index].other; const people = segment.headcount + segment.officerCount; return people ? valueAdded(segment) / people : 0; } },
-  { key: "ebitda", modelCode: "M-C14", label: "EBITDA", unit: "億円", get: (rows, index) => segmentEbitda(rows[index].other) },
-  { key: "ebitdaMargin", modelCode: "M-C15", label: "EBITDAマージン", unit: "%", indentLevel: 1, get: (rows, index) => { const segment = rows[index].other; return segmentRate(segmentEbitda(segment), segment.sales); } },
-  { key: "ebitdaGrowth", modelCode: "M-C16", label: "EBITDA増加率", unit: "%", indentLevel: 1, get: (rows, index) => segmentGrowth(segmentEbitda(rows[index].other), index ? segmentEbitda(rows[index - 1].other) : undefined) },
+  { key: "salesGrowth", modelCode: "M2-2", label: "売上高成長率", unit: "%", indentLevel: 1, get: (rows, index) => segmentGrowth(rows[index].other.sales, index ? rows[index - 1].other.sales : undefined) },
+  { key: "grossProfit", modelCode: "M2-5", label: "売上総利益", unit: "億円", get: (rows, index) => rows[index].other.sales - rows[index].other.cogs },
+  { key: "grossProfitMargin", modelCode: "M2-6", label: "売上総利益率", unit: "%", indentLevel: 1, get: (rows, index) => { const segment = rows[index].other; return segmentRate(segment.sales - segment.cogs, segment.sales); } },
+  { key: "officerPay", modelCode: "M2-8", label: "うち役員の人件費", unit: "億円", indentLevel: 1, get: (rows, index) => rows[index].other.officerPay },
+  { key: "employeePay", modelCode: "M2-11", label: "うち従業員の人件費", unit: "億円", indentLevel: 1, get: (rows, index) => rows[index].other.employeePay },
+  { key: "operatingProfit", modelCode: "M2-16", label: "営業利益", unit: "億円", get: (rows, index) => operatingProfit(rows[index].other) },
+  { key: "operatingProfitMargin", modelCode: "M2-17", label: "営業利益率", unit: "%", indentLevel: 1, get: (rows, index) => { const segment = rows[index].other; return segmentRate(operatingProfit(segment), segment.sales); } },
+  { key: "employeePayTotal", modelCode: "M2-21", label: "給与支給総額（常時使用する従業員）", unit: "億円", get: (rows, index) => rows[index].other.employeePay },
+  { key: "officerPayTotal", modelCode: "M2-22", label: "給与支給総額（役員）", unit: "億円", get: (rows, index) => rows[index].other.officerPay },
+  { key: "depreciationTotal", modelCode: "M2-23", label: "減価償却費（合計）", unit: "億円", get: (rows, index) => rows[index].other.depreciation },
+  { key: "valueAdded", modelCode: "M2-24", label: "付加価値額", unit: "億円", get: (rows, index) => valueAdded(rows[index].other) },
+  { key: "valueAddedGrowth", modelCode: "M2-25", label: "付加価値増加率", unit: "%", indentLevel: 1, get: (rows, index) => segmentGrowth(valueAdded(rows[index].other), index ? valueAdded(rows[index - 1].other) : undefined) },
+  { key: "valueAddedMargin", modelCode: "M2-26", label: "売上高付加価値率", unit: "%", indentLevel: 1, get: (rows, index) => segmentRate(valueAdded(rows[index].other), rows[index].other.sales) },
+  { key: "employeePayPerPerson", modelCode: "M2-29", label: "従業員1人当たり給与支給総額", unit: "億円/人", get: (rows, index) => { const segment = rows[index].other; return segment.headcount ? segment.employeePay / segment.headcount : 0; } },
+  { key: "employeePayPerPersonGrowth", modelCode: "M2-30", label: "従業員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = rows[index].other; const previous = index ? rows[index - 1].other : undefined; return segmentGrowth(current.headcount ? current.employeePay / current.headcount : 0, previous?.headcount ? previous.employeePay / previous.headcount : undefined); } },
+  { key: "officerPayPerPerson", modelCode: "M2-31", label: "役員1人当たり給与支給総額", unit: "億円/人", get: (rows, index) => { const segment = rows[index].other; return segment.officerCount ? segment.officerPay / segment.officerCount : 0; } },
+  { key: "officerPayPerPersonGrowth", modelCode: "M2-32", label: "役員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = rows[index].other; const previous = index ? rows[index - 1].other : undefined; return segmentGrowth(current.officerCount ? current.officerPay / current.officerCount : 0, previous?.officerCount ? previous.officerPay / previous.officerCount : undefined); } },
+  { key: "laborProductivity", modelCode: "M2-33", label: "労働生産性", unit: "億円/人", get: (rows, index) => { const segment = rows[index].other; const people = segment.headcount + segment.officerCount; return people ? valueAdded(segment) / people : 0; } },
+  { key: "ebitda", modelCode: "M2-34", label: "EBITDA", unit: "億円", get: (rows, index) => segmentEbitda(rows[index].other) },
+  { key: "ebitdaMargin", modelCode: "M2-35", label: "EBITDAマージン", unit: "%", indentLevel: 1, get: (rows, index) => { const segment = rows[index].other; return segmentRate(segmentEbitda(segment), segment.sales); } },
+  { key: "ebitdaGrowth", modelCode: "M2-36", label: "EBITDA増加率", unit: "%", indentLevel: 1, get: (rows, index) => segmentGrowth(segmentEbitda(rows[index].other), index ? segmentEbitda(rows[index - 1].other) : undefined) },
 ];
+
+type OtherPlDisplayRow = {
+  code: string;
+  label: string;
+  unit: string;
+  digits?: number;
+  indentLevel?: 1 | 2;
+  input?: OtherPlInputField;
+  get: (rows: YearPlan[], index: number) => number | undefined;
+};
+
+const otherPlDisplayRows: OtherPlDisplayRow[] = [
+  ...otherPlInputFields.map((input) => ({
+    code: input.modelCode,
+    label: input.label,
+    unit: input.unit,
+    digits: input.digits,
+    indentLevel: input.indentLevel,
+    input,
+    get: (rows: YearPlan[], index: number) => input.get(rows[index].other),
+  })),
+  ...otherPlCalculatedFields.map((item) => ({
+    code: item.modelCode,
+    label: item.label,
+    unit: item.unit,
+    digits: item.digits,
+    indentLevel: item.indentLevel,
+    get: item.get,
+  })),
+].sort((left, right) => Number(left.code.replace("M2-", "")) - Number(right.code.replace("M2-", "")));
 
 const percentDriver = (key: keyof Drivers) =>
   !["usefulLife", "investment", "subsidy", "localBenchmark"].includes(key);
@@ -380,7 +423,7 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
   const result = clone(plan);
   const projectAnchors = new Set<string>();
   const otherAnchors = new Set<string>();
-  const legacyOtherAnchors = new Set<"employeePay" | "officerPay" | "depreciation">();
+  const legacyOtherAnchors = new Set<"employeePay" | "officerPay" | "depreciation" | "otherSga">();
   const companyAnchors = new Set<string>();
   const cascade = (previousEffective: number, previousAuto: number, currentAuto: number) => {
     const value = Math.abs(previousAuto) > 1e-9
@@ -396,7 +439,7 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
     const previousEffective = result[index - 1];
 
     if (inputBasis === "other") {
-      for (const legacyField of ["employeePay", "officerPay", "depreciation"] as const) {
+      for (const legacyField of ["employeePay", "officerPay", "depreciation", "otherSga"] as const) {
         const legacyKey = forecastOverrideKey(row.year, "other", legacyField);
         if (Object.prototype.hasOwnProperty.call(overrides, legacyKey)) {
           row.other[legacyField] = roundedInput(overrides[legacyKey]);
@@ -2488,6 +2531,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
   const [omitOtherCalculated, setOmitOtherCalculated] = useState(false);
   const visibleProjectRows = omitProjectCalculated ? projectOfficialDisplayRows.filter((item) => item.input || item.fixed) : projectOfficialDisplayRows;
   const visibleCompanyRows = omitCompanyCalculated ? companyActualInputRows.filter((item) => item.set) : companyActualInputRows;
+  const visibleOtherRows = omitOtherCalculated ? otherPlDisplayRows.filter((item) => item.input) : otherPlDisplayRows;
   return <div className="manual-sections spreadsheet-grid">
     <div>
       <h3 className="manual-table-heading"><span>補助事業収支計画（7-1～7-20：過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitProjectCalculated} onClick={() => setOmitProjectCalculated((current) => !current)}>{omitProjectCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
@@ -2533,7 +2577,31 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
       </table></div>
       <p className="footnote">2-1～2-20を損益計算書、2-21～2-36を給与・付加価値・人数・EBITDAの「P/L関連計算項目」として区切っています。2-18～2-20・2-27・2-28は第6次様式に合わせた入力項目です。将来の2-18～2-20は直近実績の営業外損益率・特別損益率・税引後利益率を基に自動予測し、必要な年度だけ上書きできます。</p>
     </div>
-    <div><h3 className="manual-table-heading"><span>その他事業PL（過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitOtherCalculated} onClick={() => setOmitOtherCalculated((current) => !current)}>{omitOtherCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3><div className="wide-table"><table><thead><tr><th>内部管理番号・項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・全社－補助事業</small></th>)}{futureRows.map((row) => <th key={row.year} className={futureInputBasis === "other" ? "forecast-heading" : undefined}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・{futureInputBasis === "other" ? "空欄は自動予測" : "自動算出"}</small></th>)}</tr></thead><tbody>{otherPlInputFields.map((item) => <tr key={item.key}><th><PlRowTitle code={item.modelCode} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}／入力・上書き可</small></th>{historical.map((row) => <td className="historical-reference" key={row.year}><strong>{number(item.get(row.other), item.digits ?? 2)}</strong></td>)}{futureRows.map((row) => { const effective = effectiveByYear.get(row.year)!.other; const value = item.get(effective); if (futureInputBasis === "company") return <td key={row.year}><strong>{number(value, item.digits ?? 2)}</strong></td>; const key = forecastOverrideKey(row.year, "other", item.key); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value, item.digits ?? 2)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "other", item.key, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}{!omitOtherCalculated && <OfficialSectionHeading label="自動計算項目" range="M-C1～M-C16" columns={historical.length + futureRows.length} />}{!omitOtherCalculated && otherPlCalculatedFields.map((item) => <tr className="calculated-row" key={item.key}><th><PlRowTitle code={item.modelCode} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}／自動計算</small></th>{historical.map((row, index) => { const value = item.get(historical, index); return <td className="historical-reference calculated-cell" key={row.year}><strong>{value === undefined ? "—" : number(value, item.digits ?? 2)}</strong></td>; })}{futureRows.map((row) => { const index = effectivePlan.findIndex((candidate) => candidate.year === row.year); const value = item.get(effectivePlan, index); return <td className="calculated-cell" key={row.year}><strong>{value === undefined ? "—" : number(value, item.digits ?? 2)}</strong><small>自動計算</small></td>; })}</tr>)}</tbody></table></div><p className="footnote">その他事業は全社から補助事業を差し引いたモデル内訳です。入力項目に加え、売上高成長率・利益率・付加価値・1人当たり指標・EBITDA等を自動計算して表示します。補助事業の経常利益以下は営業利益を基準とし、営業外損益・特別損益・税効果はその他事業側に反映します。</p></div>
+    <div>
+      <h3 className="manual-table-heading"><span>その他事業PL・関連計算項目（M2-1～M2-36：過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitOtherCalculated} onClick={() => setOmitOtherCalculated((current) => !current)}>{omitOtherCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
+      <div className="wide-table"><table><thead><tr><th>第6次様式2-1～2-36準拠の内部管理項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・全社－補助事業</small></th>)}{futureRows.map((row) => <th key={row.year} className={futureInputBasis === "other" ? "forecast-heading" : undefined}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・{futureInputBasis === "other" ? "空欄は自動予測" : "自動算出"}</small></th>)}</tr></thead>
+        <tbody>
+          <OfficialSectionHeading label="損益計算書" range="M2-1～M2-20" columns={historical.length + futureRows.length} />
+          {visibleOtherRows.flatMap((item) => [
+            (omitOtherCalculated ? item.code === "M2-27" : item.code === "M2-21") ? <OfficialSectionHeading key="other-section-related" label="P/L関連計算項目" range="M2-21～M2-36" columns={historical.length + futureRows.length} /> : null,
+            <tr className={!item.input ? "calculated-row" : ""} key={item.code}>
+              <th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}／{item.input ? "入力・上書き可" : "自動計算"}</small></th>
+              {historical.map((row, index) => { const value = item.get(historical, index); return <td className={`historical-reference${item.input ? "" : " calculated-cell"}`} key={row.year}><strong>{value === undefined ? "—" : number(value, item.digits ?? 2)}</strong></td>; })}
+              {futureRows.map((row) => {
+                const index = effectivePlan.findIndex((candidate) => candidate.year === row.year);
+                const value = item.get(effectivePlan, index);
+                if (futureInputBasis === "company" || !item.input) return <td className={!item.input ? "calculated-cell" : undefined} key={row.year}><strong>{value === undefined ? "—" : number(value, item.digits ?? 2)}</strong>{!item.input && value !== undefined && <small>自動計算</small>}</td>;
+                const input = item.input;
+                const key = forecastOverrideKey(row.year, "other", input.key);
+                const overridden = Object.prototype.hasOwnProperty.call(overrides, key);
+                return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={input.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0, input.digits ?? 2)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "other", input.key, event.target.value === "" ? null : Number(event.target.value))} /></td>;
+              })}
+            </tr>,
+          ])}
+        </tbody>
+      </table></div>
+      <p className="footnote">第6次様式の会社全体2-1～2-36と同じ会計順序で、その他事業の内部管理番号をM2-1～M2-36として表示します。入力項目と自動計算項目を同じ流れに並べ、2-1～2-20相当を損益計算書、2-21～2-36相当を給与・付加価値・人数・EBITDAの関連計算項目として区切っています。補助事業の経常利益以下は営業利益を基準とし、営業外損益・特別損益・税効果はその他事業側に反映します。</p>
+    </div>
   </div>;
 }
 

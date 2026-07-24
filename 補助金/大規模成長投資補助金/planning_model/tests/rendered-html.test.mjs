@@ -439,13 +439,14 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /code: "2-20", label: "当期純利益"[\s\S]*?netIncome/);
   assert.match(pageSource, /code: "2-27"[\s\S]*?set: \(row, value\)/);
   assert.match(pageSource, /code: "2-28"[\s\S]*?set: \(row, value\)/);
-  assert.match(pageSource, /const otherPlInputFields[\s\S]*?label: "従業員給与"[\s\S]*?label: "従業員賞与"/);
+  assert.match(pageSource, /const otherPlInputFields[\s\S]*?modelCode: "M2-7", label: "販売費及び一般管理費"[\s\S]*?modelCode: "M2-12", label: "うち従業員の給与"[\s\S]*?modelCode: "M2-13", label: "うち従業員の賞与"/);
   assert.match(pageSource, /const otherPlInputFields[\s\S]*?label: "経常利益"[\s\S]*?label: "当期純利益"/);
-  assert.match(pageSource, /otherPlInputFields\.map/);
-  assert.match(pageSource, /const otherPlCalculatedFields[\s\S]*?label: "売上高成長率"[\s\S]*?label: "売上総利益"[\s\S]*?label: "EBITDA増加率"/);
+  assert.match(pageSource, /const otherPlCalculatedFields[\s\S]*?modelCode: "M2-2", label: "売上高成長率"[\s\S]*?modelCode: "M2-5", label: "売上総利益"[\s\S]*?modelCode: "M2-36", label: "EBITDA増加率"/);
+  assert.match(pageSource, /const otherPlDisplayRows[\s\S]*?otherPlInputFields\.map[\s\S]*?otherPlCalculatedFields\.map[\s\S]*?\.sort/);
   assert.match(pageSource, /omitProjectCalculated[\s\S]*?omitCompanyCalculated[\s\S]*?omitOtherCalculated/);
   assert.match(pageSource, /自動計算項目を省略する/);
-  assert.match(pageSource, /label="自動計算項目" range="M-C1～M-C16"/);
+  assert.match(pageSource, /label="損益計算書" range="M2-1～M2-20"/);
+  assert.match(pageSource, /label="P\/L関連計算項目" range="M2-21～M2-36"/);
   assert.match(globalStyles, /\.manual-table-heading \{ display: flex;/);
   assert.match(globalStyles, /\.calculated-row-toggle\[aria-pressed="true"\]/);
   assert.match(pageSource, /code: "2-2", label: "売上高成長率", unit: "%", indentLevel: 1/);
