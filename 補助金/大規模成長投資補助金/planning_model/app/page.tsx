@@ -1503,20 +1503,29 @@ export default function Home() {
     setSelectedAdjustmentSuggestions((current) => ({ ...current, [id]: checked }));
   }
 
-  function applySelectedDriverRangeSuggestions(metricKey: MetricKey, suggestions: DriverRangeSuggestion[]) {
-    const selected = suggestions.filter((suggestion) => selectedAdjustmentSuggestions[driverRangeSuggestionId(metricKey, suggestion)]);
+  async function applySelectedDriverRangeSuggestions() {
+    const selected = targetManagedMetrics.flatMap((definition) =>
+      (targetAdjustmentSuggestions[definition.key] ?? [])
+        .filter((suggestion) => selectedAdjustmentSuggestions[driverRangeSuggestionId(definition.key, suggestion)]),
+    );
     if (!selected.length) return;
-    clearAdjustment();
-    setDriverRanges((current) => {
-      const next = clone(current);
-      for (const suggestion of selected) next[suggestion.key][suggestion.boundIndex] = suggestion.value;
+    const nextRanges = clone(driverRanges);
+    for (const suggestion of selected) {
+      const currentBound = nextRanges[suggestion.key][suggestion.boundIndex];
+      nextRanges[suggestion.key][suggestion.boundIndex] = suggestion.boundIndex === 0
+        ? Math.min(currentBound, suggestion.value)
+        : Math.max(currentBound, suggestion.value);
+    }
+    setDriverRanges(nextRanges);
+    setInputValues((current) => {
+      let next = current;
+      for (const suggestion of selected) {
+        next = setInputValue(next, inputKey.driverRange(suggestion.key, suggestion.boundIndex), nextRanges[suggestion.key][suggestion.boundIndex]);
+      }
       return next;
     });
-    setInputValues((current) => selected.reduce(
-      (next, suggestion) => setInputValue(next, inputKey.driverRange(suggestion.key, suggestion.boundIndex), suggestion.value),
-      current,
-    ));
-    setSolveNote(`${selected.length}件の修正候補を一括適用しました。変更後の許容範囲で、再度「設定した目標に近づける」を実行してください。`);
+    setSelectedAdjustmentSuggestions({});
+    await solve(nextRanges);
   }
 
   function applyHistoricalDefaults() {
@@ -1656,7 +1665,7 @@ export default function Home() {
     applyHistoricalDefaults();
   }
 
-  async function solve() {
+  async function solve(rangeOverride?: Record<keyof Drivers, [number, number]>) {
     if (isSolving) return;
     if (!applicationCategory) {
       setSolveNote("申請区分が未選択です。過去データ入力の先頭で申請区分を選択してください。");
@@ -1667,6 +1676,7 @@ export default function Home() {
       return;
     }
     setIsSolving(true);
+    setSelectedAdjustmentSuggestions({});
     setSolveNote("計算中…");
     // Let React paint the busy state before the synchronous optimizer starts.
     await new Promise<void>((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
@@ -1677,7 +1687,7 @@ export default function Home() {
         historicalPlan,
         timeline,
         optimizationTargets,
-        driverRanges,
+        driverRanges: rangeOverride ?? driverRanges,
         applicationCategory,
         planTransform,
       });
@@ -1689,7 +1699,7 @@ export default function Home() {
         failedStatutory.length
           ? `制度上の必須条件を満たせません：${failedStatutory.join("／")}。固定入力と許容範囲を確認してください。最接近案を表示しています。`
           : result.failed.length
-          ? `固定入力と現在の許容範囲を守ると設定した目標を同時達成できません。目標違反が最小になる決定論的な最接近案を表示しています（未達${result.failed.length}件、総合目的関数${scoreDrop.toFixed(0)}%改善）。未達行に許容範囲の修正候補を表示します。`
+          ? `固定入力と現在の許容範囲を守ると設定した目標を同時達成できません。目標違反が最小になる決定論的な最接近案を表示しています（未達${result.failed.length}件、総合目的関数${scoreDrop.toFixed(0)}%改善）。下の「未達成項目と修正案」を確認してください。`
           : `入力値を保持したまま調整案を作成。目的関数は${scoreDrop.toFixed(0)}%改善し、設定した目標を同時達成しています。`,
       );
     } catch (error) {
@@ -1984,7 +1994,7 @@ export default function Home() {
                 return <label className="metric-group-control" key={group.key}><span><strong>{group.label}</strong><small>{group.relation}</small></span><select aria-label={`${group.label}の目標設定方法`} value={basis} onChange={(event) => { clearAdjustment(); setMetricGroupBases((current) => ({ ...current, [group.key]: event.target.value as MetricGroupBasis })); }}><option value="rate">{group.rateLabel}に目標設定（{group.amountLabel}は自動算出）</option><option value="amount">{group.amountLabel}に目標設定（{group.rateLabel}は自動算出）</option><option value="both">両方に目標設定（2指標を同時に最適化）</option></select></label>;
               })}
             </div>
-            <div className="targets-table-wrap"><table className="targets-table"><thead><tr><th>No.</th><th>指標・第6次定義</th>{historicalPlan.slice(1).map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>第5次公式参考値<small>採択者／申請者</small></th><th>投資計画 計画値<small>{adjustedPlan ? "入力 → 調整案" : "計算結果"}</small></th><th>制度上の必須条件<small>編集不可</small></th><th>目標値</th><th>優先度</th><th>判定・未達時の修正候補</th></tr></thead><tbody>
+            <div className="targets-table-wrap"><table className="targets-table"><thead><tr><th>No.</th><th>指標・第6次定義</th>{historicalPlan.slice(1).map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>第5次公式参考値<small>採択者／申請者</small></th><th>投資計画 計画値<small>{adjustedPlan ? "入力 → 調整案" : "計算結果"}</small></th><th>制度上の必須条件<small>編集不可</small></th><th>目標値</th><th>優先度</th><th>判定</th></tr></thead><tbody>
               {metrics.map((definition, index) => {
                 const target = targets[definition.key];
                 const effectiveTarget = optimizationTargets[definition.key];
@@ -1997,8 +2007,7 @@ export default function Home() {
                 if (isSixthRoundReferenceMetric(definition.key)) return <tr className="reference-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>第6次評価対象外</small><span className="metric-role-badge reference">参考値</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{historicalPlan[historyIndex - 1]?.year}→{historicalPlan[historyIndex].year}（1年間）／{definition.unit}</small>{scaleDependent && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears)} {definition.unit}</small>}</> : "—"}</td>).slice(1)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{number(actual[definition.key])} {definition.unit}</td><td className="statutory-condition">—</td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">参考値</span></td></tr>;
                 const rowClass = basisRole === "result" ? "metric-result-row" : basisRole === "basis" ? "metric-basis-row" : "metric-independent-row";
                 const roleLabel = basisRole === "result" ? "自動算出" : basisRole === "basis" ? "目標設定" : "個別に目標設定";
-                const suggestions = targetAdjustmentSuggestions[definition.key] ?? [];
-                return <tr className={rowClass} key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>{definition.sourceRound}</small><span className={`metric-role-badge ${basisRole}`}>{roleLabel}</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{history.mode === "change" ? `${historicalPlan[historyIndex - 1]?.year}→${historicalPlan[historyIndex].year}（1年間）／${definition.unit}` : definition.unit}</small>{scaleDependent && history.mode === "change" && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears)} {definition.unit}</small>}</> : "—"}</td>).slice(1)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key])} →</small>}{number(actual[definition.key])} {definition.unit}</td><td className="statutory-condition"><strong>{metricRequirementLabel(definition.key, applicationCategory)}</strong></td><td><input disabled={basisRole === "result"} aria-label={`${definition.label}目標値`} type="number" step="0.1" value={getInputValue(inputValues, inputKey.target(definition.key, "value"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "value", event.target.value === "" ? null : Number(event.target.value))} /></td><td><input disabled={basisRole === "result"} type="number" min="1" max="10" step="1" value={integerPriority(target.weight)} onChange={(event) => updateTarget(definition.key, { weight: integerPriority(Number(event.target.value)) })} /></td><td className="target-judgement"><span className={`result-badge ${basisRole === "result" || !targetSet || status.ok ? "ok" : "bad"}`}>{basisRole === "result" ? "自動算出" : !targetSet ? "未設定" : status.ok ? "目標達成" : "目標未達"}</span>{basisRole !== "result" && adjustedPlan && targetSet && !status.ok && <small className="target-adjustment-advice">{suggestions.length ? <><strong>達成に向けた修正候補</strong>{suggestions.map((suggestion) => <label className="target-adjustment-suggestion" key={driverRangeSuggestionId(definition.key, suggestion)}><input type="checkbox" checked={Boolean(selectedAdjustmentSuggestions[driverRangeSuggestionId(definition.key, suggestion)])} onChange={(event) => toggleDriverRangeSuggestion(definition.key, suggestion, event.target.checked)} /><span>{suggestion.text}</span></label>)}<button className="apply-selected-suggestions" type="button" disabled={!suggestions.some((suggestion) => selectedAdjustmentSuggestions[driverRangeSuggestionId(definition.key, suggestion)])} onClick={() => applySelectedDriverRangeSuggestions(definition.key, suggestions)}>選択した候補を一括適用</button></> : <span>現在の許容範囲では有効な拡張候補を特定できません。入力済み将来PLまたは目標値との整合を確認してください。</span>}</small>}</td></tr>;
+                return <tr className={rowClass} key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>{definition.sourceRound}</small><span className={`metric-role-badge ${basisRole}`}>{roleLabel}</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{history.mode === "change" ? `${historicalPlan[historyIndex - 1]?.year}→${historicalPlan[historyIndex].year}（1年間）／${definition.unit}` : definition.unit}</small>{scaleDependent && history.mode === "change" && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears)} {definition.unit}</small>}</> : "—"}</td>).slice(1)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key])} →</small>}{number(actual[definition.key])} {definition.unit}</td><td className="statutory-condition"><strong>{metricRequirementLabel(definition.key, applicationCategory)}</strong></td><td><input disabled={basisRole === "result"} aria-label={`${definition.label}目標値`} type="number" step="0.1" value={getInputValue(inputValues, inputKey.target(definition.key, "value"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "value", event.target.value === "" ? null : Number(event.target.value))} /></td><td><input disabled={basisRole === "result"} type="number" min="1" max="10" step="1" value={integerPriority(target.weight)} onChange={(event) => updateTarget(definition.key, { weight: integerPriority(Number(event.target.value)) })} /></td><td className="target-judgement"><span className={`result-badge ${basisRole === "result" || !targetSet || status.ok ? "ok" : "bad"}`}>{basisRole === "result" ? "自動算出" : !targetSet ? "未設定" : status.ok ? "目標達成" : "目標未達"}</span></td></tr>;
               })}
             </tbody></table></div>
             <p className="footnote round5-source-note">第5次公式参考値は、申請者全体と採択者の公表代表値です。原則は中央値ですが、「補助事業売上高／全社売上高」のみ平均値です。役員関連2指標は第5次に公表値がありません。<a href="https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公式資料 ↗</a></p>
@@ -2010,7 +2019,7 @@ export default function Home() {
                 <p className={`solve-note ${statutoryFailures.length ? "statutory-failure" : ""}`}>{statutoryFailures.length ? `制度条件：${statutoryFailures.join("／")}` : "制度上の必須条件を満たしています。"}</p>
                 {solveNote !== "未実行" && <p className="solve-note">{solveNote}</p>}
                 {adjustedPlan && hardSummary.failed.length > 0 && <p className="target-unmet-guidance" role="alert">
-                  未達の指標があります。指標表の「<strong>判定・未達時の修正候補</strong>」を見ながら、目標値または将来予測・調整水準の許容範囲の修正を検討してください。
+                  未達の指標があります。下の「<strong>未達成項目と修正案</strong>」で採用する案を選び、許容範囲を更新して再最適化してください。
                 </p>}
               </div>
               <div className="target-action-buttons">
@@ -2018,6 +2027,29 @@ export default function Home() {
                 {adjustedPlan && <button className="reset-button" onClick={clearAdjustment}>入力値表示に戻す</button>}
               </div>
             </div>
+            {adjustedPlan && hardSummary.failed.length > 0 && <section className="unmet-target-panel" aria-label="未達成項目と修正案">
+              <div className="unmet-target-heading">
+                <div><strong>未達成項目と修正案</strong><small>採用する修正案を複数選択できます。適用すると許容範囲を更新し、そのまま再最適化します。</small></div>
+                <button
+                  className="apply-selected-suggestions"
+                  type="button"
+                  disabled={isSolving || !Object.values(selectedAdjustmentSuggestions).some(Boolean)}
+                  aria-busy={isSolving}
+                  onClick={() => { void applySelectedDriverRangeSuggestions(); }}
+                >
+                  {isSolving ? "再最適化中…" : "選択した修正案を適用して再最適化"}
+                </button>
+              </div>
+              <div className="wide-table"><table className="unmet-target-table"><thead><tr><th>未達成項目</th><th>目標数値</th><th>最適化結果</th><th>修正案</th></tr></thead><tbody>
+                {targetManagedMetrics.filter((definition) => {
+                  const target = optimizationTargets[definition.key];
+                  return target.policy === "hard" && !targetStatus(definition, actual[definition.key], target).ok;
+                }).map((definition) => {
+                  const suggestions = targetAdjustmentSuggestions[definition.key] ?? [];
+                  return <tr key={definition.key}><th>{definition.label}</th><td>{number(optimizationTargets[definition.key].value)} {definition.unit}</td><td><strong>{number(actual[definition.key])} {definition.unit}</strong></td><td>{suggestions.length ? <div className="unmet-target-suggestions">{suggestions.map((suggestion) => <label className="target-adjustment-suggestion" key={driverRangeSuggestionId(definition.key, suggestion)}><input type="checkbox" checked={Boolean(selectedAdjustmentSuggestions[driverRangeSuggestionId(definition.key, suggestion)])} onChange={(event) => toggleDriverRangeSuggestion(definition.key, suggestion, event.target.checked)} /><span>{suggestion.text}</span></label>)}</div> : <span className="no-effective-suggestion">現在の許容範囲では有効な拡張候補を特定できません。入力済み将来PLまたは目標値との整合を確認してください。</span>}</td></tr>;
+                })}
+              </tbody></table></div>
+            </section>}
           </article>
           <div className="workflow-actions"><span>水準と15指標を確認したら、将来PLの自動予測をセル単位で確認・上書きします。</span><button className="solve-button" onClick={() => goToView("future")}>将来データ入力へ →</button></div>
         </section>
