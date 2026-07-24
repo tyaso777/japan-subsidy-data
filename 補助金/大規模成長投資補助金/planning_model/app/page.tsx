@@ -27,6 +27,7 @@ import {
   MetricKey,
   metrics,
   netIncome,
+  nonOperatingProfitLoss,
   operatingProfit,
   ordinaryIncome,
   officerBonus,
@@ -36,6 +37,7 @@ import {
   retimeBalanceSheets,
   researchDevelopment,
   preTaxIncome,
+  extraordinaryProfitLoss,
   SegmentKey,
   SegmentPlan,
   sgaDepreciation,
@@ -325,6 +327,8 @@ const otherPlCalculatedFields: OtherPlCalculatedField[] = [
   { key: "employeePay", modelCode: "M2-11", label: "うち従業員の人件費", unit: "億円", indentLevel: 1, get: (rows, index) => rows[index].other.employeePay },
   { key: "operatingProfit", modelCode: "M2-16", label: "営業利益", unit: "億円", get: (rows, index) => operatingProfit(rows[index].other) },
   { key: "operatingProfitMargin", modelCode: "M2-17", label: "営業利益率", unit: "%", indentLevel: 1, get: (rows, index) => { const segment = rows[index].other; return segmentRate(operatingProfit(segment), segment.sales); } },
+  { key: "nonOperatingProfitLoss", modelCode: "M2-17A", label: "営業外損益（純額）", unit: "億円", indentLevel: 1, get: (rows, index) => nonOperatingProfitLoss(rows[index].other) },
+  { key: "extraordinaryProfitLoss", modelCode: "M2-18A", label: "特別損益（純額）", unit: "億円", indentLevel: 1, get: (rows, index) => extraordinaryProfitLoss(rows[index].other) },
   { key: "employeePayTotal", modelCode: "M2-21", label: "給与支給総額（常時使用する従業員）", unit: "億円", get: (rows, index) => rows[index].other.employeePay },
   { key: "officerPayTotal", modelCode: "M2-22", label: "給与支給総額（役員）", unit: "億円", get: (rows, index) => rows[index].other.officerPay },
   { key: "depreciationTotal", modelCode: "M2-23", label: "減価償却費（合計）", unit: "億円", get: (rows, index) => rows[index].other.depreciation },
@@ -369,7 +373,14 @@ const otherPlDisplayRows: OtherPlDisplayRow[] = [
     indentLevel: item.indentLevel,
     get: item.get,
   })),
-].sort((left, right) => Number(left.code.replace("M2-", "")) - Number(right.code.replace("M2-", "")));
+].sort((left, right) => {
+  const order = (code: string) => {
+    const match = code.match(/M2-(\d+)([A-Z])?/);
+    if (!match) return Number.MAX_SAFE_INTEGER;
+    return Number(match[1]) * 10 + (match[2] ? match[2].charCodeAt(0) - 64 : 0);
+  };
+  return order(left.code) - order(right.code);
+});
 
 const projectDetailedOfficialCodes: Record<string, string> = {
   "M2-1": "7-1",
@@ -2622,7 +2633,7 @@ function DetailedProjectInputsTable({ historical, effectivePlan, overrides, omit
         ])}
       </tbody>
     </table></div>
-    <p className="footnote">第6次公式Excelに対応する項目は7-1～7-19で表示し、給与・賞与の内訳、減価償却費の区分、経常利益以下など公式様式だけでは不足する項目に限りP2-Xを付けています。P2-Xは補助事業の詳細PLを作るための内部管理用番号で、公式Excelへ直接転記する番号ではありません。7-20市場伸び率は「15指標・目標」の固定前提を参照します。</p>
+    <p className="footnote">第6次公式Excelに対応する項目は7-1～7-19で表示し、給与・賞与の内訳、減価償却費の区分、経常利益以下など公式様式だけでは不足する項目に限りP2-Xを付けています。営業外損益（純額）は「経常利益－営業利益」、特別損益（純額）は「税引前当期純利益－経常利益」で自動計算します。補助事業の経常利益以下が未入力の場合、純額は0として表示します。P2-Xは補助事業の詳細PLを作るための内部管理用番号で、公式Excelへ直接転記する番号ではありません。7-20市場伸び率は「15指標・目標」の固定前提を参照します。</p>
   </div>;
 }
 

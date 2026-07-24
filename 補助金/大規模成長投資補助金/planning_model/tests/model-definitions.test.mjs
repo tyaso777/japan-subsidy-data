@@ -58,6 +58,30 @@ test("round-six officer metrics are reference-only and displayed last", () => {
   assert.equal(model.isOptimizationExcludedMetric("employeePayCagr"), false);
 });
 
+test("non-operating and extraordinary profit/loss reconcile the three profit levels", () => {
+  const segment = {
+    sales: 100,
+    cogs: 60,
+    employeePay: 10,
+    officerPay: 2,
+    depreciation: 3,
+    otherSga: 5,
+    headcount: 10,
+    officerCount: 1,
+    ordinaryIncome: 18,
+    preTaxIncome: 16,
+  };
+  assert.equal(model.operatingProfit(segment), 20);
+  assert.equal(model.nonOperatingProfitLoss(segment), -2);
+  assert.equal(model.extraordinaryProfitLoss(segment), -2);
+  assert.equal(model.operatingProfit(segment) + model.nonOperatingProfitLoss(segment), model.ordinaryIncome(segment));
+  assert.equal(model.ordinaryIncome(segment) + model.extraordinaryProfitLoss(segment), model.preTaxIncome(segment));
+
+  const withoutBelowOperatingProfit = { ...segment, ordinaryIncome: undefined, preTaxIncome: undefined };
+  assert.equal(model.nonOperatingProfitLoss(withoutBelowOperatingProfit), 0);
+  assert.equal(model.extraordinaryProfitLoss(withoutBelowOperatingProfit), 0);
+});
+
 test("absolute-amount target defaults scale with the underlying company", () => {
   const plan = makePlan();
   const baseTargets = model.calculateScaleDependentTargetDefaults(plan, model.defaultTargets);

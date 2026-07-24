@@ -384,6 +384,8 @@ export const researchDevelopment = (segment: SegmentPlan) => segment.researchDev
 export const ordinaryIncome = (segment: SegmentPlan) => segment.ordinaryIncome ?? operatingProfit(segment);
 export const preTaxIncome = (segment: SegmentPlan) => segment.preTaxIncome ?? ordinaryIncome(segment);
 export const netIncome = (segment: SegmentPlan) => segment.netIncome ?? preTaxIncome(segment) * 0.7;
+export const nonOperatingProfitLoss = (segment: SegmentPlan) => ordinaryIncome(segment) - operatingProfit(segment);
+export const extraordinaryProfitLoss = (segment: SegmentPlan) => preTaxIncome(segment) - ordinaryIncome(segment);
 
 export function operatingProfit(segment: SegmentPlan) {
   return segment.sales - segment.cogs - segment.employeePay - segment.officerPay

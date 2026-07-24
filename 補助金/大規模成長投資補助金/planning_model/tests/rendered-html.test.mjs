@@ -457,6 +457,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /code: "2-28"[\s\S]*?set: \(row, value\)/);
   assert.match(pageSource, /const otherPlInputFields[\s\S]*?modelCode: "M2-7", label: "販売費及び一般管理費"[\s\S]*?modelCode: "M2-12", label: "うち従業員の給与"[\s\S]*?modelCode: "M2-13", label: "うち従業員の賞与"/);
   assert.match(pageSource, /const otherPlInputFields[\s\S]*?label: "経常利益"[\s\S]*?label: "当期純利益"/);
+  assert.match(pageSource, /label: "営業外損益（純額）"[\s\S]*?nonOperatingProfitLoss/);
+  assert.match(pageSource, /label: "特別損益（純額）"[\s\S]*?extraordinaryProfitLoss/);
   assert.match(pageSource, /const otherPlCalculatedFields[\s\S]*?modelCode: "M2-2", label: "売上高成長率"[\s\S]*?modelCode: "M2-5", label: "売上総利益"[\s\S]*?modelCode: "M2-36", label: "EBITDA増加率"/);
   assert.match(pageSource, /const otherPlDisplayRows[\s\S]*?otherPlInputFields\.map[\s\S]*?otherPlCalculatedFields\.map[\s\S]*?\.sort/);
   assert.match(pageSource, /const projectDetailedOfficialCodes[\s\S]*?"M2-1": "7-1"[\s\S]*?"M2-33": "7-19"/);
