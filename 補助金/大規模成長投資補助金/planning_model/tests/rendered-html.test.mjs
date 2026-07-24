@@ -52,6 +52,14 @@ test("renders the planning model shell", async () => {
   const standaloneBuildSource = await readFile(new URL("../scripts/build-standalone.mjs", import.meta.url), "utf8");
   const globalStyles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(pageSource, /<h1 className="product-title">/);
+  assert.match(pageSource, /\["history", "① 過去データ入力"\]/);
+  assert.match(pageSource, /\["targets", "② 15指標・目標"\]/);
+  assert.match(pageSource, /\["future", "③ 将来データ入力"\]/);
+  assert.match(pageSource, /\["pl", "④ 年度別PL"\]/);
+  assert.match(pageSource, /\["summary", "⑤ 診断"\]/);
+  assert.doesNotMatch(pageSource, /STEP [1-5]\s*\//);
+  assert.doesNotMatch(pageSource, /ROUND 6\s*\//);
+  assert.doesNotMatch(pageSource, /APPLICATION PERIOD|PL ACTUALS|PL FORECAST|TREND CHECK|PL VALIDATION/);
   assert.match(pageSource, /<small>Ver\. 大規模成長投資補助金 6次公募<\/small>/);
   assert.doesNotMatch(pageSource, /第3次定義を比較表示/);
   assert.match(standaloneBuildSource, /成長投資計画シミュレーター_大規模成長投資補助金6次公募\.html/);
