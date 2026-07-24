@@ -105,21 +105,21 @@ const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string;
   projectHeadcountGrowthToBase: { label: "補助事業 常時使用する従業員数（就業時間換算）の成長率（設備導入期間）", unit: "%/年", step: 0.5 },
   projectSgaImprovementToBase: { label: "補助事業 その他販管費率改善ポイント（設備導入期間）", unit: "pt", step: 0.5 },
   projectOfficerPayGrowthToBase: { label: "役員1人当たり給与支給総額の年平均上昇率（設備導入期間・モデル内管理）", unit: "%/年", step: 0.25 },
-  otherSalesGrowthToBase: { label: "その他事業 売上成長率（最新決算期→基準年）", unit: "%/年", step: 0.5 },
-  otherCogsImprovementToBase: { label: "その他事業 原価率改善ポイント（最新決算期→基準年）", unit: "pt", step: 0.5 },
-  otherPayGrowthToBase: { label: "その他事業の従業員1人当たり給与支給総額の年平均上昇率（最新決算期→基準年・モデル内管理）", unit: "%/年", step: 0.25 },
-  otherHeadcountGrowthToBase: { label: "その他事業 常時使用する従業員数（就業時間換算）の成長率（最新決算期→基準年）", unit: "%/年", step: 0.5 },
-  otherSgaImprovementToBase: { label: "その他事業 その他販管費率改善ポイント（最新決算期→基準年）", unit: "pt", step: 0.5 },
+  otherSalesGrowthToBase: { label: "ベース事業 売上成長率（最新決算期→基準年）", unit: "%/年", step: 0.5 },
+  otherCogsImprovementToBase: { label: "ベース事業 原価率改善ポイント（最新決算期→基準年）", unit: "pt", step: 0.5 },
+  otherPayGrowthToBase: { label: "ベース事業の従業員1人当たり給与支給総額の年平均上昇率（最新決算期→基準年・モデル内管理）", unit: "%/年", step: 0.25 },
+  otherHeadcountGrowthToBase: { label: "ベース事業 常時使用する従業員数（就業時間換算）の成長率（最新決算期→基準年）", unit: "%/年", step: 0.5 },
+  otherSgaImprovementToBase: { label: "ベース事業 その他販管費率改善ポイント（最新決算期→基準年）", unit: "pt", step: 0.5 },
   projectSalesGrowth: { label: "補助事業 売上成長率（基準年→事業化報告3年目）", unit: "%/年", step: 0.5 },
-  otherSalesGrowth: { label: "その他事業 売上成長率（基準年→事業化報告3年目）", unit: "%/年", step: 0.5 },
+  otherSalesGrowth: { label: "ベース事業 売上成長率（基準年→事業化報告3年目）", unit: "%/年", step: 0.5 },
   projectCogsImprovementAfterBase: { label: "補助事業 原価率改善ポイント（基準年→事業化報告3年目）", unit: "pt", step: 0.5 },
-  otherCogsImprovement: { label: "その他事業 原価率改善ポイント（基準年→事業化報告3年目）", unit: "pt", step: 0.5 },
+  otherCogsImprovement: { label: "ベース事業 原価率改善ポイント（基準年→事業化報告3年目）", unit: "pt", step: 0.5 },
   projectPayGrowth: { label: "補助事業1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目）", unit: "%/年", step: 0.25 },
-  otherPayGrowth: { label: "その他事業の従業員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
+  otherPayGrowth: { label: "ベース事業の従業員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
   projectHeadcountGrowth: { label: "補助事業 常時使用する従業員数（就業時間換算）の成長率（基準年→事業化報告3年目）", unit: "%/年", step: 0.5 },
-  otherHeadcountGrowth: { label: "その他事業 常時使用する従業員数（就業時間換算）の成長率（基準年→事業化報告3年目）", unit: "%/年", step: 0.5 },
+  otherHeadcountGrowth: { label: "ベース事業 常時使用する従業員数（就業時間換算）の成長率（基準年→事業化報告3年目）", unit: "%/年", step: 0.5 },
   projectSgaRateEnd: { label: "補助事業 その他販管費率（事業化報告3年目到達値）", unit: "%", step: 0.5 },
-  otherSgaRateEnd: { label: "その他事業 その他販管費率（事業化報告3年目到達値）", unit: "%", step: 0.5 },
+  otherSgaRateEnd: { label: "ベース事業 その他販管費率（事業化報告3年目到達値）", unit: "%", step: 0.5 },
   projectOfficerPayGrowth: { label: "役員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
   usefulLife: { label: "新規投資の耐用年数", unit: "年", step: 1 },
   investment: { label: "補助事業投資額", unit: "億円", step: 1 },
@@ -164,12 +164,12 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
     keys: ["projectSalesGrowth", "projectCogsImprovementAfterBase", "projectPayGrowth", "projectHeadcountGrowth", "projectSgaRateEnd", "projectOfficerPayGrowth"],
   },
   {
-    label: "その他事業｜設備導入期間",
+    label: "ベース事業｜設備導入期間",
     detail: "最新決算期 → 基準年",
     keys: ["otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase"],
   },
   {
-    label: "その他事業｜基準年後",
+    label: "ベース事業｜基準年後",
     detail: "基準年度 → 事業化報告3年目",
     keys: ["otherSalesGrowth", "otherCogsImprovement", "otherPayGrowth", "otherHeadcountGrowth", "otherSgaRateEnd"],
   },
@@ -1571,7 +1571,7 @@ export default function Home() {
     const proposal = createStandardSampleProposal(new Date().toISOString());
     applyProposal(proposal);
     setHistoricalDefaultsApplied(true);
-    setDefaultNote("過去3期実績から調整水準を設定し、初回最適化後に2029年のその他事業売上高・補助事業の従業員給与支給総額を上書きして、再最適化したサンプルです。");
+    setDefaultNote("過去3期実績から調整水準を設定し、初回最適化後に2029年のベース事業売上高・補助事業の従業員給与支給総額を上書きして、再最適化したサンプルです。");
     setSolveNote("標準提案サンプル：一部将来データ入力後の再最適化まで実行済みです。");
     setFileNote("過去入力・調整水準設定・2段階最適化済みの標準提案を読み込みました");
     showLoadNotice("「最適化済み標準提案」を読み込みました。");
@@ -1941,7 +1941,7 @@ export default function Home() {
       return next;
     });
     setHistoricalDefaultsApplied(true);
-    setDefaultNote("すべての計画初期値を設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目は保守的な補完値を使用しています。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。その他事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、耐用年数は10年、市場伸び率は5%で仮置きしています。");
+    setDefaultNote("すべての計画初期値を設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目は保守的な補完値を使用しています。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。ベース事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、耐用年数は10年、市場伸び率は5%で仮置きしています。");
   }
 
   function confirmAndApplyHistoricalDefaults() {
@@ -2002,7 +2002,7 @@ export default function Home() {
             <span>成長投資計画シミュレーター</span>
             <small>Ver. 大規模成長投資補助金 6次公募</small>
           </h1>
-          <p className="subtitle">過去実績と目標値を入力し、補助事業＋その他事業＝全社 の将来PLをシミュレーションします。</p>
+          <p className="subtitle">過去実績と目標値を入力し、補助事業＋ベース事業＝全社 の将来PLをシミュレーションします。</p>
         </div>
       </header>
 
@@ -2227,7 +2227,7 @@ export default function Home() {
           <div className="section-intro"><div><h2>自動予測を確認し、必要なセルだけ上書き</h2></div><p>青枠の空欄には、過去実績と「15指標・目標」の調整水準から計算した値を表示します。入力したセルは太字で固定し、それ以降の空欄年度を再予測します。</p></div>
           <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。直前の変更はCtrl＋Zで戻せます。</p>
           <article className="panel table-panel"><div className="panel-heading"><div><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">将来合計 {number(futureCapex.reduce((sum, row) => sum + row.value, 0), 2)} 億円</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} inputValues={inputValues} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。将来各年度の入力合計は「15指標・目標」の補助事業投資額と連動し、投資額／全社売上高や将来減価償却費の自動予測へ反映します。</p></article>
-          <article className="panel table-panel"><div className="panel-heading"><div><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>公式様式を直接作るか、事業別の詳細PLを積み上げるかを選びます</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>その他事業PLを入力</button></div></div><FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} drivers={calculationDrivers} onForecastChange={updateForecastOverride} /><p className="footnote">「全社PLを入力」は、会社全体2-1～2-36と補助事業7-1～7-20を入力して公式Excelを完成させる方式です。「その他事業PLを入力」は、補助事業とその他事業を同じ詳細項目で入力し、合計から会社全体PLを作る方式です。</p></article>
+          <article className="panel table-panel"><div className="panel-heading"><div><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>公式様式を直接作るか、事業別の詳細PLを積み上げるかを選びます</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>ベース事業PLを入力</button></div></div><FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} drivers={calculationDrivers} onForecastChange={updateForecastOverride} /><p className="footnote">「全社PLを入力」は、会社全体2-1～2-36と補助事業7-1～7-20を入力して公式Excelを完成させる方式です。「ベース事業PLを入力」は、補助事業とベース事業を同じ詳細項目で入力し、合計から会社全体PLを作る方式です。</p></article>
           <div className="workflow-actions"><div><span>上書きしたセルを固定して再最適化できます。再最適化後もこの画面に留まります。</span>{adjustedPlan && <p className="solve-note">{solveNote}</p>}</div><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("targets")}>← 15指標・目標へ戻る</button><button className="solve-button" disabled={isSolving} aria-busy={isSolving} onClick={() => void solve()}>{isSolving ? "計算中…" : "上書き内容を反映して再最適化"}</button><button className="reset-button" onClick={() => goToView("pl")}>年度別PLへ →</button></div></div>
         </section>
       )}
@@ -2238,14 +2238,14 @@ export default function Home() {
           {adjustedPlan && <div className="comparison-banner"><strong>入力値は保存されています。</strong><span>各セルを「入力値 → 調整案」で表示しています。</span></div>}
           <CompanyTable plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} />
           <OfficialProjectTable plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} drivers={calculationDrivers} />
-          <PlTable title="その他事業PL（モデル内訳・申請書外）" plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} segment="other" />
+          <PlTable title="ベース事業PL（モデル内訳・申請書外）" plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} segment="other" />
           <div className="workflow-actions"><span>年度別PLを確認したら、診断画面で計画推移と妥当性を確認します。</span><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("future")}>← 将来データ入力に戻る</button><button className="solve-button" onClick={() => goToView("summary")}>診断タブに進む →</button></div></div>
         </section>
       )}
 
       {view === "targets" && (
         <section className="content-stack">
-          <div className="section-intro"><div><h2>目標・制度条件・競合管理</h2></div><p>事業を「補助事業」と「その他事業」に分け、それぞれに目標数値・水準を設定します。計画値・判定・自動調整には第6次定義を使用し、複数目標が矛盾する場合は未達と修正候補を明示します。</p></div>
+          <div className="section-intro"><div><h2>目標・制度条件・競合管理</h2></div><p>事業を「補助事業」と「ベース事業」に分け、それぞれに目標数値・水準を設定します。計画値・判定・自動調整には第6次定義を使用し、複数目標が矛盾する場合は未達と修正候補を明示します。</p></div>
           <article className="panel">
             <div className="panel-heading"><div><h2>将来予測・調整水準</h2><span className={`pill ${forecastSettingsReady ? "green" : ""}`}>{forecastSettingsReady ? "設定済み" : "未設定"}</span></div><button className="default-button" onClick={confirmAndApplyHistoricalDefaults}>{forecastSettingsStarted ? "過去3期から再設定" : "過去3期からデフォルト設定"}</button></div>
             <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th>調整項目<small>A～Z</small></th>{historicalPlan.slice(1).map((row) => <th className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>計画初期値</th><th>制度上の必須条件<small>編集不可</small></th><th>許容下限</th><th>許容上限</th><th>最適化での扱い</th></tr></thead><tbody>
@@ -2283,7 +2283,7 @@ export default function Home() {
               ])}
             </tbody></table></div>
             <p className="footnote">前期・最新決算期の各列は、計画値ではなく過去実績の参考値です。前々期もデフォルト計算には使用しますが、参考値がほぼないため表では省略しています。「過去3期からデフォルト設定」では、補助事業の設備導入期間は過去実績の単純平均を計画初期値、平均±2標準偏差を許容下限・上限とします。表示されている許容下限・上限がそのまま最適化の探索範囲であり、別の非表示上限は設けません。制度条件や計算上成立しない値は別途バリデーションします。基準年後は、第5次採択者中央値を直接使える項目と、過去採択統計・利益構造から補完する項目を分けています。市場伸び率・補助事業投資額・申請補助金額・耐用年数は固定入力のため、許容下限・上限を設けません。</p>
-            <div className="benchmark-note"><strong>基準年後のデフォルト</strong><span>売上高成長率 22%［15～30%］</span><span>補助事業1人当たり給与支給総額の年平均上昇率 7%［5～10%］</span><span>常時使用する従業員数（就業時間換算）の成長率 4%［0～8%］</span><span>原価率改善 1.5pt［0～2pt］</span><span>その他販管費率 過去平均-1.5pt［過去平均-4～+1pt］</span><span>役員1人当たり給与支給総額の年平均上昇率は過去3期の役員1人当たり給与から推計（計算不能時のみ7%［5～10%］）</span><span>その他事業はシナジーを見込み、基準年後の売上成長率を設備導入期間＋2.0pt、原価率改善・給与・人員成長率を＋0.5pt</span><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公募・採択者中央値PDF ↗</a></div>
+            <div className="benchmark-note"><strong>基準年後のデフォルト</strong><span>売上高成長率 22%［15～30%］</span><span>補助事業1人当たり給与支給総額の年平均上昇率 7%［5～10%］</span><span>常時使用する従業員数（就業時間換算）の成長率 4%［0～8%］</span><span>原価率改善 1.5pt［0～2pt］</span><span>その他販管費率 過去平均-1.5pt［過去平均-4～+1pt］</span><span>役員1人当たり給与支給総額の年平均上昇率は過去3期の役員1人当たり給与から推計（計算不能時のみ7%［5～10%］）</span><span>ベース事業はシナジーを見込み、基準年後の売上成長率を設備導入期間＋2.0pt、原価率改善・給与・人員成長率を＋0.5pt</span><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公募・採択者中央値PDF ↗</a></div>
             {defaultNote && <p className="default-note">{defaultNote}</p>}
           </article>
           <article className="panel table-panel">
@@ -2358,7 +2358,7 @@ export default function Home() {
         <section className="content-stack">
           <div className="section-intro"><div><p className="eyebrow">AUDIT TRAIL</p><h2>数式と調整ロジック</h2></div><p>Excel化するときも、この順序と依存関係をそのままシートに移します。</p></div>
           <div className="logic-flow">
-            <div><span>01</span><strong>実績・根拠</strong><p>過去PL、顧客別数量、単価、能力、常時使用する従業員数、賃金表</p></div><i>→</i><div><span>02</span><strong>補助事業／その他事業PL</strong><p>売上・原価・給与・減価償却・販管費を年度別生成</p></div><i>→</i><div><span>03</span><strong>全社合算</strong><p>二つの事業区分を同じ年度・単位で足し上げる</p></div><i>→</i><div><span>04</span><strong>15指標</strong><p>計画値を算出し、設定した目標値と照合</p></div>
+            <div><span>01</span><strong>実績・根拠</strong><p>過去PL、顧客別数量、単価、能力、常時使用する従業員数、賃金表</p></div><i>→</i><div><span>02</span><strong>補助事業／ベース事業PL</strong><p>売上・原価・給与・減価償却・販管費を年度別生成</p></div><i>→</i><div><span>03</span><strong>全社合算</strong><p>二つの事業区分を同じ年度・単位で足し上げる</p></div><i>→</i><div><span>04</span><strong>15指標</strong><p>計画値を算出し、設定した目標値と照合</p></div>
           </div>
           <article className="panel formula-panel">
             <h2>PLと付加価値の恒等式</h2>
@@ -2374,8 +2374,8 @@ export default function Home() {
             <code>補助事業1人当たり給与支給総額の年平均上昇率 = 7%［5～10%］（第5次採択者中央値7%/年、一般企業の第6次要件5%以上）</code>
             <code>基準年後の常時使用する従業員数（就業時間換算）の成長率 = 4%［0～8%］（過去採択統計の給与支給総額伸びと1人当たり給与支給総額伸びの差から補完）</code>
             <code>基準年後の原価率改善 = 1.5pt［0～2pt］（悪化は初期許容範囲に含めず、設備効果を控えめに見込む）</code>
-            <code>基準年後・その他事業の計画初期値 = 前々期×20% + 前期×30% + 最新期×50%（水準項目）</code>
-            <code>基準年後・その他事業の計画初期値 = 前期までの変化率×40% + 最新期までの変化率×60%（成長項目）</code>
+            <code>基準年後・ベース事業の計画初期値 = 前々期×20% + 前期×30% + 最新期×50%（水準項目）</code>
+            <code>基準年後・ベース事業の計画初期値 = 前期までの変化率×40% + 最新期までの変化率×60%（成長項目）</code>
             <code>補助事業売上高(t) = 最新決算期売上高 × (1 + 基準年までの成長率)^経過年数　［最新決算期→基準年］</code>
             <code>補助事業売上高(t) = 基準年売上高 × (1 + 報告期間の成長率)^基準年後年数　［基準年→事業化報告3年目］</code>
             <code>期間末原価率 = 期間開始時原価率 − 原価率改善ポイント（プラスは改善、マイナスは悪化）</code>
@@ -2450,7 +2450,7 @@ function companyEbitda(row: YearPlan) {
 }
 
 function ManualEditor({ plan, onChange }: { plan: YearPlan[]; onChange: (yearIndex: number, segment: SegmentKey, field: keyof SegmentPlan, value: number) => void }) {
-  return <div className="manual-sections">{(["project", "other"] as SegmentKey[]).map((segment) => <div key={segment}><h3>{segment === "project" ? "補助事業PL" : "その他事業PL"}</h3><div className="wide-table"><table><thead><tr><th>{segment === "other" ? "内部管理番号・項目" : "モデル入力項目"}</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{plFields.map((field) => <tr key={field.key}><th>{segment === "other" ? `${field.modelCode} ` : ""}{field.label}<small>{field.unit}</small></th>{plan.map((row, index) => <td key={row.year}><input type="number" step="0.1" value={row[segment][field.key]} onChange={(event) => onChange(index, segment, field.key, Number(event.target.value))} /></td>)}</tr>)}</tbody></table></div></div>)}</div>;
+  return <div className="manual-sections">{(["project", "other"] as SegmentKey[]).map((segment) => <div key={segment}><h3>{segment === "project" ? "補助事業PL" : "ベース事業PL"}</h3><div className="wide-table"><table><thead><tr><th>{segment === "other" ? "内部管理番号・項目" : "モデル入力項目"}</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{plFields.map((field) => <tr key={field.key}><th>{segment === "other" ? `${field.modelCode} ` : ""}{field.label}<small>{field.unit}</small></th>{plan.map((row, index) => <td key={row.year}><input type="number" step="0.1" value={row[segment][field.key]} onChange={(event) => onChange(index, segment, field.key, Number(event.target.value))} /></td>)}</tr>)}</tbody></table></div></div>)}</div>;
 }
 
 type ProjectOfficialInputRow = { code: string; label: string; unit: string; digits?: number; indentLevel?: 1 | 2; get: (segment: SegmentPlan) => number; set: (segment: SegmentPlan, value: number) => Partial<SegmentPlan> };
@@ -2574,7 +2574,7 @@ function HistoricalInputsEditor({ historical, inputValues, onHistoricalCompanyCh
   return <div className="manual-sections spreadsheet-grid">
     <div><h3>会社全体にかかる損益計算書・関連計算項目（過去3期実績）</h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{companyActualInputRows.map((item) => <tr className={`${!item.set ? "emphasis" : ""}${item.groupStart ? " official-related-start" : ""}`} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.groupStart && <small>P/L関連計算項目</small>}{item.unit && <small>{item.unit}</small>}</th>{historical.map((row, index) => { const value = item.get(historical, index); return <td key={row.year}>{item.set ? <input type="number" step={item.unit === "人" ? 1 : 0.01} value={getInputValue(inputValues, inputKey.companyActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalCompanyChange(index, item, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong>}</td>; })}</tr>)}</tbody></table></div></div>
     <div><h3>補助事業PL（過去3期実績）</h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{projectOfficialInputRows.map((item) => <tr key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}</small></th>{historical.map((row, index) => <td key={row.year}><input type="number" step={item.digits === 0 ? 1 : 0.01} value={getInputValue(inputValues, inputKey.projectActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalProjectChange(index, item, event.target.value === "" ? null : Number(event.target.value))} /></td>)}</tr>)}</tbody></table></div></div>
-    <p className="footnote">その他事業の過去3期は「会社全体－補助事業」で自動算出するため、重複入力しません。</p>
+    <p className="footnote">ベース事業の過去3期は「会社全体－補助事業」で自動算出するため、重複入力しません。</p>
   </div>;
 }
 
@@ -2692,7 +2692,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
       <p className="footnote">2-1～2-20を損益計算書、2-21～2-36を給与・付加価値・人数・EBITDAの「P/L関連計算項目」として区切っています。2-18～2-20・2-27・2-28は第6次様式に合わせた入力項目です。将来の2-18～2-20は直近実績の営業外損益率・特別損益率・税引後利益率を基に自動予測し、必要な年度だけ上書きできます。</p>
     </div>
     <div>
-      <h3 className="manual-table-heading"><span>その他事業PL・関連計算項目（M2-1～M2-36：過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitOtherCalculated} onClick={() => setOmitOtherCalculated((current) => !current)}>{omitOtherCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
+      <h3 className="manual-table-heading"><span>ベース事業PL・関連計算項目（M2-1～M2-36：過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitOtherCalculated} onClick={() => setOmitOtherCalculated((current) => !current)}>{omitOtherCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
       <div className="wide-table"><table><thead><tr><th>第6次様式2-1～2-36準拠の内部管理項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・全社－補助事業</small></th>)}{futureRows.map((row) => <th key={row.year} className={futureInputBasis === "other" ? "forecast-heading" : undefined}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・{futureInputBasis === "other" ? "空欄は自動予測" : "自動算出"}</small></th>)}</tr></thead>
         <tbody>
           <OfficialSectionHeading label="損益計算書" range="M2-1～M2-20" columns={historical.length + futureRows.length} />
@@ -2714,7 +2714,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
           ])}
         </tbody>
       </table></div>
-      <p className="footnote">「その他事業PLを入力」では、会社全体2-1～2-36と同じ会計順序で入力します。「全社PLを入力」では、公式7-1～7-20から確実に差額算出できる項目だけを表示し、補助事業側の内訳が不足する賞与・減価償却費区分・経常利益以下などは「—」とします。</p>
+      <p className="footnote">「ベース事業PLを入力」では、会社全体2-1～2-36と同じ会計順序で入力します。「全社PLを入力」では、公式7-1～7-20から確実に差額算出できる項目だけを表示し、補助事業側の内訳が不足する賞与・減価償却費区分・経常利益以下などは「—」とします。</p>
     </div>
   </div>;
 }
@@ -2725,9 +2725,9 @@ function AutoRequiredInputsEditor({ historical, autoPlan, effectivePlan, overrid
   const effectiveOtherByYear = new Map(effectivePlan.map((row) => [row.year, row.other]));
   const rawPlaceholder = (value: number) => String(roundedInput(value));
   return <div className="manual-sections spreadsheet-grid">
-    <div><h3>会社全体にかかる損益計算書（過去3期実績 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{effectivePlan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{companyActualInputRows.map((item) => <tr className={!item.set ? "emphasis" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.unit && <small>{item.unit}</small>}</th>{effectivePlan.map((row, index) => { const isActual = index < historical.length; const value = item.get(isActual ? historical : effectivePlan, index); if (isActual) return <td key={row.year}>{item.set ? <input type="number" step={item.unit === "人" ? 1 : 0.1} value={value ?? 0} onChange={(event) => onHistoricalCompanyChange(index, item, Number(event.target.value))} /> : <strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong>}</td>; if (futureInputBasis !== "company") return <td key={row.year}><span className="future-empty">—</span></td>; if (!item.set) return <td key={row.year}><strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong></td>; const key = forecastOverrideKey(row.year, "company", item.code); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.unit === "人" ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "company", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">「全社PLを入力」を選ぶと将来欄が青枠になり、その他事業PLを「全社－補助事業」で自動計算します。「その他事業PLを入力」では将来欄を空欄表示します。</p></div>
+    <div><h3>会社全体にかかる損益計算書（過去3期実績 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{effectivePlan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{companyActualInputRows.map((item) => <tr className={!item.set ? "emphasis" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.unit && <small>{item.unit}</small>}</th>{effectivePlan.map((row, index) => { const isActual = index < historical.length; const value = item.get(isActual ? historical : effectivePlan, index); if (isActual) return <td key={row.year}>{item.set ? <input type="number" step={item.unit === "人" ? 1 : 0.1} value={value ?? 0} onChange={(event) => onHistoricalCompanyChange(index, item, Number(event.target.value))} /> : <strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong>}</td>; if (futureInputBasis !== "company") return <td key={row.year}><span className="future-empty">—</span></td>; if (!item.set) return <td key={row.year}><strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong></td>; const key = forecastOverrideKey(row.year, "company", item.code); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.unit === "人" ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "company", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">「全社PLを入力」を選ぶと将来欄が青枠になり、ベース事業PLを「全社－補助事業」で自動計算します。「ベース事業PLを入力」では将来欄を空欄表示します。</p></div>
     <div><h3>補助事業PL（過去3期実績 → 補助事業期間 → 基準年 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th key={`actual-${row.year}`}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}{futureProjectRows.map((row) => <th key={`future-${row.year}`} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・自動予測</small></th>)}</tr></thead><tbody>{projectOfficialInputRows.map((item) => <tr key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}</small></th>{historical.map((row, index) => <td key={`actual-${row.year}`}><input type="number" step="0.1" value={item.get(row.project)} onChange={(event) => onHistoricalProjectChange(index, item, Number(event.target.value))} /></td>)}{futureProjectRows.map((row) => { const key = forecastOverrideKey(row.year, "project", item.code); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); const effective = effectiveProjectByYear.get(row.year)!; return <td key={`future-${row.year}`}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="0.1" value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(item.get(effective))} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">過去3期は白枠の必須入力です。補助事業期間～事業化報告3年目は青枠で自動予測し、入力したセルだけ固定します。固定値を入れると、それ以降の空欄年度を再予測します。</p></div>
-    <div><h3>その他事業PL（過去3期自動算出 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>内部管理番号・項目</th>{autoPlan.map((row) => <th key={row.year} className={row.year > historical.at(-1)!.year && futureInputBasis === "other" ? "forecast-heading" : undefined}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}{row.year > historical.at(-1)!.year ? futureInputBasis === "other" ? "・入力" : "・自動算出" : "・自動算出"}</small></th>)}</tr></thead><tbody>{otherPlInputFields.map((item) => <tr key={item.key}><th><PlRowTitle code={item.modelCode} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}</small></th>{autoPlan.map((row, index) => { const isActual = index < historical.length; const effective = effectiveOtherByYear.get(row.year)!; const value = item.get(effective); if (isActual || futureInputBasis === "company") return <td key={row.year}><strong>{number(value, item.digits ?? 2)}</strong></td>; const key = forecastOverrideKey(row.year, "other", item.key); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "other", item.key, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">「その他事業PLを入力」を選ぶと将来欄が青枠になります。「全社PLを入力」では、将来値を「全社PL－補助事業PL」で自動表示します。</p></div>
+    <div><h3>ベース事業PL（過去3期自動算出 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>内部管理番号・項目</th>{autoPlan.map((row) => <th key={row.year} className={row.year > historical.at(-1)!.year && futureInputBasis === "other" ? "forecast-heading" : undefined}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}{row.year > historical.at(-1)!.year ? futureInputBasis === "other" ? "・入力" : "・自動算出" : "・自動算出"}</small></th>)}</tr></thead><tbody>{otherPlInputFields.map((item) => <tr key={item.key}><th><PlRowTitle code={item.modelCode} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}</small></th>{autoPlan.map((row, index) => { const isActual = index < historical.length; const effective = effectiveOtherByYear.get(row.year)!; const value = item.get(effective); if (isActual || futureInputBasis === "company") return <td key={row.year}><strong>{number(value, item.digits ?? 2)}</strong></td>; const key = forecastOverrideKey(row.year, "other", item.key); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "other", item.key, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">「ベース事業PLを入力」を選ぶと将来欄が青枠になります。「全社PLを入力」では、将来値を「全社PL－補助事業PL」で自動表示します。</p></div>
   </div>;
 }
 
@@ -2842,7 +2842,7 @@ function DiagnosticCharts({ plan }: { plan: YearPlan[] }) {
       <TrendChart title="売上高" subtitle="全社と事業別の規模・成長ペース" unit={moneyUnit} plan={plan} zeroBaseline={zeroBaseline} series={[
         { label: "全社", color: colors.company, values: company.map((segment) => displayMoney(segment.sales)) },
         { label: "補助事業", color: colors.project, values: plan.map((row) => displayMoney(row.project.sales)) },
-        { label: "その他事業", color: colors.other, values: plan.map((row) => displayMoney(row.other.sales)) },
+        { label: "ベース事業", color: colors.other, values: plan.map((row) => displayMoney(row.other.sales)) },
       ]} />
       <TrendChart title="収益性（全社）" subtitle="原価・その他販管費・営業利益の率" unit="%" plan={plan} zeroBaseline={zeroBaseline} series={[
         { label: "売上原価率", color: colors.project, values: company.map((segment) => chartRate(segment.cogs, segment.sales)) },
@@ -2856,7 +2856,7 @@ function DiagnosticCharts({ plan }: { plan: YearPlan[] }) {
       <TrendChart title="労働生産性" subtitle="付加価値額÷（従業員数＋役員数）" unit={`${moneyUnit}/人`} plan={plan} zeroBaseline={zeroBaseline} series={[
         { label: "全社", color: colors.company, values: company.map((segment) => displayMoney(productivity(segment))) },
         { label: "補助事業", color: colors.project, values: plan.map((row) => displayMoney(productivity(row.project))) },
-        { label: "その他事業", color: colors.other, values: plan.map((row) => displayMoney(productivity(row.other))) },
+        { label: "ベース事業", color: colors.other, values: plan.map((row) => displayMoney(productivity(row.other))) },
       ]} />
     </div>
     <p className="trend-chart-note"><span className="solid-sample" />実線：過去実績 <span className="dash-sample" />破線：将来予測。チャートは診断用であり、数値の編集は「将来データ入力」で行います。</p>
@@ -2919,7 +2919,7 @@ type DiagnosticRow = {
 
 const diagnosticSeriesColor = (label: string) => {
   if (label === "補助") return "var(--chart-project)";
-  if (label === "他") return "var(--chart-other)";
+  if (label === "ベース") return "var(--chart-other)";
   return "var(--chart-company)";
 };
 
@@ -2971,13 +2971,13 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
   const segments = (row: YearPlan) => [
     { label: "全社", value: company(row) },
     { label: "補助", value: row.project },
-    { label: "他", value: row.other },
+    { label: "ベース", value: row.other },
   ];
   const segmentValues = (row: YearPlan, calculator: (segment: SegmentPlan) => number | undefined) =>
     segments(row).map((entry) => ({ label: entry.label, value: calculator(entry.value) }));
   const pairedValues = (row: YearPlan, calculator: (segment: SegmentPlan) => number | undefined) => [
     { label: "補助", value: calculator(row.project) },
-    { label: "他", value: calculator(row.other) },
+    { label: "ベース", value: calculator(row.other) },
   ];
   const previousSegment = (index: number, key: "company" | "project" | "other") => {
     if (!index) return undefined;
@@ -3040,12 +3040,12 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
       ],
     },
     {
-      title: "5. 補助事業とその他事業の比較",
+      title: "5. 補助事業とベース事業の比較",
       rows: [
         { name: "補助事業売上構成比", formula: "補助事業売上高 ÷ 全社売上高", check: "全社が補助事業へ過度に依存していないか", unit: "%", values: (row) => [{ label: "構成比", value: safeRate(row.project.sales, company(row).sales) }] },
-        { name: "事業別売上成長率", formula: "当年売上高 ÷ 前年売上高－1", check: "片方の事業だけが不自然に急成長・縮小していないか", unit: "%", values: (row, index) => [{ label: "補助", value: previousSegment(index, "project")?.sales ? (row.project.sales / previousSegment(index, "project")!.sales - 1) * 100 : undefined }, { label: "他", value: previousSegment(index, "other")?.sales ? (row.other.sales / previousSegment(index, "other")!.sales - 1) * 100 : undefined }] },
-        { name: "売上原価率差", formula: "補助事業原価率－その他事業原価率", check: "補助事業の採算を過度に良く置いていないか", unit: "pt", values: (row) => [{ label: "差", value: (safeRate(row.project.cogs, row.project.sales) ?? 0) - (safeRate(row.other.cogs, row.other.sales) ?? 0) }] },
-        { name: "営業利益率差", formula: "補助事業営業利益率－その他事業営業利益率", check: "事業間の利益率差に合理的な根拠があるか", unit: "pt", values: (row) => [{ label: "差", value: (opMargin(row.project) ?? 0) - (opMargin(row.other) ?? 0) }] },
+        { name: "事業別売上成長率", formula: "当年売上高 ÷ 前年売上高－1", check: "片方の事業だけが不自然に急成長・縮小していないか", unit: "%", values: (row, index) => [{ label: "補助", value: previousSegment(index, "project")?.sales ? (row.project.sales / previousSegment(index, "project")!.sales - 1) * 100 : undefined }, { label: "ベース", value: previousSegment(index, "other")?.sales ? (row.other.sales / previousSegment(index, "other")!.sales - 1) * 100 : undefined }] },
+        { name: "売上原価率差", formula: "補助事業原価率－ベース事業原価率", check: "補助事業の採算を過度に良く置いていないか", unit: "pt", values: (row) => [{ label: "差", value: (safeRate(row.project.cogs, row.project.sales) ?? 0) - (safeRate(row.other.cogs, row.other.sales) ?? 0) }] },
+        { name: "営業利益率差", formula: "補助事業営業利益率－ベース事業営業利益率", check: "事業間の利益率差に合理的な根拠があるか", unit: "pt", values: (row) => [{ label: "差", value: (opMargin(row.project) ?? 0) - (opMargin(row.other) ?? 0) }] },
         { name: "事業別1人当たり売上高", formula: "事業別売上高 ÷ 事業別の常時使用する従業員数（就業時間換算）", check: "補助事業の生産性だけが突出していないか", unit: "億円/人", values: (row) => pairedValues(row, (s) => perEmployee(s.sales, s)) },
         { name: "事業別従業員1人当たり給与支給総額", formula: "事業別従業員給与支給総額 ÷ 事業別の常時使用する従業員数（就業時間換算）", check: "補助事業と既存事業の待遇差が妥当か", unit: "億円/人", values: (row) => pairedValues(row, payrollPerEmployee) },
         { name: "全社利益増加への補助事業寄与率", formula: "補助事業営業利益の前年差 ÷ 全社営業利益の前年差", check: "全社利益改善を補助事業だけへ寄せていないか", unit: "%", values: (row, index) => { if (!index) return [{ label: "寄与率", value: undefined }]; const projectIncrease = operatingProfit(row.project) - operatingProfit(plan[index - 1].project); const companyIncrease = operatingProfit(company(row)) - operatingProfit(company(plan[index - 1])); return [{ label: "寄与率", value: safeRate(projectIncrease, companyIncrease) }]; } },
@@ -3078,7 +3078,7 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
   }, [selectedKey]);
 
   return <section ref={diagnosticsRef} className="financial-diagnostics" aria-label="PL妥当性診断">
-    <div className="diagnostic-heading"><div><h2>基本指標によるシミュレーション妥当性チェック</h2></div><p>「推移」の小さなチャートを選ぶと、詳細チャートが切り替わります。年度別数値は全社・補助事業・その他事業の順です。</p></div>
+    <div className="diagnostic-heading"><div><h2>基本指標によるシミュレーション妥当性チェック</h2></div><p>「推移」の小さなチャートを選ぶと、詳細チャートが切り替わります。年度別数値は全社・補助事業・ベース事業の順です。</p></div>
     {selected && <div ref={selectedChartRef} className="diagnostic-selected-chart"><TrendChart title={selected.row.name} subtitle={`${selected.row.formula}｜${selected.row.check}`} unit={selected.row.unit} plan={plan} zeroBaseline series={diagnosticChartSeries(plan, selected.row)} /></div>}
     <div className="diagnostic-groups" aria-label="診断指標一覧">{groups.map((group) => <article className="panel table-panel diagnostic-panel" key={group.title}><h3>{group.title}</h3><div className="wide-table diagnostic-table"><table><thead><tr><th>指標名</th><th>計算式</th><th>主な確認点</th><th className="diagnostic-sparkline-column">推移</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{group.rows.map((item) => {
       const itemKey = `${group.title}:${item.name}`;

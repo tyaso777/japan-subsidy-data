@@ -35,7 +35,7 @@ test("renders the planning model shell", async () => {
   assert.match(html, /<html lang="ja">/i);
   assert.match(html, /<title>成長投資計画シミュレーター（Ver. 大規模成長投資補助金 6次公募）<\/title>/i);
   assert.match(html, /成長投資計画シミュレーター（Ver. 大規模成長投資補助金 6次公募）/);
-  assert.match(html, /過去実績と目標値を入力し、補助事業＋その他事業＝全社 の将来PLをシミュレーションします。/);
+  assert.match(html, /過去実績と目標値を入力し、補助事業＋ベース事業＝全社 の将来PLをシミュレーションします。/);
   assert.doesNotMatch(html, /目標に近づける/);
   assert.match(html, /15指標・目標/);
   const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
@@ -206,8 +206,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /将来予測・調整水準が未設定です。/);
   assert.match(pageSource, /設定した目標に近づける/);
   assert.match(pageSource, /projectSalesGrowth: \{ initial: 0\.22, lower: 0\.15, upper: 0\.30 \}/);
-  assert.match(pageSource, /その他事業｜設備導入期間/);
-  assert.match(pageSource, /その他事業｜基準年後/);
+  assert.match(pageSource, /ベース事業｜設備導入期間/);
+  assert.match(pageSource, /ベース事業｜基準年後/);
   assert.match(pageSource, /applyOtherSynergyLift\("otherSalesGrowth", "otherSalesGrowthToBase", 0\.02\)/);
   assert.match(pageSource, /設備導入期間＋2\.0pt/);
   assert.match(pageSource, /補助事業とのシナジーを見込み/);
@@ -344,7 +344,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /type DriverRangeSuggestion =/);
   assert.match(pageSource, /projectSalesGrowthToBase: \{ label: "補助事業 売上成長率（設備導入期間）"/);
   assert.match(pageSource, /projectSalesGrowth: \{ label: "補助事業 売上成長率（基準年→事業化報告3年目）"/);
-  assert.match(pageSource, /otherSalesGrowthToBase: \{ label: "その他事業 売上成長率（最新決算期→基準年）"/);
+  assert.match(pageSource, /otherSalesGrowthToBase: \{ label: "ベース事業 売上成長率（最新決算期→基準年）"/);
   assert.match(pageSource, /const improvesTargetGap = \(probeValue: number\)/);
   assert.match(suggestionSource, /for \(const key of adjustableDriverKeys\)/);
   assert.doesNotMatch(suggestionSource, /projectPayGrowthToBase|otherPayGrowthToBase/);

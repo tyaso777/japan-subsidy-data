@@ -131,9 +131,9 @@ export function buildProjectPlRows(plan: YearPlan[], marketGrowth: number): Repo
 }
 
 export function buildDiagnosticGroups(plan: YearPlan[], balanceSheets: BalanceSheetPlan[], futureCapex: { year: number; value: number }[]): DiagnosticReportGroup[] {
-  const segments = (row: YearPlan) => [{ label: "全社", value: company(row) }, { label: "補助", value: row.project }, { label: "他", value: row.other }];
+  const segments = (row: YearPlan) => [{ label: "全社", value: company(row) }, { label: "補助", value: row.project }, { label: "ベース", value: row.other }];
   const segmentValues = (row: YearPlan, calculator: (segment: SegmentPlan) => number | undefined) => segments(row).map((entry) => ({ label: entry.label, value: calculator(entry.value) }));
-  const pairedValues = (row: YearPlan, calculator: (segment: SegmentPlan) => number | undefined) => [{ label: "補助", value: calculator(row.project) }, { label: "他", value: calculator(row.other) }];
+  const pairedValues = (row: YearPlan, calculator: (segment: SegmentPlan) => number | undefined) => [{ label: "補助", value: calculator(row.project) }, { label: "ベース", value: calculator(row.other) }];
   const previous = (index: number, key: "company" | "project" | "other") => !index ? undefined : key === "company" ? company(plan[index - 1]) : plan[index - 1][key];
   const capex = new Map<number, number>([...balanceSheets.map((row) => [row.year, row.capex] as [number, number]), ...futureCapex.map((row) => [row.year, row.value] as [number, number])]);
   const perEmployee = (amount: number, segment: SegmentPlan) => multiple(amount, segment.headcount);
@@ -173,11 +173,11 @@ export function buildDiagnosticGroups(plan: YearPlan[], balanceSheets: BalanceSh
       make("減価償却カバー率", "EBITDA ÷ 減価償却費", "償却負担に対する利益余力が十分か", "倍", (row) => segmentValues(row, (s) => multiple(ebitda(s), s.depreciation))),
       make("投資後売上増加倍率", "全社売上高の前年差 ÷ 当年設備投資額", "投資効果を過大に見積もっていないか", "倍", (row, index) => [{ label: "全社", value: index ? multiple(company(row).sales - company(plan[index - 1]).sales, capex.get(row.year) ?? 0) : undefined }]),
     ] },
-    { title: "5. 補助事業とその他事業の比較", rows: [
+    { title: "5. 補助事業とベース事業の比較", rows: [
       make("補助事業売上構成比", "補助事業売上高 ÷ 全社売上高", "全社が補助事業へ過度に依存していないか", "%", (row) => [{ label: "構成比", value: rate(row.project.sales, company(row).sales) }]),
-      make("事業別売上成長率", "当年売上高 ÷ 前年売上高－1", "片方の事業だけが不自然に急成長・縮小していないか", "%", (row, index) => [{ label: "補助", value: growth(row.project.sales, previous(index, "project")?.sales) }, { label: "他", value: growth(row.other.sales, previous(index, "other")?.sales) }]),
-      make("売上原価率差", "補助事業原価率－その他事業原価率", "補助事業の採算を過度に良く置いていないか", "pt", (row) => [{ label: "差", value: (rate(row.project.cogs, row.project.sales) ?? 0) - (rate(row.other.cogs, row.other.sales) ?? 0) }]),
-      make("営業利益率差", "補助事業営業利益率－その他事業営業利益率", "事業間の利益率差に合理的な根拠があるか", "pt", (row) => [{ label: "差", value: (opMargin(row.project) ?? 0) - (opMargin(row.other) ?? 0) }]),
+      make("事業別売上成長率", "当年売上高 ÷ 前年売上高－1", "片方の事業だけが不自然に急成長・縮小していないか", "%", (row, index) => [{ label: "補助", value: growth(row.project.sales, previous(index, "project")?.sales) }, { label: "ベース", value: growth(row.other.sales, previous(index, "other")?.sales) }]),
+      make("売上原価率差", "補助事業原価率－ベース事業原価率", "補助事業の採算を過度に良く置いていないか", "pt", (row) => [{ label: "差", value: (rate(row.project.cogs, row.project.sales) ?? 0) - (rate(row.other.cogs, row.other.sales) ?? 0) }]),
+      make("営業利益率差", "補助事業営業利益率－ベース事業営業利益率", "事業間の利益率差に合理的な根拠があるか", "pt", (row) => [{ label: "差", value: (opMargin(row.project) ?? 0) - (opMargin(row.other) ?? 0) }]),
       make("事業別1人当たり売上高", "事業別売上高 ÷ 事業別の常時使用する従業員数（就業時間換算）", "補助事業の生産性だけが突出していないか", "億円/人", (row) => pairedValues(row, (s) => perEmployee(s.sales, s))),
       make("事業別従業員1人当たり給与支給総額", "事業別従業員給与支給総額 ÷ 事業別の常時使用する従業員数（就業時間換算）", "補助事業と既存事業の待遇差が妥当か", "億円/人", (row) => pairedValues(row, payPerEmployee)),
       make("全社利益増加への補助事業寄与率", "補助事業営業利益の前年差 ÷ 全社営業利益の前年差", "全社利益改善を補助事業だけへ寄せていないか", "%", (row, index) => [{ label: "寄与率", value: index ? rate(operatingProfit(row.project) - operatingProfit(plan[index - 1].project), operatingProfit(company(row)) - operatingProfit(company(plan[index - 1]))) : undefined }]),

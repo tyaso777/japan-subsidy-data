@@ -102,7 +102,7 @@ const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 const roleLabels: Record<string, string> = { prePrevious: "前々期決算期", previous: "前期決算期", latest: "最新決算期", projectPeriod: "補助事業期間", beforeBase: "基準年前年／補助事業期間", base: "基準年（完了年度）", report1: "事業化報告1年目", report2: "事業化報告2年目", report3: "事業化報告3年目" };
 const driverNames: Partial<Record<keyof Drivers, string>> = {
-  projectMarketGrowth: "7-20 市場伸び率（年あたり）", projectSalesGrowthToBase: "補助事業 売上成長率（設備導入期間）", projectCogsImprovementToBase: "補助事業 原価率改善ポイント（設備導入期間）", projectPayGrowthToBase: "補助事業 1人当たり給与支給総額上昇率（設備導入期間）", projectHeadcountGrowthToBase: "補助事業 常時使用する従業員数の成長率（設備導入期間）", projectSgaImprovementToBase: "補助事業 その他販管費率改善ポイント（設備導入期間）", projectOfficerPayGrowthToBase: "役員1人当たり給与支給総額上昇率（設備導入期間）", otherSalesGrowthToBase: "その他事業 売上成長率（設備導入期間）", otherCogsImprovementToBase: "その他事業 原価率改善ポイント（設備導入期間）", otherPayGrowthToBase: "その他事業1人当たり給与支給総額の年平均上昇率（設備導入期間）", otherHeadcountGrowthToBase: "その他事業 常時使用する従業員数の成長率（設備導入期間）", otherSgaImprovementToBase: "その他事業 その他販管費率改善ポイント（設備導入期間）", projectSalesGrowth: "補助事業 売上成長率（基準年度後）", otherSalesGrowth: "その他事業 売上成長率（基準年度後）", projectCogsImprovementAfterBase: "補助事業 原価率改善ポイント（基準年度後）", otherCogsImprovement: "その他事業 原価率改善ポイント（基準年度後）", projectPayGrowth: "補助事業1人当たり給与支給総額の年平均上昇率", otherPayGrowth: "その他事業1人当たり給与支給総額の年平均上昇率（基準年度後）", projectHeadcountGrowth: "補助事業 常時使用する従業員数の成長率", otherHeadcountGrowth: "その他事業 常時使用する従業員数の成長率（基準年度後）", projectSgaRateEnd: "補助事業 その他販管費率（事業化報告3年目）", otherSgaRateEnd: "その他事業 その他販管費率（事業化報告3年目）", projectOfficerPayGrowth: "役員1人当たり給与支給総額の年平均上昇率", usefulLife: "新規投資の耐用年数", investment: "補助事業投資額", subsidy: "申請補助金額", localBenchmark: "ローカルベンチマーク",
+  projectMarketGrowth: "7-20 市場伸び率（年あたり）", projectSalesGrowthToBase: "補助事業 売上成長率（設備導入期間）", projectCogsImprovementToBase: "補助事業 原価率改善ポイント（設備導入期間）", projectPayGrowthToBase: "補助事業 1人当たり給与支給総額上昇率（設備導入期間）", projectHeadcountGrowthToBase: "補助事業 常時使用する従業員数の成長率（設備導入期間）", projectSgaImprovementToBase: "補助事業 その他販管費率改善ポイント（設備導入期間）", projectOfficerPayGrowthToBase: "役員1人当たり給与支給総額上昇率（設備導入期間）", otherSalesGrowthToBase: "ベース事業 売上成長率（設備導入期間）", otherCogsImprovementToBase: "ベース事業 原価率改善ポイント（設備導入期間）", otherPayGrowthToBase: "ベース事業1人当たり給与支給総額の年平均上昇率（設備導入期間）", otherHeadcountGrowthToBase: "ベース事業 常時使用する従業員数の成長率（設備導入期間）", otherSgaImprovementToBase: "ベース事業 その他販管費率改善ポイント（設備導入期間）", projectSalesGrowth: "補助事業 売上成長率（基準年度後）", otherSalesGrowth: "ベース事業 売上成長率（基準年度後）", projectCogsImprovementAfterBase: "補助事業 原価率改善ポイント（基準年度後）", otherCogsImprovement: "ベース事業 原価率改善ポイント（基準年度後）", projectPayGrowth: "補助事業1人当たり給与支給総額の年平均上昇率", otherPayGrowth: "ベース事業1人当たり給与支給総額の年平均上昇率（基準年度後）", projectHeadcountGrowth: "補助事業 常時使用する従業員数の成長率", otherHeadcountGrowth: "ベース事業 常時使用する従業員数の成長率（基準年度後）", projectSgaRateEnd: "補助事業 その他販管費率（事業化報告3年目）", otherSgaRateEnd: "ベース事業 その他販管費率（事業化報告3年目）", projectOfficerPayGrowth: "役員1人当たり給与支給総額の年平均上昇率", usefulLife: "新規投資の耐用年数", investment: "補助事業投資額", subsidy: "申請補助金額", localBenchmark: "ローカルベンチマーク",
 };
 
 const display = (value: number | undefined, unit: string) => value === undefined || !Number.isFinite(value) ? "—" : `${value.toLocaleString("ja-JP", { maximumFractionDigits: unit === "億円/人" ? 3 : 2, minimumFractionDigits: 0 })}${unit ? ` ${unit}` : ""}`;
@@ -172,7 +172,7 @@ const htmlDiagnosticCharts = (plan: YearPlan[]) => {
     htmlTrendChart("売上高", "全社と事業別の規模・成長ペース", "億円", plan, [
       { label: "全社", color: colors.company, values: company.map((segment) => segment.sales) },
       { label: "補助事業", color: colors.project, values: plan.map((row) => row.project.sales) },
-      { label: "その他事業", color: colors.other, values: plan.map((row) => row.other.sales) },
+      { label: "ベース事業", color: colors.other, values: plan.map((row) => row.other.sales) },
     ]),
     htmlTrendChart("収益性（全社）", "原価・その他販管費・営業利益の率", "%", plan, [
       { label: "売上原価率", color: colors.project, values: company.map((segment) => chartRate(segment.cogs, segment.sales)) },
@@ -186,7 +186,7 @@ const htmlDiagnosticCharts = (plan: YearPlan[]) => {
     htmlTrendChart("労働生産性", "付加価値額÷（従業員数＋役員数）", "億円/人", plan, [
       { label: "全社", color: colors.company, values: company.map(productivity) },
       { label: "補助事業", color: colors.project, values: plan.map((row) => productivity(row.project)) },
-      { label: "その他事業", color: colors.other, values: plan.map((row) => productivity(row.other)) },
+      { label: "ベース事業", color: colors.other, values: plan.map((row) => productivity(row.other)) },
     ]),
   ].join("");
   return `<section class="chart-section"><h2>主要指標の推移チャート</h2><p class="chart-intro">過去実績から将来予測へのつながり、基準年の段差、事業間の乖離を視覚的に確認します。</p><div class="chart-grid">${charts}</div><p class="chart-note"><span class="solid-sample"></span>実線：過去実績 <span class="dash-sample"></span>破線：将来予測</p></section>`;

@@ -952,7 +952,7 @@ export function validatePlan(plan: YearPlan[], drivers: Drivers): Validation[] {
   for (const row of plan) {
     for (const segmentKey of ["project", "other"] as SegmentKey[]) {
       const segment = row[segmentKey];
-      const name = segmentKey === "project" ? "補助事業" : "その他事業";
+      const name = segmentKey === "project" ? "補助事業" : "ベース事業";
       for (const field of fields) {
         if (!Number.isFinite(segment[field]) || segment[field] < 0) {
           results.push({ level: "error", title: `${name}に負数または未入力`, detail: `${String(field)}は0以上の数値にしてください。`, year: row.year });
@@ -968,7 +968,7 @@ export function validatePlan(plan: YearPlan[], drivers: Drivers): Validation[] {
       if (segment.officerPay > 0 && segment.officerCount <= 0) results.push({ level: "error", title: `${name}の役員給与と役員数が不整合`, detail: "役員給与がある場合は役員数を入力してください。", year: row.year });
     }
     const company = total(row.project, row.other);
-    if (Math.abs(company.sales - row.project.sales - row.other.sales) > 0.0001) results.push({ level: "error", title: "全社合算不一致", detail: "補助事業とその他事業の合計が全社値と一致しません。", year: row.year });
+    if (Math.abs(company.sales - row.project.sales - row.other.sales) > 0.0001) results.push({ level: "error", title: "全社合算不一致", detail: "補助事業とベース事業の合計が全社値と一致しません。", year: row.year });
   }
 
   for (let i = 1; i < plan.length; i += 1) {
@@ -981,7 +981,7 @@ export function validatePlan(plan: YearPlan[], drivers: Drivers): Validation[] {
       const payPerHeadBefore = previousSegment.employeePay / Math.max(previousSegment.headcount, 1);
       const payPerHeadAfter = currentSegment.employeePay / Math.max(currentSegment.headcount, 1);
       const payChange = payPerHeadBefore ? payPerHeadAfter / payPerHeadBefore - 1 : 0;
-      if (Math.abs(salesChange) > 0.4) results.push({ level: "warning", title: "売上の年度変動が大きい", detail: `${segmentKey === "project" ? "補助事業" : "その他事業"}売上が前年比${(salesChange * 100).toFixed(1)}%。立上げ月・顧客別数量で説明が必要です。`, year: current.year });
+      if (Math.abs(salesChange) > 0.4) results.push({ level: "warning", title: "売上の年度変動が大きい", detail: `${segmentKey === "project" ? "補助事業" : "ベース事業"}売上が前年比${(salesChange * 100).toFixed(1)}%。立上げ月・顧客別数量で説明が必要です。`, year: current.year });
       if (payChange < 0 || payChange > 0.1) results.push({ level: "warning", title: "従業員1人当たり給与支給総額の年度変動を要確認", detail: `前年比${(payChange * 100).toFixed(1)}%。賃金表・採用構成との整合を確認してください。`, year: current.year });
     }
   }
