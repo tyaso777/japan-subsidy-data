@@ -354,7 +354,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /historicalPlan\.slice\(1\)\.map\(\(row\) => <th key=\{row\.year\}>/);
   assert.match(globalStyles, /\.targets-table th:nth-child\(7\), \.targets-table td:nth-child\(7\) \{ width: 135px; min-width: 135px; max-width: 135px; white-space: normal;/);
   assert.match(globalStyles, /\.targets-table \{ width: max\(100%, 1240px\) !important; min-width: 1240px; table-layout: fixed; \}/);
-  assert.match(globalStyles, /\.targets-table th:nth-child\(10\), \.targets-table td:nth-child\(10\), \.target-judgement \{ width: 110px; min-width: 110px; max-width: 110px; \}/);
+  assert.match(globalStyles, /\.targets-table th:nth-child\(10\), \.targets-table td:nth-child\(10\), \.target-judgement \{ width: 110px; min-width: 110px; max-width: 110px; text-align: center; \}/);
+  assert.match(globalStyles, /\.target-adjustment-suggestion \{[^}]*text-align: left;/);
   assert.match(pageSource, /14・15の役員関連2指標は第6次の評価対象外/);
   assert.match(pageSource, /reference-metric-row/);
   assert.match(proposalSource, /参考値・第6次評価対象外/);
