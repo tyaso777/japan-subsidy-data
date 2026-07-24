@@ -75,6 +75,7 @@ import {
   type ApplicationCategory,
 } from "./application-rules";
 import { createOptimizationTargets, runPlanningOptimization } from "./proposal-optimization";
+import { niceChartScale } from "./chart-scale";
 
 type View = "summary" | "history" | "future" | "pl" | "targets" | "logic" | "io";
 
@@ -2505,11 +2506,10 @@ function TrendChart({ title, subtitle, unit, plan, series }: { title: string; su
   const latestIndex = Math.max(0, plan.findIndex((row) => row.role === "latest"));
   const baseIndex = plan.findIndex((row) => row.role === "base");
   const finiteValues = series.flatMap((item) => item.values).filter((value): value is number => value !== undefined && Number.isFinite(value));
-  const rawMin = finiteValues.length ? Math.min(...finiteValues) : 0;
-  const rawMax = finiteValues.length ? Math.max(...finiteValues) : 1;
-  const minValue = rawMin >= 0 ? 0 : rawMin - Math.max((rawMax - rawMin) * 0.12, 1);
-  const maxValue = rawMax <= 0 ? 0 : rawMax + Math.max((rawMax - rawMin) * 0.12, rawMax * 0.06, 1);
-  const span = Math.max(maxValue - minValue, 1);
+  const scale = niceChartScale(finiteValues);
+  const minValue = scale.min;
+  const maxValue = scale.max;
+  const span = maxValue > minValue ? maxValue - minValue : 1;
   const x = (index: number) => margin.left + (plan.length === 1 ? plotWidth / 2 : plotWidth * index / (plan.length - 1));
   const y = (value: number) => margin.top + plotHeight * (1 - (value - minValue) / span);
   const pathFor = (values: (number | undefined)[], start: number, end: number) => {
@@ -2521,15 +2521,15 @@ function TrendChart({ title, subtitle, unit, plan, series }: { title: string; su
       return `${command}${x(start + offset).toFixed(1)},${y(value).toFixed(1)}`;
     }).join(" ");
   };
-  const axisLabel = (value: number) => Math.abs(value) >= 100 ? number(value, 0) : number(value, 1);
+  const axisLabel = (value: number) => number(value, scale.decimals);
 
   return <article className="trend-chart-card">
     <div className="trend-chart-title"><div><h3>{title}</h3><p>{subtitle}</p></div><span>{unit}</span></div>
     <svg className="trend-chart-svg" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${title}の年度推移。実線は過去実績、破線は将来予測。`}>
       <rect className="trend-chart-future-area" x={x(latestIndex)} y={margin.top} width={Math.max(0, width - margin.right - x(latestIndex))} height={plotHeight} />
-      {[0, 0.5, 1].map((position) => {
-        const gridValue = maxValue - span * position;
-        return <g key={position}><line className="trend-chart-gridline" x1={margin.left} y1={margin.top + plotHeight * position} x2={width - margin.right} y2={margin.top + plotHeight * position} /><text className="trend-chart-axis-label" x={margin.left - 9} y={margin.top + plotHeight * position + 4} textAnchor="end">{axisLabel(gridValue)}</text></g>;
+      {[...scale.ticks].reverse().map((gridValue) => {
+        const gridY = y(gridValue);
+        return <g key={gridValue}><line className="trend-chart-gridline" x1={margin.left} y1={gridY} x2={width - margin.right} y2={gridY} /><text className="trend-chart-axis-label" x={margin.left - 9} y={gridY + 4} textAnchor="end">{axisLabel(gridValue)}</text></g>;
       })}
       {baseIndex >= 0 && <g><line className="trend-chart-base-line" x1={x(baseIndex)} y1={margin.top} x2={x(baseIndex)} y2={margin.top + plotHeight} /><text className="trend-chart-boundary-label" x={x(baseIndex)} y={margin.top + 12} textAnchor="middle">基準年</text></g>}
       <text className="trend-chart-boundary-label" x={x(latestIndex) + 7} y={margin.top + plotHeight - 8}>予測</text>

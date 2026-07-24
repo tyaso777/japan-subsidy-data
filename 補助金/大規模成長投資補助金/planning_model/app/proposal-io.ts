@@ -4,6 +4,7 @@ import { buildBalanceSheetRows, buildCompanyPlRows, buildDiagnosticGroups, build
 import { hasInputValue, inputKey, type InputValues } from "./input-values";
 import { type MetricGroupBasis, type MetricGroupKey } from "./metric-groups";
 import { applicationCategoryLabels, defaultApplicationCategory, driverRequirementLabel, metricRequirementLabel, type ApplicationCategory } from "./application-rules";
+import { niceChartScale } from "./chart-scale";
 
 export const PROPOSAL_FORMAT = "growth-investment-proposal/v1";
 
@@ -124,11 +125,10 @@ const htmlTrendChart = (title: string, subtitle: string, unit: string, plan: Yea
   const latestIndex = Math.max(0, plan.findIndex((row) => row.role === "latest"));
   const baseIndex = plan.findIndex((row) => row.role === "base");
   const finiteValues = series.flatMap((item) => item.values).filter((value): value is number => value !== undefined && Number.isFinite(value));
-  const rawMin = finiteValues.length ? Math.min(...finiteValues) : 0;
-  const rawMax = finiteValues.length ? Math.max(...finiteValues) : 1;
-  const minValue = rawMin >= 0 ? 0 : rawMin - Math.max((rawMax - rawMin) * 0.12, 1);
-  const maxValue = rawMax <= 0 ? 0 : rawMax + Math.max((rawMax - rawMin) * 0.12, rawMax * 0.06, 1);
-  const span = Math.max(maxValue - minValue, 1);
+  const scale = niceChartScale(finiteValues);
+  const minValue = scale.min;
+  const maxValue = scale.max;
+  const span = maxValue > minValue ? maxValue - minValue : 1;
   const x = (index: number) => margin.left + (plan.length === 1 ? plotWidth / 2 : plotWidth * index / (plan.length - 1));
   const y = (value: number) => margin.top + plotHeight * (1 - (value - minValue) / span);
   const pathFor = (values: (number | undefined)[], start: number, end: number) => {
@@ -143,10 +143,9 @@ const htmlTrendChart = (title: string, subtitle: string, unit: string, plan: Yea
       return `${command}${x(start + offset).toFixed(1)},${y(value).toFixed(1)}`;
     }).join(" ");
   };
-  const axisLabel = (value: number) => display(value, "").replaceAll(",", "");
-  const grids = [0, 0.5, 1].map((position) => {
-    const gridValue = maxValue - span * position;
-    const gridY = margin.top + plotHeight * position;
+  const axisLabel = (value: number) => value.toLocaleString("ja-JP", { minimumFractionDigits: scale.decimals, maximumFractionDigits: scale.decimals });
+  const grids = [...scale.ticks].reverse().map((gridValue) => {
+    const gridY = y(gridValue);
     return `<g><line class="chart-gridline" x1="${margin.left}" y1="${gridY}" x2="${width - margin.right}" y2="${gridY}"/><text class="chart-axis-label" x="${margin.left - 9}" y="${gridY + 4}" text-anchor="end">${htmlEscape(axisLabel(gridValue))}</text></g>`;
   }).join("");
   const lines = series.map((item) => `<g><path class="chart-line actual" d="${pathFor(item.values, 0, latestIndex)}" stroke="${item.color}"/><path class="chart-line forecast" d="${pathFor(item.values, latestIndex, plan.length - 1)}" stroke="${item.color}"/>${item.values.map((value, index) => value === undefined || !Number.isFinite(value) ? "" : `<circle class="chart-point ${index <= latestIndex ? "actual" : "forecast"}" cx="${x(index)}" cy="${y(value)}" r="3.3" stroke="${item.color}" fill="${index <= latestIndex ? item.color : "#fff"}"/>`).join("")}</g>`).join("");

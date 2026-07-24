@@ -184,6 +184,7 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(pageSource, /第6次定義：計画値/);
   assert.match(pageSource, /function DiagnosticCharts\(\{ plan \}/);
   assert.match(pageSource, /主要指標の推移チャート/);
+  assert.match(pageSource, /niceChartScale/);
   assert.match(pageSource, /人員・1人当たり給与/);
   assert.match(pageSource, /労働生産性/);
   assert.match(globalStyles, /\.diagnostic-chart-grid/);
