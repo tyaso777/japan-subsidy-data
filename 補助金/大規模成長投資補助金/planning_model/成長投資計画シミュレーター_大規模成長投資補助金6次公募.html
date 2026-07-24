@@ -64,6 +64,10 @@ body {
 
 button, input, select { font: inherit; }
 button { cursor: pointer; }
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
 
 main { width: min(calc(100% - 48px), 1920px); margin: 0 auto; padding: var(--space-6) 0 80px; }
 

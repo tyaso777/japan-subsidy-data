@@ -75,6 +75,7 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /--text-3xl: 32px;/);
   assert.match(globalStyles, /--surface-header: #f3f0e8;/);
   assert.match(globalStyles, /--border-control: #c9c4b8;/);
+  assert.match(globalStyles, /:focus-visible \{\s*outline: 2px solid var\(--green\);\s*outline-offset: 2px;\s*\}/);
   assert.match(globalStyles, /table \{[^}]*font-size: 13px;/);
   assert.match(globalStyles, /thead th \{[^}]*font-size: var\(--text-xs\);/);
   assert.match(globalStyles, /th, td \{ padding: 7px 10px;/);
