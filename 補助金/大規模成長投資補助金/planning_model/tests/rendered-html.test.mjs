@@ -71,8 +71,12 @@ test("renders the planning model shell", async () => {
   assert.ok(contrastRatio("#4f6258", "#e2ece6") >= 4.5);
   assert.ok(contrastRatio("#26372f", "#f3f6f3") >= 4.5);
   assert.ok(contrastRatio("#5b6661", "#eef4ef") >= 4.5);
+  assert.ok(contrastRatio("#5b6661", "#edf4ef") >= 4.5);
+  assert.ok(contrastRatio("#42584c", "#f8fbf9") >= 4.5);
   assert.match(globalStyles, /\.logic-flow > div \{[^}]*background: #eef4ef; color: var\(--ink\);/);
   assert.match(globalStyles, /\.formula-panel code \{[^}]*background: #f3f6f3; color: #26372f;/);
+  assert.match(globalStyles, /\.dark-card \{ background: #edf4ef; color: var\(--ink\); border-color: #c8d8ce; \}/);
+  assert.match(globalStyles, /\.score-ring \{[^}]*background: #f8fbf9;/);
   assert.match(globalStyles, /\.historical-metric \{[^}]*white-space: normal;[^}]*overflow-wrap: anywhere;/);
   assert.match(globalStyles, /\.targets-table th:nth-child\(3\)[^}]*width: 145px;/);
   const initialInputFunction = pageSource.match(/function createInitialInputValues\(\): InputValues \{[\s\S]*?\n\}/)?.[0] ?? "";

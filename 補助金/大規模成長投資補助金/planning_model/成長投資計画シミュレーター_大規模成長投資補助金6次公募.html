@@ -105,12 +105,12 @@ main { width: calc(100% - 48px); margin: 0 auto; padding: 34px 0 80px; }
 .page-grid { display: grid; gap: 18px; }
 .summary-grid { grid-template-columns: 1.4fr repeat(3, 1fr); align-items: stretch; }
 .hero-card, .stat-card, .panel { border-radius: 16px; border: 1px solid var(--line); box-shadow: 0 12px 30px rgba(30, 40, 35, .035); }
-.dark-card { background: var(--navy); color: white; border-color: var(--navy); }
+.dark-card { background: #edf4ef; color: var(--ink); border-color: #c8d8ce; }
 .hero-card { display: flex; align-items: center; justify-content: space-between; padding: 27px 28px; }
 .hero-card h2 { margin: 8px 0 5px; font-family: var(--display-serif); font-size: 26px; font-weight: 500; font-variant-numeric: lining-nums; }
-.hero-card p:not(.card-kicker) { color: #b9c4bd; font-size: 13px; margin: 0; }
-.score-ring { width: 88px; height: 88px; border-radius: 50%; display: grid; place-content: center; text-align: center; border: 8px solid #325743; outline: 1px solid #5d7c6a; }
-.score-ring strong { font-size: 25px; line-height: 1; }.score-ring span { color: #b5c7bd; font-size: 12px; }.score-ring small { display: block; color: #95a79e; font-size: 11px; margin-top: 2px; }
+.hero-card p:not(.card-kicker) { color: var(--muted-readable); font-size: 13px; margin: 0; }
+.score-ring { width: 88px; height: 88px; border-radius: 50%; display: grid; place-content: center; text-align: center; border: 8px solid #b8d0c0; outline: 1px solid #7fa08d; background: #f8fbf9; }
+.score-ring strong { color: var(--ink); font-size: 25px; line-height: 1; }.score-ring span { color: #42584c; font-size: 12px; }.score-ring small { display: block; color: var(--muted-readable); font-size: 11px; margin-top: 2px; }
 .stat-card { background: var(--panel); padding: 23px; display: flex; flex-direction: column; justify-content: center; }
 .stat-card span { color: var(--muted); font-size: 12px; }.stat-card strong { font-family: var(--display-serif); font-size: 25px; font-weight: 500; font-variant-numeric: lining-nums; margin: 10px 0 5px; }.stat-card small { color: var(--muted-readable); font-size: 13px; }
 .panel { background: var(--panel); padding: 24px; }
