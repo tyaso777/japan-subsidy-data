@@ -5,12 +5,23 @@ import { build } from "esbuild";
 
 const projectDirectory = process.cwd();
 const runtimePath = path.join(projectDirectory, ".sample-proposal-test-runtime.mjs");
+const excelMappingRuntimePath = path.join(projectDirectory, ".excel-mapping-test-runtime.mjs");
 
 try {
   await build({
     absWorkingDir: projectDirectory,
     entryPoints: [path.join(projectDirectory, "app", "sample-proposals.ts")],
     outfile: runtimePath,
+    bundle: true,
+    platform: "node",
+    format: "esm",
+    target: "node22",
+    packages: "external",
+  });
+  await build({
+    absWorkingDir: projectDirectory,
+    entryPoints: [path.join(projectDirectory, "app", "excel-mapping.ts")],
+    outfile: excelMappingRuntimePath,
     bundle: true,
     platform: "node",
     format: "esm",
@@ -26,5 +37,5 @@ try {
   });
   process.exitCode = result.status ?? 1;
 } finally {
-  await rm(runtimePath, { force: true });
+  await Promise.all([rm(runtimePath, { force: true }), rm(excelMappingRuntimePath, { force: true })]);
 }

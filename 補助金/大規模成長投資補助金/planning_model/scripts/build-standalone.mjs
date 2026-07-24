@@ -17,6 +17,7 @@ await Promise.all([
   copyFile(path.join(projectDirectory, "app", "application-rules.ts"), path.join(buildDirectory, "app", "application-rules.ts")),
   copyFile(path.join(projectDirectory, "app", "model.ts"), path.join(buildDirectory, "app", "model.ts")),
   copyFile(path.join(projectDirectory, "app", "input-values.ts"), path.join(buildDirectory, "app", "input-values.ts")),
+  copyFile(path.join(projectDirectory, "app", "excel-mapping.ts"), path.join(buildDirectory, "app", "excel-mapping.ts")),
   copyFile(path.join(projectDirectory, "app", "metric-groups.ts"), path.join(buildDirectory, "app", "metric-groups.ts")),
   copyFile(path.join(projectDirectory, "app", "proposal-io.ts"), path.join(buildDirectory, "app", "proposal-io.ts")),
   copyFile(path.join(projectDirectory, "app", "proposal-optimization.ts"), path.join(buildDirectory, "app", "proposal-optimization.ts")),

@@ -29,6 +29,7 @@ test("renders the planning model shell", async () => {
   const inputValueSource = await readFile(new URL("../app/input-values.ts", import.meta.url), "utf8");
   const metricGroupSource = await readFile(new URL("../app/metric-groups.ts", import.meta.url), "utf8");
   const proposalSource = await readFile(new URL("../app/proposal-io.ts", import.meta.url), "utf8");
+  const excelMappingSource = await readFile(new URL("../app/excel-mapping.ts", import.meta.url), "utf8");
   const reportDataSource = await readFile(new URL("../app/report-data.ts", import.meta.url), "utf8");
   const sampleProposalSource = await readFile(new URL("../app/sample-proposals.ts", import.meta.url), "utf8");
   const standardWorkflowSource = await readFile(new URL("../scripts/derive-standard-workflow.ts", import.meta.url), "utf8");
@@ -82,6 +83,16 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(pageSource, /<summary>サンプル/);
   assert.match(globalStyles, /\.data-io-grid \{ display: grid; grid-template-columns: 1fr;/);
   assert.match(globalStyles, /\.sample-library-grid \{ display: grid; grid-template-columns: repeat\(2,/);
+  assert.match(pageSource, /任意形式のExcelと入出力する/);
+  assert.match(pageSource, /取込内容を確認/);
+  assert.match(pageSource, /別Excelとして出力/);
+  assert.match(pageSource, /確認した値を反映/);
+  assert.match(pageSource, /定義書作成マニュアル/);
+  assert.match(excelMappingSource, /growth-investment-excel-mapping\/v1/);
+  assert.match(excelMappingSource, /空欄と0は区別/);
+  assert.match(excelMappingSource, /数式セルです。入力セルを指定してください/);
+  assert.match(standaloneBuildSource, /excel-mapping\.ts/);
+  assert.match(globalStyles, /\.excel-mapping-steps \{ display: grid; grid-template-columns: repeat\(3,/);
   assert.doesNotMatch(initialInputFunction, /driverRange/);
   assert.match(pageSource, /forecastSettingsStarted/);
   assert.match(pageSource, /forecastSettingsReady/);

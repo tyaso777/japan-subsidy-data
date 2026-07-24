@@ -46,6 +46,16 @@ import {
   YearPlan,
 } from "./model";
 import { buildProposalHtml, buildProposalXlsx, downloadBlob, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
+import {
+  buildMappedExcel,
+  EXCEL_MAPPING_EXAMPLE,
+  EXCEL_MAPPING_MANUAL,
+  parseExcelMappingDefinition,
+  previewExcelImport,
+  type ExcelMappingDefinition,
+  type ExcelMappingPreview,
+  type ExcelMappingTarget,
+} from "./excel-mapping";
 import { createBaseYearLaunchHistoricalOnlySampleProposal, createHistoricalOnlySampleProposal, createPartiallyUnmetSampleProposal, createStandardSampleProposal } from "./sample-proposals";
 import { getInputValue, hasInputValue, inputKey, setInputValue, type InputValues } from "./input-values";
 import { defaultMetricGroupBases, metricBasisRole, metricLinkGroups, type MetricGroupBasis, type MetricGroupKey } from "./metric-groups";
@@ -547,6 +557,7 @@ function useSpreadsheetGrid() {
       document.removeEventListener("keydown", onKeyDown);
     };
   }, []);
+
 }
 
 function usePageStickyTableHeaders() {
@@ -766,6 +777,53 @@ export default function Home() {
   const [historicalDefaultsApplied, setHistoricalDefaultsApplied] = useState(false);
   const [proposalTitle, setProposalTitle] = useState("成長投資計画 提案計画");
   const [fileNote, setFileNote] = useState("未保存。ここから出力したHTML・Excelは、同じ画面へ再取込できます。");
+  const [excelMapping, setExcelMapping] = useState<ExcelMappingDefinition | null>(null);
+  const [excelMappingFileName, setExcelMappingFileName] = useState("");
+  const [mappedExcelBytes, setMappedExcelBytes] = useState<Uint8Array | null>(null);
+  const [mappedExcelFileName, setMappedExcelFileName] = useState("");
+  const [excelMappingPreview, setExcelMappingPreview] = useState<ExcelMappingPreview[]>([]);
+  const [excelMappingPreviewMode, setExcelMappingPreviewMode] = useState<"import" | "export" | null>(null);
+  const [excelMappingNote, setExcelMappingNote] = useState("マッピング定義書と対象Excelを選択してください。");
+  const excelMappingTargets = useMemo(() => {
+    const targets = new Map<string, ExcelMappingTarget>();
+    const periodNames = ["prePrevious", "previous", "latest"] as const;
+    periodNames.forEach((period, index) => {
+      const history = historicalPlan[index];
+      if (!history) return;
+      const year = history.year;
+      balanceSheetInputRows.forEach((item) => {
+        const key = inputKey.balanceSheet(year, item.field);
+        targets.set(`balanceSheet.${period}.${item.code}`, {
+          id: `balanceSheet.${period}.${item.code}`,
+          label: `${YEAR_ROLE_LABELS[history.role]} B/S ${item.code} ${item.label}`,
+          unit: "億円",
+          writable: true,
+          value: hasInputValue(inputValues, key) ? inputValues[key] : null,
+        });
+      });
+      companyActualInputRows.filter((item) => item.set).forEach((item) => {
+        const key = inputKey.companyActual(year, item.code);
+        targets.set(`companyPL.${period}.${item.code}`, {
+          id: `companyPL.${period}.${item.code}`,
+          label: `${YEAR_ROLE_LABELS[history.role]} 全社PL ${item.code} ${item.label}`,
+          unit: item.unit === "%" ? "%" : item.unit === "人" ? "人" : "億円",
+          writable: true,
+          value: hasInputValue(inputValues, key) ? inputValues[key] : null,
+        });
+      });
+      projectOfficialInputRows.forEach((item) => {
+        const key = inputKey.projectActual(year, item.code);
+        targets.set(`projectPL.${period}.${item.code}`, {
+          id: `projectPL.${period}.${item.code}`,
+          label: `${YEAR_ROLE_LABELS[history.role]} 補助事業PL ${item.code} ${item.label}`,
+          unit: item.unit === "人" ? "人" : "億円",
+          writable: true,
+          value: hasInputValue(inputValues, key) ? inputValues[key] : null,
+        });
+      });
+    });
+    return targets;
+  }, [historicalPlan, inputValues]);
 
   useEffect(() => {
     const closeProposalMenus = (event: PointerEvent) => {
@@ -1071,6 +1129,128 @@ export default function Home() {
     } catch (error) {
       setFileNote(error instanceof Error ? error.message : "取込に失敗しました");
     }
+  }
+
+  async function loadExcelMappingDefinition(file: File | undefined) {
+    if (!file) return;
+    try {
+      const definition = parseExcelMappingDefinition(await file.text());
+      setExcelMapping(definition);
+      setExcelMappingFileName(file.name);
+      setExcelMappingPreview([]);
+      setExcelMappingPreviewMode(null);
+      setExcelMappingNote(`マッピング定義「${definition.name}」を読み込みました（${definition.bindings.length}件）。`);
+    } catch (error) {
+      setExcelMapping(null);
+      setExcelMappingFileName("");
+      setExcelMappingPreview([]);
+      setExcelMappingPreviewMode(null);
+      setExcelMappingNote(error instanceof Error ? error.message : "マッピング定義書を読み込めませんでした。");
+    }
+  }
+
+  async function loadMappedExcel(file: File | undefined) {
+    if (!file) return;
+    if (!/\.(xlsx|xlsm)$/i.test(file.name)) {
+      setMappedExcelBytes(null);
+      setMappedExcelFileName("");
+      setExcelMappingNote(".xlsx または .xlsm を指定してください。");
+      return;
+    }
+    setMappedExcelBytes(new Uint8Array(await file.arrayBuffer()));
+    setMappedExcelFileName(file.name);
+    setExcelMappingPreview([]);
+    setExcelMappingPreviewMode(null);
+    setExcelMappingNote(`対象Excel「${file.name}」を読み込みました。取込内容を確認してください。`);
+  }
+
+  function inspectMappedExcelImport() {
+    if (!excelMapping || !mappedExcelBytes) {
+      setExcelMappingNote("マッピング定義書と対象Excelの両方を選択してください。");
+      return;
+    }
+    try {
+      const preview = previewExcelImport(mappedExcelBytes, excelMapping, excelMappingTargets);
+      setExcelMappingPreview(preview);
+      setExcelMappingPreviewMode("import");
+      const ready = preview.filter((item) => item.status === "ready").length;
+      const errors = preview.filter((item) => item.status === "error").length;
+      setExcelMappingNote(`取込候補 ${ready}件、エラー ${errors}件です。内容を確認してから反映してください。`);
+    } catch (error) {
+      setExcelMappingPreview([]);
+      setExcelMappingPreviewMode(null);
+      setExcelMappingNote(error instanceof Error ? error.message : "Excelの確認に失敗しました。");
+    }
+  }
+
+  function applyMappedExcelImport() {
+    const ready = excelMappingPreview.filter((item) => item.status === "ready" && item.value !== null);
+    if (!ready.length) {
+      setExcelMappingNote("反映できる取込候補がありません。");
+      return;
+    }
+    const periodIndex: Record<string, number> = { prePrevious: 0, previous: 1, latest: 2 };
+    let applied = 0;
+    for (const preview of ready) {
+      const [dataset, period, code] = preview.target.split(".");
+      const yearIndex = periodIndex[period];
+      if (yearIndex === undefined || !code) continue;
+      if (dataset === "balanceSheet") {
+        const item = balanceSheetInputRows.find((candidate) => candidate.code === code);
+        if (item) {
+          updateBalanceSheet(yearIndex, item.field, preview.value);
+          applied += 1;
+        }
+      } else if (dataset === "companyPL") {
+        const item = companyActualInputRows.find((candidate) => candidate.code === code && candidate.set);
+        if (item) {
+          updateHistoricalCompanyOfficial(yearIndex, item, preview.value);
+          applied += 1;
+        }
+      } else if (dataset === "projectPL") {
+        const item = projectOfficialInputRows.find((candidate) => candidate.code === code);
+        if (item) {
+          updateHistoricalProjectOfficial(yearIndex, item, preview.value);
+          applied += 1;
+        }
+      }
+    }
+    setExcelMappingNote(`${applied}件を反映しました。0は明示的な0、空欄は未設定のまま保持しています。`);
+  }
+
+  function exportMappedExcel() {
+    if (!excelMapping || !mappedExcelBytes || !mappedExcelFileName) {
+      setExcelMappingNote("マッピング定義書と出力元Excelの両方を選択してください。");
+      return;
+    }
+    try {
+      const result = buildMappedExcel(mappedExcelBytes, excelMapping, excelMappingTargets);
+      setExcelMappingPreview(result.previews);
+      setExcelMappingPreviewMode("export");
+      if (!result.bytes) {
+        setExcelMappingNote("出力を停止しました。エラーのあるマッピングを修正してください。");
+        return;
+      }
+      const extension = mappedExcelFileName.toLowerCase().endsWith(".xlsm") ? "xlsm" : "xlsx";
+      const stem = mappedExcelFileName.replace(/\.(xlsx|xlsm)$/i, "");
+      const outputBytes = new Uint8Array(result.bytes);
+      downloadBlob(
+        outputBytes.buffer,
+        `${stem}_シミュレーター出力.${extension}`,
+        extension === "xlsm" ? "application/vnd.ms-excel.sheet.macroEnabled.12" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      );
+      setExcelMappingNote(`元ファイルを変更せず「${stem}_シミュレーター出力.${extension}」として保存しました。`);
+    } catch (error) {
+      setExcelMappingNote(error instanceof Error ? error.message : "Excel出力に失敗しました。");
+    }
+  }
+
+  function downloadExcelMappingExample() {
+    downloadBlob(JSON.stringify(EXCEL_MAPPING_EXAMPLE, null, 2), "Excelマッピング定義書_サンプル.json", "application/json;charset=utf-8");
+  }
+
+  function downloadExcelMappingManual() {
+    downloadBlob(EXCEL_MAPPING_MANUAL, "Excelマッピング定義書_作成マニュアル.md", "text/markdown;charset=utf-8");
   }
 
   function loadSampleProposal() {
@@ -1533,6 +1713,57 @@ export default function Home() {
             </article>
           </div>
           <p className="data-io-status" aria-live="polite">{fileNote}</p>
+          <article className="excel-mapping-panel" aria-label="マッピング定義によるExcel入出力">
+            <div className="data-io-panel-heading">
+              <p className="card-kicker">MAPPING-DRIVEN EXCEL I/O</p>
+              <h3>任意形式のExcelと入出力する</h3>
+              <small>マッピング定義書に記載したセルだけを読み書きします。出力は元Excelを上書きせず、書式・数式・非対象セルを保持した別ファイルです。</small>
+            </div>
+            <div className="excel-mapping-steps">
+              <section>
+                <span className="step-number">1</span>
+                <div><strong>マッピング定義書</strong><small>{excelMappingFileName || "JSONを選択"}</small></div>
+                <label className="proposal-import-button">定義書を選択<input type="file" accept=".json,application/json" onChange={(event) => { void loadExcelMappingDefinition(event.target.files?.[0]); event.target.value = ""; }} /></label>
+              </section>
+              <section>
+                <span className="step-number">2</span>
+                <div><strong>対象Excel</strong><small>{mappedExcelFileName || ".xlsx / .xlsmを選択"}</small></div>
+                <label className="proposal-import-button">Excelを選択<input type="file" accept=".xlsx,.xlsm" onChange={(event) => { void loadMappedExcel(event.target.files?.[0]); event.target.value = ""; }} /></label>
+              </section>
+              <section>
+                <span className="step-number">3</span>
+                <div><strong>確認して実行</strong><small>取込は差分確認後に反映</small></div>
+                <div className="excel-mapping-actions">
+                  <button type="button" onClick={inspectMappedExcelImport}>取込内容を確認</button>
+                  <button type="button" onClick={exportMappedExcel}>別Excelとして出力</button>
+                </div>
+              </section>
+            </div>
+            <div className="excel-mapping-resources">
+              <span>Copilotへ対象Excelと一緒に渡す資料</span>
+              <button type="button" onClick={downloadExcelMappingManual}>定義書作成マニュアル</button>
+              <button type="button" onClick={downloadExcelMappingExample}>JSONサンプル</button>
+            </div>
+            {excelMappingPreview.length > 0 && (
+              <div className="excel-mapping-preview">
+                <div className="excel-mapping-preview-heading">
+                  <strong>処理内容</strong>
+                  <span>対象 {excelMappingPreview.length}件／エラー {excelMappingPreview.filter((item) => item.status === "error").length}件</span>
+                  {excelMappingPreviewMode === "import" && <button
+                      type="button"
+                      disabled={!excelMappingPreview.some((item) => item.status === "ready") || excelMappingPreview.some((item) => item.status === "error")}
+                      onClick={applyMappedExcelImport}
+                    >
+                      確認した値を反映
+                    </button>}
+                </div>
+                <div className="wide-table"><table><thead><tr><th>シミュレーター項目</th><th>Excelセル</th><th>Excel値</th><th>反映値</th><th>状態</th></tr></thead><tbody>
+                  {excelMappingPreview.map((item) => <tr className={`mapping-${item.status}`} key={`${item.bindingId}-${item.target}`}><th>{item.targetLabel}<small>{item.target}</small></th><td>{item.sheet}!{item.cell}</td><td>{item.rawValue === null ? "空欄" : String(item.rawValue)}</td><td>{item.value === null ? "—" : number(item.value, 2)}</td><td><strong>{item.status === "ready" ? "反映可能" : item.status === "empty" ? "変更なし" : item.status === "warning" ? "要確認" : "エラー"}</strong><small>{item.message}</small></td></tr>)}
+                </tbody></table></div>
+              </div>
+            )}
+            <p className="excel-mapping-status" aria-live="polite">{excelMappingNote}</p>
+          </article>
         </section>
       )}
 
@@ -1781,32 +2012,39 @@ export default function Home() {
 
 type BalanceSheetField = Exclude<keyof BalanceSheetPlan, "year">;
 
+const balanceSheetInputRows: { code: string; label: string; field: BalanceSheetField }[] = [
+  { code: "1-1", label: "資産総額", field: "assets" },
+  { code: "1-2", label: "うち流動資産", field: "currentAssets" },
+  { code: "1-3", label: "うち現金及び預金", field: "cash" },
+  { code: "1-4", label: "うち固定資産", field: "fixedAssets" },
+  { code: "1-5", label: "うち有形固定資産", field: "tangibleAssets" },
+  { code: "1-6", label: "うち建物及び構築物", field: "buildings" },
+  { code: "1-7", label: "うち機械装置等", field: "machinery" },
+  { code: "1-8", label: "うち土地", field: "land" },
+  { code: "1-9", label: "うち無形固定資産", field: "intangibleAssets" },
+  { code: "1-10", label: "うちソフトウェア", field: "software" },
+  { code: "1-13", label: "負債総額", field: "liabilities" },
+  { code: "1-14", label: "うち流動負債", field: "currentLiabilities" },
+  { code: "1-15", label: "うち短期借入金", field: "shortTermDebt" },
+  { code: "1-16", label: "うち固定負債", field: "fixedLiabilities" },
+  { code: "1-17", label: "うち長期借入金", field: "longTermDebt" },
+  { code: "1-19", label: "純資産総額", field: "netAssets" },
+  { code: "1-20", label: "うち株主資本", field: "shareholderEquity" },
+  { code: "1-21", label: "うち資本金", field: "capital" },
+  { code: "1-24", label: "新規設備投資による支出", field: "capex" },
+];
+
 function BalanceSheetEditor({ balanceSheets, historical, inputValues, onChange }: { balanceSheets: BalanceSheetPlan[]; historical: YearPlan[]; inputValues: InputValues; onChange: (yearIndex: number, field: keyof BalanceSheetPlan, value: number | null) => void }) {
   const rows: { code: string; label: string; field?: BalanceSheetField; percent?: boolean; multiple?: boolean; value?: (row: BalanceSheetPlan, index: number) => number }[] = [
-    { code: "1-1", label: "資産総額", field: "assets" },
-    { code: "1-2", label: "うち流動資産", field: "currentAssets" },
-    { code: "1-3", label: "うち現金及び預金", field: "cash" },
-    { code: "1-4", label: "うち固定資産", field: "fixedAssets" },
-    { code: "1-5", label: "うち有形固定資産", field: "tangibleAssets" },
-    { code: "1-6", label: "うち建物及び構築物", field: "buildings" },
-    { code: "1-7", label: "うち機械装置等", field: "machinery" },
-    { code: "1-8", label: "うち土地", field: "land" },
-    { code: "1-9", label: "うち無形固定資産", field: "intangibleAssets" },
-    { code: "1-10", label: "うちソフトウェア", field: "software" },
+    ...balanceSheetInputRows.slice(0, 10),
     { code: "1-11", label: "その他資産（自動計算）", value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).otherAssets },
     { code: "1-12", label: "負債及び純資産合計（自動計算）", value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).liabilitiesAndNetAssets },
-    { code: "1-13", label: "負債総額", field: "liabilities" },
-    { code: "1-14", label: "うち流動負債", field: "currentLiabilities" },
-    { code: "1-15", label: "うち短期借入金", field: "shortTermDebt" },
-    { code: "1-16", label: "うち固定負債", field: "fixedLiabilities" },
-    { code: "1-17", label: "うち長期借入金", field: "longTermDebt" },
+    ...balanceSheetInputRows.slice(10, 15),
     { code: "1-18", label: "その他負債（自動計算）", value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).otherLiabilities },
-    { code: "1-19", label: "純資産総額", field: "netAssets" },
-    { code: "1-20", label: "うち株主資本", field: "shareholderEquity" },
-    { code: "1-21", label: "うち資本金", field: "capital" },
+    ...balanceSheetInputRows.slice(15, 18),
     { code: "1-22", label: "その他純資産（自動計算）", value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).otherNetAssets },
     { code: "1-23", label: "自己資本比率（自動計算）", percent: true, value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).equityRatio },
-    { code: "1-24", label: "新規設備投資による支出", field: "capex" },
+    balanceSheetInputRows[18],
     { code: "1-25", label: "EBITDA有利子負債倍率（自動計算）", multiple: true, value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).ebitdaDebtMultiple },
   ];
   return <div className="wide-table balance-sheet-table spreadsheet-grid actuals-three-year-table"><table><thead><tr><th>第6次様式項目（億円）</th>{balanceSheets.map((row, index) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[historical[index].role]}</small></th>)}</tr></thead><tbody>{rows.map((item) => <tr className={!item.field ? "emphasis" : ""} key={item.code}><th>{item.code} {item.label}{item.percent && <small>%</small>}{item.multiple && <small>倍</small>}</th>{balanceSheets.map((row, index) => <td key={row.year}>{item.field ? <input type="number" step="0.01" value={getInputValue(inputValues, inputKey.balanceSheet(row.year, item.field))} placeholder="未入力" onChange={(event) => onChange(index, item.field!, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{number(item.value!(row, index), 2)}</strong>}</td>)}</tr>)}</tbody></table></div>;

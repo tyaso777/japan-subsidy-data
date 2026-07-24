@@ -1,0 +1,52 @@
+{
+  "format": "growth-investment-excel-mapping/v1",
+  "name": "任意Excel・過去3期入力例",
+  "description": "シート名とセル番地を対象Excelに合わせて変更してください。",
+  "bindings": [
+    {
+      "id": "company-sales-pre-previous",
+      "target": "companyPL.prePrevious.2-1",
+      "excel": { "sheet": "損益計算書", "cell": "B5", "unit": "百万円" },
+      "direction": "both",
+      "required": true,
+      "transform": { "round": 2 }
+    },
+    {
+      "id": "company-sales-previous",
+      "target": "companyPL.previous.2-1",
+      "excel": { "sheet": "損益計算書", "cell": "C5", "unit": "百万円" },
+      "direction": "both",
+      "required": true,
+      "transform": { "round": 2 }
+    },
+    {
+      "id": "company-sales-latest",
+      "target": "companyPL.latest.2-1",
+      "excel": { "sheet": "損益計算書", "cell": "D5", "unit": "百万円" },
+      "direction": "both",
+      "required": true,
+      "transform": { "round": 2 }
+    },
+    {
+      "id": "bs-assets-pre-previous",
+      "target": "balanceSheet.prePrevious.1-1",
+      "excel": { "sheet": "貸借対照表", "cell": "B4", "unit": "百万円" },
+      "direction": "both",
+      "transform": { "round": 2 }
+    },
+    {
+      "id": "bs-assets-previous",
+      "target": "balanceSheet.previous.1-1",
+      "excel": { "sheet": "貸借対照表", "cell": "C4", "unit": "百万円" },
+      "direction": "both",
+      "transform": { "round": 2 }
+    },
+    {
+      "id": "bs-assets-latest",
+      "target": "balanceSheet.latest.1-1",
+      "excel": { "sheet": "貸借対照表", "cell": "D4", "unit": "百万円" },
+      "direction": "both",
+      "transform": { "round": 2 }
+    }
+  ]
+}
