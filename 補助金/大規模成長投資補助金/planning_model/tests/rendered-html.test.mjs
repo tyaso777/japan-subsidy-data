@@ -58,6 +58,12 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.diagnostic-panel > h3 \{ position: sticky; top: 46px; z-index: 18;/);
   assert.match(globalStyles, /\.wide-table, \.targets-table-wrap \{[^}]*overflow-x: auto; overflow-y: visible;/);
   assert.match(globalStyles, /\.balance-sheet-table \{[^}]*overflow-x: auto; overflow-y: visible;/);
+  assert.match(globalStyles, /\.balance-sheet-display-options \{ display: flex;/);
+  assert.match(pageSource, /useState\(false\).*omitSimulationUnusedBalanceSheet|omitSimulationUnusedBalanceSheet.*useState\(false\)/s);
+  assert.match(pageSource, /checked=\{omitSimulationUnusedBalanceSheet\}/);
+  assert.match(pageSource, /omitUnused \? rows\.filter\(\(item\) => item\.code === "1-24"\) : rows/);
+  assert.match(pageSource, /入力済みのB\/S値は保持されます/);
+  assert.match(pageSource, /チェックを外してB\/S全項目を入力してください/);
   assert.match(globalStyles, /\.table-panel:has\(> \.manual-sections\) > \.panel-heading \{ position: static;/);
   assert.match(globalStyles, /\.page-sticky-header-overlay \{ position: fixed; z-index: 17; overflow: hidden;/);
   assert.match(globalStyles, /\.page-sticky-header-overlay thead th:first-child \{ position: sticky; left: 0;/);

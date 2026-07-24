@@ -197,6 +197,10 @@ thead th:first-child { background: #f3f0e8; }.emphasis th, .emphasis td { font-w
 .balance-sheet-table th:first-child { width: 270px; min-width: 270px; max-width: 270px; position: sticky !important; left: 0 !important; z-index: 5; background: var(--panel); }
 .balance-sheet-table thead th:first-child { top: 0; z-index: 7; background: #f3f0e8; }
 .balance-sheet-table .emphasis th:first-child { background: #f7f5ee; }
+.balance-sheet-display-options { display: flex; align-items: center; gap: 14px; width: min(100%, 860px); margin: 12px auto 0; padding: 10px 12px; border: 1px solid #d8dfd9; border-radius: 9px; background: #f7faf7; }
+.balance-sheet-display-options label { display: inline-flex; align-items: center; gap: 8px; color: var(--green); font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+.balance-sheet-display-options input { width: 15px; height: 15px; margin: 0; accent-color: var(--green); }
+.balance-sheet-display-options small { color: var(--muted); font-size: 9px; line-height: 1.5; }
 .actuals-three-year-table { width: min(100%, 860px); max-width: 860px; margin: 15px auto 0; }
 .history-actuals-view { width: min(100%, 1040px); margin-inline: auto; }
 .actuals-three-year-table table { width: 100% !important; min-width: 730px !important; table-layout: fixed; }
@@ -204,6 +208,7 @@ thead th:first-child { background: #f3f0e8; }.emphasis th, .emphasis td { font-w
 .actuals-three-year-table th:first-child { width: 310px !important; min-width: 310px !important; max-width: 310px !important; }
 .actuals-three-year-table th:not(:first-child), .actuals-three-year-table td:not(:first-child) { width: 140px !important; min-width: 140px !important; }
 @media (min-width: 960px) { .actuals-three-year-table { overflow-x: hidden; overflow-y: visible; } }
+@media (max-width: 720px) { .balance-sheet-display-options { align-items: flex-start; flex-direction: column; gap: 5px; }.balance-sheet-display-options label { white-space: normal; } }
 .future-capex-table input { width: 88px; padding: 6px; text-align: right; }
 .content-stack, .panel, .manual-sections, .manual-sections > div { min-width: 0; }.manual-sections { display: grid; gap: 30px; }.manual-sections h3 { font-family: var(--display-serif); font-weight: 500; font-size: 20px; font-variant-numeric: lining-nums; }.manual-sections > div > h3 { position: sticky; top: 46px; z-index: 18; margin: 0; padding: 10px 4px; border-bottom: 1px solid rgba(215, 211, 200, .9); background: rgba(248, 246, 240, .97); backdrop-filter: blur(8px); }.manual-sections input { width: 88px; text-align: right; padding: 6px; }.wide-table th small { display: block; color: var(--muted); font-size: 8px; margin-top: 3px; }
 .diagnostic-panel > h3 { position: sticky; top: 46px; z-index: 18; margin: 0; padding: 10px 4px; border-bottom: 1px solid rgba(215, 211, 200, .9); background: rgba(255, 254, 250, .97); backdrop-filter: blur(8px); }
