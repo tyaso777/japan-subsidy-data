@@ -237,17 +237,20 @@ test("round-six company income inputs are preserved and forecast from the latest
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   historical.forEach((row, index) => {
     const company = model.total(row.project, row.other);
-    row.other.ordinaryIncome = model.operatingProfit(company) - company.sales * 0.01;
-    row.other.preTaxIncome = row.other.ordinaryIncome - company.sales * 0.005;
-    row.other.netIncome = row.other.preTaxIncome * 0.7;
+    const companyOrdinary = model.operatingProfit(company) - company.sales * 0.01;
+    const companyPreTax = companyOrdinary - company.sales * 0.005;
+    const companyNet = companyPreTax * 0.7;
+    row.other.ordinaryIncome = companyOrdinary - model.ordinaryIncome(row.project);
+    row.other.preTaxIncome = companyPreTax - model.preTaxIncome(row.project);
+    row.other.netIncome = companyNet - model.netIncome(row.project);
     row.other.headcount = 100 + index * 5 - row.project.headcount;
     row.other.officerCount = 4 - row.project.officerCount;
   });
   const plan = model.generatePlan(historical, model.sampleDrivers, model.DEFAULT_TIMELINE);
   const latest = model.total(plan[2].project, plan[2].other);
-  assert.equal(model.ordinaryIncome(latest), historical[2].other.ordinaryIncome);
-  assert.equal(model.preTaxIncome(latest), historical[2].other.preTaxIncome);
-  assert.equal(model.netIncome(latest), historical[2].other.netIncome);
+  assert.equal(model.ordinaryIncome(latest), model.ordinaryIncome(historical[2].project) + historical[2].other.ordinaryIncome);
+  assert.equal(model.preTaxIncome(latest), model.preTaxIncome(historical[2].project) + historical[2].other.preTaxIncome);
+  assert.equal(model.netIncome(latest), model.netIncome(historical[2].project) + historical[2].other.netIncome);
   assert.equal(latest.headcount, 110);
   assert.equal(latest.officerCount, 4);
 

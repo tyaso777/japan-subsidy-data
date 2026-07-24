@@ -213,9 +213,9 @@ const commonProposal = (title: string, exportedAt: string, historicalPlan: YearP
       project: { ...row.project },
       other: {
         ...row.other,
-        ordinaryIncome: row.other.ordinaryIncome ?? forecastOrdinary - (row.project.ordinaryIncome ?? 0),
-        preTaxIncome: row.other.preTaxIncome ?? forecastPreTax - (row.project.preTaxIncome ?? 0),
-        netIncome: row.other.netIncome ?? forecastNet - (row.project.netIncome ?? 0),
+        ordinaryIncome: row.other.ordinaryIncome ?? forecastOrdinary - ordinaryIncome(row.project),
+        preTaxIncome: row.other.preTaxIncome ?? forecastPreTax - preTaxIncome(row.project),
+        netIncome: row.other.netIncome ?? forecastNet - netIncome(row.project),
       },
     };
   });

@@ -357,6 +357,10 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /code: "2-20", label: "当期純利益"[\s\S]*?netIncome/);
   assert.match(pageSource, /code: "2-27"[\s\S]*?set: \(row, value\)/);
   assert.match(pageSource, /code: "2-28"[\s\S]*?set: \(row, value\)/);
+  assert.match(pageSource, /const otherPlInputFields[\s\S]*?label: "従業員給与"[\s\S]*?label: "従業員賞与"/);
+  assert.match(pageSource, /const otherPlInputFields[\s\S]*?label: "経常利益"[\s\S]*?label: "当期純利益"/);
+  assert.match(pageSource, /otherPlInputFields\.map/);
+  assert.match(pageSource, /補助事業の経常利益以下は営業利益を基準/);
   assert.doesNotMatch(pageSource, /2-19・2-20はモデル未対応|2-18は営業利益と同額/);
   assert.doesNotMatch(reportDataSource, /税引前当期純利益（モデル未対応）|当期純利益（モデル未対応）/);
   assert.match(globalStyles, /\.driver-validation-error/);

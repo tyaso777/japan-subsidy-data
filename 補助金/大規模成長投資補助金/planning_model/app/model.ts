@@ -381,9 +381,9 @@ export const officerBonus = (segment: SegmentPlan) => segment.officerBonus ?? 0;
 export const cogsDepreciation = (segment: SegmentPlan) => segment.cogsDepreciation ?? 0;
 export const sgaDepreciation = (segment: SegmentPlan) => segment.sgaDepreciation ?? segment.depreciation;
 export const researchDevelopment = (segment: SegmentPlan) => segment.researchDevelopment ?? 0;
-export const ordinaryIncome = (segment: SegmentPlan) => segment.ordinaryIncome;
-export const preTaxIncome = (segment: SegmentPlan) => segment.preTaxIncome;
-export const netIncome = (segment: SegmentPlan) => segment.netIncome;
+export const ordinaryIncome = (segment: SegmentPlan) => segment.ordinaryIncome ?? operatingProfit(segment);
+export const preTaxIncome = (segment: SegmentPlan) => segment.preTaxIncome ?? ordinaryIncome(segment);
+export const netIncome = (segment: SegmentPlan) => segment.netIncome ?? preTaxIncome(segment) * 0.7;
 
 export function operatingProfit(segment: SegmentPlan) {
   return segment.sales - segment.cogs - segment.employeePay - segment.officerPay
@@ -395,8 +395,6 @@ export function valueAdded(segment: SegmentPlan) {
 }
 
 export function total(a: SegmentPlan, b: SegmentPlan): SegmentPlan {
-  const sumOptional = (field: "ordinaryIncome" | "preTaxIncome" | "netIncome") =>
-    a[field] === undefined && b[field] === undefined ? undefined : (a[field] ?? 0) + (b[field] ?? 0);
   return {
     sales: a.sales + b.sales,
     cogs: a.cogs + b.cogs,
@@ -413,9 +411,9 @@ export function total(a: SegmentPlan, b: SegmentPlan): SegmentPlan {
     cogsDepreciation: cogsDepreciation(a) + cogsDepreciation(b),
     sgaDepreciation: sgaDepreciation(a) + sgaDepreciation(b),
     researchDevelopment: researchDevelopment(a) + researchDevelopment(b),
-    ordinaryIncome: sumOptional("ordinaryIncome"),
-    preTaxIncome: sumOptional("preTaxIncome"),
-    netIncome: sumOptional("netIncome"),
+    ordinaryIncome: ordinaryIncome(a) + ordinaryIncome(b),
+    preTaxIncome: preTaxIncome(a) + preTaxIncome(b),
+    netIncome: netIncome(a) + netIncome(b),
   };
 }
 
@@ -713,21 +711,21 @@ export function generatePlan(
 
   const latestCompany = total(latest.project, latest.other);
   const latestOperatingProfit = operatingProfit(latestCompany);
-  const latestOrdinaryIncome = ordinaryIncome(latestCompany) ?? latestOperatingProfit;
-  const latestPreTaxIncome = preTaxIncome(latestCompany) ?? latestOrdinaryIncome;
+  const latestOrdinaryIncome = ordinaryIncome(latestCompany);
+  const latestPreTaxIncome = preTaxIncome(latestCompany);
   const nonOperatingRate = latestCompany.sales ? (latestOrdinaryIncome - latestOperatingProfit) / latestCompany.sales : 0;
   const specialProfitRate = latestCompany.sales ? (latestPreTaxIncome - latestOrdinaryIncome) / latestCompany.sales : 0;
   const afterTaxRatio = latestPreTaxIncome
-    ? (netIncome(latestCompany) ?? latestPreTaxIncome * 0.7) / latestPreTaxIncome
+    ? netIncome(latestCompany) / latestPreTaxIncome
     : 0.7;
   plan.slice(actuals.length).forEach((row) => {
     const company = total(row.project, row.other);
     const forecastOrdinaryIncome = round(operatingProfit(company) + company.sales * nonOperatingRate);
     const forecastPreTaxIncome = round(forecastOrdinaryIncome + company.sales * specialProfitRate);
     const forecastNetIncome = round(forecastPreTaxIncome * afterTaxRatio);
-    row.other.ordinaryIncome = round(forecastOrdinaryIncome - (row.project.ordinaryIncome ?? 0));
-    row.other.preTaxIncome = round(forecastPreTaxIncome - (row.project.preTaxIncome ?? 0));
-    row.other.netIncome = round(forecastNetIncome - (row.project.netIncome ?? 0));
+    row.other.ordinaryIncome = round(forecastOrdinaryIncome - ordinaryIncome(row.project));
+    row.other.preTaxIncome = round(forecastPreTaxIncome - preTaxIncome(row.project));
+    row.other.netIncome = round(forecastNetIncome - netIncome(row.project));
   });
   return plan;
 }
