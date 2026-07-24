@@ -127,13 +127,20 @@ const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string;
   localBenchmark: { label: "ローカルベンチマーク", unit: "点", step: 1 },
 };
 
-const driverTableLabel = (label: string) => label
-  .replace(/（設備導入期間・モデル内管理）$/, "（モデル内管理）")
-  .replace(/（設備導入期間）$/, "")
-  .replace(/（最新決算期→基準年・モデル内管理）$/, "（モデル内管理）")
-  .replace(/（最新決算期→基準年）$/, "")
-  .replace(/（基準年→事業化報告3年目・モデル内管理）$/, "（モデル内管理）")
-  .replace(/（基準年→事業化報告3年目）$/, "");
+const driverTablePresentation = (key: keyof Drivers, label: string) => {
+  const modelManaged = label.includes("モデル内管理");
+  const terminalRate = key === "projectSgaRateEnd" || key === "otherSgaRateEnd";
+  const shortLabel = label
+    .replace(/（設備導入期間(?:・モデル内管理)?）/g, "")
+    .replace(/（最新決算期→基準年(?:・モデル内管理)?）/g, "")
+    .replace(/（基準年→事業化報告3年目(?:・モデル内管理)?）/g, "")
+    .replace(/（事業化報告3年目到達値）/g, "")
+    .trim();
+  return {
+    label: `${shortLabel}${modelManaged ? "（モデル内管理）" : ""}`,
+    note: terminalRate ? "事業化報告3年目到達値" : undefined,
+  };
+};
 
 const standaloneMetricLabel = (definition: (typeof metrics)[number]) => {
   const formula = definition.round6Formula;
@@ -2092,6 +2099,7 @@ export default function Home() {
                 <tr className="driver-group-heading" key={`group-${group.label}`}><th><strong>{group.label}</strong><small>{group.detail}</small></th><td aria-hidden="true" colSpan={historicalPlan.length + 4}></td></tr>,
                 ...group.keys.map((key) => {
                 const info = driverLabels[key]!;
+                const tablePresentation = driverTablePresentation(key, info.label);
                 const movable = !["projectMarketGrowth", "usefulLife", "investment", "subsidy", "localBenchmark"].includes(key);
                 const noRange = key === "investment" || key === "subsidy" || key === "usefulLife" || key === "projectMarketGrowth";
                 const constraintError = driverConstraintFailure(key, applicationCategory, drivers);
@@ -2107,7 +2115,7 @@ export default function Home() {
                 const rangeOrdered = driverRanges[key][0] <= driverRanges[key][1];
                 const rangeValid = noRange || (rangeOrdered && drivers[key] >= driverRanges[key][0] && drivers[key] <= driverRanges[key][1]);
                 const rangeStatus = noRange ? "入力値を固定" : !rangeOrdered ? "下限＞上限" : movable ? rangeValid ? "範囲内で調整" : "初期値が範囲外" : rangeValid ? "入力値を固定" : "固定値が範囲外";
-                return <tr className={`${movable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={key}><th><span className="driver-item-code">{driverItemCodes[key]}:</span> {driverTableLabel(info.label)}<small>{info.unit}／{history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>{history.values.slice(1).map((value, referenceIndex) => {
+                return <tr className={`${movable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={key}><th><span className="driver-item-code">{driverItemCodes[key]}:</span> {tablePresentation.label}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{info.unit}／{history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>{history.values.slice(1).map((value, referenceIndex) => {
                   const index = referenceIndex + 1;
                   const referenceLevel = history.referenceLevels?.[index];
                   if (referenceLevel !== undefined && Number.isFinite(referenceLevel)) {
