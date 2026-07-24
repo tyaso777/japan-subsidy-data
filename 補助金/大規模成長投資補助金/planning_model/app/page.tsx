@@ -2803,6 +2803,55 @@ type DiagnosticRow = {
   values: (row: YearPlan, index: number) => DiagnosticValue[];
 };
 
+const diagnosticSeriesColor = (label: string) => {
+  if (label === "補助") return "var(--chart-project)";
+  if (label === "他") return "var(--chart-other)";
+  return "var(--chart-company)";
+};
+
+function diagnosticChartSeries(plan: YearPlan[], row: DiagnosticRow): ChartSeries[] {
+  const labels = Array.from(new Set(plan.flatMap((year, index) => row.values(year, index).map((entry) => entry.label))));
+  return labels.map((label) => ({
+    label,
+    color: diagnosticSeriesColor(label),
+    values: plan.map((year, index) => row.values(year, index).find((entry) => entry.label === label)?.value),
+  }));
+}
+
+function DiagnosticSparkline({ plan, row, selected, onSelect }: { plan: YearPlan[]; row: DiagnosticRow; selected: boolean; onSelect: () => void }) {
+  const width = 116;
+  const height = 44;
+  const padding = 4;
+  const series = diagnosticChartSeries(plan, row);
+  const values = series.flatMap((item) => item.values).filter((value): value is number => value !== undefined && Number.isFinite(value));
+  const minimum = values.length ? Math.min(...values) : 0;
+  const maximum = values.length ? Math.max(...values) : 1;
+  const spread = Math.max(maximum - minimum, Math.max(Math.abs(maximum), 1) * 0.08);
+  const lower = minimum - spread * 0.12;
+  const upper = maximum + spread * 0.12;
+  const x = (index: number) => padding + (plan.length <= 1 ? (width - padding * 2) / 2 : (width - padding * 2) * index / (plan.length - 1));
+  const y = (value: number) => padding + (height - padding * 2) * (1 - (value - lower) / (upper - lower || 1));
+  const path = (item: ChartSeries) => {
+    let open = false;
+    return item.values.map((value, index) => {
+      if (value === undefined || !Number.isFinite(value)) {
+        open = false;
+        return "";
+      }
+      const command = open ? "L" : "M";
+      open = true;
+      return `${command}${x(index).toFixed(1)},${y(value).toFixed(1)}`;
+    }).join(" ");
+  };
+
+  return <button type="button" className="diagnostic-sparkline-button" aria-pressed={selected} aria-label={`${row.name}の詳細チャートを表示`} onClick={onSelect}>
+    <svg className="diagnostic-sparkline" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${row.name}の年度推移`}>
+      <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} />
+      {series.map((item) => <path key={item.label} d={path(item)} stroke={item.color} />)}
+    </svg>
+  </button>;
+}
+
 function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: YearPlan[]; balanceSheets: BalanceSheetPlan[]; futureCapex: { year: number; value: number }[] }) {
   const company = (row: YearPlan) => total(row.project, row.other);
   const segments = (row: YearPlan) => [
@@ -2895,10 +2944,18 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
     const digits = unit === "億円/人" ? 3 : unit === "倍" ? 2 : 1;
     return `${number(value, digits)}${unit === "億円/人" ? "" : unit}`;
   };
+  const allRows = groups.flatMap((group) => group.rows.map((row) => ({ key: `${group.title}:${row.name}`, row })));
+  const [selectedKey, setSelectedKey] = useState(allRows[0]?.key ?? "");
+  const selected = allRows.find((entry) => entry.key === selectedKey) ?? allRows[0];
 
   return <section className="financial-diagnostics" aria-label="PL妥当性診断">
-    <div className="diagnostic-heading"><div><h2>基本指標によるシミュレーション妥当性チェック</h2></div><p>各年度セルは、全社・補助事業・その他事業の順に表示します。</p></div>
-    {groups.map((group) => <article className="panel table-panel diagnostic-panel" key={group.title}><h3>{group.title}</h3><div className="wide-table diagnostic-table"><table><thead><tr><th>指標名</th><th>計算式</th><th>主な確認点</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{group.rows.map((item) => <tr key={item.name}><th>{item.name}<small>{item.unit}</small></th><td className="diagnostic-copy">{item.formula}</td><td className="diagnostic-copy">{item.check}</td>{plan.map((row, index) => <td key={row.year}><div className="diagnostic-values">{item.values(row, index).map((entry) => <span key={entry.label}><small>{entry.label}</small><strong>{formatted(entry.value, item.unit)}</strong></span>)}</div></td>)}</tr>)}</tbody></table></div></article>)}
+    <div className="diagnostic-heading"><div><h2>基本指標によるシミュレーション妥当性チェック</h2></div><p>「推移」の小さなチャートを選ぶと、詳細チャートが切り替わります。年度別数値は全社・補助事業・その他事業の順です。</p></div>
+    {selected && <div className="diagnostic-selected-chart"><TrendChart title={selected.row.name} subtitle={`${selected.row.formula}｜${selected.row.check}`} unit={selected.row.unit} plan={plan} zeroBaseline series={diagnosticChartSeries(plan, selected.row)} /></div>}
+    {groups.map((group) => <article className="panel table-panel diagnostic-panel" key={group.title}><h3>{group.title}</h3><div className="wide-table diagnostic-table"><table><thead><tr><th>指標名</th><th>計算式</th><th>主な確認点</th><th className="diagnostic-sparkline-column">推移</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{group.rows.map((item) => {
+      const itemKey = `${group.title}:${item.name}`;
+      const isSelected = itemKey === selected?.key;
+      return <tr className={isSelected ? "diagnostic-selected-row" : undefined} key={item.name}><th>{item.name}<small>{item.unit}</small></th><td className="diagnostic-copy">{item.formula}</td><td className="diagnostic-copy">{item.check}</td><td className="diagnostic-sparkline-cell"><DiagnosticSparkline plan={plan} row={item} selected={isSelected} onSelect={() => setSelectedKey(itemKey)} /></td>{plan.map((row, index) => <td key={row.year}><div className="diagnostic-values">{item.values(row, index).map((entry) => <span key={entry.label}><small>{entry.label}</small><strong>{formatted(entry.value, item.unit)}</strong></span>)}</div></td>)}</tr>;
+    })}</tbody></table></div></article>)}
   </section>;
 }
 

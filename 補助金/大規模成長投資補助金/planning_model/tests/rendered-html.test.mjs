@@ -126,6 +126,11 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.table-panel > \.panel-heading \{ position: sticky; top: 46px; z-index: 18;/);
   assert.match(globalStyles, /\.manual-sections > div > h3 \{ position: sticky; top: 46px; z-index: 18;/);
   assert.match(globalStyles, /\.diagnostic-panel > h3 \{ position: sticky; top: 46px; z-index: 18;/);
+  assert.match(pageSource, /function DiagnosticSparkline\(/);
+  assert.match(pageSource, /<th className="diagnostic-sparkline-column">推移<\/th>/);
+  assert.match(pageSource, /setSelectedKey\(itemKey\)/);
+  assert.match(pageSource, /<TrendChart title=\{selected\.row\.name\}/);
+  assert.match(globalStyles, /\.diagnostic-sparkline-button\[aria-pressed="true"\]/);
   assert.match(globalStyles, /\.wide-table, \.targets-table-wrap \{[^}]*overflow-x: auto; overflow-y: visible;/);
   assert.match(globalStyles, /\.balance-sheet-table \{[^}]*overflow-x: auto; overflow-y: visible;/);
   assert.match(globalStyles, /\.balance-sheet-display-options \{ display: flex;/);
