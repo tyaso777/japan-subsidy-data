@@ -252,18 +252,9 @@ const fixedForecastDriverKeys = new Set<keyof Drivers>([
   "otherOfficerPayGrowth", "projectMarketGrowth",
 ]);
 
-const alphabeticCode = (index: number) => {
-  let value = index + 1;
-  let result = "";
-  while (value > 0) {
-    value -= 1;
-    result = String.fromCharCode(65 + value % 26) + result;
-    value = Math.floor(value / 26);
-  }
-  return result;
-};
+const conditionCode = (index: number) => `C-${index + 1}`;
 const driverItemCodes = Object.fromEntries(
-  forecastDriverKeys.map((key, index) => [key, alphabeticCode(index)]),
+  forecastDriverKeys.map((key, index) => [key, conditionCode(index)]),
 ) as Partial<Record<keyof Drivers, string>>;
 
 const equipmentPeriodStatisticalKeys = new Set<keyof Drivers>([
@@ -2404,7 +2395,7 @@ export default function Home() {
           <article className="panel">
             <div className="panel-heading"><div><h2>将来予測・調整水準</h2><span className={`pill ${forecastSettingsReady ? "green" : ""}`}>{forecastSettingsReady ? "設定済み" : "未設定"}</span></div><button className="default-button" onClick={confirmAndApplyHistoricalDefaults}>{forecastSettingsStarted ? "過去3期から再設定" : "過去3期からデフォルト設定"}</button></div>
             {missingAccountingAssumptions.length > 0 && <p className="default-note" role="alert">会計内訳・利益前提が未設定です。補助事業・ベース事業の各6項目と共通の実効税率を設定するまで、③将来データ入力では自動予測を表示しません。</p>}
-            <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th>調整項目<small>A～Z</small></th>{historicalPlan.slice(1).map((row) => <th className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>計画初期値</th><th>制度上の必須条件<small>編集不可</small></th><th>許容下限</th><th>許容上限</th><th>最適化での扱い</th></tr></thead><tbody>
+            <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th>調整条件<small>C-1～（Condition）</small></th>{historicalPlan.slice(1).map((row) => <th className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>計画初期値</th><th>制度上の必須条件<small>編集不可</small></th><th>許容下限</th><th>許容上限</th><th>最適化での扱い</th></tr></thead><tbody>
               {driverGroups.flatMap((group) => [
                 <tr className="driver-group-heading" key={`group-${group.label}`}><th><strong>{group.label}</strong><small>{group.detail}</small></th><td aria-hidden="true" colSpan={historicalPlan.length + 4}></td></tr>,
                 ...group.keys.map((key) => {

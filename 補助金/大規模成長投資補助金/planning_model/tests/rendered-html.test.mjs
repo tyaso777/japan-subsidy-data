@@ -338,8 +338,9 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /未達成項目と修正案/);
   assert.match(globalStyles, /\.target-action-bar\.target-action-warning/);
   assert.match(pageSource, /disabled=\{isSolving\} aria-busy=\{isSolving\}/);
+  assert.match(pageSource, /const conditionCode = \(index: number\) => `C-\$\{index \+ 1\}`/);
   assert.match(pageSource, /const driverItemCodes = Object\.fromEntries/);
-  assert.match(pageSource, /<th>調整項目<small>A～Z<\/small><\/th>/);
+  assert.match(pageSource, /<th>調整条件<small>C-1～（Condition）<\/small><\/th>/);
   assert.match(pageSource, /className="driver-item-code">\{driverItemCodes\[key\]\}:/);
   assert.match(globalStyles, /\.driver-item-code/);
   assert.match(pageSource, /const round5Benchmarks/);
