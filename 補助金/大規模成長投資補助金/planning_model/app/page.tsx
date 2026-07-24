@@ -2003,12 +2003,15 @@ export default function Home() {
             </tbody></table></div>
             <p className="footnote round5-source-note">第5次公式参考値は、申請者全体と採択者の公表代表値です。原則は中央値ですが、「補助事業売上高／全社売上高」のみ平均値です。役員関連2指標は第5次に公表値がありません。<a href="https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公式資料 ↗</a></p>
             <p className="footnote">目標値を入力した指標はすべて最適化対象となり、未入力の指標は診断表示だけに使います。上振れの現実性は「将来予測・調整水準」の許容下限・上限で管理するため、指標側の計画上限と扱い区分は設けません。「自動算出」の指標はPLから計算して確認する項目で、保存済みの目標値は切替時のため保持しますが現在の最適化には使いません。「両方に目標設定」では2指標を同時に評価し、調整水準を許容範囲内で最適化します。過去の成長率・増加額は各1年間、計画の増加額は基準年から事業化報告3年目までの{targetComparisonYears}年間です。金額指標の「単純換算」は過去1年間の増加額が同額で続く場合の比較用参考値であり、複利予測ではありません。14・15の役員関連2指標は第6次の評価対象外であり、計算結果の参考表示に限定します。ローカルベンチマークは外部で算出した点数の固定入力であり、目標判定・最適化・PL計算の対象外です。</p>
-            <div className="target-action-bar">
+            <div className={`target-action-bar ${adjustedPlan && hardSummary.failed.length > 0 ? "target-action-warning" : ""}`}>
               <div>
                 <strong>15指標の設定後に実行</strong>
                 <small>目標値と優先度を確認してから、調整水準の許容範囲内でPLを目標へ近づけます。</small>
                 <p className={`solve-note ${statutoryFailures.length ? "statutory-failure" : ""}`}>{statutoryFailures.length ? `制度条件：${statutoryFailures.join("／")}` : "制度上の必須条件を満たしています。"}</p>
                 {solveNote !== "未実行" && <p className="solve-note">{solveNote}</p>}
+                {adjustedPlan && hardSummary.failed.length > 0 && <p className="target-unmet-guidance" role="alert">
+                  未達の指標があります。指標表の「<strong>判定・未達時の修正候補</strong>」を見ながら、目標値または将来予測・調整水準の許容範囲の修正を検討してください。
+                </p>}
               </div>
               <div className="target-action-buttons">
                 <button className="solve-button" disabled={isSolving} aria-busy={isSolving} onClick={() => void solve()}>{isSolving ? "計算中…" : "設定した目標に近づける"}</button>

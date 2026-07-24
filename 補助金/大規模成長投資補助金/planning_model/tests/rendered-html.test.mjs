@@ -201,6 +201,10 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /const \[isSolving, setIsSolving\] = useState\(false\)/);
   assert.match(pageSource, /requestAnimationFrame\(\(\) => setTimeout\(resolve, 0\)\)/);
   assert.match(pageSource, /isSolving \? "計算中…" : "設定した目標に近づける"/);
+  assert.match(pageSource, /target-action-warning/);
+  assert.match(pageSource, /未達の指標があります。指標表の/);
+  assert.match(pageSource, /判定・未達時の修正候補/);
+  assert.match(globalStyles, /\.target-action-bar\.target-action-warning/);
   assert.match(pageSource, /disabled=\{isSolving\} aria-busy=\{isSolving\}/);
   assert.match(pageSource, /const driverItemCodes = Object\.fromEntries/);
   assert.match(pageSource, /<th>調整項目<small>A～Z<\/small><\/th>/);
