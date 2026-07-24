@@ -459,6 +459,11 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /const otherPlInputFields[\s\S]*?label: "経常利益"[\s\S]*?label: "当期純利益"/);
   assert.match(pageSource, /const otherPlCalculatedFields[\s\S]*?modelCode: "M2-2", label: "売上高成長率"[\s\S]*?modelCode: "M2-5", label: "売上総利益"[\s\S]*?modelCode: "M2-36", label: "EBITDA増加率"/);
   assert.match(pageSource, /const otherPlDisplayRows[\s\S]*?otherPlInputFields\.map[\s\S]*?otherPlCalculatedFields\.map[\s\S]*?\.sort/);
+  assert.match(pageSource, /const projectDetailedInputFields[\s\S]*?replace\("M2-", "P2-"\)/);
+  assert.match(pageSource, /const projectDetailedDisplayRows[\s\S]*?other: row\.project/);
+  assert.match(pageSource, /補助事業PL・関連計算項目（P2-1～P2-36/);
+  assert.match(pageSource, /補助事業とその他事業を同じ2-1～2-36相当の細かさで入力/);
+  assert.match(pageSource, /companyModeUnsupportedOtherCodes/);
   assert.match(pageSource, /omitProjectCalculated[\s\S]*?omitCompanyCalculated[\s\S]*?omitOtherCalculated/);
   assert.match(pageSource, /自動計算項目を省略する/);
   assert.match(pageSource, /label="損益計算書" range="M2-1～M2-20"/);
@@ -471,7 +476,7 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.pl-row-indent-1 \{ padding-inline-start: var\(--space-4\); \}/);
 assert.match(globalStyles, /\.pl-row-indent-2 \{ padding-inline-start: var\(--space-6\); \}/);
   assert.doesNotMatch(pageSource, /label: "　/);
-  assert.match(pageSource, /補助事業の経常利益以下は営業利益を基準/);
+  assert.match(pageSource, /補助事業側の内訳が不足する賞与・減価償却費区分・経常利益以下などは「—」/);
   assert.doesNotMatch(pageSource, /2-19・2-20はモデル未対応|2-18は営業利益と同額/);
   assert.doesNotMatch(reportDataSource, /税引前当期純利益（モデル未対応）|当期純利益（モデル未対応）/);
   assert.match(globalStyles, /\.driver-validation-error/);

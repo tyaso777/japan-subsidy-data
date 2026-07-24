@@ -371,6 +371,37 @@ const otherPlDisplayRows: OtherPlDisplayRow[] = [
   })),
 ].sort((left, right) => Number(left.code.replace("M2-", "")) - Number(right.code.replace("M2-", "")));
 
+const projectDetailedInputFields: OtherPlInputField[] = otherPlInputFields.map((item) => ({
+  ...item,
+  modelCode: item.modelCode.replace("M2-", "P2-"),
+}));
+
+const projectDetailedDisplayRows: OtherPlDisplayRow[] = otherPlDisplayRows.map((item) => {
+  const input = item.input
+    ? projectDetailedInputFields.find((candidate) => candidate.key === item.input!.key)
+    : undefined;
+  return {
+    ...item,
+    code: item.code.replace("M2-", "P2-"),
+    input,
+    get: (rows: YearPlan[], index: number) =>
+      item.get(rows.map((row) => ({ ...row, other: row.project })), index),
+  };
+});
+
+const companyModeUnsupportedOtherCodes = new Set([
+  "M2-4",
+  "M2-9",
+  "M2-10",
+  "M2-12",
+  "M2-13",
+  "M2-14",
+  "M2-15",
+  "M2-18",
+  "M2-19",
+  "M2-20",
+]);
+
 const percentDriver = (key: keyof Drivers) =>
   !["usefulLife", "investment", "subsidy", "localBenchmark"].includes(key);
 
@@ -483,24 +514,36 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
       }
     }
 
-    const autoCompany = total(autoRow.project, autoRow.other);
-    const effectiveCompany = total(row.project, row.other);
-    const operatingDelta = operatingProfit(effectiveCompany) - operatingProfit(autoCompany);
-    const autoOrdinary = ordinaryIncome(autoCompany);
-    const autoPreTax = preTaxIncome(autoCompany);
-    const autoNet = netIncome(autoCompany);
-    const afterTaxRatio = autoPreTax ? autoNet / autoPreTax : 0.7;
-    if (!Object.prototype.hasOwnProperty.call(overrides, forecastOverrideKey(row.year, "other", "ordinaryIncome")) && !otherAnchors.has("ordinaryIncome")) {
-      row.other.ordinaryIncome = roundedInput(autoOrdinary + operatingDelta - ordinaryIncome(row.project));
-    }
-    if (!Object.prototype.hasOwnProperty.call(overrides, forecastOverrideKey(row.year, "other", "preTaxIncome")) && !otherAnchors.has("preTaxIncome")) {
-      row.other.preTaxIncome = roundedInput(autoPreTax + operatingDelta - preTaxIncome(row.project));
-    }
-    if (!Object.prototype.hasOwnProperty.call(overrides, forecastOverrideKey(row.year, "other", "netIncome")) && !otherAnchors.has("netIncome")) {
-      row.other.netIncome = roundedInput(autoNet + operatingDelta * afterTaxRatio - netIncome(row.project));
+    if (inputBasis === "other") {
+      for (const item of projectDetailedInputFields) {
+        const key = forecastOverrideKey(row.year, "project", item.key);
+        if (Object.prototype.hasOwnProperty.call(overrides, key)) {
+          const patch = item.set(row.project, roundedInput(overrides[key], item.digits ?? 2));
+          Object.entries(patch).forEach(([field, value]) => {
+            row.project[field as keyof SegmentPlan] = roundedInput(value ?? 0, field === "headcount" || field === "officerCount" ? 0 : 2);
+          });
+          projectAnchors.add(item.key);
+        } else if (projectAnchors.has(item.key)) {
+          const projected = cascade(item.get(previousEffective.project), item.get(previousAuto.project), item.get(autoRow.project));
+          const patch = item.set(row.project, projected);
+          Object.entries(patch).forEach(([field, value]) => {
+            row.project[field as keyof SegmentPlan] = roundedInput(value ?? 0, field === "headcount" || field === "officerCount" ? 0 : 2);
+          });
+        }
+      }
     }
 
     if (inputBasis === "company") {
+      const autoCompany = total(autoRow.project, autoRow.other);
+      const effectiveCompany = total(row.project, row.other);
+      const operatingDelta = operatingProfit(effectiveCompany) - operatingProfit(autoCompany);
+      const autoOrdinary = ordinaryIncome(autoCompany);
+      const autoPreTax = preTaxIncome(autoCompany);
+      const autoNet = netIncome(autoCompany);
+      const afterTaxRatio = autoPreTax ? autoNet / autoPreTax : 0.7;
+      row.other.ordinaryIncome = roundedInput(autoOrdinary + operatingDelta - ordinaryIncome(row.project));
+      row.other.preTaxIncome = roundedInput(autoPreTax + operatingDelta - preTaxIncome(row.project));
+      row.other.netIncome = roundedInput(autoNet + operatingDelta * afterTaxRatio - netIncome(row.project));
       for (const item of companyActualInputRows.filter((candidate) => candidate.set)) {
         const key = forecastOverrideKey(row.year, "company", item.code);
         let companyValue: number | undefined;
@@ -2160,7 +2203,7 @@ export default function Home() {
           <div className="section-intro"><div><h2>自動予測を確認し、必要なセルだけ上書き</h2></div><p>青枠の空欄には、過去実績と「15指標・目標」の調整水準から計算した値を表示します。入力したセルは太字で固定し、それ以降の空欄年度を再予測します。</p></div>
           <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。直前の変更はCtrl＋Zで戻せます。</p>
           <article className="panel table-panel"><div className="panel-heading"><div><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">将来合計 {number(futureCapex.reduce((sum, row) => sum + row.value, 0), 2)} 億円</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} inputValues={inputValues} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。将来各年度の入力合計は「15指標・目標」の補助事業投資額と連動し、投資額／全社売上高や将来減価償却費の自動予測へ反映します。</p></article>
-          <article className="panel table-panel"><div className="panel-heading"><div><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>全社PLとその他事業PLのどちらか一方だけを入力します</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>その他事業PLを入力</button></div></div><FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} drivers={calculationDrivers} onForecastChange={updateForecastOverride} /><p className="footnote">補助事業PLは共通です。「全社PLを入力」ではその他事業PLを差額計算し、「その他事業PLを入力」では全社PLを合算計算します。</p></article>
+          <article className="panel table-panel"><div className="panel-heading"><div><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>公式様式を直接作るか、事業別の詳細PLを積み上げるかを選びます</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>その他事業PLを入力</button></div></div><FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} drivers={calculationDrivers} onForecastChange={updateForecastOverride} /><p className="footnote">「全社PLを入力」は、会社全体2-1～2-36と補助事業7-1～7-20を入力して公式Excelを完成させる方式です。「その他事業PLを入力」は、補助事業とその他事業を同じ詳細項目で入力し、合計から会社全体PLを作る方式です。</p></article>
           <div className="workflow-actions"><div><span>上書きしたセルを固定して再最適化できます。再最適化後もこの画面に留まります。</span>{adjustedPlan && <p className="solve-note">{solveNote}</p>}</div><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("targets")}>← 15指標・目標へ戻る</button><button className="solve-button" disabled={isSolving} aria-busy={isSolving} onClick={() => void solve()}>{isSolving ? "計算中…" : "上書き内容を反映して再最適化"}</button><button className="reset-button" onClick={() => goToView("pl")}>年度別PLへ →</button></div></div>
         </section>
       )}
@@ -2518,6 +2561,47 @@ function OfficialSectionHeading({ label, range, columns }: { label: string; rang
   </tr>;
 }
 
+function DetailedProjectInputsTable({ historical, effectivePlan, overrides, omitCalculated, onToggleCalculated, onForecastChange }: {
+  historical: YearPlan[];
+  effectivePlan: YearPlan[];
+  overrides: ForecastOverrides;
+  omitCalculated: boolean;
+  onToggleCalculated: () => void;
+  onForecastChange: (year: number, segment: ForecastSegment, item: string, value: number | null) => void;
+}) {
+  const futureRows = effectivePlan.slice(historical.length);
+  const visibleRows = omitCalculated ? projectDetailedDisplayRows.filter((item) => item.input) : projectDetailedDisplayRows;
+  const rawPlaceholder = (value: number, digits = 2) => String(roundedInput(value, digits));
+  return <div>
+    <h3 className="manual-table-heading"><span>補助事業PL・関連計算項目（P2-1～P2-36：過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCalculated} onClick={onToggleCalculated}>{omitCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
+    <div className="wide-table"><table><thead><tr><th>第6次様式2-1～2-36準拠の補助事業内部管理項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は自動予測</small></th>)}</tr></thead>
+      <tbody>
+        <OfficialSectionHeading label="損益計算書" range="P2-1～P2-20" columns={historical.length + futureRows.length} />
+        {visibleRows.flatMap((item) => [
+          (omitCalculated ? item.code === "P2-27" : item.code === "P2-21") ? <OfficialSectionHeading key="project-detail-related" label="P/L関連計算項目" range="P2-21～P2-36" columns={historical.length + futureRows.length} /> : null,
+          <tr className={!item.input ? "calculated-row" : ""} key={item.code}>
+            <th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}／{item.input ? "入力・上書き可" : "自動計算"}</small></th>
+            {historical.map((row, index) => {
+              const value = item.get(historical, index);
+              return <td className={`historical-reference${item.input ? "" : " calculated-cell"}`} key={row.year}><strong>{value === undefined ? "—" : number(value, item.digits ?? 2)}</strong></td>;
+            })}
+            {futureRows.map((row) => {
+              const index = effectivePlan.findIndex((candidate) => candidate.year === row.year);
+              const value = item.get(effectivePlan, index);
+              if (!item.input) return <td className="calculated-cell" key={row.year}><strong>{value === undefined ? "—" : number(value, item.digits ?? 2)}</strong>{value !== undefined && <small>自動計算</small>}</td>;
+              const input = item.input;
+              const key = forecastOverrideKey(row.year, "project", input.key);
+              const overridden = Object.prototype.hasOwnProperty.call(overrides, key);
+              return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={input.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0, input.digits ?? 2)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", input.key, event.target.value === "" ? null : Number(event.target.value))} /></td>;
+            })}
+          </tr>,
+        ])}
+      </tbody>
+    </table></div>
+    <p className="footnote">「その他事業PLを入力」では、補助事業とその他事業を同じ2-1～2-36相当の細かさで入力し、両者の合計から会社全体PLを作ります。第6次様式の補助事業7-1～7-20は、この詳細入力から自動生成して「年度別PL」に表示します。</p>
+  </div>;
+}
+
 function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, inputValues, futureInputBasis, drivers, onForecastChange }: {
   historical: YearPlan[];
   autoPlan: YearPlan[];
@@ -2539,7 +2623,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
   const visibleCompanyRows = omitCompanyCalculated ? companyActualInputRows.filter((item) => item.set) : companyActualInputRows;
   const visibleOtherRows = omitOtherCalculated ? otherPlDisplayRows.filter((item) => item.input) : otherPlDisplayRows;
   return <div className="manual-sections spreadsheet-grid">
-    <div>
+    {futureInputBasis === "company" ? <div>
       <h3 className="manual-table-heading"><span>補助事業収支計画（7-1～7-20：過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitProjectCalculated} onClick={() => setOmitProjectCalculated((current) => !current)}>{omitProjectCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
       <div className="wide-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は自動予測</small></th>)}</tr></thead>
         <tbody>{visibleProjectRows.map((item) => <tr className={!item.input ? "calculated-row" : ""} key={item.code}>
@@ -2560,7 +2644,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
         </tr>)}</tbody>
       </table></div>
       <p className="footnote">7-1・7-4・7-6・7-8～7-10・7-13・7-14は入力値です。7-2・7-3・7-5・7-7・7-11・7-12・7-15～7-19は第6次Excelと同じ関係式で自動計算し、7-20は「15指標・目標」の市場伸び率を参照します。</p>
-    </div>
+    </div> : <DetailedProjectInputsTable historical={historical} effectivePlan={effectivePlan} overrides={overrides} omitCalculated={omitProjectCalculated} onToggleCalculated={() => setOmitProjectCalculated((current) => !current)} onForecastChange={onForecastChange} />}
     <div>
       <h3 className="manual-table-heading"><span>会社全体の損益計算書・関連計算項目（2-1～2-36：過去3期参照 → 将来）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCompanyCalculated} onClick={() => setOmitCompanyCalculated((current) => !current)}>{omitCompanyCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
       <div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead>
@@ -2592,10 +2676,10 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
             (omitOtherCalculated ? item.code === "M2-27" : item.code === "M2-21") ? <OfficialSectionHeading key="other-section-related" label="P/L関連計算項目" range="M2-21～M2-36" columns={historical.length + futureRows.length} /> : null,
             <tr className={!item.input ? "calculated-row" : ""} key={item.code}>
               <th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}／{item.input ? "入力・上書き可" : "自動計算"}</small></th>
-              {historical.map((row, index) => { const value = item.get(historical, index); return <td className={`historical-reference${item.input ? "" : " calculated-cell"}`} key={row.year}><strong>{value === undefined ? "—" : number(value, item.digits ?? 2)}</strong></td>; })}
+              {historical.map((row, index) => { const value = futureInputBasis === "company" && companyModeUnsupportedOtherCodes.has(item.code) ? undefined : item.get(historical, index); return <td className={`historical-reference${item.input ? "" : " calculated-cell"}`} key={row.year}><strong>{value === undefined ? "—" : number(value, item.digits ?? 2)}</strong></td>; })}
               {futureRows.map((row) => {
                 const index = effectivePlan.findIndex((candidate) => candidate.year === row.year);
-                const value = item.get(effectivePlan, index);
+                const value = futureInputBasis === "company" && companyModeUnsupportedOtherCodes.has(item.code) ? undefined : item.get(effectivePlan, index);
                 if (futureInputBasis === "company" || !item.input) return <td className={!item.input ? "calculated-cell" : undefined} key={row.year}><strong>{value === undefined ? "—" : number(value, item.digits ?? 2)}</strong>{!item.input && value !== undefined && <small>自動計算</small>}</td>;
                 const input = item.input;
                 const key = forecastOverrideKey(row.year, "other", input.key);
@@ -2606,7 +2690,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
           ])}
         </tbody>
       </table></div>
-      <p className="footnote">第6次様式の会社全体2-1～2-36と同じ会計順序で、その他事業の内部管理番号をM2-1～M2-36として表示します。入力項目と自動計算項目を同じ流れに並べ、2-1～2-20相当を損益計算書、2-21～2-36相当を給与・付加価値・人数・EBITDAの関連計算項目として区切っています。補助事業の経常利益以下は営業利益を基準とし、営業外損益・特別損益・税効果はその他事業側に反映します。</p>
+      <p className="footnote">「その他事業PLを入力」では、会社全体2-1～2-36と同じ会計順序で入力します。「全社PLを入力」では、公式7-1～7-20から確実に差額算出できる項目だけを表示し、補助事業側の内訳が不足する賞与・減価償却費区分・経常利益以下などは「—」とします。</p>
     </div>
   </div>;
 }
