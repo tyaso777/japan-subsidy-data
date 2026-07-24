@@ -2708,7 +2708,7 @@ function TrendChart({ title, subtitle, unit, plan, series, zeroBaseline }: { tit
 
 function DiagnosticCharts({ plan }: { plan: YearPlan[] }) {
   const [zeroBaseline, setZeroBaseline] = useState(true);
-  const [moneyUnit, setMoneyUnit] = useState<MoneyDisplayUnit>("億円");
+  const [moneyUnit, setMoneyUnit] = useState<MoneyDisplayUnit>("千円");
   const company = plan.map((row) => total(row.project, row.other));
   const chartRate = (numerator: number, denominator: number) => denominator ? numerator / denominator * 100 : undefined;
   const perEmployee = (segment: SegmentPlan) => segment.headcount ? segment.employeePay / segment.headcount : undefined;
@@ -2723,7 +2723,7 @@ function DiagnosticCharts({ plan }: { plan: YearPlan[] }) {
   const displayMoney = (value: number | undefined) => value === undefined ? undefined : value * moneyMultiplier;
 
   return <section className="diagnostic-charts" aria-labelledby="diagnostic-chart-heading">
-    <div className="diagnostic-chart-heading"><div><h2 id="diagnostic-chart-heading">主要指標の推移チャート</h2></div><div className="diagnostic-chart-controls"><label className="chart-unit-control"><span>金額単位</span><select value={moneyUnit} onChange={(event) => setMoneyUnit(event.target.value as MoneyDisplayUnit)} aria-label="金額系チャートの表示単位"><option value="億円">億円（第6次様式）</option><option value="百万円">百万円</option><option value="千円">千円</option></select><small>金額系チャートに反映</small></label><div className="chart-scale-control"><span>縦軸の最小値</span><div className="mode-switch" role="group" aria-label="チャートの縦軸最小値"><button type="button" className={zeroBaseline ? "active" : ""} aria-pressed={zeroBaseline} onClick={() => setZeroBaseline(true)}>0から開始</button><button type="button" className={!zeroBaseline ? "active" : ""} aria-pressed={!zeroBaseline} onClick={() => setZeroBaseline(false)}>データ範囲を拡大</button></div><small>負の値を含む場合は、値が切れない範囲まで自動調整します。</small></div></div></div>
+    <div className="diagnostic-chart-heading"><div><h2 id="diagnostic-chart-heading">主要指標の推移チャート</h2></div><div className="diagnostic-chart-controls"><label className="chart-unit-control"><span>金額単位</span><select value={moneyUnit} onChange={(event) => setMoneyUnit(event.target.value as MoneyDisplayUnit)} aria-label="金額系チャートの表示単位"><option value="千円">千円（第6次様式）</option><option value="百万円">百万円</option><option value="億円">億円</option></select><small>金額系チャートに反映</small></label><div className="chart-scale-control"><span>縦軸の最小値</span><div className="mode-switch" role="group" aria-label="チャートの縦軸最小値"><button type="button" className={zeroBaseline ? "active" : ""} aria-pressed={zeroBaseline} onClick={() => setZeroBaseline(true)}>0から開始</button><button type="button" className={!zeroBaseline ? "active" : ""} aria-pressed={!zeroBaseline} onClick={() => setZeroBaseline(false)}>データ範囲を拡大</button></div><small>負の値を含む場合は、値が切れない範囲まで自動調整します。</small></div></div></div>
     <div className="diagnostic-chart-grid">
       <TrendChart title="売上高" subtitle="全社と事業別の規模・成長ペース" unit={moneyUnit} plan={plan} zeroBaseline={zeroBaseline} series={[
         { label: "全社", color: colors.company, values: company.map((segment) => displayMoney(segment.sales)) },
