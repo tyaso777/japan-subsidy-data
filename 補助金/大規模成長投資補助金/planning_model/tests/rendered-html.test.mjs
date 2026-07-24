@@ -88,7 +88,9 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.dark-card \{ background: #edf4ef; color: var\(--ink\); border-color: #c8d8ce; \}/);
   assert.match(globalStyles, /\.score-ring \{[^}]*background: #f8fbf9;/);
   assert.match(globalStyles, /\.historical-metric \{[^}]*white-space: normal;[^}]*overflow-wrap: anywhere;/);
-  assert.match(globalStyles, /\.targets-table th:nth-child\(3\)[^}]*width: 145px;/);
+  assert.match(globalStyles, /\.targets-table th:nth-child\(3\)[^}]*width: 130px;/);
+  assert.match(globalStyles, /main \{ width: min\(calc\(100% - 48px\), 1920px\);/);
+  assert.match(globalStyles, /@media \(max-width: 720px\) \{[\s\S]*?main \{ width: calc\(100% - 24px\);/);
   const initialInputFunction = pageSource.match(/function createInitialInputValues\(\): InputValues \{[\s\S]*?\n\}/)?.[0] ?? "";
   const suggestionSource = pageSource.match(/const targetAdjustmentSuggestions = useMemo\([\s\S]*?\n  \}, \[adjustedDrivers,[\s\S]*?\]\);/)?.[0] ?? "";
   assert.match(globalStyles, /\.tabs \{ position: sticky; top: 0; z-index: 25;/);
@@ -114,7 +116,7 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.floating-table-scrollbar \{ position: fixed; bottom: 0; z-index: 24; display: none;/);
   assert.match(globalStyles, /\.floating-table-scrollbar\.is-visible \{ display: block;/);
   assert.match(globalStyles, /\.data-io-view \.proposal-action-menu-items \{ right: auto; left: 0;/);
-  assert.match(globalStyles, /\.data-io-view \.proposal-filebar:has\(\.proposal-action-menu\[open\]\) \{ padding-bottom: 140px;/);
+  assert.doesNotMatch(globalStyles, /proposal-filebar:has\(\.proposal-action-menu\[open\]\)/);
   assert.doesNotMatch(globalStyles, /max-height: min\(76vh, 860px\)/);
   assert.match(pageSource, /function usePageStickyTableHeaders\(\)/);
   assert.match(pageSource, /function useFloatingHorizontalTableScrollbar\(\)/);
@@ -326,8 +328,8 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /targets-table thead th:nth-child\(2\), \.targets-table td:nth-child\(2\) \{ position: sticky; left: 44px;/);
   assert.match(globalStyles, /targets-table tr\.metric-basis-row td:nth-child\(-n\+2\).*background: #f4f8f2/);
   assert.match(pageSource, /historicalPlan\.slice\(1\)\.map\(\(row\) => <th key=\{row\.year\}>/);
-  assert.match(globalStyles, /\.targets-table th:nth-child\(7\), \.targets-table td:nth-child\(7\) \{ width: 145px; min-width: 145px; max-width: 145px; white-space: normal;/);
-  assert.match(globalStyles, /\.targets-table \{ width: max\(100%, 1340px\) !important; min-width: 1340px; table-layout: fixed; \}/);
+  assert.match(globalStyles, /\.targets-table th:nth-child\(7\), \.targets-table td:nth-child\(7\) \{ width: 135px; min-width: 135px; max-width: 135px; white-space: normal;/);
+  assert.match(globalStyles, /\.targets-table \{ width: max\(100%, 1240px\) !important; min-width: 1240px; table-layout: fixed; \}/);
   assert.match(globalStyles, /\.targets-table th:nth-child\(10\), \.targets-table td:nth-child\(10\), \.target-judgement \{ width: 110px; min-width: 110px; max-width: 110px; \}/);
   assert.match(pageSource, /14・15の役員関連2指標は第6次の評価対象外/);
   assert.match(pageSource, /reference-metric-row/);
