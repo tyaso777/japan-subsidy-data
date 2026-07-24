@@ -2497,7 +2497,7 @@ type ChartSeries = {
   values: (number | undefined)[];
 };
 
-function TrendChart({ title, subtitle, unit, plan, series }: { title: string; subtitle: string; unit: string; plan: YearPlan[]; series: ChartSeries[] }) {
+function TrendChart({ title, subtitle, unit, plan, series, zeroBaseline }: { title: string; subtitle: string; unit: string; plan: YearPlan[]; series: ChartSeries[]; zeroBaseline: boolean }) {
   const width = 720;
   const height = 270;
   const margin = { top: 22, right: 22, bottom: 42, left: 54 };
@@ -2506,7 +2506,7 @@ function TrendChart({ title, subtitle, unit, plan, series }: { title: string; su
   const latestIndex = Math.max(0, plan.findIndex((row) => row.role === "latest"));
   const baseIndex = plan.findIndex((row) => row.role === "base");
   const finiteValues = series.flatMap((item) => item.values).filter((value): value is number => value !== undefined && Number.isFinite(value));
-  const scale = niceChartScale(finiteValues);
+  const scale = niceChartScale(finiteValues, { zeroBaseline });
   const minValue = scale.min;
   const maxValue = scale.max;
   const span = maxValue > minValue ? maxValue - minValue : 1;
@@ -2548,6 +2548,7 @@ function TrendChart({ title, subtitle, unit, plan, series }: { title: string; su
 }
 
 function DiagnosticCharts({ plan }: { plan: YearPlan[] }) {
+  const [zeroBaseline, setZeroBaseline] = useState(true);
   const company = plan.map((row) => total(row.project, row.other));
   const chartRate = (numerator: number, denominator: number) => denominator ? numerator / denominator * 100 : undefined;
   const perEmployee = (segment: SegmentPlan) => segment.headcount ? segment.employeePay / segment.headcount : undefined;
@@ -2560,23 +2561,23 @@ function DiagnosticCharts({ plan }: { plan: YearPlan[] }) {
   const colors = { company: "var(--chart-company)", project: "var(--chart-project)", other: "var(--chart-other)" };
 
   return <section className="diagnostic-charts" aria-labelledby="diagnostic-chart-heading">
-    <div className="diagnostic-chart-heading"><div><p className="card-kicker">TREND CHECK</p><h2 id="diagnostic-chart-heading">主要指標の推移チャート</h2></div><p>過去実績から将来予測へのつながり、基準年の段差、事業間の乖離を視覚的に確認します。</p></div>
+    <div className="diagnostic-chart-heading"><div><p className="card-kicker">TREND CHECK</p><h2 id="diagnostic-chart-heading">主要指標の推移チャート</h2></div><div className="chart-scale-control"><span>縦軸の最小値</span><div className="mode-switch" role="group" aria-label="チャートの縦軸最小値"><button type="button" className={zeroBaseline ? "active" : ""} aria-pressed={zeroBaseline} onClick={() => setZeroBaseline(true)}>0から開始</button><button type="button" className={!zeroBaseline ? "active" : ""} aria-pressed={!zeroBaseline} onClick={() => setZeroBaseline(false)}>データ範囲を拡大</button></div><small>負の値を含む場合は、値が切れない範囲まで自動調整します。</small></div></div>
     <div className="diagnostic-chart-grid">
-      <TrendChart title="売上高" subtitle="全社と事業別の規模・成長ペース" unit="億円" plan={plan} series={[
+      <TrendChart title="売上高" subtitle="全社と事業別の規模・成長ペース" unit="億円" plan={plan} zeroBaseline={zeroBaseline} series={[
         { label: "全社", color: colors.company, values: company.map((segment) => segment.sales) },
         { label: "補助事業", color: colors.project, values: plan.map((row) => row.project.sales) },
         { label: "その他事業", color: colors.other, values: plan.map((row) => row.other.sales) },
       ]} />
-      <TrendChart title="収益性（全社）" subtitle="原価・その他販管費・営業利益の率" unit="%" plan={plan} series={[
+      <TrendChart title="収益性（全社）" subtitle="原価・その他販管費・営業利益の率" unit="%" plan={plan} zeroBaseline={zeroBaseline} series={[
         { label: "売上原価率", color: colors.project, values: company.map((segment) => chartRate(segment.cogs, segment.sales)) },
         { label: "その他販管費率", color: colors.other, values: company.map((segment) => chartRate(segment.otherSga, segment.sales)) },
         { label: "営業利益率", color: colors.company, values: company.map((segment) => chartRate(operatingProfit(segment), segment.sales)) },
       ]} />
-      <TrendChart title="人員・1人当たり給与" subtitle="最新決算期を100とした全社指数" unit="指数" plan={plan} series={[
+      <TrendChart title="人員・1人当たり給与" subtitle="最新決算期を100とした全社指数" unit="指数" plan={plan} zeroBaseline={zeroBaseline} series={[
         { label: "従業員数", color: colors.other, values: indexed(company.map((segment) => segment.headcount)) },
         { label: "従業員1人当たり給与", color: colors.company, values: indexed(company.map(perEmployee)) },
       ]} />
-      <TrendChart title="労働生産性" subtitle="付加価値額÷（従業員数＋役員数）" unit="億円/人" plan={plan} series={[
+      <TrendChart title="労働生産性" subtitle="付加価値額÷（従業員数＋役員数）" unit="億円/人" plan={plan} zeroBaseline={zeroBaseline} series={[
         { label: "全社", color: colors.company, values: company.map(productivity) },
         { label: "補助事業", color: colors.project, values: plan.map((row) => productivity(row.project)) },
         { label: "その他事業", color: colors.other, values: plan.map((row) => productivity(row.other)) },

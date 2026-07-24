@@ -125,7 +125,7 @@ const htmlTrendChart = (title: string, subtitle: string, unit: string, plan: Yea
   const latestIndex = Math.max(0, plan.findIndex((row) => row.role === "latest"));
   const baseIndex = plan.findIndex((row) => row.role === "base");
   const finiteValues = series.flatMap((item) => item.values).filter((value): value is number => value !== undefined && Number.isFinite(value));
-  const scale = niceChartScale(finiteValues);
+  const scale = niceChartScale(finiteValues, { zeroBaseline: true });
   const minValue = scale.min;
   const maxValue = scale.max;
   const span = maxValue > minValue ? maxValue - minValue : 1;
