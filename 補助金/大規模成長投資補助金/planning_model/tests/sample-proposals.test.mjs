@@ -43,6 +43,12 @@ test("standard sample represents the completed two-pass planning workflow", asyn
   assert.ok(Math.abs(proposal.adjustedDrivers.projectSalesGrowth - 0.22) < 0.001, "saved result should remain near the fifth-round accepted-company median");
   assert.ok(proposal.adjustedDrivers.projectSalesGrowth <= proposal.driverRanges.projectSalesGrowth[1]);
   assert.equal(proposal.drivers.subsidy, 7.66);
+  assert.equal(proposal.drivers.investment, 23);
+  assert.equal(
+    Number(proposal.futureCapex.reduce((sum, row) => sum + row.value, 0).toFixed(2)),
+    proposal.drivers.investment,
+    "the annual capex schedule must equal the investment adjustment level",
+  );
   assert.equal(proposal.targets.companySalesIncrease.value, 82.4);
   assert.equal(proposal.targets.companySalesCagr.value, 15);
   for (const code of ["2-18", "2-19", "2-20", "2-27", "2-28"]) {

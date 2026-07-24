@@ -196,10 +196,20 @@ const emptySegment = (): SegmentPlan => ({
 
 const futureCapex = (investment: number) => {
   const projectYears = DEFAULT_TIMELINE.baseYear - DEFAULT_TIMELINE.latestYear;
+  const annual = round(investment / projectYears);
   return Array.from({ length: DEFAULT_TIMELINE.baseYear + 3 - DEFAULT_TIMELINE.latestYear }, (_, index) => ({
     year: DEFAULT_TIMELINE.latestYear + index + 1,
-    value: index < projectYears ? round(investment / projectYears) : 0,
+    value: index < projectYears
+      ? index === projectYears - 1 ? round(investment - annual * (projectYears - 1)) : annual
+      : 0,
   }));
+};
+
+const syncFutureCapex = (proposal: ProposalData, investment: number) => {
+  proposal.futureCapex = futureCapex(investment);
+  for (const row of proposal.futureCapex) {
+    proposal.inputValues![inputKey.futureCapex(row.year)] = round(row.value);
+  }
 };
 
 const commonProposal = (title: string, exportedAt: string, historicalPlan: YearPlan[]): ProposalData => {
@@ -281,6 +291,7 @@ export function createStandardSampleProposal(exportedAt: string): ProposalData {
   );
   proposal.drivers = clone(standardWorkflowInitialDrivers);
   proposal.adjustedDrivers = clone(standardWorkflowAdjustedDrivers);
+  syncFutureCapex(proposal, standardWorkflowInitialDrivers.investment);
   proposal.driverRanges = clone(standardWorkflowRanges);
   proposal.targets = clone(standardWorkflowTargets);
   proposal.forecastOverrides = clone(standardWorkflowOverrides);

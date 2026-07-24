@@ -66,6 +66,9 @@ export type TimelineSettings = {
 
 export type Drivers = {
   projectMarketGrowth: number;
+  projectCogsRateWhenSalesZero: number;
+  otherCogsRateWhenSalesZero: number;
+  effectiveTaxRate: number;
   projectSalesGrowthToBase: number;
   projectCogsImprovementToBase: number;
   projectPayGrowthToBase: number;
@@ -75,6 +78,7 @@ export type Drivers = {
   otherSalesGrowthToBase: number;
   otherCogsImprovementToBase: number;
   otherPayGrowthToBase: number;
+  otherOfficerPayGrowthToBase: number;
   otherHeadcountGrowthToBase: number;
   otherSgaImprovementToBase: number;
   projectSalesGrowth: number;
@@ -83,6 +87,7 @@ export type Drivers = {
   otherCogsImprovement: number;
   projectPayGrowth: number;
   otherPayGrowth: number;
+  otherOfficerPayGrowth: number;
   projectHeadcountGrowth: number;
   otherHeadcountGrowth: number;
   projectSgaRateEnd: number;
@@ -212,6 +217,9 @@ export const defaultProjectBasePlan: SegmentPlan = {
 
 export const sampleDrivers: Drivers = {
   projectMarketGrowth: 0.05,
+  projectCogsRateWhenSalesZero: 0.68,
+  otherCogsRateWhenSalesZero: 0.68,
+  effectiveTaxRate: 0.30,
   projectSalesGrowthToBase: 0.21,
   projectCogsImprovementToBase: 0.07,
   projectPayGrowthToBase: 0.07,
@@ -221,6 +229,7 @@ export const sampleDrivers: Drivers = {
   otherSalesGrowthToBase: 0.04,
   otherCogsImprovementToBase: 0.005,
   otherPayGrowthToBase: 0.04,
+  otherOfficerPayGrowthToBase: 0.04,
   otherHeadcountGrowthToBase: 0.01,
   otherSgaImprovementToBase: 0.005,
   projectSalesGrowth: 0.21,
@@ -229,6 +238,7 @@ export const sampleDrivers: Drivers = {
   otherCogsImprovement: 0.01,
   projectPayGrowth: 0.07,
   otherPayGrowth: 0.045,
+  otherOfficerPayGrowth: 0.045,
   projectHeadcountGrowth: 0.04,
   otherHeadcountGrowth: 0.015,
   projectSgaRateEnd: 0.09,
@@ -283,6 +293,9 @@ export const defaultBalanceSheets: BalanceSheetPlan[] = [2023, 2024, 2025].map((
 
 export const defaultDrivers: Drivers = {
   projectMarketGrowth: 0,
+  projectCogsRateWhenSalesZero: 0,
+  otherCogsRateWhenSalesZero: 0,
+  effectiveTaxRate: 0,
   projectSalesGrowthToBase: 0,
   projectCogsImprovementToBase: 0,
   projectPayGrowthToBase: 0,
@@ -292,6 +305,7 @@ export const defaultDrivers: Drivers = {
   otherSalesGrowthToBase: 0,
   otherCogsImprovementToBase: 0,
   otherPayGrowthToBase: 0,
+  otherOfficerPayGrowthToBase: 0,
   otherHeadcountGrowthToBase: 0,
   otherSgaImprovementToBase: 0,
   projectSalesGrowth: 0,
@@ -300,6 +314,7 @@ export const defaultDrivers: Drivers = {
   otherCogsImprovement: 0,
   projectPayGrowth: 0,
   otherPayGrowth: 0,
+  otherOfficerPayGrowth: 0,
   projectHeadcountGrowth: 0,
   otherHeadcountGrowth: 0,
   projectSgaRateEnd: 0,
@@ -313,6 +328,9 @@ export const defaultDrivers: Drivers = {
 
 export const driverBounds: Record<keyof Drivers, [number, number]> = {
   projectMarketGrowth: [-0.05, 0.3],
+  projectCogsRateWhenSalesZero: [0, 0.99],
+  otherCogsRateWhenSalesZero: [0, 0.99],
+  effectiveTaxRate: [0, 0.6],
   projectSalesGrowthToBase: [-0.05, 0.4],
   projectCogsImprovementToBase: [0, 0.02],
   projectPayGrowthToBase: [0, 0.1],
@@ -322,6 +340,7 @@ export const driverBounds: Record<keyof Drivers, [number, number]> = {
   otherSalesGrowthToBase: [-0.1, 0.2],
   otherCogsImprovementToBase: [0, 0.02],
   otherPayGrowthToBase: [0, 0.08],
+  otherOfficerPayGrowthToBase: [0, 0.08],
   otherHeadcountGrowthToBase: [-0.05, 0.1],
   otherSgaImprovementToBase: [0, 0.02],
   projectSalesGrowth: [-0.05, 0.4],
@@ -330,6 +349,7 @@ export const driverBounds: Record<keyof Drivers, [number, number]> = {
   otherCogsImprovement: [0, 0.03],
   projectPayGrowth: [0.045, 0.1],
   otherPayGrowth: [0, 0.08],
+  otherOfficerPayGrowth: [0, 0.08],
   projectHeadcountGrowth: [-0.03, 0.2],
   otherHeadcountGrowth: [-0.05, 0.1],
   projectSgaRateEnd: [0.04, 0.25],
@@ -592,7 +612,7 @@ export function createForecastProjectPeriodInputs(
   const timeline = normalizeTimeline(settings);
   const years = timeline.baseYear - timeline.latestYear;
   const start = latest.project;
-  const startCogsRate = start.sales ? start.cogs / start.sales : 0.68;
+  const startCogsRate = start.sales ? start.cogs / start.sales : drivers.projectCogsRateWhenSalesZero;
   const targetCogsRate = Math.min(0.99, Math.max(0.01, startCogsRate - drivers.projectCogsImprovementToBase));
   const startSgaRate = start.sales ? start.otherSga / start.sales : drivers.projectSgaRateEnd;
   const startPayPerHead = start.headcount ? start.employeePay / start.headcount : 0;
@@ -639,14 +659,14 @@ export function generatePlan(
   const projectBase = structuredClone(periodInputs.at(-1)?.project ?? defaultProjectBasePlan);
   const plan: YearPlan[] = structuredClone(actuals);
   const n = timeline.baseYear + 3 - timeline.latestYear;
-  const baseProjectCogsRate = projectBase.sales ? projectBase.cogs / projectBase.sales : 0.68;
-  const baseOtherCogsRate = latest.other.sales ? latest.other.cogs / latest.other.sales : 0.68;
+  const baseProjectCogsRate = projectBase.sales ? projectBase.cogs / projectBase.sales : drivers.projectCogsRateWhenSalesZero;
+  const baseOtherCogsRate = latest.other.sales ? latest.other.cogs / latest.other.sales : drivers.otherCogsRateWhenSalesZero;
   const yearsToBase = timeline.baseYear - timeline.latestYear;
   const otherBaseSales = latest.other.sales * (1 + drivers.otherSalesGrowthToBase) ** yearsToBase;
   const otherBaseHeadcount = latest.other.headcount * (1 + drivers.otherHeadcountGrowthToBase) ** yearsToBase;
   const otherBasePayPerHead = latest.other.headcount ? latest.other.employeePay / latest.other.headcount : 0;
   const otherBaseEmployeePay = otherBasePayPerHead * (1 + drivers.otherPayGrowthToBase) ** yearsToBase * otherBaseHeadcount;
-  const otherBaseOfficerPay = latest.other.officerPay * (1 + Math.min(drivers.otherPayGrowthToBase, 0.05)) ** yearsToBase;
+  const otherBaseOfficerPay = latest.other.officerPay * (1 + drivers.otherOfficerPayGrowthToBase) ** yearsToBase;
   const otherBaseCogsRate = Math.min(0.99, Math.max(0.01, baseOtherCogsRate - drivers.otherCogsImprovementToBase));
   const latestOtherSgaRate = latest.other.sales ? latest.other.otherSga / latest.other.sales : drivers.otherSgaRateEnd;
   const otherBaseSgaRate = Math.min(0.99, Math.max(0, latestOtherSgaRate - drivers.otherSgaImprovementToBase));
@@ -678,8 +698,8 @@ export function generatePlan(
       ? otherBasePayPerHead * (1 + drivers.otherPayGrowthToBase) ** i * otherHeadcount
       : (otherBaseHeadcount ? otherBaseEmployeePay / otherBaseHeadcount : 0) * (1 + drivers.otherPayGrowth) ** yearsAfterBase * otherHeadcount;
     const otherOfficerPay = beforeOrAtBase
-      ? latest.other.officerPay * (1 + Math.min(drivers.otherPayGrowthToBase, 0.05)) ** i
-      : otherBaseOfficerPay * (1 + Math.min(drivers.otherPayGrowth, 0.05)) ** yearsAfterBase;
+      ? latest.other.officerPay * (1 + drivers.otherOfficerPayGrowthToBase) ** i
+      : otherBaseOfficerPay * (1 + drivers.otherOfficerPayGrowth) ** yearsAfterBase;
     const otherSgaRate = beforeOrAtBase
       ? lerp(latestOtherSgaRate, otherBaseSgaRate, otherProgress)
       : lerp(otherBaseSgaRate, drivers.otherSgaRateEnd, otherProgress);
@@ -717,9 +737,7 @@ export function generatePlan(
   const latestPreTaxIncome = preTaxIncome(latestCompany);
   const nonOperatingRate = latestCompany.sales ? (latestOrdinaryIncome - latestOperatingProfit) / latestCompany.sales : 0;
   const specialProfitRate = latestCompany.sales ? (latestPreTaxIncome - latestOrdinaryIncome) / latestCompany.sales : 0;
-  const afterTaxRatio = latestPreTaxIncome
-    ? netIncome(latestCompany) / latestPreTaxIncome
-    : 0.7;
+  const afterTaxRatio = 1 - drivers.effectiveTaxRate;
   plan.slice(actuals.length).forEach((row) => {
     const company = total(row.project, row.other);
     const forecastOrdinaryIncome = round(operatingProfit(company) + company.sales * nonOperatingRate);
@@ -887,6 +905,16 @@ export function calculateHistoricalDriverSeries(
 
   return {
     projectMarketGrowth: unavailable(),
+    projectCogsRateWhenSalesZero: { mode: "level", values: levels((row) => ratio(row.project.cogs, row.project.sales)) },
+    otherCogsRateWhenSalesZero: { mode: "level", values: levels((row) => ratio(row.other.cogs, row.other.sales)) },
+    effectiveTaxRate: {
+      mode: "level",
+      values: levels((row) => {
+        const company = total(row.project, row.other);
+        const beforeTax = preTaxIncome(company);
+        return beforeTax ? 1 - netIncome(company) / beforeTax : Number.NaN;
+      }),
+    },
     projectSalesGrowthToBase: { mode: "change", values: changes((row) => row.project.sales) },
     projectCogsImprovementToBase: {
       mode: "change",
@@ -908,6 +936,7 @@ export function calculateHistoricalDriverSeries(
       referenceLevels: levels((row) => ratio(row.other.cogs, row.other.sales)),
     },
     otherPayGrowthToBase: { mode: "change", values: changes((row) => perEmployee(row.other)) },
+    otherOfficerPayGrowthToBase: { mode: "change", values: changes((row) => perOfficer(row.other)) },
     otherHeadcountGrowthToBase: { mode: "change", values: changes((row) => row.other.headcount) },
     otherSgaImprovementToBase: {
       mode: "change",
@@ -928,6 +957,7 @@ export function calculateHistoricalDriverSeries(
     },
     projectPayGrowth: { mode: "change", values: changes((row) => perEmployee(row.project)) },
     otherPayGrowth: { mode: "change", values: changes((row) => perEmployee(row.other)) },
+    otherOfficerPayGrowth: { mode: "change", values: changes((row) => perOfficer(row.other)) },
     projectHeadcountGrowth: { mode: "change", values: changes((row) => row.project.headcount) },
     otherHeadcountGrowth: { mode: "change", values: changes((row) => row.other.headcount) },
     projectSgaRateEnd: { mode: "level", values: levels((row) => ratio(row.project.otherSga, row.project.sales)) },

@@ -220,7 +220,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /設備導入期間0～2pt、基準年後0～3pt/);
   assert.match(pageSource, /const improvementDriverKeys/);
   assert.match(pageSource, /"investment", "subsidy", "usefulLife"/);
-  assert.match(pageSource, /keys: \["projectMarketGrowth"\]/);
+  assert.match(pageSource, /keys: \["projectCogsRateWhenSalesZero", "otherCogsRateWhenSalesZero", "effectiveTaxRate", "projectMarketGrowth"\]/);
   assert.match(pageSource, /ローカルベンチマーク固定値/);
   assert.match(pageSource, /固定入力・判定対象外/);
   assert.match(pageSource, /key === "investment" \|\| key === "subsidy" \|\| key === "usefulLife" \|\| key === "projectMarketGrowth"/);

@@ -28,6 +28,33 @@ test("application starts without sample company, project, balance-sheet, or driv
   assert.equal(model.sampleDrivers.investment, 45);
 });
 
+test("previously implicit PL assumptions are explicit drivers", () => {
+  assert.equal(model.sampleDrivers.projectCogsRateWhenSalesZero, 0.68);
+  assert.equal(model.sampleDrivers.otherCogsRateWhenSalesZero, 0.68);
+  assert.equal(model.sampleDrivers.effectiveTaxRate, 0.30);
+  assert.equal(model.sampleDrivers.otherOfficerPayGrowthToBase, 0.04);
+  assert.equal(model.sampleDrivers.otherOfficerPayGrowth, 0.045);
+});
+
+test("base-business officer pay and tax use their own adjustment levels", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  const drivers = {
+    ...model.sampleDrivers,
+    otherPayGrowthToBase: 0,
+    otherPayGrowth: 0,
+    otherOfficerPayGrowthToBase: 0.08,
+    otherOfficerPayGrowth: 0.08,
+    effectiveTaxRate: 0.40,
+  };
+  const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE);
+  const base = plan.find((row) => row.role === "base");
+  const report3 = plan.find((row) => row.role === "report3");
+  assert.ok(base.other.officerPay > historical.at(-1).other.officerPay);
+  assert.ok(report3.other.officerPay > base.other.officerPay);
+  const company = model.total(report3.project, report3.other);
+  assert.ok(Math.abs(model.netIncome(company) / model.preTaxIncome(company) - 0.60) < 0.002);
+});
+
 test("relative planning metrics have fixed ceilings while absolute amounts are scale dependent", () => {
   assert.equal(model.metrics.length, 15);
   const scaleDependent = new Set(["companySalesIncrease", "projectSalesIncrease", "valueAddedIncrease", "employeePayIncrease", "officerPayIncrease"]);

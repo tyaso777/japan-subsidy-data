@@ -100,6 +100,11 @@ const adjustableDriverKeys: (keyof Drivers)[] = [
 ];
 
 const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string; step: number }>> = {
+  projectCogsRateWhenSalesZero: { label: "補助事業 原価率（売上実績が0の場合の開始水準）", unit: "%", step: 0.5 },
+  otherCogsRateWhenSalesZero: { label: "ベース事業 原価率（売上実績が0の場合の開始水準）", unit: "%", step: 0.5 },
+  effectiveTaxRate: { label: "実効税率", unit: "%", step: 0.5 },
+  otherOfficerPayGrowthToBase: { label: "ベース事業 役員1人当たり給与支給総額の年平均上昇率（最新決算期→基準年・モデル内管理）", unit: "%/年", step: 0.25 },
+  otherOfficerPayGrowth: { label: "ベース事業 役員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
   projectMarketGrowth: { label: "7-20 市場伸び率（年あたり）", unit: "%/年", step: 0.5 },
   projectSalesGrowthToBase: { label: "補助事業 売上成長率（設備導入期間）", unit: "%/年", step: 0.5 },
   projectCogsImprovementToBase: { label: "補助事業 原価率改善ポイント（設備導入期間）", unit: "pt", step: 0.5 },
@@ -168,25 +173,39 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
   {
     label: "ベース事業｜設備導入期間",
     detail: "最新決算期 → 基準年",
-    keys: ["otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase"],
+    keys: ["otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherOfficerPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase"],
   },
   {
     label: "ベース事業｜基準年後",
     detail: "基準年度 → 事業化報告3年目",
-    keys: ["otherSalesGrowth", "otherCogsImprovement", "otherPayGrowth", "otherHeadcountGrowth", "otherSgaRateEnd"],
+    keys: ["otherSalesGrowth", "otherCogsImprovement", "otherPayGrowth", "otherOfficerPayGrowth", "otherHeadcountGrowth", "otherSgaRateEnd"],
   },
   {
     label: "共通・固定前提",
     detail: "申請・外部前提",
-    keys: ["projectMarketGrowth"],
+    keys: ["projectCogsRateWhenSalesZero", "otherCogsRateWhenSalesZero", "effectiveTaxRate", "projectMarketGrowth"],
   },
 ];
 
 const forecastDriverKeys = driverGroups.flatMap((group) => group.keys);
-const fixedForecastDriverKeys = new Set<keyof Drivers>(["investment", "subsidy", "usefulLife", "projectMarketGrowth"]);
+const fixedForecastDriverKeys = new Set<keyof Drivers>([
+  "investment", "subsidy", "usefulLife", "projectCogsRateWhenSalesZero",
+  "otherCogsRateWhenSalesZero", "effectiveTaxRate", "otherOfficerPayGrowthToBase",
+  "otherOfficerPayGrowth", "projectMarketGrowth",
+]);
 
+const alphabeticCode = (index: number) => {
+  let value = index + 1;
+  let result = "";
+  while (value > 0) {
+    value -= 1;
+    result = String.fromCharCode(65 + value % 26) + result;
+    value = Math.floor(value / 26);
+  }
+  return result;
+};
 const driverItemCodes = Object.fromEntries(
-  forecastDriverKeys.map((key, index) => [key, String.fromCharCode(65 + index)]),
+  forecastDriverKeys.map((key, index) => [key, alphabeticCode(index)]),
 ) as Partial<Record<keyof Drivers, string>>;
 
 const equipmentPeriodStatisticalKeys = new Set<keyof Drivers>([
@@ -243,11 +262,13 @@ const historicalFallbackDefaults: Partial<Record<keyof Drivers, { initial: numbe
   otherSalesGrowthToBase: { initial: 0.03, lower: -0.03, upper: 0.08 },
   otherCogsImprovementToBase: { initial: 0, lower: 0, upper: 0.02 },
   otherPayGrowthToBase: { initial: 0.03, lower: 0, upper: 0.06 },
+  otherOfficerPayGrowthToBase: { initial: 0.03, lower: 0, upper: 0.06 },
   otherHeadcountGrowthToBase: { initial: 0.01, lower: -0.03, upper: 0.05 },
   otherSgaImprovementToBase: { initial: 0, lower: 0, upper: 0.02 },
   otherSalesGrowth: { initial: 0.05, lower: -0.01, upper: 0.10 },
   otherCogsImprovement: { initial: 0, lower: 0, upper: 0.03 },
   otherPayGrowth: { initial: 0.03, lower: 0, upper: 0.06 },
+  otherOfficerPayGrowth: { initial: 0.03, lower: 0, upper: 0.06 },
   otherHeadcountGrowth: { initial: 0.01, lower: -0.03, upper: 0.05 },
   projectSgaRateEnd: { initial: 0.10, lower: 0.06, upper: 0.15 },
   otherSgaRateEnd: { initial: 0.10, lower: 0.06, upper: 0.15 },
@@ -1840,6 +1861,32 @@ export default function Home() {
     nextDrivers.subsidy = hasInputValue(inputValues, inputKey.driver("subsidy"))
       ? drivers.subsidy
       : clamp(maximumSubsidyAmount(nextDrivers.investment), driverBounds.subsidy[0], driverBounds.subsidy[1]);
+    const latest = historicalPlan.at(-1)!;
+    const latestCompany = total(latest.project, latest.other);
+    const latestPreTax = preTaxIncome(latestCompany);
+    nextDrivers.projectCogsRateWhenSalesZero = hasInputValue(inputValues, inputKey.driver("projectCogsRateWhenSalesZero"))
+      ? drivers.projectCogsRateWhenSalesZero
+      : clamp(latest.project.sales ? latest.project.cogs / latest.project.sales : 0.68, 0, 0.99);
+    nextDrivers.otherCogsRateWhenSalesZero = hasInputValue(inputValues, inputKey.driver("otherCogsRateWhenSalesZero"))
+      ? drivers.otherCogsRateWhenSalesZero
+      : clamp(latest.other.sales ? latest.other.cogs / latest.other.sales : 0.68, 0, 0.99);
+    nextDrivers.effectiveTaxRate = hasInputValue(inputValues, inputKey.driver("effectiveTaxRate"))
+      ? drivers.effectiveTaxRate
+      : clamp(latestPreTax ? 1 - netIncome(latestCompany) / latestPreTax : 0.30, 0, 0.60);
+    const officerPayPerHead = historicalPlan.map((row) =>
+      row.other.officerCount ? row.other.officerPay / row.other.officerCount : Number.NaN);
+    const officerGrowthRates = officerPayPerHead.slice(1).map((value, index) =>
+      Number.isFinite(value) && officerPayPerHead[index] > 0 ? value / officerPayPerHead[index] - 1 : Number.NaN)
+      .filter(Number.isFinite);
+    const officerGrowthDefault = officerGrowthRates.length
+      ? officerGrowthRates.reduce((sum, value) => sum + value, 0) / officerGrowthRates.length
+      : 0.03;
+    nextDrivers.otherOfficerPayGrowthToBase = hasInputValue(inputValues, inputKey.driver("otherOfficerPayGrowthToBase"))
+      ? drivers.otherOfficerPayGrowthToBase
+      : clamp(officerGrowthDefault, 0, 0.08);
+    nextDrivers.otherOfficerPayGrowth = hasInputValue(inputValues, inputKey.driver("otherOfficerPayGrowth"))
+      ? drivers.otherOfficerPayGrowth
+      : clamp(officerGrowthDefault, 0, 0.08);
 
     for (const key of adjustableDriverKeys) {
       const history = historicalDriverSeries[key];
