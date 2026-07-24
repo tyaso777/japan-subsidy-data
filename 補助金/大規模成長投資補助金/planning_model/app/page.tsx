@@ -136,8 +136,8 @@ const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string;
   otherPayGrowth: { label: "ベース事業の従業員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
   projectHeadcountGrowth: { label: "補助事業 常時使用する従業員数（就業時間換算）の成長率（基準年→事業化報告3年目）", unit: "%/年", step: 0.5 },
   otherHeadcountGrowth: { label: "ベース事業 常時使用する従業員数（就業時間換算）の成長率（基準年→事業化報告3年目）", unit: "%/年", step: 0.5 },
-  projectSgaRateEnd: { label: "補助事業 その他販管費率（事業化報告3年目到達値）", unit: "%", step: 0.5 },
-  otherSgaRateEnd: { label: "ベース事業 その他販管費率（事業化報告3年目到達値）", unit: "%", step: 0.5 },
+  projectSgaRateEnd: { label: "補助事業 その他販管費率改善ポイント（基準年後）", unit: "pt", step: 0.5 },
+  otherSgaRateEnd: { label: "ベース事業 その他販管費率改善ポイント（基準年後）", unit: "pt", step: 0.5 },
   projectOfficerPayGrowth: { label: "役員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
   investment: { label: "補助事業投資額", unit: "億円", step: 1 },
   subsidy: { label: "申請補助金額", unit: "億円", step: 0.01 },
@@ -159,7 +159,10 @@ const driverTablePresentation = (key: keyof Drivers, label: string) => {
     effectiveTaxRate: "当期純利益＝税引前当期純利益×（100%－設定率）",
   };
   const modelManaged = label.includes("モデル内管理");
-  const terminalRate = key === "projectSgaRateEnd" || key === "otherSgaRateEnd";
+  const keepPeriodInLabel = key === "projectSgaImprovementToBase"
+    || key === "projectSgaRateEnd"
+    || key === "otherSgaImprovementToBase"
+    || key === "otherSgaRateEnd";
   const shortLabel = label
     .replace(/（設備導入期間(?:・モデル内管理)?）/g, "")
     .replace(/（最新決算期→基準年(?:・モデル内管理)?）/g, "")
@@ -167,8 +170,8 @@ const driverTablePresentation = (key: keyof Drivers, label: string) => {
     .replace(/（事業化報告3年目到達値）/g, "")
     .trim();
   return {
-    label: `${shortLabel}${modelManaged ? "（モデル内管理）" : ""}`,
-    note: accountingNotes[key] ?? (terminalRate ? "事業化報告3年目到達値" : undefined),
+    label: `${keepPeriodInLabel ? label : shortLabel}${modelManaged ? "（モデル内管理）" : ""}`,
+    note: accountingNotes[key],
   };
 };
 
@@ -191,7 +194,7 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
   {
     label: "補助事業｜基準年後",
     detail: "基準年度 → 事業化報告3年目",
-    keys: ["projectSalesGrowth", "projectCogsRateWhenSalesZero", "projectCogsImprovementAfterBase", "projectPayGrowth", "projectHeadcountGrowth", "projectSgaRateEnd", "projectOfficerPayGrowth"],
+    keys: ["projectSalesGrowth", "projectCogsRateWhenSalesZero", "projectCogsImprovementAfterBase", "projectPayGrowth", "projectHeadcountGrowth", "projectOfficerPayGrowth", "projectSgaRateEnd"],
   },
   {
     label: "ベース事業｜設備導入期間",
@@ -256,6 +259,7 @@ const improvementDriverKeys: (keyof Drivers)[] = [
   "projectCogsImprovementToBase", "projectSgaImprovementToBase",
   "otherCogsImprovementToBase", "otherSgaImprovementToBase",
   "projectCogsImprovementAfterBase", "otherCogsImprovement",
+  "projectSgaRateEnd", "otherSgaRateEnd",
 ];
 
 const scaleDependentMetricKeys = new Set<MetricKey>([
@@ -284,6 +288,7 @@ const round5Benchmarks: Partial<Record<MetricKey, Round5Benchmark>> = {
 const postBaseBenchmarkDefaults: Partial<Record<keyof Drivers, { initial: number; lower: number; upper: number }>> = {
   projectSalesGrowth: { initial: 0.22, lower: 0.15, upper: 0.30 },
   projectCogsImprovementAfterBase: { initial: 0.015, lower: 0, upper: 0.03 },
+  projectSgaRateEnd: { initial: 0.015, lower: 0, upper: 0.03 },
   projectPayGrowth: { initial: 0.07, lower: 0.05, upper: 0.10 },
   projectHeadcountGrowth: { initial: 0.04, lower: 0, upper: 0.08 },
   projectOfficerPayGrowth: { initial: 0.07, lower: 0.05, upper: 0.10 },
@@ -307,8 +312,8 @@ const historicalFallbackDefaults: Partial<Record<keyof Drivers, { initial: numbe
   otherPayGrowth: { initial: 0.03, lower: 0, upper: 0.06 },
   otherOfficerPayGrowth: { initial: 0.03, lower: 0, upper: 0.06 },
   otherHeadcountGrowth: { initial: 0.01, lower: -0.03, upper: 0.05 },
-  projectSgaRateEnd: { initial: 0.10, lower: 0.06, upper: 0.15 },
-  otherSgaRateEnd: { initial: 0.10, lower: 0.06, upper: 0.15 },
+  projectSgaRateEnd: { initial: 0.015, lower: 0, upper: 0.03 },
+  otherSgaRateEnd: { initial: 0.005, lower: 0, upper: 0.03 },
 };
 
 const plFields: { key: keyof SegmentPlan; modelCode: string; label: string; unit: string; digits?: number }[] = [
@@ -2028,14 +2033,6 @@ export default function Home() {
         ];
         continue;
       }
-      if (key === "projectSgaRateEnd") {
-        nextDrivers[key] = clamp(mean - 0.015, defaultLower, defaultUpper);
-        nextRanges[key] = [
-          clamp(mean - 0.04, defaultLower, defaultUpper),
-          clamp(mean + 0.01, defaultLower, defaultUpper),
-        ];
-        continue;
-      }
       const initial = useMeanAndDeviation ? mean : history.mode === "change"
         ? observed.length > 1 ? observed.at(-2)! * 0.4 + observed.at(-1)! * 0.6 : observed[0]
         : observed.length >= 3 ? observed[0] * 0.2 + observed[1] * 0.3 + observed[2] * 0.5 : observed.at(-1)!;
@@ -2069,14 +2066,11 @@ export default function Home() {
     applyOtherSynergyLift("otherCogsImprovement", "otherCogsImprovementToBase", 0.005);
     applyOtherSynergyLift("otherPayGrowth", "otherPayGrowthToBase", 0.005);
     applyOtherSynergyLift("otherHeadcountGrowth", "otherHeadcountGrowthToBase", 0.005);
-    const latestOther = historicalPlan.at(-1)!.other;
-    const latestOtherSgaRate = latestOther.sales ? latestOther.otherSga / latestOther.sales : 0.10;
-    const otherBaseSgaRate = latestOtherSgaRate - nextDrivers.otherSgaImprovementToBase;
     const postBaseSgaImprovement = Math.max(0, nextDrivers.otherSgaImprovementToBase + 0.005);
-    nextDrivers.otherSgaRateEnd = clamp(otherBaseSgaRate - postBaseSgaImprovement, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]);
+    nextDrivers.otherSgaRateEnd = clamp(postBaseSgaImprovement, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]);
     nextRanges.otherSgaRateEnd = [
-      clamp(nextDrivers.otherSgaRateEnd - 0.02, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]),
-      clamp(nextDrivers.otherSgaRateEnd + 0.01, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]),
+      clamp(nextDrivers.otherSgaRateEnd - 0.005, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]),
+      clamp(nextDrivers.otherSgaRateEnd + 0.005, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]),
     ];
 
     const defaultProjectInputs = createForecastProjectPeriodInputs(historicalPlan[2], nextDrivers, timeline);
@@ -2552,7 +2546,7 @@ export default function Home() {
             <code>期間末原価率 = 期間開始時原価率 − 原価率改善ポイント（プラスは改善、マイナスは悪化）</code>
             <code>各年度原価率 = 期間開始時原価率と期間末原価率を、経過年数に応じて直線補間</code>
             <code>設備導入期間末のその他販管費率 = 最新決算期のその他販管費率 − 改善ポイント（プラスは改善、マイナスは悪化）</code>
-            <code>基準年後の各年度その他販管費率 = 基準年度の実績率と事業化報告3年目の到達値を直線補間</code>
+            <code>事業化報告3年目のその他販管費率 = 基準年度のその他販管費率 − 基準年後の改善ポイント（途中年度は3年間で段階反映）</code>
             <p>許容下限・上限は、過去3期の最小・最大に変動幅の50%（最低1pt、率水準は最低2pt）を加え、技術的な上下限内に収めます。過去実績から決められない投資額・補助金額などは自動変更しません。減価償却費は投資額や耐用年数から作らず、③将来データ入力で売上原価内P2-4と販管費内P2-14を年度別に入力します。公式7-10は両項目の合計として自動計算します。</p>
           </article>
           <article className="panel formula-panel">

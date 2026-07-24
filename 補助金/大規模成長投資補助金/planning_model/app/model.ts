@@ -266,8 +266,8 @@ export const sampleDrivers: Drivers = {
   otherOfficerPayGrowth: 0.045,
   projectHeadcountGrowth: 0.04,
   otherHeadcountGrowth: 0.015,
-  projectSgaRateEnd: 0.09,
-  otherSgaRateEnd: 0.10,
+  projectSgaRateEnd: 0.015,
+  otherSgaRateEnd: 0.005,
   projectOfficerPayGrowth: 0.06,
   investment: 45,
   subsidy: 15,
@@ -401,8 +401,8 @@ export const driverBounds: Record<keyof Drivers, [number, number]> = {
   otherOfficerPayGrowth: [0, 0.08],
   projectHeadcountGrowth: [-0.03, 0.2],
   otherHeadcountGrowth: [-0.05, 0.1],
-  projectSgaRateEnd: [0.04, 0.25],
-  otherSgaRateEnd: [0.04, 0.25],
+  projectSgaRateEnd: [0, 0.03],
+  otherSgaRateEnd: [0, 0.03],
   projectOfficerPayGrowth: [0, 0.1],
   investment: [15, 200],
   subsidy: [1, 50],
@@ -687,7 +687,7 @@ export function createForecastProjectPeriodInputs(
   const start = latest.project;
   const startCogsRate = start.sales ? start.cogs / start.sales : drivers.projectCogsRateWhenSalesZero;
   const targetCogsRate = Math.min(0.99, Math.max(0.01, startCogsRate - drivers.projectCogsImprovementToBase));
-  const startSgaRate = start.sales ? start.otherSga / start.sales : drivers.projectSgaRateEnd;
+  const startSgaRate = start.sales ? start.otherSga / start.sales : 0;
   const startPayPerHead = start.headcount ? start.employeePay / start.headcount : 0;
 
   return Array.from({ length: years }, (_, index) => {
@@ -740,11 +740,13 @@ export function generatePlan(
   const otherBaseEmployeePay = otherBasePayPerHead * (1 + drivers.otherPayGrowthToBase) ** yearsToBase * otherBaseHeadcount;
   const otherBaseOfficerPay = latest.other.officerPay * (1 + drivers.otherOfficerPayGrowthToBase) ** yearsToBase;
   const otherBaseCogsRate = Math.min(0.99, Math.max(0.01, baseOtherCogsRate - drivers.otherCogsImprovementToBase));
-  const latestOtherSgaRate = latest.other.sales ? latest.other.otherSga / latest.other.sales : drivers.otherSgaRateEnd;
+  const latestOtherSgaRate = latest.other.sales ? latest.other.otherSga / latest.other.sales : 0;
   const otherBaseSgaRate = Math.min(0.99, Math.max(0, latestOtherSgaRate - drivers.otherSgaImprovementToBase));
   const projectCogsRateEnd = Math.min(0.99, Math.max(0.01, baseProjectCogsRate - drivers.projectCogsImprovementAfterBase));
   const otherCogsRateEnd = Math.min(0.99, Math.max(0.01, otherBaseCogsRate - drivers.otherCogsImprovement));
-  const baseProjectSgaRate = projectBase.sales ? projectBase.otherSga / projectBase.sales : drivers.projectSgaRateEnd;
+  const baseProjectSgaRate = projectBase.sales ? projectBase.otherSga / projectBase.sales : 0;
+  const projectSgaRateEnd = Math.min(0.99, Math.max(0, baseProjectSgaRate - drivers.projectSgaRateEnd));
+  const otherSgaRateEnd = Math.min(0.99, Math.max(0, otherBaseSgaRate - drivers.otherSgaRateEnd));
   const baseProjectPayPerHead = projectBase.headcount ? projectBase.employeePay / projectBase.headcount : 0;
   const emptyProject: SegmentPlan = { sales: 0, cogs: 0, employeePay: 0, officerPay: 0, depreciation: 0, cogsDepreciation: 0, sgaDepreciation: 0, otherSga: 0, headcount: 0, officerCount: 0 };
 
@@ -774,7 +776,7 @@ export function generatePlan(
       : otherBaseOfficerPay * (1 + drivers.otherOfficerPayGrowth) ** yearsAfterBase;
     const otherSgaRate = beforeOrAtBase
       ? lerp(latestOtherSgaRate, otherBaseSgaRate, otherProgress)
-      : lerp(otherBaseSgaRate, drivers.otherSgaRateEnd, otherProgress);
+      : lerp(otherBaseSgaRate, otherSgaRateEnd, otherProgress);
     const enteredProject = periodInputs.find((row) => row.year === year)?.project;
     const rawProject = year <= timeline.baseYear ? structuredClone(enteredProject ?? emptyProject) : withProportionalBreakdown(projectBase, {
       sales: round(projectSales),
@@ -782,7 +784,7 @@ export function generatePlan(
       employeePay: round(baseProjectPayPerHead * (1 + drivers.projectPayGrowth) ** yearsAfterBase * projectHeadcount),
       officerPay: round(projectBase.officerPay * (1 + drivers.projectOfficerPayGrowth) ** yearsAfterBase),
       depreciation: round(projectBase.depreciation),
-      otherSga: round(projectSales * lerp(baseProjectSgaRate, drivers.projectSgaRateEnd, projectProgress)),
+      otherSga: round(projectSales * lerp(baseProjectSgaRate, projectSgaRateEnd, projectProgress)),
       headcount: Math.max(0, Math.round(projectHeadcount)),
       officerCount: Math.max(0, Math.round(projectBase.officerCount)),
     });
@@ -1029,8 +1031,16 @@ export function calculateHistoricalDriverSeries(
     otherOfficerPayGrowth: { mode: "change", values: changes((row) => perOfficer(row.other)) },
     projectHeadcountGrowth: { mode: "change", values: changes((row) => row.project.headcount) },
     otherHeadcountGrowth: { mode: "change", values: changes((row) => row.other.headcount) },
-    projectSgaRateEnd: { mode: "level", values: levels((row) => ratio(row.project.otherSga, row.project.sales)) },
-    otherSgaRateEnd: { mode: "level", values: levels((row) => ratio(row.other.otherSga, row.other.sales)) },
+    projectSgaRateEnd: {
+      mode: "change",
+      values: improvements((row) => ratio(row.project.otherSga, row.project.sales)),
+      referenceLevels: levels((row) => ratio(row.project.otherSga, row.project.sales)),
+    },
+    otherSgaRateEnd: {
+      mode: "change",
+      values: improvements((row) => ratio(row.other.otherSga, row.other.sales)),
+      referenceLevels: levels((row) => ratio(row.other.otherSga, row.other.sales)),
+    },
     projectOfficerPayGrowth: { mode: "change", values: changes((row) => perOfficer(row.project)) },
     investment: { mode: "level", values: levels((_, index) => balanceSheets[index]?.capex > 0 ? balanceSheets[index].capex : Number.NaN) },
     subsidy: unavailable(),

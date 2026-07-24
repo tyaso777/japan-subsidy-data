@@ -39,6 +39,7 @@ const equipmentStatistical = new Set<keyof Drivers>(adjustable.slice(0, 11));
 const postBaseBenchmarks: Partial<Record<keyof Drivers, { initial: number; lower: number; upper: number }>> = {
   projectSalesGrowth: { initial: 0.22, lower: 0.15, upper: 0.30 },
   projectCogsImprovementAfterBase: { initial: 0.015, lower: 0, upper: 0.03 },
+  projectSgaRateEnd: { initial: 0.015, lower: 0, upper: 0.03 },
   projectPayGrowth: { initial: 0.07, lower: 0.05, upper: 0.10 },
   projectHeadcountGrowth: { initial: 0.04, lower: 0, upper: 0.08 },
   projectOfficerPayGrowth: { initial: 0.07, lower: 0.05, upper: 0.10 },
@@ -59,8 +60,8 @@ const fallbacks: Partial<Record<keyof Drivers, { initial: number; lower: number;
   otherCogsImprovement: { initial: 0, lower: 0, upper: 0.03 },
   otherPayGrowth: { initial: 0.03, lower: 0, upper: 0.06 },
   otherHeadcountGrowth: { initial: 0.01, lower: -0.03, upper: 0.05 },
-  projectSgaRateEnd: { initial: 0.10, lower: 0.06, upper: 0.15 },
-  otherSgaRateEnd: { initial: 0.10, lower: 0.06, upper: 0.15 },
+  projectSgaRateEnd: { initial: 0.015, lower: 0, upper: 0.03 },
+  otherSgaRateEnd: { initial: 0.005, lower: 0, upper: 0.03 },
 };
 const clamp = (value: number, lower: number, upper: number) => Math.min(upper, Math.max(lower, value));
 const initialDrivers = structuredClone(defaultDrivers);
@@ -92,11 +93,6 @@ for (const key of adjustable) {
     workflowBounds[key] = [clamp(benchmark.lower, defaultLower, defaultUpper), clamp(benchmark.upper, defaultLower, defaultUpper)];
     continue;
   }
-  if (key === "projectSgaRateEnd") {
-    initialDrivers[key] = clamp(mean - 0.015, defaultLower, defaultUpper);
-    workflowBounds[key] = [clamp(mean - 0.04, defaultLower, defaultUpper), clamp(mean + 0.01, defaultLower, defaultUpper)];
-    continue;
-  }
   const initial = useMeanAndDeviation ? mean : history.mode === "change"
     ? observed.length > 1 ? observed.at(-2)! * 0.4 + observed.at(-1)! * 0.6 : observed[0]
     : observed.length >= 3 ? observed[0] * 0.2 + observed[1] * 0.3 + observed[2] * 0.5 : observed.at(-1)!;
@@ -121,13 +117,10 @@ lift("otherSalesGrowth", "otherSalesGrowthToBase", 0.02);
 lift("otherCogsImprovement", "otherCogsImprovementToBase", 0.005);
 lift("otherPayGrowth", "otherPayGrowthToBase", 0.005);
 lift("otherHeadcountGrowth", "otherHeadcountGrowthToBase", 0.005);
-const latestOther = historical.at(-1)!.other;
-const latestOtherSgaRate = latestOther.sales ? latestOther.otherSga / latestOther.sales : 0.10;
-const otherBaseSgaRate = latestOtherSgaRate - initialDrivers.otherSgaImprovementToBase;
-initialDrivers.otherSgaRateEnd = clamp(otherBaseSgaRate - Math.max(0, initialDrivers.otherSgaImprovementToBase + 0.005), driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]);
+initialDrivers.otherSgaRateEnd = clamp(Math.max(0, initialDrivers.otherSgaImprovementToBase + 0.005), driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]);
 workflowBounds.otherSgaRateEnd = [
-  clamp(initialDrivers.otherSgaRateEnd - 0.02, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]),
-  clamp(initialDrivers.otherSgaRateEnd + 0.01, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]),
+  clamp(initialDrivers.otherSgaRateEnd - 0.005, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]),
+  clamp(initialDrivers.otherSgaRateEnd + 0.005, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]),
 ];
 const initialPeriod = createForecastProjectPeriodInputs(historical[2], initialDrivers, DEFAULT_TIMELINE);
 const initialPlan = generatePlan(historical, initialDrivers, DEFAULT_TIMELINE, initialPeriod);

@@ -260,6 +260,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /補助事業1人当たり給与支給総額の年平均上昇率/);
   assert.doesNotMatch(pageSource, /1人給与成長率|1人給与伸び/);
   assert.match(pageSource, /その他販管費率改善ポイント/);
+  assert.match(pageSource, /projectSgaRateEnd: \{ label: "補助事業 その他販管費率改善ポイント（基準年後）", unit: "pt"/);
+  assert.match(pageSource, /keys: \["projectSalesGrowth", "projectCogsRateWhenSalesZero", "projectCogsImprovementAfterBase", "projectPayGrowth", "projectHeadcountGrowth", "projectOfficerPayGrowth", "projectSgaRateEnd"\]/);
   assert.match(pageSource, /各期率＋前年差改善pt/);
   assert.match(pageSource, /<strong>\{improvementLabel\}<\/strong><small>当期率/);
   assert.match(pageSource, /actuals-three-year-table/);

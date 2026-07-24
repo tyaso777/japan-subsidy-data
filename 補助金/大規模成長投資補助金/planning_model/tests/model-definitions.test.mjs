@@ -238,6 +238,10 @@ test("historical target references compare the two actual-year intervals", () =>
   assert.deepEqual(model.driverBounds.otherSgaImprovementToBase, [0, 0.02]);
   assert.deepEqual(model.driverBounds.projectCogsImprovementAfterBase, [0, 0.03]);
   assert.deepEqual(model.driverBounds.otherCogsImprovement, [0, 0.03]);
+  assert.equal(driverSeries.projectSgaRateEnd.mode, "change");
+  assert.equal(driverSeries.otherSgaRateEnd.mode, "change");
+  assert.deepEqual(model.driverBounds.projectSgaRateEnd, [0, 0.03]);
+  assert.deepEqual(model.driverBounds.otherSgaRateEnd, [0, 0.03]);
   assert.deepEqual(driverSeries.investment.values, model.sampleBalanceSheets.map((row) => row.capex));
   assert.ok(model.defaultBalanceSheets.every((row) => row.capex === 0));
 });
@@ -401,6 +405,22 @@ test("equipment-period other SGA assumption is an improvement point", () => {
   const base = inputs.at(-1).project;
 
   assert.ok(Math.abs(base.otherSga / base.sales - 0.095) < 1e-4);
+});
+
+test("post-base other SGA assumption is an improvement point rather than a terminal rate", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  const drivers = { ...model.sampleDrivers, projectSgaRateEnd: 0.02, otherSgaRateEnd: 0.01 };
+  const inputs = model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE);
+  const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE, inputs);
+  const base = plan.find((row) => row.role === "base");
+  const report3 = plan.find((row) => row.role === "report3");
+  const baseProjectRate = base.project.otherSga / base.project.sales;
+  const report3ProjectRate = report3.project.otherSga / report3.project.sales;
+  const baseOtherRate = base.other.otherSga / base.other.sales;
+  const report3OtherRate = report3.other.otherSga / report3.other.sales;
+
+  assert.ok(Math.abs((baseProjectRate - report3ProjectRate) - 0.02) < 1e-4);
+  assert.ok(Math.abs((baseOtherRate - report3OtherRate) - 0.01) < 1e-4);
 });
 
 test("optimizer respects user-supplied driver ranges", () => {

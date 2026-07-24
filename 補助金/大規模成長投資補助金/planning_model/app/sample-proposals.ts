@@ -56,8 +56,8 @@ const standardWorkflowInitialDrivers = {
   otherPayGrowth: 0.02484645846924027,
   projectHeadcountGrowth: 0.04,
   otherHeadcountGrowth: 0.045833333333333386,
-  projectSgaRateEnd: 0.11,
-  otherSgaRateEnd: 0.10928571428571428,
+  projectSgaRateEnd: 0.015,
+  otherSgaRateEnd: 0.005,
   projectOfficerPayGrowth: 0.05380116959064325,
   investment: 23,
   subsidy: 7.66,
@@ -85,8 +85,8 @@ const standardWorkflowAdjustedDrivers = {
   otherPayGrowth: 0.02486379555963734,
   projectHeadcountGrowth: 0.02653400698736899,
   otherHeadcountGrowth: 0.045868396821860904,
-  projectSgaRateEnd: 0.10997758381273556,
-  otherSgaRateEnd: 0.10932163096801865,
+  projectSgaRateEnd: 0.014986550287641339,
+  otherSgaRateEnd: 0.005011972227434792,
   projectOfficerPayGrowth: 0.05376296842892359,
   investment: 23,
   subsidy: 7.66,
@@ -113,8 +113,8 @@ const standardWorkflowRanges: typeof driverBounds = {
   otherPayGrowth: [0.024139457023717444, 0.025553459914763096],
   projectHeadcountGrowth: [0, 0.08],
   otherHeadcountGrowth: [0.04416666666666668, 0.04750000000000009],
-  projectSgaRateEnd: [0.08499999999999999, 0.135],
-  otherSgaRateEnd: [0.08928571428571427, 0.11928571428571427],
+  projectSgaRateEnd: [0, 0.03],
+  otherSgaRateEnd: [0, 0.01],
   projectOfficerPayGrowth: [0.04263157894736836, 0.06555555555555558],
 };
 
@@ -151,8 +151,8 @@ const partiallyUnmetAdjustedDrivers = {
   otherPayGrowth: 0.02484645846924027,
   projectHeadcountGrowth: 0.03720548239720505,
   otherHeadcountGrowth: 0.045833333333333386,
-  projectSgaRateEnd: 0.11,
-  otherSgaRateEnd: 0.10927258987212823,
+  projectSgaRateEnd: 0.015,
+  otherSgaRateEnd: 0.005,
   projectOfficerPayGrowth: 0.05377805762871632,
 };
 
@@ -177,8 +177,8 @@ const multipleUnmetAdjustedDrivers = {
   otherPayGrowth: 0.02484645846924027,
   projectHeadcountGrowth: 0.0012644987906476753,
   otherHeadcountGrowth: 0.045833333333333386,
-  projectSgaRateEnd: 0.10249307677048204,
-  otherSgaRateEnd: 0.10930245288582688,
+  projectSgaRateEnd: 0.01875,
+  otherSgaRateEnd: 0.005,
   projectOfficerPayGrowth: 0.05383627215236722,
 };
 
