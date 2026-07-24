@@ -443,6 +443,12 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /label="自動計算項目" range="M-C1～M-C16"/);
   assert.match(globalStyles, /\.manual-table-heading \{ display: flex;/);
   assert.match(globalStyles, /\.calculated-row-toggle\[aria-pressed="true"\]/);
+  assert.match(pageSource, /code: "2-2", label: "売上高成長率", unit: "%", indentLevel: 1/);
+  assert.match(pageSource, /code: "2-10", label: "うち役員賞与", indentLevel: 2/);
+  assert.match(pageSource, /function PlRowTitle[\s\S]*?pl-row-indent-\$\{indentLevel\}[\s\S]*?\{code\} \{label\}/);
+  assert.match(globalStyles, /\.pl-row-indent-1 \{ padding-inline-start: var\(--space-4\); \}/);
+assert.match(globalStyles, /\.pl-row-indent-2 \{ padding-inline-start: var\(--space-6\); \}/);
+  assert.doesNotMatch(pageSource, /label: "　/);
   assert.match(pageSource, /補助事業の経常利益以下は営業利益を基準/);
   assert.doesNotMatch(pageSource, /2-19・2-20はモデル未対応|2-18は営業利益と同額/);
   assert.doesNotMatch(reportDataSource, /税引前当期純利益（モデル未対応）|当期純利益（モデル未対応）/);
