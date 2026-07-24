@@ -192,6 +192,12 @@ input, select { border: 1px solid #d7d2c7; background: #fffefa; color: var(--ink
 .historical-heading { background: #ebe8df !important; color: #67716c !important; }.historical-reference { background: #f4f2eb; color: #68716d; }.historical-reference strong { font-weight: 600; }
 .future-empty { display: inline-block; min-width: 88px; padding: 7px 6px; text-align: center; color: var(--muted); }
 .comparison-banner { display: flex; align-items: center; gap: 12px; background: var(--green-soft); border: 1px solid #bdd6c4; border-radius: 12px; padding: 13px 16px; color: #315340; font-size: 13px; }.comparison-banner strong { color: var(--green); }.comparison-banner .text-button { margin-left: auto; }
+.project-input-shortage { grid-column: 1 / -1; padding: 14px 16px; border: 1px solid #d88078; border-left: 4px solid var(--red); border-radius: 10px; background: var(--red-soft); color: #6f2925; }
+.project-input-shortage strong { display: block; margin-bottom: 4px; font-size: 14px; }
+.project-input-shortage p { margin: 0; font-size: 13px; line-height: 1.65; }
+.required-input-missing { background: var(--red-soft) !important; }
+.required-input-missing input { border-color: #c96058 !important; background: #fffafa !important; }
+.required-input-missing input::placeholder { color: #8f302a; opacity: 1; }
 
 .table-panel { overflow: visible; min-width: 0; }.table-panel > .panel-heading { position: sticky; top: 46px; z-index: 18; padding: 8px 0; border-bottom: 1px solid rgba(215, 211, 200, .9); background: rgba(255, 254, 250, .97); backdrop-filter: blur(8px); }.table-panel:has(> .manual-sections) > .panel-heading { position: static; }.wide-table, .targets-table-wrap { display: block; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; overflow-x: auto; overflow-y: visible; margin-top: 15px; position: relative; isolation: isolate; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }

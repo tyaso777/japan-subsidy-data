@@ -239,6 +239,18 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /固定入力・判定対象外/);
   assert.match(pageSource, /P2-4とP2-14は補助事業の詳細PLを作るための必須入力です。/);
   assert.match(pageSource, /直接入力や配賦による補完は行いません。/);
+  assert.match(pageSource, /const requiredProjectDepreciationInputs = \[/);
+  assert.match(pageSource, /row\.project\.cogsDepreciation = 0/);
+  assert.match(pageSource, /row\.project\.sgaDepreciation = 0/);
+  assert.match(pageSource, /!requiredProjectDepreciationCodes\.has\(item\.code\) && projectAnchors\.has\(item\.code\)/);
+  assert.match(pageSource, /!requiredProjectDepreciationDetailedKeys\.has\(item\.key\) && projectAnchors\.has\(item\.key\)/);
+  assert.match(pageSource, /placeholder=\{required \? "未入力"/);
+  assert.match(pageSource, /空欄を自動予測または前年度値から補完しません/);
+  assert.match(pageSource, /function ProjectDepreciationInputNotice/);
+  assert.match(pageSource, /<ProjectDepreciationInputNotice items=\{missingProjectDepreciation\} context="年度別PL" \/>/);
+  assert.match(pageSource, /<ProjectDepreciationInputNotice items=\{missingProjectDepreciation\} context="診断" \/>/);
+  assert.match(pageSource, /title: `\$\{item\.code\} \$\{item\.label\}が未入力`/);
+  assert.match(pageSource, /\{missing \? "未入力" : formatted\(value, item\.unit\)\}/);
   assert.match(proposalSource, /fixedOutputDriverKeys\.has\(key\) \? undefined/);
   assert.match(pageSource, /calculateScaleDependentTargetDefaults/);
   assert.match(pageSource, /15指標の増加額5項目は固定中央値を使わず/);

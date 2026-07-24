@@ -531,6 +531,36 @@ type ForecastOverrides = Record<string, number>;
 type FutureInputBasis = "company" | "other";
 type ForecastSegment = SegmentKey | "company";
 const forecastOverrideKey = (year: number, segment: ForecastSegment, item: string) => `${year}:${segment}:${item}`;
+const requiredProjectDepreciationInputs = [
+  { code: "P2-4", detailedKey: "cogsDepreciation", label: "売上原価に含まれる減価償却費" },
+  { code: "P2-14", detailedKey: "sgaDepreciation", label: "販管費に含まれる減価償却費" },
+] as const;
+const requiredProjectDepreciationCodes = new Set<string>(requiredProjectDepreciationInputs.map((item) => item.code));
+const requiredProjectDepreciationDetailedKeys = new Set<string>(requiredProjectDepreciationInputs.map((item) => item.detailedKey));
+type MissingProjectDepreciationInput = { year: number; code: string; label: string; overrideKey: string };
+
+function missingProjectDepreciationInputs(plan: YearPlan[], overrides: ForecastOverrides, inputBasis: FutureInputBasis) {
+  return plan.slice(3).flatMap((row) => requiredProjectDepreciationInputs.flatMap((item) => {
+    const inputItem = inputBasis === "company" ? item.code : item.detailedKey;
+    const overrideKey = forecastOverrideKey(row.year, "project", inputItem);
+    return Object.prototype.hasOwnProperty.call(overrides, overrideKey)
+      ? []
+      : [{ year: row.year, code: item.code, label: item.label, overrideKey }];
+  }));
+}
+
+function clearMissingProjectDepreciation(plan: YearPlan[], missingInputs: MissingProjectDepreciationInput[]) {
+  if (!missingInputs.length) return plan;
+  const result = clone(plan);
+  for (const missing of missingInputs) {
+    const row = result.find((candidate) => candidate.year === missing.year);
+    if (!row) continue;
+    if (missing.code === "P2-4") row.project.cogsDepreciation = 0;
+    if (missing.code === "P2-14") row.project.sgaDepreciation = 0;
+    row.project.depreciation = cogsDepreciation(row.project) + sgaDepreciation(row.project);
+  }
+  return result;
+}
 
 function createInitialInputValues(): InputValues {
   let values: InputValues = {};
@@ -560,6 +590,9 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
     const previousAuto = plan[index - 1];
     const row = result[index];
     const previousEffective = result[index - 1];
+    row.project.cogsDepreciation = 0;
+    row.project.sgaDepreciation = 0;
+    row.project.depreciation = 0;
 
     if (inputBasis === "other") {
       for (const legacyField of ["employeePay", "officerPay", "depreciation", "otherSga"] as const) {
@@ -596,8 +629,8 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
         Object.entries(patch).forEach(([field, value]) => {
           row.project[field as keyof SegmentPlan] = roundedInput(value ?? 0, item.digits ?? 2);
         });
-        projectAnchors.add(item.code);
-      } else if (projectAnchors.has(item.code)) {
+        if (!requiredProjectDepreciationCodes.has(item.code)) projectAnchors.add(item.code);
+      } else if (!requiredProjectDepreciationCodes.has(item.code) && projectAnchors.has(item.code)) {
         const projected = cascade(item.get(previousEffective.project), item.get(previousAuto.project), item.get(autoRow.project));
         const patch = item.set(row.project, projected);
         Object.entries(patch).forEach(([field, value]) => {
@@ -614,8 +647,8 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
           Object.entries(patch).forEach(([field, value]) => {
             row.project[field as keyof SegmentPlan] = roundedInput(value ?? 0, field === "headcount" || field === "officerCount" ? 0 : 2);
           });
-          projectAnchors.add(item.key);
-        } else if (projectAnchors.has(item.key)) {
+          if (!requiredProjectDepreciationDetailedKeys.has(item.key)) projectAnchors.add(item.key);
+        } else if (!requiredProjectDepreciationDetailedKeys.has(item.key) && projectAnchors.has(item.key)) {
           const projected = cascade(item.get(previousEffective.project), item.get(previousAuto.project), item.get(autoRow.project));
           const patch = item.set(row.project, projected);
           Object.entries(patch).forEach(([field, value]) => {
@@ -1199,9 +1232,20 @@ export default function Home() {
       if (menu !== openedMenu) menu.removeAttribute("open");
     });
   }
+  const missingProjectDepreciation = useMemo(
+    () => missingProjectDepreciationInputs(autoPlan, forecastOverrides, futureInputBasis),
+    [autoPlan, forecastOverrides, futureInputBasis],
+  );
   const sourcePlan = useMemo(() => applyForecastOverrides(autoPlan, forecastOverrides, futureInputBasis, drivers), [autoPlan, forecastOverrides, futureInputBasis, drivers]);
-  const plan = adjustedPlan ?? sourcePlan;
+  const plan = useMemo(
+    () => clearMissingProjectDepreciation(adjustedPlan ?? sourcePlan, missingProjectDepreciation),
+    [adjustedPlan, sourcePlan, missingProjectDepreciation],
+  );
   const calculationDrivers = adjustedDrivers ?? drivers;
+  const missingProjectDepreciationKeys = useMemo(
+    () => new Set(missingProjectDepreciation.map((item) => `${item.year}:${item.code}`)),
+    [missingProjectDepreciation],
+  );
   const sourceActual = useMemo(() => calculateMetrics(sourcePlan, drivers), [sourcePlan, drivers]);
   const actual = useMemo(() => calculateMetrics(plan, calculationDrivers), [plan, calculationDrivers]);
   const statutoryRequirements = applicationRequirements(applicationCategory);
@@ -1220,8 +1264,15 @@ export default function Home() {
   const validations = useMemo(() => {
     const modelValidations = validatePlan(plan, calculationDrivers);
     const statutoryValidations = statutoryFailures.map((detail) => ({ level: "error" as const, title: "制度上の必須条件に違反", detail }));
-    return statutoryValidations.length ? [...statutoryValidations, ...modelValidations.filter((item) => item.level !== "info")] : modelValidations;
-  }, [plan, calculationDrivers, statutoryFailures]);
+    const inputValidations = missingProjectDepreciation.map((item) => ({
+      level: "error" as const,
+      year: item.year,
+      title: `${item.code} ${item.label}が未入力`,
+      detail: "③将来データ入力で年度別計画値を入力してください。空欄を自動予測値で補完しません。",
+    }));
+    const combined = [...inputValidations, ...statutoryValidations];
+    return combined.length ? [...combined, ...modelValidations.filter((item) => item.level !== "info")] : modelValidations;
+  }, [plan, calculationDrivers, statutoryFailures, missingProjectDepreciation]);
   const optimizationTargets = useMemo(
     () => createOptimizationTargets(targets, inputValues, metricGroupBases),
     [targets, inputValues, metricGroupBases],
@@ -2242,6 +2293,7 @@ export default function Home() {
 
       {view === "summary" && (
         <section className="page-grid summary-grid">
+          <ProjectDepreciationInputNotice items={missingProjectDepreciation} context="診断" />
           <div className="hero-card dark-card">
             <div>
               <p className="card-kicker">同時達成判定</p>
@@ -2341,10 +2393,10 @@ export default function Home() {
 
       {view === "future" && (
         <section className="content-stack">
-          <div className="section-intro"><div><h2>自動予測を確認し、必要なセルだけ上書き</h2></div><p>青枠の空欄には、過去実績と「15指標・目標」の調整水準から計算した値を表示します。入力したセルは太字で固定し、それ以降の空欄年度を再予測します。</p></div>
+          <div className="section-intro"><div><h2>自動予測を確認し、必要なセルだけ上書き</h2></div><p>青枠の空欄には原則として自動予測値を表示します。ただし、P2-4・P2-14の減価償却費は年度別の必須入力で、空欄は「未入力」として扱います。</p></div>
           <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。直前の変更はCtrl＋Zで戻せます。</p>
           <article className="panel table-panel"><div className="panel-heading"><div><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">{futureCapex.some((row) => hasInputValue(inputValues, inputKey.futureCapex(row.year))) ? `入力合計 ${number(futureCapex.reduce((sum, row) => sum + row.value, 0), 2)} 億円` : "年度別計画 未入力"}</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} inputValues={inputValues} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。年度別設備投資は補助事業投資額から自動配分しません。事業計画に基づく各年度の金額を入力してください。入力値は設備投資に関する診断へ反映します。</p></article>
-          <article className="panel table-panel"><div className="panel-heading"><div><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>公式様式を直接作るか、事業別の詳細PLを積み上げるかを選びます</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>ベース事業PLを入力</button></div></div>{missingAccountingAssumptions.length ? <p className="default-note" role="alert">②15指標・目標で「会計内訳・利益前提」を設定してください。給与・賞与、役員報酬・賞与、研究開発費、営業外損益、特別損益、税率が未設定のまま将来PLを補完することはありません。減価償却費は③将来データ入力でP2-4とP2-14を直接入力します。</p> : <FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} drivers={calculationDrivers} onForecastChange={updateForecastOverride} />}<p className="footnote">「全社PLを入力」は、会社全体2-1～2-36と補助事業7-1～7-20・内部管理P2-Xを入力して公式Excelを完成させる方式です。「ベース事業PLを入力」は、補助事業とベース事業を同じ詳細項目で入力し、合計から会社全体PLを作る方式です。</p></article>
+          <article className="panel table-panel"><div className="panel-heading"><div><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">P2-4・P2-14は必須入力</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>公式様式を直接作るか、事業別の詳細PLを積み上げるかを選びます</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>ベース事業PLを入力</button></div></div>{missingAccountingAssumptions.length ? <p className="default-note" role="alert">②15指標・目標で「会計内訳・利益前提」を設定してください。給与・賞与、役員報酬・賞与、研究開発費、営業外損益、特別損益、税率が未設定のまま将来PLを補完することはありません。減価償却費は③将来データ入力でP2-4とP2-14を直接入力します。</p> : <FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} drivers={calculationDrivers} onForecastChange={updateForecastOverride} />}<p className="footnote">「全社PLを入力」は、会社全体2-1～2-36と補助事業7-1～7-20・内部管理P2-Xを入力して公式Excelを完成させる方式です。「ベース事業PLを入力」は、補助事業とベース事業を同じ詳細項目で入力し、合計から会社全体PLを作る方式です。</p></article>
           <div className="workflow-actions"><div><span>上書きしたセルを固定して再最適化できます。再最適化後もこの画面に留まります。</span>{adjustedPlan && <p className="solve-note">{solveNote}</p>}</div><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("targets")}>← 15指標・目標へ戻る</button><button className="solve-button" disabled={isSolving} aria-busy={isSolving} onClick={() => void solve()}>{isSolving ? "計算中…" : "上書き内容を反映して再最適化"}</button><button className="reset-button" onClick={() => goToView("pl")}>年度別PLへ →</button></div></div>
         </section>
       )}
@@ -2352,9 +2404,10 @@ export default function Home() {
       {view === "pl" && (
         <section className="content-stack">
           <div className="section-intro"><div><h2>第6次Excelの項目番号・並び順で表示</h2></div><p>会社全体は2-1～2-36、補助事業は7-1～7-20に合わせています。2-21以降は給与・付加価値・人数・EBITDAのP/L関連計算項目です。</p></div>
+          <ProjectDepreciationInputNotice items={missingProjectDepreciation} context="年度別PL" />
           {adjustedPlan && <div className="comparison-banner"><strong>入力値は保存されています。</strong><span>各セルを「入力値 → 調整案」で表示しています。</span></div>}
           <CompanyTable plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} />
-          <OfficialProjectTable plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} drivers={calculationDrivers} />
+          <OfficialProjectTable plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} drivers={calculationDrivers} missingKeys={missingProjectDepreciationKeys} />
           <PlTable title="ベース事業PL（モデル内訳・申請書外）" plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} segment="other" />
           <div className="workflow-actions"><span>年度別PLを確認したら、診断画面で計画推移と妥当性を確認します。</span><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("future")}>← 将来データ入力に戻る</button><button className="solve-button" onClick={() => goToView("summary")}>診断タブに進む →</button></div></div>
         </section>
@@ -2706,6 +2759,15 @@ function OfficialSectionHeading({ label, range, columns }: { label: string; rang
   </tr>;
 }
 
+function ProjectDepreciationInputNotice({ items, context }: { items: MissingProjectDepreciationInput[]; context: "年度別PL" | "診断" }) {
+  if (!items.length) return null;
+  const years = [...new Set(items.map((item) => item.year))];
+  return <aside className="project-input-shortage" role="alert">
+    <strong>補助事業の減価償却費が未入力です</strong>
+    <p>{years.join("・")}年のP2-4またはP2-14が空欄です。空欄は自動予測せず、{context}は入力不足として表示しています。③将来データ入力で年度別計画値を入力してください。</p>
+  </aside>;
+}
+
 function DetailedProjectInputsTable({ historical, effectivePlan, overrides, omitCalculated, onToggleCalculated, onForecastChange }: {
   historical: YearPlan[];
   effectivePlan: YearPlan[];
@@ -2719,7 +2781,7 @@ function DetailedProjectInputsTable({ historical, effectivePlan, overrides, omit
   const rawPlaceholder = (value: number, digits = 2) => String(roundedInput(value, digits));
   return <div>
     <h3 className="manual-table-heading"><span>補助事業PL・関連計算項目（公式7-1～7-19＋内部管理P2-X：過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCalculated} onClick={onToggleCalculated}>{omitCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
-    <div className="wide-table"><table><thead><tr><th>公式Excel項目／補足項目（P2-Xは内部管理用）</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は自動予測</small></th>)}</tr></thead>
+    <div className="wide-table"><table><thead><tr><th>公式Excel項目／補足項目（P2-Xは内部管理用）</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は原則自動予測</small></th>)}</tr></thead>
       <tbody>
         <OfficialSectionHeading label="損益計算書" range="公式7-1～7-7／補足P2-X" columns={historical.length + futureRows.length} />
         {visibleRows.flatMap((item) => [
@@ -2737,13 +2799,14 @@ function DetailedProjectInputsTable({ historical, effectivePlan, overrides, omit
               const input = item.input;
               const key = forecastOverrideKey(row.year, "project", input.key);
               const overridden = Object.prototype.hasOwnProperty.call(overrides, key);
-              return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={input.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0, input.digits ?? 2)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", input.key, event.target.value === "" ? null : Number(event.target.value))} /></td>;
+              const required = requiredProjectDepreciationDetailedKeys.has(input.key);
+              return <td className={required && !overridden ? "required-input-missing" : undefined} key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={input.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={required ? "未入力" : rawPlaceholder(value ?? 0, input.digits ?? 2)} aria-invalid={required && !overridden} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : required ? "必須・未入力" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", input.key, event.target.value === "" ? null : Number(event.target.value))} /></td>;
             })}
           </tr>,
         ])}
       </tbody>
     </table></div>
-    <p className="footnote">第6次公式Excelに対応する項目は7-1～7-19で表示し、給与・賞与の内訳、減価償却費の区分、経常利益以下など公式様式だけでは不足する項目に限りP2-Xを付けています。営業外損益（純額）は「経常利益－営業利益」、特別損益（純額）は「税引前当期純利益－経常利益」で自動計算します。補助事業の経常利益以下が未入力の場合、純額は0として表示します。P2-Xは補助事業の詳細PLを作るための内部管理用番号で、公式Excelへ直接転記する番号ではありません。7-20市場伸び率は「15指標・目標」の固定前提を参照します。</p>
+    <p className="footnote">第6次公式Excelに対応する項目は7-1～7-19で表示し、給与・賞与の内訳、減価償却費の区分、経常利益以下など公式様式だけでは不足する項目に限りP2-Xを付けています。P2-4・P2-14は年度別の必須入力で、空欄を自動予測または前年度値から補完しません。営業外損益（純額）は「経常利益－営業利益」、特別損益（純額）は「税引前当期純利益－経常利益」で自動計算します。補助事業の経常利益以下が未入力の場合、純額は0として表示します。P2-Xは補助事業の詳細PLを作るための内部管理用番号で、公式Excelへ直接転記する番号ではありません。7-20市場伸び率は「15指標・目標」の固定前提を参照します。</p>
   </div>;
 }
 
@@ -2770,7 +2833,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
   return <div className="manual-sections spreadsheet-grid">
     {futureInputBasis === "company" ? <div>
       <h3 className="manual-table-heading"><span>補助事業収支計画（7-1～7-20：過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitProjectCalculated} onClick={() => setOmitProjectCalculated((current) => !current)}>{omitProjectCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
-      <div className="wide-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は自動予測</small></th>)}</tr></thead>
+      <div className="wide-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は原則自動予測</small></th>)}</tr></thead>
         <tbody>{visibleProjectRows.map((item) => <tr className={!item.input ? "calculated-row" : ""} key={item.code}>
           <th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}／{item.input ? "入力・上書き可" : item.fixed ? "固定前提" : "自動計算"}</small></th>
           {historical.map((row, index) => {
@@ -2784,11 +2847,12 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
             if (!item.input) return <td className="calculated-cell" key={row.year}><strong>{value === undefined ? "—" : number(value, item.digits ?? 2)}</strong><small>{item.fixed ? "固定前提" : "自動計算"}</small></td>;
             const key = forecastOverrideKey(row.year, "project", item.code);
             const overridden = Object.prototype.hasOwnProperty.call(overrides, key);
-            return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0, item.digits ?? 2)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>;
+            const required = requiredProjectDepreciationCodes.has(item.code);
+            return <td className={required && !overridden ? "required-input-missing" : undefined} key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={required ? "未入力" : rawPlaceholder(value ?? 0, item.digits ?? 2)} aria-invalid={required && !overridden} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : required ? "必須・未入力" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>;
           })}
         </tr>)}</tbody>
       </table></div>
-      <p className="footnote">7-1・7-4・7-6・7-8・7-9・7-13・7-14と、内部管理用のP2-4・P2-14が入力値です。7-10はP2-4＋P2-14として自動計算します。7-2・7-3・7-5・7-7・7-11・7-12・7-15～7-19は第6次Excelと同じ関係式で自動計算し、7-20は「15指標・目標」の市場伸び率を参照します。</p>
+      <p className="footnote">7-1・7-4・7-6・7-8・7-9・7-13・7-14と、内部管理用のP2-4・P2-14が入力値です。P2-4・P2-14は年度別の必須入力で、空欄を自動予測または前年度値から補完しません。7-10はP2-4＋P2-14として自動計算します。7-2・7-3・7-5・7-7・7-11・7-12・7-15～7-19は第6次Excelと同じ関係式で自動計算し、7-20は「15指標・目標」の市場伸び率を参照します。</p>
     </div> : <DetailedProjectInputsTable historical={historical} effectivePlan={effectivePlan} overrides={overrides} omitCalculated={omitProjectCalculated} onToggleCalculated={() => setOmitProjectCalculated((current) => !current)} onForecastChange={onForecastChange} />}
     <div>
       <h3 className="manual-table-heading"><span>会社全体の損益計算書・関連計算項目（2-1～2-36：過去3期参照 → 将来）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCompanyCalculated} onClick={() => setOmitCompanyCalculated((current) => !current)}>{omitCompanyCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
@@ -2847,7 +2911,7 @@ function AutoRequiredInputsEditor({ historical, autoPlan, effectivePlan, overrid
   const rawPlaceholder = (value: number) => String(roundedInput(value));
   return <div className="manual-sections spreadsheet-grid">
     <div><h3>会社全体にかかる損益計算書（過去3期実績 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{effectivePlan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{companyActualInputRows.map((item) => <tr className={!item.set ? "emphasis" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.unit && <small>{item.unit}</small>}</th>{effectivePlan.map((row, index) => { const isActual = index < historical.length; const value = item.get(isActual ? historical : effectivePlan, index); if (isActual) return <td key={row.year}>{item.set ? <input type="number" step={item.unit === "人" ? 1 : 0.1} value={value ?? 0} onChange={(event) => onHistoricalCompanyChange(index, item, Number(event.target.value))} /> : <strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong>}</td>; if (futureInputBasis !== "company") return <td key={row.year}><span className="future-empty">—</span></td>; if (!item.set) return <td key={row.year}><strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong></td>; const key = forecastOverrideKey(row.year, "company", item.code); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.unit === "人" ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "company", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">「全社PLを入力」を選ぶと将来欄が青枠になり、ベース事業PLを「全社－補助事業」で自動計算します。「ベース事業PLを入力」では将来欄を空欄表示します。</p></div>
-    <div><h3>補助事業PL（過去3期実績 → 補助事業期間 → 基準年 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th key={`actual-${row.year}`}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}{futureProjectRows.map((row) => <th key={`future-${row.year}`} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・自動予測</small></th>)}</tr></thead><tbody>{projectOfficialInputRows.map((item) => <tr key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}</small></th>{historical.map((row, index) => <td key={`actual-${row.year}`}><input type="number" step="0.1" value={item.get(row.project)} onChange={(event) => onHistoricalProjectChange(index, item, Number(event.target.value))} /></td>)}{futureProjectRows.map((row) => { const key = forecastOverrideKey(row.year, "project", item.code); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); const effective = effectiveProjectByYear.get(row.year)!; return <td key={`future-${row.year}`}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="0.1" value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(item.get(effective))} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">過去3期は白枠の必須入力です。補助事業期間～事業化報告3年目は青枠で自動予測し、入力したセルだけ固定します。固定値を入れると、それ以降の空欄年度を再予測します。</p></div>
+    <div><h3>補助事業PL（過去3期実績 → 補助事業期間 → 基準年 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th key={`actual-${row.year}`}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}{futureProjectRows.map((row) => <th key={`future-${row.year}`} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は原則自動予測</small></th>)}</tr></thead><tbody>{projectOfficialInputRows.map((item) => <tr key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}</small></th>{historical.map((row, index) => <td key={`actual-${row.year}`}><input type="number" step="0.1" value={item.get(row.project)} onChange={(event) => onHistoricalProjectChange(index, item, Number(event.target.value))} /></td>)}{futureProjectRows.map((row) => { const key = forecastOverrideKey(row.year, "project", item.code); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); const effective = effectiveProjectByYear.get(row.year)!; const required = requiredProjectDepreciationCodes.has(item.code); return <td className={required && !overridden ? "required-input-missing" : undefined} key={`future-${row.year}`}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="0.1" value={overridden ? overrides[key] : ""} placeholder={required ? "未入力" : rawPlaceholder(item.get(effective))} aria-invalid={required && !overridden} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : required ? "必須・未入力" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">過去3期は白枠の必須入力です。補助事業期間～事業化報告3年目は原則として空欄を自動予測しますが、P2-4・P2-14は年度別の必須入力です。</p></div>
     <div><h3>ベース事業PL（過去3期自動算出 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>内部管理番号・項目</th>{autoPlan.map((row) => <th key={row.year} className={row.year > historical.at(-1)!.year && futureInputBasis === "other" ? "forecast-heading" : undefined}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}{row.year > historical.at(-1)!.year ? futureInputBasis === "other" ? "・入力" : "・自動算出" : "・自動算出"}</small></th>)}</tr></thead><tbody>{otherPlInputFields.map((item) => <tr key={item.key}><th><PlRowTitle code={item.modelCode} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}</small></th>{autoPlan.map((row, index) => { const isActual = index < historical.length; const effective = effectiveOtherByYear.get(row.year)!; const value = item.get(effective); if (isActual || futureInputBasis === "company") return <td key={row.year}><strong>{number(value, item.digits ?? 2)}</strong></td>; const key = forecastOverrideKey(row.year, "other", item.key); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "other", item.key, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">「ベース事業PLを入力」を選ぶと将来欄が青枠になります。「全社PLを入力」では、将来値を「全社PL－補助事業PL」で自動表示します。</p></div>
   </div>;
 }
@@ -3022,6 +3086,7 @@ type OfficialRow = {
   groupStart?: boolean;
   indentLevel?: 1 | 2;
   value: (rows: YearPlan[], index: number) => number | undefined;
+  missing?: (year: number) => boolean;
 };
 
 const rate = (numerator: number, denominator: number) => denominator ? numerator / denominator * 100 : 0;
@@ -3216,7 +3281,7 @@ function OfficialRowsTable({ title, pill, plan, sourcePlan, rows, note }: { titl
     {hasSections && <OfficialSectionHeading label="損益計算書" range="2-1～2-20" columns={plan.length} />}
     {rows.flatMap((item) => [
       item.groupStart ? <OfficialSectionHeading key="section-related" label="P/L関連計算項目" range="2-21～2-36" columns={plan.length} /> : null,
-      <tr className={item.emphasis ? "emphasis" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /></th>{plan.map((year, index) => { const value = item.value(plan, index); const before = sourcePlan ? item.value(sourcePlan, index) : undefined; return <td key={year.year}>{sourcePlan && <small className="before-cell">{formatted(before, item.unit)} →</small>}<strong className={sourcePlan ? "after-cell" : ""}>{formatted(value, item.unit)}</strong></td>; })}</tr>,
+      <tr className={item.emphasis ? "emphasis" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /></th>{plan.map((year, index) => { const missing = item.missing?.(year.year) ?? false; const value = item.value(plan, index); const before = sourcePlan ? item.value(sourcePlan, index) : undefined; return <td className={missing ? "required-input-missing" : undefined} key={year.year}>{sourcePlan && !missing && <small className="before-cell">{formatted(before, item.unit)} →</small>}<strong className={sourcePlan && !missing ? "after-cell" : ""}>{missing ? "未入力" : formatted(value, item.unit)}</strong></td>; })}</tr>,
     ])}
   </tbody></table></div>{note && <p className="footnote">{note}</p>}</article>;
 }
@@ -3235,20 +3300,22 @@ function CompanyTable({ plan, sourcePlan }: { plan: YearPlan[]; sourcePlan?: Yea
   return <OfficialRowsTable title="会社全体にかかる損益計算書・関連計算項目" pill="2-1～2-36" plan={plan} sourcePlan={sourcePlan} rows={rows} note="2-1～2-20が損益計算書、2-21～2-36が給与・付加価値・人数・EBITDAの関連計算項目です。2-8は2-9＋2-10、2-11は2-12＋2-13、2-23は2-4＋2-14で自動計算します。2-18～2-20・2-27・2-28は第6次様式の入力項目で、将来値は自動予測後に上書きできます。" />;
 }
 
-function OfficialProjectTable({ plan, sourcePlan, drivers }: { plan: YearPlan[]; sourcePlan?: YearPlan[]; drivers: Drivers }) {
+function OfficialProjectTable({ plan, sourcePlan, drivers, missingKeys }: { plan: YearPlan[]; sourcePlan?: YearPlan[]; drivers: Drivers; missingKeys: Set<string> }) {
+  const missing = (code: "P2-4" | "P2-14") => (year: number) => missingKeys.has(`${year}:${code}`);
+  const missingTotal = (year: number) => missingKeys.has(`${year}:P2-4`) || missingKeys.has(`${year}:P2-14`);
   const rows: OfficialRow[] = [
     { code: "7-1", label: "売上高", emphasis: true, value: (p, i) => p[i].project.sales },
         { code: "7-2", label: "売上高成長率", unit: "%", indentLevel: 1, value: (p, i) => growth(p[i].project.sales, i ? p[i - 1].project.sales : undefined) },
         { code: "7-3", label: "全社売上高に占める補助事業売上高の割合", unit: "%", indentLevel: 1, value: (p, i) => rate(p[i].project.sales, companySegment(p, i).sales) },
-        { code: "P2-4", label: "売上原価に含まれる減価償却費（内部管理用）", indentLevel: 1, value: (p, i) => cogsDepreciation(p[i].project) },
+        { code: "P2-4", label: "売上原価に含まれる減価償却費（内部管理用）", indentLevel: 1, value: (p, i) => cogsDepreciation(p[i].project), missing: missing("P2-4") },
         { code: "7-4", label: "売上総利益", emphasis: true, value: (p, i) => p[i].project.sales - p[i].project.cogs },
     { code: "7-5", label: "売上総利益率", unit: "%", indentLevel: 1, value: (p, i) => rate(p[i].project.sales - p[i].project.cogs, p[i].project.sales) },
     { code: "7-6", label: "営業利益", emphasis: true, value: (p, i) => operatingProfit(p[i].project) },
     { code: "7-7", label: "営業利益率", unit: "%", indentLevel: 1, value: (p, i) => rate(operatingProfit(p[i].project), p[i].project.sales) },
         { code: "7-8", label: "給与支給総額（常時使用する従業員）", value: (p, i) => p[i].project.employeePay },
         { code: "7-9", label: "給与支給総額（役員）", value: (p, i) => p[i].project.officerPay },
-        { code: "P2-14", label: "販管費に含まれる減価償却費（内部管理用）", indentLevel: 1, value: (p, i) => sgaDepreciation(p[i].project) },
-        { code: "7-10", label: "減価償却費（合計）", value: (p, i) => cogsDepreciation(p[i].project) + sgaDepreciation(p[i].project) },
+        { code: "P2-14", label: "販管費に含まれる減価償却費（内部管理用）", indentLevel: 1, value: (p, i) => sgaDepreciation(p[i].project), missing: missing("P2-14") },
+        { code: "7-10", label: "減価償却費（合計）", value: (p, i) => cogsDepreciation(p[i].project) + sgaDepreciation(p[i].project), missing: missingTotal },
     { code: "7-11", label: "付加価値", emphasis: true, value: (p, i) => valueAdded(p[i].project) },
     { code: "7-12", label: "付加価値増加率", unit: "%", indentLevel: 1, value: (p, i) => growth(valueAdded(p[i].project), i ? valueAdded(p[i - 1].project) : undefined) },
     { code: "7-13", label: "常時使用する従業員数（就業時間換算）", unit: "人", value: (p, i) => p[i].project.headcount },
@@ -3260,5 +3327,5 @@ function OfficialProjectTable({ plan, sourcePlan, drivers }: { plan: YearPlan[];
     { code: "7-19", label: "労働生産性", unit: "億円/人", value: (p, i) => { const s = p[i].project; return s.headcount + s.officerCount ? valueAdded(s) / (s.headcount + s.officerCount) : 0; } },
     { code: "7-20", label: "市場伸び率（年あたり）", unit: "%", value: (_p, i) => i === 0 ? drivers.projectMarketGrowth * 100 : undefined },
   ];
-      return <OfficialRowsTable title="補助事業にかかる収支計画" pill="7-1～7-20" plan={plan} sourcePlan={sourcePlan} rows={rows} note="P2-4・P2-14は詳細PLを整合させる内部管理項目です。7-10は両項目の合計です。7-20市場伸び率は、第6次Excelと同じく単一の入力値として最初の列に表示しています。" />;
+      return <OfficialRowsTable title="補助事業にかかる収支計画" pill="7-1～7-20" plan={plan} sourcePlan={sourcePlan} rows={rows} note="P2-4・P2-14は年度別の必須入力です。空欄は未入力として表示し、自動予測や前年度値による補完を行いません。7-10は両項目が入力済みの場合に、その合計として表示します。7-20市場伸び率は、第6次Excelと同じく単一の入力値として最初の列に表示しています。" />;
 }
