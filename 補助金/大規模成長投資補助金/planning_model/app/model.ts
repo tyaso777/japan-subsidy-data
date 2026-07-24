@@ -17,6 +17,9 @@ export type SegmentPlan = {
   cogsDepreciation?: number;
   sgaDepreciation?: number;
   researchDevelopment?: number;
+  ordinaryIncome?: number;
+  preTaxIncome?: number;
+  netIncome?: number;
 };
 
 export type YearPlan = {
@@ -378,6 +381,9 @@ export const officerBonus = (segment: SegmentPlan) => segment.officerBonus ?? 0;
 export const cogsDepreciation = (segment: SegmentPlan) => segment.cogsDepreciation ?? 0;
 export const sgaDepreciation = (segment: SegmentPlan) => segment.sgaDepreciation ?? segment.depreciation;
 export const researchDevelopment = (segment: SegmentPlan) => segment.researchDevelopment ?? 0;
+export const ordinaryIncome = (segment: SegmentPlan) => segment.ordinaryIncome;
+export const preTaxIncome = (segment: SegmentPlan) => segment.preTaxIncome;
+export const netIncome = (segment: SegmentPlan) => segment.netIncome;
 
 export function operatingProfit(segment: SegmentPlan) {
   return segment.sales - segment.cogs - segment.employeePay - segment.officerPay
@@ -389,6 +395,8 @@ export function valueAdded(segment: SegmentPlan) {
 }
 
 export function total(a: SegmentPlan, b: SegmentPlan): SegmentPlan {
+  const sumOptional = (field: "ordinaryIncome" | "preTaxIncome" | "netIncome") =>
+    a[field] === undefined && b[field] === undefined ? undefined : (a[field] ?? 0) + (b[field] ?? 0);
   return {
     sales: a.sales + b.sales,
     cogs: a.cogs + b.cogs,
@@ -405,6 +413,9 @@ export function total(a: SegmentPlan, b: SegmentPlan): SegmentPlan {
     cogsDepreciation: cogsDepreciation(a) + cogsDepreciation(b),
     sgaDepreciation: sgaDepreciation(a) + sgaDepreciation(b),
     researchDevelopment: researchDevelopment(a) + researchDevelopment(b),
+    ordinaryIncome: sumOptional("ordinaryIncome"),
+    preTaxIncome: sumOptional("preTaxIncome"),
+    netIncome: sumOptional("netIncome"),
   };
 }
 
@@ -483,6 +494,9 @@ function scaleSegment(segment: SegmentPlan, factor: number): SegmentPlan {
     scaled.sgaDepreciation = round(sgaDepreciation(segment) * factor);
   }
   if (segment.researchDevelopment !== undefined) scaled.researchDevelopment = round(researchDevelopment(segment) * factor);
+  if (segment.ordinaryIncome !== undefined) scaled.ordinaryIncome = round(segment.ordinaryIncome * factor);
+  if (segment.preTaxIncome !== undefined) scaled.preTaxIncome = round(segment.preTaxIncome * factor);
+  if (segment.netIncome !== undefined) scaled.netIncome = round(segment.netIncome * factor);
   return scaled;
 }
 
@@ -696,6 +710,25 @@ export function generatePlan(
       }),
     });
   }
+
+  const latestCompany = total(latest.project, latest.other);
+  const latestOperatingProfit = operatingProfit(latestCompany);
+  const latestOrdinaryIncome = ordinaryIncome(latestCompany) ?? latestOperatingProfit;
+  const latestPreTaxIncome = preTaxIncome(latestCompany) ?? latestOrdinaryIncome;
+  const nonOperatingRate = latestCompany.sales ? (latestOrdinaryIncome - latestOperatingProfit) / latestCompany.sales : 0;
+  const specialProfitRate = latestCompany.sales ? (latestPreTaxIncome - latestOrdinaryIncome) / latestCompany.sales : 0;
+  const afterTaxRatio = latestPreTaxIncome
+    ? (netIncome(latestCompany) ?? latestPreTaxIncome * 0.7) / latestPreTaxIncome
+    : 0.7;
+  plan.slice(actuals.length).forEach((row) => {
+    const company = total(row.project, row.other);
+    const forecastOrdinaryIncome = round(operatingProfit(company) + company.sales * nonOperatingRate);
+    const forecastPreTaxIncome = round(forecastOrdinaryIncome + company.sales * specialProfitRate);
+    const forecastNetIncome = round(forecastPreTaxIncome * afterTaxRatio);
+    row.other.ordinaryIncome = round(forecastOrdinaryIncome - (row.project.ordinaryIncome ?? 0));
+    row.other.preTaxIncome = round(forecastPreTaxIncome - (row.project.preTaxIncome ?? 0));
+    row.other.netIncome = round(forecastNetIncome - (row.project.netIncome ?? 0));
+  });
   return plan;
 }
 

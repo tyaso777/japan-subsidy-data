@@ -352,6 +352,13 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /から少なくとも.*へ引き上げる/);
   assert.match(pageSource, /から少なくとも.*へ引き下げる/);
   assert.match(pageSource, /normalizedInputs = setInputValue\(normalizedInputs, inputKey\.driverRange/);
+  assert.match(pageSource, /code: "2-18", label: "経常利益"[\s\S]*?ordinaryIncome/);
+  assert.match(pageSource, /code: "2-19", label: "税引前当期純利益"[\s\S]*?preTaxIncome/);
+  assert.match(pageSource, /code: "2-20", label: "当期純利益"[\s\S]*?netIncome/);
+  assert.match(pageSource, /code: "2-27"[\s\S]*?set: \(row, value\)/);
+  assert.match(pageSource, /code: "2-28"[\s\S]*?set: \(row, value\)/);
+  assert.doesNotMatch(pageSource, /2-19・2-20はモデル未対応|2-18は営業利益と同額/);
+  assert.doesNotMatch(reportDataSource, /税引前当期純利益（モデル未対応）|当期純利益（モデル未対応）/);
   assert.match(globalStyles, /\.driver-validation-error/);
   assert.match(globalStyles, /\.statutory-condition/);
   assert.match(globalStyles, /\.application-category-control \{ display: grid; width: min\(100%, 560px\); gap: 8px; \}/);

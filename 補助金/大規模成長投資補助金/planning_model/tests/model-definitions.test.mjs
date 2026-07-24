@@ -233,6 +233,32 @@ test("round-six payroll and depreciation breakdowns reconcile to their calculate
   assert.equal(model.valueAdded(segment), 37);
 });
 
+test("round-six company income inputs are preserved and forecast from the latest profit relationships", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  historical.forEach((row, index) => {
+    const company = model.total(row.project, row.other);
+    row.other.ordinaryIncome = model.operatingProfit(company) - company.sales * 0.01;
+    row.other.preTaxIncome = row.other.ordinaryIncome - company.sales * 0.005;
+    row.other.netIncome = row.other.preTaxIncome * 0.7;
+    row.other.headcount = 100 + index * 5 - row.project.headcount;
+    row.other.officerCount = 4 - row.project.officerCount;
+  });
+  const plan = model.generatePlan(historical, model.sampleDrivers, model.DEFAULT_TIMELINE);
+  const latest = model.total(plan[2].project, plan[2].other);
+  assert.equal(model.ordinaryIncome(latest), historical[2].other.ordinaryIncome);
+  assert.equal(model.preTaxIncome(latest), historical[2].other.preTaxIncome);
+  assert.equal(model.netIncome(latest), historical[2].other.netIncome);
+  assert.equal(latest.headcount, 110);
+  assert.equal(latest.officerCount, 4);
+
+  const future = model.total(plan[3].project, plan[3].other);
+  const expectedOrdinary = model.operatingProfit(future) - future.sales * 0.01;
+  const expectedPreTax = expectedOrdinary - future.sales * 0.005;
+  assert.ok(Math.abs(model.ordinaryIncome(future) - expectedOrdinary) < 0.02);
+  assert.ok(Math.abs(model.preTaxIncome(future) - expectedPreTax) < 0.02);
+  assert.ok(Math.abs(model.netIncome(future) / model.preTaxIncome(future) - 0.7) < 0.002);
+});
+
 test("cogs assumptions are period improvement points rather than terminal rates", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   const drivers = {

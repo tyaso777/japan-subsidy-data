@@ -45,6 +45,12 @@ test("standard sample represents the completed two-pass planning workflow", asyn
   assert.equal(proposal.drivers.subsidy, 7.66);
   assert.equal(proposal.targets.companySalesIncrease.value, 82.4);
   assert.equal(proposal.targets.companySalesCagr.value, 15);
+  for (const code of ["2-18", "2-19", "2-20", "2-27", "2-28"]) {
+    assert.equal(typeof proposal.inputValues[`actual:company:2025:${code}`], "number", `${code} must be saved as a round-six input`);
+  }
+  assert.equal(typeof proposal.historicalPlan[2].other.ordinaryIncome, "number");
+  assert.equal(typeof proposal.historicalPlan[2].other.preTaxIncome, "number");
+  assert.equal(typeof proposal.historicalPlan[2].other.netIncome, "number");
   assertOptimizationIsStable(proposal);
 });
 

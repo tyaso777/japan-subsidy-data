@@ -9,11 +9,14 @@ import {
   generatePlan,
   employeeBonus,
   employeeSalary,
+  netIncome,
   operatingProfit,
+  ordinaryIncome,
   officerBonus,
   officerCompensation,
   retimeBalanceSheets,
   researchDevelopment,
+  preTaxIncome,
   sampleBalanceSheets,
   sampleBasePlan,
   sampleDrivers,
@@ -200,6 +203,22 @@ const futureCapex = (investment: number) => {
 };
 
 const commonProposal = (title: string, exportedAt: string, historicalPlan: YearPlan[]): ProposalData => {
+  historicalPlan = historicalPlan.map((row) => {
+    const company = total(row.project, row.other);
+    const forecastOrdinary = round(operatingProfit(company) - company.sales * 0.002);
+    const forecastPreTax = forecastOrdinary;
+    const forecastNet = round(forecastPreTax * 0.7);
+    return {
+      ...row,
+      project: { ...row.project },
+      other: {
+        ...row.other,
+        ordinaryIncome: row.other.ordinaryIncome ?? forecastOrdinary - (row.project.ordinaryIncome ?? 0),
+        preTaxIncome: row.other.preTaxIncome ?? forecastPreTax - (row.project.preTaxIncome ?? 0),
+        netIncome: row.other.netIncome ?? forecastNet - (row.project.netIncome ?? 0),
+      },
+    };
+  });
   const balanceSheets = retimeBalanceSheets(sampleBalanceSheets, DEFAULT_TIMELINE);
   const capex = futureCapex(sampleDrivers.investment);
   const inputValues: InputValues = {};
@@ -212,6 +231,8 @@ const commonProposal = (title: string, exportedAt: string, historicalPlan: YearP
       "2-9": officerCompensation(company), "2-10": officerBonus(company),
       "2-12": employeeSalary(company), "2-13": employeeBonus(company),
       "2-14": sgaDepreciation(company), "2-15": researchDevelopment(company),
+      "2-18": ordinaryIncome(company) ?? 0, "2-19": preTaxIncome(company) ?? 0,
+      "2-20": netIncome(company) ?? 0, "2-27": company.headcount, "2-28": company.officerCount,
     };
     const projectInputs: Record<string, number> = {
       "7-1": row.project.sales, "7-4": row.project.sales - row.project.cogs,
