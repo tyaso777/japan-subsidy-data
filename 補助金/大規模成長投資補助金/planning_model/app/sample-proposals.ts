@@ -59,7 +59,6 @@ const standardWorkflowInitialDrivers = {
   projectSgaRateEnd: 0.11,
   otherSgaRateEnd: 0.10928571428571428,
   projectOfficerPayGrowth: 0.05380116959064325,
-  usefulLife: 10,
   investment: 23,
   subsidy: 7.66,
   localBenchmark: 23,

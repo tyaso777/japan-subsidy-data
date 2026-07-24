@@ -24,6 +24,8 @@ test("application starts without sample company, project, balance-sheet, or driv
   assert.ok(segmentValues.every((value) => value === 0));
   assert.ok(model.defaultBalanceSheets.every((row) => Object.entries(row).filter(([key]) => key !== "year").every(([, value]) => value === 0)));
   assert.ok(Object.values(model.defaultDrivers).every((value) => value === 0));
+  assert.equal(Object.hasOwn(model.defaultDrivers, "usefulLife"), false);
+  assert.equal(Object.hasOwn(model.driverBounds, "usefulLife"), false);
   assert.equal(model.sampleBasePlan.project.sales, 80);
   assert.equal(model.sampleDrivers.investment, 45);
 });

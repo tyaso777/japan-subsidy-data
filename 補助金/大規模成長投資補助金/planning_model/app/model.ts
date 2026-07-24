@@ -105,7 +105,6 @@ export type Drivers = {
   projectSgaRateEnd: number;
   otherSgaRateEnd: number;
   projectOfficerPayGrowth: number;
-  usefulLife: number;
   investment: number;
   subsidy: number;
   localBenchmark: number;
@@ -270,7 +269,6 @@ export const sampleDrivers: Drivers = {
   projectSgaRateEnd: 0.09,
   otherSgaRateEnd: 0.10,
   projectOfficerPayGrowth: 0.06,
-  usefulLife: 10,
   investment: 45,
   subsidy: 15,
   localBenchmark: 23,
@@ -360,7 +358,6 @@ export const defaultDrivers: Drivers = {
   projectSgaRateEnd: 0,
   otherSgaRateEnd: 0,
   projectOfficerPayGrowth: 0,
-  usefulLife: 0,
   investment: 0,
   subsidy: 0,
   localBenchmark: 0,
@@ -407,7 +404,6 @@ export const driverBounds: Record<keyof Drivers, [number, number]> = {
   projectSgaRateEnd: [0.04, 0.25],
   otherSgaRateEnd: [0.04, 0.25],
   projectOfficerPayGrowth: [0, 0.1],
-  usefulLife: [5, 20],
   investment: [15, 200],
   subsidy: [1, 50],
   localBenchmark: [0, 100],
@@ -1036,7 +1032,6 @@ export function calculateHistoricalDriverSeries(
     projectSgaRateEnd: { mode: "level", values: levels((row) => ratio(row.project.otherSga, row.project.sales)) },
     otherSgaRateEnd: { mode: "level", values: levels((row) => ratio(row.other.otherSga, row.other.sales)) },
     projectOfficerPayGrowth: { mode: "change", values: changes((row) => perOfficer(row.project)) },
-    usefulLife: unavailable(),
     investment: { mode: "level", values: levels((_, index) => balanceSheets[index]?.capex > 0 ? balanceSheets[index].capex : Number.NaN) },
     subsidy: unavailable(),
     localBenchmark: unavailable(),

@@ -66,7 +66,6 @@ const clamp = (value: number, lower: number, upper: number) => Math.min(upper, M
 const initialDrivers = structuredClone(defaultDrivers);
 const workflowBounds = structuredClone(driverBounds);
 initialDrivers.projectMarketGrowth = 0.05;
-initialDrivers.usefulLife = 10;
 const annualCapex = sampleBalanceSheets.reduce((sum, row) => sum + row.capex, 0) / sampleBalanceSheets.length;
 initialDrivers.investment = round(annualCapex * (DEFAULT_TIMELINE.baseYear - DEFAULT_TIMELINE.latestYear));
 initialDrivers.subsidy = maximumSubsidyAmount(initialDrivers.investment);

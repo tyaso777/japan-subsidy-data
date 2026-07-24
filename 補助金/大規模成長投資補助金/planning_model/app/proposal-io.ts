@@ -119,16 +119,15 @@ const driverNames: Partial<Record<keyof Drivers, string>> = {
   effectiveTaxRate: "実効税率（当期純利益割合＝100%－実効税率）",
   otherOfficerPayGrowthToBase: "ベース事業 役員1人当たり給与支給総額上昇率（設備導入期間）",
   otherOfficerPayGrowth: "ベース事業 役員1人当たり給与支給総額上昇率（基準年度後）",
-  projectMarketGrowth: "7-20 市場伸び率（年あたり）", projectSalesGrowthToBase: "補助事業 売上成長率（設備導入期間）", projectCogsImprovementToBase: "補助事業 原価率改善ポイント（設備導入期間）", projectPayGrowthToBase: "補助事業 1人当たり給与支給総額上昇率（設備導入期間）", projectHeadcountGrowthToBase: "補助事業 常時使用する従業員数の成長率（設備導入期間）", projectSgaImprovementToBase: "補助事業 その他販管費率改善ポイント（設備導入期間）", projectOfficerPayGrowthToBase: "役員1人当たり給与支給総額上昇率（設備導入期間）", otherSalesGrowthToBase: "ベース事業 売上成長率（設備導入期間）", otherCogsImprovementToBase: "ベース事業 原価率改善ポイント（設備導入期間）", otherPayGrowthToBase: "ベース事業1人当たり給与支給総額の年平均上昇率（設備導入期間）", otherHeadcountGrowthToBase: "ベース事業 常時使用する従業員数の成長率（設備導入期間）", otherSgaImprovementToBase: "ベース事業 その他販管費率改善ポイント（設備導入期間）", projectSalesGrowth: "補助事業 売上成長率（基準年度後）", otherSalesGrowth: "ベース事業 売上成長率（基準年度後）", projectCogsImprovementAfterBase: "補助事業 原価率改善ポイント（基準年度後）", otherCogsImprovement: "ベース事業 原価率改善ポイント（基準年度後）", projectPayGrowth: "補助事業1人当たり給与支給総額の年平均上昇率", otherPayGrowth: "ベース事業1人当たり給与支給総額の年平均上昇率（基準年度後）", projectHeadcountGrowth: "補助事業 常時使用する従業員数の成長率", otherHeadcountGrowth: "ベース事業 常時使用する従業員数の成長率（基準年度後）", projectSgaRateEnd: "補助事業 その他販管費率（事業化報告3年目）", otherSgaRateEnd: "ベース事業 その他販管費率（事業化報告3年目）", projectOfficerPayGrowth: "役員1人当たり給与支給総額の年平均上昇率", usefulLife: "新規投資の耐用年数", investment: "補助事業投資額", subsidy: "申請補助金額", localBenchmark: "ローカルベンチマーク",
+  projectMarketGrowth: "7-20 市場伸び率（年あたり）", projectSalesGrowthToBase: "補助事業 売上成長率（設備導入期間）", projectCogsImprovementToBase: "補助事業 原価率改善ポイント（設備導入期間）", projectPayGrowthToBase: "補助事業 1人当たり給与支給総額上昇率（設備導入期間）", projectHeadcountGrowthToBase: "補助事業 常時使用する従業員数の成長率（設備導入期間）", projectSgaImprovementToBase: "補助事業 その他販管費率改善ポイント（設備導入期間）", projectOfficerPayGrowthToBase: "役員1人当たり給与支給総額上昇率（設備導入期間）", otherSalesGrowthToBase: "ベース事業 売上成長率（設備導入期間）", otherCogsImprovementToBase: "ベース事業 原価率改善ポイント（設備導入期間）", otherPayGrowthToBase: "ベース事業1人当たり給与支給総額の年平均上昇率（設備導入期間）", otherHeadcountGrowthToBase: "ベース事業 常時使用する従業員数の成長率（設備導入期間）", otherSgaImprovementToBase: "ベース事業 その他販管費率改善ポイント（設備導入期間）", projectSalesGrowth: "補助事業 売上成長率（基準年度後）", otherSalesGrowth: "ベース事業 売上成長率（基準年度後）", projectCogsImprovementAfterBase: "補助事業 原価率改善ポイント（基準年度後）", otherCogsImprovement: "ベース事業 原価率改善ポイント（基準年度後）", projectPayGrowth: "補助事業1人当たり給与支給総額の年平均上昇率", otherPayGrowth: "ベース事業1人当たり給与支給総額の年平均上昇率（基準年度後）", projectHeadcountGrowth: "補助事業 常時使用する従業員数の成長率", otherHeadcountGrowth: "ベース事業 常時使用する従業員数の成長率（基準年度後）", projectSgaRateEnd: "補助事業 その他販管費率（事業化報告3年目）", otherSgaRateEnd: "ベース事業 その他販管費率（事業化報告3年目）", projectOfficerPayGrowth: "役員1人当たり給与支給総額の年平均上昇率", investment: "補助事業投資額", subsidy: "申請補助金額", localBenchmark: "ローカルベンチマーク",
 };
 const hiddenLegacyDriverKeys = new Set<keyof Drivers>([
-  "usefulLife",
   "projectCogsDepreciationShare",
   "otherCogsDepreciationShare",
 ]);
 
 const fixedOutputDriverKeys = new Set<keyof Drivers>([
-  "investment", "subsidy", "usefulLife", "projectMarketGrowth",
+  "investment", "subsidy", "projectMarketGrowth",
   "projectCogsRateWhenSalesZero", "otherCogsRateWhenSalesZero",
   "projectEmployeeSalaryShare", "otherEmployeeSalaryShare",
   "projectOfficerCompensationShare", "otherOfficerCompensationShare",

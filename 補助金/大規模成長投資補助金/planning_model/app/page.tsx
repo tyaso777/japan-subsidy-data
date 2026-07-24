@@ -496,7 +496,7 @@ const companyModeUnsupportedOtherCodes = new Set([
 ]);
 
 const percentDriver = (key: keyof Drivers) =>
-  !["usefulLife", "investment", "subsidy", "localBenchmark"].includes(key);
+  !["investment", "subsidy", "localBenchmark"].includes(key);
 
 function number(value: number, digits = 1) {
   return Number.isFinite(value) ? value.toLocaleString("ja-JP", { maximumFractionDigits: digits, minimumFractionDigits: digits }) : "—";
@@ -1884,7 +1884,6 @@ export default function Home() {
     const clamp = (value: number, lower: number, upper: number) => Math.min(upper, Math.max(lower, value));
 
     nextDrivers.projectMarketGrowth = hasInputValue(inputValues, inputKey.driver("projectMarketGrowth")) ? drivers.projectMarketGrowth : 0.05;
-    nextDrivers.usefulLife = hasInputValue(inputValues, inputKey.driver("usefulLife")) ? drivers.usefulLife : 10;
     const investmentEntered = hasInputValue(inputValues, inputKey.driver("investment"));
     const historicalCapex = balanceSheets.map((row) => row.capex).filter((value) => Number.isFinite(value) && value > 0);
     const annualHistoricalCapex = historicalCapex.length ? historicalCapex.reduce((sum, value) => sum + value, 0) / historicalCapex.length : 0;
@@ -2373,8 +2372,8 @@ export default function Home() {
                 ...group.keys.map((key) => {
                 const info = driverLabels[key]!;
                 const tablePresentation = driverTablePresentation(key, info.label);
-                const movable = !["projectMarketGrowth", "usefulLife", "investment", "subsidy", "localBenchmark"].includes(key);
-                const noRange = key === "investment" || key === "subsidy" || key === "usefulLife" || key === "projectMarketGrowth";
+                const movable = !["projectMarketGrowth", "investment", "subsidy", "localBenchmark"].includes(key);
+                const noRange = key === "investment" || key === "subsidy" || key === "projectMarketGrowth";
                 const constraintError = driverConstraintFailure(key, applicationCategory, drivers);
                 const history = historicalDriverSeries[key];
                 const inputValue = percentDriver(key) ? Number((drivers[key] * 100).toFixed(2)) : drivers[key];
@@ -2388,7 +2387,7 @@ export default function Home() {
                 const rangeOrdered = driverRanges[key][0] <= driverRanges[key][1];
                 const rangeValid = noRange || (rangeOrdered && drivers[key] >= driverRanges[key][0] && drivers[key] <= driverRanges[key][1]);
                 const rangeStatus = noRange ? "入力値を固定" : !rangeOrdered ? "下限＞上限" : movable ? rangeValid ? "範囲内で調整" : "初期値が範囲外" : rangeValid ? "入力値を固定" : "固定値が範囲外";
-                 return <tr className={`${movable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={key}><th><span className="driver-item-code">{driverItemCodes[key]}:</span> {tablePresentation.label}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{info.unit}／{key === "usefulLife" ? "公式様式外・過去比較なし" : history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>{history.values.slice(1).map((value, referenceIndex) => {
+                 return <tr className={`${movable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={key}><th><span className="driver-item-code">{driverItemCodes[key]}:</span> {tablePresentation.label}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{info.unit}／{history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>{history.values.slice(1).map((value, referenceIndex) => {
                   const index = referenceIndex + 1;
                   const referenceLevel = history.referenceLevels?.[index];
                   if (referenceLevel !== undefined && Number.isFinite(referenceLevel)) {

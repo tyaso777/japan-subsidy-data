@@ -230,6 +230,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /設備導入期間0～2pt、基準年後0～3pt/);
   assert.match(pageSource, /const improvementDriverKeys/);
   assert.doesNotMatch(pageSource, /新規投資の平均耐用年数/);
+  assert.doesNotMatch(modelSource, /usefulLife/);
   assert.match(pageSource, /keys: \["projectSalesGrowth", "projectCogsRateWhenSalesZero", "projectCogsImprovementAfterBase"/);
   assert.match(pageSource, /keys: \["otherSalesGrowth", "otherCogsRateWhenSalesZero", "otherCogsImprovement"/);
   assert.match(pageSource, /label: "共通・外部前提"/);
