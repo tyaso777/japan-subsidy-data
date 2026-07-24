@@ -202,6 +202,18 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(initialInputFunction, /driverRange/);
   assert.match(pageSource, /forecastSettingsStarted/);
   assert.match(pageSource, /forecastSettingsReady/);
+  assert.match(pageSource, /const accountingAssumptionDriverKeys/);
+  assert.match(pageSource, /missingAccountingAssumptions\.length \? <p className="default-note" role="alert">/);
+  assert.match(pageSource, /給与・賞与、役員報酬・賞与、減価償却費配賦、研究開発費、営業外損益、特別損益、税率が未設定のまま将来PLを補完することはありません。/);
+  assert.match(pageSource, /残額を従業員賞与として計算/);
+  assert.match(pageSource, /残額を役員賞与として計算/);
+  assert.match(pageSource, /残額を販管費の減価償却費として計算/);
+  assert.match(pageSource, /経常利益＝営業利益＋売上高×設定率/);
+  assert.match(pageSource, /税引前当期純利益＝経常利益＋売上高×設定率/);
+  assert.match(pageSource, /当期純利益＝税引前当期純利益×（100%－設定率）/);
+  assert.match(pageSource, /employeeBreakdownEntered && segment\.employeePay \? employeeSalary\(segment\) \/ segment\.employeePay : 1/);
+  assert.match(pageSource, /officerBreakdownEntered && segment\.officerPay \? officerCompensation\(segment\) \/ segment\.officerPay : 1/);
+  assert.match(pageSource, /depreciationBreakdownEntered && segment\.depreciation \? cogsDepreciation\(segment\) \/ segment\.depreciation : 0/);
   assert.match(pageSource, /将来予測の水準が指定済みです。過去データを基にした推奨値に変更してよろしいですか？/);
   assert.match(pageSource, /将来予測・調整水準が未設定です。/);
   assert.match(pageSource, /設定した目標に近づける/);

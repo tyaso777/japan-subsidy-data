@@ -102,19 +102,19 @@ const adjustableDriverKeys: (keyof Drivers)[] = [
 const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string; step: number }>> = {
   projectCogsRateWhenSalesZero: { label: "補助事業 原価率（売上実績が0の場合の開始水準）", unit: "%", step: 0.5 },
   otherCogsRateWhenSalesZero: { label: "ベース事業 原価率（売上実績が0の場合の開始水準）", unit: "%", step: 0.5 },
-  projectEmployeeSalaryShare: { label: "補助事業 従業員給与総額に占める給与の割合", unit: "%", step: 0.5 },
-  otherEmployeeSalaryShare: { label: "ベース事業 従業員給与総額に占める給与の割合", unit: "%", step: 0.5 },
-  projectOfficerCompensationShare: { label: "補助事業 役員給与総額に占める役員報酬の割合", unit: "%", step: 0.5 },
-  otherOfficerCompensationShare: { label: "ベース事業 役員給与総額に占める役員報酬の割合", unit: "%", step: 0.5 },
-  projectCogsDepreciationShare: { label: "補助事業 減価償却費のうち売上原価に含める割合", unit: "%", step: 0.5 },
-  otherCogsDepreciationShare: { label: "ベース事業 減価償却費のうち売上原価に含める割合", unit: "%", step: 0.5 },
+  projectEmployeeSalaryShare: { label: "補助事業 従業員給与支給総額のうち給与として計上する割合", unit: "%", step: 0.5 },
+  otherEmployeeSalaryShare: { label: "ベース事業 従業員給与支給総額のうち給与として計上する割合", unit: "%", step: 0.5 },
+  projectOfficerCompensationShare: { label: "補助事業 役員給与支給総額のうち役員報酬として計上する割合", unit: "%", step: 0.5 },
+  otherOfficerCompensationShare: { label: "ベース事業 役員給与支給総額のうち役員報酬として計上する割合", unit: "%", step: 0.5 },
+  projectCogsDepreciationShare: { label: "補助事業 減価償却費のうち売上原価に計上する割合", unit: "%", step: 0.5 },
+  otherCogsDepreciationShare: { label: "ベース事業 減価償却費のうち売上原価に計上する割合", unit: "%", step: 0.5 },
   projectResearchDevelopmentRate: { label: "補助事業 研究開発費の売上高比率", unit: "%", step: 0.1 },
   otherResearchDevelopmentRate: { label: "ベース事業 研究開発費の売上高比率", unit: "%", step: 0.1 },
   projectNonOperatingRate: { label: "補助事業 営業外損益の売上高比率", unit: "%", step: 0.1 },
   otherNonOperatingRate: { label: "ベース事業 営業外損益の売上高比率", unit: "%", step: 0.1 },
   projectExtraordinaryRate: { label: "補助事業 特別損益の売上高比率", unit: "%", step: 0.1 },
   otherExtraordinaryRate: { label: "ベース事業 特別損益の売上高比率", unit: "%", step: 0.1 },
-  effectiveTaxRate: { label: "実効税率（当期純利益割合＝100%－実効税率）", unit: "%", step: 0.5 },
+  effectiveTaxRate: { label: "実効税率", unit: "%", step: 0.5 },
   otherOfficerPayGrowthToBase: { label: "ベース事業 役員1人当たり給与支給総額の年平均上昇率（最新決算期→基準年・モデル内管理）", unit: "%/年", step: 0.25 },
   otherOfficerPayGrowth: { label: "ベース事業 役員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
   projectMarketGrowth: { label: "7-20 市場伸び率（年あたり）", unit: "%/年", step: 0.5 },
@@ -147,6 +147,21 @@ const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string;
 };
 
 const driverTablePresentation = (key: keyof Drivers, label: string) => {
+  const accountingNotes: Partial<Record<keyof Drivers, string>> = {
+    projectEmployeeSalaryShare: "残額を従業員賞与として計算",
+    otherEmployeeSalaryShare: "残額を従業員賞与として計算",
+    projectOfficerCompensationShare: "残額を役員賞与として計算",
+    otherOfficerCompensationShare: "残額を役員賞与として計算",
+    projectCogsDepreciationShare: "残額を販管費の減価償却費として計算",
+    otherCogsDepreciationShare: "残額を販管費の減価償却費として計算",
+    projectResearchDevelopmentRate: "研究開発費＝売上高×設定率",
+    otherResearchDevelopmentRate: "研究開発費＝売上高×設定率",
+    projectNonOperatingRate: "経常利益＝営業利益＋売上高×設定率",
+    otherNonOperatingRate: "経常利益＝営業利益＋売上高×設定率",
+    projectExtraordinaryRate: "税引前当期純利益＝経常利益＋売上高×設定率",
+    otherExtraordinaryRate: "税引前当期純利益＝経常利益＋売上高×設定率",
+    effectiveTaxRate: "当期純利益＝税引前当期純利益×（100%－設定率）",
+  };
   if (key === "usefulLife") {
     return {
       label: "新規投資の平均耐用年数（モデル内管理）",
@@ -163,7 +178,7 @@ const driverTablePresentation = (key: keyof Drivers, label: string) => {
     .trim();
   return {
     label: `${shortLabel}${modelManaged ? "（モデル内管理）" : ""}`,
-    note: terminalRate ? "事業化報告3年目到達値" : undefined,
+    note: accountingNotes[key] ?? (terminalRate ? "事業化報告3年目到達値" : undefined),
   };
 };
 
@@ -216,6 +231,15 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
 ];
 
 const forecastDriverKeys = driverGroups.flatMap((group) => group.keys);
+const accountingAssumptionDriverKeys: (keyof Drivers)[] = [
+  "projectEmployeeSalaryShare", "otherEmployeeSalaryShare",
+  "projectOfficerCompensationShare", "otherOfficerCompensationShare",
+  "projectCogsDepreciationShare", "otherCogsDepreciationShare",
+  "projectResearchDevelopmentRate", "otherResearchDevelopmentRate",
+  "projectNonOperatingRate", "otherNonOperatingRate",
+  "projectExtraordinaryRate", "otherExtraordinaryRate",
+  "effectiveTaxRate",
+];
 const fixedForecastDriverKeys = new Set<keyof Drivers>([
   "investment", "subsidy", "usefulLife", "projectCogsRateWhenSalesZero",
   "otherCogsRateWhenSalesZero", "projectEmployeeSalaryShare", "otherEmployeeSalaryShare",
@@ -1072,6 +1096,9 @@ export default function Home() {
       || (hasInputValue(inputValues, inputKey.driverRange(key, 0))
         && hasInputValue(inputValues, inputKey.driverRange(key, 1)))),
   ), [inputValues]);
+  const missingAccountingAssumptions = useMemo(() => accountingAssumptionDriverKeys.filter((key) =>
+    !hasInputValue(inputValues, inputKey.driver(key)),
+  ), [inputValues]);
   const [metricGroupBases, setMetricGroupBases] = useState<Record<MetricGroupKey, MetricGroupBasis>>({ ...defaultMetricGroupBases });
   const [applicationCategory, setApplicationCategory] = useState<ApplicationCategory>(defaultApplicationCategory);
   const [forecastOverrides, setForecastOverrides] = useState<ForecastOverrides>({});
@@ -1915,15 +1942,15 @@ export default function Home() {
       const depreciationBreakdownEntered = segment.cogsDepreciation !== undefined || segment.sgaDepreciation !== undefined;
       setAccountingDefault(
         segmentKey === "project" ? "projectEmployeeSalaryShare" : "otherEmployeeSalaryShare",
-        employeeBreakdownEntered && segment.employeePay ? employeeSalary(segment) / segment.employeePay : 0.95,
+        employeeBreakdownEntered && segment.employeePay ? employeeSalary(segment) / segment.employeePay : 1,
       );
       setAccountingDefault(
         segmentKey === "project" ? "projectOfficerCompensationShare" : "otherOfficerCompensationShare",
-        officerBreakdownEntered && segment.officerPay ? officerCompensation(segment) / segment.officerPay : 0.90,
+        officerBreakdownEntered && segment.officerPay ? officerCompensation(segment) / segment.officerPay : 1,
       );
       setAccountingDefault(
         segmentKey === "project" ? "projectCogsDepreciationShare" : "otherCogsDepreciationShare",
-        depreciationBreakdownEntered && segment.depreciation ? cogsDepreciation(segment) / segment.depreciation : 0.20,
+        depreciationBreakdownEntered && segment.depreciation ? cogsDepreciation(segment) / segment.depreciation : 0,
       );
       setAccountingDefault(
         segmentKey === "project" ? "projectResearchDevelopmentRate" : "otherResearchDevelopmentRate",
@@ -2069,7 +2096,7 @@ export default function Home() {
       return next;
     });
     setHistoricalDefaultsApplied(true);
-    setDefaultNote("すべての計画初期値を設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目は保守的な補完値を使用しています。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。ベース事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、市場伸び率は5%で仮置きしています。新規投資の平均耐用年数は、第6次公式様式の入力項目ではなく、減価償却費を自動予測するためのモデル内前提として10年で仮置きしています。");
+    setDefaultNote("すべての計画初期値を入力欄へ設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目も採用値を入力欄に明示しています。会計内訳・利益前提は、実績内訳がない場合のみ、給与100%・賞与0%、役員報酬100%・役員賞与0%、減価償却費の原価配賦0%・販管費配賦100%、研究開発費率0%、営業外損益率0%、特別損益率0%、実効税率30%を表示値として設定します。これらは非表示の補完規則ではなく、表示された調整水準として計算に使用します。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。ベース事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、市場伸び率は5%で仮置きしています。新規投資の平均耐用年数は、第6次公式様式の入力項目ではなく、減価償却費を自動予測するためのモデル内前提として10年で仮置きしています。");
   }
 
   function confirmAndApplyHistoricalDefaults() {
@@ -2355,7 +2382,7 @@ export default function Home() {
           <div className="section-intro"><div><h2>自動予測を確認し、必要なセルだけ上書き</h2></div><p>青枠の空欄には、過去実績と「15指標・目標」の調整水準から計算した値を表示します。入力したセルは太字で固定し、それ以降の空欄年度を再予測します。</p></div>
           <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。直前の変更はCtrl＋Zで戻せます。</p>
           <article className="panel table-panel"><div className="panel-heading"><div><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">将来合計 {number(futureCapex.reduce((sum, row) => sum + row.value, 0), 2)} 億円</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} inputValues={inputValues} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。将来各年度の入力合計は「15指標・目標」の補助事業投資額と連動し、投資額／全社売上高や将来減価償却費の自動予測へ反映します。</p></article>
-          <article className="panel table-panel"><div className="panel-heading"><div><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>公式様式を直接作るか、事業別の詳細PLを積み上げるかを選びます</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>ベース事業PLを入力</button></div></div><FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} drivers={calculationDrivers} onForecastChange={updateForecastOverride} /><p className="footnote">「全社PLを入力」は、会社全体2-1～2-36と補助事業7-1～7-20を入力して公式Excelを完成させる方式です。「ベース事業PLを入力」は、補助事業とベース事業を同じ詳細項目で入力し、合計から会社全体PLを作る方式です。</p></article>
+          <article className="panel table-panel"><div className="panel-heading"><div><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>公式様式を直接作るか、事業別の詳細PLを積み上げるかを選びます</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>ベース事業PLを入力</button></div></div>{missingAccountingAssumptions.length ? <p className="default-note" role="alert">②15指標・目標で「会計内訳・利益前提」を設定してください。給与・賞与、役員報酬・賞与、減価償却費配賦、研究開発費、営業外損益、特別損益、税率が未設定のまま将来PLを補完することはありません。</p> : <FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} drivers={calculationDrivers} onForecastChange={updateForecastOverride} />}<p className="footnote">「全社PLを入力」は、会社全体2-1～2-36と補助事業7-1～7-20を入力して公式Excelを完成させる方式です。「ベース事業PLを入力」は、補助事業とベース事業を同じ詳細項目で入力し、合計から会社全体PLを作る方式です。</p></article>
           <div className="workflow-actions"><div><span>上書きしたセルを固定して再最適化できます。再最適化後もこの画面に留まります。</span>{adjustedPlan && <p className="solve-note">{solveNote}</p>}</div><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("targets")}>← 15指標・目標へ戻る</button><button className="solve-button" disabled={isSolving} aria-busy={isSolving} onClick={() => void solve()}>{isSolving ? "計算中…" : "上書き内容を反映して再最適化"}</button><button className="reset-button" onClick={() => goToView("pl")}>年度別PLへ →</button></div></div>
         </section>
       )}
@@ -2376,6 +2403,7 @@ export default function Home() {
           <div className="section-intro"><div><h2>目標・制度条件・競合管理</h2></div><p>事業を「補助事業」と「ベース事業」に分け、それぞれに目標数値・水準を設定します。計画値・判定・自動調整には第6次定義を使用し、複数目標が矛盾する場合は未達と修正候補を明示します。</p></div>
           <article className="panel">
             <div className="panel-heading"><div><h2>将来予測・調整水準</h2><span className={`pill ${forecastSettingsReady ? "green" : ""}`}>{forecastSettingsReady ? "設定済み" : "未設定"}</span></div><button className="default-button" onClick={confirmAndApplyHistoricalDefaults}>{forecastSettingsStarted ? "過去3期から再設定" : "過去3期からデフォルト設定"}</button></div>
+            {missingAccountingAssumptions.length > 0 && <p className="default-note" role="alert">会計内訳・利益前提が未設定です。補助事業・ベース事業の各6項目と共通の実効税率を設定するまで、③将来データ入力では自動予測を表示しません。</p>}
             <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th>調整項目<small>A～Z</small></th>{historicalPlan.slice(1).map((row) => <th className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>計画初期値</th><th>制度上の必須条件<small>編集不可</small></th><th>許容下限</th><th>許容上限</th><th>最適化での扱い</th></tr></thead><tbody>
               {driverGroups.flatMap((group) => [
                 <tr className="driver-group-heading" key={`group-${group.label}`}><th><strong>{group.label}</strong><small>{group.detail}</small></th><td aria-hidden="true" colSpan={historicalPlan.length + 4}></td></tr>,
