@@ -290,6 +290,42 @@ const otherPlInputFields: OtherPlInputField[] = [
   { key: "officerCount", modelCode: "M-15", label: "役員数", unit: "人", digits: 0, get: (s) => s.officerCount, set: (_s, v) => ({ officerCount: Math.max(0, Math.round(v)) }) },
 ];
 
+type OtherPlCalculatedField = {
+  key: string;
+  modelCode: string;
+  label: string;
+  unit: string;
+  digits?: number;
+  get: (rows: YearPlan[], index: number) => number | undefined;
+};
+
+const segmentGrowth = (current: number, previous: number | undefined) =>
+  previous ? (current / previous - 1) * 100 : undefined;
+const segmentRate = (numerator: number, denominator: number) =>
+  denominator ? numerator / denominator * 100 : 0;
+const segmentSgaTotal = (segment: SegmentPlan) =>
+  segment.employeePay + segment.officerPay + sgaDepreciation(segment) + researchDevelopment(segment) + segment.otherSga;
+const segmentEbitda = (segment: SegmentPlan) => operatingProfit(segment) + segment.depreciation;
+
+const otherPlCalculatedFields: OtherPlCalculatedField[] = [
+  { key: "salesGrowth", modelCode: "M-C1", label: "売上高成長率", unit: "%", get: (rows, index) => segmentGrowth(rows[index].other.sales, index ? rows[index - 1].other.sales : undefined) },
+  { key: "grossProfit", modelCode: "M-C2", label: "売上総利益", unit: "億円", get: (rows, index) => rows[index].other.sales - rows[index].other.cogs },
+  { key: "grossProfitMargin", modelCode: "M-C3", label: "売上総利益率", unit: "%", get: (rows, index) => { const segment = rows[index].other; return segmentRate(segment.sales - segment.cogs, segment.sales); } },
+  { key: "sgaTotal", modelCode: "M-C4", label: "販売費及び一般管理費", unit: "億円", get: (rows, index) => segmentSgaTotal(rows[index].other) },
+  { key: "operatingProfit", modelCode: "M-C5", label: "営業利益", unit: "億円", get: (rows, index) => operatingProfit(rows[index].other) },
+  { key: "operatingProfitMargin", modelCode: "M-C6", label: "営業利益率", unit: "%", get: (rows, index) => { const segment = rows[index].other; return segmentRate(operatingProfit(segment), segment.sales); } },
+  { key: "valueAdded", modelCode: "M-C7", label: "付加価値額", unit: "億円", get: (rows, index) => valueAdded(rows[index].other) },
+  { key: "valueAddedGrowth", modelCode: "M-C8", label: "付加価値増加率", unit: "%", get: (rows, index) => segmentGrowth(valueAdded(rows[index].other), index ? valueAdded(rows[index - 1].other) : undefined) },
+  { key: "employeePayPerPerson", modelCode: "M-C9", label: "従業員1人当たり給与支給総額", unit: "億円/人", get: (rows, index) => { const segment = rows[index].other; return segment.headcount ? segment.employeePay / segment.headcount : 0; } },
+  { key: "employeePayPerPersonGrowth", modelCode: "M-C10", label: "従業員1人当たり給与支給総額の上昇率", unit: "%", get: (rows, index) => { const current = rows[index].other; const previous = index ? rows[index - 1].other : undefined; return segmentGrowth(current.headcount ? current.employeePay / current.headcount : 0, previous?.headcount ? previous.employeePay / previous.headcount : undefined); } },
+  { key: "officerPayPerPerson", modelCode: "M-C11", label: "役員1人当たり給与支給総額", unit: "億円/人", get: (rows, index) => { const segment = rows[index].other; return segment.officerCount ? segment.officerPay / segment.officerCount : 0; } },
+  { key: "officerPayPerPersonGrowth", modelCode: "M-C12", label: "役員1人当たり給与支給総額の上昇率", unit: "%", get: (rows, index) => { const current = rows[index].other; const previous = index ? rows[index - 1].other : undefined; return segmentGrowth(current.officerCount ? current.officerPay / current.officerCount : 0, previous?.officerCount ? previous.officerPay / previous.officerCount : undefined); } },
+  { key: "laborProductivity", modelCode: "M-C13", label: "労働生産性", unit: "億円/人", get: (rows, index) => { const segment = rows[index].other; const people = segment.headcount + segment.officerCount; return people ? valueAdded(segment) / people : 0; } },
+  { key: "ebitda", modelCode: "M-C14", label: "EBITDA", unit: "億円", get: (rows, index) => segmentEbitda(rows[index].other) },
+  { key: "ebitdaMargin", modelCode: "M-C15", label: "EBITDAマージン", unit: "%", get: (rows, index) => { const segment = rows[index].other; return segmentRate(segmentEbitda(segment), segment.sales); } },
+  { key: "ebitdaGrowth", modelCode: "M-C16", label: "EBITDA増加率", unit: "%", get: (rows, index) => segmentGrowth(segmentEbitda(rows[index].other), index ? segmentEbitda(rows[index - 1].other) : undefined) },
+];
+
 const percentDriver = (key: keyof Drivers) =>
   !["usefulLife", "investment", "subsidy", "localBenchmark"].includes(key);
 
@@ -2439,11 +2475,16 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
   const effectiveByYear = new Map(effectivePlan.map((row) => [row.year, row]));
   const rawPlaceholder = (value: number, digits = 2) => String(roundedInput(value, digits));
   const projectActualEntered = (year: number) => projectOfficialInputRows.some((item) => hasInputValue(inputValues, inputKey.projectActual(year, item.code)));
+  const [omitProjectCalculated, setOmitProjectCalculated] = useState(false);
+  const [omitCompanyCalculated, setOmitCompanyCalculated] = useState(false);
+  const [omitOtherCalculated, setOmitOtherCalculated] = useState(false);
+  const visibleProjectRows = omitProjectCalculated ? projectOfficialDisplayRows.filter((item) => item.input || item.fixed) : projectOfficialDisplayRows;
+  const visibleCompanyRows = omitCompanyCalculated ? companyActualInputRows.filter((item) => item.set) : companyActualInputRows;
   return <div className="manual-sections spreadsheet-grid">
     <div>
-      <h3>補助事業収支計画（7-1～7-20：過去3期参照 → 事業化報告3年目）</h3>
+      <h3 className="manual-table-heading"><span>補助事業収支計画（7-1～7-20：過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitProjectCalculated} onClick={() => setOmitProjectCalculated((current) => !current)}>{omitProjectCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
       <div className="wide-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は自動予測</small></th>)}</tr></thead>
-        <tbody>{projectOfficialDisplayRows.map((item) => <tr className={!item.input ? "calculated-row" : ""} key={item.code}>
+        <tbody>{visibleProjectRows.map((item) => <tr className={!item.input ? "calculated-row" : ""} key={item.code}>
           <th>{item.code} {item.label}<small>{item.unit}／{item.input ? "入力・上書き可" : item.fixed ? "固定前提" : "自動計算"}</small></th>
           {historical.map((row, index) => {
             const show = !item.fixed && projectActualEntered(row.year) && (!index || projectActualEntered(historical[index - 1].year) || !["7-2", "7-12", "7-16", "7-18"].includes(item.code));
@@ -2463,12 +2504,12 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
       <p className="footnote">7-1・7-4・7-6・7-8～7-10・7-13・7-14は入力値です。7-2・7-3・7-5・7-7・7-11・7-12・7-15～7-19は第6次Excelと同じ関係式で自動計算し、7-20は「15指標・目標」の市場伸び率を参照します。</p>
     </div>
     <div>
-      <h3>会社全体の損益計算書・関連計算項目（2-1～2-36：過去3期参照 → 将来）</h3>
+      <h3 className="manual-table-heading"><span>会社全体の損益計算書・関連計算項目（2-1～2-36：過去3期参照 → 将来）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCompanyCalculated} onClick={() => setOmitCompanyCalculated((current) => !current)}>{omitCompanyCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
       <div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead>
         <tbody>
           <OfficialSectionHeading label="損益計算書" range="2-1～2-20" columns={historical.length + futureRows.length} />
-          {companyActualInputRows.flatMap((item) => [
-          item.groupStart ? <OfficialSectionHeading key="section-related" label="P/L関連計算項目" range="2-21～2-36" columns={historical.length + futureRows.length} /> : null,
+          {visibleCompanyRows.flatMap((item) => [
+          (omitCompanyCalculated ? item.code === "2-27" : item.groupStart) ? <OfficialSectionHeading key="section-related" label="P/L関連計算項目" range="2-21～2-36" columns={historical.length + futureRows.length} /> : null,
           <tr className={!item.set ? "emphasis" : ""} key={item.code}>
           <th>{item.code} {item.label}{item.unit && <small>{item.unit}</small>}</th>
           {historical.map((row, index) => { const value = item.get(historical, index); return <td className="historical-reference" key={row.year}><strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong></td>; })}
@@ -2484,7 +2525,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
       </table></div>
       <p className="footnote">2-1～2-20を損益計算書、2-21～2-36を給与・付加価値・人数・EBITDAの「P/L関連計算項目」として区切っています。2-18～2-20・2-27・2-28は第6次様式に合わせた入力項目です。将来の2-18～2-20は直近実績の営業外損益率・特別損益率・税引後利益率を基に自動予測し、必要な年度だけ上書きできます。</p>
     </div>
-    <div><h3>その他事業PL（過去3期参照 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>内部管理番号・項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・全社－補助事業</small></th>)}{futureRows.map((row) => <th key={row.year} className={futureInputBasis === "other" ? "forecast-heading" : undefined}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・{futureInputBasis === "other" ? "空欄は自動予測" : "自動算出"}</small></th>)}</tr></thead><tbody>{otherPlInputFields.map((item) => <tr key={item.key}><th>{item.modelCode} {item.label}<small>{item.unit}</small></th>{historical.map((row) => <td className="historical-reference" key={row.year}><strong>{number(item.get(row.other), item.digits ?? 2)}</strong></td>)}{futureRows.map((row) => { const effective = effectiveByYear.get(row.year)!.other; const value = item.get(effective); if (futureInputBasis === "company") return <td key={row.year}><strong>{number(value, item.digits ?? 2)}</strong></td>; const key = forecastOverrideKey(row.year, "other", item.key); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value, item.digits ?? 2)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "other", item.key, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">その他事業は全社から補助事業を差し引いたモデル内訳です。補助事業の経常利益以下は営業利益を基準とし、営業外損益・特別損益・税効果はその他事業側に反映します。</p></div>
+    <div><h3 className="manual-table-heading"><span>その他事業PL（過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitOtherCalculated} onClick={() => setOmitOtherCalculated((current) => !current)}>{omitOtherCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3><div className="wide-table"><table><thead><tr><th>内部管理番号・項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・全社－補助事業</small></th>)}{futureRows.map((row) => <th key={row.year} className={futureInputBasis === "other" ? "forecast-heading" : undefined}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・{futureInputBasis === "other" ? "空欄は自動予測" : "自動算出"}</small></th>)}</tr></thead><tbody>{otherPlInputFields.map((item) => <tr key={item.key}><th>{item.modelCode} {item.label}<small>{item.unit}／入力・上書き可</small></th>{historical.map((row) => <td className="historical-reference" key={row.year}><strong>{number(item.get(row.other), item.digits ?? 2)}</strong></td>)}{futureRows.map((row) => { const effective = effectiveByYear.get(row.year)!.other; const value = item.get(effective); if (futureInputBasis === "company") return <td key={row.year}><strong>{number(value, item.digits ?? 2)}</strong></td>; const key = forecastOverrideKey(row.year, "other", item.key); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value, item.digits ?? 2)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "other", item.key, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}{!omitOtherCalculated && <OfficialSectionHeading label="自動計算項目" range="M-C1～M-C16" columns={historical.length + futureRows.length} />}{!omitOtherCalculated && otherPlCalculatedFields.map((item) => <tr className="calculated-row" key={item.key}><th>{item.modelCode} {item.label}<small>{item.unit}／自動計算</small></th>{historical.map((row, index) => { const value = item.get(historical, index); return <td className="historical-reference calculated-cell" key={row.year}><strong>{value === undefined ? "—" : number(value, item.digits ?? 2)}</strong></td>; })}{futureRows.map((row) => { const index = effectivePlan.findIndex((candidate) => candidate.year === row.year); const value = item.get(effectivePlan, index); return <td className="calculated-cell" key={row.year}><strong>{value === undefined ? "—" : number(value, item.digits ?? 2)}</strong><small>自動計算</small></td>; })}</tr>)}</tbody></table></div><p className="footnote">その他事業は全社から補助事業を差し引いたモデル内訳です。入力項目に加え、売上高成長率・利益率・付加価値・1人当たり指標・EBITDA等を自動計算して表示します。補助事業の経常利益以下は営業利益を基準とし、営業外損益・特別損益・税効果はその他事業側に反映します。</p></div>
   </div>;
 }
 

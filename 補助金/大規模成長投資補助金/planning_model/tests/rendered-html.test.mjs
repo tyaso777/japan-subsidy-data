@@ -437,6 +437,12 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /const otherPlInputFields[\s\S]*?label: "従業員給与"[\s\S]*?label: "従業員賞与"/);
   assert.match(pageSource, /const otherPlInputFields[\s\S]*?label: "経常利益"[\s\S]*?label: "当期純利益"/);
   assert.match(pageSource, /otherPlInputFields\.map/);
+  assert.match(pageSource, /const otherPlCalculatedFields[\s\S]*?label: "売上高成長率"[\s\S]*?label: "売上総利益"[\s\S]*?label: "EBITDA増加率"/);
+  assert.match(pageSource, /omitProjectCalculated[\s\S]*?omitCompanyCalculated[\s\S]*?omitOtherCalculated/);
+  assert.match(pageSource, /自動計算項目を省略する/);
+  assert.match(pageSource, /label="自動計算項目" range="M-C1～M-C16"/);
+  assert.match(globalStyles, /\.manual-table-heading \{ display: flex;/);
+  assert.match(globalStyles, /\.calculated-row-toggle\[aria-pressed="true"\]/);
   assert.match(pageSource, /補助事業の経常利益以下は営業利益を基準/);
   assert.doesNotMatch(pageSource, /2-19・2-20はモデル未対応|2-18は営業利益と同額/);
   assert.doesNotMatch(reportDataSource, /税引前当期純利益（モデル未対応）|当期純利益（モデル未対応）/);
