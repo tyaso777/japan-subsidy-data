@@ -140,13 +140,19 @@ const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string;
   projectSgaRateEnd: { label: "補助事業 その他販管費率（事業化報告3年目到達値）", unit: "%", step: 0.5 },
   otherSgaRateEnd: { label: "ベース事業 その他販管費率（事業化報告3年目到達値）", unit: "%", step: 0.5 },
   projectOfficerPayGrowth: { label: "役員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
-  usefulLife: { label: "新規投資の耐用年数", unit: "年", step: 1 },
+  usefulLife: { label: "新規投資の平均耐用年数（減価償却費の自動予測用・モデル内管理）", unit: "年", step: 1 },
   investment: { label: "補助事業投資額", unit: "億円", step: 1 },
   subsidy: { label: "申請補助金額", unit: "億円", step: 0.01 },
   localBenchmark: { label: "ローカルベンチマーク", unit: "点", step: 1 },
 };
 
 const driverTablePresentation = (key: keyof Drivers, label: string) => {
+  if (key === "usefulLife") {
+    return {
+      label: "新規投資の平均耐用年数（モデル内管理）",
+      note: "減価償却費の自動予測用・第6次公式様式外",
+    };
+  }
   const modelManaged = label.includes("モデル内管理");
   const terminalRate = key === "projectSgaRateEnd" || key === "otherSgaRateEnd";
   const shortLabel = label
@@ -2063,7 +2069,7 @@ export default function Home() {
       return next;
     });
     setHistoricalDefaultsApplied(true);
-    setDefaultNote("すべての計画初期値を設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目は保守的な補完値を使用しています。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。ベース事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、耐用年数は10年、市場伸び率は5%で仮置きしています。");
+    setDefaultNote("すべての計画初期値を設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目は保守的な補完値を使用しています。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。ベース事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、市場伸び率は5%で仮置きしています。新規投資の平均耐用年数は、第6次公式様式の入力項目ではなく、減価償却費を自動予測するためのモデル内前提として10年で仮置きしています。");
   }
 
   function confirmAndApplyHistoricalDefaults() {
@@ -2391,7 +2397,7 @@ export default function Home() {
                 const rangeOrdered = driverRanges[key][0] <= driverRanges[key][1];
                 const rangeValid = noRange || (rangeOrdered && drivers[key] >= driverRanges[key][0] && drivers[key] <= driverRanges[key][1]);
                 const rangeStatus = noRange ? "入力値を固定" : !rangeOrdered ? "下限＞上限" : movable ? rangeValid ? "範囲内で調整" : "初期値が範囲外" : rangeValid ? "入力値を固定" : "固定値が範囲外";
-                return <tr className={`${movable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={key}><th><span className="driver-item-code">{driverItemCodes[key]}:</span> {tablePresentation.label}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{info.unit}／{history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>{history.values.slice(1).map((value, referenceIndex) => {
+                 return <tr className={`${movable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={key}><th><span className="driver-item-code">{driverItemCodes[key]}:</span> {tablePresentation.label}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{info.unit}／{key === "usefulLife" ? "公式様式外・過去比較なし" : history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>{history.values.slice(1).map((value, referenceIndex) => {
                   const index = referenceIndex + 1;
                   const referenceLevel = history.referenceLevels?.[index];
                   if (referenceLevel !== undefined && Number.isFinite(referenceLevel)) {
@@ -2404,7 +2410,7 @@ export default function Home() {
               }),
               ])}
             </tbody></table></div>
-            <p className="footnote">前期・最新決算期の各列は、計画値ではなく過去実績の参考値です。前々期もデフォルト計算には使用しますが、参考値がほぼないため表では省略しています。「過去3期からデフォルト設定」では、補助事業の設備導入期間は過去実績の単純平均を計画初期値、平均±2標準偏差を許容下限・上限とします。表示されている許容下限・上限がそのまま最適化の探索範囲であり、別の非表示上限は設けません。制度条件や計算上成立しない値は別途バリデーションします。基準年後は、第5次採択者中央値を直接使える項目と、過去採択統計・利益構造から補完する項目を分けています。市場伸び率・補助事業投資額・申請補助金額・耐用年数は固定入力のため、許容下限・上限を設けません。</p>
+            <p className="footnote">前期・最新決算期の各列は、計画値ではなく過去実績の参考値です。前々期もデフォルト計算には使用しますが、参考値がほぼないため表では省略しています。「過去3期からデフォルト設定」では、補助事業の設備導入期間は過去実績の単純平均を計画初期値、平均±2標準偏差を許容下限・上限とします。表示されている許容下限・上限がそのまま最適化の探索範囲であり、別の非表示上限は設けません。制度条件や計算上成立しない値は別途バリデーションします。基準年後は、第5次採択者中央値を直接使える項目と、過去採択統計・利益構造から補完する項目を分けています。市場伸び率・補助事業投資額・申請補助金額・新規投資の平均耐用年数は固定入力のため、許容下限・上限を設けません。平均耐用年数は第6次公式様式の入力項目ではなく、減価償却費の自動予測だけに使うモデル内前提です。</p>
             <div className="benchmark-note"><strong>基準年後のデフォルト</strong><span>売上高成長率 22%［15～30%］</span><span>補助事業1人当たり給与支給総額の年平均上昇率 7%［5～10%］</span><span>常時使用する従業員数（就業時間換算）の成長率 4%［0～8%］</span><span>原価率改善 1.5pt［0～2pt］</span><span>その他販管費率 過去平均-1.5pt［過去平均-4～+1pt］</span><span>役員1人当たり給与支給総額の年平均上昇率は過去3期の役員1人当たり給与から推計（計算不能時のみ7%［5～10%］）</span><span>ベース事業はシナジーを見込み、基準年後の売上成長率を設備導入期間＋2.0pt、原価率改善・給与・人員成長率を＋0.5pt</span><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公募・採択者中央値PDF ↗</a></div>
             {defaultNote && <p className="default-note">{defaultNote}</p>}
           </article>
@@ -2504,7 +2510,7 @@ export default function Home() {
             <code>各年度原価率 = 期間開始時原価率と期間末原価率を、経過年数に応じて直線補間</code>
             <code>設備導入期間末のその他販管費率 = 最新決算期のその他販管費率 − 改善ポイント（プラスは改善、マイナスは悪化）</code>
             <code>基準年後の各年度その他販管費率 = 基準年度の実績率と事業化報告3年目の到達値を直線補間</code>
-            <p>許容下限・上限は、過去3期の最小・最大に変動幅の50%（最低1pt、率水準は最低2pt）を加え、技術的な上下限内に収めます。過去実績から決められない投資額・補助金額・耐用年数などは自動変更しません。従来の固定サンプル120億円からの割戻しは、画面の自動予測では使用しません。</p>
+            <p>許容下限・上限は、過去3期の最小・最大に変動幅の50%（最低1pt、率水準は最低2pt）を加え、技術的な上下限内に収めます。過去実績から決められない投資額・補助金額・新規投資の平均耐用年数などは自動変更しません。平均耐用年数は公式様式外のモデル内前提で、投資額÷平均耐用年数により減価償却費を簡易予測します。公式様式へ転記する際は、7-10「減価償却費（合計）」の年度別計画値を確認・上書きしてください。従来の固定サンプル120億円からの割戻しは、画面の自動予測では使用しません。</p>
           </article>
           <article className="panel formula-panel">
             <h2>近似調整の目的関数</h2>

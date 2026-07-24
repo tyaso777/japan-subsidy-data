@@ -224,7 +224,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /ローカルベンチマーク固定値/);
   assert.match(pageSource, /固定入力・判定対象外/);
   assert.match(pageSource, /key === "investment" \|\| key === "subsidy" \|\| key === "usefulLife" \|\| key === "projectMarketGrowth"/);
-  assert.match(pageSource, /市場伸び率・補助事業投資額・申請補助金額・耐用年数は固定入力/);
+  assert.match(pageSource, /平均耐用年数は第6次公式様式の入力項目ではなく、減価償却費の自動予測だけに使うモデル内前提/);
   assert.match(proposalSource, /fixedOutputDriverKeys\.has\(key\) \? undefined/);
   assert.match(pageSource, /calculateScaleDependentTargetDefaults/);
   assert.match(pageSource, /15指標の増加額5項目は固定中央値を使わず/);
