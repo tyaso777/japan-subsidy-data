@@ -459,10 +459,11 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /const otherPlInputFields[\s\S]*?label: "経常利益"[\s\S]*?label: "当期純利益"/);
   assert.match(pageSource, /const otherPlCalculatedFields[\s\S]*?modelCode: "M2-2", label: "売上高成長率"[\s\S]*?modelCode: "M2-5", label: "売上総利益"[\s\S]*?modelCode: "M2-36", label: "EBITDA増加率"/);
   assert.match(pageSource, /const otherPlDisplayRows[\s\S]*?otherPlInputFields\.map[\s\S]*?otherPlCalculatedFields\.map[\s\S]*?\.sort/);
-  assert.match(pageSource, /const projectDetailedInputFields[\s\S]*?replace\("M2-", "P2-"\)/);
+  assert.match(pageSource, /const projectDetailedOfficialCodes[\s\S]*?"M2-1": "7-1"[\s\S]*?"M2-33": "7-19"/);
+  assert.match(pageSource, /const projectDetailedCode[\s\S]*?projectDetailedOfficialCodes\[modelCode\][\s\S]*?replace\("M2-", "P2-"\)/);
   assert.match(pageSource, /const projectDetailedDisplayRows[\s\S]*?other: row\.project/);
-  assert.match(pageSource, /補助事業PL・関連計算項目（P2-1～P2-36/);
-  assert.match(pageSource, /補助事業とその他事業を同じ2-1～2-36相当の細かさで入力/);
+  assert.match(pageSource, /補助事業PL・関連計算項目（公式7-1～7-19＋内部管理P2-X/);
+  assert.match(pageSource, /P2-Xは補助事業の詳細PLを作るための内部管理用番号/);
   assert.match(pageSource, /companyModeUnsupportedOtherCodes/);
   assert.match(pageSource, /omitProjectCalculated[\s\S]*?omitCompanyCalculated[\s\S]*?omitOtherCalculated/);
   assert.match(pageSource, /自動計算項目を省略する/);

@@ -371,9 +371,33 @@ const otherPlDisplayRows: OtherPlDisplayRow[] = [
   })),
 ].sort((left, right) => Number(left.code.replace("M2-", "")) - Number(right.code.replace("M2-", "")));
 
+const projectDetailedOfficialCodes: Record<string, string> = {
+  "M2-1": "7-1",
+  "M2-2": "7-2",
+  "M2-5": "7-4",
+  "M2-6": "7-5",
+  "M2-16": "7-6",
+  "M2-17": "7-7",
+  "M2-21": "7-8",
+  "M2-22": "7-9",
+  "M2-23": "7-10",
+  "M2-24": "7-11",
+  "M2-25": "7-12",
+  "M2-27": "7-13",
+  "M2-28": "7-14",
+  "M2-29": "7-15",
+  "M2-30": "7-16",
+  "M2-31": "7-17",
+  "M2-32": "7-18",
+  "M2-33": "7-19",
+};
+
+const projectDetailedCode = (modelCode: string) =>
+  projectDetailedOfficialCodes[modelCode] ?? modelCode.replace("M2-", "P2-");
+
 const projectDetailedInputFields: OtherPlInputField[] = otherPlInputFields.map((item) => ({
   ...item,
-  modelCode: item.modelCode.replace("M2-", "P2-"),
+  modelCode: projectDetailedCode(item.modelCode),
 }));
 
 const projectDetailedDisplayRows: OtherPlDisplayRow[] = otherPlDisplayRows.map((item) => {
@@ -382,7 +406,7 @@ const projectDetailedDisplayRows: OtherPlDisplayRow[] = otherPlDisplayRows.map((
     : undefined;
   return {
     ...item,
-    code: item.code.replace("M2-", "P2-"),
+    code: projectDetailedCode(item.code),
     input,
     get: (rows: YearPlan[], index: number) =>
       item.get(rows.map((row) => ({ ...row, other: row.project })), index),
@@ -2573,14 +2597,14 @@ function DetailedProjectInputsTable({ historical, effectivePlan, overrides, omit
   const visibleRows = omitCalculated ? projectDetailedDisplayRows.filter((item) => item.input) : projectDetailedDisplayRows;
   const rawPlaceholder = (value: number, digits = 2) => String(roundedInput(value, digits));
   return <div>
-    <h3 className="manual-table-heading"><span>補助事業PL・関連計算項目（P2-1～P2-36：過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCalculated} onClick={onToggleCalculated}>{omitCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
-    <div className="wide-table"><table><thead><tr><th>第6次様式2-1～2-36準拠の補助事業内部管理項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は自動予測</small></th>)}</tr></thead>
+    <h3 className="manual-table-heading"><span>補助事業PL・関連計算項目（公式7-1～7-19＋内部管理P2-X：過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCalculated} onClick={onToggleCalculated}>{omitCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
+    <div className="wide-table"><table><thead><tr><th>公式Excel項目／補足項目（P2-Xは内部管理用）</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は自動予測</small></th>)}</tr></thead>
       <tbody>
-        <OfficialSectionHeading label="損益計算書" range="P2-1～P2-20" columns={historical.length + futureRows.length} />
+        <OfficialSectionHeading label="損益計算書" range="公式7-1～7-7／補足P2-X" columns={historical.length + futureRows.length} />
         {visibleRows.flatMap((item) => [
-          (omitCalculated ? item.code === "P2-27" : item.code === "P2-21") ? <OfficialSectionHeading key="project-detail-related" label="P/L関連計算項目" range="P2-21～P2-36" columns={historical.length + futureRows.length} /> : null,
+          (omitCalculated ? item.code === "7-13" : item.code === "7-8") ? <OfficialSectionHeading key="project-detail-related" label="P/L関連計算項目" range="公式7-8～7-19／補足P2-X" columns={historical.length + futureRows.length} /> : null,
           <tr className={!item.input ? "calculated-row" : ""} key={item.code}>
-            <th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}／{item.input ? "入力・上書き可" : "自動計算"}</small></th>
+            <th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}／{item.input ? "入力・上書き可" : "自動計算"}{item.code.startsWith("P2-") ? "／内部管理用" : ""}</small></th>
             {historical.map((row, index) => {
               const value = item.get(historical, index);
               return <td className={`historical-reference${item.input ? "" : " calculated-cell"}`} key={row.year}><strong>{value === undefined ? "—" : number(value, item.digits ?? 2)}</strong></td>;
@@ -2598,7 +2622,7 @@ function DetailedProjectInputsTable({ historical, effectivePlan, overrides, omit
         ])}
       </tbody>
     </table></div>
-    <p className="footnote">「その他事業PLを入力」では、補助事業とその他事業を同じ2-1～2-36相当の細かさで入力し、両者の合計から会社全体PLを作ります。第6次様式の補助事業7-1～7-20は、この詳細入力から自動生成して「年度別PL」に表示します。</p>
+    <p className="footnote">第6次公式Excelに対応する項目は7-1～7-19で表示し、給与・賞与の内訳、減価償却費の区分、経常利益以下など公式様式だけでは不足する項目に限りP2-Xを付けています。P2-Xは補助事業の詳細PLを作るための内部管理用番号で、公式Excelへ直接転記する番号ではありません。7-20市場伸び率は「15指標・目標」の固定前提を参照します。</p>
   </div>;
 }
 
