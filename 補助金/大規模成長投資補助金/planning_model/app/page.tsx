@@ -102,7 +102,19 @@ const adjustableDriverKeys: (keyof Drivers)[] = [
 const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string; step: number }>> = {
   projectCogsRateWhenSalesZero: { label: "補助事業 原価率（売上実績が0の場合の開始水準）", unit: "%", step: 0.5 },
   otherCogsRateWhenSalesZero: { label: "ベース事業 原価率（売上実績が0の場合の開始水準）", unit: "%", step: 0.5 },
-  effectiveTaxRate: { label: "実効税率", unit: "%", step: 0.5 },
+  projectEmployeeSalaryShare: { label: "補助事業 従業員給与総額に占める給与の割合", unit: "%", step: 0.5 },
+  otherEmployeeSalaryShare: { label: "ベース事業 従業員給与総額に占める給与の割合", unit: "%", step: 0.5 },
+  projectOfficerCompensationShare: { label: "補助事業 役員給与総額に占める役員報酬の割合", unit: "%", step: 0.5 },
+  otherOfficerCompensationShare: { label: "ベース事業 役員給与総額に占める役員報酬の割合", unit: "%", step: 0.5 },
+  projectCogsDepreciationShare: { label: "補助事業 減価償却費のうち売上原価に含める割合", unit: "%", step: 0.5 },
+  otherCogsDepreciationShare: { label: "ベース事業 減価償却費のうち売上原価に含める割合", unit: "%", step: 0.5 },
+  projectResearchDevelopmentRate: { label: "補助事業 研究開発費の売上高比率", unit: "%", step: 0.1 },
+  otherResearchDevelopmentRate: { label: "ベース事業 研究開発費の売上高比率", unit: "%", step: 0.1 },
+  projectNonOperatingRate: { label: "補助事業 営業外損益の売上高比率", unit: "%", step: 0.1 },
+  otherNonOperatingRate: { label: "ベース事業 営業外損益の売上高比率", unit: "%", step: 0.1 },
+  projectExtraordinaryRate: { label: "補助事業 特別損益の売上高比率", unit: "%", step: 0.1 },
+  otherExtraordinaryRate: { label: "ベース事業 特別損益の売上高比率", unit: "%", step: 0.1 },
+  effectiveTaxRate: { label: "実効税率（当期純利益割合＝100%－実効税率）", unit: "%", step: 0.5 },
   otherOfficerPayGrowthToBase: { label: "ベース事業 役員1人当たり給与支給総額の年平均上昇率（最新決算期→基準年・モデル内管理）", unit: "%/年", step: 0.25 },
   otherOfficerPayGrowth: { label: "ベース事業 役員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
   projectMarketGrowth: { label: "7-20 市場伸び率（年あたり）", unit: "%/年", step: 0.5 },
@@ -181,6 +193,16 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
     keys: ["otherSalesGrowth", "otherCogsImprovement", "otherPayGrowth", "otherOfficerPayGrowth", "otherHeadcountGrowth", "otherSgaRateEnd"],
   },
   {
+    label: "補助事業｜会計内訳・利益前提",
+    detail: "将来各年度に固定適用",
+    keys: ["projectEmployeeSalaryShare", "projectOfficerCompensationShare", "projectCogsDepreciationShare", "projectResearchDevelopmentRate", "projectNonOperatingRate", "projectExtraordinaryRate"],
+  },
+  {
+    label: "ベース事業｜会計内訳・利益前提",
+    detail: "将来各年度に固定適用",
+    keys: ["otherEmployeeSalaryShare", "otherOfficerCompensationShare", "otherCogsDepreciationShare", "otherResearchDevelopmentRate", "otherNonOperatingRate", "otherExtraordinaryRate"],
+  },
+  {
     label: "共通・固定前提",
     detail: "申請・外部前提",
     keys: ["projectCogsRateWhenSalesZero", "otherCogsRateWhenSalesZero", "effectiveTaxRate", "projectMarketGrowth"],
@@ -190,7 +212,13 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
 const forecastDriverKeys = driverGroups.flatMap((group) => group.keys);
 const fixedForecastDriverKeys = new Set<keyof Drivers>([
   "investment", "subsidy", "usefulLife", "projectCogsRateWhenSalesZero",
-  "otherCogsRateWhenSalesZero", "effectiveTaxRate", "otherOfficerPayGrowthToBase",
+  "otherCogsRateWhenSalesZero", "projectEmployeeSalaryShare", "otherEmployeeSalaryShare",
+  "projectOfficerCompensationShare", "otherOfficerCompensationShare",
+  "projectCogsDepreciationShare", "otherCogsDepreciationShare",
+  "projectResearchDevelopmentRate", "otherResearchDevelopmentRate",
+  "projectNonOperatingRate", "otherNonOperatingRate",
+  "projectExtraordinaryRate", "otherExtraordinaryRate",
+  "effectiveTaxRate", "otherOfficerPayGrowthToBase",
   "otherOfficerPayGrowth", "projectMarketGrowth",
 ]);
 
@@ -506,7 +534,7 @@ function createInitialInputValues(): InputValues {
   return values;
 }
 
-function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, inputBasis: FutureInputBasis) {
+function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, inputBasis: FutureInputBasis, drivers: Drivers) {
   const result = clone(plan);
   const projectAnchors = new Set<string>();
   const otherAnchors = new Set<string>();
@@ -596,7 +624,7 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
       const autoOrdinary = ordinaryIncome(autoCompany);
       const autoPreTax = preTaxIncome(autoCompany);
       const autoNet = netIncome(autoCompany);
-      const afterTaxRatio = autoPreTax ? autoNet / autoPreTax : 0.7;
+      const afterTaxRatio = autoPreTax ? autoNet / autoPreTax : 1 - drivers.effectiveTaxRate;
       row.other.ordinaryIncome = roundedInput(autoOrdinary + operatingDelta - ordinaryIncome(row.project));
       row.other.preTaxIncome = roundedInput(autoPreTax + operatingDelta - preTaxIncome(row.project));
       row.other.netIncome = roundedInput(autoNet + operatingDelta * afterTaxRatio - netIncome(row.project));
@@ -1160,7 +1188,7 @@ export default function Home() {
       if (menu !== openedMenu) menu.removeAttribute("open");
     });
   }
-  const sourcePlan = useMemo(() => applyForecastOverrides(autoPlan, forecastOverrides, futureInputBasis), [autoPlan, forecastOverrides, futureInputBasis]);
+  const sourcePlan = useMemo(() => applyForecastOverrides(autoPlan, forecastOverrides, futureInputBasis, drivers), [autoPlan, forecastOverrides, futureInputBasis, drivers]);
   const plan = adjustedPlan ?? sourcePlan;
   const calculationDrivers = adjustedDrivers ?? drivers;
   const sourceActual = useMemo(() => calculateMetrics(sourcePlan, drivers), [sourcePlan, drivers]);
@@ -1199,7 +1227,7 @@ export default function Home() {
     const sourceHistorical = sourcePlan.slice(0, 3);
     const candidateActual = (candidateDrivers: Drivers) => {
       const period = createForecastProjectPeriodInputs(sourceHistorical[2], candidateDrivers, timeline);
-      const candidatePlan = applyForecastOverrides(generatePlan(sourceHistorical, candidateDrivers, timeline, period), forecastOverrides, futureInputBasis);
+      const candidatePlan = applyForecastOverrides(generatePlan(sourceHistorical, candidateDrivers, timeline, period), forecastOverrides, futureInputBasis, candidateDrivers);
       return calculateMetrics(candidatePlan, candidateDrivers);
     };
     for (const definition of targetManagedMetrics) {
@@ -1427,7 +1455,7 @@ export default function Home() {
       const adjustedPeriodInputs = createForecastProjectPeriodInputs(importedHistoricalPlan[2], importedAdjustedDrivers, importedTimeline);
       const adjustedAutoPlan = generatePlan(importedHistoricalPlan, importedAdjustedDrivers, importedTimeline, adjustedPeriodInputs);
       setAdjustedDrivers(importedAdjustedDrivers);
-      setAdjustedPlan(applyForecastOverrides(adjustedAutoPlan, importedForecastOverrides, importedFutureInputBasis));
+      setAdjustedPlan(applyForecastOverrides(adjustedAutoPlan, importedForecastOverrides, importedFutureInputBasis, importedAdjustedDrivers ?? importedDrivers));
       setSolveNote("保存済みの最適化結果を表示しています。");
     }
     setDefaultNote("");
@@ -1870,6 +1898,42 @@ export default function Home() {
     nextDrivers.otherCogsRateWhenSalesZero = hasInputValue(inputValues, inputKey.driver("otherCogsRateWhenSalesZero"))
       ? drivers.otherCogsRateWhenSalesZero
       : clamp(latest.other.sales ? latest.other.cogs / latest.other.sales : 0.68, 0, 0.99);
+    const setAccountingDefault = (key: keyof Drivers, value: number) => {
+      nextDrivers[key] = hasInputValue(inputValues, inputKey.driver(key))
+        ? drivers[key]
+        : clamp(value, driverBounds[key][0], driverBounds[key][1]);
+    };
+    const segmentAccountingDefaults = (segment: SegmentPlan, segmentKey: "project" | "other") => {
+      const employeeBreakdownEntered = segment.employeeSalary !== undefined || segment.employeeBonus !== undefined;
+      const officerBreakdownEntered = segment.officerCompensation !== undefined || segment.officerBonus !== undefined;
+      const depreciationBreakdownEntered = segment.cogsDepreciation !== undefined || segment.sgaDepreciation !== undefined;
+      setAccountingDefault(
+        segmentKey === "project" ? "projectEmployeeSalaryShare" : "otherEmployeeSalaryShare",
+        employeeBreakdownEntered && segment.employeePay ? employeeSalary(segment) / segment.employeePay : 0.95,
+      );
+      setAccountingDefault(
+        segmentKey === "project" ? "projectOfficerCompensationShare" : "otherOfficerCompensationShare",
+        officerBreakdownEntered && segment.officerPay ? officerCompensation(segment) / segment.officerPay : 0.90,
+      );
+      setAccountingDefault(
+        segmentKey === "project" ? "projectCogsDepreciationShare" : "otherCogsDepreciationShare",
+        depreciationBreakdownEntered && segment.depreciation ? cogsDepreciation(segment) / segment.depreciation : 0.20,
+      );
+      setAccountingDefault(
+        segmentKey === "project" ? "projectResearchDevelopmentRate" : "otherResearchDevelopmentRate",
+        segment.sales ? researchDevelopment(segment) / segment.sales : 0,
+      );
+      setAccountingDefault(
+        segmentKey === "project" ? "projectNonOperatingRate" : "otherNonOperatingRate",
+        segment.sales ? nonOperatingProfitLoss(segment) / segment.sales : 0,
+      );
+      setAccountingDefault(
+        segmentKey === "project" ? "projectExtraordinaryRate" : "otherExtraordinaryRate",
+        segment.sales ? extraordinaryProfitLoss(segment) / segment.sales : 0,
+      );
+    };
+    segmentAccountingDefaults(latest.project, "project");
+    segmentAccountingDefaults(latest.other, "other");
     nextDrivers.effectiveTaxRate = hasInputValue(inputValues, inputKey.driver("effectiveTaxRate"))
       ? drivers.effectiveTaxRate
       : clamp(latestPreTax ? 1 - netIncome(latestCompany) / latestPreTax : 0.30, 0, 0.60);
@@ -2023,7 +2087,7 @@ export default function Home() {
     // Let React paint the busy state before the synchronous optimizer starts.
     await new Promise<void>((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
     try {
-      const planTransform = (candidate: YearPlan[]) => applyForecastOverrides(candidate, forecastOverrides, futureInputBasis);
+      const planTransform = (candidate: YearPlan[]) => applyForecastOverrides(candidate, forecastOverrides, futureInputBasis, drivers);
       const result = runPlanningOptimization({
         drivers,
         historicalPlan,

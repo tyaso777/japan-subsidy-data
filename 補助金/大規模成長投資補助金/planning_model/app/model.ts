@@ -68,6 +68,18 @@ export type Drivers = {
   projectMarketGrowth: number;
   projectCogsRateWhenSalesZero: number;
   otherCogsRateWhenSalesZero: number;
+  projectEmployeeSalaryShare: number;
+  otherEmployeeSalaryShare: number;
+  projectOfficerCompensationShare: number;
+  otherOfficerCompensationShare: number;
+  projectCogsDepreciationShare: number;
+  otherCogsDepreciationShare: number;
+  projectResearchDevelopmentRate: number;
+  otherResearchDevelopmentRate: number;
+  projectNonOperatingRate: number;
+  otherNonOperatingRate: number;
+  projectExtraordinaryRate: number;
+  otherExtraordinaryRate: number;
   effectiveTaxRate: number;
   projectSalesGrowthToBase: number;
   projectCogsImprovementToBase: number;
@@ -219,6 +231,18 @@ export const sampleDrivers: Drivers = {
   projectMarketGrowth: 0.05,
   projectCogsRateWhenSalesZero: 0.68,
   otherCogsRateWhenSalesZero: 0.68,
+  projectEmployeeSalaryShare: 0.95,
+  otherEmployeeSalaryShare: 0.95,
+  projectOfficerCompensationShare: 0.90,
+  otherOfficerCompensationShare: 0.90,
+  projectCogsDepreciationShare: 0.25,
+  otherCogsDepreciationShare: 0.20,
+  projectResearchDevelopmentRate: 0.005,
+  otherResearchDevelopmentRate: 0.004,
+  projectNonOperatingRate: 0,
+  otherNonOperatingRate: -0.005,
+  projectExtraordinaryRate: 0,
+  otherExtraordinaryRate: 0,
   effectiveTaxRate: 0.30,
   projectSalesGrowthToBase: 0.21,
   projectCogsImprovementToBase: 0.07,
@@ -295,6 +319,18 @@ export const defaultDrivers: Drivers = {
   projectMarketGrowth: 0,
   projectCogsRateWhenSalesZero: 0,
   otherCogsRateWhenSalesZero: 0,
+  projectEmployeeSalaryShare: 0,
+  otherEmployeeSalaryShare: 0,
+  projectOfficerCompensationShare: 0,
+  otherOfficerCompensationShare: 0,
+  projectCogsDepreciationShare: 0,
+  otherCogsDepreciationShare: 0,
+  projectResearchDevelopmentRate: 0,
+  otherResearchDevelopmentRate: 0,
+  projectNonOperatingRate: 0,
+  otherNonOperatingRate: 0,
+  projectExtraordinaryRate: 0,
+  otherExtraordinaryRate: 0,
   effectiveTaxRate: 0,
   projectSalesGrowthToBase: 0,
   projectCogsImprovementToBase: 0,
@@ -330,6 +366,18 @@ export const driverBounds: Record<keyof Drivers, [number, number]> = {
   projectMarketGrowth: [-0.05, 0.3],
   projectCogsRateWhenSalesZero: [0, 0.99],
   otherCogsRateWhenSalesZero: [0, 0.99],
+  projectEmployeeSalaryShare: [0, 1],
+  otherEmployeeSalaryShare: [0, 1],
+  projectOfficerCompensationShare: [0, 1],
+  otherOfficerCompensationShare: [0, 1],
+  projectCogsDepreciationShare: [0, 1],
+  otherCogsDepreciationShare: [0, 1],
+  projectResearchDevelopmentRate: [0, 0.3],
+  otherResearchDevelopmentRate: [0, 0.3],
+  projectNonOperatingRate: [-0.5, 0.5],
+  otherNonOperatingRate: [-0.5, 0.5],
+  projectExtraordinaryRate: [-0.5, 0.5],
+  otherExtraordinaryRate: [-0.5, 0.5],
   effectiveTaxRate: [0, 0.6],
   projectSalesGrowthToBase: [-0.05, 0.4],
   projectCogsImprovementToBase: [0, 0.02],
@@ -403,7 +451,9 @@ export const sgaDepreciation = (segment: SegmentPlan) => segment.sgaDepreciation
 export const researchDevelopment = (segment: SegmentPlan) => segment.researchDevelopment ?? 0;
 export const ordinaryIncome = (segment: SegmentPlan) => segment.ordinaryIncome ?? operatingProfit(segment);
 export const preTaxIncome = (segment: SegmentPlan) => segment.preTaxIncome ?? ordinaryIncome(segment);
-export const netIncome = (segment: SegmentPlan) => segment.netIncome ?? preTaxIncome(segment) * 0.7;
+// 当期純利益が未入力の過去セグメントには、税率を暗黙適用しない。
+// 将来値は withDriverBreakdowns で明示した実効税率から必ず設定する。
+export const netIncome = (segment: SegmentPlan) => segment.netIncome ?? 0;
 export const nonOperatingProfitLoss = (segment: SegmentPlan) => ordinaryIncome(segment) - operatingProfit(segment);
 export const extraordinaryProfitLoss = (segment: SegmentPlan) => preTaxIncome(segment) - ordinaryIncome(segment);
 
@@ -544,6 +594,29 @@ function withProportionalBreakdown(source: SegmentPlan, target: SegmentPlan): Se
   return result;
 }
 
+function withDriverBreakdowns(segment: SegmentPlan, drivers: Drivers, segmentKey: SegmentKey): SegmentPlan {
+  const employeeSalaryShare = segmentKey === "project" ? drivers.projectEmployeeSalaryShare : drivers.otherEmployeeSalaryShare;
+  const officerCompensationShare = segmentKey === "project" ? drivers.projectOfficerCompensationShare : drivers.otherOfficerCompensationShare;
+  const cogsDepreciationShare = segmentKey === "project" ? drivers.projectCogsDepreciationShare : drivers.otherCogsDepreciationShare;
+  const researchDevelopmentRate = segmentKey === "project" ? drivers.projectResearchDevelopmentRate : drivers.otherResearchDevelopmentRate;
+  const nonOperatingRate = segmentKey === "project" ? drivers.projectNonOperatingRate : drivers.otherNonOperatingRate;
+  const extraordinaryRate = segmentKey === "project" ? drivers.projectExtraordinaryRate : drivers.otherExtraordinaryRate;
+  const result: SegmentPlan = {
+    ...segment,
+    employeeSalary: round(segment.employeePay * employeeSalaryShare),
+    employeeBonus: round(segment.employeePay * (1 - employeeSalaryShare)),
+    officerCompensation: round(segment.officerPay * officerCompensationShare),
+    officerBonus: round(segment.officerPay * (1 - officerCompensationShare)),
+    cogsDepreciation: round(segment.depreciation * cogsDepreciationShare),
+    sgaDepreciation: round(segment.depreciation * (1 - cogsDepreciationShare)),
+    researchDevelopment: round(segment.sales * researchDevelopmentRate),
+  };
+  result.ordinaryIncome = round(operatingProfit(result) + result.sales * nonOperatingRate);
+  result.preTaxIncome = round(result.ordinaryIncome + result.sales * extraordinaryRate);
+  result.netIncome = round(result.preTaxIncome * (1 - drivers.effectiveTaxRate));
+  return result;
+}
+
 function historicalSegmentWithPayGrowth(segment: SegmentPlan, factor: number, yearsBeforeLatest: number): SegmentPlan {
   const scaled = scaleSegment(segment, factor);
   if (segment.headcount > 0) {
@@ -625,7 +698,7 @@ export function createForecastProjectPeriodInputs(
     const headcount = start.headcount * (1 + drivers.projectHeadcountGrowthToBase) ** elapsed;
     return {
       year: timeline.latestYear + elapsed,
-      project: withProportionalBreakdown(start, {
+      project: withDriverBreakdowns(withProportionalBreakdown(start, {
         sales: round(sales),
         cogs: round(sales * lerp(startCogsRate, targetCogsRate, progress)),
         employeePay: round(startPayPerHead * (1 + drivers.projectPayGrowthToBase) ** elapsed * headcount),
@@ -634,7 +707,7 @@ export function createForecastProjectPeriodInputs(
         otherSga: round(sales * lerp(startSgaRate, Math.max(0, startSgaRate - drivers.projectSgaImprovementToBase), progress)),
         headcount: Math.max(0, Math.round(headcount)),
         officerCount: Math.max(0, Math.round(start.officerCount)),
-      }),
+      }), drivers, "project"),
     };
   });
 }
@@ -704,7 +777,7 @@ export function generatePlan(
       ? lerp(latestOtherSgaRate, otherBaseSgaRate, otherProgress)
       : lerp(otherBaseSgaRate, drivers.otherSgaRateEnd, otherProgress);
     const enteredProject = periodInputs.find((row) => row.year === year)?.project;
-    const project = year <= timeline.baseYear ? structuredClone(enteredProject ?? emptyProject) : withProportionalBreakdown(projectBase, {
+    const rawProject = year <= timeline.baseYear ? structuredClone(enteredProject ?? emptyProject) : withProportionalBreakdown(projectBase, {
       sales: round(projectSales),
       cogs: round(projectSales * lerp(baseProjectCogsRate, projectCogsRateEnd, projectProgress)),
       employeePay: round(baseProjectPayPerHead * (1 + drivers.projectPayGrowth) ** yearsAfterBase * projectHeadcount),
@@ -714,39 +787,24 @@ export function generatePlan(
       headcount: Math.max(0, Math.round(projectHeadcount)),
       officerCount: Math.max(0, Math.round(projectBase.officerCount)),
     });
+    const project = withDriverBreakdowns(rawProject, drivers, "project");
+    const other = withDriverBreakdowns(withProportionalBreakdown(latest.other, {
+      sales: round(otherSales),
+      cogs: round(otherSales * otherCogsRate),
+      employeePay: round(otherEmployeePay),
+      officerPay: round(otherOfficerPay),
+      depreciation: round(latest.other.depreciation),
+      otherSga: round(otherSales * otherSgaRate),
+      headcount: Math.max(0, Math.round(otherHeadcount)),
+      officerCount: Math.max(0, Math.round(latest.other.officerCount)),
+    }), drivers, "other");
     plan.push({
       year,
       role,
       project,
-      other: withProportionalBreakdown(latest.other, {
-        sales: round(otherSales),
-        cogs: round(otherSales * otherCogsRate),
-        employeePay: round(otherEmployeePay),
-        officerPay: round(otherOfficerPay),
-        depreciation: round(latest.other.depreciation),
-        otherSga: round(otherSales * otherSgaRate),
-        headcount: Math.max(0, Math.round(otherHeadcount)),
-        officerCount: Math.max(0, Math.round(latest.other.officerCount)),
-      }),
+      other,
     });
   }
-
-  const latestCompany = total(latest.project, latest.other);
-  const latestOperatingProfit = operatingProfit(latestCompany);
-  const latestOrdinaryIncome = ordinaryIncome(latestCompany);
-  const latestPreTaxIncome = preTaxIncome(latestCompany);
-  const nonOperatingRate = latestCompany.sales ? (latestOrdinaryIncome - latestOperatingProfit) / latestCompany.sales : 0;
-  const specialProfitRate = latestCompany.sales ? (latestPreTaxIncome - latestOrdinaryIncome) / latestCompany.sales : 0;
-  const afterTaxRatio = 1 - drivers.effectiveTaxRate;
-  plan.slice(actuals.length).forEach((row) => {
-    const company = total(row.project, row.other);
-    const forecastOrdinaryIncome = round(operatingProfit(company) + company.sales * nonOperatingRate);
-    const forecastPreTaxIncome = round(forecastOrdinaryIncome + company.sales * specialProfitRate);
-    const forecastNetIncome = round(forecastPreTaxIncome * afterTaxRatio);
-    row.other.ordinaryIncome = round(forecastOrdinaryIncome - ordinaryIncome(row.project));
-    row.other.preTaxIncome = round(forecastPreTaxIncome - preTaxIncome(row.project));
-    row.other.netIncome = round(forecastNetIncome - netIncome(row.project));
-  });
   return plan;
 }
 
@@ -907,6 +965,18 @@ export function calculateHistoricalDriverSeries(
     projectMarketGrowth: unavailable(),
     projectCogsRateWhenSalesZero: { mode: "level", values: levels((row) => ratio(row.project.cogs, row.project.sales)) },
     otherCogsRateWhenSalesZero: { mode: "level", values: levels((row) => ratio(row.other.cogs, row.other.sales)) },
+    projectEmployeeSalaryShare: { mode: "level", values: levels((row) => ratio(employeeSalary(row.project), row.project.employeePay)) },
+    otherEmployeeSalaryShare: { mode: "level", values: levels((row) => ratio(employeeSalary(row.other), row.other.employeePay)) },
+    projectOfficerCompensationShare: { mode: "level", values: levels((row) => ratio(officerCompensation(row.project), row.project.officerPay)) },
+    otherOfficerCompensationShare: { mode: "level", values: levels((row) => ratio(officerCompensation(row.other), row.other.officerPay)) },
+    projectCogsDepreciationShare: { mode: "level", values: levels((row) => ratio(cogsDepreciation(row.project), row.project.depreciation)) },
+    otherCogsDepreciationShare: { mode: "level", values: levels((row) => ratio(cogsDepreciation(row.other), row.other.depreciation)) },
+    projectResearchDevelopmentRate: { mode: "level", values: levels((row) => ratio(researchDevelopment(row.project), row.project.sales)) },
+    otherResearchDevelopmentRate: { mode: "level", values: levels((row) => ratio(researchDevelopment(row.other), row.other.sales)) },
+    projectNonOperatingRate: { mode: "level", values: levels((row) => ratio(nonOperatingProfitLoss(row.project), row.project.sales)) },
+    otherNonOperatingRate: { mode: "level", values: levels((row) => ratio(nonOperatingProfitLoss(row.other), row.other.sales)) },
+    projectExtraordinaryRate: { mode: "level", values: levels((row) => ratio(extraordinaryProfitLoss(row.project), row.project.sales)) },
+    otherExtraordinaryRate: { mode: "level", values: levels((row) => ratio(extraordinaryProfitLoss(row.other), row.other.sales)) },
     effectiveTaxRate: {
       mode: "level",
       values: levels((row) => {

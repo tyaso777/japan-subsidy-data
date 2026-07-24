@@ -31,12 +31,24 @@ test("application starts without sample company, project, balance-sheet, or driv
 test("previously implicit PL assumptions are explicit drivers", () => {
   assert.equal(model.sampleDrivers.projectCogsRateWhenSalesZero, 0.68);
   assert.equal(model.sampleDrivers.otherCogsRateWhenSalesZero, 0.68);
+  assert.equal(model.sampleDrivers.projectEmployeeSalaryShare, 0.95);
+  assert.equal(model.sampleDrivers.otherEmployeeSalaryShare, 0.95);
+  assert.equal(model.sampleDrivers.projectOfficerCompensationShare, 0.90);
+  assert.equal(model.sampleDrivers.otherOfficerCompensationShare, 0.90);
+  assert.equal(model.sampleDrivers.projectCogsDepreciationShare, 0.25);
+  assert.equal(model.sampleDrivers.otherCogsDepreciationShare, 0.20);
+  assert.equal(model.sampleDrivers.projectResearchDevelopmentRate, 0.005);
+  assert.equal(model.sampleDrivers.otherResearchDevelopmentRate, 0.004);
+  assert.equal(model.sampleDrivers.projectNonOperatingRate, 0);
+  assert.equal(model.sampleDrivers.otherNonOperatingRate, -0.005);
+  assert.equal(model.sampleDrivers.projectExtraordinaryRate, 0);
+  assert.equal(model.sampleDrivers.otherExtraordinaryRate, 0);
   assert.equal(model.sampleDrivers.effectiveTaxRate, 0.30);
   assert.equal(model.sampleDrivers.otherOfficerPayGrowthToBase, 0.04);
   assert.equal(model.sampleDrivers.otherOfficerPayGrowth, 0.045);
 });
 
-test("base-business officer pay and tax use their own adjustment levels", () => {
+test("accounting breakdowns and profit stages use explicit adjustment levels", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   const drivers = {
     ...model.sampleDrivers,
@@ -44,6 +56,18 @@ test("base-business officer pay and tax use their own adjustment levels", () => 
     otherPayGrowth: 0,
     otherOfficerPayGrowthToBase: 0.08,
     otherOfficerPayGrowth: 0.08,
+    projectEmployeeSalaryShare: 0.80,
+    otherEmployeeSalaryShare: 0.75,
+    projectOfficerCompensationShare: 0.70,
+    otherOfficerCompensationShare: 0.65,
+    projectCogsDepreciationShare: 0.30,
+    otherCogsDepreciationShare: 0.40,
+    projectResearchDevelopmentRate: 0.02,
+    otherResearchDevelopmentRate: 0.03,
+    projectNonOperatingRate: 0.01,
+    otherNonOperatingRate: -0.02,
+    projectExtraordinaryRate: -0.01,
+    otherExtraordinaryRate: 0.02,
     effectiveTaxRate: 0.40,
   };
   const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE);
@@ -51,6 +75,18 @@ test("base-business officer pay and tax use their own adjustment levels", () => 
   const report3 = plan.find((row) => row.role === "report3");
   assert.ok(base.other.officerPay > historical.at(-1).other.officerPay);
   assert.ok(report3.other.officerPay > base.other.officerPay);
+  assert.ok(Math.abs(model.employeeSalary(report3.project) / report3.project.employeePay - 0.80) < 0.002);
+  assert.ok(Math.abs(model.employeeSalary(report3.other) / report3.other.employeePay - 0.75) < 0.002);
+  assert.equal(model.officerCompensation(report3.project), Number((report3.project.officerPay * 0.70).toFixed(2)));
+  assert.equal(model.officerCompensation(report3.other), Number((report3.other.officerPay * 0.65).toFixed(2)));
+  assert.equal(model.cogsDepreciation(report3.project), Number((report3.project.depreciation * 0.30).toFixed(2)));
+  assert.equal(model.cogsDepreciation(report3.other), Number((report3.other.depreciation * 0.40).toFixed(2)));
+  assert.ok(Math.abs(model.researchDevelopment(report3.project) / report3.project.sales - 0.02) < 0.002);
+  assert.ok(Math.abs(model.researchDevelopment(report3.other) / report3.other.sales - 0.03) < 0.002);
+  assert.ok(Math.abs(model.nonOperatingProfitLoss(report3.project) / report3.project.sales - 0.01) < 0.002);
+  assert.ok(Math.abs(model.nonOperatingProfitLoss(report3.other) / report3.other.sales + 0.02) < 0.002);
+  assert.ok(Math.abs(model.extraordinaryProfitLoss(report3.project) / report3.project.sales + 0.01) < 0.002);
+  assert.ok(Math.abs(model.extraordinaryProfitLoss(report3.other) / report3.other.sales - 0.02) < 0.002);
   const company = model.total(report3.project, report3.other);
   assert.ok(Math.abs(model.netIncome(company) / model.preTaxIncome(company) - 0.60) < 0.002);
 });
@@ -115,7 +151,14 @@ test("absolute-amount target defaults scale with the underlying company", () => 
   const doubledPlan = structuredClone(plan);
   for (const row of doubledPlan) {
     for (const segment of [row.project, row.other]) {
-      for (const key of ["sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga"]) segment[key] *= 2;
+      for (const key of [
+        "sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga",
+        "employeeSalary", "employeeBonus", "officerCompensation", "officerBonus",
+        "cogsDepreciation", "sgaDepreciation", "researchDevelopment",
+        "ordinaryIncome", "preTaxIncome", "netIncome",
+      ]) {
+        if (segment[key] !== undefined) segment[key] *= 2;
+      }
     }
   }
   const doubledTargets = model.calculateScaleDependentTargetDefaults(doubledPlan, model.defaultTargets);
@@ -284,7 +327,7 @@ test("round-six payroll and depreciation breakdowns reconcile to their calculate
   assert.equal(model.valueAdded(segment), 37);
 });
 
-test("round-six company income inputs are preserved and forecast from the latest profit relationships", () => {
+test("round-six company income inputs are preserved and future profits use explicit driver rates", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   historical.forEach((row, index) => {
     const company = model.total(row.project, row.other);
@@ -297,7 +340,15 @@ test("round-six company income inputs are preserved and forecast from the latest
     row.other.headcount = 100 + index * 5 - row.project.headcount;
     row.other.officerCount = 4 - row.project.officerCount;
   });
-  const plan = model.generatePlan(historical, model.sampleDrivers, model.DEFAULT_TIMELINE);
+  const drivers = {
+    ...model.sampleDrivers,
+    projectNonOperatingRate: -0.01,
+    otherNonOperatingRate: -0.01,
+    projectExtraordinaryRate: -0.005,
+    otherExtraordinaryRate: -0.005,
+    effectiveTaxRate: 0.30,
+  };
+  const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE);
   const latest = model.total(plan[2].project, plan[2].other);
   assert.equal(model.ordinaryIncome(latest), model.ordinaryIncome(historical[2].project) + historical[2].other.ordinaryIncome);
   assert.equal(model.preTaxIncome(latest), model.preTaxIncome(historical[2].project) + historical[2].other.preTaxIncome);
@@ -531,7 +582,10 @@ test("project-period inputs are preserved and report years start from the manual
   const report1 = plan.find((row) => row.role === "report1");
 
   assert.deepEqual(beforeBase.map((row) => row.project.sales), [12.3, 45.6]);
-  assert.deepEqual(base.project, projectBase);
+  for (const key of ["sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga", "headcount", "officerCount"]) {
+    assert.equal(base.project[key], projectBase[key]);
+  }
+  assert.ok(Math.abs(model.cogsDepreciation(base.project) / base.project.depreciation - model.sampleDrivers.projectCogsDepreciationShare) < 0.002);
   assert.equal(report1.project.sales, 192.5);
 });
 
