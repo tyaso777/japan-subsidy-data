@@ -255,6 +255,11 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /function DiagnosticCharts\(\{ plan \}/);
   assert.match(pageSource, /主要指標の推移チャート/);
   assert.match(pageSource, /niceChartScale/);
+  assert.match(pageSource, /useState<MoneyDisplayUnit>\("億円"\)/);
+  assert.match(pageSource, /億円（第6次様式）/);
+  assert.match(pageSource, /<option value="百万円">百万円<\/option>/);
+  assert.match(pageSource, /<option value="千円">千円<\/option>/);
+  assert.match(pageSource, /moneyDisplayMultiplier/);
   assert.match(pageSource, /driverTablePresentation\(key, info\.label\)/);
   assert.match(pageSource, /tablePresentation\.note/);
   assert.match(pageSource, /standaloneMetricLabel\(definition\)/);

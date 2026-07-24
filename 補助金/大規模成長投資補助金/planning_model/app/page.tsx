@@ -2572,6 +2572,22 @@ type ChartSeries = {
   values: (number | undefined)[];
 };
 
+type MoneyDisplayUnit = "億円" | "百万円" | "千円";
+
+const moneyDisplayMultiplier: Record<MoneyDisplayUnit, number> = {
+  "億円": 1,
+  "百万円": 100,
+  "千円": 100000,
+};
+
+const chartValueDigits = (unit: string) => {
+  if (unit === "億円/人") return 3;
+  if (unit === "億円") return 2;
+  if (unit === "百万円/人" || unit === "百万円") return 1;
+  if (unit === "千円/人" || unit === "千円") return 0;
+  return 1;
+};
+
 function TrendChart({ title, subtitle, unit, plan, series, zeroBaseline }: { title: string; subtitle: string; unit: string; plan: YearPlan[]; series: ChartSeries[]; zeroBaseline: boolean }) {
   const width = 720;
   const height = 270;
@@ -2617,13 +2633,14 @@ function TrendChart({ title, subtitle, unit, plan, series, zeroBaseline }: { tit
     </svg>
     <div className="trend-chart-legend" aria-label="系列凡例">{series.map((item) => {
       const lastValue = [...item.values].reverse().find((value) => value !== undefined && Number.isFinite(value));
-      return <span key={item.label}><i style={{ background: item.color }} />{item.label}<strong>{lastValue === undefined ? "—" : number(lastValue, unit === "億円" ? 2 : 1)}</strong></span>;
+      return <span key={item.label}><i style={{ background: item.color }} />{item.label}<strong>{lastValue === undefined ? "—" : number(lastValue, chartValueDigits(unit))}</strong></span>;
     })}</div>
   </article>;
 }
 
 function DiagnosticCharts({ plan }: { plan: YearPlan[] }) {
   const [zeroBaseline, setZeroBaseline] = useState(true);
+  const [moneyUnit, setMoneyUnit] = useState<MoneyDisplayUnit>("億円");
   const company = plan.map((row) => total(row.project, row.other));
   const chartRate = (numerator: number, denominator: number) => denominator ? numerator / denominator * 100 : undefined;
   const perEmployee = (segment: SegmentPlan) => segment.headcount ? segment.employeePay / segment.headcount : undefined;
@@ -2634,14 +2651,16 @@ function DiagnosticCharts({ plan }: { plan: YearPlan[] }) {
     return base && Number.isFinite(base) ? values.map((value) => value === undefined ? undefined : value / base * 100) : values.map(() => undefined);
   };
   const colors = { company: "var(--chart-company)", project: "var(--chart-project)", other: "var(--chart-other)" };
+  const moneyMultiplier = moneyDisplayMultiplier[moneyUnit];
+  const displayMoney = (value: number | undefined) => value === undefined ? undefined : value * moneyMultiplier;
 
   return <section className="diagnostic-charts" aria-labelledby="diagnostic-chart-heading">
-    <div className="diagnostic-chart-heading"><div><h2 id="diagnostic-chart-heading">主要指標の推移チャート</h2></div><div className="chart-scale-control"><span>縦軸の最小値</span><div className="mode-switch" role="group" aria-label="チャートの縦軸最小値"><button type="button" className={zeroBaseline ? "active" : ""} aria-pressed={zeroBaseline} onClick={() => setZeroBaseline(true)}>0から開始</button><button type="button" className={!zeroBaseline ? "active" : ""} aria-pressed={!zeroBaseline} onClick={() => setZeroBaseline(false)}>データ範囲を拡大</button></div><small>負の値を含む場合は、値が切れない範囲まで自動調整します。</small></div></div>
+    <div className="diagnostic-chart-heading"><div><h2 id="diagnostic-chart-heading">主要指標の推移チャート</h2></div><div className="diagnostic-chart-controls"><label className="chart-unit-control"><span>金額単位</span><select value={moneyUnit} onChange={(event) => setMoneyUnit(event.target.value as MoneyDisplayUnit)} aria-label="金額系チャートの表示単位"><option value="億円">億円（第6次様式）</option><option value="百万円">百万円</option><option value="千円">千円</option></select><small>金額系チャートに反映</small></label><div className="chart-scale-control"><span>縦軸の最小値</span><div className="mode-switch" role="group" aria-label="チャートの縦軸最小値"><button type="button" className={zeroBaseline ? "active" : ""} aria-pressed={zeroBaseline} onClick={() => setZeroBaseline(true)}>0から開始</button><button type="button" className={!zeroBaseline ? "active" : ""} aria-pressed={!zeroBaseline} onClick={() => setZeroBaseline(false)}>データ範囲を拡大</button></div><small>負の値を含む場合は、値が切れない範囲まで自動調整します。</small></div></div></div>
     <div className="diagnostic-chart-grid">
-      <TrendChart title="売上高" subtitle="全社と事業別の規模・成長ペース" unit="億円" plan={plan} zeroBaseline={zeroBaseline} series={[
-        { label: "全社", color: colors.company, values: company.map((segment) => segment.sales) },
-        { label: "補助事業", color: colors.project, values: plan.map((row) => row.project.sales) },
-        { label: "その他事業", color: colors.other, values: plan.map((row) => row.other.sales) },
+      <TrendChart title="売上高" subtitle="全社と事業別の規模・成長ペース" unit={moneyUnit} plan={plan} zeroBaseline={zeroBaseline} series={[
+        { label: "全社", color: colors.company, values: company.map((segment) => displayMoney(segment.sales)) },
+        { label: "補助事業", color: colors.project, values: plan.map((row) => displayMoney(row.project.sales)) },
+        { label: "その他事業", color: colors.other, values: plan.map((row) => displayMoney(row.other.sales)) },
       ]} />
       <TrendChart title="収益性（全社）" subtitle="原価・その他販管費・営業利益の率" unit="%" plan={plan} zeroBaseline={zeroBaseline} series={[
         { label: "売上原価率", color: colors.project, values: company.map((segment) => chartRate(segment.cogs, segment.sales)) },
@@ -2652,10 +2671,10 @@ function DiagnosticCharts({ plan }: { plan: YearPlan[] }) {
         { label: "従業員数", color: colors.other, values: indexed(company.map((segment) => segment.headcount)) },
         { label: "従業員1人当たり給与", color: colors.company, values: indexed(company.map(perEmployee)) },
       ]} />
-      <TrendChart title="労働生産性" subtitle="付加価値額÷（従業員数＋役員数）" unit="億円/人" plan={plan} zeroBaseline={zeroBaseline} series={[
-        { label: "全社", color: colors.company, values: company.map(productivity) },
-        { label: "補助事業", color: colors.project, values: plan.map((row) => productivity(row.project)) },
-        { label: "その他事業", color: colors.other, values: plan.map((row) => productivity(row.other)) },
+      <TrendChart title="労働生産性" subtitle="付加価値額÷（従業員数＋役員数）" unit={`${moneyUnit}/人`} plan={plan} zeroBaseline={zeroBaseline} series={[
+        { label: "全社", color: colors.company, values: company.map((segment) => displayMoney(productivity(segment))) },
+        { label: "補助事業", color: colors.project, values: plan.map((row) => displayMoney(productivity(row.project))) },
+        { label: "その他事業", color: colors.other, values: plan.map((row) => displayMoney(productivity(row.other))) },
       ]} />
     </div>
     <p className="trend-chart-note"><span className="solid-sample" />実線：過去実績 <span className="dash-sample" />破線：将来予測。チャートは診断用であり、数値の編集は「将来データ入力」で行います。</p>
