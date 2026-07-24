@@ -154,6 +154,32 @@ const partiallyUnmetAdjustedDrivers = {
   projectOfficerPayGrowth: 0.05377805762871632,
 };
 
+const multipleUnmetAdjustedDrivers = {
+  ...standardWorkflowAdjustedDrivers,
+  projectSalesGrowthToBase: 0.05701754385964919,
+  projectCogsImprovementToBase: 3.221017417122367e-17,
+  projectPayGrowthToBase: 0.020383328262853606,
+  projectHeadcountGrowthToBase: 0.052185054472916916,
+  projectSgaImprovementToBase: 0,
+  projectOfficerPayGrowthToBase: 0.05409356725146197,
+  otherSalesGrowthToBase: 0.040760869565217184,
+  otherCogsImprovementToBase: 0,
+  otherPayGrowthToBase: 0.020288334372692035,
+  otherHeadcountGrowthToBase: 0.04062500000000005,
+  otherSgaImprovementToBase: 0,
+  projectSalesGrowth: 0.3,
+  otherSalesGrowth: 0.06438405797101453,
+  projectCogsImprovementAfterBase: 0.015679318550567874,
+  otherCogsImprovement: 0.005,
+  projectPayGrowth: 0.07285156250000001,
+  otherPayGrowth: 0.02484645846924027,
+  projectHeadcountGrowth: 0.0012644987906476753,
+  otherHeadcountGrowth: 0.045833333333333386,
+  projectSgaRateEnd: 0.10249307677048204,
+  otherSgaRateEnd: 0.10930245288582688,
+  projectOfficerPayGrowth: 0.05383627215236722,
+};
+
 const emptySegment = (): SegmentPlan => ({
   sales: 0,
   cogs: 0,
@@ -261,6 +287,22 @@ export function createPartiallyUnmetSampleProposal(exportedAt: string): Proposal
   };
   proposal.inputValues![inputKey.target("companyPaySchedule", "value")] = 3.5;
   proposal.adjustedDrivers = clone(partiallyUnmetAdjustedDrivers);
+  return proposal;
+}
+
+export function createMultipleUnmetSampleProposal(exportedAt: string): ProposalData {
+  const proposal = createStandardSampleProposal(exportedAt);
+  proposal.title = "成長投資計画 複数目標未達サンプル";
+  const unmetTargets = {
+    companySalesCagr: 30,
+    companyPaySchedule: 3.5,
+    projectSalesCagr: 35,
+  } as const;
+  for (const [key, value] of Object.entries(unmetTargets) as [keyof typeof unmetTargets, number][]) {
+    proposal.targets[key] = { ...proposal.targets[key], value };
+    proposal.inputValues![inputKey.target(key, "value")] = value;
+  }
+  proposal.adjustedDrivers = clone(multipleUnmetAdjustedDrivers);
   return proposal;
 }
 

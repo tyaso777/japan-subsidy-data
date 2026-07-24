@@ -8,6 +8,7 @@ const projectDirectory = path.resolve(path.dirname(fileURLToPath(import.meta.url
 const baseName = "成長投資計画_提案計画サンプル_基準年売上開始";
 const standardBaseName = "成長投資計画_提案計画サンプル";
 const partiallyUnmetBaseName = "成長投資計画_提案計画サンプル_一部目標未達";
+const multipleUnmetBaseName = "成長投資計画_提案計画サンプル_複数目標未達";
 const runtimePath = path.join(projectDirectory, ".sample-proposal-test-runtime.mjs");
 const sampleRuntime = await import(`${pathToFileURL(runtimePath).href}?v=${Date.now()}`);
 
@@ -54,6 +55,21 @@ test("partially unmet sample retains a visibly unattainable pay target", async (
   assert.equal(proposal.targets.companyPaySchedule.value, 3.5);
   assert.ok(proposal.adjustedDrivers.projectPayGrowthToBase < proposal.driverRanges.projectPayGrowthToBase[1]);
   assert.ok(proposal.adjustedDrivers.otherPayGrowthToBase < proposal.driverRanges.otherPayGrowthToBase[1]);
+  assertOptimizationIsStable(proposal);
+});
+
+test("multiple unmet sample retains three deterministic unmet targets", async () => {
+  const proposal = await proposalFromHtml(multipleUnmetBaseName);
+  const rerun = sampleRuntime.reoptimizeSampleProposal(proposal);
+  const expectedUnmet = ["companySalesCagr", "companyPaySchedule", "projectSalesCagr"];
+  const actualUnmet = rerun.failed.map((item) => item.key).filter((key) => expectedUnmet.includes(key)).sort();
+
+  assert.equal(proposal.title, "成長投資計画 複数目標未達サンプル");
+  assert.equal(proposal.targets.companySalesCagr.value, 30);
+  assert.equal(proposal.targets.companyPaySchedule.value, 3.5);
+  assert.equal(proposal.targets.projectSalesCagr.value, 35);
+  assert.deepEqual(actualUnmet, [...expectedUnmet].sort());
+  assert.equal(rerun.failed.length, 3);
   assertOptimizationIsStable(proposal);
 });
 

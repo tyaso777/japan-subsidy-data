@@ -309,7 +309,11 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, />シミュレーション結果を見る<\/strong>/);
   assert.match(pageSource, />最適化済み標準提案<\/button>/);
   assert.match(pageSource, />一部目標未達ケース<\/button>/);
+  assert.match(pageSource, />複数目標未達ケース（3指標）<\/button>/);
   assert.match(sampleProposalSource, /createPartiallyUnmetSampleProposal/);
+  assert.match(sampleProposalSource, /createMultipleUnmetSampleProposal/);
+  assert.match(sampleProposalSource, /companySalesCagr: 30/);
+  assert.match(sampleProposalSource, /projectSalesCagr: 35/);
   assert.match(sampleProposalSource, /inputKey\.target\("companyPaySchedule", "value"\)\] = 3\.5/);
   assert.match(sampleProposalSource, /proposal\.adjustedDrivers = clone\(partiallyUnmetAdjustedDrivers\)/);
   assert.match(sampleProposalSource, /reoptimizeSampleProposal/);

@@ -7,12 +7,13 @@ import {
   metrics,
 } from "../app/model";
 import { buildProposalHtml, buildProposalXlsx, parseProposalFile, type ProposalData } from "../app/proposal-io";
-import { createBaseYearLaunchSample, createPartiallyUnmetSampleProposal, createStandardSampleEffectivePlan, createStandardSampleProposal } from "../app/sample-proposals";
+import { createBaseYearLaunchSample, createMultipleUnmetSampleProposal, createPartiallyUnmetSampleProposal, createStandardSampleEffectivePlan, createStandardSampleProposal } from "../app/sample-proposals";
 
 const outputDirectory = path.resolve(process.cwd(), "examples");
 const exportedAt = "2026-07-22T00:00:00.000Z";
 const standardProposal = createStandardSampleProposal(exportedAt);
 const partiallyUnmetProposal = createPartiallyUnmetSampleProposal(exportedAt);
+const multipleUnmetProposal = createMultipleUnmetSampleProposal(exportedAt);
 const launchSample = createBaseYearLaunchSample(exportedAt);
 
 async function buildAndVerify(proposal: ProposalData, effectivePlan: ReturnType<typeof generatePlan>, baseName: string) {
@@ -61,6 +62,14 @@ if (partiallyUnmetActuals.companyPaySchedule >= partiallyUnmetProposal.targets.c
   throw new Error("一部目標未達サンプルで、給与上昇率目標が達成済みになっています。");
 }
 const partiallyUnmetOutput = await buildAndVerify(partiallyUnmetProposal, partiallyUnmetPlan, "成長投資計画_提案計画サンプル_一部目標未達");
+const multipleUnmetPlan = createStandardSampleEffectivePlan(multipleUnmetProposal);
+const multipleUnmetActuals = calculateMetrics(multipleUnmetPlan, multipleUnmetProposal.adjustedDrivers ?? multipleUnmetProposal.drivers);
+const multipleUnmetKeys = ["companySalesCagr", "companyPaySchedule", "projectSalesCagr"] as const;
+const failedMultipleTargets = multipleUnmetKeys.filter((key) => multipleUnmetActuals[key] < multipleUnmetProposal.targets[key].value);
+if (failedMultipleTargets.length !== multipleUnmetKeys.length) {
+  throw new Error(`複数目標未達サンプルの未達数が${multipleUnmetKeys.length}件ではありません：${failedMultipleTargets.join("、")}`);
+}
+const multipleUnmetOutput = await buildAndVerify(multipleUnmetProposal, multipleUnmetPlan, "成長投資計画_提案計画サンプル_複数目標未達");
 const launchOutput = await buildAndVerify(launchSample.proposal, launchSample.effectivePlan, "成長投資計画_提案計画サンプル_基準年売上開始");
 
 await mkdir(outputDirectory, { recursive: true });
@@ -69,6 +78,8 @@ await Promise.all([
   writeFile(path.join(outputDirectory, "成長投資計画_提案計画サンプル.xlsx"), standardOutput.xlsx),
   writeFile(path.join(outputDirectory, "成長投資計画_提案計画サンプル_一部目標未達.html"), partiallyUnmetOutput.html, "utf8"),
   writeFile(path.join(outputDirectory, "成長投資計画_提案計画サンプル_一部目標未達.xlsx"), partiallyUnmetOutput.xlsx),
+  writeFile(path.join(outputDirectory, "成長投資計画_提案計画サンプル_複数目標未達.html"), multipleUnmetOutput.html, "utf8"),
+  writeFile(path.join(outputDirectory, "成長投資計画_提案計画サンプル_複数目標未達.xlsx"), multipleUnmetOutput.xlsx),
   writeFile(path.join(outputDirectory, "成長投資計画_提案計画サンプル_基準年売上開始.html"), launchOutput.html, "utf8"),
   writeFile(path.join(outputDirectory, "成長投資計画_提案計画サンプル_基準年売上開始.xlsx"), launchOutput.xlsx),
 ]);

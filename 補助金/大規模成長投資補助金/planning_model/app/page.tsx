@@ -57,7 +57,7 @@ import {
   type ExcelMappingPreview,
   type ExcelMappingTarget,
 } from "./excel-mapping";
-import { createBaseYearLaunchHistoricalOnlySampleProposal, createHistoricalOnlySampleProposal, createPartiallyUnmetSampleProposal, createStandardSampleProposal } from "./sample-proposals";
+import { createBaseYearLaunchHistoricalOnlySampleProposal, createHistoricalOnlySampleProposal, createMultipleUnmetSampleProposal, createPartiallyUnmetSampleProposal, createStandardSampleProposal } from "./sample-proposals";
 import { getInputValue, hasInputValue, inputKey, setInputValue, type InputValues } from "./input-values";
 import { defaultMetricGroupBases, metricBasisRole, metricLinkGroups, type MetricGroupBasis, type MetricGroupKey } from "./metric-groups";
 import {
@@ -1338,6 +1338,16 @@ export default function Home() {
     showLoadNotice("「一部目標未達ケース」を読み込みました。");
   }
 
+  function loadMultipleUnmetSample() {
+    if (!confirmSampleReplacement()) return;
+    applyProposal(createMultipleUnmetSampleProposal(new Date().toISOString()));
+    setHistoricalDefaultsApplied(true);
+    setDefaultNote("全社売上高成長率、全社の従業員1人当たり給与上昇率、補助事業売上高成長率の3指標が、現在の許容範囲では同時達成できない最接近案です。複数の未達項目と修正案の一括適用を確認できます。");
+    setSolveNote("複数目標未達サンプル：3指標が未達となる決定論的な最接近案を表示しています。");
+    setFileNote("最適化後も3指標が未達となる確認用サンプルを読み込みました");
+    showLoadNotice("「複数目標未達ケース（3指標）」を読み込みました。");
+  }
+
   function loadHistoricalOnlySample() {
     if (!confirmSampleReplacement()) return;
     applyProposal(createHistoricalOnlySampleProposal(new Date().toISOString()));
@@ -1852,6 +1862,7 @@ export default function Home() {
                 <span>調整水準設定・将来入力・再最適化後の完成例です。</span>
                 <button className="sample-result-button" onClick={loadSampleProposal}>最適化済み標準提案</button>
                 <button onClick={loadPartiallyUnmetSample}>一部目標未達ケース</button>
+                <button onClick={loadMultipleUnmetSample}>複数目標未達ケース（3指標）</button>
               </section>
             </div>
           </article>
