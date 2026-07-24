@@ -196,6 +196,15 @@ test("renders the planning model shell", async () => {
   assert.match(inputValueSource, /A missing key means "not entered"/);
   assert.match(inputValueSource, /else next\[key\] = value/);
   assert.match(proposalSource, /入力データ監査（Null／0区別）/);
+  assert.match(proposalSource, /class="table-section"/);
+  assert.match(proposalSource, /section>h2\{position:sticky;top:0/);
+  assert.match(proposalSource, /tbody th:first-child\{position:sticky;left:0/);
+  assert.match(proposalSource, /className = "sticky-table-header"/);
+  assert.match(proposalSource, /className = "floating-table-scrollbar"/);
+  assert.match(proposalSource, /floatingWrapper\.scrollLeft = floating\.scrollLeft/);
+  assert.match(proposalSource, /主要指標の推移チャート/);
+  assert.match(proposalSource, /htmlTrendChart\("労働生産性"/);
+  assert.match(proposalSource, /class="chart-svg"/);
   assert.match(pageSource, /metric-group-controls/);
   assert.match(pageSource, /proposal-action-menu/);
   assert.match(pageSource, /document\.addEventListener\("pointerdown", closeProposalMenus\)/);
