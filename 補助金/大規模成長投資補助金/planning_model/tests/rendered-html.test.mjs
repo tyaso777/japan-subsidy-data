@@ -66,6 +66,16 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(globalStyles, /font-size:\s*(?:10|11)px(?:\s*!important)?;[^}]*font-weight:\s*800/);
   assert.match(globalStyles, /--muted-readable: #5b6661;/);
   assert.match(globalStyles, /--amber-ink: #80520d;/);
+  assert.match(globalStyles, /--sans: "Hiragino Sans", "Yu Gothic UI", "Noto Sans JP", system-ui, sans-serif;/);
+  assert.match(globalStyles, /--serif: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", Georgia, serif;/);
+  assert.match(globalStyles, /--display-serif: var\(--serif\);/);
+  assert.match(globalStyles, /body \{[\s\S]*?font-family: var\(--sans\);/);
+  assert.doesNotMatch(globalStyles, /font-weight:\s*(?:500|650|800|900)\b/);
+  assert.match(globalStyles, /thead th \{[^}]*letter-spacing: \.01em;[^}]*background:/);
+  assert.doesNotMatch(globalStyles, /thead th \{[^}]*text-transform:/);
+  assert.match(globalStyles, /\.card-kicker \{ letter-spacing: \.02em; \}/);
+  assert.match(proposalSource, /--sans:"Hiragino Sans","Yu Gothic UI","Noto Sans JP",system-ui,sans-serif/);
+  assert.match(proposalSource, /body\{[^}]*font-family:var\(--sans\)/);
   assert.ok(contrastRatio("#5b6661", "#fffdf8") >= 4.5);
   assert.ok(contrastRatio("#80520d", "#fffdf8") >= 4.5);
   assert.ok(contrastRatio("#4f6258", "#e2ece6") >= 4.5);
