@@ -48,6 +48,7 @@ import {
 import { buildProposalHtml, buildProposalXlsx, downloadBlob, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
 import {
   buildMappedExcel,
+  EXCEL_MAPPING_COPILOT_PROMPT,
   EXCEL_MAPPING_EXAMPLE,
   EXCEL_MAPPING_MANUAL,
   parseExcelMappingDefinition,
@@ -784,6 +785,7 @@ export default function Home() {
   const [excelMappingPreview, setExcelMappingPreview] = useState<ExcelMappingPreview[]>([]);
   const [excelMappingPreviewMode, setExcelMappingPreviewMode] = useState<"import" | "export" | null>(null);
   const [excelMappingNote, setExcelMappingNote] = useState("マッピング定義書と対象Excelを選択してください。");
+  const [copilotPromptCopied, setCopilotPromptCopied] = useState(false);
   const excelMappingTargets = useMemo(() => {
     const targets = new Map<string, ExcelMappingTarget>();
     const periodNames = ["prePrevious", "previous", "latest"] as const;
@@ -1251,6 +1253,31 @@ export default function Home() {
 
   function downloadExcelMappingManual() {
     downloadBlob(EXCEL_MAPPING_MANUAL, "Excelマッピング定義書_作成マニュアル.md", "text/markdown;charset=utf-8");
+  }
+
+  async function copyExcelMappingCopilotPrompt() {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(EXCEL_MAPPING_COPILOT_PROMPT);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = EXCEL_MAPPING_COPILOT_PROMPT;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.select();
+        const copied = document.execCommand("copy");
+        textArea.remove();
+        if (!copied) throw new Error("copy command failed");
+      }
+      setCopilotPromptCopied(true);
+      setExcelMappingNote("Copilotへの指示プロンプトをコピーしました。対象Excel・作成マニュアル・JSONサンプルと一緒にCopilotへ渡してください。");
+      window.setTimeout(() => setCopilotPromptCopied(false), 2500);
+    } catch {
+      setCopilotPromptCopied(false);
+      setExcelMappingNote("プロンプトをコピーできませんでした。作成マニュアル内の「Copilotへの依頼方法」をコピーしてください。");
+    }
   }
 
   function loadSampleProposal() {
@@ -1741,6 +1768,9 @@ export default function Home() {
             </div>
             <div className="excel-mapping-resources">
               <span>Copilotへ対象Excelと一緒に渡す資料</span>
+              <button type="button" onClick={() => { void copyExcelMappingCopilotPrompt(); }}>
+                {copilotPromptCopied ? "コピー済み" : "Copilot指示をコピー"}
+              </button>
               <button type="button" onClick={downloadExcelMappingManual}>定義書作成マニュアル</button>
               <button type="button" onClick={downloadExcelMappingExample}>JSONサンプル</button>
             </div>

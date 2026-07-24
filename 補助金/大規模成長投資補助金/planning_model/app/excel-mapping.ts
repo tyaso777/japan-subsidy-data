@@ -317,13 +317,30 @@ export const EXCEL_MAPPING_EXAMPLE: ExcelMappingDefinition = {
   ],
 };
 
+export const EXCEL_MAPPING_COPILOT_PROMPT = `添付したExcelを確認し、添付した「Excelマッピング定義書 作成マニュアル」とJSONサンプルに従って、成長投資計画シミュレーター用のマッピング定義書を作成してください。
+
+要件:
+1. 出力は growth-investment-excel-mapping/v1 形式のJSONファイルとしてください。
+2. 対象Excelのシート名とセル番地を実際に確認し、計算式セルではなく入力セルを指定してください。
+3. 各セルの金額単位と、パーセントがExcel内部で0.05と保持されるか5と保持されるかを確認してください。
+4. 空欄と数値の0を区別してください。
+5. 読み込みだけなら direction を import、書き出しだけなら export、両方なら both としてください。
+6. 対応関係を推測した項目、候補が複数ある項目、対応できない項目は、JSONとは別に一覧で報告してください。
+7. 元のExcelは変更しないでください。
+
+最初に、対象Excelで確認できたシート名と候補セルの一覧を示してください。その後に完成したJSONを提示してください。`;
+
 export const EXCEL_MAPPING_MANUAL = `# Excelマッピング定義書 作成マニュアル
 
 ## 目的
 このシミュレーターと任意形式のExcel（.xlsx / .xlsm）のセルを、JSONのマッピング定義書で結びます。マクロ・書式・数式・非対象セルは保持し、出力時は元ファイルを上書きせず別Excelとして保存します。
 
 ## Copilotへの依頼方法
-対象Excelとこのマニュアルを渡し、「入力に使う数値セルを確認し、下記形式のJSONを作成してください。計算式セルではなく入力セルを指定し、金額単位とパーセントの格納形式も明記してください」と依頼します。
+対象Excel、このマニュアル、JSONサンプルを渡し、次のプロンプトで依頼します。
+
+\`\`\`text
+${EXCEL_MAPPING_COPILOT_PROMPT}
+\`\`\`
 
 ## 定義書の基本形
 \`\`\`json
