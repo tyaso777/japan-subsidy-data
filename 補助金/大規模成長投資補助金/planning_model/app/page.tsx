@@ -778,6 +778,7 @@ export default function Home() {
   const [historicalDefaultsApplied, setHistoricalDefaultsApplied] = useState(false);
   const [proposalTitle, setProposalTitle] = useState("成長投資計画 提案計画");
   const [fileNote, setFileNote] = useState("未保存。ここから出力したHTML・Excelは、同じ画面へ再取込できます。");
+  const [loadNotice, setLoadNotice] = useState<{ id: number; message: string } | null>(null);
   const [excelMapping, setExcelMapping] = useState<ExcelMappingDefinition | null>(null);
   const [excelMappingFileName, setExcelMappingFileName] = useState("");
   const [mappedExcelBytes, setMappedExcelBytes] = useState<Uint8Array | null>(null);
@@ -861,6 +862,19 @@ export default function Home() {
       document.removeEventListener("keydown", closeProposalMenusWithEscape);
     };
   }, []);
+
+  useEffect(() => {
+    if (!loadNotice) return;
+    const noticeId = loadNotice.id;
+    const timeoutId = window.setTimeout(() => {
+      setLoadNotice((current) => current?.id === noticeId ? null : current);
+    }, 5000);
+    return () => window.clearTimeout(timeoutId);
+  }, [loadNotice]);
+
+  function showLoadNotice(message: string) {
+    setLoadNotice({ id: Date.now(), message });
+  }
 
   function keepOnlyProposalMenuOpen(openedMenu: HTMLDetailsElement) {
     if (!openedMenu.open) return;
@@ -1144,6 +1158,7 @@ export default function Home() {
     if (!file) return;
     try {
       applyProposal(await parseProposalFile(file));
+      showLoadNotice(`提案計画「${file.name}」を読み込みました。`);
     } catch (error) {
       setFileNote(error instanceof Error ? error.message : "取込に失敗しました");
     }
@@ -1234,6 +1249,7 @@ export default function Home() {
       }
     }
     setExcelMappingNote(`${applied}件を反映しました。0は明示的な0、空欄は未設定のまま保持しています。`);
+    if (applied > 0) showLoadNotice(`Excelから${applied}件の値を読み込みました。`);
   }
 
   function exportMappedExcel() {
@@ -1309,6 +1325,7 @@ export default function Home() {
     setDefaultNote("過去3期実績から調整水準を設定し、初回最適化後に2029年のその他事業売上高・補助事業の従業員給与支給総額を上書きして、再最適化したサンプルです。");
     setSolveNote("標準提案サンプル：一部将来データ入力後の再最適化まで実行済みです。");
     setFileNote("過去入力・調整水準設定・2段階最適化済みの標準提案を読み込みました");
+    showLoadNotice("「最適化済み標準提案」を読み込みました。");
   }
 
   function loadPartiallyUnmetSample() {
@@ -1318,18 +1335,21 @@ export default function Home() {
     setDefaultNote("現実的な許容範囲を維持したため、一部指標が目標に届かなかった最接近案です。未達判定と許容範囲の修正候補を確認できます。");
     setSolveNote("一部目標未達サンプル：許容範囲内で最適化した最接近案を表示しています。");
     setFileNote("最適化後も一部指標が未達となる確認用サンプルを読み込みました");
+    showLoadNotice("「一部目標未達ケース」を読み込みました。");
   }
 
   function loadHistoricalOnlySample() {
     if (!confirmSampleReplacement()) return;
     applyProposal(createHistoricalOnlySampleProposal(new Date().toISOString()));
     setFileNote("過去3期入力済み・将来予測未設定のサンプルを読み込みました");
+    showLoadNotice("「標準ケース（過去3期入力済み）」を読み込みました。");
   }
 
   function loadBaseYearLaunchSample() {
     if (!confirmSampleReplacement()) return;
     applyProposal(createBaseYearLaunchHistoricalOnlySampleProposal(new Date().toISOString()));
     setFileNote("補助事業の過去3期実績が0で、将来予測未設定のサンプルを読み込みました");
+    showLoadNotice("「基準年売上開始ケース（過去3期入力済み）」を読み込みました。");
   }
 
   function updateHistorical(yearIndex: number, segment: SegmentKey, field: keyof SegmentPlan, value: number) {
@@ -1733,6 +1753,12 @@ export default function Home() {
         <span className="tab-group-separator" aria-hidden="true">|</span>
         <button className={view === "io" ? "active" : ""} onClick={() => goToView("io")}>データ入出力</button>
       </nav>
+
+      {loadNotice && <aside className="load-success-notice" role="status" aria-live="polite">
+        <span className="load-success-icon" aria-hidden="true">✓</span>
+        <span><strong>読み込み完了</strong><small>{loadNotice.message}</small></span>
+        <button type="button" aria-label="読み込み完了通知を閉じる" onClick={() => setLoadNotice(null)}>×</button>
+      </aside>}
 
       {view === "io" && (
         <section className="content-stack data-io-view">

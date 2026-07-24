@@ -84,6 +84,14 @@ test("renders the planning model shell", async () => {
   assert.ok(pageSource.indexOf('className="excel-mapping-panel"') < pageSource.indexOf('className="sample-library-panel"'));
   assert.match(pageSource, /すでに入力されているデータがあります。サンプルを読み込むと、現在の入力・設定・最適化結果を上書きします。よろしいですか？/);
   assert.match(pageSource, /if \(!confirmSampleReplacement\(\)\) return;/);
+  assert.match(pageSource, /className="load-success-notice" role="status" aria-live="polite"/);
+  assert.match(pageSource, /<strong>読み込み完了<\/strong>/);
+  assert.match(pageSource, /showLoadNotice\(`提案計画「\$\{file\.name\}」を読み込みました。`\)/);
+  assert.match(pageSource, /showLoadNotice\(`Excelから\$\{applied\}件の値を読み込みました。`\)/);
+  assert.match(pageSource, /showLoadNotice\("「最適化済み標準提案」を読み込みました。"\)/);
+  assert.match(pageSource, /showLoadNotice\("「一部目標未達ケース」を読み込みました。"\)/);
+  assert.match(pageSource, /window\.setTimeout\(\(\) => \{/);
+  assert.match(globalStyles, /\.load-success-notice \{ position: fixed;/);
   assert.match(globalStyles, /\.data-io-grid \{ display: grid; grid-template-columns: 1fr;/);
   assert.match(globalStyles, /\.sample-library-grid \{ display: grid; grid-template-columns: repeat\(2,/);
   assert.match(pageSource, /任意形式のExcelと入出力する/);
