@@ -44,10 +44,9 @@ test("standard sample represents the completed two-pass planning workflow", asyn
   assert.ok(proposal.adjustedDrivers.projectSalesGrowth <= proposal.driverRanges.projectSalesGrowth[1]);
   assert.equal(proposal.drivers.subsidy, 7.66);
   assert.equal(proposal.drivers.investment, 23);
-  assert.equal(
-    Number(proposal.futureCapex.reduce((sum, row) => sum + row.value, 0).toFixed(2)),
-    proposal.drivers.investment,
-    "the annual capex schedule must equal the investment adjustment level",
+  assert.ok(
+    proposal.futureCapex.every((row) => row.value === 0 && !Object.hasOwn(proposal.inputValues, `future-capex:${row.year}`)),
+    "the investment adjustment level must not be allocated automatically to annual capex",
   );
   assert.equal(proposal.targets.companySalesIncrease.value, 82.4);
   assert.equal(proposal.targets.companySalesCagr.value, 15);

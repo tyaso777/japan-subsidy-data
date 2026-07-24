@@ -194,21 +194,17 @@ const emptySegment = (): SegmentPlan => ({
   officerCount: 0,
 });
 
-const futureCapex = (investment: number) => {
-  const projectYears = DEFAULT_TIMELINE.baseYear - DEFAULT_TIMELINE.latestYear;
-  const annual = round(investment / projectYears);
+const emptyFutureCapex = () => {
   return Array.from({ length: DEFAULT_TIMELINE.baseYear + 3 - DEFAULT_TIMELINE.latestYear }, (_, index) => ({
     year: DEFAULT_TIMELINE.latestYear + index + 1,
-    value: index < projectYears
-      ? index === projectYears - 1 ? round(investment - annual * (projectYears - 1)) : annual
-      : 0,
+    value: 0,
   }));
 };
 
-const syncFutureCapex = (proposal: ProposalData, investment: number) => {
-  proposal.futureCapex = futureCapex(investment);
+const clearFutureCapex = (proposal: ProposalData) => {
+  proposal.futureCapex = emptyFutureCapex();
   for (const row of proposal.futureCapex) {
-    proposal.inputValues![inputKey.futureCapex(row.year)] = round(row.value);
+    delete proposal.inputValues?.[inputKey.futureCapex(row.year)];
   }
 };
 
@@ -230,7 +226,7 @@ const commonProposal = (title: string, exportedAt: string, historicalPlan: YearP
     };
   });
   const balanceSheets = retimeBalanceSheets(sampleBalanceSheets, DEFAULT_TIMELINE);
-  const capex = futureCapex(sampleDrivers.investment);
+  const capex = emptyFutureCapex();
   const inputValues: InputValues = {};
   historicalPlan.forEach((row) => {
     const company = total(row.project, row.other);
@@ -254,7 +250,6 @@ const commonProposal = (title: string, exportedAt: string, historicalPlan: YearP
     Object.entries(projectInputs).forEach(([code, value]) => { inputValues[inputKey.projectActual(row.year, code)] = round(value); });
   });
   balanceSheets.forEach((row) => (Object.keys(row) as (keyof typeof row)[]).filter((field) => field !== "year").forEach((field) => { inputValues[inputKey.balanceSheet(row.year, field)] = round(row[field]); }));
-  capex.forEach((row) => { inputValues[inputKey.futureCapex(row.year)] = round(row.value); });
   (Object.keys(sampleDrivers) as (keyof typeof sampleDrivers)[]).forEach((key) => {
     inputValues[inputKey.driver(key)] = sampleDrivers[key];
     inputValues[inputKey.driverRange(key, 0)] = driverBounds[key][0];
@@ -291,7 +286,7 @@ export function createStandardSampleProposal(exportedAt: string): ProposalData {
   );
   proposal.drivers = clone(standardWorkflowInitialDrivers);
   proposal.adjustedDrivers = clone(standardWorkflowAdjustedDrivers);
-  syncFutureCapex(proposal, standardWorkflowInitialDrivers.investment);
+  clearFutureCapex(proposal);
   proposal.driverRanges = clone(standardWorkflowRanges);
   proposal.targets = clone(standardWorkflowTargets);
   proposal.forecastOverrides = clone(standardWorkflowOverrides);
@@ -411,7 +406,7 @@ export function createHistoricalOnlySampleProposal(exportedAt: string): Proposal
 
 function clearFutureSettings(proposal: ProposalData): ProposalData {
   proposal.drivers = clone(defaultDrivers);
-  proposal.futureCapex = futureCapex(0);
+  proposal.futureCapex = emptyFutureCapex();
   (Object.keys(sampleDrivers) as (keyof typeof sampleDrivers)[]).forEach((key) => {
     delete proposal.inputValues?.[inputKey.driver(key)];
     delete proposal.inputValues?.[inputKey.driverRange(key, 0)];

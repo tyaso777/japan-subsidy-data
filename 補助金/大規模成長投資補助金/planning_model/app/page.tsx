@@ -532,11 +532,10 @@ function clone<T>(value: T): T {
   return structuredClone(value);
 }
 
-const createFutureCapex = (settings: TimelineSettings, totalInvestment: number) => {
-  const projectYears = settings.baseYear - settings.latestYear;
+const createFutureCapex = (settings: TimelineSettings) => {
   return Array.from({ length: settings.baseYear + 3 - settings.latestYear }, (_, index) => ({
     year: settings.latestYear + index + 1,
-    value: index < projectYears ? totalInvestment / projectYears : 0,
+    value: 0,
   }));
 };
 
@@ -1071,7 +1070,7 @@ export default function Home() {
   const [historicalPlan, setHistoricalPlan] = useState<YearPlan[]>(() => createHistoricalPlan(basePlan, DEFAULT_TIMELINE));
   const [balanceSheets, setBalanceSheets] = useState<BalanceSheetPlan[]>(() => retimeBalanceSheets(defaultBalanceSheets, DEFAULT_TIMELINE));
   const [omitSimulationUnusedBalanceSheet, setOmitSimulationUnusedBalanceSheet] = useState(false);
-  const [futureCapex, setFutureCapex] = useState(() => createFutureCapex(DEFAULT_TIMELINE, defaultDrivers.investment));
+  const [futureCapex, setFutureCapex] = useState(() => createFutureCapex(DEFAULT_TIMELINE));
   const [drivers, setDrivers] = useState<Drivers>({ ...defaultDrivers });
   const [driverRanges, setDriverRanges] = useState<Record<keyof Drivers, [number, number]>>(() => clone(driverBounds));
   const [targets, setTargets] = useState<Record<MetricKey, Target>>(clone(defaultTargets));
@@ -1761,14 +1760,11 @@ export default function Home() {
     clearAdjustment();
     setFutureCapex((current) => {
       const next = current.map((row, index) => index === yearIndex ? { ...row, value: roundedInput(value ?? 0) } : row);
-      const investment = roundedInput(next.reduce((sum, row) => sum + row.value, 0));
-      setDrivers((driver) => ({ ...driver, investment }));
-      setInputValues((values) => {
-        let updated = setInputValue(values, inputKey.futureCapex(next[yearIndex].year), value === null ? null : roundedInput(value));
-        const anyCapexEntered = next.some((row) => hasInputValue(updated, inputKey.futureCapex(row.year)));
-        updated = setInputValue(updated, inputKey.driver("investment"), anyCapexEntered ? investment : null);
-        return updated;
-      });
+      setInputValues((values) => setInputValue(
+        values,
+        inputKey.futureCapex(next[yearIndex].year),
+        value === null ? null : roundedInput(value),
+      ));
       return next;
     });
   }
@@ -1778,7 +1774,10 @@ export default function Home() {
     const next = normalizeTimeline({ ...timeline, ...patch });
     const nextHistorical = retimeHistoricalPlan(historicalPlan, next);
     const nextBalanceSheets = retimeBalanceSheets(balanceSheets, next);
-    const nextFutureCapex = createFutureCapex(next, futureCapex.reduce((sum, row) => sum + row.value, 0));
+    const nextFutureCapex = createFutureCapex(next).map((row, index) => ({
+      ...row,
+      value: futureCapex[index]?.value ?? 0,
+    }));
     setInputValues((current) => {
       const remapped: InputValues = Object.fromEntries(Object.entries(current).filter(([key]) => !key.startsWith("actual:") && !key.startsWith("balance-sheet:") && !key.startsWith("future-capex:")));
       historicalPlan.forEach((oldRow, index) => {
@@ -1847,11 +1846,6 @@ export default function Home() {
     const numericValue = value ?? 0;
     setInputValues((current) => setInputValue(current, inputKey.driver(key), value === null ? null : numericValue));
     setDrivers((current) => ({ ...current, [key]: numericValue }));
-    if (key === "investment") {
-      const capex = createFutureCapex(timeline, numericValue);
-      setFutureCapex(capex);
-      setInputValues((current) => capex.reduce((next, row) => setInputValue(next, inputKey.futureCapex(row.year), value === null ? null : roundedInput(row.value)), current));
-    }
   }
 
   function updateDriverRange(key: keyof Drivers, boundIndex: 0 | 1, displayValue: number | null) {
@@ -1903,13 +1897,11 @@ export default function Home() {
 
     nextDrivers.projectMarketGrowth = hasInputValue(inputValues, inputKey.driver("projectMarketGrowth")) ? drivers.projectMarketGrowth : 0.05;
     nextDrivers.usefulLife = hasInputValue(inputValues, inputKey.driver("usefulLife")) ? drivers.usefulLife : 10;
-    const enteredInvestment = futureCapex.reduce((sum, row) => sum + row.value, 0);
-    const capexEntered = futureCapex.some((row) => hasInputValue(inputValues, inputKey.futureCapex(row.year)));
-    const investmentEntered = capexEntered || hasInputValue(inputValues, inputKey.driver("investment"));
+    const investmentEntered = hasInputValue(inputValues, inputKey.driver("investment"));
     const historicalCapex = balanceSheets.map((row) => row.capex).filter((value) => Number.isFinite(value) && value > 0);
     const annualHistoricalCapex = historicalCapex.length ? historicalCapex.reduce((sum, value) => sum + value, 0) / historicalCapex.length : 0;
     const estimatedInvestment = annualHistoricalCapex * Math.max(1, timeline.baseYear - timeline.latestYear);
-    nextDrivers.investment = investmentEntered ? (capexEntered ? enteredInvestment : drivers.investment) : clamp(estimatedInvestment || 15, driverBounds.investment[0], driverBounds.investment[1]);
+    nextDrivers.investment = investmentEntered ? drivers.investment : clamp(estimatedInvestment || 15, driverBounds.investment[0], driverBounds.investment[1]);
     nextDrivers.subsidy = hasInputValue(inputValues, inputKey.driver("subsidy"))
       ? drivers.subsidy
       : clamp(maximumSubsidyAmount(nextDrivers.investment), driverBounds.subsidy[0], driverBounds.subsidy[1]);
@@ -2068,8 +2060,6 @@ export default function Home() {
       }
       return next;
     });
-    const nextCapex = investmentEntered ? futureCapex : createFutureCapex(timeline, nextDrivers.investment);
-    if (!investmentEntered) setFutureCapex(nextCapex);
     setInputValues((current) => {
       let next = { ...current };
       for (const key of Object.keys(nextDrivers) as (keyof Drivers)[]) {
@@ -2083,7 +2073,6 @@ export default function Home() {
         next = setInputValue(next, inputKey.target(key, "value"), roundedInput(values.value));
         next = setInputValue(next, inputKey.target(key, "max"), roundedInput(values.max));
       }
-      for (const row of nextCapex) next = setInputValue(next, inputKey.futureCapex(row.year), roundedInput(row.value));
       return next;
     });
     setHistoricalDefaultsApplied(true);
@@ -2372,7 +2361,7 @@ export default function Home() {
         <section className="content-stack">
           <div className="section-intro"><div><h2>自動予測を確認し、必要なセルだけ上書き</h2></div><p>青枠の空欄には、過去実績と「15指標・目標」の調整水準から計算した値を表示します。入力したセルは太字で固定し、それ以降の空欄年度を再予測します。</p></div>
           <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。直前の変更はCtrl＋Zで戻せます。</p>
-          <article className="panel table-panel"><div className="panel-heading"><div><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">将来合計 {number(futureCapex.reduce((sum, row) => sum + row.value, 0), 2)} 億円</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} inputValues={inputValues} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。将来各年度の入力合計は「15指標・目標」の補助事業投資額と連動し、投資額／全社売上高や将来減価償却費の自動予測へ反映します。</p></article>
+          <article className="panel table-panel"><div className="panel-heading"><div><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">{futureCapex.some((row) => hasInputValue(inputValues, inputKey.futureCapex(row.year))) ? `入力合計 ${number(futureCapex.reduce((sum, row) => sum + row.value, 0), 2)} 億円` : "年度別計画 未入力"}</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} inputValues={inputValues} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。年度別設備投資は補助事業投資額から自動配分しません。事業計画に基づく各年度の金額を入力してください。入力値は設備投資に関する診断へ反映します。</p></article>
           <article className="panel table-panel"><div className="panel-heading"><div><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">空欄は自動予測</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>公式様式を直接作るか、事業別の詳細PLを積み上げるかを選びます</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>ベース事業PLを入力</button></div></div>{missingAccountingAssumptions.length ? <p className="default-note" role="alert">②15指標・目標で「会計内訳・利益前提」を設定してください。給与・賞与、役員報酬・賞与、減価償却費配賦、研究開発費、営業外損益、特別損益、税率が未設定のまま将来PLを補完することはありません。</p> : <FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} drivers={calculationDrivers} onForecastChange={updateForecastOverride} />}<p className="footnote">「全社PLを入力」は、会社全体2-1～2-36と補助事業7-1～7-20を入力して公式Excelを完成させる方式です。「ベース事業PLを入力」は、補助事業とベース事業を同じ詳細項目で入力し、合計から会社全体PLを作る方式です。</p></article>
           <div className="workflow-actions"><div><span>上書きしたセルを固定して再最適化できます。再最適化後もこの画面に留まります。</span>{adjustedPlan && <p className="solve-note">{solveNote}</p>}</div><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("targets")}>← 15指標・目標へ戻る</button><button className="solve-button" disabled={isSolving} aria-busy={isSolving} onClick={() => void solve()}>{isSolving ? "計算中…" : "上書き内容を反映して再最適化"}</button><button className="reset-button" onClick={() => goToView("pl")}>年度別PLへ →</button></div></div>
         </section>
