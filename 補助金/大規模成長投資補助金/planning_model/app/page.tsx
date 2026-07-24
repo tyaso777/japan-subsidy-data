@@ -786,6 +786,22 @@ export default function Home() {
   const [excelMappingPreviewMode, setExcelMappingPreviewMode] = useState<"import" | "export" | null>(null);
   const [excelMappingNote, setExcelMappingNote] = useState("マッピング定義書と対象Excelを選択してください。");
   const [copilotPromptCopied, setCopilotPromptCopied] = useState(false);
+  const hasExistingPlanningData = useMemo(() => {
+    const initialValues = createInitialInputValues();
+    const inputKeys = new Set([...Object.keys(initialValues), ...Object.keys(inputValues)]);
+    const inputsChanged = [...inputKeys].some((key) =>
+      !hasInputValue(initialValues, key)
+      || !hasInputValue(inputValues, key)
+      || initialValues[key] !== inputValues[key],
+    );
+    return inputsChanged
+      || Object.keys(forecastOverrides).length > 0
+      || adjustedPlan !== null
+      || historicalDefaultsApplied
+      || applicationCategory !== defaultApplicationCategory
+      || futureInputBasis !== "other"
+      || JSON.stringify(timeline) !== JSON.stringify(DEFAULT_TIMELINE);
+  }, [adjustedPlan, applicationCategory, forecastOverrides, futureInputBasis, historicalDefaultsApplied, inputValues, timeline]);
   const excelMappingTargets = useMemo(() => {
     const targets = new Map<string, ExcelMappingTarget>();
     const periodNames = ["prePrevious", "previous", "latest"] as const;
@@ -1280,7 +1296,13 @@ export default function Home() {
     }
   }
 
+  function confirmSampleReplacement() {
+    if (!hasExistingPlanningData) return true;
+    return window.confirm("すでに入力されているデータがあります。サンプルを読み込むと、現在の入力・設定・最適化結果を上書きします。よろしいですか？");
+  }
+
   function loadSampleProposal() {
+    if (!confirmSampleReplacement()) return;
     const proposal = createStandardSampleProposal(new Date().toISOString());
     applyProposal(proposal);
     setHistoricalDefaultsApplied(true);
@@ -1290,6 +1312,7 @@ export default function Home() {
   }
 
   function loadPartiallyUnmetSample() {
+    if (!confirmSampleReplacement()) return;
     applyProposal(createPartiallyUnmetSampleProposal(new Date().toISOString()));
     setHistoricalDefaultsApplied(true);
     setDefaultNote("現実的な許容範囲を維持したため、一部指標が目標に届かなかった最接近案です。未達判定と許容範囲の修正候補を確認できます。");
@@ -1298,11 +1321,13 @@ export default function Home() {
   }
 
   function loadHistoricalOnlySample() {
+    if (!confirmSampleReplacement()) return;
     applyProposal(createHistoricalOnlySampleProposal(new Date().toISOString()));
     setFileNote("過去3期入力済み・将来予測未設定のサンプルを読み込みました");
   }
 
   function loadBaseYearLaunchSample() {
+    if (!confirmSampleReplacement()) return;
     applyProposal(createBaseYearLaunchHistoricalOnlySampleProposal(new Date().toISOString()));
     setFileNote("補助事業の過去3期実績が0で、将来予測未設定のサンプルを読み込みました");
   }
@@ -1721,23 +1746,6 @@ export default function Home() {
                 <label className="proposal-import-button">ファイル取込<input type="file" accept=".html,.htm,.xlsx" onChange={(event) => { void importProposal(event.target.files?.[0]); event.target.value = ""; }} /></label>
               </div>
             </section>
-            <article className="sample-library-panel" aria-label="確認用サンプル">
-              <div className="data-io-panel-heading"><p className="card-kicker">SAMPLE LIBRARY</p><h3>確認用サンプルを読み込む</h3><small>現在の入力は選択したサンプルで置き換わります。</small></div>
-              <div className="sample-library-grid">
-                <section>
-                  <strong>使い方を試す</strong>
-                  <span>過去データ入力後から、設定・最適化を自分で進めます。</span>
-                  <button onClick={loadHistoricalOnlySample}>標準ケース（過去3期入力済み）</button>
-                  <button onClick={loadBaseYearLaunchSample}>基準年売上開始ケース（過去3期入力済み）</button>
-                </section>
-                <section className="result-sample-section">
-                  <strong>シミュレーション結果を見る</strong>
-                  <span>調整水準設定・将来入力・再最適化後の完成例です。</span>
-                  <button className="sample-result-button" onClick={loadSampleProposal}>最適化済み標準提案</button>
-                  <button onClick={loadPartiallyUnmetSample}>一部目標未達ケース</button>
-                </section>
-              </div>
-            </article>
           </div>
           <p className="data-io-status" aria-live="polite">{fileNote}</p>
           <article className="excel-mapping-panel" aria-label="マッピング定義によるExcel入出力">
@@ -1793,6 +1801,23 @@ export default function Home() {
               </div>
             )}
             <p className="excel-mapping-status" aria-live="polite">{excelMappingNote}</p>
+          </article>
+          <article className="sample-library-panel" aria-label="確認用サンプル">
+            <div className="data-io-panel-heading"><p className="card-kicker">SAMPLE LIBRARY</p><h3>確認用サンプルを読み込む</h3><small>入力済みデータがある場合は、置換前に確認します。</small></div>
+            <div className="sample-library-grid">
+              <section>
+                <strong>使い方を試す</strong>
+                <span>過去データ入力後から、設定・最適化を自分で進めます。</span>
+                <button onClick={loadHistoricalOnlySample}>標準ケース（過去3期入力済み）</button>
+                <button onClick={loadBaseYearLaunchSample}>基準年売上開始ケース（過去3期入力済み）</button>
+              </section>
+              <section className="result-sample-section">
+                <strong>シミュレーション結果を見る</strong>
+                <span>調整水準設定・将来入力・再最適化後の完成例です。</span>
+                <button className="sample-result-button" onClick={loadSampleProposal}>最適化済み標準提案</button>
+                <button onClick={loadPartiallyUnmetSample}>一部目標未達ケース</button>
+              </section>
+            </div>
           </article>
         </section>
       )}

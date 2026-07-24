@@ -81,6 +81,9 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /className="sample-library-panel"/);
   assert.match(pageSource, /SAMPLE LIBRARY/);
   assert.doesNotMatch(pageSource, /<summary>サンプル/);
+  assert.ok(pageSource.indexOf('className="excel-mapping-panel"') < pageSource.indexOf('className="sample-library-panel"'));
+  assert.match(pageSource, /すでに入力されているデータがあります。サンプルを読み込むと、現在の入力・設定・最適化結果を上書きします。よろしいですか？/);
+  assert.match(pageSource, /if \(!confirmSampleReplacement\(\)\) return;/);
   assert.match(globalStyles, /\.data-io-grid \{ display: grid; grid-template-columns: 1fr;/);
   assert.match(globalStyles, /\.sample-library-grid \{ display: grid; grid-template-columns: repeat\(2,/);
   assert.match(pageSource, /任意形式のExcelと入出力する/);
