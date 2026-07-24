@@ -2,6 +2,20 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+function contrastRatio(foreground, background) {
+  const luminance = (hex) => {
+    const channels = hex.match(/[0-9a-f]{2}/gi).map((channel) => Number.parseInt(channel, 16) / 255);
+    const [red, green, blue] = channels.map((channel) =>
+      channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4,
+    );
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+  };
+  const foregroundLuminance = luminance(foreground);
+  const backgroundLuminance = luminance(background);
+  return (Math.max(foregroundLuminance, backgroundLuminance) + 0.05)
+    / (Math.min(foregroundLuminance, backgroundLuminance) + 0.05);
+}
+
 async function render() {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
@@ -50,6 +64,14 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /thead th \{[^}]*font-size: 11px;/);
   assert.match(globalStyles, /th, td \{ padding: 7px 10px;/);
   assert.doesNotMatch(globalStyles, /font-size:\s*(?:10|11)px(?:\s*!important)?;[^}]*font-weight:\s*800/);
+  assert.match(globalStyles, /--muted-readable: #5b6661;/);
+  assert.match(globalStyles, /--amber-ink: #80520d;/);
+  assert.ok(contrastRatio("#5b6661", "#fffdf8") >= 4.5);
+  assert.ok(contrastRatio("#80520d", "#fffdf8") >= 4.5);
+  assert.ok(contrastRatio("#4f6258", "#e2ece6") >= 4.5);
+  assert.ok(contrastRatio("#d6952a", "#16271f") >= 4.5);
+  assert.match(globalStyles, /\.historical-metric \{[^}]*white-space: normal;[^}]*overflow-wrap: anywhere;/);
+  assert.match(globalStyles, /\.targets-table th:nth-child\(3\)[^}]*width: 145px;/);
   const initialInputFunction = pageSource.match(/function createInitialInputValues\(\): InputValues \{[\s\S]*?\n\}/)?.[0] ?? "";
   const suggestionSource = pageSource.match(/const targetAdjustmentSuggestions = useMemo\([\s\S]*?\n  \}, \[adjustedDrivers,[\s\S]*?\]\);/)?.[0] ?? "";
   assert.match(globalStyles, /\.tabs \{ position: sticky; top: 0; z-index: 25;/);
@@ -288,7 +310,7 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /targets-table tr\.metric-basis-row td:nth-child\(-n\+2\).*background: #f4f8f2/);
   assert.match(pageSource, /historicalPlan\.slice\(1\)\.map\(\(row\) => <th key=\{row\.year\}>/);
   assert.match(globalStyles, /\.targets-table th:nth-child\(7\), \.targets-table td:nth-child\(7\) \{ width: 145px; min-width: 145px; max-width: 145px; white-space: normal;/);
-  assert.match(globalStyles, /\.targets-table \{ width: max\(100%, 1260px\) !important; min-width: 1260px; table-layout: fixed; \}/);
+  assert.match(globalStyles, /\.targets-table \{ width: max\(100%, 1340px\) !important; min-width: 1340px; table-layout: fixed; \}/);
   assert.match(globalStyles, /\.targets-table th:nth-child\(10\), \.targets-table td:nth-child\(10\), \.target-judgement \{ width: 110px; min-width: 110px; max-width: 110px; \}/);
   assert.match(pageSource, /14・15の役員関連2指標は第6次の評価対象外/);
   assert.match(pageSource, /reference-metric-row/);
