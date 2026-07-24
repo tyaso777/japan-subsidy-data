@@ -127,6 +127,24 @@ const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string;
   localBenchmark: { label: "ローカルベンチマーク", unit: "点", step: 1 },
 };
 
+const driverTableLabel = (label: string) => label
+  .replace(/（設備導入期間・モデル内管理）$/, "（モデル内管理）")
+  .replace(/（設備導入期間）$/, "")
+  .replace(/（最新決算期→基準年・モデル内管理）$/, "（モデル内管理）")
+  .replace(/（最新決算期→基準年）$/, "")
+  .replace(/（基準年→事業化報告3年目・モデル内管理）$/, "（モデル内管理）")
+  .replace(/（基準年→事業化報告3年目）$/, "");
+
+const standaloneMetricLabel = (definition: (typeof metrics)[number]) => {
+  const formula = definition.round6Formula;
+  if (formula.includes("最新決算期→基準年度")) return `${definition.label}（最新決算期→基準年度）`;
+  if (formula.includes("基準年→事業化報告3年目") || formula.includes("事業化報告3年目 − 基準年")) {
+    return `${definition.label}（基準年→事業化報告3年目）`;
+  }
+  if (formula.includes("事業化報告3年目")) return `${definition.label}（事業化報告3年目時点）`;
+  return definition.label;
+};
+
 const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[] = [
   {
     label: "補助事業｜設備導入期間",
@@ -2089,7 +2107,7 @@ export default function Home() {
                 const rangeOrdered = driverRanges[key][0] <= driverRanges[key][1];
                 const rangeValid = noRange || (rangeOrdered && drivers[key] >= driverRanges[key][0] && drivers[key] <= driverRanges[key][1]);
                 const rangeStatus = noRange ? "入力値を固定" : !rangeOrdered ? "下限＞上限" : movable ? rangeValid ? "範囲内で調整" : "初期値が範囲外" : rangeValid ? "入力値を固定" : "固定値が範囲外";
-                return <tr className={`${movable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={key}><th><span className="driver-item-code">{driverItemCodes[key]}:</span> {info.label}<small>{info.unit}／{history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>{history.values.slice(1).map((value, referenceIndex) => {
+                return <tr className={`${movable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={key}><th><span className="driver-item-code">{driverItemCodes[key]}:</span> {driverTableLabel(info.label)}<small>{info.unit}／{history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>{history.values.slice(1).map((value, referenceIndex) => {
                   const index = referenceIndex + 1;
                   const referenceLevel = history.referenceLevels?.[index];
                   if (referenceLevel !== undefined && Number.isFinite(referenceLevel)) {
@@ -2165,7 +2183,7 @@ export default function Home() {
                   return target.policy === "hard" && !targetStatus(definition, actual[definition.key], target).ok;
                 }).map((definition) => {
                   const suggestions = targetAdjustmentSuggestions[definition.key] ?? [];
-                  return <tr key={definition.key}><th>{definition.label}</th><td>{number(optimizationTargets[definition.key].value)} {definition.unit}</td><td><strong>{number(actual[definition.key])} {definition.unit}</strong></td><td>{suggestions.length ? <div className="unmet-target-suggestions">{suggestions.map((suggestion) => <label className="target-adjustment-suggestion" key={driverRangeSuggestionId(definition.key, suggestion)}><input type="checkbox" checked={Boolean(selectedAdjustmentSuggestions[driverRangeSuggestionId(definition.key, suggestion)])} onChange={(event) => toggleDriverRangeSuggestion(definition.key, suggestion, event.target.checked)} /><span>{suggestion.text}</span></label>)}</div> : <span className="no-effective-suggestion">現在の許容範囲では有効な拡張候補を特定できません。入力済み将来PLまたは目標値との整合を確認してください。</span>}</td></tr>;
+                  return <tr key={definition.key}><th>{standaloneMetricLabel(definition)}<small>第6次定義：{definition.round6Formula}</small></th><td>{number(optimizationTargets[definition.key].value)} {definition.unit}</td><td><strong>{number(actual[definition.key])} {definition.unit}</strong></td><td>{suggestions.length ? <div className="unmet-target-suggestions">{suggestions.map((suggestion) => <label className="target-adjustment-suggestion" key={driverRangeSuggestionId(definition.key, suggestion)}><input type="checkbox" checked={Boolean(selectedAdjustmentSuggestions[driverRangeSuggestionId(definition.key, suggestion)])} onChange={(event) => toggleDriverRangeSuggestion(definition.key, suggestion, event.target.checked)} /><span>{suggestion.text}</span></label>)}</div> : <span className="no-effective-suggestion">現在の許容範囲では有効な拡張候補を特定できません。入力済み将来PLまたは目標値との整合を確認してください。</span>}</td></tr>;
                 })}
               </tbody></table></div>
             </section>}

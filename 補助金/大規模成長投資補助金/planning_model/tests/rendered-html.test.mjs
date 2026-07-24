@@ -185,6 +185,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /function DiagnosticCharts\(\{ plan \}/);
   assert.match(pageSource, /主要指標の推移チャート/);
   assert.match(pageSource, /niceChartScale/);
+  assert.match(pageSource, /driverTableLabel\(info\.label\)/);
+  assert.match(pageSource, /standaloneMetricLabel\(definition\)/);
   assert.match(pageSource, /0から開始/);
   assert.match(pageSource, /データ範囲を拡大/);
   assert.match(pageSource, /人員・1人当たり給与/);
