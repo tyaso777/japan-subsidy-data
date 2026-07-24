@@ -868,7 +868,7 @@ export default function Home() {
     const noticeId = loadNotice.id;
     const timeoutId = window.setTimeout(() => {
       setLoadNotice((current) => current?.id === noticeId ? null : current);
-    }, 5000);
+    }, 3000);
     return () => window.clearTimeout(timeoutId);
   }, [loadNotice]);
 

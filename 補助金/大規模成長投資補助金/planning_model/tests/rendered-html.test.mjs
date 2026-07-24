@@ -90,7 +90,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /showLoadNotice\(`Excelから\$\{applied\}件の値を読み込みました。`\)/);
   assert.match(pageSource, /showLoadNotice\("「最適化済み標準提案」を読み込みました。"\)/);
   assert.match(pageSource, /showLoadNotice\("「一部目標未達ケース」を読み込みました。"\)/);
-  assert.match(pageSource, /window\.setTimeout\(\(\) => \{/);
+  assert.match(pageSource, /window\.setTimeout\(\(\) => \{[\s\S]*?\}, 3000\)/);
   assert.match(globalStyles, /\.load-success-notice \{ position: fixed;/);
   assert.match(globalStyles, /\.data-io-grid \{ display: grid; grid-template-columns: 1fr;/);
   assert.match(globalStyles, /\.sample-library-grid \{ display: grid; grid-template-columns: repeat\(2,/);
