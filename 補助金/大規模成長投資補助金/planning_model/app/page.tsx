@@ -201,7 +201,7 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
   {
     label: "補助事業｜基準年後",
     detail: "基準年度 → 事業化報告3年目",
-    keys: ["projectSalesGrowth", "projectCogsImprovementAfterBase", "projectPayGrowth", "projectHeadcountGrowth", "projectSgaRateEnd", "projectOfficerPayGrowth"],
+    keys: ["projectSalesGrowth", "projectCogsRateWhenSalesZero", "projectCogsImprovementAfterBase", "projectPayGrowth", "projectHeadcountGrowth", "projectSgaRateEnd", "projectOfficerPayGrowth"],
   },
   {
     label: "ベース事業｜設備導入期間",
@@ -211,7 +211,7 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
   {
     label: "ベース事業｜基準年後",
     detail: "基準年度 → 事業化報告3年目",
-    keys: ["otherSalesGrowth", "otherCogsImprovement", "otherPayGrowth", "otherOfficerPayGrowth", "otherHeadcountGrowth", "otherSgaRateEnd"],
+    keys: ["otherSalesGrowth", "otherCogsRateWhenSalesZero", "otherCogsImprovement", "otherPayGrowth", "otherOfficerPayGrowth", "otherHeadcountGrowth", "otherSgaRateEnd"],
   },
   {
     label: "補助事業｜会計内訳・利益前提",
@@ -224,9 +224,9 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
     keys: ["otherEmployeeSalaryShare", "otherOfficerCompensationShare", "otherCogsDepreciationShare", "otherResearchDevelopmentRate", "otherNonOperatingRate", "otherExtraordinaryRate"],
   },
   {
-    label: "共通・固定前提",
-    detail: "申請・外部前提",
-    keys: ["projectCogsRateWhenSalesZero", "otherCogsRateWhenSalesZero", "effectiveTaxRate", "projectMarketGrowth"],
+    label: "共通・外部前提",
+    detail: "共通会計・市場前提",
+    keys: ["effectiveTaxRate", "projectMarketGrowth"],
   },
 ];
 
