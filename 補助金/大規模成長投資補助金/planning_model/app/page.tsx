@@ -2328,43 +2328,43 @@ export default function Home() {
 
 type BalanceSheetField = Exclude<keyof BalanceSheetPlan, "year">;
 
-const balanceSheetInputRows: { code: string; label: string; field: BalanceSheetField }[] = [
+const balanceSheetInputRows: { code: string; label: string; field: BalanceSheetField; indentLevel?: 1 | 2 | 3 }[] = [
   { code: "1-1", label: "資産総額", field: "assets" },
-  { code: "1-2", label: "うち流動資産", field: "currentAssets" },
-  { code: "1-3", label: "うち現金及び預金", field: "cash" },
-  { code: "1-4", label: "うち固定資産", field: "fixedAssets" },
-  { code: "1-5", label: "うち有形固定資産", field: "tangibleAssets" },
-  { code: "1-6", label: "うち建物及び構築物", field: "buildings" },
-  { code: "1-7", label: "うち機械装置等", field: "machinery" },
-  { code: "1-8", label: "うち土地", field: "land" },
-  { code: "1-9", label: "うち無形固定資産", field: "intangibleAssets" },
-  { code: "1-10", label: "うちソフトウェア", field: "software" },
-  { code: "1-13", label: "負債総額", field: "liabilities" },
-  { code: "1-14", label: "うち流動負債", field: "currentLiabilities" },
-  { code: "1-15", label: "うち短期借入金", field: "shortTermDebt" },
-  { code: "1-16", label: "うち固定負債", field: "fixedLiabilities" },
-  { code: "1-17", label: "うち長期借入金", field: "longTermDebt" },
-  { code: "1-19", label: "純資産総額", field: "netAssets" },
-  { code: "1-20", label: "うち株主資本", field: "shareholderEquity" },
-  { code: "1-21", label: "うち資本金", field: "capital" },
+  { code: "1-2", label: "うち流動資産", field: "currentAssets", indentLevel: 1 },
+  { code: "1-3", label: "うち現金及び預金", field: "cash", indentLevel: 2 },
+  { code: "1-4", label: "うち固定資産", field: "fixedAssets", indentLevel: 1 },
+  { code: "1-5", label: "うち有形固定資産", field: "tangibleAssets", indentLevel: 2 },
+  { code: "1-6", label: "うち建物及び構築物", field: "buildings", indentLevel: 3 },
+  { code: "1-7", label: "うち機械装置等", field: "machinery", indentLevel: 3 },
+  { code: "1-8", label: "うち土地", field: "land", indentLevel: 3 },
+  { code: "1-9", label: "うち無形固定資産", field: "intangibleAssets", indentLevel: 2 },
+  { code: "1-10", label: "うちソフトウェア", field: "software", indentLevel: 3 },
+  { code: "1-13", label: "負債総額", field: "liabilities", indentLevel: 1 },
+  { code: "1-14", label: "うち流動負債", field: "currentLiabilities", indentLevel: 2 },
+  { code: "1-15", label: "うち短期借入金", field: "shortTermDebt", indentLevel: 3 },
+  { code: "1-16", label: "うち固定負債", field: "fixedLiabilities", indentLevel: 2 },
+  { code: "1-17", label: "うち長期借入金", field: "longTermDebt", indentLevel: 3 },
+  { code: "1-19", label: "純資産総額", field: "netAssets", indentLevel: 1 },
+  { code: "1-20", label: "うち株主資本", field: "shareholderEquity", indentLevel: 2 },
+  { code: "1-21", label: "うち資本金", field: "capital", indentLevel: 3 },
   { code: "1-24", label: "新規設備投資による支出", field: "capex" },
 ];
 
 function BalanceSheetEditor({ balanceSheets, historical, inputValues, omitUnused, onChange }: { balanceSheets: BalanceSheetPlan[]; historical: YearPlan[]; inputValues: InputValues; omitUnused: boolean; onChange: (yearIndex: number, field: keyof BalanceSheetPlan, value: number | null) => void }) {
-  const rows: { code: string; label: string; field?: BalanceSheetField; percent?: boolean; multiple?: boolean; value?: (row: BalanceSheetPlan, index: number) => number }[] = [
+  const rows: { code: string; label: string; field?: BalanceSheetField; indentLevel?: 1 | 2 | 3; percent?: boolean; multiple?: boolean; value?: (row: BalanceSheetPlan, index: number) => number }[] = [
     ...balanceSheetInputRows.slice(0, 10),
-    { code: "1-11", label: "その他資産（自動計算）", value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).otherAssets },
+    { code: "1-11", label: "その他資産（自動計算）", indentLevel: 1, value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).otherAssets },
     { code: "1-12", label: "負債及び純資産合計（自動計算）", value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).liabilitiesAndNetAssets },
     ...balanceSheetInputRows.slice(10, 15),
-    { code: "1-18", label: "その他負債（自動計算）", value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).otherLiabilities },
+    { code: "1-18", label: "その他負債（自動計算）", indentLevel: 2, value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).otherLiabilities },
     ...balanceSheetInputRows.slice(15, 18),
-    { code: "1-22", label: "その他純資産（自動計算）", value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).otherNetAssets },
+    { code: "1-22", label: "その他純資産（自動計算）", indentLevel: 2, value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).otherNetAssets },
     { code: "1-23", label: "自己資本比率（自動計算）", percent: true, value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).equityRatio },
     balanceSheetInputRows[18],
     { code: "1-25", label: "EBITDA有利子負債倍率（自動計算）", multiple: true, value: (row, index) => balanceSheetDerived(row, companyEbitda(historical[index])).ebitdaDebtMultiple },
   ];
   const visibleRows = omitUnused ? rows.filter((item) => item.code === "1-24") : rows;
-  return <div className="wide-table balance-sheet-table spreadsheet-grid actuals-three-year-table"><table><thead><tr><th>第6次様式項目（億円）</th>{balanceSheets.map((row, index) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[historical[index].role]}</small></th>)}</tr></thead><tbody>{visibleRows.map((item) => <tr className={!item.field ? "emphasis" : ""} key={item.code}><th>{item.code} {item.label}{item.percent && <small>%</small>}{item.multiple && <small>倍</small>}</th>{balanceSheets.map((row, index) => <td key={row.year}>{item.field ? <input type="number" step="0.01" value={getInputValue(inputValues, inputKey.balanceSheet(row.year, item.field))} placeholder="未入力" onChange={(event) => onChange(index, item.field!, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{number(item.value!(row, index), 2)}</strong>}</td>)}</tr>)}</tbody></table></div>;
+  return <div className="wide-table balance-sheet-table spreadsheet-grid actuals-three-year-table"><table><thead><tr><th>第6次様式項目（億円）</th>{balanceSheets.map((row, index) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[historical[index].role]}</small></th>)}</tr></thead><tbody>{visibleRows.map((item) => <tr className={!item.field ? "emphasis" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.percent && <small>%</small>}{item.multiple && <small>倍</small>}</th>{balanceSheets.map((row, index) => <td key={row.year}>{item.field ? <input type="number" step="0.01" value={getInputValue(inputValues, inputKey.balanceSheet(row.year, item.field))} placeholder="未入力" onChange={(event) => onChange(index, item.field!, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{number(item.value!(row, index), 2)}</strong>}</td>)}</tr>)}</tbody></table></div>;
 }
 
 function FutureCapexEditor({ balanceSheets, historical, futureCapex, inputValues, onChange }: { balanceSheets: BalanceSheetPlan[]; historical: YearPlan[]; futureCapex: { year: number; value: number }[]; inputValues: InputValues; onChange: (yearIndex: number, value: number | null) => void }) {
@@ -2488,7 +2488,7 @@ const companyActualInputRows: CompanyActualInputRow[] = [
   { code: "2-36", label: "EBITDA増加率", unit: "%", indentLevel: 1, get: (rows, index) => { const company = companySegment(rows, index); const previous = index ? companySegment(rows, index - 1) : undefined; return growth(operatingProfit(company) + company.depreciation, previous ? operatingProfit(previous) + previous.depreciation : undefined); } },
 ];
 
-function PlRowTitle({ code, label, indentLevel = 0 }: { code: string; label: string; indentLevel?: 0 | 1 | 2 }) {
+function PlRowTitle({ code, label, indentLevel = 0 }: { code: string; label: string; indentLevel?: 0 | 1 | 2 | 3 }) {
   return <span className={`pl-row-title pl-row-indent-${indentLevel}`}>{code} {label}</span>;
 }
 
