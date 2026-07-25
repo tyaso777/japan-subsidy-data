@@ -162,6 +162,8 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(globalStyles, /max-height: min\(76vh, 860px\)/);
   assert.match(pageSource, /function usePageStickyTableHeaders\(refreshKey: unknown\)/);
   assert.match(pageSource, /function useFloatingHorizontalTableScrollbar\(\)/);
+  assert.match(pageSource, /将来の減価償却費・支払利息は年度別に入力してください。本ツールは、固定資産台帳・借入返済表との自動連動には対応していません。/);
+  assert.doesNotMatch(pageSource, /次段階で「固定資産台帳」と「借入返済表」を年度別に設けます/);
   assert.match(pageSource, /activeWrapper\.scrollLeft = scrollbar\.scrollLeft/);
   assert.match(pageSource, /overflowX === "auto" \|\| overflowX === "scroll"/);
   assert.match(pageSource, /rect\.bottom > window\.innerHeight/);
