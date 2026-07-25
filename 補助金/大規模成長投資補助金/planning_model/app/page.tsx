@@ -1027,7 +1027,9 @@ function useFloatingHorizontalTableScrollbar() {
       const candidates = Array.from(document.querySelectorAll<HTMLElement>(".wide-table, .targets-table-wrap"))
         .filter((wrapper) => {
           const rect = wrapper.getBoundingClientRect();
+          const overflowX = window.getComputedStyle(wrapper).overflowX;
           return wrapper.offsetParent !== null
+            && (overflowX === "auto" || overflowX === "scroll")
             && wrapper.scrollWidth > wrapper.clientWidth + 1
             && rect.top < window.innerHeight
             && rect.bottom > window.innerHeight;

@@ -161,6 +161,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /function usePageStickyTableHeaders\(\)/);
   assert.match(pageSource, /function useFloatingHorizontalTableScrollbar\(\)/);
   assert.match(pageSource, /activeWrapper\.scrollLeft = scrollbar\.scrollLeft/);
+  assert.match(pageSource, /overflowX === "auto" \|\| overflowX === "scroll"/);
   assert.match(pageSource, /rect\.bottom > window\.innerHeight/);
   assert.match(pageSource, /overlay\.style\.top = `\$\{Math\.min\(targetTop, wrapperRect\.bottom - headerHeight\)\}px`/);
   assert.doesNotMatch(pageSource, /page-sticky-header-offset/);
