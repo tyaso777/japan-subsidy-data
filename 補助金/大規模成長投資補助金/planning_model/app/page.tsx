@@ -71,9 +71,12 @@ import {
   applicationRequirements,
   defaultApplicationCategory,
   driverConstraintFailure,
+  driverRequirementFloor,
   driverRequirementLabel,
   maximumSubsidyAmount,
   metricRequirementLabel,
+  normalizeDriverRangeForRequirements,
+  normalizeDriverValueForRequirements,
   systemConstraintFailures,
   type ApplicationCategory,
 } from "./application-rules";
@@ -1508,6 +1511,10 @@ export default function Home() {
     const importedAdjustedDrivers = proposal.adjustedDrivers
       ? { ...defaultDrivers, ...clone(proposal.adjustedDrivers) }
       : null;
+    importedDrivers.projectPayGrowthToBase = normalizeDriverValueForRequirements("projectPayGrowthToBase", importedDrivers.projectPayGrowthToBase);
+    if (importedAdjustedDrivers) {
+      importedAdjustedDrivers.projectPayGrowthToBase = normalizeDriverValueForRequirements("projectPayGrowthToBase", importedAdjustedDrivers.projectPayGrowthToBase);
+    }
     const importedTimeline = normalizeTimeline(proposal.timeline);
     const importedHistoricalPlan = clone(proposal.historicalPlan);
     const importedForecastOverrides = clone(proposal.forecastOverrides ?? {});
@@ -1516,7 +1523,7 @@ export default function Home() {
     for (const key of Object.keys(driverBounds) as (keyof Drivers)[]) {
       const importedRange = importedRanges[key] ?? driverBounds[key];
       const validRange = importedRange.every(Number.isFinite) ? importedRange : driverBounds[key];
-      importedRanges[key] = [Math.min(...validRange), Math.max(...validRange)];
+      importedRanges[key] = normalizeDriverRangeForRequirements(key, [Math.min(...validRange), Math.max(...validRange)]);
     }
     setProposalTitle(proposal.title || "成長投資計画 提案計画");
     setTimeline(importedTimeline);
@@ -1553,6 +1560,7 @@ export default function Home() {
         for (const bound of [0, 1] as const) {
           if (hasInputValue(normalizedInputs, inputKey.driverRange(key, bound))) normalizedInputs = setInputValue(normalizedInputs, inputKey.driverRange(key, bound), importedRanges[key][bound]);
         }
+        if (hasInputValue(normalizedInputs, inputKey.driver(key))) normalizedInputs = setInputValue(normalizedInputs, inputKey.driver(key), importedDrivers[key]);
       }
       setInputValues(normalizedInputs);
     } else {
@@ -1950,7 +1958,7 @@ export default function Home() {
 
   function updateDriver(key: keyof Drivers, value: number | null) {
     clearAdjustment();
-    const numericValue = value ?? 0;
+    const numericValue = normalizeDriverValueForRequirements(key, value ?? 0);
     setInputValues((current) => setInputValue(current, inputKey.driver(key), value === null ? null : numericValue));
     setDrivers((current) => ({ ...current, [key]: numericValue }));
   }
@@ -1961,13 +1969,15 @@ export default function Home() {
     const value = displayValue === null ? fallback : percentDriver(key) ? displayValue / 100 : displayValue;
     const nextRange: [number, number] = [...driverRanges[key]];
     nextRange[boundIndex] = value;
-    const midpoint = (nextRange[0] + nextRange[1]) / 2;
+    const normalizedRange = normalizeDriverRangeForRequirements(key, nextRange);
+    const midpoint = (normalizedRange[0] + normalizedRange[1]) / 2;
     setInputValues((current) => {
-      let next = setInputValue(current, inputKey.driverRange(key, boundIndex), displayValue === null ? null : value);
+      let next = setInputValue(current, inputKey.driverRange(key, 0), displayValue === null && boundIndex === 0 ? null : normalizedRange[0]);
+      next = setInputValue(next, inputKey.driverRange(key, 1), displayValue === null && boundIndex === 1 ? null : normalizedRange[1]);
       next = setInputValue(next, inputKey.driver(key), midpoint);
       return next;
     });
-    setDriverRanges((current) => ({ ...current, [key]: nextRange }));
+    setDriverRanges((current) => ({ ...current, [key]: normalizedRange }));
     setDrivers((current) => ({ ...current, [key]: midpoint }));
   }
 
@@ -2236,8 +2246,8 @@ export default function Home() {
     }
     return <td className="driver-period-range" colSpan={2}>
       <div className="driver-period-range-grid">
-        <input aria-label={`${info.label} 許容下限`} type="number" step={info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />
-        <input aria-label={`${info.label} 許容上限`} type="number" step={info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />
+        <input aria-label={`${info.label} 許容下限`} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />
+        <input aria-label={`${info.label} 許容上限`} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />
         {resultValue !== null && <small className="adjusted-value">結果 {number(resultValue, 2)}</small>}
       </div>
     </td>;

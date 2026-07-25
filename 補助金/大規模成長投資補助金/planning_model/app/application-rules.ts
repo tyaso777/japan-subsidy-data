@@ -21,6 +21,21 @@ export function maximumSubsidyAmount(investment: number) {
   return Math.floor((exactMaximum + Number.EPSILON) * 100) / 100;
 }
 
+export function driverRequirementFloor(key: keyof Drivers) {
+  return key === "projectPayGrowthToBase" ? 0 : undefined;
+}
+
+export function normalizeDriverValueForRequirements(key: keyof Drivers, value: number) {
+  const floor = driverRequirementFloor(key);
+  return floor === undefined ? value : Math.max(floor, value);
+}
+
+export function normalizeDriverRangeForRequirements(key: keyof Drivers, range: [number, number]): [number, number] {
+  const first = normalizeDriverValueForRequirements(key, range[0]);
+  const second = normalizeDriverValueForRequirements(key, range[1]);
+  return [first, second];
+}
+
 export function driverRequirementLabel(key: keyof Drivers, category: ApplicationCategory, investment: number) {
   const requirements = applicationRequirements(category);
   if (key === "projectPayGrowthToBase") return "基準年度額が最新決算期額以上（成長率0%以上）";

@@ -381,7 +381,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /<th colSpan=\{2\} className="driver-period-heading">基準年後<small>基準年 → 事業化報告3年目<\/small><\/th>/);
   assert.doesNotMatch(pageSource, /<th>計画初期値<\/th>/);
   assert.doesNotMatch(pageSource, /<th>最適化での扱い<\/th>/);
-  assert.match(pageSource, /const midpoint = \(nextRange\[0\] \+ nextRange\[1\]\) \/ 2/);
+  assert.match(pageSource, /const midpoint = \(normalizedRange\[0\] \+ normalizedRange\[1\]\) \/ 2/);
   assert.match(pageSource, /className="driver-fixed-common-value" colSpan=\{4\}/);
   assert.match(pageSource, /className="driver-item-code">\{codes\}:/);
   assert.match(globalStyles, /\.driver-item-code/);
@@ -494,6 +494,9 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(pageSource, /applicationCategory === "startupException"/);
   assert.doesNotMatch(modelSource, /drivers\.investment < 15/);
   assert.match(modelSource, /projectPayGrowthToBase: \[0, 0\.1\]/);
+  assert.match(pageSource, /min=\{driverRequirementFloor\(key\) === undefined \? undefined : 0\}/);
+  assert.match(pageSource, /normalizeDriverRangeForRequirements\(key, nextRange\)/);
+  assert.match(pageSource, /normalizeDriverRangeForRequirements\(key, \[Math\.min\(\.\.\.validRange\), Math\.max\(\.\.\.validRange\)\]\)/);
   assert.match(modelSource, /latestPayPerEmployee \/ 1\.02 \*\* yearsBeforeLatest/);
   assert.doesNotMatch(pageSource, /Math\.min\(technicalUpper, Math\.max\(technicalLower, enteredValue\)\)/);
   assert.doesNotMatch(pageSource, /min=\{rangeInputMin\} max=\{rangeInputMax\}/);

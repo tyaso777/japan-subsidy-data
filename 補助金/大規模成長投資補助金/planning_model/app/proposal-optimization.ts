@@ -1,4 +1,4 @@
-import { requiredMetricMinimums, type ApplicationCategory } from "./application-rules";
+import { normalizeDriverRangeForRequirements, requiredMetricMinimums, type ApplicationCategory } from "./application-rules";
 import { hasInputValue, inputKey, type InputValues } from "./input-values";
 import { metricBasisRole, type MetricGroupBasis, type MetricGroupKey } from "./metric-groups";
 import {
@@ -57,7 +57,7 @@ export function runPlanningOptimization({
     const [first, second] = driverRanges[key];
     const lower = Math.min(first, second);
     const upper = Math.max(first, second);
-    return [key, key === "projectPayGrowthToBase" ? [Math.max(0, lower), Math.max(0, upper)] : [lower, upper]];
+    return [key, normalizeDriverRangeForRequirements(key, [lower, upper])];
   })) as Record<keyof Drivers, [number, number]>;
   const beforeScore = objective(
     drivers,

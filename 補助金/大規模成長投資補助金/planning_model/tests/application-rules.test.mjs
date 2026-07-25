@@ -6,7 +6,8 @@ import { fileURLToPath } from "node:url";
 import ts from "typescript";
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
-const source = await readFile(path.resolve(testDirectory, "../app/application-rules.ts"), "utf8");
+const projectDirectory = path.resolve(testDirectory, "..");
+const source = await readFile(path.join(projectDirectory, "app", "application-rules.ts"), "utf8");
 const compiled = ts.transpileModule(source, {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText;
@@ -21,4 +22,21 @@ test("subsidy ceiling is truncated to the entered two-decimal monetary precision
   const drivers = { investment: 23, subsidy: 7.66 };
   assert.equal(rules.driverConstraintFailure("subsidy", "general", drivers), null);
   assert.match(rules.driverConstraintFailure("subsidy", "general", { ...drivers, subsidy: 7.67 }), /7\.66億円以下/);
+});
+
+test("equipment-period project pay growth cannot fall below the statutory zero-percent floor", () => {
+  assert.equal(rules.driverRequirementFloor("projectPayGrowthToBase"), 0);
+  assert.deepEqual(
+    rules.normalizeDriverRangeForRequirements("projectPayGrowthToBase", [-0.01, 0.0207]),
+    [0, 0.0207],
+  );
+  assert.equal(rules.normalizeDriverValueForRequirements("projectPayGrowthToBase", -0.01), 0);
+});
+
+test("drivers without a statutory floor keep their entered values", () => {
+  assert.equal(rules.driverRequirementFloor("projectSalesGrowthToBase"), undefined);
+  assert.deepEqual(
+    rules.normalizeDriverRangeForRequirements("projectSalesGrowthToBase", [-0.01, 0.05]),
+    [-0.01, 0.05],
+  );
 });
