@@ -58,8 +58,9 @@ test("historical balance-sheet unused-row toggle is grouped inside the same stic
   );
   assert.match(
     pageSource,
-    /<label className="balance-sheet-omit-unused"><input type="checkbox" checked=\{omitUnused\} onChange=\{\(event\) => onToggleUnused\(event\.target\.checked\)\} \/><span>シミュレーションに使わないB\/S項目を省略する<\/span><\/label>/,
+    /<button type="button" className="calculated-row-toggle balance-sheet-unused-toggle" aria-pressed=\{omitUnused\} onClick=\{\(\) => onToggleUnused\(!omitUnused\)\}>\{omitUnused \? "B\/S全項目を表示する" : "シミュレーションに使わないB\/S項目を省略する"\}<\/button>/,
   );
+  assert.doesNotMatch(pageSource, /className="balance-sheet-omit-unused"/);
   assert.doesNotMatch(pageSource, /<div className="balance-sheet-display-options">/);
   assert.match(stylesheet, /\.balance-sheet-heading-actions \{[^}]*display: flex;[^}]*align-items: center;/);
 });
