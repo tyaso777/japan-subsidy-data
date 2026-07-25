@@ -2686,7 +2686,7 @@ export default function Home() {
             <div className="panel-heading"><div><h2>1-1～1-25 貸借対照表等（過去3期）</h2></div><span className="pill green">公式番号に準拠</span></div>
             <p className="balance-sheet-display-note">{omitSimulationUnusedBalanceSheet ? "過去の投資水準として使用する1-24だけを表示しています。入力済みのB/S値は保持されます。" : "第6次様式に沿ってB/S全項目を表示しています。"}</p>
             <BalanceSheetEditor balanceSheets={balanceSheets} historical={historicalPlan} inputValues={inputValues} omitUnused={omitSimulationUnusedBalanceSheet} onToggleUnused={setOmitSimulationUnusedBalanceSheet} onChange={updateBalanceSheet} />
-            <p className="footnote">{omitSimulationUnusedBalanceSheet ? "シミュレーションは1-24だけで実行できます。第6次申請書・提案書を完成させる場合は、チェックを外してB/S全項目を入力してください。" : "B/S残高の1-1～1-23・1-25と、過去実績の1-24を入力します。将来の1-24 新規設備投資による支出は「将来データ入力」の冒頭へ移しました。金額単位は千円です。"}</p>
+            <p className="footnote">{omitSimulationUnusedBalanceSheet ? "シミュレーションは1-24だけで実行できます。第6次申請書・提案書を完成させる場合は、B/S全項目を表示して入力してください。" : "第6次様式に沿って、B/S各項目と新規設備投資による支出の過去3期実績を入力します。"}</p>
           </article>
           <article className="panel formula-panel">
             <h2>B/SとP/Lの連動方針</h2>

@@ -151,7 +151,7 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.pl-row-indent-3 \{ padding-inline-start: var\(--space-8\); \}/);
   assert.match(pageSource, /omitUnused \? rows\.filter\(\(item\) => item\.code === "1-24"\) : rows/);
   assert.match(pageSource, /入力済みのB\/S値は保持されます/);
-  assert.match(pageSource, /チェックを外してB\/S全項目を入力してください/);
+  assert.match(pageSource, /B\/S全項目を表示して入力してください/);
   assert.match(globalStyles, /\.table-panel:has\(> \.manual-sections\) > \.panel-heading \{ position: static;/);
   assert.match(globalStyles, /\.page-sticky-header-overlay \{ position: fixed; z-index: 17; overflow: hidden;/);
   assert.match(globalStyles, /\.page-sticky-header-overlay thead th:first-child \{ position: sticky; left: 0;/);
@@ -332,6 +332,9 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /<MoneyInput/);
   assert.doesNotMatch(pageSource, /const \[moneyUnit, setMoneyUnit\] = useState<MoneyDisplayUnit>/);
   assert.match(pageSource, /千円（第6次様式）/);
+  assert.match(pageSource, /第6次様式に沿って、B\/S各項目と新規設備投資による支出の過去3期実績を入力します。/);
+  assert.doesNotMatch(pageSource, /将来の1-24 新規設備投資による支出は「将来データ入力」の冒頭へ移しました。/);
+  assert.doesNotMatch(pageSource, /金額単位は千円です。/);
   assert.match(pageSource, /<option value="百万円">百万円<\/option>/);
   assert.match(pageSource, /<option value="千円">千円（第6次様式）<\/option>/);
   assert.match(pageSource, /toDisplayMoney\(value, moneyUnit\)/);
