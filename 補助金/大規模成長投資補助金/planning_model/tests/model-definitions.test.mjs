@@ -303,7 +303,7 @@ test("project sales uses separate growth rates before and after the base year", 
   assert.equal(report1.project.sales, 138.42);
 });
 
-test("zero-sales project uses first equipment-year and base-year sales anchors", () => {
+test("zero-sales project keeps first equipment-year and base-year sales anchors without inventing intermediate sales", () => {
   const zeroSalesLatest = {
     ...model.sampleBasePlan,
     project: { ...model.sampleBasePlan.project, sales: 0, cogs: 0 },
@@ -316,8 +316,7 @@ test("zero-sales project uses first equipment-year and base-year sales anchors",
   };
   const inputs = model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE);
 
-  assert.deepEqual(inputs.map((row) => row.project.sales), [20, 40, 80]);
-  assert.equal(model.projectLaunchSalesCagr(historical.at(-1).project.sales, drivers, model.DEFAULT_TIMELINE), 1);
+  assert.deepEqual(inputs.map((row) => row.project.sales), [20, 0, 80]);
 });
 
 test("sales anchors do not override a project with latest actual sales", () => {
@@ -347,7 +346,6 @@ test("zero first-year sales does not invent intermediate project sales", () => {
   const inputs = model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE);
 
   assert.deepEqual(inputs.map((row) => row.project.sales), [0, 0, 80]);
-  assert.ok(Number.isNaN(model.projectLaunchSalesCagr(historical.at(-1).project.sales, drivers, model.DEFAULT_TIMELINE)));
 });
 
 test("other-business forecast uses separate assumptions before and after the base year", () => {

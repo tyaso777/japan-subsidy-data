@@ -710,17 +710,6 @@ export function createProjectPeriodInputs(settings: TimelineSettings = DEFAULT_T
  * 最新実績を起点に、調整水準を補助事業期間へ段階的に反映する。
  * createProjectPeriodInputs は旧サンプル互換用に残し、画面の自動予測はこちらを使う。
  */
-export function projectLaunchSalesCagr(
-  latestProjectSales: number,
-  drivers: Drivers,
-  settings: TimelineSettings = DEFAULT_TIMELINE,
-) {
-  const years = normalizeTimeline(settings).baseYear - normalizeTimeline(settings).latestYear;
-  if (latestProjectSales > 0) return drivers.projectSalesGrowthToBase;
-  if (years <= 1 || drivers.projectFirstYearSales <= 0 || drivers.projectBaseYearSales <= 0) return Number.NaN;
-  return (drivers.projectBaseYearSales / drivers.projectFirstYearSales) ** (1 / (years - 1)) - 1;
-}
-
 export function createForecastProjectPeriodInputs(
   latest: YearPlan,
   drivers: Drivers,
@@ -737,18 +726,15 @@ export function createForecastProjectPeriodInputs(
   return Array.from({ length: years }, (_, index) => {
     const elapsed = index + 1;
     const progress = elapsed / years;
-    const launchCagr = projectLaunchSalesCagr(start.sales, drivers, timeline);
     const sales = start.sales > 0
       ? start.sales * (1 + drivers.projectSalesGrowthToBase) ** elapsed
       : years === 1
         ? drivers.projectBaseYearSales
-        : drivers.projectFirstYearSales > 0 && drivers.projectBaseYearSales > 0
-          ? drivers.projectFirstYearSales * (1 + launchCagr) ** index
-          : index === years - 1
-            ? drivers.projectBaseYearSales
-            : index === 0
-              ? drivers.projectFirstYearSales
-              : 0;
+        : index === years - 1
+          ? drivers.projectBaseYearSales
+          : index === 0
+            ? drivers.projectFirstYearSales
+            : 0;
     const headcount = start.headcount * (1 + drivers.projectHeadcountGrowthToBase) ** elapsed;
     return {
       year: timeline.latestYear + elapsed,

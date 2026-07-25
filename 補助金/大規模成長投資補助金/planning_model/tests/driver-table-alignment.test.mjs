@@ -84,6 +84,23 @@ test("optimization result spans both lower and upper bound columns", () => {
   );
 });
 
+test("zero-history project sales amount is a separate row above the growth-rate row", () => {
+  const amountRowIndex = pageSource.indexOf('className="driver-fixed project-launch-sales-row"');
+  const amountCodeIndex = pageSource.indexOf("C-1A／C-1B:", amountRowIndex);
+  const amountInputIndex = pageSource.indexOf("renderProjectLaunchSalesCells()", amountCodeIndex);
+  const growthRowIndex = pageSource.indexOf("const growthRow =", amountInputIndex);
+  assert.ok(amountRowIndex >= 0, "補助事業売上高の固定入力行が必要");
+  assert.ok(amountCodeIndex > amountRowIndex, "固定入力行にはC-1A／C-1Bを表示する");
+  assert.ok(amountInputIndex > amountCodeIndex, "固定入力行に設備導入初年度・基準年度の入力欄を置く");
+  assert.ok(growthRowIndex > amountInputIndex, "売上高入力行を売上成長率行より上に置く");
+  assert.match(
+    pageSource,
+    /const codes = launchSalesGrowthRow[\s\S]*?\? "C-1／C-9"/,
+  );
+  assert.doesNotMatch(pageSource, /C-1A／C-1B／C-9/);
+  assert.doesNotMatch(pageSource, /0始まりではCAGRを計算できません/);
+});
+
 test("fixed forecast-condition header keeps its two-row layout and centering", () => {
   assert.match(
     pageSource,

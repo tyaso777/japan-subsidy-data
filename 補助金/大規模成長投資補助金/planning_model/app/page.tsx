@@ -33,7 +33,6 @@ import {
   officerBonus,
   officerCompensation,
   normalizeTimeline,
-  projectLaunchSalesCagr,
   retimeHistoricalPlan,
   retimeBalanceSheets,
   researchDevelopment,
@@ -2264,8 +2263,6 @@ export default function Home() {
   }
 
   function renderProjectLaunchSalesCells() {
-    const launchCagr = projectLaunchSalesCagr(historicalPlan[2].project.sales, drivers, timeline);
-    const firstYearIsZero = drivers.projectFirstYearSales <= 0 && drivers.projectBaseYearSales > 0;
     return <td className="driver-period-range project-launch-sales" colSpan={2}>
       <div className="project-launch-sales-grid">
         <label>
@@ -2292,13 +2289,7 @@ export default function Home() {
             onChange={(event) => updateDriver("projectBaseYearSales", event.target.value === "" ? null : Number(event.target.value))}
           />
         </label>
-        <small className={firstYearIsZero ? "field-error project-launch-result" : "adjusted-value project-launch-result"}>
-          {Number.isFinite(launchCagr)
-            ? `設備導入期間CAGR ${number(launchCagr * 100, 2)}%/年`
-            : firstYearIsZero
-              ? "0始まりではCAGRを計算できません。③で設備導入期間の7-1を年度別に入力してください"
-              : "2つの売上高を入力すると設備導入期間CAGRを自動算出します"}
-        </small>
+        <small className="driver-period-note project-launch-result">中間年度の売上高は③将来データ入力の7-1で年度別に入力します</small>
       </div>
     </td>;
   }
@@ -2623,24 +2614,33 @@ export default function Home() {
             <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th rowSpan={2}>調整条件<small>C-1～（Condition）</small></th><th rowSpan={2} className="driver-statutory-heading">制度上の必須条件<small>編集不可</small></th>{historicalPlan.slice(1).map((row) => <th rowSpan={2} className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th colSpan={2} className="driver-period-heading">設備導入期間<small>最新決算期 → 基準年</small></th><th colSpan={2} className="driver-period-heading">基準年後<small>基準年 → 事業化報告3年目</small></th></tr><tr><th className="driver-bound-heading">下限</th><th className="driver-bound-heading">上限</th><th className="driver-bound-heading">下限</th><th className="driver-bound-heading">上限</th></tr></thead><tbody>
               {driverComparisonGroups.flatMap((group) => [
                 <tr className="driver-group-heading" key={`group-${group.label}`}><th><strong>{group.label}</strong></th><td aria-hidden="true" colSpan={7}></td></tr>,
-                ...group.rows.map((comparisonRow, rowIndex) => {
+                ...group.rows.flatMap((comparisonRow, rowIndex) => {
                   const keys = [comparisonRow.equipment, comparisonRow.postBase, comparisonRow.fixed].filter((key): key is keyof Drivers => Boolean(key));
                   const referenceKey = keys[0];
                   const info = driverLabels[referenceKey]!;
                   const tablePresentation = driverTablePresentation(referenceKey, info.label);
                   const history = historicalDriverSeries[referenceKey];
-                  const launchSalesRow = latestProjectSalesIsZero && comparisonRow.equipment === "projectSalesGrowthToBase";
-                  const codes = launchSalesRow
-                    ? "C-1A／C-1B／C-9"
+                  const launchSalesGrowthRow = latestProjectSalesIsZero && comparisonRow.equipment === "projectSalesGrowthToBase";
+                  const codes = launchSalesGrowthRow
+                    ? "C-1／C-9"
                     : keys.map((key) => driverItemCodes[key]).filter(Boolean).join("／");
-                  const displayLabel = launchSalesRow
-                    ? "補助事業 売上高（設備導入初年度・基準年度）／売上成長率（基準年後）"
+                  const displayLabel = launchSalesGrowthRow
+                    ? "補助事業 売上成長率"
                     : tablePresentation.label;
                   const requirementLabels = [...new Set(keys.map((key) => driverRequirementLabel(key, applicationCategory, drivers.investment)).filter((label) => label !== "—"))];
                   const constraintError = keys.some((key) => driverConstraintFailure(key, applicationCategory, drivers));
                   const adjustable = keys.some((key) => adjustableDriverKeys.includes(key));
-                  return <tr className={`${adjustable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={`${group.label}-${rowIndex}`}>
-                    <th><span className="driver-item-code">{codes}:</span> {displayLabel}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{launchSalesRow ? "億円（売上高）／%/年（基準年後）" : `${info.unit}／${history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}`}</small></th>
+                  const launchSalesAmountRow = launchSalesGrowthRow
+                    ? <tr className="driver-fixed project-launch-sales-row" key={`${group.label}-${rowIndex}-sales`}>
+                      <th><span className="driver-item-code">C-1A／C-1B:</span> 補助事業 売上高<small>億円／設備導入初年度・基準年度の固定値</small></th>
+                      <td className="statutory-condition">—</td>
+                      {historicalPlan.slice(1).map((row) => <td className="driver-history" key={`project-launch-sales-${row.year}`}>—</td>)}
+                      {renderProjectLaunchSalesCells()}
+                      <td className="driver-period-empty" colSpan={2}>—</td>
+                    </tr>
+                    : null;
+                  const growthRow = <tr className={`${adjustable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={`${group.label}-${rowIndex}`}>
+                    <th><span className="driver-item-code">{codes}:</span> {displayLabel}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{`${info.unit}／${history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}`}</small></th>
                     <td className="statutory-condition"><strong>{requirementLabels.join("／") || "—"}</strong></td>
                     {history.values.slice(1).map((value, referenceIndex) => {
                       const index = referenceIndex + 1;
@@ -2654,8 +2654,9 @@ export default function Home() {
                     })}
                     {comparisonRow.fixed
                       ? renderFixedDriverCells(comparisonRow.fixed)
-                      : <>{launchSalesRow ? renderProjectLaunchSalesCells() : renderDriverPeriodCells(comparisonRow.equipment)}{renderDriverPeriodCells(comparisonRow.postBase)}</>}
+                      : <>{launchSalesGrowthRow ? renderDriverPeriodCells(undefined) : renderDriverPeriodCells(comparisonRow.equipment)}{renderDriverPeriodCells(comparisonRow.postBase)}</>}
                   </tr>;
+                  return launchSalesAmountRow ? [launchSalesAmountRow, growthRow] : [growthRow];
                 }),
               ])}
             </tbody></table></div>
