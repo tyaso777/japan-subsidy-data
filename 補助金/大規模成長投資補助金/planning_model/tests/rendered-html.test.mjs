@@ -139,9 +139,10 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.diagnostic-sparkline-button\[aria-pressed="true"\]/);
   assert.match(globalStyles, /\.wide-table, \.targets-table-wrap \{[^}]*overflow-x: auto; overflow-y: visible;/);
   assert.match(globalStyles, /\.balance-sheet-table \{[^}]*overflow-x: auto; overflow-y: visible;/);
-  assert.match(globalStyles, /\.balance-sheet-display-options \{ display: flex;/);
+  assert.match(globalStyles, /\.balance-sheet-heading-actions \{ display: flex;/);
   assert.match(pageSource, /useState\(false\).*omitSimulationUnusedBalanceSheet|omitSimulationUnusedBalanceSheet.*useState\(false\)/s);
-  assert.match(pageSource, /checked=\{omitSimulationUnusedBalanceSheet\}/);
+  assert.match(pageSource, /omitUnused=\{omitSimulationUnusedBalanceSheet\}/);
+  assert.match(pageSource, /checked=\{omitUnused\}/);
   assert.match(pageSource, /code: "1-2", label: "うち流動資産"[\s\S]*?indentLevel: 1/);
   assert.match(pageSource, /code: "1-3", label: "うち現金及び預金"[\s\S]*?indentLevel: 2/);
   assert.match(pageSource, /code: "1-6", label: "うち建物及び構築物"[\s\S]*?indentLevel: 3/);

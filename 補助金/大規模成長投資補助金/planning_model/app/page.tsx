@@ -2518,14 +2518,8 @@ export default function Home() {
           </article>
           <article className="panel table-panel balance-sheet-panel">
             <div className="panel-heading"><div><h2>1-1～1-25 貸借対照表等（過去3期）</h2></div><span className="pill green">公式番号に準拠</span></div>
-            <div className="balance-sheet-display-options">
-              <label>
-                <input type="checkbox" checked={omitSimulationUnusedBalanceSheet} onChange={(event) => setOmitSimulationUnusedBalanceSheet(event.target.checked)} />
-                <span>シミュレーションに使わないB/S項目を省略する</span>
-              </label>
-              <small>{omitSimulationUnusedBalanceSheet ? "過去の投資水準として使用する1-24だけを表示しています。入力済みのB/S値は保持されます。" : "第6次様式に沿ってB/S全項目を表示しています。"}</small>
-            </div>
-            <BalanceSheetEditor balanceSheets={balanceSheets} historical={historicalPlan} inputValues={inputValues} omitUnused={omitSimulationUnusedBalanceSheet} onChange={updateBalanceSheet} />
+            <p className="balance-sheet-display-note">{omitSimulationUnusedBalanceSheet ? "過去の投資水準として使用する1-24だけを表示しています。入力済みのB/S値は保持されます。" : "第6次様式に沿ってB/S全項目を表示しています。"}</p>
+            <BalanceSheetEditor balanceSheets={balanceSheets} historical={historicalPlan} inputValues={inputValues} omitUnused={omitSimulationUnusedBalanceSheet} onToggleUnused={setOmitSimulationUnusedBalanceSheet} onChange={updateBalanceSheet} />
             <p className="footnote">{omitSimulationUnusedBalanceSheet ? "シミュレーションは1-24だけで実行できます。第6次申請書・提案書を完成させる場合は、チェックを外してB/S全項目を入力してください。" : "B/S残高の1-1～1-23・1-25と、過去実績の1-24を入力します。将来の1-24 新規設備投資による支出は「将来データ入力」の冒頭へ移しました。金額単位は億円です。"}</p>
           </article>
           <article className="panel formula-panel">
@@ -2738,7 +2732,7 @@ const balanceSheetInputRows: { code: string; label: string; field: BalanceSheetF
   { code: "1-24", label: "新規設備投資による支出", field: "capex" },
 ];
 
-function BalanceSheetEditor({ balanceSheets, historical, inputValues, omitUnused, onChange }: { balanceSheets: BalanceSheetPlan[]; historical: YearPlan[]; inputValues: InputValues; omitUnused: boolean; onChange: (yearIndex: number, field: keyof BalanceSheetPlan, value: number | null) => void }) {
+function BalanceSheetEditor({ balanceSheets, historical, inputValues, omitUnused, onToggleUnused, onChange }: { balanceSheets: BalanceSheetPlan[]; historical: YearPlan[]; inputValues: InputValues; omitUnused: boolean; onToggleUnused: (omit: boolean) => void; onChange: (yearIndex: number, field: keyof BalanceSheetPlan, value: number | null) => void }) {
   const [omitCalculated, setOmitCalculated] = useState(false);
   const rows: { code: string; label: string; field?: BalanceSheetField; indentLevel?: 1 | 2 | 3; percent?: boolean; multiple?: boolean; value?: (row: BalanceSheetPlan, index: number) => number }[] = [
     ...balanceSheetInputRows.slice(0, 10),
@@ -2755,7 +2749,7 @@ function BalanceSheetEditor({ balanceSheets, historical, inputValues, omitUnused
   const scopeRows = omitUnused ? rows.filter((item) => item.code === "1-24") : rows;
   const visibleRows = omitCalculated ? scopeRows.filter((item) => item.field) : scopeRows;
   return <>
-    <h3 className="manual-table-heading"><span>貸借対照表等（1-1～1-25：過去3期実績）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCalculated} disabled={omitUnused} onClick={() => setOmitCalculated((current) => !current)}>{omitCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
+    <h3 className="manual-table-heading"><span>貸借対照表等（1-1～1-25：過去3期実績）</span><div className="balance-sheet-heading-actions"><label className="balance-sheet-omit-unused"><input type="checkbox" checked={omitUnused} onChange={(event) => onToggleUnused(event.target.checked)} /><span>シミュレーションに使わないB/S項目を省略する</span></label><button type="button" className="calculated-row-toggle" aria-pressed={omitCalculated} disabled={omitUnused} onClick={() => setOmitCalculated((current) => !current)}>{omitCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></div></h3>
     <div className="wide-table balance-sheet-table spreadsheet-grid actuals-three-year-table"><table><thead><tr><th>第6次様式項目（億円）</th>{balanceSheets.map((row, index) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[historical[index].role]}</small></th>)}</tr></thead><tbody>{visibleRows.map((item) => <tr className={!item.field ? "emphasis" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.percent && <small>%</small>}{item.multiple && <small>倍</small>}</th>{balanceSheets.map((row, index) => <td key={row.year}>{item.field ? <input type="number" step="0.01" value={getInputValue(inputValues, inputKey.balanceSheet(row.year, item.field))} placeholder="未入力" onChange={(event) => onChange(index, item.field!, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{number(item.value!(row, index), 2)}</strong>}</td>)}</tr>)}</tbody></table></div>
   </>;
 }

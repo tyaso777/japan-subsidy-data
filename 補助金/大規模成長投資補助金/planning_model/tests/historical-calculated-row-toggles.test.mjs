@@ -41,7 +41,7 @@ test("historical balance-sheet calculated-row toggle stays with a sticky table s
   assert.match(pageSource, /<article className="panel table-panel balance-sheet-panel">/);
   assert.match(
     pageSource,
-    /<h3 className="manual-table-heading"><span>貸借対照表等（1-1～1-25：過去3期実績）<\/span><button type="button" className="calculated-row-toggle"/,
+    /<h3 className="manual-table-heading"><span>貸借対照表等（1-1～1-25：過去3期実績）<\/span>[\s\S]*?<button type="button" className="calculated-row-toggle"/,
   );
   assert.doesNotMatch(pageSource, /<div className="historical-table-actions">/);
   assert.match(stylesheet, /\.balance-sheet-panel > \.panel-heading \{ position: static; \}/);
@@ -49,4 +49,17 @@ test("historical balance-sheet calculated-row toggle stays with a sticky table s
     stylesheet,
     /\.balance-sheet-panel > \.manual-table-heading \{[^}]*position: sticky;[^}]*top: 46px;[^}]*z-index: 18;/,
   );
+});
+
+test("historical balance-sheet unused-row toggle is grouped inside the same sticky subtitle", () => {
+  assert.match(
+    pageSource,
+    /<h3 className="manual-table-heading"><span>貸借対照表等（1-1～1-25：過去3期実績）<\/span><div className="balance-sheet-heading-actions">/,
+  );
+  assert.match(
+    pageSource,
+    /<label className="balance-sheet-omit-unused"><input type="checkbox" checked=\{omitUnused\} onChange=\{\(event\) => onToggleUnused\(event\.target\.checked\)\} \/><span>シミュレーションに使わないB\/S項目を省略する<\/span><\/label>/,
+  );
+  assert.doesNotMatch(pageSource, /<div className="balance-sheet-display-options">/);
+  assert.match(stylesheet, /\.balance-sheet-heading-actions \{[^}]*display: flex;[^}]*align-items: center;/);
 });
