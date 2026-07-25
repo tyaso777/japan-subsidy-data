@@ -27,9 +27,11 @@ import {
   type YearPlan,
 } from "./model";
 import { PROPOSAL_FORMAT, type ProposalData } from "./proposal-io";
+import { INTERNAL_MONEY_UNIT } from "./money";
 import { inputKey, type InputValues } from "./input-values";
 import { defaultMetricGroupBases } from "./metric-groups";
 import { createOptimizationTargets, runPlanningOptimization } from "./proposal-optimization";
+import { legacyOkuToInternalMoney } from "./money";
 
 const clone = <T,>(value: T): T => structuredClone(value);
 const round = (value: number) => Number(value.toFixed(2));
@@ -59,8 +61,8 @@ const standardWorkflowInitialDrivers = {
   projectSgaRateEnd: 0.015,
   otherSgaRateEnd: 0.005,
   projectOfficerPayGrowth: 0.05380116959064325,
-  investment: 23,
-  subsidy: 7.66,
+  investment: legacyOkuToInternalMoney(23),
+  subsidy: legacyOkuToInternalMoney(7.66),
   localBenchmark: 23,
 };
 
@@ -90,8 +92,8 @@ const standardWorkflowAdjustedDrivers = {
   projectSgaRateEnd: 0.014999737221599106,
   otherSgaRateEnd: 0.005026523443170271,
   projectOfficerPayGrowth: 0.05379522273680665,
-  investment: 23,
-  subsidy: 7.66,
+  investment: legacyOkuToInternalMoney(23),
+  subsidy: legacyOkuToInternalMoney(7.66),
 };
 
 const standardWorkflowRanges: typeof driverBounds = {
@@ -125,18 +127,18 @@ const standardWorkflowRanges: typeof driverBounds = {
 const standardWorkflowTargets = clone(defaultTargets);
 Object.assign(standardWorkflowTargets, {
   companySalesCagr: { ...standardWorkflowTargets.companySalesCagr, value: 15 },
-  companySalesIncrease: { ...standardWorkflowTargets.companySalesIncrease, value: 82.4, max: 252.69 },
+  companySalesIncrease: { ...standardWorkflowTargets.companySalesIncrease, value: legacyOkuToInternalMoney(82.4), max: legacyOkuToInternalMoney(252.69) },
   companyPaySchedule: { ...standardWorkflowTargets.companyPaySchedule, value: 2 },
   projectSalesShare: { ...standardWorkflowTargets.projectSalesShare, value: 60 },
-  projectSalesIncrease: { ...standardWorkflowTargets.projectSalesIncrease, value: 74.8, max: 136.84 },
-  valueAddedIncrease: { ...standardWorkflowTargets.valueAddedIncrease, value: 18.78, max: 33.43 },
-  employeePayIncrease: { ...standardWorkflowTargets.employeePayIncrease, value: 2.85, max: 3.74 },
+  projectSalesIncrease: { ...standardWorkflowTargets.projectSalesIncrease, value: legacyOkuToInternalMoney(74.8), max: legacyOkuToInternalMoney(136.84) },
+  valueAddedIncrease: { ...standardWorkflowTargets.valueAddedIncrease, value: legacyOkuToInternalMoney(18.78), max: legacyOkuToInternalMoney(33.43) },
+  employeePayIncrease: { ...standardWorkflowTargets.employeePayIncrease, value: legacyOkuToInternalMoney(2.85), max: legacyOkuToInternalMoney(3.74) },
   investmentSalesRatio: { ...standardWorkflowTargets.investmentSalesRatio, value: 15 },
 });
 
 const standardWorkflowOverrides: Record<string, number> = {
-  "2029:other:sales": 85.13,
-  "2029:project:7-8": 7.9,
+  "2029:other:sales": legacyOkuToInternalMoney(85.13),
+  "2029:project:7-8": legacyOkuToInternalMoney(7.9),
 };
 
 const partiallyUnmetAdjustedDrivers = {
@@ -269,6 +271,7 @@ const commonProposal = (title: string, exportedAt: string, historicalPlan: YearP
   });
   return {
     format: PROPOSAL_FORMAT,
+    moneyUnit: INTERNAL_MONEY_UNIT,
     title,
     exportedAt,
     timeline: { ...DEFAULT_TIMELINE },
@@ -310,6 +313,7 @@ export function createStandardSampleProposal(exportedAt: string): ProposalData {
       proposal.inputValues![inputKey.target(key, "max")] = round(standardWorkflowTargets[key].max!);
     }
   }
+  proposal.adjustedDrivers = reoptimizeSampleProposal(proposal).drivers;
   return proposal;
 }
 
@@ -321,7 +325,7 @@ export function createPartiallyUnmetSampleProposal(exportedAt: string): Proposal
     value: 3.5,
   };
   proposal.inputValues![inputKey.target("companyPaySchedule", "value")] = 3.5;
-  proposal.adjustedDrivers = clone(partiallyUnmetAdjustedDrivers);
+  proposal.adjustedDrivers = reoptimizeSampleProposal(proposal).drivers;
   return proposal;
 }
 
@@ -337,7 +341,7 @@ export function createMultipleUnmetSampleProposal(exportedAt: string): ProposalD
     proposal.targets[key] = { ...proposal.targets[key], value };
     proposal.inputValues![inputKey.target(key, "value")] = value;
   }
-  proposal.adjustedDrivers = clone(multipleUnmetAdjustedDrivers);
+  proposal.adjustedDrivers = reoptimizeSampleProposal(proposal).drivers;
   return proposal;
 }
 
@@ -451,14 +455,14 @@ export function createBaseYearLaunchSample(exportedAt: string) {
   };
   const historicalPlan = createHistoricalPlan(latest, DEFAULT_TIMELINE);
   const launchBase: SegmentPlan = {
-    sales: 60,
-    cogs: 39,
-    employeePay: 4.8,
-    officerPay: 0.3,
-    depreciation: 4.5,
-    cogsDepreciation: 1.13,
-    sgaDepreciation: 3.37,
-    otherSga: 6,
+    sales: legacyOkuToInternalMoney(60),
+    cogs: legacyOkuToInternalMoney(39),
+    employeePay: legacyOkuToInternalMoney(4.8),
+    officerPay: legacyOkuToInternalMoney(0.3),
+    depreciation: legacyOkuToInternalMoney(4.5),
+    cogsDepreciation: legacyOkuToInternalMoney(1.13),
+    sgaDepreciation: legacyOkuToInternalMoney(3.37),
+    otherSga: legacyOkuToInternalMoney(6),
     headcount: 48,
     officerCount: 2,
   };

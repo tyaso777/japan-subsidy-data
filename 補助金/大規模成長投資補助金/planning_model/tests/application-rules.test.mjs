@@ -1,27 +1,31 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import ts from "typescript";
+import { build } from "esbuild";
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const projectDirectory = path.resolve(testDirectory, "..");
-const source = await readFile(path.join(projectDirectory, "app", "application-rules.ts"), "utf8");
-const compiled = ts.transpileModule(source, {
-  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
-}).outputText;
+const compiled = (await build({
+  absWorkingDir: projectDirectory,
+  entryPoints: ["./app/application-rules.ts"],
+  bundle: true,
+  write: false,
+  platform: "node",
+  format: "cjs",
+  target: "node22",
+})).outputFiles[0].text;
 const commonJsModule = { exports: {} };
 new Function("module", "exports", compiled)(commonJsModule, commonJsModule.exports);
 const rules = commonJsModule.exports;
 
-test("subsidy ceiling is truncated to the entered two-decimal monetary precision", () => {
-  assert.equal(rules.maximumSubsidyAmount(23), 7.66);
-  assert.match(rules.driverRequirementLabel("subsidy", "general", 23), /現在上限7\.66億円/);
+test("subsidy ceiling is truncated to integer thousand-yen precision", () => {
+  assert.equal(rules.maximumSubsidyAmount(2_300_000), 766_666);
+  assert.match(rules.driverRequirementLabel("subsidy", "general", 2_300_000), /現在上限7\.67億円/);
 
-  const drivers = { investment: 23, subsidy: 7.66 };
+  const drivers = { investment: 2_300_000, subsidy: 766_666 };
   assert.equal(rules.driverConstraintFailure("subsidy", "general", drivers), null);
-  assert.match(rules.driverConstraintFailure("subsidy", "general", { ...drivers, subsidy: 7.67 }), /7\.66億円以下/);
+  assert.match(rules.driverConstraintFailure("subsidy", "general", { ...drivers, subsidy: 766_667 }), /7\.67億円以下/);
 });
 
 test("equipment-period project pay growth cannot fall below the statutory zero-percent floor", () => {

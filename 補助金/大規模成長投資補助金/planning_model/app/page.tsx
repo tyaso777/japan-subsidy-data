@@ -51,7 +51,8 @@ import {
   YEAR_ROLE_LABELS,
   YearPlan,
 } from "./model";
-import { buildProposalHtml, buildProposalXlsx, downloadBlob, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
+import { buildProposalHtml, buildProposalXlsx, downloadBlob, normalizeProposalMoneyUnit, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
+import { INTERNAL_MONEY_UNIT, legacyOkuToInternalMoney, normalizeInternalMoney, toDisplayMoney, type MoneyDisplayUnit } from "./money";
 import {
   buildMappedExcel,
   EXCEL_MAPPING_COPILOT_PROMPT,
@@ -123,8 +124,8 @@ const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string;
   otherOfficerPayGrowth: { label: "ベース事業 役員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
   projectMarketGrowth: { label: "7-20 市場伸び率（年あたり）", unit: "%/年", step: 0.5 },
   projectSalesGrowthToBase: { label: "補助事業 売上成長率（設備導入期間）", unit: "%/年", step: 0.5 },
-  projectFirstYearSales: { label: "補助事業 売上高（設備導入初年度）", unit: "億円", step: 0.01 },
-  projectBaseYearSales: { label: "補助事業 売上高（基準年度）", unit: "億円", step: 0.01 },
+  projectFirstYearSales: { label: "補助事業 売上高（設備導入初年度）", unit: "千円", step: 0.01 },
+  projectBaseYearSales: { label: "補助事業 売上高（基準年度）", unit: "千円", step: 0.01 },
   projectCogsImprovementToBase: { label: "補助事業 原価率改善ポイント（設備導入期間）", unit: "pt", step: 0.5 },
   projectPayGrowthToBase: { label: "補助事業に関わる従業員1人当たり給与支給総額の年平均上昇率（設備導入期間・モデル内管理）", unit: "%/年", step: 0.25 },
   projectHeadcountGrowthToBase: { label: "補助事業 常時使用する従業員数（就業時間換算）の成長率（設備導入期間）", unit: "%/年", step: 0.5 },
@@ -146,8 +147,8 @@ const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string;
   projectSgaRateEnd: { label: "補助事業 その他販管費率改善ポイント（基準年後）", unit: "pt", step: 0.5 },
   otherSgaRateEnd: { label: "ベース事業 その他販管費率改善ポイント（基準年後）", unit: "pt", step: 0.5 },
   projectOfficerPayGrowth: { label: "役員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
-  investment: { label: "補助事業投資額", unit: "億円", step: 1 },
-  subsidy: { label: "申請補助金額", unit: "億円", step: 0.01 },
+  investment: { label: "補助事業投資額", unit: "千円", step: 1 },
+  subsidy: { label: "申請補助金額", unit: "千円", step: 0.01 },
   localBenchmark: { label: "ローカルベンチマーク", unit: "点", step: 1 },
 };
 
@@ -329,15 +330,15 @@ type Round5Benchmark = { applicant: number; accepted: number; statistic: "中央
 
 const round5Benchmarks: Partial<Record<MetricKey, Round5Benchmark>> = {
   companySalesCagr: { applicant: 20, accepted: 21, statistic: "中央値" },
-  companySalesIncrease: { applicant: 67.1, accepted: 82.4, statistic: "中央値" },
+  companySalesIncrease: { applicant: legacyOkuToInternalMoney(67.1), accepted: legacyOkuToInternalMoney(82.4), statistic: "中央値" },
   companyPaySchedule: { applicant: 2.3, accepted: 2.5, statistic: "中央値" },
   projectSalesShare: { applicant: 80, accepted: 89, statistic: "平均値" },
   projectSalesCagr: { applicant: 22, accepted: 22, statistic: "中央値" },
-  projectSalesIncrease: { applicant: 57.4, accepted: 74.8, statistic: "中央値" },
+  projectSalesIncrease: { applicant: legacyOkuToInternalMoney(57.4), accepted: legacyOkuToInternalMoney(74.8), statistic: "中央値" },
   laborProductivityCagr: { applicant: 21, accepted: 21, statistic: "中央値" },
-  valueAddedIncrease: { applicant: 19.9, accepted: 28.1, statistic: "中央値" },
+  valueAddedIncrease: { applicant: legacyOkuToInternalMoney(19.9), accepted: legacyOkuToInternalMoney(28.1), statistic: "中央値" },
   employeePayCagr: { applicant: 6.5, accepted: 7, statistic: "中央値" },
-  employeePayIncrease: { applicant: 2.8, accepted: 3.9, statistic: "中央値" },
+  employeePayIncrease: { applicant: legacyOkuToInternalMoney(2.8), accepted: legacyOkuToInternalMoney(3.9), statistic: "中央値" },
   investmentSalesRatio: { applicant: 64, accepted: 61, statistic: "中央値" },
   valueAddedSubsidyRatio: { applicant: 171, accepted: 213, statistic: "中央値" },
   localBenchmark: { applicant: 23, accepted: 23, statistic: "中央値" },
@@ -375,12 +376,12 @@ const historicalFallbackDefaults: Partial<Record<keyof Drivers, { initial: numbe
 };
 
 const plFields: { key: keyof SegmentPlan; modelCode: string; label: string; unit: string; digits?: number }[] = [
-  { key: "sales", modelCode: "M-1", label: "売上高", unit: "億円" },
-  { key: "cogs", modelCode: "M-2", label: "売上原価", unit: "億円" },
-  { key: "employeePay", modelCode: "M-3", label: "従業員給与支給総額", unit: "億円" },
-  { key: "officerPay", modelCode: "M-4", label: "役員給与支給総額", unit: "億円" },
-  { key: "depreciation", modelCode: "M-5", label: "減価償却費", unit: "億円" },
-  { key: "otherSga", modelCode: "M-6", label: "その他販管費", unit: "億円" },
+  { key: "sales", modelCode: "M-1", label: "売上高", unit: "千円" },
+  { key: "cogs", modelCode: "M-2", label: "売上原価", unit: "千円" },
+  { key: "employeePay", modelCode: "M-3", label: "従業員給与支給総額", unit: "千円" },
+  { key: "officerPay", modelCode: "M-4", label: "役員給与支給総額", unit: "千円" },
+  { key: "depreciation", modelCode: "M-5", label: "減価償却費", unit: "千円" },
+  { key: "otherSga", modelCode: "M-6", label: "その他販管費", unit: "千円" },
   { key: "headcount", modelCode: "M-7", label: "常時使用する従業員数（就業時間換算）", unit: "人", digits: 0 },
   { key: "officerCount", modelCode: "M-8", label: "役員数", unit: "人", digits: 0 },
 ];
@@ -405,19 +406,19 @@ const preserveOtherSgaTotal = (segment: SegmentPlan, patch: Partial<SegmentPlan>
 });
 
 const otherPlInputFields: OtherPlInputField[] = [
-  { key: "sales", modelCode: "M2-1", label: "売上高", unit: "億円", get: (s) => s.sales, set: (_s, v) => ({ sales: v }) },
-  { key: "cogs", modelCode: "M2-3", label: "売上原価", unit: "億円", get: (s) => s.cogs, set: (_s, v) => ({ cogs: v }) },
-  { key: "cogsDepreciation", modelCode: "M2-4", label: "うち減価償却費", unit: "億円", indentLevel: 1, get: cogsDepreciation, set: (s, v) => ({ cogsDepreciation: v, depreciation: v + sgaDepreciation(s) }) },
-  { key: "sgaTotal", modelCode: "M2-7", label: "販売費及び一般管理費", unit: "億円", get: otherSgaTotal, set: (s, v) => ({ otherSga: v - s.employeePay - s.officerPay - sgaDepreciation(s) - researchDevelopment(s) }) },
-  { key: "officerCompensation", modelCode: "M2-9", label: "うち役員報酬", unit: "億円", indentLevel: 2, get: officerCompensation, set: (s, v) => { const nextPay = v + officerBonus(s); return preserveOtherSgaTotal(s, { officerCompensation: v, officerPay: nextPay }, nextPay - s.officerPay); } },
-  { key: "officerBonus", modelCode: "M2-10", label: "うち役員賞与", unit: "億円", indentLevel: 2, get: officerBonus, set: (s, v) => { const nextPay = officerCompensation(s) + v; return preserveOtherSgaTotal(s, { officerBonus: v, officerPay: nextPay }, nextPay - s.officerPay); } },
-  { key: "employeeSalary", modelCode: "M2-12", label: "うち従業員の給与", unit: "億円", indentLevel: 2, get: employeeSalary, set: (s, v) => { const nextPay = v + employeeBonus(s); return preserveOtherSgaTotal(s, { employeeSalary: v, employeePay: nextPay }, nextPay - s.employeePay); } },
-  { key: "employeeBonus", modelCode: "M2-13", label: "うち従業員の賞与", unit: "億円", indentLevel: 2, get: employeeBonus, set: (s, v) => { const nextPay = employeeSalary(s) + v; return preserveOtherSgaTotal(s, { employeeBonus: v, employeePay: nextPay }, nextPay - s.employeePay); } },
-  { key: "sgaDepreciation", modelCode: "M2-14", label: "うち減価償却費", unit: "億円", indentLevel: 1, get: sgaDepreciation, set: (s, v) => preserveOtherSgaTotal(s, { sgaDepreciation: v, depreciation: cogsDepreciation(s) + v }, v - sgaDepreciation(s)) },
-  { key: "researchDevelopment", modelCode: "M2-15", label: "うち研究開発費", unit: "億円", indentLevel: 1, get: researchDevelopment, set: (s, v) => preserveOtherSgaTotal(s, { researchDevelopment: v }, v - researchDevelopment(s)) },
-  { key: "ordinaryIncome", modelCode: "M2-18", label: "経常利益", unit: "億円", get: ordinaryIncome, set: (_s, v) => ({ ordinaryIncome: v }) },
-  { key: "preTaxIncome", modelCode: "M2-19", label: "税引前当期純利益", unit: "億円", get: preTaxIncome, set: (_s, v) => ({ preTaxIncome: v }) },
-  { key: "netIncome", modelCode: "M2-20", label: "当期純利益", unit: "億円", get: netIncome, set: (_s, v) => ({ netIncome: v }) },
+  { key: "sales", modelCode: "M2-1", label: "売上高", unit: "千円", get: (s) => s.sales, set: (_s, v) => ({ sales: v }) },
+  { key: "cogs", modelCode: "M2-3", label: "売上原価", unit: "千円", get: (s) => s.cogs, set: (_s, v) => ({ cogs: v }) },
+  { key: "cogsDepreciation", modelCode: "M2-4", label: "うち減価償却費", unit: "千円", indentLevel: 1, get: cogsDepreciation, set: (s, v) => ({ cogsDepreciation: v, depreciation: v + sgaDepreciation(s) }) },
+  { key: "sgaTotal", modelCode: "M2-7", label: "販売費及び一般管理費", unit: "千円", get: otherSgaTotal, set: (s, v) => ({ otherSga: v - s.employeePay - s.officerPay - sgaDepreciation(s) - researchDevelopment(s) }) },
+  { key: "officerCompensation", modelCode: "M2-9", label: "うち役員報酬", unit: "千円", indentLevel: 2, get: officerCompensation, set: (s, v) => { const nextPay = v + officerBonus(s); return preserveOtherSgaTotal(s, { officerCompensation: v, officerPay: nextPay }, nextPay - s.officerPay); } },
+  { key: "officerBonus", modelCode: "M2-10", label: "うち役員賞与", unit: "千円", indentLevel: 2, get: officerBonus, set: (s, v) => { const nextPay = officerCompensation(s) + v; return preserveOtherSgaTotal(s, { officerBonus: v, officerPay: nextPay }, nextPay - s.officerPay); } },
+  { key: "employeeSalary", modelCode: "M2-12", label: "うち従業員の給与", unit: "千円", indentLevel: 2, get: employeeSalary, set: (s, v) => { const nextPay = v + employeeBonus(s); return preserveOtherSgaTotal(s, { employeeSalary: v, employeePay: nextPay }, nextPay - s.employeePay); } },
+  { key: "employeeBonus", modelCode: "M2-13", label: "うち従業員の賞与", unit: "千円", indentLevel: 2, get: employeeBonus, set: (s, v) => { const nextPay = employeeSalary(s) + v; return preserveOtherSgaTotal(s, { employeeBonus: v, employeePay: nextPay }, nextPay - s.employeePay); } },
+  { key: "sgaDepreciation", modelCode: "M2-14", label: "うち減価償却費", unit: "千円", indentLevel: 1, get: sgaDepreciation, set: (s, v) => preserveOtherSgaTotal(s, { sgaDepreciation: v, depreciation: cogsDepreciation(s) + v }, v - sgaDepreciation(s)) },
+  { key: "researchDevelopment", modelCode: "M2-15", label: "うち研究開発費", unit: "千円", indentLevel: 1, get: researchDevelopment, set: (s, v) => preserveOtherSgaTotal(s, { researchDevelopment: v }, v - researchDevelopment(s)) },
+  { key: "ordinaryIncome", modelCode: "M2-18", label: "経常利益", unit: "千円", get: ordinaryIncome, set: (_s, v) => ({ ordinaryIncome: v }) },
+  { key: "preTaxIncome", modelCode: "M2-19", label: "税引前当期純利益", unit: "千円", get: preTaxIncome, set: (_s, v) => ({ preTaxIncome: v }) },
+  { key: "netIncome", modelCode: "M2-20", label: "当期純利益", unit: "千円", get: netIncome, set: (_s, v) => ({ netIncome: v }) },
   { key: "headcount", modelCode: "M2-27", label: "常時使用する従業員数（就業時間換算）", unit: "人", digits: 0, get: (s) => s.headcount, set: (_s, v) => ({ headcount: Math.max(0, Math.round(v)) }) },
   { key: "officerCount", modelCode: "M2-28", label: "役員数", unit: "人", digits: 0, get: (s) => s.officerCount, set: (_s, v) => ({ officerCount: Math.max(0, Math.round(v)) }) },
 ];
@@ -442,26 +443,26 @@ const segmentEbitda = (segment: SegmentPlan) => operatingProfit(segment) + segme
 
 const otherPlCalculatedFields: OtherPlCalculatedField[] = [
   { key: "salesGrowth", modelCode: "M2-2", label: "売上高成長率", unit: "%", indentLevel: 1, get: (rows, index) => segmentGrowth(rows[index].other.sales, index ? rows[index - 1].other.sales : undefined) },
-  { key: "grossProfit", modelCode: "M2-5", label: "売上総利益", unit: "億円", get: (rows, index) => rows[index].other.sales - rows[index].other.cogs },
+  { key: "grossProfit", modelCode: "M2-5", label: "売上総利益", unit: "千円", get: (rows, index) => rows[index].other.sales - rows[index].other.cogs },
   { key: "grossProfitMargin", modelCode: "M2-6", label: "売上総利益率", unit: "%", indentLevel: 1, get: (rows, index) => { const segment = rows[index].other; return segmentRate(segment.sales - segment.cogs, segment.sales); } },
-  { key: "officerPay", modelCode: "M2-8", label: "うち役員の人件費", unit: "億円", indentLevel: 1, get: (rows, index) => rows[index].other.officerPay },
-  { key: "employeePay", modelCode: "M2-11", label: "うち従業員の人件費", unit: "億円", indentLevel: 1, get: (rows, index) => rows[index].other.employeePay },
-  { key: "operatingProfit", modelCode: "M2-16", label: "営業利益", unit: "億円", get: (rows, index) => operatingProfit(rows[index].other) },
+  { key: "officerPay", modelCode: "M2-8", label: "うち役員の人件費", unit: "千円", indentLevel: 1, get: (rows, index) => rows[index].other.officerPay },
+  { key: "employeePay", modelCode: "M2-11", label: "うち従業員の人件費", unit: "千円", indentLevel: 1, get: (rows, index) => rows[index].other.employeePay },
+  { key: "operatingProfit", modelCode: "M2-16", label: "営業利益", unit: "千円", get: (rows, index) => operatingProfit(rows[index].other) },
   { key: "operatingProfitMargin", modelCode: "M2-17", label: "営業利益率", unit: "%", indentLevel: 1, get: (rows, index) => { const segment = rows[index].other; return segmentRate(operatingProfit(segment), segment.sales); } },
-  { key: "nonOperatingProfitLoss", modelCode: "M2-17A", label: "営業外損益（純額）", unit: "億円", indentLevel: 1, get: (rows, index) => nonOperatingProfitLoss(rows[index].other) },
-  { key: "extraordinaryProfitLoss", modelCode: "M2-18A", label: "特別損益（純額）", unit: "億円", indentLevel: 1, get: (rows, index) => extraordinaryProfitLoss(rows[index].other) },
-  { key: "employeePayTotal", modelCode: "M2-21", label: "給与支給総額（常時使用する従業員）", unit: "億円", get: (rows, index) => rows[index].other.employeePay },
-  { key: "officerPayTotal", modelCode: "M2-22", label: "給与支給総額（役員）", unit: "億円", get: (rows, index) => rows[index].other.officerPay },
-  { key: "depreciationTotal", modelCode: "M2-23", label: "減価償却費（合計）", unit: "億円", get: (rows, index) => rows[index].other.depreciation },
-  { key: "valueAdded", modelCode: "M2-24", label: "付加価値額", unit: "億円", get: (rows, index) => valueAdded(rows[index].other) },
+  { key: "nonOperatingProfitLoss", modelCode: "M2-17A", label: "営業外損益（純額）", unit: "千円", indentLevel: 1, get: (rows, index) => nonOperatingProfitLoss(rows[index].other) },
+  { key: "extraordinaryProfitLoss", modelCode: "M2-18A", label: "特別損益（純額）", unit: "千円", indentLevel: 1, get: (rows, index) => extraordinaryProfitLoss(rows[index].other) },
+  { key: "employeePayTotal", modelCode: "M2-21", label: "給与支給総額（常時使用する従業員）", unit: "千円", get: (rows, index) => rows[index].other.employeePay },
+  { key: "officerPayTotal", modelCode: "M2-22", label: "給与支給総額（役員）", unit: "千円", get: (rows, index) => rows[index].other.officerPay },
+  { key: "depreciationTotal", modelCode: "M2-23", label: "減価償却費（合計）", unit: "千円", get: (rows, index) => rows[index].other.depreciation },
+  { key: "valueAdded", modelCode: "M2-24", label: "付加価値額", unit: "千円", get: (rows, index) => valueAdded(rows[index].other) },
   { key: "valueAddedGrowth", modelCode: "M2-25", label: "付加価値増加率", unit: "%", indentLevel: 1, get: (rows, index) => segmentGrowth(valueAdded(rows[index].other), index ? valueAdded(rows[index - 1].other) : undefined) },
   { key: "valueAddedMargin", modelCode: "M2-26", label: "売上高付加価値率", unit: "%", indentLevel: 1, get: (rows, index) => segmentRate(valueAdded(rows[index].other), rows[index].other.sales) },
-  { key: "employeePayPerPerson", modelCode: "M2-29", label: "従業員1人当たり給与支給総額", unit: "億円/人", get: (rows, index) => { const segment = rows[index].other; return segment.headcount ? segment.employeePay / segment.headcount : 0; } },
+  { key: "employeePayPerPerson", modelCode: "M2-29", label: "従業員1人当たり給与支給総額", unit: "千円/人", get: (rows, index) => { const segment = rows[index].other; return segment.headcount ? segment.employeePay / segment.headcount : 0; } },
   { key: "employeePayPerPersonGrowth", modelCode: "M2-30", label: "従業員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = rows[index].other; const previous = index ? rows[index - 1].other : undefined; return segmentGrowth(current.headcount ? current.employeePay / current.headcount : 0, previous?.headcount ? previous.employeePay / previous.headcount : undefined); } },
-  { key: "officerPayPerPerson", modelCode: "M2-31", label: "役員1人当たり給与支給総額", unit: "億円/人", get: (rows, index) => { const segment = rows[index].other; return segment.officerCount ? segment.officerPay / segment.officerCount : 0; } },
+  { key: "officerPayPerPerson", modelCode: "M2-31", label: "役員1人当たり給与支給総額", unit: "千円/人", get: (rows, index) => { const segment = rows[index].other; return segment.officerCount ? segment.officerPay / segment.officerCount : 0; } },
   { key: "officerPayPerPersonGrowth", modelCode: "M2-32", label: "役員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = rows[index].other; const previous = index ? rows[index - 1].other : undefined; return segmentGrowth(current.officerCount ? current.officerPay / current.officerCount : 0, previous?.officerCount ? previous.officerPay / previous.officerCount : undefined); } },
-  { key: "laborProductivity", modelCode: "M2-33", label: "労働生産性", unit: "億円/人", get: (rows, index) => { const segment = rows[index].other; const people = segment.headcount + segment.officerCount; return people ? valueAdded(segment) / people : 0; } },
-  { key: "ebitda", modelCode: "M2-34", label: "EBITDA", unit: "億円", get: (rows, index) => segmentEbitda(rows[index].other) },
+  { key: "laborProductivity", modelCode: "M2-33", label: "労働生産性", unit: "千円/人", get: (rows, index) => { const segment = rows[index].other; const people = segment.headcount + segment.officerCount; return people ? valueAdded(segment) / people : 0; } },
+  { key: "ebitda", modelCode: "M2-34", label: "EBITDA", unit: "千円", get: (rows, index) => segmentEbitda(rows[index].other) },
   { key: "ebitdaMargin", modelCode: "M2-35", label: "EBITDAマージン", unit: "%", indentLevel: 1, get: (rows, index) => { const segment = rows[index].other; return segmentRate(segmentEbitda(segment), segment.sales); } },
   { key: "ebitdaGrowth", modelCode: "M2-36", label: "EBITDA増加率", unit: "%", indentLevel: 1, get: (rows, index) => segmentGrowth(segmentEbitda(rows[index].other), index ? segmentEbitda(rows[index - 1].other) : undefined) },
 ];
@@ -577,6 +578,13 @@ function roundedInput(value: number, digits = 2) {
   return Math.round((value + Number.EPSILON) * factor) / factor;
 }
 
+const monetaryTargetKeys = new Set<MetricKey>([
+  "companySalesIncrease", "projectSalesIncrease", "valueAddedIncrease",
+  "employeePayIncrease", "officerPayIncrease",
+]);
+const monetaryDriverKeys = new Set<keyof Drivers>(["investment", "subsidy", "projectFirstYearSales", "projectBaseYearSales"]);
+const normalizePlanInput = (value: number, isCount = false) => isCount ? roundedInput(value, 0) : normalizeInternalMoney(value);
+
 const integerPriority = (value: number) => Math.min(10, Math.max(1, Math.round(Number.isFinite(value) ? value : 1)));
 
 function clone<T>(value: T): T {
@@ -645,7 +653,7 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
     const value = Math.abs(previousAuto) > 1e-9
       ? previousEffective * (currentAuto / previousAuto)
       : previousEffective + (currentAuto - previousAuto);
-    return roundedInput(value);
+    return normalizeInternalMoney(value);
   };
 
   for (let index = 3; index < result.length; index += 1) {
@@ -661,7 +669,7 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
       for (const legacyField of ["employeePay", "officerPay", "depreciation", "otherSga"] as const) {
         const legacyKey = forecastOverrideKey(row.year, "other", legacyField);
         if (Object.prototype.hasOwnProperty.call(overrides, legacyKey)) {
-          row.other[legacyField] = roundedInput(overrides[legacyKey]);
+          row.other[legacyField] = normalizeInternalMoney(overrides[legacyKey]);
           legacyOtherAnchors.add(legacyField);
         } else if (legacyOtherAnchors.has(legacyField)) {
           row.other[legacyField] = cascade(previousEffective.other[legacyField], previousAuto.other[legacyField], autoRow.other[legacyField]);
@@ -670,16 +678,17 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
       for (const item of otherPlInputFields) {
         const key = forecastOverrideKey(row.year, "other", item.key);
         if (Object.prototype.hasOwnProperty.call(overrides, key)) {
-          const patch = item.set(row.other, roundedInput(overrides[key], item.digits ?? 2));
+          const isCount = item.key === "headcount" || item.key === "officerCount";
+          const patch = item.set(row.other, normalizePlanInput(overrides[key], isCount));
           Object.entries(patch).forEach(([field, value]) => {
-            row.other[field as keyof SegmentPlan] = roundedInput(value ?? 0, field === "headcount" || field === "officerCount" ? 0 : 2);
+            row.other[field as keyof SegmentPlan] = normalizePlanInput(value ?? 0, field === "headcount" || field === "officerCount");
           });
           otherAnchors.add(item.key);
         } else if (otherAnchors.has(item.key)) {
           const projected = cascade(item.get(previousEffective.other), item.get(previousAuto.other), item.get(autoRow.other));
           const patch = item.set(row.other, projected);
           Object.entries(patch).forEach(([field, value]) => {
-            row.other[field as keyof SegmentPlan] = roundedInput(value ?? 0, field === "headcount" || field === "officerCount" ? 0 : 2);
+            row.other[field as keyof SegmentPlan] = normalizePlanInput(value ?? 0, field === "headcount" || field === "officerCount");
           });
         }
       }
@@ -690,14 +699,14 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
       if (Object.prototype.hasOwnProperty.call(overrides, key)) {
         const patch = item.set(row.project, overrides[key]);
         Object.entries(patch).forEach(([field, value]) => {
-          row.project[field as keyof SegmentPlan] = roundedInput(value ?? 0, item.digits ?? 2);
+          row.project[field as keyof SegmentPlan] = normalizePlanInput(value ?? 0, field === "headcount" || field === "officerCount");
         });
         if (!requiredProjectDepreciationCodes.has(item.code)) projectAnchors.add(item.code);
       } else if (!requiredProjectDepreciationCodes.has(item.code) && projectAnchors.has(item.code)) {
         const projected = cascade(item.get(previousEffective.project), item.get(previousAuto.project), item.get(autoRow.project));
         const patch = item.set(row.project, projected);
         Object.entries(patch).forEach(([field, value]) => {
-          row.project[field as keyof SegmentPlan] = roundedInput(value ?? 0, item.digits ?? 2);
+          row.project[field as keyof SegmentPlan] = normalizePlanInput(value ?? 0, field === "headcount" || field === "officerCount");
         });
       }
     }
@@ -706,16 +715,16 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
       for (const item of projectDetailedInputFields) {
         const key = forecastOverrideKey(row.year, "project", item.key);
         if (Object.prototype.hasOwnProperty.call(overrides, key)) {
-          const patch = item.set(row.project, roundedInput(overrides[key], item.digits ?? 2));
+          const patch = item.set(row.project, normalizePlanInput(overrides[key], item.code === "7-13" || item.code === "7-14"));
           Object.entries(patch).forEach(([field, value]) => {
-            row.project[field as keyof SegmentPlan] = roundedInput(value ?? 0, field === "headcount" || field === "officerCount" ? 0 : 2);
+            row.project[field as keyof SegmentPlan] = normalizePlanInput(value ?? 0, field === "headcount" || field === "officerCount");
           });
           if (!requiredProjectDepreciationDetailedKeys.has(item.key)) projectAnchors.add(item.key);
         } else if (!requiredProjectDepreciationDetailedKeys.has(item.key) && projectAnchors.has(item.key)) {
           const projected = cascade(item.get(previousEffective.project), item.get(previousAuto.project), item.get(autoRow.project));
           const patch = item.set(row.project, projected);
           Object.entries(patch).forEach(([field, value]) => {
-            row.project[field as keyof SegmentPlan] = roundedInput(value ?? 0, field === "headcount" || field === "officerCount" ? 0 : 2);
+            row.project[field as keyof SegmentPlan] = normalizePlanInput(value ?? 0, field === "headcount" || field === "officerCount");
           });
         }
       }
@@ -729,14 +738,14 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
       const autoPreTax = preTaxIncome(autoCompany);
       const autoNet = netIncome(autoCompany);
       const afterTaxRatio = autoPreTax ? autoNet / autoPreTax : 1 - drivers.effectiveTaxRate;
-      row.other.ordinaryIncome = roundedInput(autoOrdinary + operatingDelta - ordinaryIncome(row.project));
-      row.other.preTaxIncome = roundedInput(autoPreTax + operatingDelta - preTaxIncome(row.project));
-      row.other.netIncome = roundedInput(autoNet + operatingDelta * afterTaxRatio - netIncome(row.project));
+      row.other.ordinaryIncome = normalizeInternalMoney(autoOrdinary + operatingDelta - ordinaryIncome(row.project));
+      row.other.preTaxIncome = normalizeInternalMoney(autoPreTax + operatingDelta - preTaxIncome(row.project));
+      row.other.netIncome = normalizeInternalMoney(autoNet + operatingDelta * afterTaxRatio - netIncome(row.project));
       for (const item of companyActualInputRows.filter((candidate) => candidate.set)) {
         const key = forecastOverrideKey(row.year, "company", item.code);
         let companyValue: number | undefined;
         if (Object.prototype.hasOwnProperty.call(overrides, key)) {
-          companyValue = roundedInput(overrides[key]);
+          companyValue = normalizePlanInput(overrides[key], item.unit === "人");
           companyAnchors.add(item.code);
         } else if (companyAnchors.has(item.code)) {
           companyValue = cascade(item.get(result, index - 1)!, item.get(plan, index - 1)!, item.get(plan, index)!);
@@ -744,7 +753,7 @@ function applyForecastOverrides(plan: YearPlan[], overrides: ForecastOverrides, 
         if (companyValue !== undefined) {
           const patch = item.set!(row, companyValue);
           Object.entries(patch).forEach(([field, residual]) => {
-            row.other[field as keyof SegmentPlan] = roundedInput(residual ?? 0);
+            row.other[field as keyof SegmentPlan] = normalizePlanInput(residual ?? 0, field === "headcount" || field === "officerCount");
           });
         }
       }
@@ -1244,7 +1253,7 @@ export default function Home() {
         targets.set(`balanceSheet.${period}.${item.code}`, {
           id: `balanceSheet.${period}.${item.code}`,
           label: `${YEAR_ROLE_LABELS[history.role]} B/S ${item.code} ${item.label}`,
-          unit: "億円",
+          unit: "千円",
           writable: true,
           value: hasInputValue(inputValues, key) ? inputValues[key] : null,
         });
@@ -1254,7 +1263,7 @@ export default function Home() {
         targets.set(`companyPL.${period}.${item.code}`, {
           id: `companyPL.${period}.${item.code}`,
           label: `${YEAR_ROLE_LABELS[history.role]} 全社PL ${item.code} ${item.label}`,
-          unit: item.unit === "%" ? "%" : item.unit === "人" ? "人" : "億円",
+          unit: item.unit === "%" ? "%" : item.unit === "人" ? "人" : "千円",
           writable: true,
           value: hasInputValue(inputValues, key) ? inputValues[key] : null,
         });
@@ -1264,7 +1273,7 @@ export default function Home() {
         targets.set(`projectPL.${period}.${item.code}`, {
           id: `projectPL.${period}.${item.code}`,
           label: `${YEAR_ROLE_LABELS[history.role]} 補助事業PL ${item.code} ${item.label}`,
-          unit: item.unit === "人" ? "人" : "億円",
+          unit: item.unit === "人" ? "人" : "千円",
           writable: true,
           value: hasInputValue(inputValues, key) ? inputValues[key] : null,
         });
@@ -1478,6 +1487,7 @@ export default function Home() {
       inputValues: clone(inputValues),
       metricGroupBases: clone(metricGroupBases),
       applicationCategory,
+      moneyUnit: INTERNAL_MONEY_UNIT,
     };
   }
 
@@ -1514,6 +1524,7 @@ export default function Home() {
   }
 
   function applyProposal(proposal: ProposalData) {
+    proposal = normalizeProposalMoneyUnit(proposal);
     clearAdjustment();
     const importedDrivers = { ...defaultDrivers, ...clone(proposal.drivers) };
     const importedAdjustedDrivers = proposal.adjustedDrivers
@@ -1840,13 +1851,13 @@ export default function Home() {
 
   function updateHistorical(yearIndex: number, segment: SegmentKey, field: keyof SegmentPlan, value: number) {
     clearAdjustment();
-    const digits = field === "headcount" || field === "officerCount" ? 0 : 2;
-    const roundedValue = roundedInput(value, digits);
+    const isCount = field === "headcount" || field === "officerCount";
+    const roundedValue = normalizePlanInput(value, isCount);
     setHistoricalPlan((current) => current.map((row, index) => {
       if (index !== yearIndex) return row;
       if (segment === "project") {
         const companyValue = row.project[field] + row.other[field];
-        return { ...row, project: { ...row.project, [field]: roundedValue }, other: { ...row.other, [field]: roundedInput(companyValue - roundedValue, digits) } };
+        return { ...row, project: { ...row.project, [field]: roundedValue }, other: { ...row.other, [field]: normalizePlanInput(companyValue - roundedValue, isCount) } };
       }
       return { ...row, other: { ...row.other, [field]: roundedValue } };
     }));
@@ -1854,19 +1865,20 @@ export default function Home() {
 
   function updateHistoricalProjectOfficial(yearIndex: number, item: ProjectOfficialInputRow, inputValue: number | null) {
     clearAdjustment();
-    setInputValues((current) => setInputValue(current, inputKey.projectActual(historicalPlan[yearIndex].year, item.code), inputValue === null ? null : roundedInput(inputValue, item.digits ?? 2)));
+    const isCount = item.code === "7-13" || item.code === "7-14";
+    setInputValues((current) => setInputValue(current, inputKey.projectActual(historicalPlan[yearIndex].year, item.code), inputValue === null ? null : normalizePlanInput(inputValue, isCount)));
     setHistoricalPlan((current) => current.map((row, index) => {
       if (index !== yearIndex) return row;
-      const patch = item.set(row.project, roundedInput(inputValue ?? 0, item.digits ?? 2));
+      const patch = item.set(row.project, normalizePlanInput(inputValue ?? 0, isCount));
       const nextProject = { ...row.project };
       const nextOther = { ...row.other };
       Object.entries(patch).forEach(([rawField, rawValue]) => {
         const field = rawField as keyof SegmentPlan;
-        const digits = field === "headcount" || field === "officerCount" ? 0 : 2;
+        const fieldIsCount = field === "headcount" || field === "officerCount";
         const previousProjectValue = Number(row.project[field] ?? 0);
-        const nextProjectValue = roundedInput(rawValue ?? 0, digits);
+        const nextProjectValue = normalizePlanInput(rawValue ?? 0, fieldIsCount);
         nextProject[field] = nextProjectValue;
-        nextOther[field] = roundedInput(Number(row.other[field] ?? 0) + previousProjectValue - nextProjectValue, digits);
+        nextOther[field] = normalizePlanInput(Number(row.other[field] ?? 0) + previousProjectValue - nextProjectValue, fieldIsCount);
       });
       return { ...row, project: nextProject, other: nextOther };
     }));
@@ -1875,20 +1887,20 @@ export default function Home() {
   function updateHistoricalCompanyOfficial(yearIndex: number, item: CompanyActualInputRow, inputValue: number | null) {
     if (!item.set) return;
     clearAdjustment();
-    const digits = item.unit === "人" ? 0 : 2;
-    setInputValues((current) => setInputValue(current, inputKey.companyActual(historicalPlan[yearIndex].year, item.code), inputValue === null ? null : roundedInput(inputValue, digits)));
+    const isCount = item.unit === "人";
+    setInputValues((current) => setInputValue(current, inputKey.companyActual(historicalPlan[yearIndex].year, item.code), inputValue === null ? null : normalizePlanInput(inputValue, isCount)));
     setHistoricalPlan((current) => current.map((row, index) => {
       if (index !== yearIndex) return row;
       if (inputValue === null && ["2-18", "2-19", "2-20"].includes(item.code)) {
         const field = ({ "2-18": "ordinaryIncome", "2-19": "preTaxIncome", "2-20": "netIncome" } as const)[item.code as "2-18" | "2-19" | "2-20"];
         return { ...row, other: { ...row.other, [field]: undefined } };
       }
-      const patch = item.set!(row, roundedInput(inputValue ?? 0, digits));
+      const patch = item.set!(row, normalizePlanInput(inputValue ?? 0, isCount));
       return {
         ...row,
         other: {
           ...row.other,
-          ...Object.fromEntries(Object.entries(patch).map(([field, residual]) => [field, roundedInput(residual ?? 0, field === "headcount" || field === "officerCount" ? 0 : 2)])),
+          ...Object.fromEntries(Object.entries(patch).map(([field, residual]) => [field, normalizePlanInput(residual ?? 0, field === "headcount" || field === "officerCount")])),
         },
       };
     }));
@@ -1896,18 +1908,18 @@ export default function Home() {
 
   function updateBalanceSheet(yearIndex: number, field: keyof BalanceSheetPlan, value: number | null) {
     clearAdjustment();
-    setInputValues((current) => setInputValue(current, inputKey.balanceSheet(balanceSheets[yearIndex].year, field), value === null ? null : roundedInput(value)));
-    setBalanceSheets((current) => current.map((row, index) => index === yearIndex ? { ...row, [field]: roundedInput(value ?? 0) } : row));
+    setInputValues((current) => setInputValue(current, inputKey.balanceSheet(balanceSheets[yearIndex].year, field), value === null ? null : normalizeInternalMoney(value)));
+    setBalanceSheets((current) => current.map((row, index) => index === yearIndex ? { ...row, [field]: normalizeInternalMoney(value ?? 0) } : row));
   }
 
   function updateFutureCapex(yearIndex: number, value: number | null) {
     clearAdjustment();
     setFutureCapex((current) => {
-      const next = current.map((row, index) => index === yearIndex ? { ...row, value: roundedInput(value ?? 0) } : row);
+      const next = current.map((row, index) => index === yearIndex ? { ...row, value: normalizeInternalMoney(value ?? 0) } : row);
       setInputValues((values) => setInputValue(
         values,
         inputKey.futureCapex(next[yearIndex].year),
-        value === null ? null : roundedInput(value),
+        value === null ? null : normalizeInternalMoney(value),
       ));
       return next;
     });
@@ -1961,7 +1973,7 @@ export default function Home() {
     setForecastOverrides((current) => {
       const next = { ...current };
       if (value === null) delete next[key];
-      else next[key] = roundedInput(value, integerValue ? 0 : 2);
+      else next[key] = normalizePlanInput(value, integerValue);
       return next;
     });
   }
@@ -1978,16 +1990,17 @@ export default function Home() {
 
   function updateTargetBound(key: MetricKey, bound: "value" | "max", value: number | null) {
     clearAdjustment();
-    setInputValues((current) => setInputValue(current, inputKey.target(key, bound), value === null ? null : roundedInput(value)));
+    const normalized = value === null ? null : monetaryTargetKeys.has(key) ? normalizeInternalMoney(value) : roundedInput(value);
+    setInputValues((current) => setInputValue(current, inputKey.target(key, bound), normalized));
     setTargets((current) => ({
       ...current,
-      [key]: { ...current[key], [bound]: value === null ? (bound === "max" ? undefined : 0) : roundedInput(value) },
+      [key]: { ...current[key], [bound]: normalized === null ? (bound === "max" ? undefined : 0) : normalized },
     }));
   }
 
   function updateDriver(key: keyof Drivers, value: number | null) {
     clearAdjustment();
-    const numericValue = normalizeDriverValueForRequirements(key, value ?? 0);
+    const numericValue = normalizeDriverValueForRequirements(key, monetaryDriverKeys.has(key) ? normalizeInternalMoney(value ?? 0) : value ?? 0);
     setInputValues((current) => setInputValue(current, inputKey.driver(key), value === null ? null : numericValue));
     setDrivers((current) => ({ ...current, [key]: numericValue }));
   }
@@ -1995,7 +2008,7 @@ export default function Home() {
   function updateDriverRange(key: keyof Drivers, boundIndex: 0 | 1, displayValue: number | null) {
     clearAdjustment();
     const fallback = driverBounds[key][boundIndex];
-    const value = displayValue === null ? fallback : percentDriver(key) ? displayValue / 100 : displayValue;
+    const value = displayValue === null ? fallback : percentDriver(key) ? displayValue / 100 : normalizeInternalMoney(displayValue);
     const nextRange: [number, number] = [...driverRanges[key]];
     nextRange[boundIndex] = value;
     if (
@@ -2275,7 +2288,7 @@ export default function Home() {
           min={key === "investment" || key === "subsidy" ? 0 : undefined}
           aria-label={`${info.label} 固定値`}
           aria-invalid={constraintError ? "true" : undefined}
-          step={info.step}
+          step={monetaryDriverKeys.has(key) ? 1 : info.step}
           value={driverDirectDisplayValue(key)}
           placeholder="未設定"
           onChange={(event) => updateDriver(key, event.target.value === "" ? null : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))}
@@ -2286,8 +2299,8 @@ export default function Home() {
     }
     return <td className="driver-period-range" colSpan={2}>
       <div className="driver-period-range-grid">
-        <input aria-label={`${info.label} 許容下限`} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />
-        <input aria-label={`${info.label} 許容上限`} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />
+        <input aria-label={`${info.label} 許容下限`} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={monetaryDriverKeys.has(key) ? 1 : info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />
+        <input aria-label={`${info.label} 許容上限`} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={monetaryDriverKeys.has(key) ? 1 : info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />
         {resultValue !== null && <small className="adjusted-value">結果 {number(resultValue, 2)}</small>}
       </div>
     </td>;
@@ -2301,7 +2314,7 @@ export default function Home() {
         type="number"
         aria-label={`${info.label} 固定値`}
         aria-invalid={constraintError ? "true" : undefined}
-        step={info.step}
+        step={monetaryDriverKeys.has(key) ? 1 : info.step}
         value={driverDirectDisplayValue(key)}
         placeholder="未設定"
         onChange={(event) => updateDriver(key, event.target.value === "" ? null : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))}
@@ -2500,8 +2513,8 @@ export default function Home() {
             <div className="score-ring"><strong>{achieved}</strong><span>/ {targetManagedMetrics.length}</span><small>最適化対象の範囲内</small></div>
           </div>
 
-          <div className="stat-card"><span>全社売上高</span><strong>{number(total(report3.project, report3.other).sales)} 億円</strong><small>事業化報告3年目 {report3.year}</small></div>
-          <div className="stat-card"><span>補助事業付加価値増加</span><strong>{number(actual.valueAddedIncrease)} 億円</strong><small>基準年比</small></div>
+          <div className="stat-card"><span>全社売上高</span><strong>{number(total(report3.project, report3.other).sales, 0)} 千円</strong><small>事業化報告3年目 {report3.year}</small></div>
+          <div className="stat-card"><span>補助事業付加価値増加</span><strong>{number(actual.valueAddedIncrease, 0)} 千円</strong><small>基準年比</small></div>
           <div className="stat-card"><span>補助金1円当たり効果</span><strong>{number(actual.valueAddedSubsidyRatio, 0)}%</strong><small>{hasInputValue(inputValues, inputKey.target("valueAddedSubsidyRatio", "value")) ? `目標 ${number(targets.valueAddedSubsidyRatio.value, 0)}%` : "目標 未設定"}</small></div>
 
           <DiagnosticCharts plan={plan} />
@@ -2570,7 +2583,7 @@ export default function Home() {
             <div className="panel-heading"><div><h2>1-1～1-25 貸借対照表等（過去3期）</h2></div><span className="pill green">公式番号に準拠</span></div>
             <p className="balance-sheet-display-note">{omitSimulationUnusedBalanceSheet ? "過去の投資水準として使用する1-24だけを表示しています。入力済みのB/S値は保持されます。" : "第6次様式に沿ってB/S全項目を表示しています。"}</p>
             <BalanceSheetEditor balanceSheets={balanceSheets} historical={historicalPlan} inputValues={inputValues} omitUnused={omitSimulationUnusedBalanceSheet} onToggleUnused={setOmitSimulationUnusedBalanceSheet} onChange={updateBalanceSheet} />
-            <p className="footnote">{omitSimulationUnusedBalanceSheet ? "シミュレーションは1-24だけで実行できます。第6次申請書・提案書を完成させる場合は、チェックを外してB/S全項目を入力してください。" : "B/S残高の1-1～1-23・1-25と、過去実績の1-24を入力します。将来の1-24 新規設備投資による支出は「将来データ入力」の冒頭へ移しました。金額単位は億円です。"}</p>
+            <p className="footnote">{omitSimulationUnusedBalanceSheet ? "シミュレーションは1-24だけで実行できます。第6次申請書・提案書を完成させる場合は、チェックを外してB/S全項目を入力してください。" : "B/S残高の1-1～1-23・1-25と、過去実績の1-24を入力します。将来の1-24 新規設備投資による支出は「将来データ入力」の冒頭へ移しました。金額単位は千円です。"}</p>
           </article>
           <article className="panel formula-panel">
             <h2>B/SとP/Lの連動方針</h2>
@@ -2586,7 +2599,7 @@ export default function Home() {
         <section className="content-stack">
           <div className="section-intro"><div><h2>自動予測を確認し、必要なセルだけ上書き</h2></div><p>青枠の空欄には原則として自動予測値を表示します。ただし、P2-4・P2-14の減価償却費は年度別の必須入力で、空欄は「未入力」として扱います。</p></div>
           <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。直前の変更はCtrl＋Zで戻せます。</p>
-          <article className="panel table-panel"><div className="panel-heading"><div><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">{futureCapex.some((row) => hasInputValue(inputValues, inputKey.futureCapex(row.year))) ? `入力合計 ${number(futureCapex.reduce((sum, row) => sum + row.value, 0), 2)} 億円` : "年度別計画 未入力"}</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} inputValues={inputValues} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。年度別設備投資は補助事業投資額から自動配分しません。事業計画に基づく各年度の金額を入力してください。入力値は設備投資に関する診断へ反映します。</p></article>
+          <article className="panel table-panel"><div className="panel-heading"><div><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">{futureCapex.some((row) => hasInputValue(inputValues, inputKey.futureCapex(row.year))) ? `入力合計 ${number(futureCapex.reduce((sum, row) => sum + row.value, 0), 0)} 千円` : "年度別計画 未入力"}</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} inputValues={inputValues} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。年度別設備投資は補助事業投資額から自動配分しません。事業計画に基づく各年度の金額を入力してください。入力値は設備投資に関する診断へ反映します。</p></article>
           <article className="panel table-panel"><div className="panel-heading"><div><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">P2-4・P2-14は必須入力</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>公式様式を直接作るか、事業別の詳細PLを積み上げるかを選びます</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>ベース事業PLを入力</button></div></div>{missingAccountingAssumptions.length ? <p className="default-note" role="alert">②15指標・目標で「会計内訳・利益前提」を設定してください。給与・賞与、役員報酬・賞与、研究開発費、営業外損益、特別損益、税率が未設定のまま将来PLを補完することはありません。減価償却費は③将来データ入力でP2-4とP2-14を直接入力します。</p> : <FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} drivers={calculationDrivers} onForecastChange={updateForecastOverride} />}<p className="footnote">「全社PLを入力」は、会社全体2-1～2-36と補助事業7-1～7-20・内部管理P2-Xを入力して公式Excelを完成させる方式です。「ベース事業PLを入力」は、補助事業とベース事業を同じ詳細項目で入力し、合計から会社全体PLを作る方式です。</p></article>
           <div className="workflow-actions"><div><span>上書きしたセルを固定して再最適化できます。再最適化後もこの画面に留まります。</span>{adjustedPlan && <p className="solve-note">{solveNote}</p>}</div><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("targets")}>← 15指標・目標へ戻る</button><button className="solve-button" disabled={isSolving} aria-busy={isSolving} onClick={() => void solve()}>{isSolving ? "計算中…" : "上書き内容を反映して再最適化"}</button><button className="reset-button" onClick={() => goToView("pl")}>年度別PLへ →</button></div></div>
         </section>
@@ -2631,7 +2644,7 @@ export default function Home() {
                   const adjustable = keys.some((key) => adjustableDriverKeys.includes(key));
                   const launchSalesAmountRow = launchSalesGrowthRow
                     ? <tr className="driver-adjustable project-launch-sales-row" key={`${group.label}-${rowIndex}-sales`}>
-                      <th><span className="driver-item-code">C-1A／C-1B:</span> 補助事業 売上高<small>億円／設備導入初年度・基準年度の許容範囲</small></th>
+                      <th><span className="driver-item-code">C-1A／C-1B:</span> 補助事業 売上高<small>千円／設備導入初年度・基準年度の許容範囲</small></th>
                       <td className="statutory-condition">—</td>
                       {historicalPlan.slice(1).map((row) => <td className="driver-history" key={`project-launch-sales-${row.year}`}>—</td>)}
                       {renderDriverPeriodCells("projectFirstYearSales")}
@@ -2683,7 +2696,7 @@ export default function Home() {
                 if (isSixthRoundReferenceMetric(definition.key)) return <tr className="reference-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>第6次評価対象外</small><span className="metric-role-badge reference">参考値</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{historicalPlan[historyIndex - 1]?.year}→{historicalPlan[historyIndex].year}（1年間）／{definition.unit}</small>{scaleDependent && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears)} {definition.unit}</small>}</> : "—"}</td>).slice(1)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{number(actual[definition.key])} {definition.unit}</td><td className="statutory-condition">—</td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">参考値</span></td></tr>;
                 const rowClass = basisRole === "result" ? "metric-result-row" : basisRole === "basis" ? "metric-basis-row" : "metric-independent-row";
                 const roleLabel = basisRole === "result" ? "自動算出" : basisRole === "basis" ? "目標設定" : "個別に目標設定";
-                return <tr className={rowClass} key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>{definition.sourceRound}</small><span className={`metric-role-badge ${basisRole}`}>{roleLabel}</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{history.mode === "change" ? `${historicalPlan[historyIndex - 1]?.year}→${historicalPlan[historyIndex].year}（1年間）／${definition.unit}` : definition.unit}</small>{scaleDependent && history.mode === "change" && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears)} {definition.unit}</small>}</> : "—"}</td>).slice(1)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key])} →</small>}{number(actual[definition.key])} {definition.unit}</td><td className="statutory-condition"><strong>{metricRequirementLabel(definition.key, applicationCategory)}</strong></td><td><input disabled={basisRole === "result"} aria-label={`${definition.label}目標値`} type="number" step="0.1" value={getInputValue(inputValues, inputKey.target(definition.key, "value"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "value", event.target.value === "" ? null : Number(event.target.value))} /></td><td><input disabled={basisRole === "result"} type="number" min="1" max="10" step="1" value={integerPriority(target.weight)} onChange={(event) => updateTarget(definition.key, { weight: integerPriority(Number(event.target.value)) })} /></td><td className="target-judgement"><span className={`result-badge ${basisRole === "result" || !targetSet || status.ok ? "ok" : "bad"}`}>{basisRole === "result" ? "自動算出" : !targetSet ? "未設定" : status.ok ? "目標達成" : "目標未達"}</span></td></tr>;
+                return <tr className={rowClass} key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>{definition.sourceRound}</small><span className={`metric-role-badge ${basisRole}`}>{roleLabel}</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value, monetaryTargetKeys.has(definition.key) ? 0 : 1)}</strong><small>{history.mode === "change" ? `${historicalPlan[historyIndex - 1]?.year}→${historicalPlan[historyIndex].year}（1年間）／${definition.unit}` : definition.unit}</small>{scaleDependent && history.mode === "change" && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears, monetaryTargetKeys.has(definition.key) ? 0 : 1)} {definition.unit}</small>}</> : "—"}</td>).slice(1)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key], monetaryTargetKeys.has(definition.key) ? 0 : 1)} →</small>}{number(actual[definition.key], monetaryTargetKeys.has(definition.key) ? 0 : 1)} {definition.unit}</td><td className="statutory-condition"><strong>{metricRequirementLabel(definition.key, applicationCategory)}</strong></td><td><input disabled={basisRole === "result"} aria-label={`${definition.label}目標値`} type="number" step={monetaryTargetKeys.has(definition.key) ? 1 : 0.1} value={getInputValue(inputValues, inputKey.target(definition.key, "value"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "value", event.target.value === "" ? null : Number(event.target.value))} /></td><td><input disabled={basisRole === "result"} type="number" min="1" max="10" step="1" value={integerPriority(target.weight)} onChange={(event) => updateTarget(definition.key, { weight: integerPriority(Number(event.target.value)) })} /></td><td className="target-judgement"><span className={`result-badge ${basisRole === "result" || !targetSet || status.ok ? "ok" : "bad"}`}>{basisRole === "result" ? "自動算出" : !targetSet ? "未設定" : status.ok ? "目標達成" : "目標未達"}</span></td></tr>;
               })}
             </tbody></table></div>
             <p className="footnote round5-source-note">第5次公式参考値は、申請者全体と採択者の公表代表値です。原則は中央値ですが、「補助事業売上高／全社売上高」のみ平均値です。役員関連2指標は第5次に公表値がありません。<a href="https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公式資料 ↗</a></p>
@@ -2818,12 +2831,12 @@ function BalanceSheetEditor({ balanceSheets, historical, inputValues, omitUnused
   const visibleRows = omitCalculated ? scopeRows.filter((item) => item.field) : scopeRows;
   return <>
     <h3 className="manual-table-heading"><span>貸借対照表等（1-1～1-25：過去3期実績）</span><div className="balance-sheet-heading-actions"><button type="button" className="calculated-row-toggle balance-sheet-unused-toggle" aria-pressed={omitUnused} onClick={() => onToggleUnused(!omitUnused)}>{omitUnused ? "B/S全項目を表示する" : "シミュレーションに使わないB/S項目を省略する"}</button><button type="button" className="calculated-row-toggle" aria-pressed={omitCalculated} disabled={omitUnused} onClick={() => setOmitCalculated((current) => !current)}>{omitCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></div></h3>
-    <div className="wide-table balance-sheet-table spreadsheet-grid actuals-three-year-table"><table><thead><tr><th>第6次様式項目（億円）</th>{balanceSheets.map((row, index) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[historical[index].role]}</small></th>)}</tr></thead><tbody>{visibleRows.map((item) => <tr className={!item.field ? "emphasis" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.percent && <small>%</small>}{item.multiple && <small>倍</small>}</th>{balanceSheets.map((row, index) => <td key={row.year}>{item.field ? <input type="number" step="0.01" value={getInputValue(inputValues, inputKey.balanceSheet(row.year, item.field))} placeholder="未入力" onChange={(event) => onChange(index, item.field!, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{number(item.value!(row, index), 2)}</strong>}</td>)}</tr>)}</tbody></table></div>
+    <div className="wide-table balance-sheet-table spreadsheet-grid actuals-three-year-table"><table><thead><tr><th>第6次様式項目（千円）</th>{balanceSheets.map((row, index) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[historical[index].role]}</small></th>)}</tr></thead><tbody>{visibleRows.map((item) => <tr className={!item.field ? "emphasis" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.percent && <small>%</small>}{item.multiple && <small>倍</small>}</th>{balanceSheets.map((row, index) => <td key={row.year}>{item.field ? <input type="number" step="1" value={getInputValue(inputValues, inputKey.balanceSheet(row.year, item.field))} placeholder="未入力" onChange={(event) => onChange(index, item.field!, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{number(item.value!(row, index), item.percent || item.multiple ? 2 : 0)}</strong>}</td>)}</tr>)}</tbody></table></div>
   </>;
 }
 
 function FutureCapexEditor({ balanceSheets, historical, futureCapex, inputValues, onChange }: { balanceSheets: BalanceSheetPlan[]; historical: YearPlan[]; futureCapex: { year: number; value: number }[]; inputValues: InputValues; onChange: (yearIndex: number, value: number | null) => void }) {
-  return <div className="wide-table spreadsheet-grid future-capex-table"><table><thead><tr><th>第6次様式項目（億円）</th>{balanceSheets.map((row, index) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[historical[index].role]}・参照</small></th>)}{futureCapex.map((row) => <th className="forecast-heading" key={row.year}>{row.year}<small>将来計画・入力</small></th>)}</tr></thead><tbody><tr><th>1-24 新規設備投資による支出</th>{balanceSheets.map((row) => <td className="historical-reference" key={row.year}><strong>{hasInputValue(inputValues, inputKey.balanceSheet(row.year, "capex")) ? number(row.capex, 2) : "—"}</strong></td>)}{futureCapex.map((row, index) => <td key={row.year}><input type="number" step="0.01" value={getInputValue(inputValues, inputKey.futureCapex(row.year))} placeholder="未入力" onChange={(event) => onChange(index, event.target.value === "" ? null : Number(event.target.value))} /></td>)}</tr></tbody></table></div>;
+  return <div className="wide-table spreadsheet-grid future-capex-table"><table><thead><tr><th>第6次様式項目（千円）</th>{balanceSheets.map((row, index) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[historical[index].role]}・参照</small></th>)}{futureCapex.map((row) => <th className="forecast-heading" key={row.year}>{row.year}<small>将来計画・入力</small></th>)}</tr></thead><tbody><tr><th>1-24 新規設備投資による支出</th>{balanceSheets.map((row) => <td className="historical-reference" key={row.year}><strong>{hasInputValue(inputValues, inputKey.balanceSheet(row.year, "capex")) ? number(row.capex, 0) : "—"}</strong></td>)}{futureCapex.map((row, index) => <td key={row.year}><input type="number" step="1" value={getInputValue(inputValues, inputKey.futureCapex(row.year))} placeholder="未入力" onChange={(event) => onChange(index, event.target.value === "" ? null : Number(event.target.value))} /></td>)}</tr></tbody></table></div>;
 }
 
 function companyEbitda(row: YearPlan) {
@@ -2832,19 +2845,19 @@ function companyEbitda(row: YearPlan) {
 }
 
 function ManualEditor({ plan, onChange }: { plan: YearPlan[]; onChange: (yearIndex: number, segment: SegmentKey, field: keyof SegmentPlan, value: number) => void }) {
-  return <div className="manual-sections">{(["project", "other"] as SegmentKey[]).map((segment) => <div key={segment}><h3>{segment === "project" ? "補助事業PL" : "ベース事業PL"}</h3><div className="wide-table"><table><thead><tr><th>{segment === "other" ? "内部管理番号・項目" : "モデル入力項目"}</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{plFields.map((field) => <tr key={field.key}><th>{segment === "other" ? `${field.modelCode} ` : ""}{field.label}<small>{field.unit}</small></th>{plan.map((row, index) => <td key={row.year}><input type="number" step="0.1" value={row[segment][field.key]} onChange={(event) => onChange(index, segment, field.key, Number(event.target.value))} /></td>)}</tr>)}</tbody></table></div></div>)}</div>;
+  return <div className="manual-sections">{(["project", "other"] as SegmentKey[]).map((segment) => <div key={segment}><h3>{segment === "project" ? "補助事業PL" : "ベース事業PL"}</h3><div className="wide-table"><table><thead><tr><th>{segment === "other" ? "内部管理番号・項目" : "モデル入力項目"}</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{plFields.map((field) => <tr key={field.key}><th>{segment === "other" ? `${field.modelCode} ` : ""}{field.label}<small>{field.unit}</small></th>{plan.map((row, index) => <td key={row.year}><input type="number" step="1" value={row[segment][field.key]} onChange={(event) => onChange(index, segment, field.key, Number(event.target.value))} /></td>)}</tr>)}</tbody></table></div></div>)}</div>;
 }
 
 type ProjectOfficialInputRow = { code: string; label: string; unit: string; digits?: number; indentLevel?: 1 | 2; get: (segment: SegmentPlan) => number; set: (segment: SegmentPlan, value: number) => Partial<SegmentPlan> };
 
 const projectOfficialInputRows: ProjectOfficialInputRow[] = [
-  { code: "7-1", label: "売上高", unit: "億円", get: (s) => s.sales, set: (_s, v) => ({ sales: v }) },
-  { code: "7-4", label: "売上総利益", unit: "億円", get: (s) => s.sales - s.cogs, set: (s, v) => ({ cogs: s.sales - v }) },
-  { code: "7-6", label: "営業利益", unit: "億円", get: operatingProfit, set: (s, v) => ({ otherSga: s.sales - s.cogs - s.employeePay - s.officerPay - sgaDepreciation(s) - researchDevelopment(s) - v }) },
-  { code: "7-8", label: "従業員給与支給総額", unit: "億円", get: (s) => s.employeePay, set: (s, v) => { if (s.employeeSalary === undefined && s.employeeBonus === undefined) return { employeePay: v }; const salary = s.employeePay ? v * employeeSalary(s) / s.employeePay : v; return { employeePay: v, employeeSalary: salary, employeeBonus: v - salary }; } },
-  { code: "7-9", label: "役員給与支給総額", unit: "億円", get: (s) => s.officerPay, set: (s, v) => { if (s.officerCompensation === undefined && s.officerBonus === undefined) return { officerPay: v }; const compensation = s.officerPay ? v * officerCompensation(s) / s.officerPay : v; return { officerPay: v, officerCompensation: compensation, officerBonus: v - compensation }; } },
-  { code: "P2-4", label: "売上原価に含まれる減価償却費", unit: "億円", indentLevel: 1, get: cogsDepreciation, set: (s, v) => ({ cogsDepreciation: v, depreciation: v + sgaDepreciation(s) }) },
-  { code: "P2-14", label: "販管費に含まれる減価償却費", unit: "億円", indentLevel: 1, get: sgaDepreciation, set: (s, v) => ({ sgaDepreciation: v, depreciation: cogsDepreciation(s) + v }) },
+  { code: "7-1", label: "売上高", unit: "千円", get: (s) => s.sales, set: (_s, v) => ({ sales: v }) },
+  { code: "7-4", label: "売上総利益", unit: "千円", get: (s) => s.sales - s.cogs, set: (s, v) => ({ cogs: s.sales - v }) },
+  { code: "7-6", label: "営業利益", unit: "千円", get: operatingProfit, set: (s, v) => ({ otherSga: s.sales - s.cogs - s.employeePay - s.officerPay - sgaDepreciation(s) - researchDevelopment(s) - v }) },
+  { code: "7-8", label: "従業員給与支給総額", unit: "千円", get: (s) => s.employeePay, set: (s, v) => { if (s.employeeSalary === undefined && s.employeeBonus === undefined) return { employeePay: v }; const salary = s.employeePay ? v * employeeSalary(s) / s.employeePay : v; return { employeePay: v, employeeSalary: salary, employeeBonus: v - salary }; } },
+  { code: "7-9", label: "役員給与支給総額", unit: "千円", get: (s) => s.officerPay, set: (s, v) => { if (s.officerCompensation === undefined && s.officerBonus === undefined) return { officerPay: v }; const compensation = s.officerPay ? v * officerCompensation(s) / s.officerPay : v; return { officerPay: v, officerCompensation: compensation, officerBonus: v - compensation }; } },
+  { code: "P2-4", label: "売上原価に含まれる減価償却費", unit: "千円", indentLevel: 1, get: cogsDepreciation, set: (s, v) => ({ cogsDepreciation: v, depreciation: v + sgaDepreciation(s) }) },
+  { code: "P2-14", label: "販管費に含まれる減価償却費", unit: "千円", indentLevel: 1, get: sgaDepreciation, set: (s, v) => ({ sgaDepreciation: v, depreciation: cogsDepreciation(s) + v }) },
   { code: "7-13", label: "常時使用する従業員数（就業時間換算）", unit: "人", digits: 0, get: (s) => s.headcount, set: (_s, v) => ({ headcount: Math.max(0, Math.round(v)) }) },
   { code: "7-14", label: "役員数", unit: "人", digits: 0, get: (s) => s.officerCount, set: (_s, v) => ({ officerCount: Math.max(0, Math.round(v)) }) },
 ];
@@ -2865,27 +2878,27 @@ const projectPayPerEmployee = (segment: SegmentPlan) => segment.headcount ? segm
 const projectPayPerOfficer = (segment: SegmentPlan) => segment.officerCount ? segment.officerPay / segment.officerCount : 0;
 
 const projectOfficialDisplayRows: ProjectOfficialDisplayRow[] = [
-  { code: "7-1", label: "売上高", unit: "億円", input: projectInputByCode.get("7-1"), get: (rows, index) => rows[index].project.sales },
+  { code: "7-1", label: "売上高", unit: "千円", input: projectInputByCode.get("7-1"), get: (rows, index) => rows[index].project.sales },
   { code: "7-2", label: "売上高成長率", unit: "%", indentLevel: 1, get: (rows, index) => growth(rows[index].project.sales, index ? rows[index - 1].project.sales : undefined) },
   { code: "7-3", label: "全社売上高に占める補助事業売上高の割合", unit: "%", indentLevel: 1, get: (rows, index) => rate(rows[index].project.sales, companySegment(rows, index).sales) },
-  { code: "P2-4", label: "売上原価に含まれる減価償却費", unit: "億円", indentLevel: 1, input: projectInputByCode.get("P2-4"), get: (rows, index) => cogsDepreciation(rows[index].project) },
-  { code: "7-4", label: "売上総利益", unit: "億円", input: projectInputByCode.get("7-4"), get: (rows, index) => rows[index].project.sales - rows[index].project.cogs },
+  { code: "P2-4", label: "売上原価に含まれる減価償却費", unit: "千円", indentLevel: 1, input: projectInputByCode.get("P2-4"), get: (rows, index) => cogsDepreciation(rows[index].project) },
+  { code: "7-4", label: "売上総利益", unit: "千円", input: projectInputByCode.get("7-4"), get: (rows, index) => rows[index].project.sales - rows[index].project.cogs },
   { code: "7-5", label: "売上総利益率", unit: "%", indentLevel: 1, get: (rows, index) => rate(rows[index].project.sales - rows[index].project.cogs, rows[index].project.sales) },
-  { code: "7-6", label: "営業利益", unit: "億円", input: projectInputByCode.get("7-6"), get: (rows, index) => operatingProfit(rows[index].project) },
+  { code: "7-6", label: "営業利益", unit: "千円", input: projectInputByCode.get("7-6"), get: (rows, index) => operatingProfit(rows[index].project) },
   { code: "7-7", label: "営業利益率", unit: "%", indentLevel: 1, get: (rows, index) => rate(operatingProfit(rows[index].project), rows[index].project.sales) },
-  { code: "7-8", label: "給与支給総額（常時使用する従業員）", unit: "億円", input: projectInputByCode.get("7-8"), get: (rows, index) => rows[index].project.employeePay },
-  { code: "7-9", label: "給与支給総額（役員）", unit: "億円", input: projectInputByCode.get("7-9"), get: (rows, index) => rows[index].project.officerPay },
-  { code: "P2-14", label: "販管費に含まれる減価償却費", unit: "億円", indentLevel: 1, input: projectInputByCode.get("P2-14"), get: (rows, index) => sgaDepreciation(rows[index].project) },
-  { code: "7-10", label: "減価償却費（合計）", unit: "億円", get: (rows, index) => cogsDepreciation(rows[index].project) + sgaDepreciation(rows[index].project) },
-  { code: "7-11", label: "付加価値額", unit: "億円", get: (rows, index) => valueAdded(rows[index].project) },
+  { code: "7-8", label: "給与支給総額（常時使用する従業員）", unit: "千円", input: projectInputByCode.get("7-8"), get: (rows, index) => rows[index].project.employeePay },
+  { code: "7-9", label: "給与支給総額（役員）", unit: "千円", input: projectInputByCode.get("7-9"), get: (rows, index) => rows[index].project.officerPay },
+  { code: "P2-14", label: "販管費に含まれる減価償却費", unit: "千円", indentLevel: 1, input: projectInputByCode.get("P2-14"), get: (rows, index) => sgaDepreciation(rows[index].project) },
+  { code: "7-10", label: "減価償却費（合計）", unit: "千円", get: (rows, index) => cogsDepreciation(rows[index].project) + sgaDepreciation(rows[index].project) },
+  { code: "7-11", label: "付加価値額", unit: "千円", get: (rows, index) => valueAdded(rows[index].project) },
   { code: "7-12", label: "付加価値増加率", unit: "%", indentLevel: 1, get: (rows, index) => growth(valueAdded(rows[index].project), index ? valueAdded(rows[index - 1].project) : undefined) },
   { code: "7-13", label: "常時使用する従業員数（就業時間換算）", unit: "人", digits: 0, input: projectInputByCode.get("7-13"), get: (rows, index) => rows[index].project.headcount },
   { code: "7-14", label: "役員数", unit: "人", digits: 0, input: projectInputByCode.get("7-14"), get: (rows, index) => rows[index].project.officerCount },
-  { code: "7-15", label: "従業員1人当たり給与支給総額", unit: "億円/人", get: (rows, index) => projectPayPerEmployee(rows[index].project) },
+  { code: "7-15", label: "従業員1人当たり給与支給総額", unit: "千円/人", get: (rows, index) => projectPayPerEmployee(rows[index].project) },
   { code: "7-16", label: "従業員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => growth(projectPayPerEmployee(rows[index].project), index ? projectPayPerEmployee(rows[index - 1].project) : undefined) },
-  { code: "7-17", label: "役員1人当たり給与支給総額", unit: "億円/人", get: (rows, index) => projectPayPerOfficer(rows[index].project) },
+  { code: "7-17", label: "役員1人当たり給与支給総額", unit: "千円/人", get: (rows, index) => projectPayPerOfficer(rows[index].project) },
   { code: "7-18", label: "役員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => growth(projectPayPerOfficer(rows[index].project), index ? projectPayPerOfficer(rows[index - 1].project) : undefined) },
-  { code: "7-19", label: "労働生産性", unit: "億円/人", get: (rows, index) => { const segment = rows[index].project; const people = segment.headcount + segment.officerCount; return people ? valueAdded(segment) / people : 0; } },
+  { code: "7-19", label: "労働生産性", unit: "千円/人", get: (rows, index) => { const segment = rows[index].project; const people = segment.headcount + segment.officerCount; return people ? valueAdded(segment) / people : 0; } },
   { code: "7-20", label: "市場伸び率（年あたり）", unit: "%", fixed: true, get: (_rows, _index, drivers) => drivers.projectMarketGrowth * 100 },
 ];
 
@@ -2936,11 +2949,11 @@ const companyActualInputRows: CompanyActualInputRow[] = [
   { code: "2-26", label: "売上高付加価値率", unit: "%", indentLevel: 1, get: (rows, index) => { const company = companySegment(rows, index); return rate(valueAdded(company), company.sales); } },
   { code: "2-27", label: "常時使用する従業員数（就業時間換算）", unit: "人", get: (rows, index) => companySegment(rows, index).headcount, set: (row, value) => ({ headcount: Math.max(0, Math.round(value - row.project.headcount)) }) },
   { code: "2-28", label: "役員数", unit: "人", get: (rows, index) => companySegment(rows, index).officerCount, set: (row, value) => ({ officerCount: Math.max(0, Math.round(value - row.project.officerCount)) }) },
-  { code: "2-29", label: "従業員1人当たり給与支給総額", unit: "億円/人", get: (rows, index) => { const company = companySegment(rows, index); return company.headcount ? company.employeePay / company.headcount : 0; } },
+  { code: "2-29", label: "従業員1人当たり給与支給総額", unit: "千円/人", get: (rows, index) => { const company = companySegment(rows, index); return company.headcount ? company.employeePay / company.headcount : 0; } },
   { code: "2-30", label: "従業員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = companySegment(rows, index); const previous = index ? companySegment(rows, index - 1) : undefined; return growth(current.headcount ? current.employeePay / current.headcount : 0, previous?.headcount ? previous.employeePay / previous.headcount : undefined); } },
-  { code: "2-31", label: "役員1人当たり給与支給総額", unit: "億円/人", get: (rows, index) => { const company = companySegment(rows, index); return company.officerCount ? company.officerPay / company.officerCount : 0; } },
+  { code: "2-31", label: "役員1人当たり給与支給総額", unit: "千円/人", get: (rows, index) => { const company = companySegment(rows, index); return company.officerCount ? company.officerPay / company.officerCount : 0; } },
   { code: "2-32", label: "役員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = companySegment(rows, index); const previous = index ? companySegment(rows, index - 1) : undefined; return growth(current.officerCount ? current.officerPay / current.officerCount : 0, previous?.officerCount ? previous.officerPay / previous.officerCount : undefined); } },
-  { code: "2-33", label: "労働生産性", unit: "億円/人", get: (rows, index) => { const company = companySegment(rows, index); const people = company.headcount + company.officerCount; return people ? valueAdded(company) / people : 0; } },
+  { code: "2-33", label: "労働生産性", unit: "千円/人", get: (rows, index) => { const company = companySegment(rows, index); const people = company.headcount + company.officerCount; return people ? valueAdded(company) / people : 0; } },
   { code: "2-34", label: "EBITDA", get: (rows, index) => { const company = companySegment(rows, index); return operatingProfit(company) + company.depreciation; } },
   { code: "2-35", label: "EBITDAマージン", unit: "%", indentLevel: 1, get: (rows, index) => { const company = companySegment(rows, index); return rate(operatingProfit(company) + company.depreciation, company.sales); } },
   { code: "2-36", label: "EBITDA増加率", unit: "%", indentLevel: 1, get: (rows, index) => { const company = companySegment(rows, index); const previous = index ? companySegment(rows, index - 1) : undefined; return growth(operatingProfit(company) + company.depreciation, previous ? operatingProfit(previous) + previous.depreciation : undefined); } },
@@ -2961,7 +2974,7 @@ function HistoricalInputsEditor({ historical, inputValues, onHistoricalCompanyCh
   const visibleCompanyActualRows = omitCompanyActualCalculated ? companyActualInputRows.filter((item) => item.set) : companyActualInputRows;
   const visibleProjectActualRows = omitProjectActualCalculated ? projectOfficialDisplayRows.filter((item) => item.input) : projectOfficialDisplayRows.filter((item) => !item.fixed);
   return <div className="manual-sections spreadsheet-grid">
-    <div><h3 className="manual-table-heading"><span>会社全体にかかる損益計算書・関連計算項目（過去3期実績）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCompanyActualCalculated} onClick={() => setOmitCompanyActualCalculated((current) => !current)}>{omitCompanyActualCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{visibleCompanyActualRows.map((item) => <tr className={`${!item.set ? "emphasis" : ""}${item.groupStart ? " official-related-start" : ""}`} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.groupStart && <small>P/L関連計算項目</small>}{item.unit && <small>{item.unit}</small>}</th>{historical.map((row, index) => { const value = item.get(historical, index); return <td key={row.year}>{item.set ? <input type="number" step={item.unit === "人" ? 1 : 0.01} value={getInputValue(inputValues, inputKey.companyActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalCompanyChange(index, item, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong>}</td>; })}</tr>)}</tbody></table></div></div>
+    <div><h3 className="manual-table-heading"><span>会社全体にかかる損益計算書・関連計算項目（過去3期実績）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCompanyActualCalculated} onClick={() => setOmitCompanyActualCalculated((current) => !current)}>{omitCompanyActualCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目（金額は千円）</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{visibleCompanyActualRows.map((item) => <tr className={`${!item.set ? "emphasis" : ""}${item.groupStart ? " official-related-start" : ""}`} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.groupStart && <small>P/L関連計算項目</small>}{item.unit && <small>{item.unit}</small>}</th>{historical.map((row, index) => { const value = item.get(historical, index); return <td key={row.year}>{item.set ? <input type="number" step="1" value={getInputValue(inputValues, inputKey.companyActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalCompanyChange(index, item, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : item.unit === "%" || item.unit === "倍" ? 2 : 0)}</strong>}</td>; })}</tr>)}</tbody></table></div></div>
     <div>
       <h3 className="manual-table-heading">
         <span>補助事業PL（過去3期実績）</span>
@@ -2970,7 +2983,7 @@ function HistoricalInputsEditor({ historical, inputValues, onHistoricalCompanyCh
         </button>
       </h3>
       <div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目／補足項目（P2-Xは内部管理用）</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{visibleProjectActualRows.map((item) => <tr className={!item.input ? "calculated-row" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}／{item.input ? "必須入力" : "自動計算"}</small></th>{historical.map((row, index) => {
-        if (item.input) return <td key={row.year}><input type="number" step={item.digits === 0 ? 1 : 0.01} value={getInputValue(inputValues, inputKey.projectActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalProjectChange(index, item.input!, event.target.value === "" ? null : Number(event.target.value))} /></td>;
+        if (item.input) return <td key={row.year}><input type="number" step="1" value={getInputValue(inputValues, inputKey.projectActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalProjectChange(index, item.input!, event.target.value === "" ? null : Number(event.target.value))} /></td>;
         const calculatedValue = item.get(historical, index, emptyDrivers);
         return <td className="calculated-cell" key={row.year}><strong>{calculatedValue === undefined ? "—" : number(calculatedValue, item.digits ?? 2)}</strong><small>{item.code === "7-10" ? "P2-4＋P2-14" : "自動計算"}</small></td>;
       })}</tr>)}</tbody></table></div>
@@ -3028,7 +3041,7 @@ function DetailedProjectInputsTable({ historical, effectivePlan, overrides, omit
               const key = forecastOverrideKey(row.year, "project", input.key);
               const overridden = Object.prototype.hasOwnProperty.call(overrides, key);
               const required = requiredProjectDepreciationDetailedKeys.has(input.key);
-              return <td className={required && !overridden ? "required-input-missing" : undefined} key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={input.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={required ? "未入力" : rawPlaceholder(value ?? 0, input.digits ?? 2)} aria-invalid={required && !overridden} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : required ? "必須・未入力" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", input.key, event.target.value === "" ? null : Number(event.target.value))} /></td>;
+              return <td className={required && !overridden ? "required-input-missing" : undefined} key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="1" value={overridden ? overrides[key] : ""} placeholder={required ? "未入力" : rawPlaceholder(value ?? 0, input.digits ?? 2)} aria-invalid={required && !overridden} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : required ? "必須・未入力" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", input.key, event.target.value === "" ? null : Number(event.target.value))} /></td>;
             })}
           </tr>,
         ])}
@@ -3076,7 +3089,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
             const key = forecastOverrideKey(row.year, "project", item.code);
             const overridden = Object.prototype.hasOwnProperty.call(overrides, key);
             const required = requiredProjectDepreciationCodes.has(item.code);
-            return <td className={required && !overridden ? "required-input-missing" : undefined} key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={required ? "未入力" : rawPlaceholder(value ?? 0, item.digits ?? 2)} aria-invalid={required && !overridden} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : required ? "必須・未入力" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>;
+            return <td className={required && !overridden ? "required-input-missing" : undefined} key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="1" value={overridden ? overrides[key] : ""} placeholder={required ? "未入力" : rawPlaceholder(value ?? 0, item.digits ?? 2)} aria-invalid={required && !overridden} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : required ? "必須・未入力" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>;
           })}
         </tr>)}</tbody>
       </table></div>
@@ -3084,7 +3097,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
     </div> : <DetailedProjectInputsTable historical={historical} effectivePlan={effectivePlan} overrides={overrides} omitCalculated={omitProjectCalculated} onToggleCalculated={() => setOmitProjectCalculated((current) => !current)} onForecastChange={onForecastChange} />}
     <div>
       <h3 className="manual-table-heading"><span>会社全体の損益計算書・関連計算項目（2-1～2-36：過去3期参照 → 将来）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCompanyCalculated} onClick={() => setOmitCompanyCalculated((current) => !current)}>{omitCompanyCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
-      <div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead>
+      <div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は千円）</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead>
         <tbody>
           <OfficialSectionHeading label="損益計算書" range="2-1～2-20" columns={historical.length + futureRows.length} />
           {visibleCompanyRows.flatMap((item) => [
@@ -3098,7 +3111,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
             if (futureInputBasis !== "company" || !item.set) return <td className={!item.set ? "calculated-cell" : undefined} key={row.year}><strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong>{!item.set && value !== undefined && <small>自動計算</small>}</td>;
             const key = forecastOverrideKey(row.year, "company", item.code);
             const overridden = Object.prototype.hasOwnProperty.call(overrides, key);
-            return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.unit === "人" ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0, item.unit === "人" ? 0 : 2)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "company", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>;
+            return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="1" value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0, item.unit === "人" ? 0 : 2)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "company", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>;
           })}
         </tr>])}</tbody>
       </table></div>
@@ -3121,7 +3134,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
                 const input = item.input;
                 const key = forecastOverrideKey(row.year, "other", input.key);
                 const overridden = Object.prototype.hasOwnProperty.call(overrides, key);
-                return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={input.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0, input.digits ?? 2)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "other", input.key, event.target.value === "" ? null : Number(event.target.value))} /></td>;
+                return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="1" value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0, input.digits ?? 2)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "other", input.key, event.target.value === "" ? null : Number(event.target.value))} /></td>;
               })}
             </tr>,
           ])}
@@ -3138,9 +3151,9 @@ function AutoRequiredInputsEditor({ historical, autoPlan, effectivePlan, overrid
   const effectiveOtherByYear = new Map(effectivePlan.map((row) => [row.year, row.other]));
   const rawPlaceholder = (value: number) => String(roundedInput(value));
   return <div className="manual-sections spreadsheet-grid">
-    <div><h3>会社全体にかかる損益計算書（過去3期実績 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{effectivePlan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{companyActualInputRows.map((item) => <tr className={!item.set ? "emphasis" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.unit && <small>{item.unit}</small>}</th>{effectivePlan.map((row, index) => { const isActual = index < historical.length; const value = item.get(isActual ? historical : effectivePlan, index); if (isActual) return <td key={row.year}>{item.set ? <input type="number" step={item.unit === "人" ? 1 : 0.1} value={value ?? 0} onChange={(event) => onHistoricalCompanyChange(index, item, Number(event.target.value))} /> : <strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong>}</td>; if (futureInputBasis !== "company") return <td key={row.year}><span className="future-empty">—</span></td>; if (!item.set) return <td key={row.year}><strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong></td>; const key = forecastOverrideKey(row.year, "company", item.code); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.unit === "人" ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "company", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">「全社PLを入力」を選ぶと将来欄が青枠になり、ベース事業PLを「全社－補助事業」で自動計算します。「ベース事業PLを入力」では将来欄を空欄表示します。</p></div>
-    <div><h3>補助事業PL（過去3期実績 → 補助事業期間 → 基準年 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th key={`actual-${row.year}`}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}{futureProjectRows.map((row) => <th key={`future-${row.year}`} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は原則自動予測</small></th>)}</tr></thead><tbody>{projectOfficialInputRows.map((item) => <tr key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}</small></th>{historical.map((row, index) => <td key={`actual-${row.year}`}><input type="number" step="0.1" value={item.get(row.project)} onChange={(event) => onHistoricalProjectChange(index, item, Number(event.target.value))} /></td>)}{futureProjectRows.map((row) => { const key = forecastOverrideKey(row.year, "project", item.code); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); const effective = effectiveProjectByYear.get(row.year)!; const required = requiredProjectDepreciationCodes.has(item.code); return <td className={required && !overridden ? "required-input-missing" : undefined} key={`future-${row.year}`}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="0.1" value={overridden ? overrides[key] : ""} placeholder={required ? "未入力" : rawPlaceholder(item.get(effective))} aria-invalid={required && !overridden} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : required ? "必須・未入力" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">過去3期は白枠の必須入力です。補助事業期間～事業化報告3年目は原則として空欄を自動予測しますが、P2-4・P2-14は年度別の必須入力です。</p></div>
-    <div><h3>ベース事業PL（過去3期自動算出 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>内部管理番号・項目</th>{autoPlan.map((row) => <th key={row.year} className={row.year > historical.at(-1)!.year && futureInputBasis === "other" ? "forecast-heading" : undefined}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}{row.year > historical.at(-1)!.year ? futureInputBasis === "other" ? "・入力" : "・自動算出" : "・自動算出"}</small></th>)}</tr></thead><tbody>{otherPlInputFields.map((item) => <tr key={item.key}><th><PlRowTitle code={item.modelCode} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}</small></th>{autoPlan.map((row, index) => { const isActual = index < historical.length; const effective = effectiveOtherByYear.get(row.year)!; const value = item.get(effective); if (isActual || futureInputBasis === "company") return <td key={row.year}><strong>{number(value, item.digits ?? 2)}</strong></td>; const key = forecastOverrideKey(row.year, "other", item.key); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={item.digits === 0 ? 1 : 0.1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "other", item.key, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">「ベース事業PLを入力」を選ぶと将来欄が青枠になります。「全社PLを入力」では、将来値を「全社PL－補助事業PL」で自動表示します。</p></div>
+    <div><h3>会社全体にかかる損益計算書（過去3期実績 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は千円）</th>{effectivePlan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{companyActualInputRows.map((item) => <tr className={!item.set ? "emphasis" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.unit && <small>{item.unit}</small>}</th>{effectivePlan.map((row, index) => { const isActual = index < historical.length; const value = item.get(isActual ? historical : effectivePlan, index); if (isActual) return <td key={row.year}>{item.set ? <input type="number" step={1} value={value ?? 0} onChange={(event) => onHistoricalCompanyChange(index, item, Number(event.target.value))} /> : <strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong>}</td>; if (futureInputBasis !== "company") return <td key={row.year}><span className="future-empty">—</span></td>; if (!item.set) return <td key={row.year}><strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong></td>; const key = forecastOverrideKey(row.year, "company", item.code); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "company", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">「全社PLを入力」を選ぶと将来欄が青枠になり、ベース事業PLを「全社－補助事業」で自動計算します。「ベース事業PLを入力」では将来欄を空欄表示します。</p></div>
+    <div><h3>補助事業PL（過去3期実績 → 補助事業期間 → 基準年 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>第6次様式項目</th>{historical.map((row) => <th key={`actual-${row.year}`}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}{futureProjectRows.map((row) => <th key={`future-${row.year}`} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は原則自動予測</small></th>)}</tr></thead><tbody>{projectOfficialInputRows.map((item) => <tr key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}</small></th>{historical.map((row, index) => <td key={`actual-${row.year}`}><input type="number" step="1" value={item.get(row.project)} onChange={(event) => onHistoricalProjectChange(index, item, Number(event.target.value))} /></td>)}{futureProjectRows.map((row) => { const key = forecastOverrideKey(row.year, "project", item.code); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); const effective = effectiveProjectByYear.get(row.year)!; const required = requiredProjectDepreciationCodes.has(item.code); return <td className={required && !overridden ? "required-input-missing" : undefined} key={`future-${row.year}`}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="1" value={overridden ? overrides[key] : ""} placeholder={required ? "未入力" : rawPlaceholder(item.get(effective))} aria-invalid={required && !overridden} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : required ? "必須・未入力" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", item.code, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">過去3期は白枠の必須入力です。補助事業期間～事業化報告3年目は原則として空欄を自動予測しますが、P2-4・P2-14は年度別の必須入力です。</p></div>
+    <div><h3>ベース事業PL（過去3期自動算出 → 事業化報告3年目）</h3><div className="wide-table"><table><thead><tr><th>内部管理番号・項目</th>{autoPlan.map((row) => <th key={row.year} className={row.year > historical.at(-1)!.year && futureInputBasis === "other" ? "forecast-heading" : undefined}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}{row.year > historical.at(-1)!.year ? futureInputBasis === "other" ? "・入力" : "・自動算出" : "・自動算出"}</small></th>)}</tr></thead><tbody>{otherPlInputFields.map((item) => <tr key={item.key}><th><PlRowTitle code={item.modelCode} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}</small></th>{autoPlan.map((row, index) => { const isActual = index < historical.length; const effective = effectiveOtherByYear.get(row.year)!; const value = item.get(effective); if (isActual || futureInputBasis === "company") return <td key={row.year}><strong>{number(value, item.digits ?? 2)}</strong></td>; const key = forecastOverrideKey(row.year, "other", item.key); const overridden = Object.prototype.hasOwnProperty.call(overrides, key); return <td key={row.year}><input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step={1} value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "other", item.key, event.target.value === "" ? null : Number(event.target.value))} /></td>; })}</tr>)}</tbody></table></div><p className="footnote">「ベース事業PLを入力」を選ぶと将来欄が青枠になります。「全社PLを入力」では、将来値を「全社PL－補助事業PL」で自動表示します。</p></div>
   </div>;
 }
 
@@ -3158,7 +3171,7 @@ function PlTable({ title, plan, sourcePlan, segment }: { title: string; plan: Ye
     { label: "常時使用する従業員数（就業時間換算）", value: (row) => row[segment].headcount },
     { label: "役員数", value: (row) => row[segment].officerCount },
   ];
-  return <article className="panel table-panel"><h2>{title}</h2><div className="wide-table"><table><thead><tr><th>億円（人数項目のみ人）</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{rows.map((item) => <tr className={item.emphasis ? "emphasis" : ""} key={item.label}><th>{item.label}</th>{plan.map((row, index) => <td key={row.year}>{sourcePlan && <small className="before-cell">{number(item.value(sourcePlan[index]))} →</small>}<strong className={sourcePlan ? "after-cell" : ""}>{number(item.value(row))}</strong></td>)}</tr>)}</tbody></table></div></article>;
+  return <article className="panel table-panel"><h2>{title}</h2><div className="wide-table"><table><thead><tr><th>千円（人数項目のみ人）</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{rows.map((item) => <tr className={item.emphasis ? "emphasis" : ""} key={item.label}><th>{item.label}</th>{plan.map((row, index) => <td key={row.year}>{sourcePlan && <small className="before-cell">{number(item.value(sourcePlan[index]))} →</small>}<strong className={sourcePlan ? "after-cell" : ""}>{number(item.value(row))}</strong></td>)}</tr>)}</tbody></table></div></article>;
 }
 
 type ChartSeries = {
@@ -3167,16 +3180,8 @@ type ChartSeries = {
   values: (number | undefined)[];
 };
 
-type MoneyDisplayUnit = "億円" | "百万円" | "千円";
-
-const moneyDisplayMultiplier: Record<MoneyDisplayUnit, number> = {
-  "億円": 1,
-  "百万円": 100,
-  "千円": 100000,
-};
-
 const chartValueDigits = (unit: string) => {
-  if (unit === "億円/人") return 3;
+  if (unit === "千円/人") return 3;
   if (unit === "億円") return 2;
   if (unit === "百万円/人" || unit === "百万円") return 1;
   if (unit === "千円/人" || unit === "千円") return 0;
@@ -3246,8 +3251,7 @@ function DiagnosticCharts({ plan }: { plan: YearPlan[] }) {
     return base && Number.isFinite(base) ? values.map((value) => value === undefined ? undefined : value / base * 100) : values.map(() => undefined);
   };
   const colors = { company: "var(--chart-company)", project: "var(--chart-project)", other: "var(--chart-other)" };
-  const moneyMultiplier = moneyDisplayMultiplier[moneyUnit];
-  const displayMoney = (value: number | undefined) => value === undefined ? undefined : value * moneyMultiplier;
+  const displayMoney = (value: number | undefined) => value === undefined ? undefined : toDisplayMoney(value, moneyUnit);
 
   return <section className="diagnostic-charts" aria-labelledby="diagnostic-chart-heading">
     <div className="diagnostic-chart-heading"><div><h2 id="diagnostic-chart-heading">主要指標の推移チャート</h2></div><div className="diagnostic-chart-controls"><label className="chart-unit-control"><span>金額単位</span><select value={moneyUnit} onChange={(event) => setMoneyUnit(event.target.value as MoneyDisplayUnit)} aria-label="金額系チャートの表示単位"><option value="千円">千円（第6次様式）</option><option value="百万円">百万円</option><option value="億円">億円</option></select><small>金額系チャートに反映</small></label><div className="chart-scale-control"><span>縦軸の最小値</span><div className="mode-switch" role="group" aria-label="チャートの縦軸最小値"><button type="button" className={zeroBaseline ? "active" : ""} aria-pressed={zeroBaseline} onClick={() => setZeroBaseline(true)}>0から開始</button><button type="button" className={!zeroBaseline ? "active" : ""} aria-pressed={!zeroBaseline} onClick={() => setZeroBaseline(false)}>データ範囲を拡大</button></div><small>負の値を含む場合は、値が切れない範囲まで自動調整します。</small></div></div></div>
@@ -3291,8 +3295,8 @@ function BehaviorChangeTable({ plan, balanceSheets, futureCapex, timeline }: { p
   const useCompanyEmployees = companyBase.headcount > 0;
   const useProjectEmployees = base.project.headcount > 0;
   const average = (values: number[]) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : undefined;
-  const historicalInvestment = average(balanceSheets.map((row) => row.capex * 100000));
-  const implementationInvestment = average(futureCapex.filter((row) => row.year >= timeline.baseYear && row.year <= timeline.baseYear + 3).map((row) => row.value * 100000));
+  const historicalInvestment = average(balanceSheets.map((row) => row.capex));
+  const implementationInvestment = average(futureCapex.filter((row) => row.year >= timeline.baseYear && row.year <= timeline.baseYear + 3).map((row) => row.value));
   const rows: { code: string; label: string; unit: "千円" | "%"; company?: number; project?: number; formula: string }[] = [
     { code: "4-1", label: "年間平均投資額（従前）", unit: "千円", company: historicalInvestment, formula: "過去3期の1-24 新規設備投資による支出の平均" },
     { code: "4-2", label: "年間平均投資額（補助事業実施時）", unit: "千円", company: implementationInvestment, formula: "基準年～事業化報告3年目の設備投資額の平均" },
@@ -3303,13 +3307,13 @@ function BehaviorChangeTable({ plan, balanceSheets, futureCapex, timeline }: { p
     { code: "4-7", label: "年間売上成長率（補助事業実施時）", unit: "%", company: cagr(companyBase.sales, companyAt(report3).sales, 3), formula: "基準年→事業化報告3年目の全社売上高CAGR" },
   ];
   const display = (value: number | undefined, unit: "千円" | "%") => value === undefined || !Number.isFinite(value) ? "算出不可" : `${number(value, unit === "%" ? 2 : 0)} ${unit}`;
-  return <article className="panel table-panel behavior-change-panel"><div className="panel-heading"><div><h2>行動変容に係る数値（自動計算）</h2></div><span className="pill green">4-1～4-7</span></div><div className="wide-table"><table><thead><tr><th>第6次様式項目</th><th>全社</th><th>補助事業</th><th>HTMLでの計算根拠</th></tr></thead><tbody>{rows.map((row) => <tr key={row.code}><th>{row.code} {row.label}<small>{row.unit}</small></th><td><strong>{display(row.company, row.unit)}</strong></td><td><strong>{row.project === undefined ? "—" : display(row.project, row.unit)}</strong></td><td className="formula-cell">{row.formula}</td></tr>)}</tbody></table></div><p className="footnote">第6次入力ガイドの②補助事業情報 4-1～4-7を再現しています。賃上げ率は基準年の従業員数が0人の場合のみ、役員1人当たり給与支給総額で代替します。投資額はHTML内部の億円から公式様式の千円へ換算しています。</p></article>;
+  return <article className="panel table-panel behavior-change-panel"><div className="panel-heading"><div><h2>行動変容に係る数値（自動計算）</h2></div><span className="pill green">4-1～4-7</span></div><div className="wide-table"><table><thead><tr><th>第6次様式項目</th><th>全社</th><th>補助事業</th><th>HTMLでの計算根拠</th></tr></thead><tbody>{rows.map((row) => <tr key={row.code}><th>{row.code} {row.label}<small>{row.unit}</small></th><td><strong>{display(row.company, row.unit)}</strong></td><td><strong>{row.project === undefined ? "—" : display(row.project, row.unit)}</strong></td><td className="formula-cell">{row.formula}</td></tr>)}</tbody></table></div><p className="footnote">第6次入力ガイドの②補助事業情報 4-1～4-7を再現しています。賃上げ率は基準年の従業員数が0人の場合のみ、役員1人当たり給与支給総額で代替します。投資額は内部・公式様式とも千円単位で保持しています。</p></article>;
 }
 
 type OfficialRow = {
   code: string;
   label: string;
-  unit?: "%" | "人" | "億円/人";
+  unit?: "%" | "人" | "千円/人";
   emphasis?: boolean;
   groupStart?: boolean;
   indentLevel?: 1 | 2;
@@ -3327,7 +3331,7 @@ type DiagnosticRow = {
   name: string;
   formula: string;
   check: string;
-  unit: "%" | "pt" | "倍" | "億円/人";
+  unit: "%" | "pt" | "倍" | "千円/人";
   values: (row: YearPlan, index: number) => DiagnosticValue[];
 };
 
@@ -3427,8 +3431,8 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
         { name: "従業員人件費率", formula: "従業員給与支給総額 ÷ 売上高", check: "人員計画と売上規模に対して妥当か", unit: "%", values: (row) => segmentValues(row, (s) => safeRate(s.employeePay, s.sales)) },
         { name: "役員人件費率", formula: "役員給与支給総額 ÷ 売上高", check: "役員報酬の変動が利益を歪めていないか", unit: "%", values: (row) => segmentValues(row, (s) => safeRate(s.officerPay, s.sales)) },
         { name: "総人件費率", formula: "（従業員＋役員給与）÷ 売上高", check: "賃上げと利益率が両立しているか", unit: "%", values: (row) => segmentValues(row, (s) => safeRate(s.employeePay + s.officerPay, s.sales)) },
-        { name: "従業員1人当たり給与支給総額", formula: "従業員給与支給総額 ÷ 常時使用する従業員数（就業時間換算）", check: "給与支給総額の増加が人数増だけになっていないか", unit: "億円/人", values: (row) => segmentValues(row, payrollPerEmployee) },
-        { name: "役員1人当たり給与支給総額（参考）", formula: "役員給与支給総額 ÷ 役員数", check: "役員数の変化を除いた報酬水準が妥当か", unit: "億円/人", values: (row) => segmentValues(row, (s) => s.officerCount ? s.officerPay / s.officerCount : undefined) },
+        { name: "従業員1人当たり給与支給総額", formula: "従業員給与支給総額 ÷ 常時使用する従業員数（就業時間換算）", check: "給与支給総額の増加が人数増だけになっていないか", unit: "千円/人", values: (row) => segmentValues(row, payrollPerEmployee) },
+        { name: "役員1人当たり給与支給総額（参考）", formula: "役員給与支給総額 ÷ 役員数", check: "役員数の変化を除いた報酬水準が妥当か", unit: "千円/人", values: (row) => segmentValues(row, (s) => s.officerCount ? s.officerPay / s.officerCount : undefined) },
         { name: "従業員1人当たり給与支給総額の対前年上昇率", formula: "当年の従業員1人当たり給与支給総額 ÷ 前年値－1", check: "第6次の賃上げ計画と年度推移が整合するか", unit: "%", values: (row, index) => segments(row).map((entry) => { const key = entry.label === "全社" ? "company" : entry.label === "補助" ? "project" : "other"; const previous = previousSegment(index, key); const currentPay = payrollPerEmployee(entry.value); const previousPay = previous ? payrollPerEmployee(previous) : undefined; return { label: entry.label, value: currentPay !== undefined && previousPay ? (currentPay / previousPay - 1) * 100 : undefined }; }) },
         { name: "労働分配率", formula: "（従業員＋役員給与）÷ 付加価値額", check: "付加価値の増加が従業員へ還元されているか", unit: "%", values: (row) => segmentValues(row, (s) => safeRate(s.employeePay + s.officerPay, valueAdded(s))) },
       ],
@@ -3436,9 +3440,9 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
     {
       title: "3. 生産性",
       rows: [
-        { name: "従業員1人当たり売上高", formula: "売上高 ÷ 常時使用する従業員数（就業時間換算）", check: "人員を増やさず売上だけが急増していないか", unit: "億円/人", values: (row) => segmentValues(row, (s) => perEmployee(s.sales, s)) },
-        { name: "1人当たり営業利益", formula: "営業利益 ÷ 常時使用する従業員数（就業時間換算）", check: "生産性改善が過度になっていないか", unit: "億円/人", values: (row) => segmentValues(row, (s) => perEmployee(operatingProfit(s), s)) },
-        { name: "労働生産性", formula: "付加価値額 ÷（常時使用する従業員数（就業時間換算）＋役員数）", check: "付加価値・人数・賃上げの関係が整合するか", unit: "億円/人", values: (row) => segmentValues(row, (s) => safeMultiple(valueAdded(s), s.headcount + s.officerCount)) },
+        { name: "従業員1人当たり売上高", formula: "売上高 ÷ 常時使用する従業員数（就業時間換算）", check: "人員を増やさず売上だけが急増していないか", unit: "千円/人", values: (row) => segmentValues(row, (s) => perEmployee(s.sales, s)) },
+        { name: "1人当たり営業利益", formula: "営業利益 ÷ 常時使用する従業員数（就業時間換算）", check: "生産性改善が過度になっていないか", unit: "千円/人", values: (row) => segmentValues(row, (s) => perEmployee(operatingProfit(s), s)) },
+        { name: "労働生産性", formula: "付加価値額 ÷（常時使用する従業員数（就業時間換算）＋役員数）", check: "付加価値・人数・賃上げの関係が整合するか", unit: "千円/人", values: (row) => segmentValues(row, (s) => safeMultiple(valueAdded(s), s.headcount + s.officerCount)) },
         { name: "従業員数増加率", formula: "当年の常時使用する従業員数（就業時間換算）÷ 前年値－1", check: "採用可能性と事業拡大ペースが整合するか", unit: "%", values: (row, index) => segments(row).map((entry) => { const key = entry.label === "全社" ? "company" : entry.label === "補助" ? "project" : "other"; const previous = previousSegment(index, key); return { label: entry.label, value: previous?.headcount ? (entry.value.headcount / previous.headcount - 1) * 100 : undefined }; }) },
         { name: "売上成長率－従業員増加率", formula: "売上成長率－常時使用する従業員数（就業時間換算）の増加率", check: "人員増を大きく上回る売上成長に根拠があるか", unit: "pt", values: (row, index) => segments(row).map((entry) => { const key = entry.label === "全社" ? "company" : entry.label === "補助" ? "project" : "other"; const previous = previousSegment(index, key); const salesGrowth = previous?.sales ? (entry.value.sales / previous.sales - 1) * 100 : undefined; const headGrowth = previous?.headcount ? (entry.value.headcount / previous.headcount - 1) * 100 : undefined; return { label: entry.label, value: salesGrowth !== undefined && headGrowth !== undefined ? salesGrowth - headGrowth : undefined }; }) },
       ],
@@ -3460,8 +3464,8 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
         { name: "事業別売上成長率", formula: "当年売上高 ÷ 前年売上高－1", check: "片方の事業だけが不自然に急成長・縮小していないか", unit: "%", values: (row, index) => [{ label: "補助", value: previousSegment(index, "project")?.sales ? (row.project.sales / previousSegment(index, "project")!.sales - 1) * 100 : undefined }, { label: "ベース", value: previousSegment(index, "other")?.sales ? (row.other.sales / previousSegment(index, "other")!.sales - 1) * 100 : undefined }] },
         { name: "売上原価率差", formula: "補助事業原価率－ベース事業原価率", check: "補助事業の採算を過度に良く置いていないか", unit: "pt", values: (row) => [{ label: "差", value: (safeRate(row.project.cogs, row.project.sales) ?? 0) - (safeRate(row.other.cogs, row.other.sales) ?? 0) }] },
         { name: "営業利益率差", formula: "補助事業営業利益率－ベース事業営業利益率", check: "事業間の利益率差に合理的な根拠があるか", unit: "pt", values: (row) => [{ label: "差", value: (opMargin(row.project) ?? 0) - (opMargin(row.other) ?? 0) }] },
-        { name: "事業別1人当たり売上高", formula: "事業別売上高 ÷ 事業別の常時使用する従業員数（就業時間換算）", check: "補助事業の生産性だけが突出していないか", unit: "億円/人", values: (row) => pairedValues(row, (s) => perEmployee(s.sales, s)) },
-        { name: "事業別従業員1人当たり給与支給総額", formula: "事業別従業員給与支給総額 ÷ 事業別の常時使用する従業員数（就業時間換算）", check: "補助事業と既存事業の待遇差が妥当か", unit: "億円/人", values: (row) => pairedValues(row, payrollPerEmployee) },
+        { name: "事業別1人当たり売上高", formula: "事業別売上高 ÷ 事業別の常時使用する従業員数（就業時間換算）", check: "補助事業の生産性だけが突出していないか", unit: "千円/人", values: (row) => pairedValues(row, (s) => perEmployee(s.sales, s)) },
+        { name: "事業別従業員1人当たり給与支給総額", formula: "事業別従業員給与支給総額 ÷ 事業別の常時使用する従業員数（就業時間換算）", check: "補助事業と既存事業の待遇差が妥当か", unit: "千円/人", values: (row) => pairedValues(row, payrollPerEmployee) },
         { name: "全社利益増加への補助事業寄与率", formula: "補助事業営業利益の前年差 ÷ 全社営業利益の前年差", check: "全社利益改善を補助事業だけへ寄せていないか", unit: "%", values: (row, index) => { if (!index) return [{ label: "寄与率", value: undefined }]; const projectIncrease = operatingProfit(row.project) - operatingProfit(plan[index - 1].project); const companyIncrease = operatingProfit(company(row)) - operatingProfit(company(plan[index - 1])); return [{ label: "寄与率", value: safeRate(projectIncrease, companyIncrease) }]; } },
       ],
     },
@@ -3469,8 +3473,8 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
 
   const formatted = (value: number | undefined, unit: DiagnosticRow["unit"]) => {
     if (value === undefined || !Number.isFinite(value)) return "—";
-    const digits = unit === "億円/人" ? 3 : unit === "倍" ? 2 : 1;
-    return `${number(value, digits)}${unit === "億円/人" ? "" : unit}`;
+    const digits = unit === "千円/人" ? 2 : unit === "倍" ? 2 : 1;
+    return `${number(value, digits)}${unit === "千円/人" ? "" : unit}`;
   };
   const allRows = groups.flatMap((group) => group.rows.map((row) => ({ key: `${group.title}:${row.name}`, row })));
   const [selectedKey, setSelectedKey] = useState(allRows[0]?.key ?? "");
@@ -3505,7 +3509,7 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
 function OfficialRowsTable({ title, pill, plan, sourcePlan, rows, note }: { title: string; pill: string; plan: YearPlan[]; sourcePlan?: YearPlan[]; rows: OfficialRow[]; note?: string }) {
   const formatted = (value: number | undefined, unit?: OfficialRow["unit"]) => value === undefined ? "—" : `${number(value, unit === "%" ? 1 : 2)}${unit ? ` ${unit}` : ""}`;
   const hasSections = rows.some((item) => item.groupStart);
-  return <article className="panel table-panel company-table"><div className="panel-heading"><div><h2>{title}</h2></div><span className="pill green">{pill}</span></div><div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>
+  return <article className="panel table-panel company-table"><div className="panel-heading"><div><h2>{title}</h2></div><span className="pill green">{pill}</span></div><div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は千円）</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>
     {hasSections && <OfficialSectionHeading label="損益計算書" range="2-1～2-20" columns={plan.length} />}
     {rows.flatMap((item) => [
       item.groupStart ? <OfficialSectionHeading key="section-related" label="P/L関連計算項目" range="2-21～2-36" columns={plan.length} /> : null,
@@ -3548,11 +3552,11 @@ function OfficialProjectTable({ plan, sourcePlan, drivers, missingKeys }: { plan
     { code: "7-12", label: "付加価値増加率", unit: "%", indentLevel: 1, value: (p, i) => growth(valueAdded(p[i].project), i ? valueAdded(p[i - 1].project) : undefined) },
     { code: "7-13", label: "常時使用する従業員数（就業時間換算）", unit: "人", value: (p, i) => p[i].project.headcount },
     { code: "7-14", label: "役員数", unit: "人", value: (p, i) => p[i].project.officerCount },
-    { code: "7-15", label: "従業員1人当たり給与支給総額", unit: "億円/人", value: (p, i) => p[i].project.headcount ? p[i].project.employeePay / p[i].project.headcount : 0 },
+    { code: "7-15", label: "従業員1人当たり給与支給総額", unit: "千円/人", value: (p, i) => p[i].project.headcount ? p[i].project.employeePay / p[i].project.headcount : 0 },
     { code: "7-16", label: "従業員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, value: (p, i) => growth(p[i].project.headcount ? p[i].project.employeePay / p[i].project.headcount : 0, i && p[i - 1].project.headcount ? p[i - 1].project.employeePay / p[i - 1].project.headcount : undefined) },
-    { code: "7-17", label: "役員1人当たり給与支給総額", unit: "億円/人", value: (p, i) => p[i].project.officerCount ? p[i].project.officerPay / p[i].project.officerCount : 0 },
+    { code: "7-17", label: "役員1人当たり給与支給総額", unit: "千円/人", value: (p, i) => p[i].project.officerCount ? p[i].project.officerPay / p[i].project.officerCount : 0 },
     { code: "7-18", label: "役員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, value: (p, i) => growth(p[i].project.officerCount ? p[i].project.officerPay / p[i].project.officerCount : 0, i && p[i - 1].project.officerCount ? p[i - 1].project.officerPay / p[i - 1].project.officerCount : undefined) },
-    { code: "7-19", label: "労働生産性", unit: "億円/人", value: (p, i) => { const s = p[i].project; return s.headcount + s.officerCount ? valueAdded(s) / (s.headcount + s.officerCount) : 0; } },
+    { code: "7-19", label: "労働生産性", unit: "千円/人", value: (p, i) => { const s = p[i].project; return s.headcount + s.officerCount ? valueAdded(s) / (s.headcount + s.officerCount) : 0; } },
     { code: "7-20", label: "市場伸び率（年あたり）", unit: "%", value: (_p, i) => i === 0 ? drivers.projectMarketGrowth * 100 : undefined },
   ];
       return <OfficialRowsTable title="補助事業にかかる収支計画" pill="7-1～7-20" plan={plan} sourcePlan={sourcePlan} rows={rows} note="P2-4・P2-14は年度別の必須入力です。空欄は未入力として表示し、自動予測や前年度値による補完を行いません。7-10は両項目が入力済みの場合に、その合計として表示します。7-20市場伸び率は、第6次Excelと同じく単一の入力値として最初の列に表示しています。" />;

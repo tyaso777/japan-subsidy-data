@@ -1,3 +1,5 @@
+import { legacyOkuToInternalMoney, normalizeInternalMoney } from "./money";
+
 export type SegmentKey = "project" | "other";
 export type Mode = "auto" | "manual";
 
@@ -172,10 +174,21 @@ export const YEAR_ROLE_LABELS: Record<YearRole, string> = {
   report3: "事業化報告3年目",
 };
 
+const segmentFromLegacyOku = (segment: SegmentPlan): SegmentPlan => Object.fromEntries(
+  Object.entries(segment).map(([key, value]) => [
+    key,
+    key === "headcount" || key === "officerCount" ? value : legacyOkuToInternalMoney(value),
+  ]),
+) as SegmentPlan;
+
+const balanceSheetFromLegacyOku = (row: BalanceSheetPlan): BalanceSheetPlan => Object.fromEntries(
+  Object.entries(row).map(([key, value]) => [key, key === "year" ? value : legacyOkuToInternalMoney(value)]),
+) as BalanceSheetPlan;
+
 export const sampleBasePlan: YearPlan = {
   year: DEFAULT_TIMELINE.latestYear,
   role: "latest",
-  project: {
+  project: segmentFromLegacyOku({
     sales: 80,
     cogs: 54.4,
     employeePay: 6,
@@ -191,8 +204,8 @@ export const sampleBasePlan: YearPlan = {
     otherSga: 10,
     headcount: 100,
     officerCount: 2,
-  },
-  other: {
+  }),
+  other: segmentFromLegacyOku({
     sales: 70,
     cogs: 47.6,
     employeePay: 8,
@@ -208,16 +221,16 @@ export const sampleBasePlan: YearPlan = {
     otherSga: 8,
     headcount: 130,
     officerCount: 3,
-  },
+  }),
 };
 
 export const sampleBalanceSheets: BalanceSheetPlan[] = [
   { year: 2023, assets: 132, currentAssets: 67, cash: 24, fixedAssets: 65, tangibleAssets: 53, buildings: 19, machinery: 24, land: 10, intangibleAssets: 7, software: 5, liabilities: 75, currentLiabilities: 39, shortTermDebt: 12, fixedLiabilities: 36, longTermDebt: 29, netAssets: 57, shareholderEquity: 54, capital: 10, capex: 5 },
   { year: 2024, assets: 143, currentAssets: 72, cash: 25, fixedAssets: 71, tangibleAssets: 58, buildings: 20, machinery: 28, land: 10, intangibleAssets: 8, software: 6, liabilities: 79, currentLiabilities: 41, shortTermDebt: 12, fixedLiabilities: 38, longTermDebt: 31, netAssets: 64, shareholderEquity: 61, capital: 10, capex: 8 },
   { year: 2025, assets: 156, currentAssets: 78, cash: 27, fixedAssets: 78, tangibleAssets: 64, buildings: 22, machinery: 32, land: 10, intangibleAssets: 9, software: 7, liabilities: 83, currentLiabilities: 43, shortTermDebt: 11, fixedLiabilities: 40, longTermDebt: 32, netAssets: 73, shareholderEquity: 70, capital: 10, capex: 10 },
-];
+].map(balanceSheetFromLegacyOku);
 
-export const defaultProjectBasePlan: SegmentPlan = {
+export const defaultProjectBasePlan: SegmentPlan = segmentFromLegacyOku({
   sales: 120,
   cogs: 78,
   employeePay: 10,
@@ -228,7 +241,7 @@ export const defaultProjectBasePlan: SegmentPlan = {
   otherSga: 12,
   headcount: 115,
   officerCount: 2,
-};
+});
 
 export const sampleDrivers: Drivers = {
   projectMarketGrowth: 0.05,
@@ -273,8 +286,8 @@ export const sampleDrivers: Drivers = {
   projectSgaRateEnd: 0.015,
   otherSgaRateEnd: 0.005,
   projectOfficerPayGrowth: 0.06,
-  investment: 45,
-  subsidy: 15,
+  investment: legacyOkuToInternalMoney(45),
+  subsidy: legacyOkuToInternalMoney(15),
   localBenchmark: 23,
 };
 
@@ -387,8 +400,8 @@ export const driverBounds: Record<keyof Drivers, [number, number]> = {
   otherExtraordinaryRate: [-0.5, 0.5],
   effectiveTaxRate: [0, 0.6],
   projectSalesGrowthToBase: [-0.05, 0.4],
-  projectFirstYearSales: [0, 100000],
-  projectBaseYearSales: [0, 100000],
+  projectFirstYearSales: [0, legacyOkuToInternalMoney(100000)],
+  projectBaseYearSales: [0, legacyOkuToInternalMoney(100000)],
   projectCogsImprovementToBase: [0, 0.02],
   projectPayGrowthToBase: [0, 0.1],
   projectHeadcountGrowthToBase: [-0.03, 0.2],
@@ -412,8 +425,8 @@ export const driverBounds: Record<keyof Drivers, [number, number]> = {
   projectSgaRateEnd: [0, 0.03],
   otherSgaRateEnd: [0, 0.03],
   projectOfficerPayGrowth: [0, 0.1],
-  investment: [15, 200],
-  subsidy: [1, 50],
+  investment: [legacyOkuToInternalMoney(15), legacyOkuToInternalMoney(200)],
+  subsidy: [legacyOkuToInternalMoney(1), legacyOkuToInternalMoney(50)],
   localBenchmark: [0, 100],
 };
 
@@ -444,20 +457,20 @@ export function suggestCogsRateRange(primaryRates: number[], fallbackRates: numb
 
 export const metrics: MetricDefinition[] = [
   { key: "companySalesCagr", label: "全社年平均売上高成長率", unit: "%/年", round3Formula: "基準年前年→事業化報告3年目（4年CAGR）", round6Formula: "基準年→事業化報告3年目（3年CAGR）", defaultTarget: 21, rangeMax: 35, direction: "min", sourceRound: "過去中央値は第5次採択者21%（期間差に注意）" },
-  { key: "companySalesIncrease", label: "全社売上高増加額", unit: "億円", round3Formula: "事業化報告3年目 − 基準年前年", round6Formula: "事業化報告3年目 − 基準年", defaultTarget: 0, direction: "min", sourceRound: "全社売上高成長率の目標と基準年売上高から規模連動で設定" },
+  { key: "companySalesIncrease", label: "全社売上高増加額", unit: "千円", round3Formula: "事業化報告3年目 − 基準年前年", round6Formula: "事業化報告3年目 − 基準年", defaultTarget: 0, direction: "min", sourceRound: "全社売上高成長率の目標と基準年売上高から規模連動で設定" },
   { key: "companyPaySchedule", label: "全社の従業員1人当たり給与支給総額の年平均上昇率（最新決算期→基準年度）", unit: "%/年", round3Formula: "従業員＋役員の合算1人当たり給与支給総額：最新決算期→基準年度の年率", round6Formula: "全社の従業員1人当たり給与支給総額：最新決算期→基準年度の年平均上昇率（基準年度の常時使用する従業員数（就業時間換算）が0の場合のみ役員で代替）", defaultTarget: 3.5, rangeMax: 7, direction: "min", sourceRound: "第6次の足下賃上げ評価" },
   { key: "projectSalesShare", label: "補助事業売上高／全社売上高", unit: "%", round3Formula: "事業化報告3年目の補助事業売上高 ÷ 同年全社売上高", round6Formula: "事業化報告3年目の補助事業売上高 ÷ 同年全社売上高", defaultTarget: 70, rangeMax: 95, direction: "range", sourceRound: "第5次平均89%を参考に範囲管理" },
   { key: "projectSalesCagr", label: "補助事業年平均売上高成長率", unit: "%/年", round3Formula: "基準年→事業化報告3年目（3年CAGR）", round6Formula: "基準年→事業化報告3年目（3年CAGR）", defaultTarget: 22, rangeMax: 35, direction: "min", sourceRound: "第5次採択者中央値" },
-  { key: "projectSalesIncrease", label: "補助事業売上高増加額", unit: "億円", round3Formula: "事業化報告3年目 − 基準年", round6Formula: "事業化報告3年目 − 基準年", defaultTarget: 0, direction: "min", sourceRound: "補助事業売上高成長率の目標と基準年売上高から規模連動で設定" },
+  { key: "projectSalesIncrease", label: "補助事業売上高増加額", unit: "千円", round3Formula: "事業化報告3年目 − 基準年", round6Formula: "事業化報告3年目 − 基準年", defaultTarget: 0, direction: "min", sourceRound: "補助事業売上高成長率の目標と基準年売上高から規模連動で設定" },
   { key: "laborProductivityCagr", label: "補助事業年平均労働生産性の伸び", unit: "%/年", round3Formula: "付加価値額÷（常時使用する従業員数（就業時間換算）＋役員数）の基準年→3年目CAGR", round6Formula: "付加価値額÷（常時使用する従業員数（就業時間換算）＋役員数）の基準年→3年目CAGR", defaultTarget: 21, rangeMax: 35, direction: "min", sourceRound: "第5次採択者中央値" },
-  { key: "valueAddedIncrease", label: "補助事業付加価値増加額", unit: "億円", round3Formula: "3年目付加価値額 − 基準年付加価値額", round6Formula: "3年目付加価値額 − 基準年付加価値額", defaultTarget: 0, direction: "min", sourceRound: "労働生産性目標と基準年付加価値・人員計画から規模連動で設定" },
+  { key: "valueAddedIncrease", label: "補助事業付加価値増加額", unit: "千円", round3Formula: "3年目付加価値額 − 基準年付加価値額", round6Formula: "3年目付加価値額 − 基準年付加価値額", defaultTarget: 0, direction: "min", sourceRound: "労働生産性目標と基準年付加価値・人員計画から規模連動で設定" },
   { key: "employeePayCagr", label: "補助事業1人当たり給与支給総額の年平均上昇率", unit: "%/年", round3Formula: "従業員給与支給総額÷常時使用する従業員数（就業時間換算）の基準年度→事業化報告3年目（本モデルの最終年度）CAGR", round6Formula: "補助事業1人当たり給与支給総額の基準年度→事業化報告3年目（本モデルの最終年度）の年平均上昇率（基準年度の常時使用する従業員数（就業時間換算）が0の場合のみ役員で代替）", defaultTarget: 7, rangeMax: 10, direction: "min", sourceRound: "第6次要件は一般5.0%・100億宣言4.5%以上" },
-  { key: "employeePayIncrease", label: "補助事業従業員給与支給総額の増加額", unit: "億円", round3Formula: "3年目従業員給与総額 − 基準年総額", round6Formula: "3年目従業員給与総額 − 基準年総額", defaultTarget: 0, direction: "min", sourceRound: "1人当たり給与上昇率目標と基準年給与・人員計画から規模連動で設定" },
+  { key: "employeePayIncrease", label: "補助事業従業員給与支給総額の増加額", unit: "千円", round3Formula: "3年目従業員給与総額 − 基準年総額", round6Formula: "3年目従業員給与総額 − 基準年総額", defaultTarget: 0, direction: "min", sourceRound: "1人当たり給与上昇率目標と基準年給与・人員計画から規模連動で設定" },
   { key: "investmentSalesRatio", label: "投資額／全社売上高", unit: "%", round3Formula: "補助事業投資額 ÷ 最新決算期全社売上高", round6Formula: "補助事業投資額 ÷ 最新決算期全社売上高", defaultTarget: 30, rangeMax: 70, direction: "range", sourceRound: "第5次中央値61%を参考に範囲管理" },
   { key: "valueAddedSubsidyRatio", label: "付加価値増加額／補助金額", unit: "%", round3Formula: "基準年→3年目の付加価値増加額 ÷ 補助金額", round6Formula: "基準年→3年目の付加価値増加額 ÷ 補助金額", defaultTarget: 213, rangeMax: 350, direction: "min", sourceRound: "第5次採択者中央値" },
   { key: "localBenchmark", label: "ローカルベンチマーク財務分析結果", unit: "点", round3Formula: "ローカルベンチマーク入力値", round6Formula: "ローカルベンチマーク入力値", defaultTarget: 23, rangeMax: 40, direction: "min", sourceRound: "第5次採択者中央値" },
   { key: "officerPayCagr", label: "年平均役員目標賃上げ率", unit: "%/年", round3Formula: "役員給与総額÷役員数の基準年→3年目CAGR", round6Formula: "役員給与総額÷役員数の基準年→3年目CAGR（参考管理）", defaultTarget: 6, rangeMax: 10, direction: "min", sourceRound: "第6次評価対象外・参考値" },
-  { key: "officerPayIncrease", label: "役員給与支給総額の増加額", unit: "億円", round3Formula: "3年目役員給与総額 − 基準年総額", round6Formula: "3年目役員給与総額 − 基準年総額（参考管理）", defaultTarget: 0, direction: "min", sourceRound: "第6次評価対象外・参考値" },
+  { key: "officerPayIncrease", label: "役員給与支給総額の増加額", unit: "千円", round3Formula: "3年目役員給与総額 − 基準年総額", round6Formula: "3年目役員給与総額 − 基準年総額（参考管理）", defaultTarget: 0, direction: "min", sourceRound: "第6次評価対象外・参考値" },
 ];
 
 export const defaultTargets = Object.fromEntries(
@@ -473,7 +486,7 @@ export const defaultTargets = Object.fromEntries(
 ) as Record<MetricKey, Target>;
 
 const lerp = (start: number, end: number, progress: number) => start + (end - start) * progress;
-const round = (value: number, digits = 2) => Number(value.toFixed(digits));
+const round = (value: number) => normalizeInternalMoney(value);
 
 export const employeeSalary = (segment: SegmentPlan) => segment.employeeSalary ?? segment.employeePay;
 export const employeeBonus = (segment: SegmentPlan) => segment.employeeBonus ?? 0;

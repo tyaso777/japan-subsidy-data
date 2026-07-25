@@ -1,4 +1,5 @@
 import type { Drivers, MetricKey, YearPlan } from "./model";
+import { legacyOkuToInternalMoney, toDisplayMoney } from "./money";
 
 export type ApplicationCategory = "" | "general" | "hundredBillion";
 export const defaultApplicationCategory: Exclude<ApplicationCategory, ""> = "general";
@@ -11,14 +12,14 @@ export const applicationCategoryLabels: Record<Exclude<ApplicationCategory, "">,
 export function applicationRequirements(category: ApplicationCategory) {
   if (!category) return null;
   return {
-    investmentMinimum: category === "hundredBillion" ? 15 : 20,
+    investmentMinimum: legacyOkuToInternalMoney(category === "hundredBillion" ? 15 : 20),
     projectPayCagrMinimum: category === "general" ? 5 : 4.5,
   };
 }
 
 export function maximumSubsidyAmount(investment: number) {
-  const exactMaximum = Math.min(50, Math.max(0, investment) / 3);
-  return Math.floor((exactMaximum + Number.EPSILON) * 100) / 100;
+  const exactMaximum = Math.min(legacyOkuToInternalMoney(50), Math.max(0, investment) / 3);
+  return Math.floor(exactMaximum);
 }
 
 export function driverRequirementFloor(key: keyof Drivers) {
@@ -39,8 +40,8 @@ export function normalizeDriverRangeForRequirements(key: keyof Drivers, range: [
 export function driverRequirementLabel(key: keyof Drivers, category: ApplicationCategory, investment: number) {
   const requirements = applicationRequirements(category);
   if (key === "projectPayGrowthToBase") return "基準年度額が最新決算期額以上（成長率0%以上）";
-  if (key === "investment") return requirements ? `${requirements.investmentMinimum}億円以上（専門家経費・外注費を除く補助対象経費）` : "申請区分の選択後に確定";
-  if (key === "subsidy") return `50億円以下、かつ投資額の1/3以下（現在上限${maximumSubsidyAmount(investment).toFixed(2)}億円）`;
+  if (key === "investment") return requirements ? `${toDisplayMoney(requirements.investmentMinimum, "億円")}億円以上（専門家経費・外注費を除く補助対象経費）` : "申請区分の選択後に確定";
+  if (key === "subsidy") return `50億円以下、かつ投資額の1/3以下（現在上限${toDisplayMoney(maximumSubsidyAmount(investment), "億円").toFixed(2)}億円）`;
   return "—";
 }
 
@@ -49,13 +50,13 @@ export function driverConstraintFailure(key: keyof Drivers, category: Applicatio
   if (key === "projectPayGrowthToBase" && drivers.projectPayGrowthToBase < 0) return "基準年度額が最新決算期額以上となるよう、0%以上で入力してください";
   if (key === "investment") {
     if (!requirements) return "申請区分を先に選択してください";
-    if (drivers.investment < requirements.investmentMinimum) return `制度下限${requirements.investmentMinimum}億円以上で入力してください`;
+    if (drivers.investment < requirements.investmentMinimum) return `制度下限${toDisplayMoney(requirements.investmentMinimum, "億円")}億円以上で入力してください`;
   }
   if (key === "subsidy") {
     if (drivers.subsidy < 0) return "0億円以上で入力してください";
-    if (drivers.subsidy > 50) return "制度上限50億円以下で入力してください";
+    if (drivers.subsidy > legacyOkuToInternalMoney(50)) return "制度上限50億円以下で入力してください";
     const maximum = maximumSubsidyAmount(drivers.investment);
-    if (drivers.subsidy > maximum + 1e-9) return `投資額の1/3以下（現在${maximum.toFixed(2)}億円以下）で入力してください`;
+    if (drivers.subsidy > maximum + 1e-9) return `投資額の1/3以下（現在${toDisplayMoney(maximum, "億円").toFixed(2)}億円以下）で入力してください`;
   }
   return null;
 }

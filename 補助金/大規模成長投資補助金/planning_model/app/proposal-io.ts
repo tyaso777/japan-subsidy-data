@@ -5,11 +5,14 @@ import { hasInputValue, inputKey, type InputValues } from "./input-values";
 import { type MetricGroupBasis, type MetricGroupKey } from "./metric-groups";
 import { applicationCategoryLabels, defaultApplicationCategory, driverRequirementLabel, metricRequirementLabel, type ApplicationCategory } from "./application-rules";
 import { niceChartScale } from "./chart-scale";
+import { INTERNAL_MONEY_UNIT, legacyOkuToInternalMoney } from "./money";
 
 export const PROPOSAL_FORMAT = "growth-investment-proposal/v1";
 
 export type ProposalData = {
   format: typeof PROPOSAL_FORMAT;
+  /** Canonical monetary storage unit. Missing means the legacy 億円 model. */
+  moneyUnit?: typeof INTERNAL_MONEY_UNIT;
   title: string;
   exportedAt: string;
   timeline: TimelineSettings;
@@ -29,6 +32,91 @@ export type ProposalData = {
   /** Optional for compatibility with files created before sixth-round application categories. */
   applicationCategory?: ApplicationCategory;
 };
+
+const moneySegmentFields = new Set([
+  "sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga",
+  "employeeSalary", "employeeBonus", "officerCompensation", "officerBonus",
+  "cogsDepreciation", "sgaDepreciation", "researchDevelopment",
+  "ordinaryIncome", "preTaxIncome", "netIncome",
+]);
+const moneyDriverKeys = new Set<keyof Drivers>(["projectFirstYearSales", "projectBaseYearSales", "investment", "subsidy"]);
+const moneyMetricKeys = new Set<MetricKey>([
+  "companySalesIncrease", "projectSalesIncrease", "valueAddedIncrease",
+  "employeePayIncrease", "officerPayIncrease",
+]);
+const moneyForecastOverrideFields = new Set([
+  ...moneySegmentFields,
+  "2-1", "2-3", "2-4", "2-5", "2-7", "2-8", "2-9", "2-10",
+  "2-11", "2-12", "2-13", "2-14", "2-15", "2-16", "2-18", "2-19",
+  "2-20", "2-21", "2-22", "2-23", "2-24", "2-29", "2-31", "2-33",
+  "2-34", "7-1", "7-4", "7-6", "7-8", "7-9", "7-10", "7-11",
+  "7-15", "7-17", "7-19", "P2-4", "P2-14",
+]);
+
+const migrateSegmentFromLegacyOku = (segment: SegmentPlan): SegmentPlan => Object.fromEntries(
+  Object.entries(segment).map(([key, value]) => [
+    key,
+    moneySegmentFields.has(key) && typeof value === "number" ? legacyOkuToInternalMoney(value) : value,
+  ]),
+) as SegmentPlan;
+
+/**
+ * Converts proposal files created before the canonical 千円 model exactly once.
+ * New files are returned unchanged. Legacy `inputValues` are rebuilt from the
+ * migrated domain model by the caller, avoiding a second, key-guessing conversion.
+ */
+export function normalizeProposalMoneyUnit(proposal: ProposalData): ProposalData {
+  if (proposal.moneyUnit === INTERNAL_MONEY_UNIT) return proposal;
+  const convertDriverRecord = <T extends Partial<Record<keyof Drivers, number>>>(source: T): T =>
+    Object.fromEntries(Object.entries(source).map(([key, value]) => [
+      key,
+      moneyDriverKeys.has(key as keyof Drivers) && typeof value === "number"
+        ? legacyOkuToInternalMoney(value)
+        : value,
+    ])) as T;
+  const convertedRanges = Object.fromEntries(Object.entries(proposal.driverRanges).map(([key, range]) => [
+    key,
+    moneyDriverKeys.has(key as keyof Drivers)
+      ? range.map(legacyOkuToInternalMoney) as [number, number]
+      : range,
+  ])) as Record<keyof Drivers, [number, number]>;
+  const convertedTargets = Object.fromEntries(Object.entries(proposal.targets).map(([key, target]) => [
+    key,
+    moneyMetricKeys.has(key as MetricKey)
+      ? {
+          ...target,
+          value: legacyOkuToInternalMoney(target.value),
+          max: target.max === undefined ? undefined : legacyOkuToInternalMoney(target.max),
+        }
+      : target,
+  ])) as Record<MetricKey, Target>;
+  const convertedOverrides = Object.fromEntries(Object.entries(proposal.forecastOverrides ?? {}).map(([key, value]) => {
+    const field = key.split(":").at(-1) ?? "";
+    return [key, moneyForecastOverrideFields.has(field) ? legacyOkuToInternalMoney(value) : value];
+  }));
+  return {
+    ...proposal,
+    moneyUnit: INTERNAL_MONEY_UNIT,
+    historicalPlan: proposal.historicalPlan.map((row) => ({
+      ...row,
+      project: migrateSegmentFromLegacyOku(row.project),
+      other: migrateSegmentFromLegacyOku(row.other),
+    })),
+    balanceSheets: proposal.balanceSheets.map((row) => Object.fromEntries(
+      Object.entries(row).map(([key, value]) => [
+        key,
+        key !== "year" && typeof value === "number" ? legacyOkuToInternalMoney(value) : value,
+      ]),
+    ) as BalanceSheetPlan),
+    futureCapex: proposal.futureCapex.map((row) => ({ ...row, value: legacyOkuToInternalMoney(row.value) })),
+    drivers: convertDriverRecord(proposal.drivers),
+    adjustedDrivers: proposal.adjustedDrivers ? convertDriverRecord(proposal.adjustedDrivers) : undefined,
+    driverRanges: convertedRanges,
+    targets: convertedTargets,
+    forecastOverrides: convertedOverrides,
+    inputValues: undefined,
+  };
+}
 
 export type ProposalExportContext = {
   proposal: ProposalData;
@@ -137,7 +225,7 @@ const fixedOutputDriverKeys = new Set<keyof Drivers>([
   "otherOfficerPayGrowthToBase", "otherOfficerPayGrowth",
 ]);
 
-const display = (value: number | undefined, unit: string) => value === undefined || !Number.isFinite(value) ? "—" : `${value.toLocaleString("ja-JP", { maximumFractionDigits: unit === "億円/人" ? 3 : 2, minimumFractionDigits: 0 })}${unit ? ` ${unit}` : ""}`;
+const display = (value: number | undefined, unit: string) => value === undefined || !Number.isFinite(value) ? "—" : `${value.toLocaleString("ja-JP", { maximumFractionDigits: unit === "千円/人" ? 2 : unit === "千円" ? 0 : 2, minimumFractionDigits: 0 })}${unit ? ` ${unit}` : ""}`;
 const htmlPeriodHeader = (plan: YearPlan[]) => plan.map((row) => `<th>${row.year}<small>${htmlEscape(roleLabels[row.role] ?? row.role)}</small></th>`).join("");
 const htmlReportRows = (rows: ReportRow[]) => rows.map((row) => `<tr class="${row.emphasis ? "emphasis" : ""}"><th>${row.code} ${htmlEscape(row.label)}<small>${htmlEscape(row.unit)}</small></th>${row.values.map((value) => `<td>${display(value, row.unit)}</td>`).join("")}</tr>`).join("");
 const htmlSection = (title: string, columns: string, rows: string, note = "") => `<section class="table-section"><h2>${htmlEscape(title)}</h2><div class="table-wrap"><table><thead><tr>${columns}</tr></thead><tbody>${rows}</tbody></table></div>${note ? `<p class="note">${htmlEscape(note)}</p>` : ""}</section>`;
@@ -201,7 +289,7 @@ const htmlDiagnosticCharts = (plan: YearPlan[]) => {
   };
   const colors = { company: "#1f6f54", project: "#d88b15", other: "#56738f" };
   const charts = [
-    htmlTrendChart("売上高", "全社と事業別の規模・成長ペース", "億円", plan, [
+    htmlTrendChart("売上高", "全社と事業別の規模・成長ペース", "千円", plan, [
       { label: "全社", color: colors.company, values: company.map((segment) => segment.sales) },
       { label: "補助事業", color: colors.project, values: plan.map((row) => row.project.sales) },
       { label: "ベース事業", color: colors.other, values: plan.map((row) => row.other.sales) },
@@ -215,7 +303,7 @@ const htmlDiagnosticCharts = (plan: YearPlan[]) => {
       { label: "従業員数", color: colors.other, values: indexed(company.map((segment) => segment.headcount)) },
       { label: "従業員1人当たり給与", color: colors.company, values: indexed(company.map(perEmployee)) },
     ]),
-    htmlTrendChart("労働生産性", "付加価値額÷（従業員数＋役員数）", "億円/人", plan, [
+    htmlTrendChart("労働生産性", "付加価値額÷（従業員数＋役員数）", "千円/人", plan, [
       { label: "全社", color: colors.company, values: company.map(productivity) },
       { label: "補助事業", color: colors.project, values: plan.map((row) => productivity(row.project)) },
       { label: "ベース事業", color: colors.other, values: plan.map((row) => productivity(row.other)) },
@@ -465,7 +553,7 @@ export function buildProposalHtml({ proposal, effectivePlan, metricRows }: Propo
   const diagnosticSections = parts.diagnostics.map((group) => htmlSection(`基本指標による妥当性チェック｜${group.title}`, `<th>指標名</th><th>計算式</th><th>主な確認点</th>${planHeader}`, group.rows.map((row) => `<tr><th>${htmlEscape(row.name)}<small>${htmlEscape(row.unit)}</small></th><td class="copy">${htmlEscape(row.formula)}</td><td class="copy">${htmlEscape(row.check)}</td>${row.values.map((period) => `<td>${period.map((entry) => `<span class="diagnostic-value"><small>${htmlEscape(entry.label)}</small>${display(entry.value, row.unit)}</span>`).join("")}</td>`).join("")}</tr>`).join(""))).join("");
   const diagnosticCharts = htmlDiagnosticCharts(effectivePlan);
   const auditRows = inputAuditRows(proposal).map(([key, value]) => `<tr><th>${htmlEscape(key)}</th><td>${display(value, "")}</td><td>${value === 0 ? "明示的な0" : "入力済み"}</td><td>—</td><td>—</td></tr>`).join("");
-  const driverRows = (Object.keys(proposal.drivers) as (keyof Drivers)[]).filter((key) => key !== "localBenchmark" && !hiddenLegacyDriverKeys.has(key)).map((key) => { const percent = !["investment", "subsidy", "projectFirstYearSales", "projectBaseYearSales"].includes(key); const factor = percent ? 100 : 1; const range = fixedOutputDriverKeys.has(key) ? undefined : proposal.driverRanges[key]; const value = proposalInput(proposal, inputKey.driver(key), proposal.drivers[key]); const lower = range ? proposalInput(proposal, inputKey.driverRange(key, 0), range[0]) : undefined; const upper = range ? proposalInput(proposal, inputKey.driverRange(key, 1), range[1]) : undefined; return `<tr><th>${htmlEscape(driverNames[key] ?? key)}</th><td>${display(value === undefined ? undefined : value * factor, percent ? "%" : "億円")}</td><td>${htmlEscape(driverRequirementLabel(key, category, proposal.drivers.investment))}</td><td>${display(lower === undefined ? undefined : lower * factor, percent ? "%" : "")}</td><td>${display(upper === undefined ? undefined : upper * factor, percent ? "%" : "")}</td></tr>`; }).join("") + `<tr class="emphasis"><th colspan="5">入力データ監査（一覧にないキーは未設定／Null）</th></tr>${auditRows}`;
+  const driverRows = (Object.keys(proposal.drivers) as (keyof Drivers)[]).filter((key) => key !== "localBenchmark" && !hiddenLegacyDriverKeys.has(key)).map((key) => { const percent = !["investment", "subsidy", "projectFirstYearSales", "projectBaseYearSales"].includes(key); const factor = percent ? 100 : 1; const range = fixedOutputDriverKeys.has(key) ? undefined : proposal.driverRanges[key]; const value = proposalInput(proposal, inputKey.driver(key), proposal.drivers[key]); const lower = range ? proposalInput(proposal, inputKey.driverRange(key, 0), range[0]) : undefined; const upper = range ? proposalInput(proposal, inputKey.driverRange(key, 1), range[1]) : undefined; return `<tr><th>${htmlEscape(driverNames[key] ?? key)}</th><td>${display(value === undefined ? undefined : value * factor, percent ? "%" : "千円")}</td><td>${htmlEscape(driverRequirementLabel(key, category, proposal.drivers.investment))}</td><td>${display(lower === undefined ? undefined : lower * factor, percent ? "%" : "")}</td><td>${display(upper === undefined ? undefined : upper * factor, percent ? "%" : "")}</td></tr>`; }).join("") + `<tr class="emphasis"><th colspan="5">入力データ監査（一覧にないキーは未設定／Null）</th></tr>${auditRows}`;
   return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${htmlEscape(proposal.title)}</title><style>${proposalHtmlStyles}</style></head><body><main class="report"><header class="cover"><p>大規模成長投資補助金 6次公募対応</p><h1>${htmlEscape(proposal.title)}</h1><p>入力実績、将来計画、目標、妥当性診断を一体で整理した提案計画書</p><div class="meta"><span>申請区分 ${htmlEscape(categoryLabel)}</span><span>最新決算期 ${proposal.timeline.latestYear}</span><span>基準年度 ${proposal.timeline.baseYear}</span><span>出力日時 ${htmlEscape(proposal.exportedAt)}</span></div></header>${htmlSection("15指標・目標", "<th>指標・第6次定義</th><th>計画値</th><th>制度上の必須条件</th><th>目標値</th><th>判定</th>", metricBody)}${htmlSection("1-1～1-25 貸借対照表等（入力結果）", `<th>第6次様式項目</th>${balanceHeader}`, htmlReportRows(parts.balanceRows))}${htmlSection("会社全体にかかる損益計算書（P/L）", `<th>第6次様式項目</th>${planHeader}`, htmlReportRows(parts.companyRows))}${htmlSection("補助事業にかかる収支計画", `<th>第6次様式項目</th>${planHeader}`, htmlReportRows(parts.projectRows))}${diagnosticCharts}${diagnosticSections}${htmlSection("将来予測・調整水準", "<th>調整項目</th><th>計画初期値</th><th>制度上の必須条件</th><th>許容下限</th><th>許容上限</th>", driverRows)}<p class="note">このファイルは「成長投資計画シミュレーター（Ver. 大規模成長投資補助金 6次公募）」に再取込できます。</p><script id="growth-proposal-data" type="application/json">${payload}</script><script>${proposalHtmlInteractionScript}</script></main></body></html>`;
 }
 
@@ -538,7 +626,7 @@ export async function parseProposalFile(file: File): Promise<ProposalData> {
   }
   const proposal = JSON.parse(json) as ProposalData;
   if (proposal.format !== PROPOSAL_FORMAT || !proposal.timeline || !Array.isArray(proposal.historicalPlan)) throw new Error("提案計画データの形式が正しくありません。");
-  return proposal;
+  return normalizeProposalMoneyUnit(proposal);
 }
 
 export function downloadBlob(content: BlobPart, fileName: string, type: string) {

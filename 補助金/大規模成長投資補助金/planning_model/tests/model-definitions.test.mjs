@@ -1,17 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import ts from "typescript";
+import { build } from "esbuild";
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const projectDirectory = path.resolve(testDirectory, "..");
-const modelPath = path.join(projectDirectory, "app", "model.ts");
-const source = await readFile(modelPath, "utf8");
-const compiled = ts.transpileModule(source, {
-  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
-}).outputText;
+const compiled = (await build({
+  absWorkingDir: projectDirectory,
+  entryPoints: ["./app/model.ts"],
+  bundle: true,
+  write: false,
+  platform: "node",
+  format: "cjs",
+  target: "node22",
+})).outputFiles[0].text;
 const commonJsModule = { exports: {} };
 new Function("module", "exports", compiled)(commonJsModule, commonJsModule.exports);
 const model = commonJsModule.exports;
@@ -26,8 +29,8 @@ test("application starts without sample company, project, balance-sheet, or driv
   assert.ok(Object.values(model.defaultDrivers).every((value) => value === 0));
   assert.equal(Object.hasOwn(model.defaultDrivers, "usefulLife"), false);
   assert.equal(Object.hasOwn(model.driverBounds, "usefulLife"), false);
-  assert.equal(model.sampleBasePlan.project.sales, 80);
-  assert.equal(model.sampleDrivers.investment, 45);
+  assert.equal(model.sampleBasePlan.project.sales, 8_000_000);
+  assert.equal(model.sampleDrivers.investment, 4_500_000);
 });
 
 test("previously implicit PL assumptions are explicit drivers", () => {
@@ -112,8 +115,8 @@ test("accounting breakdowns and profit stages use explicit adjustment levels", (
   assert.ok(report3.other.officerPay > base.other.officerPay);
   assert.ok(Math.abs(model.employeeSalary(report3.project) / report3.project.employeePay - 0.80) < 0.002);
   assert.ok(Math.abs(model.employeeSalary(report3.other) / report3.other.employeePay - 0.75) < 0.002);
-  assert.equal(model.officerCompensation(report3.project), Number((report3.project.officerPay * 0.70).toFixed(2)));
-  assert.equal(model.officerCompensation(report3.other), Number((report3.other.officerPay * 0.65).toFixed(2)));
+  assert.equal(model.officerCompensation(report3.project), Math.round(report3.project.officerPay * 0.70));
+  assert.equal(model.officerCompensation(report3.other), Math.round(report3.other.officerPay * 0.65));
   assert.equal(model.cogsDepreciation(report3.project) + model.sgaDepreciation(report3.project), report3.project.depreciation);
   assert.equal(model.cogsDepreciation(report3.other) + model.sgaDepreciation(report3.other), report3.other.depreciation);
   const changedLegacyShares = model.generatePlan(historical, {
@@ -212,8 +215,8 @@ test("absolute-amount target defaults scale with the underlying company", () => 
   for (const key of ["companySalesIncrease", "projectSalesIncrease", "valueAddedIncrease", "employeePayIncrease"]) {
     assert.ok(baseTargets[key].value >= 0);
     assert.ok(baseTargets[key].max >= baseTargets[key].value);
-    assert.ok(Math.abs(doubledTargets[key].value - baseTargets[key].value * 2) < 0.02);
-    assert.ok(Math.abs(doubledTargets[key].max - baseTargets[key].max * 2) < 0.02);
+    assert.ok(Math.abs(doubledTargets[key].value - baseTargets[key].value * 2) <= 1);
+    assert.ok(Math.abs(doubledTargets[key].max - baseTargets[key].max * 2) <= 1);
   }
   assert.equal(baseTargets.officerPayIncrease, undefined);
 });
@@ -284,9 +287,9 @@ test("project-period forecast starts from latest actuals instead of the legacy 1
   const latest = historical.at(-1);
   const inputs = model.createForecastProjectPeriodInputs(latest, model.sampleDrivers, model.DEFAULT_TIMELINE);
 
-  assert.equal(latest.project.sales, 80);
-  assert.equal(inputs[0].project.sales, 96.8);
-  assert.notEqual(inputs[0].project.sales, 40);
+  assert.equal(latest.project.sales, 8_000_000);
+  assert.equal(inputs[0].project.sales, 9_680_000);
+  assert.notEqual(inputs[0].project.sales, 4_000_000);
   assert.equal(inputs.at(-1).year, model.DEFAULT_TIMELINE.baseYear);
 });
 
@@ -298,9 +301,9 @@ test("project sales uses separate growth rates before and after the base year", 
   const base = plan.find((row) => row.role === "base");
   const report1 = plan.find((row) => row.role === "report1");
 
-  assert.equal(inputs[0].project.sales, 88);
-  assert.equal(base.project.sales, 106.48);
-  assert.equal(report1.project.sales, 138.42);
+  assert.equal(inputs[0].project.sales, 8_800_000);
+  assert.equal(base.project.sales, 10_648_000);
+  assert.equal(report1.project.sales, 13_842_400);
 });
 
 test("zero-sales project keeps first equipment-year and base-year sales anchors without inventing intermediate sales", () => {
@@ -311,12 +314,12 @@ test("zero-sales project keeps first equipment-year and base-year sales anchors 
   const historical = model.createHistoricalPlan(zeroSalesLatest, model.DEFAULT_TIMELINE);
   const drivers = {
     ...model.sampleDrivers,
-    projectFirstYearSales: 20,
-    projectBaseYearSales: 80,
+    projectFirstYearSales: 2_000_000,
+    projectBaseYearSales: 8_000_000,
   };
   const inputs = model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE);
 
-  assert.deepEqual(inputs.map((row) => row.project.sales), [20, 0, 80]);
+  assert.deepEqual(inputs.map((row) => row.project.sales), [2_000_000, 0, 8_000_000]);
 });
 
 test("sales anchors do not override a project with latest actual sales", () => {
@@ -324,12 +327,12 @@ test("sales anchors do not override a project with latest actual sales", () => {
   const drivers = {
     ...model.sampleDrivers,
     projectSalesGrowthToBase: 0.1,
-    projectFirstYearSales: 20,
-    projectBaseYearSales: 80,
+    projectFirstYearSales: 2_000_000,
+    projectBaseYearSales: 8_000_000,
   };
   const inputs = model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE);
 
-  assert.deepEqual(inputs.map((row) => row.project.sales), [88, 96.8, 106.48]);
+  assert.deepEqual(inputs.map((row) => row.project.sales), [8_800_000, 9_680_000, 10_648_000]);
 });
 
 test("zero first-year sales does not invent intermediate project sales", () => {
@@ -341,11 +344,11 @@ test("zero first-year sales does not invent intermediate project sales", () => {
   const drivers = {
     ...model.sampleDrivers,
     projectFirstYearSales: 0,
-    projectBaseYearSales: 80,
+    projectBaseYearSales: 8_000_000,
   };
   const inputs = model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE);
 
-  assert.deepEqual(inputs.map((row) => row.project.sales), [0, 0, 80]);
+  assert.deepEqual(inputs.map((row) => row.project.sales), [0, 0, 8_000_000]);
 });
 
 test("other-business forecast uses separate assumptions before and after the base year", () => {
@@ -376,13 +379,13 @@ test("sample other-business post-base assumptions include a modest synergy lift"
   assert.ok(Math.abs(model.sampleDrivers.otherHeadcountGrowth - model.sampleDrivers.otherHeadcountGrowthToBase - 0.005) < 1e-9);
 });
 
-test("forecast PL values are stored with at most two decimal places", () => {
+test("forecast monetary PL values are stored as integer thousands of yen", () => {
   const plan = makePlan();
-  const numericFields = ["sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga", "headcount", "officerCount"];
+  const monetaryFields = ["sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga"];
   for (const row of plan.slice(3)) {
     for (const segment of [row.project, row.other]) {
-      for (const field of numericFields) {
-        assert.ok(Math.abs(segment[field] * 100 - Math.round(segment[field] * 100)) < 1e-8, `${row.year} ${field}=${segment[field]}`);
+      for (const field of monetaryFields) {
+        assert.ok(Number.isInteger(segment[field]), `${row.year} ${field}=${segment[field]}`);
       }
     }
   }
@@ -455,8 +458,8 @@ test("round-six company income inputs are preserved and future profits use expli
   const future = model.total(plan[3].project, plan[3].other);
   const expectedOrdinary = model.operatingProfit(future) - future.sales * 0.01;
   const expectedPreTax = expectedOrdinary - future.sales * 0.005;
-  assert.ok(Math.abs(model.ordinaryIncome(future) - expectedOrdinary) < 0.02);
-  assert.ok(Math.abs(model.preTaxIncome(future) - expectedPreTax) < 0.02);
+  assert.ok(Math.abs(model.ordinaryIncome(future) - expectedOrdinary) <= 1);
+  assert.ok(Math.abs(model.preTaxIncome(future) - expectedPreTax) <= 1);
   assert.ok(Math.abs(model.netIncome(future) / model.preTaxIncome(future) - 0.7) < 0.002);
 });
 
@@ -684,23 +687,23 @@ test("forecast drivers never overwrite the three manually supplied actual period
 
 test("project-period inputs are preserved and report years start from the manual base-year PL", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
-  const projectBase = { ...model.defaultProjectBasePlan, sales: 137.5, cogs: 81.25, headcount: 77 };
+  const projectBase = { ...model.defaultProjectBasePlan, sales: 13_750_000, cogs: 8_125_000, headcount: 77 };
   const projectInputs = model.createProjectPeriodInputs(model.DEFAULT_TIMELINE, projectBase);
-  projectInputs[0].project.sales = 12.3;
-  projectInputs[1].project.sales = 45.6;
+  projectInputs[0].project.sales = 1_230_000;
+  projectInputs[1].project.sales = 4_560_000;
   const plan = model.generatePlan(historical, { ...model.sampleDrivers, projectSalesGrowth: 0.4 }, model.DEFAULT_TIMELINE, projectInputs);
   const beforeBase = plan.filter((row) => row.year > model.DEFAULT_TIMELINE.latestYear && row.year < model.DEFAULT_TIMELINE.baseYear);
   const base = plan.find((row) => row.role === "base");
   const report1 = plan.find((row) => row.role === "report1");
 
-  assert.deepEqual(beforeBase.map((row) => row.project.sales), [12.3, 45.6]);
+  assert.deepEqual(beforeBase.map((row) => row.project.sales), [1_230_000, 4_560_000]);
   for (const key of ["sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga", "headcount", "officerCount"]) {
     assert.equal(base.project[key], projectBase[key]);
   }
   assert.equal(model.cogsDepreciation(base.project), projectBase.cogsDepreciation);
   assert.equal(model.sgaDepreciation(base.project), projectBase.sgaDepreciation);
   assert.equal(model.cogsDepreciation(base.project) + model.sgaDepreciation(base.project), base.project.depreciation);
-  assert.equal(report1.project.sales, 192.5);
+  assert.equal(report1.project.sales, 19_250_000);
 });
 
 test("both round definitions are retained and sixth-round definitions are explicit", () => {

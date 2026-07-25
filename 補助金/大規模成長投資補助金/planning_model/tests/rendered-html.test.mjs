@@ -298,7 +298,7 @@ test("renders the planning model shell", async () => {
   assert.match(reportDataSource, /code: "P2-4", label: "売上原価に含まれる減価償却費（内部管理用）"/);
   assert.match(reportDataSource, /code: "P2-14", label: "販管費に含まれる減価償却費（内部管理用）"/);
   assert.match(reportDataSource, /cogsDepreciation\(row\.project\) \+ sgaDepreciation\(row\.project\)/);
-  assert.match(pageSource, /step=\{item\.digits === 0 \? 1 : 0\.1\}/);
+  assert.match(pageSource, /step=\{1\}/);
   assert.match(modelSource, /headcount: Math\.max\(0, Math\.round\(projectHeadcount\)\)/);
   assert.match(reportDataSource, /code: "2-36", label: "EBITDA増加率"/);
   assert.match(pageSource, /15指標・目標へ戻る/);
@@ -323,7 +323,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /千円（第6次様式）/);
   assert.match(pageSource, /<option value="百万円">百万円<\/option>/);
   assert.match(pageSource, /<option value="千円">千円（第6次様式）<\/option>/);
-  assert.match(pageSource, /moneyDisplayMultiplier/);
+  assert.match(pageSource, /toDisplayMoney\(value, moneyUnit\)/);
   assert.match(pageSource, /driverTablePresentation\(referenceKey, info\.label\)/);
   assert.match(pageSource, /tablePresentation\.note/);
   assert.match(pageSource, /standaloneMetricLabel\(definition\)/);
@@ -460,11 +460,11 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /proposal\.applicationCategory \?\? defaultApplicationCategory/);
   assert.match(modelSource, /sweep < 10/);
   assert.doesNotMatch(modelSource, /sweep < 4/);
-  assert.match(applicationRulesSource, /investmentMinimum: category === "hundredBillion" \? 15 : 20/);
+  assert.match(applicationRulesSource, /investmentMinimum: legacyOkuToInternalMoney\(category === "hundredBillion" \? 15 : 20\)/);
   assert.match(applicationRulesSource, /projectPayCagrMinimum: category === "general" \? 5 : 4\.5/);
-  assert.match(applicationRulesSource, /drivers\.subsidy > 50/);
+  assert.match(applicationRulesSource, /drivers\.subsidy > legacyOkuToInternalMoney\(50\)/);
   assert.match(applicationRulesSource, /maximumSubsidyAmount\(drivers\.investment\)/);
-  assert.match(applicationRulesSource, /Math\.floor\(\(exactMaximum \+ Number\.EPSILON\) \* 100\) \/ 100/);
+  assert.match(applicationRulesSource, /Math\.floor\(exactMaximum\)/);
   assert.match(pageSource, /driverConstraintFailure\(key, applicationCategory, drivers\)/);
   assert.match(pageSource, /proposal\.adjustedDrivers/);
   assert.match(pageSource, /setAdjustedDrivers\(importedAdjustedDrivers\)/);
@@ -483,7 +483,8 @@ test("renders the planning model shell", async () => {
   assert.match(sampleProposalSource, /companySalesCagr: 30/);
   assert.match(sampleProposalSource, /projectSalesCagr: 35/);
   assert.match(sampleProposalSource, /inputKey\.target\("companyPaySchedule", "value"\)\] = 3\.5/);
-  assert.match(sampleProposalSource, /proposal\.adjustedDrivers = clone\(partiallyUnmetAdjustedDrivers\)/);
+  assert.match(sampleProposalSource, /proposal\.adjustedDrivers = reoptimizeSampleProposal\(proposal\)\.drivers/);
+  assert.match(standaloneBuildSource, /copyFile\(path\.join\(projectDirectory, "app", "money\.ts"\)/);
   assert.match(sampleProposalSource, /reoptimizeSampleProposal/);
   assert.match(globalStyles, /\.sample-menu-section \+ \.sample-menu-section/);
   assert.doesNotMatch(globalStyles, /\.sample-menu-section \.sample-result-button \{ background: var\(--green-soft\);/);
