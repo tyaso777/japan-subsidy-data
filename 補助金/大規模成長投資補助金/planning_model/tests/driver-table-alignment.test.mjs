@@ -51,6 +51,17 @@ test("lower and upper bound inputs stay compact enough to remain visually separa
   );
 });
 
+test("forecast-condition number inputs hide spinner controls that obscure compact values", () => {
+  assert.match(
+    stylesheet,
+    /\.driver-target-table input\[type="number"\] \{ appearance: textfield; -moz-appearance: textfield; \}/,
+  );
+  assert.match(
+    stylesheet,
+    /\.driver-target-table input\[type="number"\]::-webkit-inner-spin-button, \.driver-target-table input\[type="number"\]::-webkit-outer-spin-button \{ -webkit-appearance: none; margin: 0; \}/,
+  );
+});
+
 test("forecast-condition controls are centered in their cells while numbers remain right aligned", () => {
   assert.match(
     stylesheet,
