@@ -37,6 +37,13 @@ test("statutory condition is placed immediately after the adjustment-condition c
   );
 });
 
+test("statutory condition column is compact and cannot expand into the period inputs", () => {
+  assert.match(
+    stylesheet,
+    /\.driver-target-table th:nth-child\(2\), \.driver-target-table td:nth-child\(2\) \{ width: 105px !important; min-width: 105px !important; max-width: 105px !important; \}/,
+  );
+});
+
 test("forecast-condition controls are centered in their cells while numbers remain right aligned", () => {
   assert.match(
     stylesheet,
