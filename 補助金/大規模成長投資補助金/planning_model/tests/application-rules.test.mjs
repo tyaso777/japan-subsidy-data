@@ -44,3 +44,14 @@ test("drivers without a statutory floor keep their entered values", () => {
     [-0.01, 0.05],
   );
 });
+
+test("forecast range ordering is rejected only when both bounds exist and lower exceeds upper", () => {
+  assert.equal(rules.driverRangeOrderingFailure(null, 0.1), null);
+  assert.equal(rules.driverRangeOrderingFailure(0.1, null), null);
+  assert.equal(rules.driverRangeOrderingFailure(0.1, 0.1), null);
+  assert.equal(rules.driverRangeOrderingFailure(0.1, 0.2), null);
+  assert.equal(
+    rules.driverRangeOrderingFailure(0.2, 0.1),
+    "下限は上限以下にしてください",
+  );
+});

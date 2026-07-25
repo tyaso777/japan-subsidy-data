@@ -72,6 +72,7 @@ import {
   applicationRequirements,
   defaultApplicationCategory,
   driverConstraintFailure,
+  driverRangeOrderingFailure,
   driverRequirementFloor,
   driverRequirementLabel,
   maximumSubsidyAmount,
@@ -1195,6 +1196,12 @@ export default function Home() {
       || (hasInputValue(inputValues, inputKey.driverRange(key, 0))
         && hasInputValue(inputValues, inputKey.driverRange(key, 1)))),
   ), [activeForecastDriverKeys, inputValues]);
+  const invalidForecastDriverRangeKeys = useMemo(() => activeForecastDriverKeys.filter((key) => {
+    if (!adjustableDriverKeys.includes(key)) return false;
+    const rawLower = getInputValue(inputValues, inputKey.driverRange(key, 0));
+    const rawUpper = getInputValue(inputValues, inputKey.driverRange(key, 1));
+    return driverRangeOrderingFailure(rawLower === "" ? null : rawLower, rawUpper === "" ? null : rawUpper) !== null;
+  }), [activeForecastDriverKeys, inputValues]);
   const missingAccountingAssumptions = useMemo(() => accountingAssumptionDriverKeys.filter((key) =>
     !hasInputValue(inputValues, inputKey.driver(key)),
   ), [inputValues]);
@@ -2297,11 +2304,17 @@ export default function Home() {
         {constraintError && <small className="field-error" role="alert">{constraintError}</small>}
       </td>;
     }
+    const lowerInput = getInputValue(inputValues, inputKey.driverRange(key, 0));
+    const upperInput = getInputValue(inputValues, inputKey.driverRange(key, 1));
+    const rawLower = lowerInput === "" ? null : lowerInput;
+    const rawUpper = upperInput === "" ? null : upperInput;
+    const orderingError = driverRangeOrderingFailure(rawLower, rawUpper);
     return <td className="driver-period-range" colSpan={2}>
       <div className="driver-period-range-grid">
-        <input aria-label={`${info.label} 許容下限`} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={monetaryDriverKeys.has(key) ? 1 : info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />
-        <input aria-label={`${info.label} 許容上限`} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={monetaryDriverKeys.has(key) ? 1 : info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />
+        <input aria-label={`${info.label} 許容下限`} aria-invalid={orderingError ? "true" : undefined} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={monetaryDriverKeys.has(key) ? 1 : info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />
+        <input aria-label={`${info.label} 許容上限`} aria-invalid={orderingError ? "true" : undefined} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={monetaryDriverKeys.has(key) ? 1 : info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />
         {resultValue !== null && <small className="adjusted-value">結果 {number(resultValue, 2)}</small>}
+        {orderingError && <small className="field-error driver-range-error" role="alert">{orderingError}</small>}
       </div>
     </td>;
   }
@@ -2334,6 +2347,15 @@ export default function Home() {
     }
     if (!forecastSettingsReady) {
       setSolveNote("将来予測・調整水準が未設定です。「過去3期からデフォルト設定」で推奨値を作成するか、すべての項目を入力してください。");
+      return;
+    }
+    const rangesToValidate = rangeOverride ?? driverRanges;
+    const invalidRangeKey = activeForecastDriverKeys.find((key) =>
+      adjustableDriverKeys.includes(key)
+      && driverRangeOrderingFailure(rangesToValidate[key][0], rangesToValidate[key][1]) !== null,
+    );
+    if (invalidRangeKey) {
+      setSolveNote(`${driverLabels[invalidRangeKey]?.label ?? "調整条件"}の下限・上限を修正してください。`);
       return;
     }
     setIsSolving(true);
@@ -2623,6 +2645,7 @@ export default function Home() {
           <article className="panel">
             <div className="panel-heading"><div><h2>将来予測・調整水準</h2><span className={`pill ${forecastSettingsReady ? "green" : ""}`}>{forecastSettingsReady ? "設定済み" : "未設定"}</span></div><button className="default-button" onClick={confirmAndApplyHistoricalDefaults}>{forecastSettingsStarted ? "過去3期から再設定" : "過去3期からデフォルト設定"}</button></div>
             {missingAccountingAssumptions.length > 0 && <p className="default-note" role="alert">会計内訳・利益前提が未設定です。補助事業・ベース事業の各6項目と共通の実効税率を設定するまで、③将来データ入力では自動予測を表示しません。</p>}
+            {invalidForecastDriverRangeKeys.length > 0 && <p className="driver-range-summary-error" role="alert">下限が上限を超えている調整条件があります。赤字の範囲を修正してください。</p>}
             <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th rowSpan={2}>調整条件<small>C-1～（Condition）</small></th><th rowSpan={2} className="driver-statutory-heading">制度上の必須条件<small>編集不可</small></th>{historicalPlan.slice(1).map((row) => <th rowSpan={2} className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th colSpan={2} className="driver-period-heading">設備導入期間<small>最新決算期 → 基準年</small></th><th colSpan={2} className="driver-period-heading">基準年後<small>基準年 → 事業化報告3年目</small></th></tr><tr><th className="driver-bound-heading">下限</th><th className="driver-bound-heading">上限</th><th className="driver-bound-heading">下限</th><th className="driver-bound-heading">上限</th></tr></thead><tbody>
               {driverComparisonGroups.flatMap((group) => [
                 <tr className="driver-group-heading" key={`group-${group.label}`}><th><strong>{group.label}</strong></th><td aria-hidden="true" colSpan={7}></td></tr>,

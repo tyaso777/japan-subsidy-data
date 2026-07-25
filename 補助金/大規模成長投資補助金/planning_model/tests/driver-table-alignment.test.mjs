@@ -84,6 +84,25 @@ test("optimization result spans both lower and upper bound columns", () => {
   );
 });
 
+test("invalid lower and upper bounds are announced immediately on the affected pair", () => {
+  assert.match(
+    pageSource,
+    /const orderingError = driverRangeOrderingFailure\(rawLower, rawUpper\)/,
+  );
+  assert.equal(
+    pageSource.match(/aria-invalid=\{orderingError \? "true" : undefined\}/g)?.length,
+    2,
+  );
+  assert.match(
+    pageSource,
+    /<small className="field-error driver-range-error" role="alert">\{orderingError\}<\/small>/,
+  );
+  assert.match(
+    stylesheet,
+    /\.driver-period-range-grid \.driver-range-error \{ grid-column: 1 \/ -1;/,
+  );
+});
+
 test("zero-history project sales amount is a separate row above the growth-rate row", () => {
   const amountRowIndex = pageSource.indexOf('className="driver-adjustable project-launch-sales-row"');
   const amountCodeIndex = pageSource.indexOf("C-1A／C-1B:", amountRowIndex);

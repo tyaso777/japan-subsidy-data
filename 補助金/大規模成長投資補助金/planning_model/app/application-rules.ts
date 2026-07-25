@@ -37,6 +37,11 @@ export function normalizeDriverRangeForRequirements(key: keyof Drivers, range: [
   return [first, second];
 }
 
+export function driverRangeOrderingFailure(lower: number | null, upper: number | null) {
+  if (lower === null || upper === null) return null;
+  return lower > upper ? "下限は上限以下にしてください" : null;
+}
+
 export function driverRequirementLabel(key: keyof Drivers, category: ApplicationCategory, investment: number) {
   const requirements = applicationRequirements(category);
   if (key === "projectPayGrowthToBase") return "基準年度額が最新決算期額以上（成長率0%以上）";
