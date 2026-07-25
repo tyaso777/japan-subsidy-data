@@ -243,12 +243,13 @@ thead th:first-child { background: var(--surface-header); }.emphasis th, .emphas
 .balance-sheet-display-options small { color: var(--muted); font-size: 11px; line-height: 1.5; }
 .actuals-three-year-table { width: min(100%, 860px); max-width: 860px; margin: 15px auto 0; }
 .history-actuals-view { width: min(100%, 1040px); margin-inline: auto; }
-.actuals-three-year-table table { width: 100% !important; min-width: 690px !important; table-layout: fixed; }
+.actuals-three-year-table table { width: 100% !important; min-width: 0 !important; table-layout: fixed; }
 .actuals-three-year-table table, .actuals-three-year-table th, .actuals-three-year-table td { box-sizing: border-box; }
-.actuals-three-year-table th:first-child { width: 300px !important; min-width: 300px !important; max-width: 300px !important; }
-.actuals-three-year-table th:not(:first-child), .actuals-three-year-table td:not(:first-child) { width: 130px !important; min-width: 130px !important; }
+.actuals-three-year-table th:first-child { width: 40% !important; min-width: 0 !important; max-width: none !important; }
+.actuals-three-year-table th:not(:first-child), .actuals-three-year-table td:not(:first-child) { width: 20% !important; min-width: 0 !important; }
+.actuals-three-year-table td input { display: block; width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; }
 @media (min-width: 960px) { .actuals-three-year-table { overflow-x: hidden; overflow-y: visible; } }
-@media (max-width: 720px) { .balance-sheet-display-options { align-items: flex-start; flex-direction: column; gap: 5px; }.balance-sheet-display-options label { white-space: normal; } }
+@media (max-width: 720px) { .balance-sheet-display-options { align-items: flex-start; flex-direction: column; gap: 5px; }.balance-sheet-display-options label { white-space: normal; }.actuals-three-year-table table { min-width: 620px !important; }.actuals-three-year-table th:first-child { width: 248px !important; }.actuals-three-year-table th:not(:first-child), .actuals-three-year-table td:not(:first-child) { width: 124px !important; } }
 .future-capex-table input { width: 88px; padding: 6px; text-align: right; }
 .content-stack, .panel, .manual-sections, .manual-sections > div { min-width: 0; }.manual-sections { display: grid; gap: var(--space-6); }.manual-sections h3 { font-family: var(--display-serif); font-weight: 600; font-size: var(--text-xl); font-variant-numeric: lining-nums; letter-spacing: .01em; }.manual-sections > div > h3 { position: sticky; top: 46px; z-index: 18; margin: 0; padding: 10px var(--space-1); border-bottom: 1px solid rgba(215, 211, 200, .9); background: rgba(248, 246, 240, .97); backdrop-filter: blur(8px); }.manual-sections input { width: 88px; text-align: right; padding: 6px; }.wide-table th small { display: block; color: var(--muted); font-size: var(--text-xs); margin-top: 3px; }
 .manual-table-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
