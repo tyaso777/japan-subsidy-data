@@ -44,6 +44,13 @@ test("statutory condition column is compact and cannot expand into the period in
   );
 });
 
+test("lower and upper bound inputs stay compact enough to remain visually separated", () => {
+  assert.match(
+    stylesheet,
+    /\.driver-target-table input \{ width: 54px; padding: 6px; text-align: right; \}/,
+  );
+});
+
 test("forecast-condition controls are centered in their cells while numbers remain right aligned", () => {
   assert.match(
     stylesheet,
