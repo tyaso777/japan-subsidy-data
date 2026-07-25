@@ -97,6 +97,7 @@ const driverRangeSuggestionId = (metricKey: MetricKey, suggestion: DriverRangeSu
   `${metricKey}:${suggestion.key}:${suggestion.boundIndex}:${suggestion.value}`;
 
 const adjustableDriverKeys: (keyof Drivers)[] = [
+  "projectFirstYearSales", "projectBaseYearSales",
   "projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase", "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase",
   "otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase",
   "projectSalesGrowth", "otherSalesGrowth", "projectCogsRateWhenSalesZero", "otherCogsRateWhenSalesZero", "projectCogsImprovementAfterBase", "otherCogsImprovement",
@@ -291,7 +292,7 @@ const accountingAssumptionDriverKeys: (keyof Drivers)[] = [
 ];
 // 実効税率を含む会計前提は、目標達成のために動かさず入力値を固定する。
 const fixedForecastDriverKeys = new Set<keyof Drivers>([
-  "investment", "subsidy", "projectFirstYearSales", "projectBaseYearSales", "projectEmployeeSalaryShare", "otherEmployeeSalaryShare",
+  "investment", "subsidy", "projectEmployeeSalaryShare", "otherEmployeeSalaryShare",
   "projectOfficerCompensationShare", "otherOfficerCompensationShare",
   "projectResearchDevelopmentRate", "otherResearchDevelopmentRate",
   "projectNonOperatingRate", "otherNonOperatingRate",
@@ -1546,6 +1547,25 @@ export default function Home() {
     setApplicationCategory(proposal.applicationCategory ?? defaultApplicationCategory);
     if (proposal.inputValues) {
       let normalizedInputs = clone(proposal.inputValues);
+      for (const key of ["projectFirstYearSales", "projectBaseYearSales"] as const) {
+        const directKey = inputKey.driver(key);
+        const lowerKey = inputKey.driverRange(key, 0);
+        const upperKey = inputKey.driverRange(key, 1);
+        if (
+          hasInputValue(normalizedInputs, directKey)
+          && !hasInputValue(normalizedInputs, lowerKey)
+          && !hasInputValue(normalizedInputs, upperKey)
+        ) {
+          const anchor = Math.max(0, Number(getInputValue(normalizedInputs, directKey)));
+          const lower = roundedInput(anchor * 0.8);
+          const upper = roundedInput(anchor * 1.2);
+          importedRanges[key] = [lower, upper];
+          importedDrivers[key] = (lower + upper) / 2;
+          normalizedInputs = setInputValue(normalizedInputs, lowerKey, lower);
+          normalizedInputs = setInputValue(normalizedInputs, upperKey, upper);
+          normalizedInputs = setInputValue(normalizedInputs, directKey, importedDrivers[key]);
+        }
+      }
       proposal.historicalPlan.forEach((row) => {
         const migrateBreakdown = (legacyCode: string, primaryCode: string, secondaryCode: string) => {
           const legacyKey = inputKey.companyActual(row.year, legacyCode);
@@ -1569,6 +1589,8 @@ export default function Home() {
         }
         if (hasInputValue(normalizedInputs, inputKey.driver(key))) normalizedInputs = setInputValue(normalizedInputs, inputKey.driver(key), importedDrivers[key]);
       }
+      setDrivers({ ...importedDrivers });
+      setDriverRanges({ ...importedRanges });
       setInputValues(normalizedInputs);
     } else {
       // Legacy v1 files had numeric models only.  Treat their saved cells as
@@ -1976,6 +1998,13 @@ export default function Home() {
     const value = displayValue === null ? fallback : percentDriver(key) ? displayValue / 100 : displayValue;
     const nextRange: [number, number] = [...driverRanges[key]];
     nextRange[boundIndex] = value;
+    if (
+      displayValue !== null
+      && (key === "projectFirstYearSales" || key === "projectBaseYearSales")
+      && !hasInputValue(inputValues, inputKey.driverRange(key, boundIndex === 0 ? 1 : 0))
+    ) {
+      nextRange[boundIndex === 0 ? 1 : 0] = value;
+    }
     const normalizedRange = normalizeDriverRangeForRequirements(key, nextRange);
     const midpoint = (normalizedRange[0] + normalizedRange[1]) / 2;
     setInputValues((current) => {
@@ -2112,6 +2141,7 @@ export default function Home() {
       : clamp(officerGrowthDefault, 0, 0.08);
 
     for (const key of adjustableDriverKeys) {
+      if (key === "projectFirstYearSales" || key === "projectBaseYearSales") continue;
       if (key === "projectCogsRateWhenSalesZero" || key === "otherCogsRateWhenSalesZero") continue;
       const history = historicalDriverSeries[key];
       const observed = history.values.filter(Number.isFinite);
@@ -2179,6 +2209,7 @@ export default function Home() {
       clamp(nextDrivers.otherSgaRateEnd + 0.005, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]),
     ];
     for (const key of adjustableDriverKeys) {
+      if (key === "projectFirstYearSales" || key === "projectBaseYearSales") continue;
       nextDrivers[key] = (nextRanges[key][0] + nextRanges[key][1]) / 2;
     }
 
@@ -2258,38 +2289,6 @@ export default function Home() {
         <input aria-label={`${info.label} 許容下限`} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />
         <input aria-label={`${info.label} 許容上限`} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />
         {resultValue !== null && <small className="adjusted-value">結果 {number(resultValue, 2)}</small>}
-      </div>
-    </td>;
-  }
-
-  function renderProjectLaunchSalesCells() {
-    return <td className="driver-period-range project-launch-sales" colSpan={2}>
-      <div className="project-launch-sales-grid">
-        <label>
-          <small>設備導入初年度</small>
-          <input
-            aria-label="補助事業 売上高（設備導入初年度）固定値"
-            type="number"
-            min="0"
-            step={driverLabels.projectFirstYearSales!.step}
-            value={driverDirectDisplayValue("projectFirstYearSales")}
-            placeholder="未設定"
-            onChange={(event) => updateDriver("projectFirstYearSales", event.target.value === "" ? null : Number(event.target.value))}
-          />
-        </label>
-        <label>
-          <small>基準年度</small>
-          <input
-            aria-label="補助事業 売上高（基準年度）固定値"
-            type="number"
-            min="0"
-            step={driverLabels.projectBaseYearSales!.step}
-            value={driverDirectDisplayValue("projectBaseYearSales")}
-            placeholder="未設定"
-            onChange={(event) => updateDriver("projectBaseYearSales", event.target.value === "" ? null : Number(event.target.value))}
-          />
-        </label>
-        <small className="driver-period-note project-launch-result">中間年度の売上高は③将来データ入力の7-1で年度別に入力します</small>
       </div>
     </td>;
   }
@@ -2631,12 +2630,12 @@ export default function Home() {
                   const constraintError = keys.some((key) => driverConstraintFailure(key, applicationCategory, drivers));
                   const adjustable = keys.some((key) => adjustableDriverKeys.includes(key));
                   const launchSalesAmountRow = launchSalesGrowthRow
-                    ? <tr className="driver-fixed project-launch-sales-row" key={`${group.label}-${rowIndex}-sales`}>
-                      <th><span className="driver-item-code">C-1A／C-1B:</span> 補助事業 売上高<small>億円／設備導入初年度・基準年度の固定値</small></th>
+                    ? <tr className="driver-adjustable project-launch-sales-row" key={`${group.label}-${rowIndex}-sales`}>
+                      <th><span className="driver-item-code">C-1A／C-1B:</span> 補助事業 売上高<small>億円／設備導入初年度・基準年度の許容範囲</small></th>
                       <td className="statutory-condition">—</td>
                       {historicalPlan.slice(1).map((row) => <td className="driver-history" key={`project-launch-sales-${row.year}`}>—</td>)}
-                      {renderProjectLaunchSalesCells()}
-                      <td className="driver-period-empty" colSpan={2}>—</td>
+                      {renderDriverPeriodCells("projectFirstYearSales")}
+                      {renderDriverPeriodCells("projectBaseYearSales")}
                     </tr>
                     : null;
                   const growthRow = <tr className={`${adjustable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={`${group.label}-${rowIndex}`}>

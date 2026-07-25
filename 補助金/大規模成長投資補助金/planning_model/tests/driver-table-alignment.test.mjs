@@ -85,20 +85,33 @@ test("optimization result spans both lower and upper bound columns", () => {
 });
 
 test("zero-history project sales amount is a separate row above the growth-rate row", () => {
-  const amountRowIndex = pageSource.indexOf('className="driver-fixed project-launch-sales-row"');
+  const amountRowIndex = pageSource.indexOf('className="driver-adjustable project-launch-sales-row"');
   const amountCodeIndex = pageSource.indexOf("C-1A／C-1B:", amountRowIndex);
-  const amountInputIndex = pageSource.indexOf("renderProjectLaunchSalesCells()", amountCodeIndex);
-  const growthRowIndex = pageSource.indexOf("const growthRow =", amountInputIndex);
-  assert.ok(amountRowIndex >= 0, "補助事業売上高の固定入力行が必要");
-  assert.ok(amountCodeIndex > amountRowIndex, "固定入力行にはC-1A／C-1Bを表示する");
-  assert.ok(amountInputIndex > amountCodeIndex, "固定入力行に設備導入初年度・基準年度の入力欄を置く");
-  assert.ok(growthRowIndex > amountInputIndex, "売上高入力行を売上成長率行より上に置く");
+  const firstYearRangeIndex = pageSource.indexOf('renderDriverPeriodCells("projectFirstYearSales")', amountCodeIndex);
+  const baseYearRangeIndex = pageSource.indexOf('renderDriverPeriodCells("projectBaseYearSales")', firstYearRangeIndex);
+  const growthRowIndex = pageSource.indexOf("const growthRow =", baseYearRangeIndex);
+  assert.ok(amountRowIndex >= 0, "補助事業売上高の範囲入力行が必要");
+  assert.ok(amountCodeIndex > amountRowIndex, "範囲入力行にはC-1A／C-1Bを表示する");
+  assert.ok(firstYearRangeIndex > amountCodeIndex, "設備導入期間の下限・上限には設備導入初年度売上高を置く");
+  assert.ok(baseYearRangeIndex > firstYearRangeIndex, "基準年度側の下限・上限には基準年度売上高を置く");
+  assert.ok(growthRowIndex > baseYearRangeIndex, "売上高入力行を売上成長率行より上に置く");
   assert.match(
     pageSource,
     /const codes = launchSalesGrowthRow[\s\S]*?\? "C-1／C-9"/,
   );
   assert.doesNotMatch(pageSource, /C-1A／C-1B／C-9/);
   assert.doesNotMatch(pageSource, /0始まりではCAGRを計算できません/);
+});
+
+test("zero-history project sales anchors are adjustable within their own ranges", () => {
+  const adjustableStart = pageSource.indexOf("const adjustableDriverKeys:");
+  const adjustableEnd = pageSource.indexOf("];", adjustableStart);
+  const adjustableBlock = pageSource.slice(adjustableStart, adjustableEnd);
+  const fixedStart = pageSource.indexOf("const fixedForecastDriverKeys");
+  const fixedEnd = pageSource.indexOf("]);", fixedStart);
+  const fixedBlock = pageSource.slice(fixedStart, fixedEnd);
+  assert.match(adjustableBlock, /"projectFirstYearSales"[\s\S]*?"projectBaseYearSales"/);
+  assert.doesNotMatch(fixedBlock, /"projectFirstYearSales"|"projectBaseYearSales"/);
 });
 
 test("fixed forecast-condition header keeps its two-row layout and centering", () => {
