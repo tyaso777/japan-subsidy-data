@@ -375,8 +375,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /const conditionCode = \(index: number\) => `C-\$\{index \+ 1\}`/);
   assert.match(pageSource, /const driverItemCodes = Object\.fromEntries/);
   assert.match(pageSource, /<th rowSpan=\{2\}>調整条件<small>C-1～（Condition）<\/small><\/th>/);
-  assert.match(pageSource, /<th colSpan=\{2\}>設備導入期間<small>最新決算期 → 基準年<\/small><\/th>/);
-  assert.match(pageSource, /<th colSpan=\{2\}>基準年後<small>基準年 → 事業化報告3年目<\/small><\/th>/);
+  assert.match(pageSource, /<th colSpan=\{2\} className="driver-period-heading">設備導入期間<small>最新決算期 → 基準年<\/small><\/th>/);
+  assert.match(pageSource, /<th colSpan=\{2\} className="driver-period-heading">基準年後<small>基準年 → 事業化報告3年目<\/small><\/th>/);
   assert.doesNotMatch(pageSource, /<th>計画初期値<\/th>/);
   assert.doesNotMatch(pageSource, /<th>最適化での扱い<\/th>/);
   assert.match(pageSource, /const midpoint = \(nextRange\[0\] \+ nextRange\[1\]\) \/ 2/);
