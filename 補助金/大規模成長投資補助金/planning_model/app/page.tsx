@@ -52,7 +52,7 @@ import {
   YearPlan,
 } from "./model";
 import { buildProposalHtml, buildProposalXlsx, downloadBlob, normalizeProposalMoneyUnit, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
-import { fromDisplayMoney, INTERNAL_MONEY_UNIT, legacyOkuToInternalMoney, moneyUnitLabel, normalizeInternalMoney, toDisplayMoney, type MoneyDisplayUnit } from "./money";
+import { formatNumericInput, fromDisplayMoney, INTERNAL_MONEY_UNIT, legacyOkuToInternalMoney, moneyUnitLabel, normalizeInternalMoney, parseNumericInput, toDisplayMoney, type MoneyDisplayUnit } from "./money";
 import {
   buildMappedExcel,
   EXCEL_MAPPING_COPILOT_PROMPT,
@@ -89,8 +89,6 @@ type View = "summary" | "history" | "future" | "pl" | "targets" | "logic" | "io"
 const emptyDrivers = defaultDrivers;
 const MoneyDisplayUnitContext = createContext<MoneyDisplayUnit>("千円");
 
-const moneyInputStep = (unit: MoneyDisplayUnit) =>
-  unit === "千円" ? 1 : unit === "百万円" ? 0.001 : 0.00001;
 const moneyDisplayDigits = (unit: MoneyDisplayUnit) =>
   unit === "千円" ? 0 : unit === "百万円" ? 3 : 5;
 
@@ -115,16 +113,36 @@ function MoneyInput({
   ariaInvalid?: boolean;
 }) {
   const unit = useContext(MoneyDisplayUnitContext);
-  const displayedValue = value === "" ? "" : toDisplayMoney(Number(value), unit);
+  const digits = moneyDisplayDigits(unit);
+  const displayedValue = value === "" ? "" : formatNumericInput(toDisplayMoney(Number(value), unit), digits);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(displayedValue);
+  useEffect(() => {
+    if (!editing) setDraft(displayedValue);
+  }, [displayedValue, editing]);
   return <input
-    type="number"
-    step={moneyInputStep(unit)}
-    value={displayedValue}
-    placeholder={canonicalPlaceholder === undefined ? placeholder : String(toDisplayMoney(canonicalPlaceholder, unit))}
+    type="text"
+    inputMode="decimal"
+    value={editing ? draft : displayedValue}
+    placeholder={canonicalPlaceholder === undefined ? placeholder : formatNumericInput(toDisplayMoney(canonicalPlaceholder, unit), digits)}
     className={className}
     aria-label={ariaLabel}
     aria-invalid={ariaInvalid}
-    onChange={(event) => onCanonicalChange(event.target.value === "" ? null : fromDisplayMoney(Number(event.target.value), unit))}
+    onFocus={() => {
+      setEditing(true);
+      setDraft(displayedValue);
+    }}
+    onChange={(event) => {
+      const formatted = formatNumericInput(event.target.value, digits);
+      setDraft(formatted);
+      if (formatted === "") {
+        onCanonicalChange(null);
+        return;
+      }
+      const parsed = parseNumericInput(formatted);
+      if (parsed !== null) onCanonicalChange(fromDisplayMoney(parsed, unit));
+    }}
+    onBlur={() => setEditing(false)}
   />;
 }
 
@@ -2341,16 +2359,21 @@ export default function Home() {
     const resultValue = adjustedDrivers ? (monetaryDriverKeys.has(key) ? toDisplayMoney(adjustedDrivers[key], moneyDisplayUnit) : percentDriver(key) ? adjustedDrivers[key] * 100 : adjustedDrivers[key]) : null;
     if (!adjustableDriverKeys.includes(key)) {
       return <td className="driver-fixed-period-value" colSpan={2}>
-        <input
+        {monetaryDriverKeys.has(key) ? <MoneyInput
+          value={getInputValue(inputValues, inputKey.driver(key))}
+          ariaLabel={`${info.label} 固定値`}
+          ariaInvalid={Boolean(constraintError)}
+          onCanonicalChange={(value) => updateDriver(key, value)}
+        /> : <input
           type="number"
           min={key === "investment" || key === "subsidy" ? 0 : undefined}
           aria-label={`${info.label} 固定値`}
           aria-invalid={constraintError ? "true" : undefined}
-          step={monetaryDriverKeys.has(key) ? moneyInputStep(moneyDisplayUnit) : info.step}
+          step={info.step}
           value={driverDirectDisplayValue(key)}
           placeholder="未設定"
-          onChange={(event) => updateDriver(key, event.target.value === "" ? null : monetaryDriverKeys.has(key) ? fromDisplayMoney(Number(event.target.value), moneyDisplayUnit) : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))}
-        />
+          onChange={(event) => updateDriver(key, event.target.value === "" ? null : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))}
+        />}
         {resultValue !== null && <small className="adjusted-value">最適化結果 {number(resultValue, 2)}</small>}
         {constraintError && <small className="field-error" role="alert">{constraintError}</small>}
       </td>;
@@ -2362,8 +2385,8 @@ export default function Home() {
     const orderingError = driverRangeOrderingFailure(rawLower, rawUpper);
     return <td className="driver-period-range" colSpan={2}>
       <div className="driver-period-range-grid">
-        <input aria-label={`${info.label} 許容下限`} aria-invalid={orderingError ? "true" : undefined} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={monetaryDriverKeys.has(key) ? moneyInputStep(moneyDisplayUnit) : info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : monetaryDriverKeys.has(key) ? fromDisplayMoney(Number(event.target.value), moneyDisplayUnit) : Number(event.target.value))} />
-        <input aria-label={`${info.label} 許容上限`} aria-invalid={orderingError ? "true" : undefined} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={monetaryDriverKeys.has(key) ? moneyInputStep(moneyDisplayUnit) : info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : monetaryDriverKeys.has(key) ? fromDisplayMoney(Number(event.target.value), moneyDisplayUnit) : Number(event.target.value))} />
+        {monetaryDriverKeys.has(key) ? <MoneyInput value={lowerInput} ariaLabel={`${info.label} 許容下限`} ariaInvalid={Boolean(orderingError)} onCanonicalChange={(value) => updateDriverRange(key, 0, value)} /> : <input aria-label={`${info.label} 許容下限`} aria-invalid={orderingError ? "true" : undefined} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />}
+        {monetaryDriverKeys.has(key) ? <MoneyInput value={upperInput} ariaLabel={`${info.label} 許容上限`} ariaInvalid={Boolean(orderingError)} onCanonicalChange={(value) => updateDriverRange(key, 1, value)} /> : <input aria-label={`${info.label} 許容上限`} aria-invalid={orderingError ? "true" : undefined} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />}
         {resultValue !== null && <small className="adjusted-value">結果 {number(resultValue, 2)}</small>}
         {orderingError && <small className="field-error driver-range-error" role="alert">{orderingError}</small>}
       </div>
@@ -2374,15 +2397,20 @@ export default function Home() {
     const info = driverLabels[key]!;
     const constraintError = driverConstraintFailure(key, applicationCategory, drivers);
     return <td className="driver-fixed-common-value" colSpan={4}>
-      <input
+      {monetaryDriverKeys.has(key) ? <MoneyInput
+        value={getInputValue(inputValues, inputKey.driver(key))}
+        ariaLabel={`${info.label} 固定値`}
+        ariaInvalid={Boolean(constraintError)}
+        onCanonicalChange={(value) => updateDriver(key, value)}
+      /> : <input
         type="number"
         aria-label={`${info.label} 固定値`}
         aria-invalid={constraintError ? "true" : undefined}
-        step={monetaryDriverKeys.has(key) ? moneyInputStep(moneyDisplayUnit) : info.step}
+        step={info.step}
         value={driverDirectDisplayValue(key)}
         placeholder="未設定"
-        onChange={(event) => updateDriver(key, event.target.value === "" ? null : monetaryDriverKeys.has(key) ? fromDisplayMoney(Number(event.target.value), moneyDisplayUnit) : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))}
-      />
+        onChange={(event) => updateDriver(key, event.target.value === "" ? null : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))}
+      />}
       {constraintError && <small className="field-error" role="alert">{constraintError}</small>}
     </td>;
   }

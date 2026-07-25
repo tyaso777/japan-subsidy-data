@@ -40,3 +40,17 @@ test("legacy billion-yen proposal amounts migrate exactly once", () => {
   assert.equal(money.legacyOkuToInternalMoney(0.01), 1_000);
   assert.equal(money.normalizeInternalMoney(34.855999999999995), 35);
 });
+
+test("money inputs use grouped thousands without losing editable decimals", () => {
+  assert.equal(money.formatNumericInput(13_640_000, 0), "13,640,000");
+  assert.equal(money.formatNumericInput(1234.5678, 3), "1,234.568");
+  assert.equal(money.formatNumericInput("1234."), "1,234.");
+  assert.equal(money.formatNumericInput("-1234.50"), "-1,234.50");
+});
+
+test("grouped money input text parses back to a number", () => {
+  assert.equal(money.parseNumericInput("13,640,000"), 13_640_000);
+  assert.equal(money.parseNumericInput("-1,234.50"), -1234.5);
+  assert.equal(money.parseNumericInput(""), null);
+  assert.equal(money.parseNumericInput("-"), null);
+});
