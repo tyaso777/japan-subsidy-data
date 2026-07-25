@@ -473,6 +473,15 @@ export function createBaseYearLaunchSample(exportedAt: string) {
     exportedAt,
     historicalPlan,
   );
+  proposal.drivers.projectFirstYearSales = 0;
+  proposal.drivers.projectBaseYearSales = launchBase.sales;
+  if (proposal.inputValues) {
+    proposal.inputValues[inputKey.driver("projectFirstYearSales")] = 0;
+    proposal.inputValues[inputKey.driver("projectBaseYearSales")] = launchBase.sales;
+    delete proposal.inputValues[inputKey.driver("projectSalesGrowthToBase")];
+    delete proposal.inputValues[inputKey.driverRange("projectSalesGrowthToBase", 0)];
+    delete proposal.inputValues[inputKey.driverRange("projectSalesGrowthToBase", 1)];
+  }
 
   for (const row of effectivePlan.filter((candidate) => candidate.year > DEFAULT_TIMELINE.latestYear)) {
     const project = row.project;

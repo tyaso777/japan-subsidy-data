@@ -33,6 +33,7 @@ import {
   officerBonus,
   officerCompensation,
   normalizeTimeline,
+  projectLaunchSalesCagr,
   retimeHistoricalPlan,
   retimeBalanceSheets,
   researchDevelopment,
@@ -122,6 +123,8 @@ const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string;
   otherOfficerPayGrowth: { label: "ベース事業 役員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
   projectMarketGrowth: { label: "7-20 市場伸び率（年あたり）", unit: "%/年", step: 0.5 },
   projectSalesGrowthToBase: { label: "補助事業 売上成長率（設備導入期間）", unit: "%/年", step: 0.5 },
+  projectFirstYearSales: { label: "補助事業 売上高（設備導入初年度）", unit: "億円", step: 0.01 },
+  projectBaseYearSales: { label: "補助事業 売上高（基準年度）", unit: "億円", step: 0.01 },
   projectCogsImprovementToBase: { label: "補助事業 原価率改善ポイント（設備導入期間）", unit: "pt", step: 0.5 },
   projectPayGrowthToBase: { label: "補助事業に関わる従業員1人当たり給与支給総額の年平均上昇率（設備導入期間・モデル内管理）", unit: "%/年", step: 0.25 },
   projectHeadcountGrowthToBase: { label: "補助事業 常時使用する従業員数（就業時間換算）の成長率（設備導入期間）", unit: "%/年", step: 0.5 },
@@ -289,7 +292,7 @@ const accountingAssumptionDriverKeys: (keyof Drivers)[] = [
 ];
 // 実効税率を含む会計前提は、目標達成のために動かさず入力値を固定する。
 const fixedForecastDriverKeys = new Set<keyof Drivers>([
-  "investment", "subsidy", "projectEmployeeSalaryShare", "otherEmployeeSalaryShare",
+  "investment", "subsidy", "projectFirstYearSales", "projectBaseYearSales", "projectEmployeeSalaryShare", "otherEmployeeSalaryShare",
   "projectOfficerCompensationShare", "otherOfficerCompensationShare",
   "projectResearchDevelopmentRate", "otherResearchDevelopmentRate",
   "projectNonOperatingRate", "otherNonOperatingRate",
@@ -556,7 +559,7 @@ const companyModeUnsupportedOtherCodes = new Set([
 ]);
 
 const percentDriver = (key: keyof Drivers) =>
-  !["investment", "subsidy", "localBenchmark"].includes(key);
+  !["investment", "subsidy", "projectFirstYearSales", "projectBaseYearSales", "localBenchmark"].includes(key);
 
 function number(value: number, digits = 1) {
   return Number.isFinite(value) ? value.toLocaleString("ja-JP", { maximumFractionDigits: digits, minimumFractionDigits: digits }) : "—";
@@ -1167,17 +1170,22 @@ export default function Home() {
   const [driverRanges, setDriverRanges] = useState<Record<keyof Drivers, [number, number]>>(() => clone(driverBounds));
   const [targets, setTargets] = useState<Record<MetricKey, Target>>(clone(defaultTargets));
   const [inputValues, setInputValues] = useState<InputValues>(() => createInitialInputValues());
-  const forecastSettingsStarted = useMemo(() => forecastDriverKeys.some((key) =>
+  const latestProjectSalesIsZero = historicalPlan[2].project.sales <= 0;
+  const activeForecastDriverKeys = useMemo<(keyof Drivers)[]>(() => latestProjectSalesIsZero
+    ? [...forecastDriverKeys.filter((key) => key !== "projectSalesGrowthToBase"), "projectFirstYearSales", "projectBaseYearSales"]
+    : forecastDriverKeys,
+  [latestProjectSalesIsZero]);
+  const forecastSettingsStarted = useMemo(() => activeForecastDriverKeys.some((key) =>
     hasInputValue(inputValues, inputKey.driver(key))
     || hasInputValue(inputValues, inputKey.driverRange(key, 0))
     || hasInputValue(inputValues, inputKey.driverRange(key, 1)),
-  ), [inputValues]);
-  const forecastSettingsReady = useMemo(() => forecastDriverKeys.every((key) =>
+  ), [activeForecastDriverKeys, inputValues]);
+  const forecastSettingsReady = useMemo(() => activeForecastDriverKeys.every((key) =>
     hasInputValue(inputValues, inputKey.driver(key))
     && (fixedForecastDriverKeys.has(key)
       || (hasInputValue(inputValues, inputKey.driverRange(key, 0))
         && hasInputValue(inputValues, inputKey.driverRange(key, 1)))),
-  ), [inputValues]);
+  ), [activeForecastDriverKeys, inputValues]);
   const missingAccountingAssumptions = useMemo(() => accountingAssumptionDriverKeys.filter((key) =>
     !hasInputValue(inputValues, inputKey.driver(key)),
   ), [inputValues]);
@@ -1566,7 +1574,7 @@ export default function Home() {
     } else {
       // Legacy v1 files had numeric models only.  Treat their saved cells as
       // explicitly entered because the old format cannot recover blanks.
-      let inferred = createInitialInputValues();
+      const inferred = createInitialInputValues();
       proposal.historicalPlan.forEach((row) => {
         companyActualInputRows.filter((item) => item.set).forEach((item) => {
           const value = item.get(proposal.historicalPlan, proposal.historicalPlan.indexOf(row));
@@ -2192,9 +2200,11 @@ export default function Home() {
     setInputValues((current) => {
       let next = { ...current };
       for (const key of Object.keys(nextDrivers) as (keyof Drivers)[]) {
+        if (key === "projectFirstYearSales" || key === "projectBaseYearSales") continue;
         if (key !== "localBenchmark") next = setInputValue(next, inputKey.driver(key), nextDrivers[key]);
       }
       for (const key of Object.keys(nextRanges) as (keyof Drivers)[]) {
+        if (key === "projectFirstYearSales" || key === "projectBaseYearSales") continue;
         next = setInputValue(next, inputKey.driverRange(key, 0), nextRanges[key][0]);
         next = setInputValue(next, inputKey.driverRange(key, 1), nextRanges[key][1]);
       }
@@ -2249,6 +2259,46 @@ export default function Home() {
         <input aria-label={`${info.label} 許容下限`} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />
         <input aria-label={`${info.label} 許容上限`} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />
         {resultValue !== null && <small className="adjusted-value">結果 {number(resultValue, 2)}</small>}
+      </div>
+    </td>;
+  }
+
+  function renderProjectLaunchSalesCells() {
+    const launchCagr = projectLaunchSalesCagr(historicalPlan[2].project.sales, drivers, timeline);
+    const firstYearIsZero = drivers.projectFirstYearSales <= 0 && drivers.projectBaseYearSales > 0;
+    return <td className="driver-period-range project-launch-sales" colSpan={2}>
+      <div className="project-launch-sales-grid">
+        <label>
+          <small>設備導入初年度</small>
+          <input
+            aria-label="補助事業 売上高（設備導入初年度）固定値"
+            type="number"
+            min="0"
+            step={driverLabels.projectFirstYearSales!.step}
+            value={driverDirectDisplayValue("projectFirstYearSales")}
+            placeholder="未設定"
+            onChange={(event) => updateDriver("projectFirstYearSales", event.target.value === "" ? null : Number(event.target.value))}
+          />
+        </label>
+        <label>
+          <small>基準年度</small>
+          <input
+            aria-label="補助事業 売上高（基準年度）固定値"
+            type="number"
+            min="0"
+            step={driverLabels.projectBaseYearSales!.step}
+            value={driverDirectDisplayValue("projectBaseYearSales")}
+            placeholder="未設定"
+            onChange={(event) => updateDriver("projectBaseYearSales", event.target.value === "" ? null : Number(event.target.value))}
+          />
+        </label>
+        <small className={firstYearIsZero ? "field-error project-launch-result" : "adjusted-value project-launch-result"}>
+          {Number.isFinite(launchCagr)
+            ? `設備導入期間CAGR ${number(launchCagr * 100, 2)}%/年`
+            : firstYearIsZero
+              ? "0始まりではCAGRを計算できません。③で設備導入期間の7-1を年度別に入力してください"
+              : "2つの売上高を入力すると設備導入期間CAGRを自動算出します"}
+        </small>
       </div>
     </td>;
   }
@@ -2579,12 +2629,18 @@ export default function Home() {
                   const info = driverLabels[referenceKey]!;
                   const tablePresentation = driverTablePresentation(referenceKey, info.label);
                   const history = historicalDriverSeries[referenceKey];
-                  const codes = keys.map((key) => driverItemCodes[key]).filter(Boolean).join("／");
+                  const launchSalesRow = latestProjectSalesIsZero && comparisonRow.equipment === "projectSalesGrowthToBase";
+                  const codes = launchSalesRow
+                    ? "C-1A／C-1B／C-9"
+                    : keys.map((key) => driverItemCodes[key]).filter(Boolean).join("／");
+                  const displayLabel = launchSalesRow
+                    ? "補助事業 売上高（設備導入初年度・基準年度）／売上成長率（基準年後）"
+                    : tablePresentation.label;
                   const requirementLabels = [...new Set(keys.map((key) => driverRequirementLabel(key, applicationCategory, drivers.investment)).filter((label) => label !== "—"))];
                   const constraintError = keys.some((key) => driverConstraintFailure(key, applicationCategory, drivers));
                   const adjustable = keys.some((key) => adjustableDriverKeys.includes(key));
                   return <tr className={`${adjustable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={`${group.label}-${rowIndex}`}>
-                    <th><span className="driver-item-code">{codes}:</span> {tablePresentation.label}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{info.unit}／{history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>
+                    <th><span className="driver-item-code">{codes}:</span> {displayLabel}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{launchSalesRow ? "億円（売上高）／%/年（基準年後）" : `${info.unit}／${history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}`}</small></th>
                     <td className="statutory-condition"><strong>{requirementLabels.join("／") || "—"}</strong></td>
                     {history.values.slice(1).map((value, referenceIndex) => {
                       const index = referenceIndex + 1;
@@ -2596,7 +2652,9 @@ export default function Home() {
                       }
                       return <td className="driver-history" key={`${referenceKey}-${historicalPlan[index].year}`}>{Number.isFinite(value) ? <><strong>{number(percentDriver(referenceKey) ? value * 100 : value, 2)}</strong><small>{history.mode === "change" ? `${historicalPlan[index - 1]?.year}→${historicalPlan[index].year}` : info.unit}</small></> : "—"}</td>;
                     })}
-                    {comparisonRow.fixed ? renderFixedDriverCells(comparisonRow.fixed) : <>{renderDriverPeriodCells(comparisonRow.equipment)}{renderDriverPeriodCells(comparisonRow.postBase)}</>}
+                    {comparisonRow.fixed
+                      ? renderFixedDriverCells(comparisonRow.fixed)
+                      : <>{launchSalesRow ? renderProjectLaunchSalesCells() : renderDriverPeriodCells(comparisonRow.equipment)}{renderDriverPeriodCells(comparisonRow.postBase)}</>}
                   </tr>;
                 }),
               ])}
