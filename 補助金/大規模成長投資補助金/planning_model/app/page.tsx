@@ -2880,9 +2880,24 @@ function HistoricalInputsEditor({ historical, inputValues, onHistoricalCompanyCh
   onHistoricalCompanyChange: (yearIndex: number, item: CompanyActualInputRow, value: number | null) => void;
   onHistoricalProjectChange: (yearIndex: number, item: ProjectOfficialInputRow, value: number | null) => void;
 }) {
+  const [omitProjectActualCalculated, setOmitProjectActualCalculated] = useState(false);
+  const visibleProjectActualRows = omitProjectActualCalculated ? projectOfficialDisplayRows.filter((item) => item.input) : projectOfficialDisplayRows.filter((item) => !item.fixed);
   return <div className="manual-sections spreadsheet-grid">
     <div><h3>会社全体にかかる損益計算書・関連計算項目（過去3期実績）</h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目（金額は億円）</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{companyActualInputRows.map((item) => <tr className={`${!item.set ? "emphasis" : ""}${item.groupStart ? " official-related-start" : ""}`} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.groupStart && <small>P/L関連計算項目</small>}{item.unit && <small>{item.unit}</small>}</th>{historical.map((row, index) => { const value = item.get(historical, index); return <td key={row.year}>{item.set ? <input type="number" step={item.unit === "人" ? 1 : 0.01} value={getInputValue(inputValues, inputKey.companyActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalCompanyChange(index, item, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{value === undefined ? "—" : number(value, item.unit === "人" ? 0 : 2)}</strong>}</td>; })}</tr>)}</tbody></table></div></div>
-    <div><h3>補助事業PL（過去3期実績）</h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目／補足項目（P2-Xは内部管理用）</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{projectOfficialDisplayRows.filter((item) => item.input || item.code === "7-10").map((item) => <tr className={!item.input ? "calculated-row" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}／{item.input ? "必須入力" : "自動計算"}</small></th>{historical.map((row, index) => <td className={!item.input ? "calculated-cell" : undefined} key={row.year}>{item.input ? <input type="number" step={item.digits === 0 ? 1 : 0.01} value={getInputValue(inputValues, inputKey.projectActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalProjectChange(index, item.input!, event.target.value === "" ? null : Number(event.target.value))} /> : <><strong>{number(item.get(historical, index, emptyDrivers) ?? 0, item.digits ?? 2)}</strong><small>P2-4＋P2-14</small></>}</td>)}</tr>)}</tbody></table></div><p className="footnote">P2-4とP2-14は補助事業の詳細PLを作るための必須入力です。公式7-10「減価償却費（合計）」は、各年度のP2-4＋P2-14として自動計算し、直接入力や配賦による補完は行いません。</p></div>
+    <div>
+      <h3 className="manual-table-heading">
+        <span>補助事業PL（過去3期実績）</span>
+        <button type="button" className="calculated-row-toggle" aria-pressed={omitProjectActualCalculated} onClick={() => setOmitProjectActualCalculated((current) => !current)}>
+          {omitProjectActualCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}
+        </button>
+      </h3>
+      <div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目／補足項目（P2-Xは内部管理用）</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{visibleProjectActualRows.map((item) => <tr className={!item.input ? "calculated-row" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} /><small>{item.unit}／{item.input ? "必須入力" : "自動計算"}</small></th>{historical.map((row, index) => {
+        if (item.input) return <td key={row.year}><input type="number" step={item.digits === 0 ? 1 : 0.01} value={getInputValue(inputValues, inputKey.projectActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalProjectChange(index, item.input!, event.target.value === "" ? null : Number(event.target.value))} /></td>;
+        const calculatedValue = item.get(historical, index, emptyDrivers);
+        return <td className="calculated-cell" key={row.year}><strong>{calculatedValue === undefined ? "—" : number(calculatedValue, item.digits ?? 2)}</strong><small>{item.code === "7-10" ? "P2-4＋P2-14" : "自動計算"}</small></td>;
+      })}</tr>)}</tbody></table></div>
+      <p className="footnote">7-2・7-3・7-5・7-7・7-10～7-12・7-15～7-19は入力済みの過去実績から自動計算します。P2-4とP2-14は補助事業の詳細PLを作るための必須入力です。公式7-10「減価償却費（合計）」は、各年度のP2-4＋P2-14として自動計算し、直接入力や配賦による補完は行いません。</p>
+    </div>
     <p className="footnote">ベース事業の過去3期は「会社全体－補助事業」で自動算出するため、重複入力しません。</p>
   </div>;
 }
