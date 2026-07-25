@@ -1024,7 +1024,7 @@ function useSpreadsheetGrid() {
 
 }
 
-function usePageStickyTableHeaders() {
+function usePageStickyTableHeaders(refreshKey: unknown) {
   useEffect(() => {
     const overlays = new Map<HTMLElement, HTMLDivElement>();
     let animationFrame = 0;
@@ -1130,7 +1130,7 @@ function usePageStickyTableHeaders() {
       document.removeEventListener("scroll", scheduleUpdate, { capture: true });
       overlays.forEach((overlay) => overlay.remove());
     };
-  }, []);
+  }, [refreshKey]);
 }
 
 function useFloatingHorizontalTableScrollbar() {
@@ -1213,10 +1213,10 @@ function useFloatingHorizontalTableScrollbar() {
 
 export default function Home() {
   useSpreadsheetGrid();
-  usePageStickyTableHeaders();
+  const [moneyDisplayUnit, setMoneyDisplayUnit] = useState<MoneyDisplayUnit>("千円");
+  usePageStickyTableHeaders(moneyDisplayUnit);
   useFloatingHorizontalTableScrollbar();
   const [view, setView] = useState<View>("history");
-  const [moneyDisplayUnit, setMoneyDisplayUnit] = useState<MoneyDisplayUnit>("千円");
 
   function goToView(nextView: View) {
     setView(nextView);

@@ -160,7 +160,7 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.data-io-view \.proposal-action-menu-items \{ right: auto; left: 0;/);
   assert.doesNotMatch(globalStyles, /proposal-filebar:has\(\.proposal-action-menu\[open\]\)/);
   assert.doesNotMatch(globalStyles, /max-height: min\(76vh, 860px\)/);
-  assert.match(pageSource, /function usePageStickyTableHeaders\(\)/);
+  assert.match(pageSource, /function usePageStickyTableHeaders\(refreshKey: unknown\)/);
   assert.match(pageSource, /function useFloatingHorizontalTableScrollbar\(\)/);
   assert.match(pageSource, /activeWrapper\.scrollLeft = scrollbar\.scrollLeft/);
   assert.match(pageSource, /overflowX === "auto" \|\| overflowX === "scroll"/);
@@ -330,6 +330,9 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /<option value="百万円">百万円<\/option>/);
   assert.match(pageSource, /<option value="千円">千円（第6次様式）<\/option>/);
   assert.match(pageSource, /toDisplayMoney\(value, moneyUnit\)/);
+  assert.match(pageSource, /function usePageStickyTableHeaders\(refreshKey: unknown\)/);
+  assert.match(pageSource, /usePageStickyTableHeaders\(moneyDisplayUnit\)/);
+  assert.match(pageSource, /\}, \[refreshKey\]\);/);
   assert.match(pageSource, /driverTablePresentation\(referenceKey, info\.label\)/);
   assert.match(pageSource, /tablePresentation\.note/);
   assert.match(pageSource, /standaloneMetricLabel\(definition\)/);
