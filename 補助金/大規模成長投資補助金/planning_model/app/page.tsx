@@ -2516,7 +2516,7 @@ export default function Home() {
             </div>
             <p className="footnote">入力範囲：{timeline.latestYear - 2}年度（前々期）～{timeline.baseYear + 3}年度（事業化報告3年目）。第6次様式の最大枠は、過去3期＋将来9期です。</p>
           </article>
-          <article className="panel table-panel">
+          <article className="panel table-panel balance-sheet-panel">
             <div className="panel-heading"><div><h2>1-1～1-25 貸借対照表等（過去3期）</h2></div><span className="pill green">公式番号に準拠</span></div>
             <div className="balance-sheet-display-options">
               <label>
@@ -2755,7 +2755,7 @@ function BalanceSheetEditor({ balanceSheets, historical, inputValues, omitUnused
   const scopeRows = omitUnused ? rows.filter((item) => item.code === "1-24") : rows;
   const visibleRows = omitCalculated ? scopeRows.filter((item) => item.field) : scopeRows;
   return <>
-    <div className="historical-table-actions"><button type="button" className="calculated-row-toggle" aria-pressed={omitCalculated} disabled={omitUnused} onClick={() => setOmitCalculated((current) => !current)}>{omitCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></div>
+    <h3 className="manual-table-heading"><span>貸借対照表等（1-1～1-25：過去3期実績）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCalculated} disabled={omitUnused} onClick={() => setOmitCalculated((current) => !current)}>{omitCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
     <div className="wide-table balance-sheet-table spreadsheet-grid actuals-three-year-table"><table><thead><tr><th>第6次様式項目（億円）</th>{balanceSheets.map((row, index) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[historical[index].role]}</small></th>)}</tr></thead><tbody>{visibleRows.map((item) => <tr className={!item.field ? "emphasis" : ""} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.percent && <small>%</small>}{item.multiple && <small>倍</small>}</th>{balanceSheets.map((row, index) => <td key={row.year}>{item.field ? <input type="number" step="0.01" value={getInputValue(inputValues, inputKey.balanceSheet(row.year, item.field))} placeholder="未入力" onChange={(event) => onChange(index, item.field!, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{number(item.value!(row, index), 2)}</strong>}</td>)}</tr>)}</tbody></table></div>
   </>;
 }

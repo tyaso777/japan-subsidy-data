@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const pageSource = fs.readFileSync(path.join(root, "app", "page.tsx"), "utf8");
+const stylesheet = fs.readFileSync(path.join(root, "app", "globals.css"), "utf8");
 
 test("historical company PL can hide and restore calculated rows", () => {
   assert.match(pageSource, /const \[omitCompanyActualCalculated, setOmitCompanyActualCalculated\] = useState\(false\)/);
@@ -33,5 +34,19 @@ test("historical balance sheet can hide and restore calculated rows independentl
   assert.match(
     pageSource,
     /omitCalculated \? "自動計算項目を表示する" : "自動計算項目を省略する"/,
+  );
+});
+
+test("historical balance-sheet calculated-row toggle stays with a sticky table subtitle", () => {
+  assert.match(pageSource, /<article className="panel table-panel balance-sheet-panel">/);
+  assert.match(
+    pageSource,
+    /<h3 className="manual-table-heading"><span>貸借対照表等（1-1～1-25：過去3期実績）<\/span><button type="button" className="calculated-row-toggle"/,
+  );
+  assert.doesNotMatch(pageSource, /<div className="historical-table-actions">/);
+  assert.match(stylesheet, /\.balance-sheet-panel > \.panel-heading \{ position: static; \}/);
+  assert.match(
+    stylesheet,
+    /\.balance-sheet-panel > \.manual-table-heading \{[^}]*position: sticky;[^}]*top: 46px;[^}]*z-index: 18;/,
   );
 });
