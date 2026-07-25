@@ -29,10 +29,21 @@ test("forecast-condition grouped headings are centered over their exact columns"
 test("forecast-condition controls are centered in their cells while numbers remain right aligned", () => {
   assert.match(
     stylesheet,
-    /\.driver-target-table \.statutory-condition, \.driver-target-table \.driver-period-bound, \.driver-target-table \.driver-fixed-period-value, \.driver-target-table \.driver-fixed-common-value \{ text-align: center; \}/,
+    /\.driver-target-table \.driver-period-range \{ text-align: center; \}/,
   );
   assert.match(
     stylesheet,
-    /\.driver-target-table \.driver-period-bound input, \.driver-target-table \.driver-fixed-period-value input, \.driver-target-table \.driver-fixed-common-value input \{ display: block; margin-inline: auto; text-align: right; \}/,
+    /\.driver-period-range-grid input \{ justify-self: center; margin: 0; text-align: right; \}/,
+  );
+});
+
+test("optimization result spans both lower and upper bound columns", () => {
+  assert.match(
+    pageSource,
+    /<td className="driver-period-range" colSpan=\{2\}>[\s\S]*?<div className="driver-period-range-grid">[\s\S]*?許容下限[\s\S]*?許容上限[\s\S]*?<small className="adjusted-value">結果 /,
+  );
+  assert.match(
+    stylesheet,
+    /\.driver-period-range-grid \.adjusted-value \{ grid-column: 1 \/ -1; display: block; margin-top: var\(--space-1\); text-align: center; \}/,
   );
 });

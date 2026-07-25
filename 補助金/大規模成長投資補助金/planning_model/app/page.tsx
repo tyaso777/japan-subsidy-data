@@ -2225,10 +2225,13 @@ export default function Home() {
         {constraintError && <small className="field-error" role="alert">{constraintError}</small>}
       </td>;
     }
-    return <>
-      <td className="driver-period-bound"><input aria-label={`${info.label} 許容下限`} type="number" step={info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} /></td>
-      <td className="driver-period-bound"><input aria-label={`${info.label} 許容上限`} type="number" step={info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />{resultValue !== null && <small className="adjusted-value">結果 {number(resultValue, 2)}</small>}</td>
-    </>;
+    return <td className="driver-period-range" colSpan={2}>
+      <div className="driver-period-range-grid">
+        <input aria-label={`${info.label} 許容下限`} type="number" step={info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />
+        <input aria-label={`${info.label} 許容上限`} type="number" step={info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />
+        {resultValue !== null && <small className="adjusted-value">結果 {number(resultValue, 2)}</small>}
+      </div>
+    </td>;
   }
 
   function renderFixedDriverCells(key: keyof Drivers) {
