@@ -237,6 +237,9 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /otherCogsRateWhenSalesZero: \{ label: "ベース事業 原価率"/);
   assert.doesNotMatch(pageSource, /売上実績が0の場合の開始水準/);
   assert.match(pageSource, /suggestCogsRateRange/);
+  assert.match(globalStyles, /actuals-three-year-table table[^}]*min-width:\s*690px/);
+  assert.match(globalStyles, /actuals-three-year-table th:first-child[^}]*width:\s*300px/);
+  assert.match(globalStyles, /actuals-three-year-table th:not\(:first-child\)[^}]*min-width:\s*130px/);
   assert.match(pageSource, /label: "共通・外部前提"/);
   assert.match(pageSource, /keys: \["effectiveTaxRate", "projectMarketGrowth"\]/);
   const adjustableDriverBlock = pageSource.match(/const adjustableDriverKeys:[\s\S]*?\];/)?.[0] ?? "";
