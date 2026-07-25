@@ -319,7 +319,13 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /function DiagnosticCharts\(\{ plan \}/);
   assert.match(pageSource, /主要指標の推移チャート/);
   assert.match(pageSource, /niceChartScale/);
-  assert.match(pageSource, /useState<MoneyDisplayUnit>\("千円"\)/);
+  assert.match(pageSource, /const \[moneyDisplayUnit, setMoneyDisplayUnit\] = useState<MoneyDisplayUnit>\("千円"\)/);
+  assert.match(pageSource, /MoneyDisplayUnitContext\.Provider value=\{moneyDisplayUnit\}/);
+  assert.match(pageSource, /aria-label="画面全体の金額表示単位"/);
+  assert.match(pageSource, /function MoneyInput\(/);
+  assert.match(pageSource, /fromDisplayMoney\(Number\(event\.target\.value\), unit\)/);
+  assert.match(pageSource, /<MoneyInput/);
+  assert.doesNotMatch(pageSource, /const \[moneyUnit, setMoneyUnit\] = useState<MoneyDisplayUnit>/);
   assert.match(pageSource, /千円（第6次様式）/);
   assert.match(pageSource, /<option value="百万円">百万円<\/option>/);
   assert.match(pageSource, /<option value="千円">千円（第6次様式）<\/option>/);

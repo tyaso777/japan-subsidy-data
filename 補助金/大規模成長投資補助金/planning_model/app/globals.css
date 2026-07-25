@@ -122,6 +122,13 @@ main { width: min(calc(100% - 48px), 1920px); margin: 0 auto; padding: var(--spa
 .tabs { position: sticky; top: 0; z-index: 25; display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 24px; overflow-x: auto; background: rgba(248, 246, 240, .96); backdrop-filter: blur(10px); }
 .tabs button { background: transparent; border: 0; color: var(--muted); padding: 13px 18px; font-size: 13px; font-weight: 700; white-space: nowrap; border-bottom: 3px solid transparent; }
 .tabs button.active { color: var(--green); border-color: var(--green); }
+.global-money-unit { margin-left: auto; display: flex; align-items: center; gap: 8px; padding: 6px 10px; white-space: nowrap; color: var(--muted); font-size: 12px; font-weight: 600; }
+.global-money-unit select { min-width: 168px; padding: 7px 28px 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font: inherit; }
+@media (max-width: 900px) {
+  .global-money-unit { position: sticky; right: 0; background: rgba(248, 246, 240, .98); }
+  .global-money-unit span { display: none; }
+  .global-money-unit select { min-width: 116px; }
+}
 .tab-group-separator { align-self: center; flex: 0 0 auto; margin: 0 8px; color: #b8b3a8; font-size: 16px; line-height: 1; }
 
 .page-grid { display: grid; gap: 18px; }

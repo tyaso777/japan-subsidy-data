@@ -30,6 +30,6 @@ test("historical project PL can hide and restore calculated rows", () => {
 test("historical calculated values preserve the distinction between blank and zero", () => {
   assert.match(
     pageSource,
-    /const calculatedValue = item\.get\(historical, index, emptyDrivers\);[\s\S]*?calculatedValue === undefined \? "—" : number\(calculatedValue, item\.digits \?\? 2\)/,
+    /const calculatedValue = item\.get\(historical, index, emptyDrivers\);[\s\S]*?calculatedValue === undefined \? "—" : <ModelValue value=\{calculatedValue\}/,
   );
 });
