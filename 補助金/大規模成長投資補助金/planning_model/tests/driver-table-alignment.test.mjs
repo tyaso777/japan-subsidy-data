@@ -26,6 +26,17 @@ test("forecast-condition grouped headings are centered over their exact columns"
   );
 });
 
+test("statutory condition is placed immediately after the adjustment-condition column", () => {
+  assert.match(
+    pageSource,
+    /<th rowSpan=\{2\}>調整条件<small>C-1～（Condition）<\/small><\/th><th rowSpan=\{2\} className="driver-statutory-heading">制度上の必須条件<small>編集不可<\/small><\/th>\{historicalPlan\.slice\(1\)\.map/,
+  );
+  assert.match(
+    pageSource,
+    /<th><span className="driver-item-code">[\s\S]*?<\/th>\s*<td className="statutory-condition">[\s\S]*?<\/td>\s*\{history\.values\.slice\(1\)\.map/,
+  );
+});
+
 test("forecast-condition controls are centered in their cells while numbers remain right aligned", () => {
   assert.match(
     stylesheet,

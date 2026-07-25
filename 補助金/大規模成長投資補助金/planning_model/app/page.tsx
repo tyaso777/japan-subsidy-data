@@ -2560,7 +2560,7 @@ export default function Home() {
           <article className="panel">
             <div className="panel-heading"><div><h2>将来予測・調整水準</h2><span className={`pill ${forecastSettingsReady ? "green" : ""}`}>{forecastSettingsReady ? "設定済み" : "未設定"}</span></div><button className="default-button" onClick={confirmAndApplyHistoricalDefaults}>{forecastSettingsStarted ? "過去3期から再設定" : "過去3期からデフォルト設定"}</button></div>
             {missingAccountingAssumptions.length > 0 && <p className="default-note" role="alert">会計内訳・利益前提が未設定です。補助事業・ベース事業の各6項目と共通の実効税率を設定するまで、③将来データ入力では自動予測を表示しません。</p>}
-            <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th rowSpan={2}>調整条件<small>C-1～（Condition）</small></th>{historicalPlan.slice(1).map((row) => <th rowSpan={2} className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th rowSpan={2} className="driver-statutory-heading">制度上の必須条件<small>編集不可</small></th><th colSpan={2} className="driver-period-heading">設備導入期間<small>最新決算期 → 基準年</small></th><th colSpan={2} className="driver-period-heading">基準年後<small>基準年 → 事業化報告3年目</small></th></tr><tr><th className="driver-bound-heading">下限</th><th className="driver-bound-heading">上限</th><th className="driver-bound-heading">下限</th><th className="driver-bound-heading">上限</th></tr></thead><tbody>
+            <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th rowSpan={2}>調整条件<small>C-1～（Condition）</small></th><th rowSpan={2} className="driver-statutory-heading">制度上の必須条件<small>編集不可</small></th>{historicalPlan.slice(1).map((row) => <th rowSpan={2} className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th colSpan={2} className="driver-period-heading">設備導入期間<small>最新決算期 → 基準年</small></th><th colSpan={2} className="driver-period-heading">基準年後<small>基準年 → 事業化報告3年目</small></th></tr><tr><th className="driver-bound-heading">下限</th><th className="driver-bound-heading">上限</th><th className="driver-bound-heading">下限</th><th className="driver-bound-heading">上限</th></tr></thead><tbody>
               {driverComparisonGroups.flatMap((group) => [
                 <tr className="driver-group-heading" key={`group-${group.label}`}><th><strong>{group.label}</strong></th><td aria-hidden="true" colSpan={7}></td></tr>,
                 ...group.rows.map((comparisonRow, rowIndex) => {
@@ -2575,6 +2575,7 @@ export default function Home() {
                   const adjustable = keys.some((key) => adjustableDriverKeys.includes(key));
                   return <tr className={`${adjustable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={`${group.label}-${rowIndex}`}>
                     <th><span className="driver-item-code">{codes}:</span> {tablePresentation.label}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{info.unit}／{history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>
+                    <td className="statutory-condition"><strong>{requirementLabels.join("／") || "—"}</strong></td>
                     {history.values.slice(1).map((value, referenceIndex) => {
                       const index = referenceIndex + 1;
                       const referenceLevel = history.referenceLevels?.[index];
@@ -2585,7 +2586,6 @@ export default function Home() {
                       }
                       return <td className="driver-history" key={`${referenceKey}-${historicalPlan[index].year}`}>{Number.isFinite(value) ? <><strong>{number(percentDriver(referenceKey) ? value * 100 : value, 2)}</strong><small>{history.mode === "change" ? `${historicalPlan[index - 1]?.year}→${historicalPlan[index].year}` : info.unit}</small></> : "—"}</td>;
                     })}
-                    <td className="statutory-condition"><strong>{requirementLabels.join("／") || "—"}</strong></td>
                     {comparisonRow.fixed ? renderFixedDriverCells(comparisonRow.fixed) : <>{renderDriverPeriodCells(comparisonRow.equipment)}{renderDriverPeriodCells(comparisonRow.postBase)}</>}
                   </tr>;
                 }),
