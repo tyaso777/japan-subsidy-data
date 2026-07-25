@@ -133,6 +133,23 @@ test("zero-history project sales anchors are adjustable within their own ranges"
   assert.doesNotMatch(fixedBlock, /"projectFirstYearSales"|"projectBaseYearSales"/);
 });
 
+test("base-business officer pay growth is range-adjustable in both forecast periods", () => {
+  const adjustableStart = pageSource.indexOf("const adjustableDriverKeys:");
+  const adjustableEnd = pageSource.indexOf("];", adjustableStart);
+  const adjustableBlock = pageSource.slice(adjustableStart, adjustableEnd);
+  const fixedStart = pageSource.indexOf("const fixedForecastDriverKeys");
+  const fixedEnd = pageSource.indexOf("]);", fixedStart);
+  const fixedBlock = pageSource.slice(fixedStart, fixedEnd);
+  const statisticalStart = pageSource.indexOf("const equipmentPeriodStatisticalKeys");
+  const statisticalEnd = pageSource.indexOf("]);", statisticalStart);
+  const statisticalBlock = pageSource.slice(statisticalStart, statisticalEnd);
+
+  assert.match(adjustableBlock, /"otherOfficerPayGrowthToBase"/);
+  assert.match(adjustableBlock, /"otherOfficerPayGrowth"/);
+  assert.doesNotMatch(fixedBlock, /"otherOfficerPayGrowthToBase"|"otherOfficerPayGrowth"/);
+  assert.match(statisticalBlock, /"otherOfficerPayGrowthToBase"/);
+});
+
 test("fixed forecast-condition header keeps its two-row layout and centering", () => {
   assert.match(
     pageSource,

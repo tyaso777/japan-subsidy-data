@@ -169,9 +169,9 @@ const driverRangeSuggestionId = (metricKey: MetricKey, suggestion: DriverRangeSu
 const adjustableDriverKeys: (keyof Drivers)[] = [
   "projectFirstYearSales", "projectBaseYearSales",
   "projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase", "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase",
-  "otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase",
+  "otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherOfficerPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase",
   "projectSalesGrowth", "otherSalesGrowth", "projectCogsRateWhenSalesZero", "otherCogsRateWhenSalesZero", "projectCogsImprovementAfterBase", "otherCogsImprovement",
-  "projectPayGrowth", "otherPayGrowth", "projectHeadcountGrowth", "otherHeadcountGrowth",
+  "projectPayGrowth", "otherPayGrowth", "otherOfficerPayGrowth", "projectHeadcountGrowth", "otherHeadcountGrowth",
   "projectSgaRateEnd", "otherSgaRateEnd", "projectOfficerPayGrowth",
 ];
 
@@ -367,8 +367,7 @@ const fixedForecastDriverKeys = new Set<keyof Drivers>([
   "projectResearchDevelopmentRate", "otherResearchDevelopmentRate",
   "projectNonOperatingRate", "otherNonOperatingRate",
   "projectExtraordinaryRate", "otherExtraordinaryRate",
-  "effectiveTaxRate", "otherOfficerPayGrowthToBase",
-  "otherOfficerPayGrowth", "projectMarketGrowth",
+  "effectiveTaxRate", "projectMarketGrowth",
 ]);
 
 const conditionCode = (index: number) => `C-${index + 1}`;
@@ -379,7 +378,7 @@ const driverItemCodes = Object.fromEntries(
 const equipmentPeriodStatisticalKeys = new Set<keyof Drivers>([
   "projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase",
   "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase",
-  "otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase",
+  "otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherOfficerPayGrowthToBase",
   "otherHeadcountGrowthToBase", "otherSgaImprovementToBase",
 ]);
 
@@ -2214,21 +2213,6 @@ export default function Home() {
     nextDrivers.effectiveTaxRate = hasInputValue(inputValues, inputKey.driver("effectiveTaxRate"))
       ? drivers.effectiveTaxRate
       : clamp(latestPreTax ? 1 - netIncome(latestCompany) / latestPreTax : 0.30, 0, 0.60);
-    const officerPayPerHead = historicalPlan.map((row) =>
-      row.other.officerCount ? row.other.officerPay / row.other.officerCount : Number.NaN);
-    const officerGrowthRates = officerPayPerHead.slice(1).map((value, index) =>
-      Number.isFinite(value) && officerPayPerHead[index] > 0 ? value / officerPayPerHead[index] - 1 : Number.NaN)
-      .filter(Number.isFinite);
-    const officerGrowthDefault = officerGrowthRates.length
-      ? officerGrowthRates.reduce((sum, value) => sum + value, 0) / officerGrowthRates.length
-      : 0.03;
-    nextDrivers.otherOfficerPayGrowthToBase = hasInputValue(inputValues, inputKey.driver("otherOfficerPayGrowthToBase"))
-      ? drivers.otherOfficerPayGrowthToBase
-      : clamp(officerGrowthDefault, 0, 0.08);
-    nextDrivers.otherOfficerPayGrowth = hasInputValue(inputValues, inputKey.driver("otherOfficerPayGrowth"))
-      ? drivers.otherOfficerPayGrowth
-      : clamp(officerGrowthDefault, 0, 0.08);
-
     for (const key of adjustableDriverKeys) {
       if (key === "projectFirstYearSales" || key === "projectBaseYearSales") continue;
       if (key === "projectCogsRateWhenSalesZero" || key === "otherCogsRateWhenSalesZero") continue;
