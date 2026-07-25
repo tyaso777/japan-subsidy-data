@@ -321,7 +321,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /<option value="百万円">百万円<\/option>/);
   assert.match(pageSource, /<option value="千円">千円（第6次様式）<\/option>/);
   assert.match(pageSource, /moneyDisplayMultiplier/);
-  assert.match(pageSource, /driverTablePresentation\(key, info\.label\)/);
+  assert.match(pageSource, /driverTablePresentation\(referenceKey, info\.label\)/);
   assert.match(pageSource, /tablePresentation\.note/);
   assert.match(pageSource, /standaloneMetricLabel\(definition\)/);
   assert.match(pageSource, /0から開始/);
@@ -373,8 +373,14 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /disabled=\{isSolving\} aria-busy=\{isSolving\}/);
   assert.match(pageSource, /const conditionCode = \(index: number\) => `C-\$\{index \+ 1\}`/);
   assert.match(pageSource, /const driverItemCodes = Object\.fromEntries/);
-  assert.match(pageSource, /<th>調整条件<small>C-1～（Condition）<\/small><\/th>/);
-  assert.match(pageSource, /className="driver-item-code">\{driverItemCodes\[key\]\}:/);
+  assert.match(pageSource, /<th rowSpan=\{2\}>調整条件<small>C-1～（Condition）<\/small><\/th>/);
+  assert.match(pageSource, /<th colSpan=\{2\}>設備導入期間<small>最新決算期 → 基準年<\/small><\/th>/);
+  assert.match(pageSource, /<th colSpan=\{2\}>基準年後<small>基準年 → 事業化報告3年目<\/small><\/th>/);
+  assert.doesNotMatch(pageSource, /<th>計画初期値<\/th>/);
+  assert.doesNotMatch(pageSource, /<th>最適化での扱い<\/th>/);
+  assert.match(pageSource, /const midpoint = \(nextRange\[0\] \+ nextRange\[1\]\) \/ 2/);
+  assert.match(pageSource, /className="driver-fixed-common-value" colSpan=\{4\}/);
+  assert.match(pageSource, /className="driver-item-code">\{codes\}:/);
   assert.match(globalStyles, /\.driver-item-code/);
   assert.match(pageSource, /const round5Benchmarks/);
   assert.match(pageSource, /companySalesCagr: \{ applicant: 20, accepted: 21, statistic: "中央値" \}/);
@@ -396,7 +402,7 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(suggestionSource, /projectPayGrowthToBase|otherPayGrowthToBase/);
   assert.doesNotMatch(pageSource, /Math\.abs\(current - rangeUpper\)/);
   assert.match(pageSource, /async function applySelectedDriverRangeSuggestions\(\)/);
-  assert.match(pageSource, /await solve\(nextRanges\)/);
+  assert.match(pageSource, /await solve\(nextRanges, nextDrivers\)/);
   assert.match(pageSource, /type="checkbox" checked=\{Boolean\(selectedAdjustmentSuggestions/);
   assert.match(pageSource, /選択した修正案を適用して再最適化/);
   assert.match(pageSource, /<th>未達成項目<\/th><th>目標数値<\/th><th>最適化結果<\/th><th>修正案<\/th>/);
@@ -404,7 +410,7 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.apply-selected-suggestions/);
   assert.match(globalStyles, /\.unmet-target-panel/);
   assert.match(pageSource, /className="driver-group-heading"[\s\S]*?<th><strong>\{group\.label\}<\/strong>/);
-  assert.match(pageSource, /<td aria-hidden="true" colSpan=\{historicalPlan\.length \+ 4\}><\/td>/);
+  assert.match(pageSource, /<td aria-hidden="true" colSpan=\{7\}><\/td>/);
   assert.match(globalStyles, /\.driver-target-table \.driver-group-heading th \{ position: sticky; left: 0;/);
   assert.match(globalStyles, /\.driver-target-table \.driver-group-heading th, \.driver-target-table \.driver-group-heading td \{[^}]*background: #e2ece6;[^}]*color: #28483a;/);
   assert.match(globalStyles, /\.driver-target-table tr\.driver-adjustable th:first-child \{ background: #fcf8ed; \}/);
@@ -461,8 +467,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /setAdjustedDrivers\(importedAdjustedDrivers\)/);
   assert.match(pageSource, /historicalPlan\.slice\(1\)\.map/);
   assert.match(pageSource, /history\.values\.slice\(1\)\.map/);
-  assert.match(globalStyles, /\.driver-target-table table \{ width: max-content !important; min-width: 1220px !important; \}/);
-  assert.match(globalStyles, /\.driver-target-table table \{ width: max\(100%, 1220px\) !important; table-layout: fixed; \}/);
+  assert.match(globalStyles, /\.driver-target-table table \{ width: max\(100%, 1080px\) !important; min-width: 1080px !important; table-layout: fixed; \}/);
+  assert.match(globalStyles, /\.driver-fixed-common-value input \{ width: min\(100%, 380px\); \}/);
   assert.match(globalStyles, /\.driver-target-table tbody tr:not\(\.driver-group-heading\) th:first-child \{ white-space: normal; overflow-wrap: anywhere; line-height: 1\.45; \}/);
   assert.match(pageSource, />使い方を試す<\/strong>/);
   assert.match(pageSource, />シミュレーション結果を見る<\/strong>/);

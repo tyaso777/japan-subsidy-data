@@ -160,10 +160,6 @@ const driverTablePresentation = (key: keyof Drivers, label: string) => {
     effectiveTaxRate: "当期純利益＝税引前当期純利益×（100%－設定率）。入力値を全年度へ固定適用し、最適化しません",
   };
   const modelManaged = label.includes("モデル内管理");
-  const keepPeriodInLabel = key === "projectSgaImprovementToBase"
-    || key === "projectSgaRateEnd"
-    || key === "otherSgaImprovementToBase"
-    || key === "otherSgaRateEnd";
   const shortLabel = label
     .replace(/（設備導入期間(?:・モデル内管理)?）/g, "")
     .replace(/（最新決算期→基準年(?:・モデル内管理)?）/g, "")
@@ -171,7 +167,7 @@ const driverTablePresentation = (key: keyof Drivers, label: string) => {
     .replace(/（事業化報告3年目到達値）/g, "")
     .trim();
   return {
-    label: `${keepPeriodInLabel ? label : shortLabel}${modelManaged ? "（モデル内管理）" : ""}`,
+    label: `${shortLabel}${modelManaged ? "（モデル内管理）" : ""}`,
     note: accountingNotes[key],
   };
 };
@@ -221,6 +217,61 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
     label: "共通・外部前提",
     detail: "共通会計・市場前提",
     keys: ["effectiveTaxRate", "projectMarketGrowth"],
+  },
+];
+
+type DriverComparisonRow = {
+  equipment?: keyof Drivers;
+  postBase?: keyof Drivers;
+  fixed?: keyof Drivers;
+};
+
+const driverComparisonGroups: { label: string; rows: DriverComparisonRow[] }[] = [
+  {
+    label: "補助事業",
+    rows: [
+      { equipment: "projectSalesGrowthToBase", postBase: "projectSalesGrowth" },
+      { equipment: "projectCogsImprovementToBase", postBase: "projectCogsImprovementAfterBase" },
+      { postBase: "projectCogsRateWhenSalesZero" },
+      { equipment: "projectPayGrowthToBase", postBase: "projectPayGrowth" },
+      { equipment: "projectHeadcountGrowthToBase", postBase: "projectHeadcountGrowth" },
+      { equipment: "projectSgaImprovementToBase", postBase: "projectSgaRateEnd" },
+      { equipment: "projectOfficerPayGrowthToBase", postBase: "projectOfficerPayGrowth" },
+      { equipment: "investment" },
+      { equipment: "subsidy" },
+    ],
+  },
+  {
+    label: "ベース事業",
+    rows: [
+      { equipment: "otherSalesGrowthToBase", postBase: "otherSalesGrowth" },
+      { equipment: "otherCogsImprovementToBase", postBase: "otherCogsImprovement" },
+      { postBase: "otherCogsRateWhenSalesZero" },
+      { equipment: "otherPayGrowthToBase", postBase: "otherPayGrowth" },
+      { equipment: "otherHeadcountGrowthToBase", postBase: "otherHeadcountGrowth" },
+      { equipment: "otherSgaImprovementToBase", postBase: "otherSgaRateEnd" },
+      { equipment: "otherOfficerPayGrowthToBase", postBase: "otherOfficerPayGrowth" },
+    ],
+  },
+  {
+    label: "会計内訳・利益前提",
+    rows: [
+      { fixed: "projectEmployeeSalaryShare" },
+      { fixed: "projectOfficerCompensationShare" },
+      { fixed: "projectResearchDevelopmentRate" },
+      { fixed: "projectNonOperatingRate" },
+      { fixed: "projectExtraordinaryRate" },
+      { fixed: "otherEmployeeSalaryShare" },
+      { fixed: "otherOfficerCompensationShare" },
+      { fixed: "otherResearchDevelopmentRate" },
+      { fixed: "otherNonOperatingRate" },
+      { fixed: "otherExtraordinaryRate" },
+      { fixed: "effectiveTaxRate" },
+    ],
+  },
+  {
+    label: "外部前提",
+    rows: [{ fixed: "projectMarketGrowth" }],
   },
 ];
 
@@ -1899,12 +1950,16 @@ export default function Home() {
     clearAdjustment();
     const fallback = driverBounds[key][boundIndex];
     const value = displayValue === null ? fallback : percentDriver(key) ? displayValue / 100 : displayValue;
-    setInputValues((current) => setInputValue(current, inputKey.driverRange(key, boundIndex), displayValue === null ? null : value));
-    setDriverRanges((current) => {
-      const next: [number, number] = [...current[key]];
-      next[boundIndex] = value;
-      return { ...current, [key]: next };
+    const nextRange: [number, number] = [...driverRanges[key]];
+    nextRange[boundIndex] = value;
+    const midpoint = (nextRange[0] + nextRange[1]) / 2;
+    setInputValues((current) => {
+      let next = setInputValue(current, inputKey.driverRange(key, boundIndex), displayValue === null ? null : value);
+      next = setInputValue(next, inputKey.driver(key), midpoint);
+      return next;
     });
+    setDriverRanges((current) => ({ ...current, [key]: nextRange }));
+    setDrivers((current) => ({ ...current, [key]: midpoint }));
   }
 
   function toggleDriverRangeSuggestion(metricKey: MetricKey, suggestion: DriverRangeSuggestion, checked: boolean) {
@@ -1925,16 +1980,24 @@ export default function Home() {
         ? Math.min(currentBound, suggestion.value)
         : Math.max(currentBound, suggestion.value);
     }
+    const nextDrivers = { ...drivers };
+    for (const key of adjustableDriverKeys) {
+      nextDrivers[key] = (nextRanges[key][0] + nextRanges[key][1]) / 2;
+    }
     setDriverRanges(nextRanges);
+    setDrivers(nextDrivers);
     setInputValues((current) => {
       let next = current;
       for (const suggestion of selected) {
         next = setInputValue(next, inputKey.driverRange(suggestion.key, suggestion.boundIndex), nextRanges[suggestion.key][suggestion.boundIndex]);
       }
+      for (const key of adjustableDriverKeys) {
+        next = setInputValue(next, inputKey.driver(key), nextDrivers[key]);
+      }
       return next;
     });
     setSelectedAdjustmentSuggestions({});
-    await solve(nextRanges);
+    await solve(nextRanges, nextDrivers);
   }
 
   function applyHistoricalDefaults() {
@@ -2089,6 +2152,9 @@ export default function Home() {
       clamp(nextDrivers.otherSgaRateEnd - 0.005, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]),
       clamp(nextDrivers.otherSgaRateEnd + 0.005, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]),
     ];
+    for (const key of adjustableDriverKeys) {
+      nextDrivers[key] = (nextRanges[key][0] + nextRanges[key][1]) / 2;
+    }
 
     const defaultProjectInputs = createForecastProjectPeriodInputs(historicalPlan[2], nextDrivers, timeline);
     const defaultPlan = generatePlan(historicalPlan, nextDrivers, timeline, defaultProjectInputs);
@@ -2120,7 +2186,7 @@ export default function Home() {
       return next;
     });
     setHistoricalDefaultsApplied(true);
-    setDefaultNote("すべての計画初期値を入力欄へ設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目も採用値を入力欄に明示しています。補助事業原価率は有効な過去実績を直近重視で設定し、算出不能時はベース事業原価率を参照します。会計内訳・利益前提は、実績内訳がない場合のみ、給与100%・賞与0%、役員報酬100%・役員賞与0%、研究開発費率0%、営業外損益率0%、特別損益率0%、実効税率30%を表示値として設定します。減価償却費は配賦率や耐用年数から作らず、P2-4（売上原価内）とP2-14（販管費内）を年度別に直接入力します。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。ベース事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、市場伸び率は5%で仮置きしています。");
+    setDefaultNote("許容下限・上限を過去実績から設定し、その中点を最適化前の計画値にしました。実績不足の項目も推奨範囲または固定値を入力欄に明示しています。補助事業原価率は有効な過去実績を直近重視で設定し、算出不能時はベース事業原価率を参照します。会計内訳・利益前提は、実績内訳がない場合のみ、給与100%・賞与0%、役員報酬100%・役員賞与0%、研究開発費率0%、営業外損益率0%、特別損益率0%、実効税率30%を表示値として設定します。減価償却費は配賦率や耐用年数から作らず、P2-4（売上原価内）とP2-14（販管費内）を年度別に直接入力します。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。ベース事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、市場伸び率は5%で仮置きしています。");
   }
 
   function confirmAndApplyHistoricalDefaults() {
@@ -2128,7 +2194,64 @@ export default function Home() {
     applyHistoricalDefaults();
   }
 
-  async function solve(rangeOverride?: Record<keyof Drivers, [number, number]>) {
+  function driverRangeDisplayValue(key: keyof Drivers, boundIndex: 0 | 1) {
+    const raw = getInputValue(inputValues, inputKey.driverRange(key, boundIndex));
+    return raw === "" ? "" : roundedInput(percentDriver(key) ? raw * 100 : raw);
+  }
+
+  function driverDirectDisplayValue(key: keyof Drivers) {
+    const raw = getInputValue(inputValues, inputKey.driver(key));
+    return raw === "" ? "" : roundedInput(percentDriver(key) ? raw * 100 : raw);
+  }
+
+  function renderDriverPeriodCells(key?: keyof Drivers) {
+    if (!key) return <><td className="driver-period-empty" colSpan={2}>—</td></>;
+    const info = driverLabels[key]!;
+    const constraintError = driverConstraintFailure(key, applicationCategory, drivers);
+    const resultValue = adjustedDrivers ? (percentDriver(key) ? adjustedDrivers[key] * 100 : adjustedDrivers[key]) : null;
+    if (!adjustableDriverKeys.includes(key)) {
+      return <td className="driver-fixed-period-value" colSpan={2}>
+        <input
+          type="number"
+          min={key === "investment" || key === "subsidy" ? 0 : undefined}
+          aria-label={`${info.label} 固定値`}
+          aria-invalid={constraintError ? "true" : undefined}
+          step={info.step}
+          value={driverDirectDisplayValue(key)}
+          placeholder="未設定"
+          onChange={(event) => updateDriver(key, event.target.value === "" ? null : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))}
+        />
+        {resultValue !== null && <small className="adjusted-value">最適化結果 {number(resultValue, 2)}</small>}
+        {constraintError && <small className="field-error" role="alert">{constraintError}</small>}
+      </td>;
+    }
+    return <>
+      <td className="driver-period-bound"><input aria-label={`${info.label} 許容下限`} type="number" step={info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} /></td>
+      <td className="driver-period-bound"><input aria-label={`${info.label} 許容上限`} type="number" step={info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />{resultValue !== null && <small className="adjusted-value">結果 {number(resultValue, 2)}</small>}</td>
+    </>;
+  }
+
+  function renderFixedDriverCells(key: keyof Drivers) {
+    const info = driverLabels[key]!;
+    const constraintError = driverConstraintFailure(key, applicationCategory, drivers);
+    return <td className="driver-fixed-common-value" colSpan={4}>
+      <input
+        type="number"
+        aria-label={`${info.label} 固定値`}
+        aria-invalid={constraintError ? "true" : undefined}
+        step={info.step}
+        value={driverDirectDisplayValue(key)}
+        placeholder="未設定"
+        onChange={(event) => updateDriver(key, event.target.value === "" ? null : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))}
+      />
+      {constraintError && <small className="field-error" role="alert">{constraintError}</small>}
+    </td>;
+  }
+
+  async function solve(
+    rangeOverride?: Record<keyof Drivers, [number, number]>,
+    driverOverride?: Drivers,
+  ) {
     if (isSolving) return;
     if (!applicationCategory) {
       setSolveNote("申請区分が未選択です。過去データ入力の先頭で申請区分を選択してください。");
@@ -2144,9 +2267,10 @@ export default function Home() {
     // Let React paint the busy state before the synchronous optimizer starts.
     await new Promise<void>((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
     try {
-      const planTransform = (candidate: YearPlan[]) => applyForecastOverrides(candidate, forecastOverrides, futureInputBasis, drivers);
+      const optimizationDrivers = driverOverride ?? drivers;
+      const planTransform = (candidate: YearPlan[]) => applyForecastOverrides(candidate, forecastOverrides, futureInputBasis, optimizationDrivers);
       const result = runPlanningOptimization({
-        drivers,
+        drivers: optimizationDrivers,
         historicalPlan,
         timeline,
         optimizationTargets,
@@ -2430,41 +2554,38 @@ export default function Home() {
           <article className="panel">
             <div className="panel-heading"><div><h2>将来予測・調整水準</h2><span className={`pill ${forecastSettingsReady ? "green" : ""}`}>{forecastSettingsReady ? "設定済み" : "未設定"}</span></div><button className="default-button" onClick={confirmAndApplyHistoricalDefaults}>{forecastSettingsStarted ? "過去3期から再設定" : "過去3期からデフォルト設定"}</button></div>
             {missingAccountingAssumptions.length > 0 && <p className="default-note" role="alert">会計内訳・利益前提が未設定です。補助事業・ベース事業の各6項目と共通の実効税率を設定するまで、③将来データ入力では自動予測を表示しません。</p>}
-            <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th>調整条件<small>C-1～（Condition）</small></th>{historicalPlan.slice(1).map((row) => <th className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th>計画初期値</th><th>制度上の必須条件<small>編集不可</small></th><th>許容下限</th><th>許容上限</th><th>最適化での扱い</th></tr></thead><tbody>
-              {driverGroups.flatMap((group) => [
-                <tr className="driver-group-heading" key={`group-${group.label}`}><th><strong>{group.label}</strong><small>{group.detail}</small></th><td aria-hidden="true" colSpan={historicalPlan.length + 4}></td></tr>,
-                ...group.keys.map((key) => {
-                const info = driverLabels[key]!;
-                const tablePresentation = driverTablePresentation(key, info.label);
-                const movable = !["projectMarketGrowth", "investment", "subsidy", "localBenchmark"].includes(key);
-                const noRange = key === "investment" || key === "subsidy" || key === "projectMarketGrowth";
-                const constraintError = driverConstraintFailure(key, applicationCategory, drivers);
-                const history = historicalDriverSeries[key];
-                const inputValue = percentDriver(key) ? Number((drivers[key] * 100).toFixed(2)) : drivers[key];
-                const rawDriverValue = getInputValue(inputValues, inputKey.driver(key));
-                const displayedInputValue = rawDriverValue === "" ? "" : roundedInput(percentDriver(key) ? rawDriverValue * 100 : rawDriverValue);
-                const resultValue = adjustedDrivers ? (percentDriver(key) ? adjustedDrivers[key] * 100 : adjustedDrivers[key]) : null;
-                const rangeValues = ([0, 1] as const).map((bound) => {
-                  const raw = getInputValue(inputValues, inputKey.driverRange(key, bound));
-                  return raw === "" ? "" : roundedInput(percentDriver(key) ? raw * 100 : raw);
-                }) as [number | "", number | ""];
-                const rangeOrdered = driverRanges[key][0] <= driverRanges[key][1];
-                const rangeValid = noRange || (rangeOrdered && drivers[key] >= driverRanges[key][0] && drivers[key] <= driverRanges[key][1]);
-                const rangeStatus = noRange ? "入力値を固定" : !rangeOrdered ? "下限＞上限" : movable ? rangeValid ? "範囲内で調整" : "初期値が範囲外" : rangeValid ? "入力値を固定" : "固定値が範囲外";
-                 return <tr className={`${movable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={key}><th><span className="driver-item-code">{driverItemCodes[key]}:</span> {tablePresentation.label}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{info.unit}／{history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>{history.values.slice(1).map((value, referenceIndex) => {
-                  const index = referenceIndex + 1;
-                  const referenceLevel = history.referenceLevels?.[index];
-                  if (referenceLevel !== undefined && Number.isFinite(referenceLevel)) {
-                    const improvement = Number.isFinite(value) ? value * 100 : undefined;
-                    const improvementLabel = improvement === undefined ? "—" : improvement > 0 ? `+${number(improvement, 2)}pt 改善` : improvement < 0 ? `${number(improvement, 2)}pt（悪化）` : "+0.00pt 改善";
-                    return <td className="driver-history driver-rate-history" key={`${key}-${historicalPlan[index].year}`}><strong>{improvementLabel}</strong><small>当期率 {number(referenceLevel * 100, 2)}%</small></td>;
-                  }
-                  return <td className="driver-history" key={`${key}-${historicalPlan[index].year}`}>{Number.isFinite(value) ? <><strong>{number(percentDriver(key) ? value * 100 : value, 2)}</strong><small>{history.mode === "change" ? `${historicalPlan[index - 1]?.year}→${historicalPlan[index].year}` : info.unit}</small></> : "—"}</td>;
-                })}<td><span className="driver-values"><input type="number" min={key === "investment" || key === "subsidy" ? 0 : undefined} aria-invalid={constraintError ? "true" : undefined} step={info.step} value={displayedInputValue} placeholder="未設定" onChange={(event) => updateDriver(key, event.target.value === "" ? null : percentDriver(key) ? Number(event.target.value) / 100 : Number(event.target.value))} />{resultValue !== null && <small className="adjusted-value">→ 最適化結果 {number(resultValue, 2)}</small>}</span>{constraintError && <small className="field-error" role="alert">{constraintError}</small>}</td><td className="statutory-condition"><strong>{driverRequirementLabel(key, applicationCategory, drivers.investment)}</strong></td><td>{noRange ? <span className="no-range">—</span> : <input type="number" step={info.step} value={rangeValues[0]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />}</td><td>{noRange ? <span className="no-range">—</span> : <input type="number" step={info.step} value={rangeValues[1]} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />}</td><td><span className={`driver-policy ${rangeValid ? "" : "out-of-range"}`}>{rangeStatus}</span></td></tr>;
-              }),
+            <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th rowSpan={2}>調整条件<small>C-1～（Condition）</small></th>{historicalPlan.slice(1).map((row) => <th rowSpan={2} className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th rowSpan={2}>制度上の必須条件<small>編集不可</small></th><th colSpan={2}>設備導入期間<small>最新決算期 → 基準年</small></th><th colSpan={2}>基準年後<small>基準年 → 事業化報告3年目</small></th></tr><tr><th>下限</th><th>上限</th><th>下限</th><th>上限</th></tr></thead><tbody>
+              {driverComparisonGroups.flatMap((group) => [
+                <tr className="driver-group-heading" key={`group-${group.label}`}><th><strong>{group.label}</strong></th><td aria-hidden="true" colSpan={7}></td></tr>,
+                ...group.rows.map((comparisonRow, rowIndex) => {
+                  const keys = [comparisonRow.equipment, comparisonRow.postBase, comparisonRow.fixed].filter((key): key is keyof Drivers => Boolean(key));
+                  const referenceKey = keys[0];
+                  const info = driverLabels[referenceKey]!;
+                  const tablePresentation = driverTablePresentation(referenceKey, info.label);
+                  const history = historicalDriverSeries[referenceKey];
+                  const codes = keys.map((key) => driverItemCodes[key]).filter(Boolean).join("／");
+                  const requirementLabels = [...new Set(keys.map((key) => driverRequirementLabel(key, applicationCategory, drivers.investment)).filter((label) => label !== "—"))];
+                  const constraintError = keys.some((key) => driverConstraintFailure(key, applicationCategory, drivers));
+                  const adjustable = keys.some((key) => adjustableDriverKeys.includes(key));
+                  return <tr className={`${adjustable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={`${group.label}-${rowIndex}`}>
+                    <th><span className="driver-item-code">{codes}:</span> {tablePresentation.label}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{info.unit}／{history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}</small></th>
+                    {history.values.slice(1).map((value, referenceIndex) => {
+                      const index = referenceIndex + 1;
+                      const referenceLevel = history.referenceLevels?.[index];
+                      if (referenceLevel !== undefined && Number.isFinite(referenceLevel)) {
+                        const improvement = Number.isFinite(value) ? value * 100 : undefined;
+                        const improvementLabel = improvement === undefined ? "—" : improvement > 0 ? `+${number(improvement, 2)}pt 改善` : improvement < 0 ? `${number(improvement, 2)}pt（悪化）` : "+0.00pt 改善";
+                        return <td className="driver-history driver-rate-history" key={`${referenceKey}-${historicalPlan[index].year}`}><strong>{improvementLabel}</strong><small>当期率 {number(referenceLevel * 100, 2)}%</small></td>;
+                      }
+                      return <td className="driver-history" key={`${referenceKey}-${historicalPlan[index].year}`}>{Number.isFinite(value) ? <><strong>{number(percentDriver(referenceKey) ? value * 100 : value, 2)}</strong><small>{history.mode === "change" ? `${historicalPlan[index - 1]?.year}→${historicalPlan[index].year}` : info.unit}</small></> : "—"}</td>;
+                    })}
+                    <td className="statutory-condition"><strong>{requirementLabels.join("／") || "—"}</strong></td>
+                    {comparisonRow.fixed ? renderFixedDriverCells(comparisonRow.fixed) : <>{renderDriverPeriodCells(comparisonRow.equipment)}{renderDriverPeriodCells(comparisonRow.postBase)}</>}
+                  </tr>;
+                }),
               ])}
             </tbody></table></div>
-            <p className="footnote">前期・最新決算期の各列は、計画値ではなく過去実績の参考値です。前々期もデフォルト計算には使用しますが、参考値がほぼないため表では省略しています。「過去3期からデフォルト設定」では、補助事業の設備導入期間は過去実績の単純平均を計画初期値、平均±2標準偏差を許容下限・上限とします。表示されている許容下限・上限がそのまま最適化の探索範囲であり、別の非表示上限は設けません。制度条件や計算上成立しない値は別途バリデーションします。基準年後は、第5次採択者中央値を直接使える項目と、過去採択統計・利益構造から補完する項目を分けています。市場伸び率・補助事業投資額・申請補助金額は固定入力のため、許容下限・上限を設けません。減価償却費は調整水準では生成せず、③将来データ入力のP2-4・P2-14で年度別に入力します。</p>
+            <p className="footnote">前期・最新決算期は、計画値ではなく過去実績の参考値です。可変条件は許容下限・上限の中点を最適化前の計画値とし、表では独立した「計画初期値」欄を設けません。固定条件は下限・上限を持たないため、期間内の2列を結合した入力欄で表示します。表示されている下限・上限がそのまま最適化の探索範囲であり、別の非表示上限は設けません。制度条件や計算上成立しない値は別途バリデーションします。減価償却費は調整水準では生成せず、③将来データ入力のP2-4・P2-14で年度別に入力します。</p>
             <div className="benchmark-note"><strong>基準年後のデフォルト</strong><span>売上高成長率 22%［15～30%］</span><span>補助事業1人当たり給与支給総額の年平均上昇率 7%［5～10%］</span><span>常時使用する従業員数（就業時間換算）の成長率 4%［0～8%］</span><span>原価率改善 1.5pt［0～2pt］</span><span>その他販管費率 過去平均-1.5pt［過去平均-4～+1pt］</span><span>役員1人当たり給与支給総額の年平均上昇率は過去3期の役員1人当たり給与から推計（計算不能時のみ7%［5～10%］）</span><span>ベース事業はシナジーを見込み、基準年後の売上成長率を設備導入期間＋2.0pt、原価率改善・給与・人員成長率を＋0.5pt</span><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公募・採択者中央値PDF ↗</a></div>
             {defaultNote && <p className="default-note">{defaultNote}</p>}
           </article>
@@ -2551,13 +2672,13 @@ export default function Home() {
           </article>
           <article className="panel formula-panel">
             <h2>過去3期から将来PLを作る順序</h2>
-            <code>設備導入期間の計画初期値 = 過去実績の単純平均　／　許容範囲 = 平均 ± 2×標準偏差</code>
+            <code>設備導入期間の許容範囲 = 過去実績の単純平均 ± 2×標準偏差　／　最適化前の計画値 = 許容下限・上限の中点</code>
             <code>基準年後の補助事業売上成長率 = 22%［15～30%］（第5次採択者中央値22%/年を中心）</code>
             <code>補助事業1人当たり給与支給総額の年平均上昇率 = 7%［5～10%］（第5次採択者中央値7%/年、一般企業の第6次要件5%以上）</code>
             <code>基準年後の常時使用する従業員数（就業時間換算）の成長率 = 4%［0～8%］（過去採択統計の給与支給総額伸びと1人当たり給与支給総額伸びの差から補完）</code>
             <code>基準年後の原価率改善 = 1.5pt［0～2pt］（悪化は初期許容範囲に含めず、設備効果を控えめに見込む）</code>
-            <code>基準年後・ベース事業の計画初期値 = 前々期×20% + 前期×30% + 最新期×50%（水準項目）</code>
-            <code>基準年後・ベース事業の計画初期値 = 前期までの変化率×40% + 最新期までの変化率×60%（成長項目）</code>
+            <code>基準年後・ベース事業の許容範囲の中心 = 前々期×20% + 前期×30% + 最新期×50%（水準項目）</code>
+            <code>基準年後・ベース事業の許容範囲の中心 = 前期までの変化率×40% + 最新期までの変化率×60%（成長項目）</code>
             <code>補助事業売上高(t) = 最新決算期売上高 × (1 + 基準年までの成長率)^経過年数　［最新決算期→基準年］</code>
             <code>補助事業売上高(t) = 基準年売上高 × (1 + 報告期間の成長率)^基準年後年数　［基準年→事業化報告3年目］</code>
             <code>期間末原価率 = 期間開始時原価率 − 原価率改善ポイント（プラスは改善、マイナスは悪化）</code>
