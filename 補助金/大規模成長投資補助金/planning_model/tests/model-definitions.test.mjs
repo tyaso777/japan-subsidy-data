@@ -50,6 +50,39 @@ test("previously implicit PL assumptions are explicit drivers", () => {
   assert.equal(model.sampleDrivers.otherOfficerPayGrowth, 0.045);
 });
 
+test("cogs-rate defaults use project history and fall back to a wider base-business range", () => {
+  const fromProject = model.suggestCogsRateRange([0.66, 0.68, 0.70], [0.55, 0.56, 0.57]);
+  assert.ok(Math.abs(fromProject.initial - 0.686) < 1e-9);
+  assert.ok(Math.abs(fromProject.lower - 0.64) < 1e-9);
+  assert.ok(Math.abs(fromProject.upper - 0.72) < 1e-9);
+
+  const fromBase = model.suggestCogsRateRange([0, Number.NaN, 0], [0.60, 0.62, 0.64]);
+  assert.ok(Math.abs(fromBase.initial - 0.626) < 1e-9);
+  assert.ok(Math.abs(fromBase.lower - 0.55) < 1e-9);
+  assert.ok(Math.abs(fromBase.upper - 0.69) < 1e-9);
+
+  assert.deepEqual(model.suggestCogsRateRange([0, 0, 0], [0, 0, 0]), {
+    initial: 0.68,
+    lower: 0.58,
+    upper: 0.78,
+  });
+});
+
+test("post-base cogs-rate inputs affect forecasts even when historical sales exist", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  const drivers = {
+    ...model.sampleDrivers,
+    projectCogsRateWhenSalesZero: 0.55,
+    otherCogsRateWhenSalesZero: 0.60,
+    projectCogsImprovementAfterBase: 0,
+    otherCogsImprovement: 0,
+  };
+  const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE);
+  const report1 = plan.find((row) => row.role === "report1");
+  assert.ok(Math.abs(report1.project.cogs / report1.project.sales - 0.55) < 0.002);
+  assert.ok(Math.abs(report1.other.cogs / report1.other.sales - 0.60) < 0.002);
+});
+
 test("accounting breakdowns and profit stages use explicit adjustment levels", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   const drivers = {
@@ -288,7 +321,7 @@ test("other-business forecast uses separate assumptions before and after the bas
   assert.equal(base.other.sales, Number((latest.other.sales * 1.1 ** 3).toFixed(2)));
   assert.equal(report1.other.sales, Number((base.other.sales * 1.2).toFixed(2)));
   assert.ok(Math.abs(base.other.cogs / base.other.sales - 0.65) < 0.001);
-  assert.ok(Math.abs(report3.other.cogs / report3.other.sales - 0.59) < 0.001);
+  assert.ok(Math.abs(report3.other.cogs / report3.other.sales - 0.62) < 0.001);
 });
 
 test("sample other-business post-base assumptions include a modest synergy lift", () => {
@@ -382,7 +415,7 @@ test("round-six company income inputs are preserved and future profits use expli
   assert.ok(Math.abs(model.netIncome(future) / model.preTaxIncome(future) - 0.7) < 0.002);
 });
 
-test("cogs assumptions are period improvement points rather than terminal rates", () => {
+test("post-base cogs rate is an explicit starting level and improvement is applied from it", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   const drivers = {
     ...model.sampleDrivers,
@@ -395,7 +428,7 @@ test("cogs assumptions are period improvement points rather than terminal rates"
   const report3 = plan.find((row) => row.role === "report3");
 
   assert.ok(Math.abs(base.project.cogs / base.project.sales - 0.62) < 1e-4);
-  assert.ok(Math.abs(report3.project.cogs / report3.project.sales - 0.59) < 1e-4);
+  assert.ok(Math.abs(report3.project.cogs / report3.project.sales - 0.65) < 1e-4);
 });
 
 test("equipment-period other SGA assumption is an improvement point", () => {

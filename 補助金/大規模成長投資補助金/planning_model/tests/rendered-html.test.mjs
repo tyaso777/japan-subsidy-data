@@ -233,6 +233,10 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(modelSource, /usefulLife/);
   assert.match(pageSource, /keys: \["projectSalesGrowth", "projectCogsRateWhenSalesZero", "projectCogsImprovementAfterBase"/);
   assert.match(pageSource, /keys: \["otherSalesGrowth", "otherCogsRateWhenSalesZero", "otherCogsImprovement"/);
+  assert.match(pageSource, /projectCogsRateWhenSalesZero: \{ label: "補助事業 原価率"/);
+  assert.match(pageSource, /otherCogsRateWhenSalesZero: \{ label: "ベース事業 原価率"/);
+  assert.doesNotMatch(pageSource, /売上実績が0の場合の開始水準/);
+  assert.match(pageSource, /suggestCogsRateRange/);
   assert.match(pageSource, /label: "共通・外部前提"/);
   assert.match(pageSource, /keys: \["effectiveTaxRate", "projectMarketGrowth"\]/);
   const adjustableDriverBlock = pageSource.match(/const adjustableDriverKeys:[\s\S]*?\];/)?.[0] ?? "";

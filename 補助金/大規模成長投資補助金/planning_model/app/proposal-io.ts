@@ -102,8 +102,8 @@ const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 const roleLabels: Record<string, string> = { prePrevious: "前々期決算期", previous: "前期決算期", latest: "最新決算期", projectPeriod: "補助事業期間", beforeBase: "基準年前年／補助事業期間", base: "基準年（完了年度）", report1: "事業化報告1年目", report2: "事業化報告2年目", report3: "事業化報告3年目" };
 const driverNames: Partial<Record<keyof Drivers, string>> = {
-  projectCogsRateWhenSalesZero: "補助事業 原価率（売上実績が0の場合の開始水準）",
-  otherCogsRateWhenSalesZero: "ベース事業 原価率（売上実績が0の場合の開始水準）",
+  projectCogsRateWhenSalesZero: "補助事業 原価率",
+  otherCogsRateWhenSalesZero: "ベース事業 原価率",
   projectEmployeeSalaryShare: "補助事業 従業員給与総額に占める給与の割合",
   otherEmployeeSalaryShare: "ベース事業 従業員給与総額に占める給与の割合",
   projectOfficerCompensationShare: "補助事業 役員給与総額に占める役員報酬の割合",
@@ -128,7 +128,6 @@ const hiddenLegacyDriverKeys = new Set<keyof Drivers>([
 
 const fixedOutputDriverKeys = new Set<keyof Drivers>([
   "investment", "subsidy", "projectMarketGrowth",
-  "projectCogsRateWhenSalesZero", "otherCogsRateWhenSalesZero",
   "projectEmployeeSalaryShare", "otherEmployeeSalaryShare",
   "projectOfficerCompensationShare", "otherOfficerCompensationShare",
   "projectCogsDepreciationShare", "otherCogsDepreciationShare",

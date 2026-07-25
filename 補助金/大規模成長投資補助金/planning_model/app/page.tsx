@@ -41,6 +41,7 @@ import {
   SegmentKey,
   SegmentPlan,
   sgaDepreciation,
+  suggestCogsRateRange,
   Target,
   targetStatus,
   TimelineSettings,
@@ -95,14 +96,14 @@ const driverRangeSuggestionId = (metricKey: MetricKey, suggestion: DriverRangeSu
 const adjustableDriverKeys: (keyof Drivers)[] = [
   "projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase", "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase",
   "otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase",
-  "projectSalesGrowth", "otherSalesGrowth", "projectCogsImprovementAfterBase", "otherCogsImprovement",
+  "projectSalesGrowth", "otherSalesGrowth", "projectCogsRateWhenSalesZero", "otherCogsRateWhenSalesZero", "projectCogsImprovementAfterBase", "otherCogsImprovement",
   "projectPayGrowth", "otherPayGrowth", "projectHeadcountGrowth", "otherHeadcountGrowth",
   "projectSgaRateEnd", "otherSgaRateEnd", "projectOfficerPayGrowth",
 ];
 
 const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string; step: number }>> = {
-  projectCogsRateWhenSalesZero: { label: "補助事業 原価率（売上実績が0の場合の開始水準）", unit: "%", step: 0.5 },
-  otherCogsRateWhenSalesZero: { label: "ベース事業 原価率（売上実績が0の場合の開始水準）", unit: "%", step: 0.5 },
+  projectCogsRateWhenSalesZero: { label: "補助事業 原価率", unit: "%", step: 0.5 },
+  otherCogsRateWhenSalesZero: { label: "ベース事業 原価率", unit: "%", step: 0.5 },
   projectEmployeeSalaryShare: { label: "補助事業 従業員給与支給総額のうち給与として計上する割合", unit: "%", step: 0.5 },
   otherEmployeeSalaryShare: { label: "ベース事業 従業員給与支給総額のうち給与として計上する割合", unit: "%", step: 0.5 },
   projectOfficerCompensationShare: { label: "補助事業 役員給与支給総額のうち役員報酬として計上する割合", unit: "%", step: 0.5 },
@@ -234,8 +235,7 @@ const accountingAssumptionDriverKeys: (keyof Drivers)[] = [
 ];
 // 実効税率を含む会計前提は、目標達成のために動かさず入力値を固定する。
 const fixedForecastDriverKeys = new Set<keyof Drivers>([
-  "investment", "subsidy", "projectCogsRateWhenSalesZero",
-  "otherCogsRateWhenSalesZero", "projectEmployeeSalaryShare", "otherEmployeeSalaryShare",
+  "investment", "subsidy", "projectEmployeeSalaryShare", "otherEmployeeSalaryShare",
   "projectOfficerCompensationShare", "otherOfficerCompensationShare",
   "projectResearchDevelopmentRate", "otherResearchDevelopmentRate",
   "projectNonOperatingRate", "otherNonOperatingRate",
@@ -1952,12 +1952,25 @@ export default function Home() {
     const latest = historicalPlan.at(-1)!;
     const latestCompany = total(latest.project, latest.other);
     const latestPreTax = preTaxIncome(latestCompany);
-    nextDrivers.projectCogsRateWhenSalesZero = hasInputValue(inputValues, inputKey.driver("projectCogsRateWhenSalesZero"))
-      ? drivers.projectCogsRateWhenSalesZero
-      : clamp(latest.project.sales ? latest.project.cogs / latest.project.sales : 0.68, 0, 0.99);
-    nextDrivers.otherCogsRateWhenSalesZero = hasInputValue(inputValues, inputKey.driver("otherCogsRateWhenSalesZero"))
-      ? drivers.otherCogsRateWhenSalesZero
-      : clamp(latest.other.sales ? latest.other.cogs / latest.other.sales : 0.68, 0, 0.99);
+    const projectCogsSuggestion = suggestCogsRateRange(
+      historicalDriverSeries.projectCogsRateWhenSalesZero.values,
+      historicalDriverSeries.otherCogsRateWhenSalesZero.values,
+    );
+    const otherCogsSuggestion = suggestCogsRateRange(historicalDriverSeries.otherCogsRateWhenSalesZero.values);
+    const applyCogsSuggestion = (
+      key: "projectCogsRateWhenSalesZero" | "otherCogsRateWhenSalesZero",
+      suggestion: ReturnType<typeof suggestCogsRateRange>,
+    ) => {
+      const entered = hasInputValue(inputValues, inputKey.driver(key));
+      const initial = entered ? drivers[key] : suggestion.initial;
+      nextDrivers[key] = clamp(initial, driverBounds[key][0], driverBounds[key][1]);
+      nextRanges[key] = [
+        Math.min(nextDrivers[key], suggestion.lower),
+        Math.max(nextDrivers[key], suggestion.upper),
+      ];
+    };
+    applyCogsSuggestion("projectCogsRateWhenSalesZero", projectCogsSuggestion);
+    applyCogsSuggestion("otherCogsRateWhenSalesZero", otherCogsSuggestion);
     const setAccountingDefault = (key: keyof Drivers, value: number) => {
       nextDrivers[key] = hasInputValue(inputValues, inputKey.driver(key))
         ? drivers[key]
@@ -2008,6 +2021,7 @@ export default function Home() {
       : clamp(officerGrowthDefault, 0, 0.08);
 
     for (const key of adjustableDriverKeys) {
+      if (key === "projectCogsRateWhenSalesZero" || key === "otherCogsRateWhenSalesZero") continue;
       const history = historicalDriverSeries[key];
       const observed = history.values.filter(Number.isFinite);
       const [defaultLower, defaultUpper] = driverBounds[key];
@@ -2104,7 +2118,7 @@ export default function Home() {
       return next;
     });
     setHistoricalDefaultsApplied(true);
-    setDefaultNote("すべての計画初期値を入力欄へ設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目も採用値を入力欄に明示しています。会計内訳・利益前提は、実績内訳がない場合のみ、給与100%・賞与0%、役員報酬100%・役員賞与0%、研究開発費率0%、営業外損益率0%、特別損益率0%、実効税率30%を表示値として設定します。減価償却費は配賦率や耐用年数から作らず、P2-4（売上原価内）とP2-14（販管費内）を年度別に直接入力します。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。ベース事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、市場伸び率は5%で仮置きしています。");
+    setDefaultNote("すべての計画初期値を入力欄へ設定しました。過去実績が使える項目は平均・変動幅から推計し、実績不足の項目も採用値を入力欄に明示しています。補助事業原価率は有効な過去実績を直近重視で設定し、算出不能時はベース事業原価率を参照します。会計内訳・利益前提は、実績内訳がない場合のみ、給与100%・賞与0%、役員報酬100%・役員賞与0%、研究開発費率0%、営業外損益率0%、特別損益率0%、実効税率30%を表示値として設定します。減価償却費は配賦率や耐用年数から作らず、P2-4（売上原価内）とP2-14（販管費内）を年度別に直接入力します。原価率・その他販管費率の改善ポイントは悪化を見込まず、設備導入期間0～2pt、基準年後0～3ptの常識レンジに制限しています。ベース事業の基準年後は補助事業とのシナジーを見込み、設備導入期間より売上成長率を2.0pt、原価率改善を0.5pt、給与・人員成長率を0.5pt高く設定しています。15指標の増加額5項目は固定中央値を使わず、対応する成長率目標と基準年の売上高・付加価値・給与・人数から規模連動で換算しています。未入力の投資額は過去の年平均設備投資額×設備導入年数、補助金額は投資額の3分の1、市場伸び率は5%で仮置きしています。");
   }
 
   function confirmAndApplyHistoricalDefaults() {
