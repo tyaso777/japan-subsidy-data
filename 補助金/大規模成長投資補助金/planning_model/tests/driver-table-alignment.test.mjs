@@ -47,3 +47,18 @@ test("optimization result spans both lower and upper bound columns", () => {
     /\.driver-period-range-grid \.adjusted-value \{ grid-column: 1 \/ -1; display: block; margin-top: var\(--space-1\); text-align: center; \}/,
   );
 });
+
+test("fixed forecast-condition header keeps its two-row layout and centering", () => {
+  assert.match(
+    pageSource,
+    /overlay\.classList\.toggle\("driver-target-table", wrapper\.classList\.contains\("driver-target-table"\)\)/,
+  );
+  assert.match(
+    pageSource,
+    /const sourceRows = Array\.from\(header\.rows\)[\s\S]*?overlayRows\[index\]\.style\.height = `\$\{rowHeight\}px`/,
+  );
+  assert.doesNotMatch(
+    stylesheet,
+    /\.page-sticky-header-overlay thead th \{[^}]*height:\s*56px/,
+  );
+});

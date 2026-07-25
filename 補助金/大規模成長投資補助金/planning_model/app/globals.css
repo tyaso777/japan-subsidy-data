@@ -211,7 +211,7 @@ thead th:first-child { background: var(--surface-header); }.emphasis th, .emphas
 .page-sticky-header-overlay { position: fixed; z-index: 17; overflow: hidden; box-sizing: border-box; pointer-events: none; background: var(--surface-header); box-shadow: 0 1px 0 #d8d3c7; scrollbar-width: none; }
 .page-sticky-header-overlay::-webkit-scrollbar { display: none; }
 .page-sticky-header-overlay table { width: max-content; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
-.page-sticky-header-overlay thead th { position: static; height: 56px; box-sizing: border-box; background: var(--surface-header); }
+.page-sticky-header-overlay thead th { position: static; box-sizing: border-box; background: var(--surface-header); }
 .page-sticky-header-overlay thead th small { display: block; margin-top: 3px; color: var(--muted); font-size: var(--text-xs); }
 .page-sticky-header-overlay thead th:first-child { position: sticky; left: 0; z-index: 2; background: var(--surface-header); }
 .floating-table-scrollbar { position: fixed; bottom: 0; z-index: 24; display: none; height: 17px; overflow-x: auto; overflow-y: hidden; border-top: 1px solid #d3cec1; background: rgba(248, 246, 240, .98); box-shadow: 0 -2px 8px rgba(36, 46, 40, .08); }

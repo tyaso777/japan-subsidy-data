@@ -1009,6 +1009,7 @@ function usePageStickyTableHeaders() {
           document.body.append(overlay);
           overlays.set(wrapper, overlay);
         }
+        overlay.classList.toggle("driver-target-table", wrapper.classList.contains("driver-target-table"));
 
         const signature = header.innerHTML;
         if (overlay.dataset.signature !== signature) {
@@ -1019,14 +1020,22 @@ function usePageStickyTableHeaders() {
           overlay.dataset.signature = signature;
         }
         const overlayTable = overlay.querySelector("table")!;
+        const sourceRows = Array.from(header.rows);
+        const overlayRows = Array.from(overlayTable.tHead?.rows ?? []);
+        sourceRows.forEach((row, index) => {
+          const rowHeight = row.getBoundingClientRect().height;
+          if (overlayRows[index]) overlayRows[index].style.height = `${rowHeight}px`;
+        });
         const sourceCells = Array.from(header.querySelectorAll<HTMLTableCellElement>("th, td"));
         const overlayCells = Array.from(overlayTable.querySelectorAll<HTMLTableCellElement>("th, td"));
         sourceCells.forEach((cell, index) => {
           const width = cell.getBoundingClientRect().width;
+          const height = cell.getBoundingClientRect().height;
           if (overlayCells[index]) {
             overlayCells[index].style.width = `${width}px`;
             overlayCells[index].style.minWidth = `${width}px`;
             overlayCells[index].style.maxWidth = `${width}px`;
+            overlayCells[index].style.height = `${height}px`;
           }
         });
         overlayTable.style.width = `${table.scrollWidth}px`;
