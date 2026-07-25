@@ -235,6 +235,11 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /keys: \["otherSalesGrowth", "otherCogsRateWhenSalesZero", "otherCogsImprovement"/);
   assert.match(pageSource, /label: "共通・外部前提"/);
   assert.match(pageSource, /keys: \["effectiveTaxRate", "projectMarketGrowth"\]/);
+  const adjustableDriverBlock = pageSource.match(/const adjustableDriverKeys:[\s\S]*?\];/)?.[0] ?? "";
+  const fixedDriverBlock = pageSource.match(/const fixedForecastDriverKeys[\s\S]*?\]\);/)?.[0] ?? "";
+  assert.doesNotMatch(adjustableDriverBlock, /effectiveTaxRate/);
+  assert.match(fixedDriverBlock, /effectiveTaxRate/);
+  assert.match(pageSource, /入力値を全年度へ固定適用し、最適化しません/);
   assert.match(pageSource, /ローカルベンチマーク固定値/);
   assert.match(pageSource, /固定入力・判定対象外/);
   assert.match(pageSource, /P2-4とP2-14は補助事業の詳細PLを作るための必須入力です。/);

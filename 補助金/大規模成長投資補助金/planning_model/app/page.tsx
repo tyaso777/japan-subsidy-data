@@ -156,7 +156,7 @@ const driverTablePresentation = (key: keyof Drivers, label: string) => {
     otherNonOperatingRate: "経常利益＝営業利益＋売上高×設定率",
     projectExtraordinaryRate: "税引前当期純利益＝経常利益＋売上高×設定率",
     otherExtraordinaryRate: "税引前当期純利益＝経常利益＋売上高×設定率",
-    effectiveTaxRate: "当期純利益＝税引前当期純利益×（100%－設定率）",
+    effectiveTaxRate: "当期純利益＝税引前当期純利益×（100%－設定率）。入力値を全年度へ固定適用し、最適化しません",
   };
   const modelManaged = label.includes("モデル内管理");
   const keepPeriodInLabel = key === "projectSgaImprovementToBase"
@@ -232,6 +232,7 @@ const accountingAssumptionDriverKeys: (keyof Drivers)[] = [
   "projectExtraordinaryRate", "otherExtraordinaryRate",
   "effectiveTaxRate",
 ];
+// 実効税率を含む会計前提は、目標達成のために動かさず入力値を固定する。
 const fixedForecastDriverKeys = new Set<keyof Drivers>([
   "investment", "subsidy", "projectCogsRateWhenSalesZero",
   "otherCogsRateWhenSalesZero", "projectEmployeeSalaryShare", "otherEmployeeSalaryShare",
