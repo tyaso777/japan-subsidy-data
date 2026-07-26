@@ -10,6 +10,7 @@ import {
   calculateMetrics,
   calculateScaleDependentTargetDefaults,
   cogsDepreciation,
+  cogsImprovementAnnualWarningLimit,
   createForecastProjectPeriodInputs,
   createHistoricalPlan,
   DEFAULT_TIMELINE,
@@ -2375,12 +2376,22 @@ export default function Home() {
     const rawLower = lowerInput === "" ? null : lowerInput;
     const rawUpper = upperInput === "" ? null : upperInput;
     const orderingError = driverRangeOrderingFailure(rawLower, rawUpper);
+    const improvementWarningLimit = cogsImprovementAnnualWarningLimit(key);
+    const improvementMaximum = Math.max(
+      rawLower ?? Number.NEGATIVE_INFINITY,
+      rawUpper ?? Number.NEGATIVE_INFINITY,
+    );
+    const improvementWarning = improvementWarningLimit !== undefined
+      && improvementMaximum > improvementWarningLimit + 1e-9
+      ? `年当たり改善ポイントの上限${number(improvementMaximum * 100, 2)}ptは通常目安${number(improvementWarningLimit * 100, 2)}ptを超えています。期間末原価率から次期初年度原価率へ戻る段差も確認してください。`
+      : "";
     return <td className="driver-period-range" colSpan={2}>
       <div className="driver-period-range-grid">
         {monetaryDriverKeys.has(key) ? <MoneyInput value={lowerInput} ariaLabel={`${info.label} 許容下限`} ariaInvalid={Boolean(orderingError)} onCanonicalChange={(value) => updateDriverRange(key, 0, value)} /> : <input aria-label={`${info.label} 許容下限`} aria-invalid={orderingError ? "true" : undefined} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />}
         {monetaryDriverKeys.has(key) ? <MoneyInput value={upperInput} ariaLabel={`${info.label} 許容上限`} ariaInvalid={Boolean(orderingError)} onCanonicalChange={(value) => updateDriverRange(key, 1, value)} /> : <input aria-label={`${info.label} 許容上限`} aria-invalid={orderingError ? "true" : undefined} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />}
         {resultValue !== null && <small className="adjusted-value">結果 {number(resultValue, 2)}</small>}
         {orderingError && <small className="field-error driver-range-error" role="alert">{orderingError}</small>}
+        {improvementWarning && <small className="field-warning driver-range-warning" role="status">{improvementWarning}</small>}
       </div>
     </td>;
   }

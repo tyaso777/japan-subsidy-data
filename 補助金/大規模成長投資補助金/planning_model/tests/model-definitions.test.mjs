@@ -528,6 +528,52 @@ test("cogs transition validation warns when the post-base first-year rate worsen
   assert.ok(validations.some((item) => item.title === "補助事業の原価率が期間境界で悪化"));
 });
 
+test("cogs transition validation warns when annual improvement itself is excessive", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  const drivers = {
+    ...model.sampleDrivers,
+    projectCogsRateToBase: 0.68,
+    projectCogsImprovementToBase: 0.10,
+    projectCogsRateWhenSalesZero: 0.68,
+  };
+  const inputs = model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE);
+  const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE, inputs);
+  const validations = model.validatePlan(plan, drivers);
+
+  assert.ok(validations.some((item) => (
+    item.title === "補助事業の設備導入期間の原価率改善が過大"
+    && item.detail.includes("10.00pt/年")
+    && item.detail.includes("2.00pt/年")
+  )));
+});
+
+test("cogs transition validation detects a reset even when the project has no equipment-period sales", () => {
+  const historical = model.createHistoricalPlan({
+    ...model.sampleBasePlan,
+    project: {
+      ...model.sampleBasePlan.project,
+      sales: 0,
+      cogs: 0,
+    },
+  }, model.DEFAULT_TIMELINE);
+  const drivers = {
+    ...model.sampleDrivers,
+    projectFirstYearSales: 0,
+    projectBaseYearSales: 0,
+    projectCogsRateToBase: 0.68,
+    projectCogsImprovementToBase: 0.10,
+    projectCogsRateWhenSalesZero: 0.68,
+  };
+  const inputs = model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE);
+  const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE, inputs);
+  const validations = model.validatePlan(plan, drivers);
+
+  assert.ok(validations.some((item) => (
+    item.title === "補助事業の原価率が期間境界で悪化"
+    && item.detail.includes("設備導入期間末")
+  )));
+});
+
 test("cogs transition validation warns about an excessive boundary improvement", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   const drivers = {

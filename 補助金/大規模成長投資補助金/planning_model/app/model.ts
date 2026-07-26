@@ -1122,9 +1122,14 @@ export function targetStatus(definition: MetricDefinition, actual: number, targe
   return { ok: true, gap: 0 };
 }
 
+export function cogsImprovementAnnualWarningLimit(key: keyof Drivers): number | undefined {
+  if (key === "projectCogsImprovementToBase" || key === "otherCogsImprovementToBase") return 0.02;
+  if (key === "projectCogsImprovementAfterBase" || key === "otherCogsImprovement") return 0.03;
+  return undefined;
+}
+
 function validateCogsTransitions(plan: YearPlan[], drivers: Drivers): Validation[] {
   const results: Validation[] = [];
-  const base = plan.find((row) => row.role === "base");
   const report1 = plan.find((row) => row.role === "report1");
   const equipmentYears = plan.filter((row) => (
     row.role === "projectPeriod" || row.role === "beforeBase" || row.role === "base"
@@ -1135,16 +1140,20 @@ function validateCogsTransitions(plan: YearPlan[], drivers: Drivers): Validation
       name: "補助事業",
       equipmentInitial: drivers.projectCogsRateToBase,
       equipmentAnnual: drivers.projectCogsImprovementToBase,
+      equipmentAnnualKey: "projectCogsImprovementToBase" as const,
       postBaseInitial: drivers.projectCogsRateWhenSalesZero,
       postBaseAnnual: drivers.projectCogsImprovementAfterBase,
+      postBaseAnnualKey: "projectCogsImprovementAfterBase" as const,
     },
     {
       key: "other" as const,
       name: "ベース事業",
       equipmentInitial: drivers.otherCogsRateToBase,
       equipmentAnnual: drivers.otherCogsImprovementToBase,
+      equipmentAnnualKey: "otherCogsImprovementToBase" as const,
       postBaseInitial: drivers.otherCogsRateWhenSalesZero,
       postBaseAnnual: drivers.otherCogsImprovement,
+      postBaseAnnualKey: "otherCogsImprovement" as const,
     },
   ];
 
@@ -1152,6 +1161,28 @@ function validateCogsTransitions(plan: YearPlan[], drivers: Drivers): Validation
     const equipmentTerminal = configuration.equipmentInitial
       - configuration.equipmentAnnual * Math.max(0, equipmentYears - 1);
     const postBaseTerminal = configuration.postBaseInitial - configuration.postBaseAnnual * 2;
+    const periods = [
+      {
+        name: "設備導入期間",
+        annual: configuration.equipmentAnnual,
+        key: configuration.equipmentAnnualKey,
+      },
+      {
+        name: "基準年後",
+        annual: configuration.postBaseAnnual,
+        key: configuration.postBaseAnnualKey,
+      },
+    ];
+    for (const period of periods) {
+      const limit = cogsImprovementAnnualWarningLimit(period.key);
+      if (limit !== undefined && period.annual > limit + 0.000001) {
+        results.push({
+          level: "warning",
+          title: `${configuration.name}の${period.name}の原価率改善が過大`,
+          detail: `${(period.annual * 100).toFixed(2)}pt/年は、通常レンジの上限${(limit * 100).toFixed(2)}pt/年を超えています。設備効果や原価低減施策の根拠を確認してください。`,
+        });
+      }
+    }
     if (equipmentTerminal < 0 || postBaseTerminal < 0) {
       results.push({
         level: "error",
@@ -1160,25 +1191,20 @@ function validateCogsTransitions(plan: YearPlan[], drivers: Drivers): Validation
       });
     }
 
-    const baseSegment = base?.[configuration.key];
-    const report1Segment = report1?.[configuration.key];
-    if (!baseSegment?.sales || !report1Segment?.sales) continue;
-    const baseRate = baseSegment.cogs / baseSegment.sales;
-    const report1Rate = report1Segment.cogs / report1Segment.sales;
-    const boundaryChange = report1Rate - baseRate;
+    const boundaryChange = configuration.postBaseInitial - equipmentTerminal;
     if (boundaryChange > 0.000001) {
       results.push({
         level: "warning",
         title: `${configuration.name}の原価率が期間境界で悪化`,
-        detail: `基準年度の${(baseRate * 100).toFixed(2)}%から、基準年後初年度の${(report1Rate * 100).toFixed(2)}%へ悪化します。基準年後初年度の原価率または設備導入期間の年当たり改善ポイントを確認してください。`,
-        year: report1.year,
+        detail: `設備導入期間末の${(equipmentTerminal * 100).toFixed(2)}%から、基準年後初年度の${(configuration.postBaseInitial * 100).toFixed(2)}%へ悪化します。基準年後初年度の原価率または設備導入期間の年当たり改善ポイントを確認してください。`,
+        year: report1?.year,
       });
     } else if (boundaryChange < -0.05) {
       results.push({
         level: "warning",
         title: `${configuration.name}の原価率が期間境界で急改善`,
-        detail: `基準年度の${(baseRate * 100).toFixed(2)}%から、基準年後初年度の${(report1Rate * 100).toFixed(2)}%へ5pt超改善します。設備効果などの根拠を確認してください。`,
-        year: report1.year,
+        detail: `設備導入期間末の${(equipmentTerminal * 100).toFixed(2)}%から、基準年後初年度の${(configuration.postBaseInitial * 100).toFixed(2)}%へ5pt超改善します。設備効果などの根拠を確認してください。`,
+        year: report1?.year,
       });
     }
   }
