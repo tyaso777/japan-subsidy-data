@@ -238,10 +238,14 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(modelSource, /usefulLife/);
   assert.match(pageSource, /keys: \["projectSalesGrowth", "projectCogsRateWhenSalesZero", "projectCogsImprovementAfterBase"/);
   assert.match(pageSource, /keys: \["otherSalesGrowth", "otherCogsRateWhenSalesZero", "otherCogsImprovement"/);
-  assert.match(pageSource, /projectCogsRateWhenSalesZero: \{ label: "補助事業 原価率"/);
-  assert.match(pageSource, /otherCogsRateWhenSalesZero: \{ label: "ベース事業 原価率"/);
-  assert.match(pageSource, /projectCogsRateToBase: \{ label: "補助事業 原価率（設備導入期間）"/);
-  assert.match(pageSource, /otherCogsRateToBase: \{ label: "ベース事業 原価率（設備導入期間）"/);
+  assert.match(pageSource, /projectCogsRateToBase: \{ label: "補助事業 原価率（設備導入期間初年度）"/);
+  assert.match(pageSource, /projectCogsRateWhenSalesZero: \{ label: "補助事業 原価率（基準年後初年度）"/);
+  assert.match(pageSource, /projectCogsImprovementToBase: \{ label: "補助事業 原価率 年当たり改善ポイント（設備導入期間）"/);
+  assert.match(pageSource, /projectCogsImprovementAfterBase: \{ label: "補助事業 原価率 年当たり改善ポイント（基準年後）"/);
+  assert.match(pageSource, /otherCogsRateToBase: \{ label: "ベース事業 原価率（設備導入期間初年度）"/);
+  assert.match(pageSource, /otherCogsRateWhenSalesZero: \{ label: "ベース事業 原価率（基準年後初年度）"/);
+  assert.match(pageSource, /otherCogsImprovementToBase: \{ label: "ベース事業 原価率 年当たり改善ポイント（設備導入期間）"/);
+  assert.match(pageSource, /otherCogsImprovement: \{ label: "ベース事業 原価率 年当たり改善ポイント（基準年後）"/);
   assert.match(pageSource, /\{ equipment: "projectCogsRateToBase", postBase: "projectCogsRateWhenSalesZero" \}/);
   assert.match(pageSource, /\{ equipment: "otherCogsRateToBase", postBase: "otherCogsRateWhenSalesZero" \}/);
   assert.doesNotMatch(pageSource, /売上実績が0の場合の開始水準/);

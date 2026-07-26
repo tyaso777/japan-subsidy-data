@@ -357,8 +357,10 @@ test("other-business forecast uses separate assumptions before and after the bas
     ...model.sampleDrivers,
     otherSalesGrowthToBase: 0.1,
     otherSalesGrowth: 0.2,
+    otherCogsRateToBase: 0.68,
     otherCogsImprovementToBase: 0.03,
-    otherCogsImprovement: 0.06,
+    otherCogsRateWhenSalesZero: 0.65,
+    otherCogsImprovement: 0.01,
   };
   const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE);
   const latest = plan.find((row) => row.role === "latest");
@@ -368,8 +370,9 @@ test("other-business forecast uses separate assumptions before and after the bas
 
   assert.equal(base.other.sales, Number((latest.other.sales * 1.1 ** 3).toFixed(2)));
   assert.equal(report1.other.sales, Number((base.other.sales * 1.2).toFixed(2)));
-  assert.ok(Math.abs(base.other.cogs / base.other.sales - 0.65) < 0.001);
-  assert.ok(Math.abs(report3.other.cogs / report3.other.sales - 0.62) < 0.001);
+  assert.ok(Math.abs(base.other.cogs / base.other.sales - 0.62) < 0.001);
+  assert.ok(Math.abs(report1.other.cogs / report1.other.sales - 0.65) < 0.001);
+  assert.ok(Math.abs(report3.other.cogs / report3.other.sales - 0.63) < 0.001);
 });
 
 test("sample other-business post-base assumptions include a modest synergy lift", () => {
@@ -463,23 +466,30 @@ test("round-six company income inputs are preserved and future profits use expli
   assert.ok(Math.abs(model.netIncome(future) / model.preTaxIncome(future) - 0.7) < 0.002);
 });
 
-test("post-base cogs rate is an explicit starting level and improvement is applied from it", () => {
+test("post-base cogs rate is the first-year level and annual improvement is applied thereafter", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   const drivers = {
     ...model.sampleDrivers,
-    projectCogsImprovementToBase: 0.06,
+    projectCogsRateWhenSalesZero: 0.70,
     projectCogsImprovementAfterBase: 0.03,
+    otherCogsRateWhenSalesZero: 0.67,
+    otherCogsImprovement: 0.02,
   };
   const inputs = model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE);
   const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE, inputs);
-  const base = plan.find((row) => row.role === "base");
+  const report1 = plan.find((row) => row.role === "report1");
+  const report2 = plan.find((row) => row.role === "report2");
   const report3 = plan.find((row) => row.role === "report3");
 
-  assert.ok(Math.abs(base.project.cogs / base.project.sales - 0.62) < 1e-4);
-  assert.ok(Math.abs(report3.project.cogs / report3.project.sales - 0.65) < 1e-4);
+  assert.ok(Math.abs(report1.project.cogs / report1.project.sales - 0.70) < 1e-4);
+  assert.ok(Math.abs(report2.project.cogs / report2.project.sales - 0.67) < 1e-4);
+  assert.ok(Math.abs(report3.project.cogs / report3.project.sales - 0.64) < 1e-4);
+  assert.ok(Math.abs(report1.other.cogs / report1.other.sales - 0.67) < 1e-4);
+  assert.ok(Math.abs(report2.other.cogs / report2.other.sales - 0.65) < 1e-4);
+  assert.ok(Math.abs(report3.other.cogs / report3.other.sales - 0.63) < 1e-4);
 });
 
-test("equipment-period cogs rates are explicit starting levels for both segments", () => {
+test("equipment-period cogs rates are first-year levels and improvements are annual", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   const drivers = {
     ...model.sampleDrivers,
@@ -490,10 +500,61 @@ test("equipment-period cogs rates are explicit starting levels for both segments
   };
   const inputs = model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE);
   const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE, inputs);
+  const equipment1 = plan.find((row) => row.year === model.DEFAULT_TIMELINE.latestYear + 1);
+  const equipment2 = plan.find((row) => row.year === model.DEFAULT_TIMELINE.latestYear + 2);
   const base = plan.find((row) => row.role === "base");
 
-  assert.ok(Math.abs(base.project.cogs / base.project.sales - 0.64) < 1e-4);
-  assert.ok(Math.abs(base.other.cogs / base.other.sales - 0.63) < 1e-4);
+  assert.ok(Math.abs(equipment1.project.cogs / equipment1.project.sales - 0.66) < 1e-4);
+  assert.ok(Math.abs(equipment2.project.cogs / equipment2.project.sales - 0.64) < 1e-4);
+  assert.ok(Math.abs(base.project.cogs / base.project.sales - 0.62) < 1e-4);
+  assert.ok(Math.abs(equipment1.other.cogs / equipment1.other.sales - 0.64) < 1e-4);
+  assert.ok(Math.abs(equipment2.other.cogs / equipment2.other.sales - 0.63) < 1e-4);
+  assert.ok(Math.abs(base.other.cogs / base.other.sales - 0.62) < 1e-4);
+});
+
+test("cogs transition validation warns when the post-base first-year rate worsens", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  const drivers = {
+    ...model.sampleDrivers,
+    projectCogsRateToBase: 0.68,
+    projectCogsImprovementToBase: 0.02,
+    projectCogsRateWhenSalesZero: 0.70,
+    projectCogsImprovementAfterBase: 0.01,
+  };
+  const inputs = model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE);
+  const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE, inputs);
+  const validations = model.validatePlan(plan, drivers);
+
+  assert.ok(validations.some((item) => item.title === "補助事業の原価率が期間境界で悪化"));
+});
+
+test("cogs transition validation warns about an excessive boundary improvement", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  const drivers = {
+    ...model.sampleDrivers,
+    projectCogsRateToBase: 0.68,
+    projectCogsImprovementToBase: 0.01,
+    projectCogsRateWhenSalesZero: 0.55,
+  };
+  const inputs = model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE);
+  const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE, inputs);
+  const validations = model.validatePlan(plan, drivers);
+
+  assert.ok(validations.some((item) => item.title === "補助事業の原価率が期間境界で急改善"));
+});
+
+test("cogs transition validation reports annual improvements that make a rate negative", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  const drivers = {
+    ...model.sampleDrivers,
+    projectCogsRateWhenSalesZero: 0.04,
+    projectCogsImprovementAfterBase: 0.03,
+  };
+  const inputs = model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE);
+  const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE, inputs);
+  const validations = model.validatePlan(plan, drivers);
+
+  assert.ok(validations.some((item) => item.title === "補助事業の原価率が0%を下回る設定"));
 });
 
 test("equipment-period other SGA assumption is an improvement point", () => {

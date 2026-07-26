@@ -175,10 +175,10 @@ const adjustableDriverKeys: (keyof Drivers)[] = [
 ];
 
 const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string; step: number }>> = {
-  projectCogsRateWhenSalesZero: { label: "補助事業 原価率", unit: "%", step: 0.5 },
-  otherCogsRateWhenSalesZero: { label: "ベース事業 原価率", unit: "%", step: 0.5 },
-  projectCogsRateToBase: { label: "補助事業 原価率（設備導入期間）", unit: "%", step: 0.5 },
-  otherCogsRateToBase: { label: "ベース事業 原価率（設備導入期間）", unit: "%", step: 0.5 },
+  projectCogsRateWhenSalesZero: { label: "補助事業 原価率（基準年後初年度）", unit: "%", step: 0.5 },
+  otherCogsRateWhenSalesZero: { label: "ベース事業 原価率（基準年後初年度）", unit: "%", step: 0.5 },
+  projectCogsRateToBase: { label: "補助事業 原価率（設備導入期間初年度）", unit: "%", step: 0.5 },
+  otherCogsRateToBase: { label: "ベース事業 原価率（設備導入期間初年度）", unit: "%", step: 0.5 },
   projectEmployeeSalaryShare: { label: "補助事業 従業員給与支給総額のうち給与として計上する割合", unit: "%", step: 0.5 },
   otherEmployeeSalaryShare: { label: "ベース事業 従業員給与支給総額のうち給与として計上する割合", unit: "%", step: 0.5 },
   projectOfficerCompensationShare: { label: "補助事業 役員給与支給総額のうち役員報酬として計上する割合", unit: "%", step: 0.5 },
@@ -196,20 +196,20 @@ const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string;
   projectSalesGrowthToBase: { label: "補助事業 売上成長率（設備導入期間）", unit: "%/年", step: 0.5 },
   projectFirstYearSales: { label: "補助事業 売上高（設備導入初年度）", unit: "千円", step: 0.01 },
   projectBaseYearSales: { label: "補助事業 売上高（基準年度）", unit: "千円", step: 0.01 },
-  projectCogsImprovementToBase: { label: "補助事業 原価率改善ポイント（設備導入期間）", unit: "pt", step: 0.5 },
+  projectCogsImprovementToBase: { label: "補助事業 原価率 年当たり改善ポイント（設備導入期間）", unit: "pt/年", step: 0.5 },
   projectPayGrowthToBase: { label: "補助事業に関わる従業員1人当たり給与支給総額の年平均上昇率（設備導入期間・モデル内管理）", unit: "%/年", step: 0.25 },
   projectHeadcountGrowthToBase: { label: "補助事業 常時使用する従業員数（就業時間換算）の成長率（設備導入期間）", unit: "%/年", step: 0.5 },
   projectSgaImprovementToBase: { label: "補助事業 その他販管費率改善ポイント（設備導入期間）", unit: "pt", step: 0.5 },
   projectOfficerPayGrowthToBase: { label: "役員1人当たり給与支給総額の年平均上昇率（設備導入期間・モデル内管理）", unit: "%/年", step: 0.25 },
   otherSalesGrowthToBase: { label: "ベース事業 売上成長率（最新決算期→基準年）", unit: "%/年", step: 0.5 },
-  otherCogsImprovementToBase: { label: "ベース事業 原価率改善ポイント（最新決算期→基準年）", unit: "pt", step: 0.5 },
+  otherCogsImprovementToBase: { label: "ベース事業 原価率 年当たり改善ポイント（設備導入期間）", unit: "pt/年", step: 0.5 },
   otherPayGrowthToBase: { label: "ベース事業の従業員1人当たり給与支給総額の年平均上昇率（最新決算期→基準年・モデル内管理）", unit: "%/年", step: 0.25 },
   otherHeadcountGrowthToBase: { label: "ベース事業 常時使用する従業員数（就業時間換算）の成長率（最新決算期→基準年）", unit: "%/年", step: 0.5 },
   otherSgaImprovementToBase: { label: "ベース事業 その他販管費率改善ポイント（最新決算期→基準年）", unit: "pt", step: 0.5 },
   projectSalesGrowth: { label: "補助事業 売上成長率（基準年→事業化報告3年目）", unit: "%/年", step: 0.5 },
   otherSalesGrowth: { label: "ベース事業 売上成長率（基準年→事業化報告3年目）", unit: "%/年", step: 0.5 },
-  projectCogsImprovementAfterBase: { label: "補助事業 原価率改善ポイント（基準年→事業化報告3年目）", unit: "pt", step: 0.5 },
-  otherCogsImprovement: { label: "ベース事業 原価率改善ポイント（基準年→事業化報告3年目）", unit: "pt", step: 0.5 },
+  projectCogsImprovementAfterBase: { label: "補助事業 原価率 年当たり改善ポイント（基準年後）", unit: "pt/年", step: 0.5 },
+  otherCogsImprovement: { label: "ベース事業 原価率 年当たり改善ポイント（基準年後）", unit: "pt/年", step: 0.5 },
   projectPayGrowth: { label: "補助事業1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目）", unit: "%/年", step: 0.25 },
   otherPayGrowth: { label: "ベース事業の従業員1人当たり給与支給総額の年平均上昇率（基準年→事業化報告3年目・モデル内管理）", unit: "%/年", step: 0.25 },
   projectHeadcountGrowth: { label: "補助事業 常時使用する従業員数（就業時間換算）の成長率（基準年→事業化報告3年目）", unit: "%/年", step: 0.5 },
@@ -2864,8 +2864,8 @@ export default function Home() {
             <code>基準年後・ベース事業の許容範囲の中心 = 前期までの変化率×40% + 最新期までの変化率×60%（成長項目）</code>
             <code>補助事業売上高(t) = 最新決算期売上高 × (1 + 基準年までの成長率)^経過年数　［最新決算期→基準年］</code>
             <code>補助事業売上高(t) = 基準年売上高 × (1 + 報告期間の成長率)^基準年後年数　［基準年→事業化報告3年目］</code>
-            <code>期間末原価率 = 期間開始時原価率 − 原価率改善ポイント（プラスは改善、マイナスは悪化）</code>
-            <code>各年度原価率 = 期間開始時原価率と期間末原価率を、経過年数に応じて直線補間</code>
+            <code>各年度原価率 = 期間初年度原価率 − 年当たり改善ポイント × 初年度からの経過年数</code>
+            <code>期間初年度は経過年数0として入力した原価率をそのまま使用し、翌年度から毎年改善ポイントを反映</code>
             <code>設備導入期間末のその他販管費率 = 最新決算期のその他販管費率 − 改善ポイント（プラスは改善、マイナスは悪化）</code>
             <code>事業化報告3年目のその他販管費率 = 基準年度のその他販管費率 − 基準年後の改善ポイント（途中年度は3年間で段階反映）</code>
             <p>許容下限・上限は、過去3期の最小・最大に変動幅の50%（最低1pt、率水準は最低2pt）を加え、技術的な上下限内に収めます。過去実績から決められない投資額・補助金額などは自動変更しません。減価償却費は投資額や耐用年数から作らず、③将来データ入力で売上原価内P2-4と販管費内P2-14を年度別に入力します。公式7-10は両項目の合計として自動計算します。</p>

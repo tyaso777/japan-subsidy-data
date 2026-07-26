@@ -742,13 +742,13 @@ export function createForecastProjectPeriodInputs(
   const startCogsRate = Number.isFinite(drivers.projectCogsRateToBase)
     ? drivers.projectCogsRateToBase
     : (start.sales ? start.cogs / start.sales : drivers.projectCogsRateWhenSalesZero);
-  const targetCogsRate = Math.min(0.99, Math.max(0.01, startCogsRate - drivers.projectCogsImprovementToBase));
   const startSgaRate = start.sales ? start.otherSga / start.sales : 0;
   const startPayPerHead = start.headcount ? start.employeePay / start.headcount : 0;
 
   return Array.from({ length: years }, (_, index) => {
     const elapsed = index + 1;
     const progress = elapsed / years;
+    const cogsRate = Math.min(0.99, Math.max(0.01, startCogsRate - drivers.projectCogsImprovementToBase * index));
     const sales = start.sales > 0
       ? start.sales * (1 + drivers.projectSalesGrowthToBase) ** elapsed
       : years === 1
@@ -763,7 +763,7 @@ export function createForecastProjectPeriodInputs(
       year: timeline.latestYear + elapsed,
       project: withDriverBreakdowns(withProportionalBreakdown(start, {
         sales: round(sales),
-        cogs: round(sales * lerp(startCogsRate, targetCogsRate, progress)),
+        cogs: round(sales * cogsRate),
         employeePay: round(startPayPerHead * (1 + drivers.projectPayGrowthToBase) ** elapsed * headcount),
         officerPay: round(start.officerPay * (1 + drivers.projectOfficerPayGrowthToBase) ** elapsed),
         depreciation: round(cogsDepreciation(start) + sgaDepreciation(start)),
@@ -795,7 +795,7 @@ export function generatePlan(
   const projectBase = structuredClone(periodInputs.at(-1)?.project ?? defaultProjectBasePlan);
   const plan: YearPlan[] = structuredClone(actuals);
   const n = timeline.baseYear + 3 - timeline.latestYear;
-  const baseProjectCogsRate = drivers.projectCogsRateWhenSalesZero;
+  const projectPostBaseInitialCogsRate = drivers.projectCogsRateWhenSalesZero;
   const historicalOtherCogsRate = latest.other.sales ? latest.other.cogs / latest.other.sales : drivers.otherCogsRateWhenSalesZero;
   const otherEquipmentCogsRate = Number.isFinite(drivers.otherCogsRateToBase)
     ? drivers.otherCogsRateToBase
@@ -806,11 +806,8 @@ export function generatePlan(
   const otherBasePayPerHead = latest.other.headcount ? latest.other.employeePay / latest.other.headcount : 0;
   const otherBaseEmployeePay = otherBasePayPerHead * (1 + drivers.otherPayGrowthToBase) ** yearsToBase * otherBaseHeadcount;
   const otherBaseOfficerPay = latest.other.officerPay * (1 + drivers.otherOfficerPayGrowthToBase) ** yearsToBase;
-  const otherBaseCogsRate = Math.min(0.99, Math.max(0.01, otherEquipmentCogsRate - drivers.otherCogsImprovementToBase));
   const latestOtherSgaRate = latest.other.sales ? latest.other.otherSga / latest.other.sales : 0;
   const otherBaseSgaRate = Math.min(0.99, Math.max(0, latestOtherSgaRate - drivers.otherSgaImprovementToBase));
-  const projectCogsRateEnd = Math.min(0.99, Math.max(0.01, baseProjectCogsRate - drivers.projectCogsImprovementAfterBase));
-  const otherCogsRateEnd = Math.min(0.99, Math.max(0.01, drivers.otherCogsRateWhenSalesZero - drivers.otherCogsImprovement));
   const baseProjectSgaRate = projectBase.sales ? projectBase.otherSga / projectBase.sales : 0;
   const projectSgaRateEnd = Math.min(0.99, Math.max(0, baseProjectSgaRate - drivers.projectSgaRateEnd));
   const otherSgaRateEnd = Math.min(0.99, Math.max(0, otherBaseSgaRate - drivers.otherSgaRateEnd));
@@ -821,9 +818,9 @@ export function generatePlan(
     const year = timeline.latestYear + i;
     const role = roleForYear(year, timeline);
     const yearsAfterBase = Math.max(0, year - timeline.baseYear);
-    const projectProgress = yearsAfterBase / 3;
     const beforeOrAtBase = year <= timeline.baseYear;
     const otherProgress = beforeOrAtBase ? i / yearsToBase : yearsAfterBase / 3;
+    const projectProgress = yearsAfterBase / 3;
     const projectHeadcount = projectBase.headcount * (1 + drivers.projectHeadcountGrowth) ** yearsAfterBase;
     const otherHeadcount = beforeOrAtBase
       ? latest.other.headcount * (1 + drivers.otherHeadcountGrowthToBase) ** i
@@ -833,8 +830,8 @@ export function generatePlan(
       ? latest.other.sales * (1 + drivers.otherSalesGrowthToBase) ** i
       : otherBaseSales * (1 + drivers.otherSalesGrowth) ** yearsAfterBase;
     const otherCogsRate = beforeOrAtBase
-      ? lerp(otherEquipmentCogsRate, otherBaseCogsRate, otherProgress)
-      : lerp(drivers.otherCogsRateWhenSalesZero, otherCogsRateEnd, otherProgress);
+      ? Math.min(0.99, Math.max(0.01, otherEquipmentCogsRate - drivers.otherCogsImprovementToBase * (i - 1)))
+      : Math.min(0.99, Math.max(0.01, drivers.otherCogsRateWhenSalesZero - drivers.otherCogsImprovement * Math.max(0, yearsAfterBase - 1)));
     const otherEmployeePay = beforeOrAtBase
       ? otherBasePayPerHead * (1 + drivers.otherPayGrowthToBase) ** i * otherHeadcount
       : (otherBaseHeadcount ? otherBaseEmployeePay / otherBaseHeadcount : 0) * (1 + drivers.otherPayGrowth) ** yearsAfterBase * otherHeadcount;
@@ -847,7 +844,7 @@ export function generatePlan(
     const enteredProject = periodInputs.find((row) => row.year === year)?.project;
     const rawProject = year <= timeline.baseYear ? structuredClone(enteredProject ?? emptyProject) : withProportionalBreakdown(projectBase, {
       sales: round(projectSales),
-      cogs: round(projectSales * lerp(baseProjectCogsRate, projectCogsRateEnd, projectProgress)),
+      cogs: round(projectSales * Math.min(0.99, Math.max(0.01, projectPostBaseInitialCogsRate - drivers.projectCogsImprovementAfterBase * Math.max(0, yearsAfterBase - 1)))),
       employeePay: round(baseProjectPayPerHead * (1 + drivers.projectPayGrowth) ** yearsAfterBase * projectHeadcount),
       officerPay: round(projectBase.officerPay * (1 + drivers.projectOfficerPayGrowth) ** yearsAfterBase),
       depreciation: round(projectBase.depreciation),
@@ -1125,6 +1122,69 @@ export function targetStatus(definition: MetricDefinition, actual: number, targe
   return { ok: true, gap: 0 };
 }
 
+function validateCogsTransitions(plan: YearPlan[], drivers: Drivers): Validation[] {
+  const results: Validation[] = [];
+  const base = plan.find((row) => row.role === "base");
+  const report1 = plan.find((row) => row.role === "report1");
+  const equipmentYears = plan.filter((row) => (
+    row.role === "projectPeriod" || row.role === "beforeBase" || row.role === "base"
+  )).length;
+  const configurations = [
+    {
+      key: "project" as const,
+      name: "補助事業",
+      equipmentInitial: drivers.projectCogsRateToBase,
+      equipmentAnnual: drivers.projectCogsImprovementToBase,
+      postBaseInitial: drivers.projectCogsRateWhenSalesZero,
+      postBaseAnnual: drivers.projectCogsImprovementAfterBase,
+    },
+    {
+      key: "other" as const,
+      name: "ベース事業",
+      equipmentInitial: drivers.otherCogsRateToBase,
+      equipmentAnnual: drivers.otherCogsImprovementToBase,
+      postBaseInitial: drivers.otherCogsRateWhenSalesZero,
+      postBaseAnnual: drivers.otherCogsImprovement,
+    },
+  ];
+
+  for (const configuration of configurations) {
+    const equipmentTerminal = configuration.equipmentInitial
+      - configuration.equipmentAnnual * Math.max(0, equipmentYears - 1);
+    const postBaseTerminal = configuration.postBaseInitial - configuration.postBaseAnnual * 2;
+    if (equipmentTerminal < 0 || postBaseTerminal < 0) {
+      results.push({
+        level: "error",
+        title: `${configuration.name}の原価率が0%を下回る設定`,
+        detail: "期間初年度の原価率と年当たり改善ポイントの組合せを見直してください。",
+      });
+    }
+
+    const baseSegment = base?.[configuration.key];
+    const report1Segment = report1?.[configuration.key];
+    if (!baseSegment?.sales || !report1Segment?.sales) continue;
+    const baseRate = baseSegment.cogs / baseSegment.sales;
+    const report1Rate = report1Segment.cogs / report1Segment.sales;
+    const boundaryChange = report1Rate - baseRate;
+    if (boundaryChange > 0.000001) {
+      results.push({
+        level: "warning",
+        title: `${configuration.name}の原価率が期間境界で悪化`,
+        detail: `基準年度の${(baseRate * 100).toFixed(2)}%から、基準年後初年度の${(report1Rate * 100).toFixed(2)}%へ悪化します。基準年後初年度の原価率または設備導入期間の年当たり改善ポイントを確認してください。`,
+        year: report1.year,
+      });
+    } else if (boundaryChange < -0.05) {
+      results.push({
+        level: "warning",
+        title: `${configuration.name}の原価率が期間境界で急改善`,
+        detail: `基準年度の${(baseRate * 100).toFixed(2)}%から、基準年後初年度の${(report1Rate * 100).toFixed(2)}%へ5pt超改善します。設備効果などの根拠を確認してください。`,
+        year: report1.year,
+      });
+    }
+  }
+  return results;
+}
+
 export function validatePlan(plan: YearPlan[], drivers: Drivers): Validation[] {
   const results: Validation[] = [];
   const fields: (keyof SegmentPlan)[] = ["sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga", "headcount", "officerCount"];
@@ -1165,6 +1225,7 @@ export function validatePlan(plan: YearPlan[], drivers: Drivers): Validation[] {
     }
   }
 
+  results.push(...validateCogsTransitions(plan, drivers));
   if (!results.length) results.push({ level: "info", title: "暫定検証を通過", detail: "汎用レンジ内です。業種別・社内実績による根拠確認は別途必要です。" });
   return results;
 }
