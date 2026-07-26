@@ -52,7 +52,7 @@ import {
   YearPlan,
 } from "./model";
 import { buildProposalHtml, buildProposalXlsx, downloadBlob, normalizeProposalMoneyUnit, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
-import { formatNumericInput, fromDisplayMoney, INTERNAL_MONEY_UNIT, legacyOkuToInternalMoney, moneyUnitLabel, normalizeInternalMoney, parseNumericInput, toDisplayMoney, type MoneyDisplayUnit } from "./money";
+import { formatDisplayMoney, formatNumericInput, fromDisplayMoney, INTERNAL_MONEY_UNIT, legacyOkuToInternalMoney, moneyDisplayFractionDigits, moneyUnitLabel, normalizeInternalMoney, parseNumericInput, toDisplayMoney, type MoneyDisplayUnit } from "./money";
 import {
   buildMappedExcel,
   EXCEL_MAPPING_COPILOT_PROMPT,
@@ -89,9 +89,6 @@ type View = "summary" | "history" | "future" | "pl" | "targets" | "logic" | "io"
 const emptyDrivers = defaultDrivers;
 const MoneyDisplayUnitContext = createContext<MoneyDisplayUnit>("千円");
 
-const moneyDisplayDigits = (unit: MoneyDisplayUnit) =>
-  unit === "千円" ? 0 : unit === "百万円" ? 3 : 5;
-
 const displayedMoneyUnit = (unit: string | undefined, moneyUnit: MoneyDisplayUnit) =>
   unit === "千円/人" ? `${moneyUnit}/人` : unit === "千円" || unit === undefined ? moneyUnit : unit;
 
@@ -113,7 +110,7 @@ function MoneyInput({
   ariaInvalid?: boolean;
 }) {
   const unit = useContext(MoneyDisplayUnitContext);
-  const digits = moneyDisplayDigits(unit);
+  const digits = moneyDisplayFractionDigits(unit);
   const displayedValue = value === "" ? "" : formatNumericInput(toDisplayMoney(Number(value), unit), digits);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(displayedValue);
@@ -148,7 +145,7 @@ function MoneyInput({
 
 function MoneyValue({ value, digits }: { value: number; digits?: number }) {
   const unit = useContext(MoneyDisplayUnitContext);
-  return <>{number(toDisplayMoney(value, unit), digits ?? moneyDisplayDigits(unit))}</>;
+  return <>{digits === undefined ? formatDisplayMoney(value, unit) : number(toDisplayMoney(value, unit), digits)}</>;
 }
 
 function ModelValue({ value, unit, digits }: { value: number; unit?: string; digits?: number }) {
@@ -3270,7 +3267,7 @@ function PlTable({ title, plan, sourcePlan, segment }: { title: string; plan: Ye
     { label: "常時使用する従業員数（就業時間換算）", value: (row) => row[segment].headcount },
     { label: "役員数", value: (row) => row[segment].officerCount },
   ];
-  return <article className="panel table-panel"><h2>{title}</h2><div className="wide-table"><table><thead><tr><th>{moneyUnit}（人数項目のみ人）</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{rows.map((item) => { const isPeople = item.label === "常時使用する従業員数（就業時間換算）" || item.label === "役員数"; return <tr className={item.emphasis ? "emphasis" : ""} key={item.label}><th>{item.label}</th>{plan.map((row, index) => <td key={row.year}>{sourcePlan && <small className="before-cell">{isPeople ? number(item.value(sourcePlan[index]), 0) : number(toDisplayMoney(item.value(sourcePlan[index]), moneyUnit), moneyDisplayDigits(moneyUnit))} →</small>}<strong className={sourcePlan ? "after-cell" : ""}>{isPeople ? number(item.value(row), 0) : number(toDisplayMoney(item.value(row), moneyUnit), moneyDisplayDigits(moneyUnit))}</strong></td>)}</tr>; })}</tbody></table></div></article>;
+  return <article className="panel table-panel"><h2>{title}</h2><div className="wide-table"><table><thead><tr><th>{moneyUnit}（人数項目のみ人）</th>{plan.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{rows.map((item) => { const isPeople = item.label === "常時使用する従業員数（就業時間換算）" || item.label === "役員数"; return <tr className={item.emphasis ? "emphasis" : ""} key={item.label}><th>{item.label}</th>{plan.map((row, index) => <td key={row.year}>{sourcePlan && <small className="before-cell">{isPeople ? number(item.value(sourcePlan[index]), 0) : formatDisplayMoney(item.value(sourcePlan[index]), moneyUnit)} →</small>}<strong className={sourcePlan ? "after-cell" : ""}>{isPeople ? number(item.value(row), 0) : formatDisplayMoney(item.value(row), moneyUnit)}</strong></td>)}</tr>; })}</tbody></table></div></article>;
 }
 
 type ChartSeries = {
@@ -3406,7 +3403,7 @@ function BehaviorChangeTable({ plan, balanceSheets, futureCapex, timeline }: { p
     { code: "4-6", label: "年間売上成長率（従前）", unit: "%", company: cagr(companyAt(actualRows[0]).sales, companyAt(actualRows[2]).sales, 2), formula: "過去3期の全社売上高CAGR" },
     { code: "4-7", label: "年間売上成長率（補助事業実施時）", unit: "%", company: cagr(companyBase.sales, companyAt(report3).sales, 3), formula: "基準年→事業化報告3年目の全社売上高CAGR" },
   ];
-  const display = (value: number | undefined, unit: "千円" | "%") => value === undefined || !Number.isFinite(value) ? "算出不可" : unit === "千円" ? `${number(toDisplayMoney(value, moneyUnit), moneyDisplayDigits(moneyUnit))} ${moneyUnit}` : `${number(value, 2)} %`;
+  const display = (value: number | undefined, unit: "千円" | "%") => value === undefined || !Number.isFinite(value) ? "算出不可" : unit === "千円" ? `${formatDisplayMoney(value, moneyUnit)} ${moneyUnit}` : `${number(value, 2)} %`;
   return <article className="panel table-panel behavior-change-panel"><div className="panel-heading"><div><h2>行動変容に係る数値（自動計算）</h2></div><span className="pill green">4-1～4-7</span></div><div className="wide-table"><table><thead><tr><th>第6次様式項目</th><th>全社</th><th>補助事業</th><th>HTMLでの計算根拠</th></tr></thead><tbody>{rows.map((row) => <tr key={row.code}><th>{row.code} {row.label}<small>{row.unit}</small></th><td><strong>{display(row.company, row.unit)}</strong></td><td><strong>{row.project === undefined ? "—" : display(row.project, row.unit)}</strong></td><td className="formula-cell">{row.formula}</td></tr>)}</tbody></table></div><p className="footnote">第6次入力ガイドの②補助事業情報 4-1～4-7を再現しています。賃上げ率は基準年の従業員数が0人の場合のみ、役員1人当たり給与支給総額で代替します。投資額は内部・公式様式とも千円単位で保持しています。</p></article>;
 }
 
@@ -3575,7 +3572,7 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
   const formatted = (value: number | undefined, unit: DiagnosticRow["unit"]) => {
     if (value === undefined || !Number.isFinite(value)) return "—";
     const digits = unit === "千円/人" ? 2 : unit === "倍" ? 2 : 1;
-    return unit === "千円/人" ? number(toDisplayMoney(value, moneyUnit), moneyDisplayDigits(moneyUnit)) : `${number(value, digits)}${unit}`;
+    return unit === "千円/人" ? formatDisplayMoney(value, moneyUnit) : `${number(value, digits)}${unit}`;
   };
   const allRows = groups.flatMap((group) => group.rows.map((row) => ({ key: `${group.title}:${row.name}`, row })));
   const [selectedKey, setSelectedKey] = useState(allRows[0]?.key ?? "");
@@ -3611,8 +3608,8 @@ function OfficialRowsTable({ title, pill, plan, sourcePlan, rows, note }: { titl
   const moneyUnit = useContext(MoneyDisplayUnitContext);
   const formatted = (value: number | undefined, unit?: OfficialRow["unit"]) => {
     if (value === undefined) return "—";
-    if (!unit) return number(toDisplayMoney(value, moneyUnit), moneyDisplayDigits(moneyUnit));
-    if (unit === "千円/人") return `${number(toDisplayMoney(value, moneyUnit), moneyDisplayDigits(moneyUnit))} ${moneyUnit}/人`;
+    if (!unit) return formatDisplayMoney(value, moneyUnit);
+    if (unit === "千円/人") return `${formatDisplayMoney(value, moneyUnit)} ${moneyUnit}/人`;
     return `${number(value, unit === "%" ? 1 : 2)} ${unit}`;
   };
   const hasSections = rows.some((item) => item.groupStart);

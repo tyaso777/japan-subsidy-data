@@ -19,6 +19,17 @@ export const fromDisplayMoney = (value: number, unit: MoneyDisplayUnit) =>
 export const toDisplayMoney = (value: number, unit: MoneyDisplayUnit) =>
   normalizeInternalMoney(value) / THOUSAND_YEN_PER_UNIT[unit];
 
+export const moneyDisplayFractionDigits = (unit: MoneyDisplayUnit) =>
+  unit === "千円" ? 0 : 2;
+
+/** Format canonical money for reading without exposing unnecessary conversion decimals. */
+export const formatDisplayMoney = (value: number, unit: MoneyDisplayUnit) =>
+  toDisplayMoney(value, unit).toLocaleString("ja-JP", {
+    useGrouping: true,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: moneyDisplayFractionDigits(unit),
+  });
+
 /** Format a numeric input with grouped thousands while preserving an editable decimal suffix. */
 export const formatNumericInput = (value: number | string, maximumFractionDigits?: number) => {
   if (typeof value === "number") {
