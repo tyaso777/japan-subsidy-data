@@ -22,12 +22,23 @@ export const toDisplayMoney = (value: number, unit: MoneyDisplayUnit) =>
 export const moneyDisplayFractionDigits = (unit: MoneyDisplayUnit) =>
   unit === "千円" ? 0 : 2;
 
+export const moneyEditableFractionDigits = (unit: MoneyDisplayUnit) =>
+  unit === "千円" ? 0 : unit === "百万円" ? 3 : 5;
+
 /** Format canonical money for reading without exposing unnecessary conversion decimals. */
 export const formatDisplayMoney = (value: number, unit: MoneyDisplayUnit) =>
   toDisplayMoney(value, unit).toLocaleString("ja-JP", {
     useGrouping: true,
     minimumFractionDigits: 0,
     maximumFractionDigits: moneyDisplayFractionDigits(unit),
+  });
+
+/** Format canonical money for editing without losing any thousand-yen precision. */
+export const formatEditableMoney = (value: number, unit: MoneyDisplayUnit) =>
+  toDisplayMoney(value, unit).toLocaleString("ja-JP", {
+    useGrouping: true,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: moneyEditableFractionDigits(unit),
   });
 
 /** Format a numeric input with grouped thousands while preserving an editable decimal suffix. */

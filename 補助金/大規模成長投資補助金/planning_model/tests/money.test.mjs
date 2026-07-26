@@ -43,6 +43,12 @@ test("displayed money uses at most two decimals without trailing zeroes", () => 
   assert.equal(money.formatDisplayMoney(4_800_000, "千円"), "4,800,000");
 });
 
+test("focused money inputs reveal the exact canonical thousand-yen value", () => {
+  assert.equal(money.formatEditableMoney(1_228_817, "百万円"), "1,228.817");
+  assert.equal(money.formatEditableMoney(1_228_817, "億円"), "12.28817");
+  assert.equal(money.formatEditableMoney(1_228_817, "千円"), "1,228,817");
+});
+
 test("legacy billion-yen proposal amounts migrate exactly once", () => {
   assert.equal(money.legacyOkuToInternalMoney(80), 8_000_000);
   assert.equal(money.legacyOkuToInternalMoney(0.01), 1_000);

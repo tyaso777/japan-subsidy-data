@@ -52,7 +52,7 @@ import {
   YearPlan,
 } from "./model";
 import { buildProposalHtml, buildProposalXlsx, downloadBlob, normalizeProposalMoneyUnit, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
-import { formatDisplayMoney, formatNumericInput, fromDisplayMoney, INTERNAL_MONEY_UNIT, legacyOkuToInternalMoney, moneyDisplayFractionDigits, moneyUnitLabel, normalizeInternalMoney, parseNumericInput, toDisplayMoney, type MoneyDisplayUnit } from "./money";
+import { formatDisplayMoney, formatEditableMoney, formatNumericInput, fromDisplayMoney, INTERNAL_MONEY_UNIT, legacyOkuToInternalMoney, moneyDisplayFractionDigits, moneyEditableFractionDigits, moneyUnitLabel, normalizeInternalMoney, parseNumericInput, toDisplayMoney, type MoneyDisplayUnit } from "./money";
 import {
   buildMappedExcel,
   EXCEL_MAPPING_COPILOT_PROMPT,
@@ -110,8 +110,10 @@ function MoneyInput({
   ariaInvalid?: boolean;
 }) {
   const unit = useContext(MoneyDisplayUnitContext);
-  const digits = moneyDisplayFractionDigits(unit);
-  const displayedValue = value === "" ? "" : formatNumericInput(toDisplayMoney(Number(value), unit), digits);
+  const displayDigits = moneyDisplayFractionDigits(unit);
+  const editableDigits = moneyEditableFractionDigits(unit);
+  const displayedValue = value === "" ? "" : formatNumericInput(toDisplayMoney(Number(value), unit), displayDigits);
+  const editableValue = value === "" ? "" : formatEditableMoney(Number(value), unit);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(displayedValue);
   useEffect(() => {
@@ -121,16 +123,16 @@ function MoneyInput({
     type="text"
     inputMode="decimal"
     value={editing ? draft : displayedValue}
-    placeholder={canonicalPlaceholder === undefined ? placeholder : formatNumericInput(toDisplayMoney(canonicalPlaceholder, unit), digits)}
+    placeholder={canonicalPlaceholder === undefined ? placeholder : formatNumericInput(toDisplayMoney(canonicalPlaceholder, unit), displayDigits)}
     className={className}
     aria-label={ariaLabel}
     aria-invalid={ariaInvalid}
     onFocus={() => {
       setEditing(true);
-      setDraft(displayedValue);
+      setDraft(editableValue);
     }}
     onChange={(event) => {
-      const formatted = formatNumericInput(event.target.value, digits);
+      const formatted = formatNumericInput(event.target.value, editableDigits);
       setDraft(formatted);
       if (formatted === "") {
         onCanonicalChange(null);

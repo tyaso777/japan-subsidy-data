@@ -326,7 +326,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /aria-label="画面全体の金額表示単位"/);
   assert.match(pageSource, /function MoneyInput\(/);
   assert.match(pageSource, /type="text"\s+inputMode="decimal"/);
-  assert.match(pageSource, /formatNumericInput\(event\.target\.value, digits\)/);
+  assert.match(pageSource, /setDraft\(editableValue\)/);
+  assert.match(pageSource, /formatNumericInput\(event\.target\.value, editableDigits\)/);
   assert.match(pageSource, /parseNumericInput\(formatted\)/);
   assert.match(pageSource, /fromDisplayMoney\(parsed, unit\)/);
   assert.match(pageSource, /<MoneyInput/);
