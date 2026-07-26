@@ -50,13 +50,44 @@ test("post-base project pay growth uses the statutory floor for each application
   assert.equal(rules.driverRangeRequirementFailure("projectPayGrowth", "hundredBillion", 0.045), null);
 });
 
-test("post-base project pay growth explains the examination risk separately from the statutory floor", () => {
-  assert.equal(
-    rules.driverReviewNote("projectPayGrowth"),
-    "審査項目。最低でも物価上昇率を上回る程度でないと、審査上大幅に不利",
-  );
-  assert.equal(rules.driverReviewNote("projectPayGrowthToBase"), "");
+test("latest-to-base pay growth explains the inflation examination risk separately from the statutory floor", () => {
+  assert.match(rules.driverReviewNote("projectPayGrowthToBase"), /物価上昇率超を審査上重視/);
+  assert.equal(rules.driverReviewNote("projectPayGrowth"), "");
   assert.equal(rules.driverReviewNote("projectSalesGrowth"), "");
+});
+
+test("whole-company latest-to-base pay growth has a zero-percent statutory minimum", () => {
+  assert.equal(rules.requiredMetricMinimums("general").companyPaySchedule, 0);
+  assert.match(rules.metricRequirementLabel("companyPaySchedule", "general"), /0\.0%\/年以上/);
+
+  const failures = rules.systemConstraintFailures(
+    "general",
+    { investment: 2_300_000, subsidy: 700_000 },
+    { companyPaySchedule: -0.1, employeePayCagr: 5 },
+  );
+  assert.ok(failures.some((failure) => failure.includes("全社") && failure.includes("0.0%")));
+
+  const valid = rules.systemConstraintFailures(
+    "general",
+    { investment: 2_300_000, subsidy: 700_000 },
+    { companyPaySchedule: 0, employeePayCagr: 5 },
+  );
+  assert.ok(!valid.some((failure) => failure.includes("全社") && failure.includes("0.0%")));
+});
+
+test("pay growth can be compared with an entered inflation reference", () => {
+  assert.deepEqual(rules.comparePayGrowthWithInflation(2.5, 2), {
+    difference: 0.5,
+    status: "above",
+  });
+  assert.deepEqual(rules.comparePayGrowthWithInflation(2, 2), {
+    difference: 0,
+    status: "equal",
+  });
+  assert.deepEqual(rules.comparePayGrowthWithInflation(1.8, 2), {
+    difference: -0.2,
+    status: "below",
+  });
 });
 
 test("drivers without a statutory floor keep their entered values", () => {

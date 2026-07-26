@@ -14,6 +14,7 @@ export const inputKey = {
   driver: (key: keyof Drivers) => `driver:${key}`,
   driverRange: (key: keyof Drivers, bound: 0 | 1) => `driver-range:${key}:${bound}`,
   target: (key: MetricKey, bound: "value" | "max") => `target:${key}:${bound}`,
+  assumption: (key: "inflationReference") => `assumption:${key}`,
 };
 
 export const hasInputValue = (values: InputValues, key: string) =>
