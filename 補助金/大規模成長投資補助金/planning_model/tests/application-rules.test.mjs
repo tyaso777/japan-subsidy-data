@@ -50,6 +50,15 @@ test("post-base project pay growth uses the statutory floor for each application
   assert.equal(rules.driverRangeRequirementFailure("projectPayGrowth", "hundredBillion", 0.045), null);
 });
 
+test("post-base project pay growth explains the examination risk separately from the statutory floor", () => {
+  assert.equal(
+    rules.driverReviewNote("projectPayGrowth"),
+    "審査項目。最低でも物価上昇率を上回る程度でないと、審査上大幅に不利",
+  );
+  assert.equal(rules.driverReviewNote("projectPayGrowthToBase"), "");
+  assert.equal(rules.driverReviewNote("projectSalesGrowth"), "");
+});
+
 test("drivers without a statutory floor keep their entered values", () => {
   assert.equal(rules.driverRequirementFloor("projectSalesGrowthToBase"), undefined);
   assert.deepEqual(

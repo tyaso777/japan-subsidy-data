@@ -102,6 +102,7 @@ test("invalid lower and upper bounds are announced immediately on the affected p
     /<small className="field-error driver-range-error" role="alert">\{rangeError\}<\/small>/,
   );
   assert.match(pageSource, /className="driver-statutory-floor"/);
+  assert.match(pageSource, /className="driver-review-note"/);
   assert.match(
     stylesheet,
     /\.driver-period-range-grid \.driver-range-error \{ grid-column: 1 \/ -1;/,

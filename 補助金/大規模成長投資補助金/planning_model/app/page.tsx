@@ -75,6 +75,7 @@ import {
   driverConstraintFailure,
   driverRangeOrderingFailure,
   driverRangeRequirementFailure,
+  driverReviewNote,
   driverRequirementFloor,
   driverRequirementLabel,
   maximumSubsidyAmount,
@@ -2394,6 +2395,7 @@ export default function Home() {
     const requirementError = driverRangeRequirementFailure(key, applicationCategory, rawLower);
     const rangeError = orderingError ?? requirementError;
     const statutoryFloor = driverRequirementFloor(key, applicationCategory);
+    const reviewNote = driverReviewNote(key);
     const inputMinimum = statutoryFloor === undefined
       ? undefined
       : percentDriver(key) ? statutoryFloor * 100 : statutoryFloor;
@@ -2416,6 +2418,7 @@ export default function Home() {
         {resultValue !== null && <small className="adjusted-value">結果 {number(resultValue, 2)}</small>}
         {rangeError && <small className="field-error driver-range-error" role="alert">{rangeError}</small>}
         {statutoryFloorLabel && !requirementError && <small className="driver-statutory-floor">{statutoryFloorLabel}</small>}
+        {reviewNote && <small className="driver-review-note">{reviewNote}</small>}
         {improvementWarning && <small className="field-warning driver-range-warning" role="status">{improvementWarning}</small>}
       </div>
     </td>;

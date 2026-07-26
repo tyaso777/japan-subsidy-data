@@ -31,6 +31,13 @@ export function driverRequirementFloor(key: keyof Drivers, category: Application
   return undefined;
 }
 
+export function driverReviewNote(key: keyof Drivers) {
+  if (key === "projectPayGrowth") {
+    return "審査項目。最低でも物価上昇率を上回る程度でないと、審査上大幅に不利";
+  }
+  return "";
+}
+
 export function normalizeDriverValueForRequirements(key: keyof Drivers, value: number) {
   const floor = driverRequirementFloor(key);
   return floor === undefined ? value : Math.max(floor, value);
