@@ -240,6 +240,10 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /keys: \["otherSalesGrowth", "otherCogsRateWhenSalesZero", "otherCogsImprovement"/);
   assert.match(pageSource, /projectCogsRateWhenSalesZero: \{ label: "補助事業 原価率"/);
   assert.match(pageSource, /otherCogsRateWhenSalesZero: \{ label: "ベース事業 原価率"/);
+  assert.match(pageSource, /projectCogsRateToBase: \{ label: "補助事業 原価率（設備導入期間）"/);
+  assert.match(pageSource, /otherCogsRateToBase: \{ label: "ベース事業 原価率（設備導入期間）"/);
+  assert.match(pageSource, /\{ equipment: "projectCogsRateToBase", postBase: "projectCogsRateWhenSalesZero" \}/);
+  assert.match(pageSource, /\{ equipment: "otherCogsRateToBase", postBase: "otherCogsRateWhenSalesZero" \}/);
   assert.doesNotMatch(pageSource, /売上実績が0の場合の開始水準/);
   assert.match(pageSource, /suggestCogsRateRange/);
   assert.match(globalStyles, /actuals-three-year-table table[^}]*min-width:\s*0\s*!important/);

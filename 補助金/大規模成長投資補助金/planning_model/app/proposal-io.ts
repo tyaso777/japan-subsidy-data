@@ -192,6 +192,8 @@ const roleLabels: Record<string, string> = { prePrevious: "前々期決算期", 
 const driverNames: Partial<Record<keyof Drivers, string>> = {
   projectCogsRateWhenSalesZero: "補助事業 原価率",
   otherCogsRateWhenSalesZero: "ベース事業 原価率",
+  projectCogsRateToBase: "補助事業 原価率（設備導入期間）",
+  otherCogsRateToBase: "ベース事業 原価率（設備導入期間）",
   projectEmployeeSalaryShare: "補助事業 従業員給与総額に占める給与の割合",
   otherEmployeeSalaryShare: "ベース事業 従業員給与総額に占める給与の割合",
   projectOfficerCompensationShare: "補助事業 役員給与総額に占める役員報酬の割合",

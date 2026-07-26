@@ -167,8 +167,8 @@ const driverRangeSuggestionId = (metricKey: MetricKey, suggestion: DriverRangeSu
 
 const adjustableDriverKeys: (keyof Drivers)[] = [
   "projectFirstYearSales", "projectBaseYearSales",
-  "projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase", "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase",
-  "otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherOfficerPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase",
+  "projectSalesGrowthToBase", "projectCogsRateToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase", "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase",
+  "otherSalesGrowthToBase", "otherCogsRateToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherOfficerPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase",
   "projectSalesGrowth", "otherSalesGrowth", "projectCogsRateWhenSalesZero", "otherCogsRateWhenSalesZero", "projectCogsImprovementAfterBase", "otherCogsImprovement",
   "projectPayGrowth", "otherPayGrowth", "otherOfficerPayGrowth", "projectHeadcountGrowth", "otherHeadcountGrowth",
   "projectSgaRateEnd", "otherSgaRateEnd", "projectOfficerPayGrowth",
@@ -177,6 +177,8 @@ const adjustableDriverKeys: (keyof Drivers)[] = [
 const driverLabels: Partial<Record<keyof Drivers, { label: string; unit: string; step: number }>> = {
   projectCogsRateWhenSalesZero: { label: "補助事業 原価率", unit: "%", step: 0.5 },
   otherCogsRateWhenSalesZero: { label: "ベース事業 原価率", unit: "%", step: 0.5 },
+  projectCogsRateToBase: { label: "補助事業 原価率（設備導入期間）", unit: "%", step: 0.5 },
+  otherCogsRateToBase: { label: "ベース事業 原価率（設備導入期間）", unit: "%", step: 0.5 },
   projectEmployeeSalaryShare: { label: "補助事業 従業員給与支給総額のうち給与として計上する割合", unit: "%", step: 0.5 },
   otherEmployeeSalaryShare: { label: "ベース事業 従業員給与支給総額のうち給与として計上する割合", unit: "%", step: 0.5 },
   projectOfficerCompensationShare: { label: "補助事業 役員給与支給総額のうち役員報酬として計上する割合", unit: "%", step: 0.5 },
@@ -261,7 +263,7 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
   {
     label: "補助事業｜設備導入期間",
     detail: "最新決算期 → 基準年",
-    keys: ["projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase", "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase", "investment", "subsidy"],
+    keys: ["projectSalesGrowthToBase", "projectCogsRateToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase", "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase", "investment", "subsidy"],
   },
   {
     label: "補助事業｜基準年後",
@@ -271,7 +273,7 @@ const driverGroups: { label: string; detail: string; keys: (keyof Drivers)[] }[]
   {
     label: "ベース事業｜設備導入期間",
     detail: "最新決算期 → 基準年",
-    keys: ["otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherOfficerPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase"],
+    keys: ["otherSalesGrowthToBase", "otherCogsRateToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherOfficerPayGrowthToBase", "otherHeadcountGrowthToBase", "otherSgaImprovementToBase"],
   },
   {
     label: "ベース事業｜基準年後",
@@ -307,7 +309,7 @@ const driverComparisonGroups: { label: string; rows: DriverComparisonRow[] }[] =
     rows: [
       { equipment: "projectSalesGrowthToBase", postBase: "projectSalesGrowth" },
       { equipment: "projectCogsImprovementToBase", postBase: "projectCogsImprovementAfterBase" },
-      { postBase: "projectCogsRateWhenSalesZero" },
+      { equipment: "projectCogsRateToBase", postBase: "projectCogsRateWhenSalesZero" },
       { equipment: "projectPayGrowthToBase", postBase: "projectPayGrowth" },
       { equipment: "projectHeadcountGrowthToBase", postBase: "projectHeadcountGrowth" },
       { equipment: "projectSgaImprovementToBase", postBase: "projectSgaRateEnd" },
@@ -321,7 +323,7 @@ const driverComparisonGroups: { label: string; rows: DriverComparisonRow[] }[] =
     rows: [
       { equipment: "otherSalesGrowthToBase", postBase: "otherSalesGrowth" },
       { equipment: "otherCogsImprovementToBase", postBase: "otherCogsImprovement" },
-      { postBase: "otherCogsRateWhenSalesZero" },
+      { equipment: "otherCogsRateToBase", postBase: "otherCogsRateWhenSalesZero" },
       { equipment: "otherPayGrowthToBase", postBase: "otherPayGrowth" },
       { equipment: "otherHeadcountGrowthToBase", postBase: "otherHeadcountGrowth" },
       { equipment: "otherSgaImprovementToBase", postBase: "otherSgaRateEnd" },
@@ -375,9 +377,9 @@ const driverItemCodes = Object.fromEntries(
 ) as Partial<Record<keyof Drivers, string>>;
 
 const equipmentPeriodStatisticalKeys = new Set<keyof Drivers>([
-  "projectSalesGrowthToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase",
+  "projectSalesGrowthToBase", "projectCogsRateToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase",
   "projectHeadcountGrowthToBase", "projectSgaImprovementToBase", "projectOfficerPayGrowthToBase",
-  "otherSalesGrowthToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherOfficerPayGrowthToBase",
+  "otherSalesGrowthToBase", "otherCogsRateToBase", "otherCogsImprovementToBase", "otherPayGrowthToBase", "otherOfficerPayGrowthToBase",
   "otherHeadcountGrowthToBase", "otherSgaImprovementToBase",
 ]);
 
@@ -2165,7 +2167,7 @@ export default function Home() {
     );
     const otherCogsSuggestion = suggestCogsRateRange(historicalDriverSeries.otherCogsRateWhenSalesZero.values);
     const applyCogsSuggestion = (
-      key: "projectCogsRateWhenSalesZero" | "otherCogsRateWhenSalesZero",
+      key: "projectCogsRateToBase" | "projectCogsRateWhenSalesZero" | "otherCogsRateToBase" | "otherCogsRateWhenSalesZero",
       suggestion: ReturnType<typeof suggestCogsRateRange>,
     ) => {
       const entered = hasInputValue(inputValues, inputKey.driver(key));
@@ -2176,7 +2178,9 @@ export default function Home() {
         Math.max(nextDrivers[key], suggestion.upper),
       ];
     };
+    applyCogsSuggestion("projectCogsRateToBase", projectCogsSuggestion);
     applyCogsSuggestion("projectCogsRateWhenSalesZero", projectCogsSuggestion);
+    applyCogsSuggestion("otherCogsRateToBase", otherCogsSuggestion);
     applyCogsSuggestion("otherCogsRateWhenSalesZero", otherCogsSuggestion);
     const setAccountingDefault = (key: keyof Drivers, value: number) => {
       nextDrivers[key] = hasInputValue(inputValues, inputKey.driver(key))
@@ -2214,7 +2218,12 @@ export default function Home() {
       : clamp(latestPreTax ? 1 - netIncome(latestCompany) / latestPreTax : 0.30, 0, 0.60);
     for (const key of adjustableDriverKeys) {
       if (key === "projectFirstYearSales" || key === "projectBaseYearSales") continue;
-      if (key === "projectCogsRateWhenSalesZero" || key === "otherCogsRateWhenSalesZero") continue;
+      if (
+        key === "projectCogsRateToBase"
+        || key === "projectCogsRateWhenSalesZero"
+        || key === "otherCogsRateToBase"
+        || key === "otherCogsRateWhenSalesZero"
+      ) continue;
       const history = historicalDriverSeries[key];
       const observed = history.values.filter(Number.isFinite);
       const [defaultLower, defaultUpper] = driverBounds[key];

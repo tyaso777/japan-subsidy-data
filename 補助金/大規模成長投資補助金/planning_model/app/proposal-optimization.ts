@@ -50,9 +50,18 @@ export function runPlanningOptimization({
   applicationCategory,
   planTransform,
 }: PlanningOptimizationInput) {
+  const normalizedDrivers = {
+    ...drivers,
+    projectCogsRateToBase: Number.isFinite(drivers.projectCogsRateToBase)
+      ? drivers.projectCogsRateToBase
+      : drivers.projectCogsRateWhenSalesZero,
+    otherCogsRateToBase: Number.isFinite(drivers.otherCogsRateToBase)
+      ? drivers.otherCogsRateToBase
+      : drivers.otherCogsRateWhenSalesZero,
+  };
   const sourceHistorical = historicalPlan.slice(0, 3);
-  const periodInput = createForecastProjectPeriodInputs(sourceHistorical[2], drivers, timeline);
-  const sourcePlan = planTransform(generatePlan(sourceHistorical, drivers, timeline, periodInput));
+  const periodInput = createForecastProjectPeriodInputs(sourceHistorical[2], normalizedDrivers, timeline);
+  const sourcePlan = planTransform(generatePlan(sourceHistorical, normalizedDrivers, timeline, periodInput));
   const optimizationBounds = Object.fromEntries((Object.keys(driverRanges) as (keyof Drivers)[]).map((key) => {
     const [first, second] = driverRanges[key];
     const lower = Math.min(first, second);
@@ -60,8 +69,8 @@ export function runPlanningOptimization({
     return [key, normalizeDriverRangeForRequirements(key, [lower, upper])];
   })) as Record<keyof Drivers, [number, number]>;
   const beforeScore = objective(
-    drivers,
-    drivers,
+    normalizedDrivers,
+    normalizedDrivers,
     sourceHistorical,
     timeline,
     optimizationTargets,
@@ -72,7 +81,7 @@ export function runPlanningOptimization({
     planTransform,
   );
   const result = optimizeDrivers(
-    drivers,
+    normalizedDrivers,
     sourceHistorical,
     timeline,
     optimizationTargets,

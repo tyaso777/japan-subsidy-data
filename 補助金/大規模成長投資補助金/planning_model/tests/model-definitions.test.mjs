@@ -479,6 +479,23 @@ test("post-base cogs rate is an explicit starting level and improvement is appli
   assert.ok(Math.abs(report3.project.cogs / report3.project.sales - 0.65) < 1e-4);
 });
 
+test("equipment-period cogs rates are explicit starting levels for both segments", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  const drivers = {
+    ...model.sampleDrivers,
+    projectCogsRateToBase: 0.66,
+    projectCogsImprovementToBase: 0.02,
+    otherCogsRateToBase: 0.64,
+    otherCogsImprovementToBase: 0.01,
+  };
+  const inputs = model.createForecastProjectPeriodInputs(historical.at(-1), drivers, model.DEFAULT_TIMELINE);
+  const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE, inputs);
+  const base = plan.find((row) => row.role === "base");
+
+  assert.ok(Math.abs(base.project.cogs / base.project.sales - 0.64) < 1e-4);
+  assert.ok(Math.abs(base.other.cogs / base.other.sales - 0.63) < 1e-4);
+});
+
 test("equipment-period other SGA assumption is an improvement point", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   const drivers = { ...model.sampleDrivers, projectSgaImprovementToBase: 0.03 };

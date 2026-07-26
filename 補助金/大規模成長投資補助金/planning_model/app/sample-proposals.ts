@@ -98,7 +98,9 @@ const standardWorkflowAdjustedDrivers = {
 
 const standardWorkflowRanges: typeof driverBounds = {
   ...clone(driverBounds),
+  projectCogsRateToBase: [0.68, 0.68],
   projectCogsRateWhenSalesZero: [0.66, 0.7],
+  otherCogsRateToBase: [0.68, 0.68],
   otherCogsRateWhenSalesZero: [0.66, 0.7],
   projectSalesGrowthToBase: [0.051169590643274754, 0.05701754385964919],
   projectCogsImprovementToBase: [0, 1.6653345369377348e-16],
