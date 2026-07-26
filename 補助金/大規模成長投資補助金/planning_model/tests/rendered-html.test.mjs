@@ -531,7 +531,9 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(pageSource, /applicationCategory === "startupException"/);
   assert.doesNotMatch(modelSource, /drivers\.investment < 15/);
   assert.match(modelSource, /projectPayGrowthToBase: \[0, 0\.1\]/);
-  assert.match(pageSource, /min=\{driverRequirementFloor\(key\) === undefined \? undefined : 0\}/);
+  assert.match(pageSource, /const statutoryFloor = driverRequirementFloor\(key, applicationCategory\)/);
+  assert.match(pageSource, /const requirementError = driverRangeRequirementFailure\(key, applicationCategory, rawLower\)/);
+  assert.match(pageSource, /const inputMinimum = statutoryFloor === undefined[\s\S]*?percentDriver\(key\) \? statutoryFloor \* 100 : statutoryFloor/);
   assert.match(pageSource, /normalizeDriverRangeForRequirements\(key, nextRange\)/);
   assert.match(pageSource, /normalizeDriverRangeForRequirements\(key, \[Math\.min\(\.\.\.validRange\), Math\.max\(\.\.\.validRange\)\]\)/);
   assert.match(modelSource, /latestPayPerEmployee \/ 1\.02 \*\* yearsBeforeLatest/);

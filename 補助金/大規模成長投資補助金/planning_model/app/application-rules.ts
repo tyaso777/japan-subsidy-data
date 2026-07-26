@@ -22,8 +22,13 @@ export function maximumSubsidyAmount(investment: number) {
   return Math.floor(exactMaximum);
 }
 
-export function driverRequirementFloor(key: keyof Drivers) {
-  return key === "projectPayGrowthToBase" ? 0 : undefined;
+export function driverRequirementFloor(key: keyof Drivers, category: ApplicationCategory = "") {
+  if (key === "projectPayGrowthToBase") return 0;
+  if (key === "projectPayGrowth") {
+    const requirements = applicationRequirements(category);
+    return requirements ? requirements.projectPayCagrMinimum / 100 : undefined;
+  }
+  return undefined;
 }
 
 export function normalizeDriverValueForRequirements(key: keyof Drivers, value: number) {
@@ -42,9 +47,17 @@ export function driverRangeOrderingFailure(lower: number | null, upper: number |
   return lower > upper ? "下限は上限以下にしてください" : null;
 }
 
+export function driverRangeRequirementFailure(key: keyof Drivers, category: ApplicationCategory, lower: number | null) {
+  if (lower === null) return null;
+  const floor = driverRequirementFloor(key, category);
+  if (floor === undefined || lower + 1e-12 >= floor) return null;
+  return `制度下限${(floor * 100).toFixed(1)}%/年以上で入力してください`;
+}
+
 export function driverRequirementLabel(key: keyof Drivers, category: ApplicationCategory, investment: number) {
   const requirements = applicationRequirements(category);
   if (key === "projectPayGrowthToBase") return "基準年度額が最新決算期額以上（成長率0%以上）";
+  if (key === "projectPayGrowth") return requirements ? `制度下限${requirements.projectPayCagrMinimum.toFixed(1)}%/年（基準年→事業化報告3年目）` : "申請区分の選択後に確定";
   if (key === "investment") return requirements ? `${toDisplayMoney(requirements.investmentMinimum, "億円")}億円以上（専門家経費・外注費を除く補助対象経費）` : "申請区分の選択後に確定";
   if (key === "subsidy") return `50億円以下、かつ投資額の1/3以下（現在上限${toDisplayMoney(maximumSubsidyAmount(investment), "億円").toFixed(2)}億円）`;
   return "—";

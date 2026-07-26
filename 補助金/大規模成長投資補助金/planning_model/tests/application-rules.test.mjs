@@ -37,6 +37,19 @@ test("equipment-period project pay growth cannot fall below the statutory zero-p
   assert.equal(rules.normalizeDriverValueForRequirements("projectPayGrowthToBase", -0.01), 0);
 });
 
+test("post-base project pay growth uses the statutory floor for each application category", () => {
+  assert.equal(rules.driverRequirementFloor("projectPayGrowth", "general"), 0.05);
+  assert.equal(rules.driverRequirementFloor("projectPayGrowth", "hundredBillion"), 0.045);
+  assert.match(rules.driverRequirementLabel("projectPayGrowth", "general", 0), /制度下限5\.0%\/年/);
+  assert.match(rules.driverRequirementLabel("projectPayGrowth", "hundredBillion", 0), /制度下限4\.5%\/年/);
+  assert.equal(
+    rules.driverRangeRequirementFailure("projectPayGrowth", "general", 0.049),
+    "制度下限5.0%/年以上で入力してください",
+  );
+  assert.equal(rules.driverRangeRequirementFailure("projectPayGrowth", "general", 0.05), null);
+  assert.equal(rules.driverRangeRequirementFailure("projectPayGrowth", "hundredBillion", 0.045), null);
+});
+
 test("drivers without a statutory floor keep their entered values", () => {
   assert.equal(rules.driverRequirementFloor("projectSalesGrowthToBase"), undefined);
   assert.deepEqual(

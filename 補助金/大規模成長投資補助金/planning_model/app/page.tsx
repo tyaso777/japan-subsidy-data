@@ -74,6 +74,7 @@ import {
   defaultApplicationCategory,
   driverConstraintFailure,
   driverRangeOrderingFailure,
+  driverRangeRequirementFailure,
   driverRequirementFloor,
   driverRequirementLabel,
   maximumSubsidyAmount,
@@ -1255,6 +1256,7 @@ export default function Home() {
   const [driverRanges, setDriverRanges] = useState<Record<keyof Drivers, [number, number]>>(() => clone(driverBounds));
   const [targets, setTargets] = useState<Record<MetricKey, Target>>(clone(defaultTargets));
   const [inputValues, setInputValues] = useState<InputValues>(() => createInitialInputValues());
+  const [applicationCategory, setApplicationCategory] = useState<ApplicationCategory>(defaultApplicationCategory);
   const latestProjectSalesIsZero = historicalPlan[2].project.sales <= 0;
   const activeForecastDriverKeys = useMemo<(keyof Drivers)[]>(() => latestProjectSalesIsZero
     ? [...forecastDriverKeys.filter((key) => key !== "projectSalesGrowthToBase"), "projectFirstYearSales", "projectBaseYearSales"]
@@ -1275,13 +1277,15 @@ export default function Home() {
     if (!adjustableDriverKeys.includes(key)) return false;
     const rawLower = getInputValue(inputValues, inputKey.driverRange(key, 0));
     const rawUpper = getInputValue(inputValues, inputKey.driverRange(key, 1));
-    return driverRangeOrderingFailure(rawLower === "" ? null : rawLower, rawUpper === "" ? null : rawUpper) !== null;
-  }), [activeForecastDriverKeys, inputValues]);
+    const lower = rawLower === "" ? null : rawLower;
+    const upper = rawUpper === "" ? null : rawUpper;
+    return driverRangeOrderingFailure(lower, upper) !== null
+      || driverRangeRequirementFailure(key, applicationCategory, lower) !== null;
+  }), [activeForecastDriverKeys, applicationCategory, inputValues]);
   const missingAccountingAssumptions = useMemo(() => accountingAssumptionDriverKeys.filter((key) =>
     !hasInputValue(inputValues, inputKey.driver(key)),
   ), [inputValues]);
   const [metricGroupBases, setMetricGroupBases] = useState<Record<MetricGroupKey, MetricGroupBasis>>({ ...defaultMetricGroupBases });
-  const [applicationCategory, setApplicationCategory] = useState<ApplicationCategory>(defaultApplicationCategory);
   const [forecastOverrides, setForecastOverrides] = useState<ForecastOverrides>({});
   const [futureInputBasis, setFutureInputBasis] = useState<FutureInputBasis>("other");
   const projectPeriodInputs = useMemo(
@@ -2387,6 +2391,15 @@ export default function Home() {
     const rawLower = lowerInput === "" ? null : lowerInput;
     const rawUpper = upperInput === "" ? null : upperInput;
     const orderingError = driverRangeOrderingFailure(rawLower, rawUpper);
+    const requirementError = driverRangeRequirementFailure(key, applicationCategory, rawLower);
+    const rangeError = orderingError ?? requirementError;
+    const statutoryFloor = driverRequirementFloor(key, applicationCategory);
+    const inputMinimum = statutoryFloor === undefined
+      ? undefined
+      : percentDriver(key) ? statutoryFloor * 100 : statutoryFloor;
+    const statutoryFloorLabel = key === "projectPayGrowth" && statutoryFloor !== undefined
+      ? `制度下限 ${number(statutoryFloor * 100, 1)}%/年`
+      : "";
     const improvementWarningLimit = cogsImprovementAnnualWarningLimit(key);
     const improvementMaximum = Math.max(
       rawLower ?? Number.NEGATIVE_INFINITY,
@@ -2398,10 +2411,11 @@ export default function Home() {
       : "";
     return <td className="driver-period-range" colSpan={2}>
       <div className="driver-period-range-grid">
-        {monetaryDriverKeys.has(key) ? <MoneyInput value={lowerInput} ariaLabel={`${info.label} 許容下限`} ariaInvalid={Boolean(orderingError)} onCanonicalChange={(value) => updateDriverRange(key, 0, value)} /> : <input aria-label={`${info.label} 許容下限`} aria-invalid={orderingError ? "true" : undefined} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />}
-        {monetaryDriverKeys.has(key) ? <MoneyInput value={upperInput} ariaLabel={`${info.label} 許容上限`} ariaInvalid={Boolean(orderingError)} onCanonicalChange={(value) => updateDriverRange(key, 1, value)} /> : <input aria-label={`${info.label} 許容上限`} aria-invalid={orderingError ? "true" : undefined} type="number" min={driverRequirementFloor(key) === undefined ? undefined : 0} step={info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />}
+        {monetaryDriverKeys.has(key) ? <MoneyInput value={lowerInput} ariaLabel={`${info.label} 許容下限`} ariaInvalid={Boolean(rangeError)} onCanonicalChange={(value) => updateDriverRange(key, 0, value)} /> : <input aria-label={`${info.label} 許容下限`} aria-invalid={rangeError ? "true" : undefined} type="number" min={inputMinimum} step={info.step} value={driverRangeDisplayValue(key, 0)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 0, event.target.value === "" ? null : Number(event.target.value))} />}
+        {monetaryDriverKeys.has(key) ? <MoneyInput value={upperInput} ariaLabel={`${info.label} 許容上限`} ariaInvalid={Boolean(rangeError)} onCanonicalChange={(value) => updateDriverRange(key, 1, value)} /> : <input aria-label={`${info.label} 許容上限`} aria-invalid={rangeError ? "true" : undefined} type="number" min={inputMinimum} step={info.step} value={driverRangeDisplayValue(key, 1)} placeholder="未設定" onChange={(event) => updateDriverRange(key, 1, event.target.value === "" ? null : Number(event.target.value))} />}
         {resultValue !== null && <small className="adjusted-value">結果 {number(resultValue, 2)}</small>}
-        {orderingError && <small className="field-error driver-range-error" role="alert">{orderingError}</small>}
+        {rangeError && <small className="field-error driver-range-error" role="alert">{rangeError}</small>}
+        {statutoryFloorLabel && !requirementError && <small className="driver-statutory-floor">{statutoryFloorLabel}</small>}
         {improvementWarning && <small className="field-warning driver-range-warning" role="status">{improvementWarning}</small>}
       </div>
     </td>;
@@ -2443,12 +2457,16 @@ export default function Home() {
       return;
     }
     const rangesToValidate = rangeOverride ?? driverRanges;
-    const invalidRangeKey = activeForecastDriverKeys.find((key) =>
-      adjustableDriverKeys.includes(key)
-      && driverRangeOrderingFailure(rangesToValidate[key][0], rangesToValidate[key][1]) !== null,
-    );
-    if (invalidRangeKey) {
-      setSolveNote(`${driverLabels[invalidRangeKey]?.label ?? "調整条件"}の下限・上限を修正してください。`);
+    const invalidRange = activeForecastDriverKeys
+      .filter((key) => adjustableDriverKeys.includes(key))
+      .map((key) => ({
+        key,
+        error: driverRangeOrderingFailure(rangesToValidate[key][0], rangesToValidate[key][1])
+          ?? driverRangeRequirementFailure(key, applicationCategory, rangesToValidate[key][0]),
+      }))
+      .find(({ error }) => error !== null);
+    if (invalidRange) {
+      setSolveNote(`${driverLabels[invalidRange.key]?.label ?? "調整条件"}：${invalidRange.error}`);
       return;
     }
     setIsSolving(true);
@@ -2740,7 +2758,7 @@ export default function Home() {
           <article className="panel">
             <div className="panel-heading"><div><h2>将来予測・調整水準</h2><span className={`pill ${forecastSettingsReady ? "green" : ""}`}>{forecastSettingsReady ? "設定済み" : "未設定"}</span></div><button className="default-button" onClick={confirmAndApplyHistoricalDefaults}>{forecastSettingsStarted ? "過去3期から再設定" : "過去3期からデフォルト設定"}</button></div>
             {missingAccountingAssumptions.length > 0 && <p className="default-note" role="alert">会計内訳・利益前提が未設定です。補助事業・ベース事業の各6項目と共通の実効税率を設定するまで、③将来データ入力では自動予測を表示しません。</p>}
-            {invalidForecastDriverRangeKeys.length > 0 && <p className="driver-range-summary-error" role="alert">下限が上限を超えている調整条件があります。赤字の範囲を修正してください。</p>}
+            {invalidForecastDriverRangeKeys.length > 0 && <p className="driver-range-summary-error" role="alert">入力できない許容範囲があります。下限・上限の順序と、赤字で示した制度下限を確認してください。</p>}
             <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th rowSpan={2}>調整条件<small>C-1～（Condition）</small></th><th rowSpan={2} className="driver-statutory-heading">制度上の必須条件<small>編集不可</small></th>{historicalPlan.slice(1).map((row) => <th rowSpan={2} className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th colSpan={2} className="driver-period-heading">設備導入期間<small>最新決算期 → 基準年</small></th><th colSpan={2} className="driver-period-heading">基準年後<small>基準年 → 事業化報告3年目</small></th></tr><tr><th className="driver-bound-heading">下限</th><th className="driver-bound-heading">上限</th><th className="driver-bound-heading">下限</th><th className="driver-bound-heading">上限</th></tr></thead><tbody>
               {driverComparisonGroups.flatMap((group) => [
                 <tr className="driver-group-heading" key={`group-${group.label}`}><th><strong>{group.label}</strong></th><td aria-hidden="true" colSpan={7}></td></tr>,
@@ -2830,7 +2848,7 @@ export default function Home() {
                 </p>}
               </div>
               <div className="target-action-buttons">
-                <button className="solve-button" disabled={isSolving} aria-busy={isSolving} onClick={() => void solve()}>{isSolving ? "計算中…" : "設定した目標に近づける"}</button>
+                <button className="solve-button" disabled={isSolving || invalidForecastDriverRangeKeys.length > 0} aria-busy={isSolving} onClick={() => void solve()}>{isSolving ? "計算中…" : "設定した目標に近づける"}</button>
                 {adjustedPlan && <button className="reset-button" onClick={clearAdjustment}>入力値表示に戻す</button>}
               </div>
             </div>

@@ -89,14 +89,19 @@ test("invalid lower and upper bounds are announced immediately on the affected p
     pageSource,
     /const orderingError = driverRangeOrderingFailure\(rawLower, rawUpper\)/,
   );
+  assert.match(
+    pageSource,
+    /const requirementError = driverRangeRequirementFailure\(key, applicationCategory, rawLower\)/,
+  );
   assert.equal(
-    pageSource.match(/aria-invalid=\{orderingError \? "true" : undefined\}/g)?.length,
+    pageSource.match(/aria-invalid=\{rangeError \? "true" : undefined\}/g)?.length,
     2,
   );
   assert.match(
     pageSource,
-    /<small className="field-error driver-range-error" role="alert">\{orderingError\}<\/small>/,
+    /<small className="field-error driver-range-error" role="alert">\{rangeError\}<\/small>/,
   );
+  assert.match(pageSource, /className="driver-statutory-floor"/);
   assert.match(
     stylesheet,
     /\.driver-period-range-grid \.driver-range-error \{ grid-column: 1 \/ -1;/,
