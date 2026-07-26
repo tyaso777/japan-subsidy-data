@@ -234,6 +234,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /projectCogsImprovementAfterBase: \{ initial: 0\.015, lower: 0, upper: 0\.03 \}/);
   assert.match(pageSource, /設備導入期間0～2pt、基準年後0～3pt/);
   assert.match(pageSource, /const improvementDriverKeys/);
+  assert.match(pageSource, /改善幅の根拠を確認してください。/);
+  assert.doesNotMatch(pageSource, /期間末原価率から次期初年度原価率へ戻る段差も確認してください。/);
   assert.doesNotMatch(pageSource, /新規投資の平均耐用年数/);
   assert.doesNotMatch(modelSource, /usefulLife/);
   assert.match(pageSource, /keys: \["projectSalesGrowth", "projectCogsRateWhenSalesZero", "projectCogsImprovementAfterBase"/);

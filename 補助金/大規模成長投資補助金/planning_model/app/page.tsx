@@ -2383,7 +2383,7 @@ export default function Home() {
     );
     const improvementWarning = improvementWarningLimit !== undefined
       && improvementMaximum > improvementWarningLimit + 1e-9
-      ? `年当たり改善ポイントの上限${number(improvementMaximum * 100, 2)}ptは通常目安${number(improvementWarningLimit * 100, 2)}ptを超えています。期間末原価率から次期初年度原価率へ戻る段差も確認してください。`
+      ? `年当たり改善ポイントの上限${number(improvementMaximum * 100, 2)}ptは通常目安${number(improvementWarningLimit * 100, 2)}ptを超えています。改善幅の根拠を確認してください。`
       : "";
     return <td className="driver-period-range" colSpan={2}>
       <div className="driver-period-range-grid">
