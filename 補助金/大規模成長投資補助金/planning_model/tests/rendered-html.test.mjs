@@ -227,9 +227,17 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /設備導入期間＋2\.0pt/);
   assert.match(pageSource, /補助事業とのシナジーを見込み/);
   assert.match(pageSource, /projectPayGrowth: \{ initial: 0\.07, lower: 0\.05, upper: 0\.10 \}/);
-  assert.match(pageSource, /benchmark && key !== "projectOfficerPayGrowth"/);
+  assert.match(pageSource, /if \(benchmark\)/);
   assert.doesNotMatch(pageSource, /nextDrivers\.projectOfficerPayGrowth = nextDrivers\.projectPayGrowth/);
   assert.doesNotMatch(pageSource, /nextDrivers\.projectOfficerPayGrowthToBase = nextDrivers\.projectPayGrowthToBase/);
+  assert.match(pageSource, /const projectPostBaseDefaultMirrors/);
+  assert.match(pageSource, /projectHeadcountGrowth: "projectHeadcountGrowthToBase"/);
+  assert.match(pageSource, /projectSgaRateEnd: "projectSgaImprovementToBase"/);
+  assert.match(pageSource, /projectOfficerPayGrowth: "projectOfficerPayGrowthToBase"/);
+  assert.match(pageSource, /nextDrivers\[postBaseKey\] = clamp\(nextDrivers\[equipmentKey\]/);
+  assert.match(pageSource, /nextRanges\[postBaseKey\] = \[/);
+  assert.doesNotMatch(pageSource, /projectHeadcountGrowth: \{ initial: 0\.04, lower: 0, upper: 0\.08 \}/);
+  assert.doesNotMatch(pageSource, /projectOfficerPayGrowth: \{ initial: 0\.07, lower: 0\.05, upper: 0\.10 \}/);
   assert.match(pageSource, /過去3期の役員1人当たり給与から推計/);
   assert.match(pageSource, /projectCogsImprovementAfterBase: \{ initial: 0\.015, lower: 0, upper: 0\.03 \}/);
   assert.match(pageSource, /設備導入期間0～2pt、基準年後0～3pt/);

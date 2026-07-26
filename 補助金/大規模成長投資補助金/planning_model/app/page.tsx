@@ -384,6 +384,15 @@ const equipmentPeriodStatisticalKeys = new Set<keyof Drivers>([
   "otherHeadcountGrowthToBase", "otherSgaImprovementToBase",
 ]);
 
+// These post-base assumptions use the same historical mean ± 2 population
+// standard deviations as their equipment-period counterparts. Keeping the
+// mapping explicit prevents one period from silently reverting to a benchmark.
+const projectPostBaseDefaultMirrors: Partial<Record<keyof Drivers, keyof Drivers>> = {
+  projectHeadcountGrowth: "projectHeadcountGrowthToBase",
+  projectSgaRateEnd: "projectSgaImprovementToBase",
+  projectOfficerPayGrowth: "projectOfficerPayGrowthToBase",
+};
+
 const improvementDriverKeys: (keyof Drivers)[] = [
   "projectCogsImprovementToBase", "projectSgaImprovementToBase",
   "otherCogsImprovementToBase", "otherSgaImprovementToBase",
@@ -417,10 +426,7 @@ const round5Benchmarks: Partial<Record<MetricKey, Round5Benchmark>> = {
 const postBaseBenchmarkDefaults: Partial<Record<keyof Drivers, { initial: number; lower: number; upper: number }>> = {
   projectSalesGrowth: { initial: 0.22, lower: 0.15, upper: 0.30 },
   projectCogsImprovementAfterBase: { initial: 0.015, lower: 0, upper: 0.03 },
-  projectSgaRateEnd: { initial: 0.015, lower: 0, upper: 0.03 },
   projectPayGrowth: { initial: 0.07, lower: 0.05, upper: 0.10 },
-  projectHeadcountGrowth: { initial: 0.04, lower: 0, upper: 0.08 },
-  projectOfficerPayGrowth: { initial: 0.07, lower: 0.05, upper: 0.10 },
 };
 
 const historicalFallbackDefaults: Partial<Record<keyof Drivers, { initial: number; lower: number; upper: number }>> = {
@@ -441,7 +447,6 @@ const historicalFallbackDefaults: Partial<Record<keyof Drivers, { initial: numbe
   otherPayGrowth: { initial: 0.03, lower: 0, upper: 0.06 },
   otherOfficerPayGrowth: { initial: 0.03, lower: 0, upper: 0.06 },
   otherHeadcountGrowth: { initial: 0.01, lower: -0.03, upper: 0.05 },
-  projectSgaRateEnd: { initial: 0.015, lower: 0, upper: 0.03 },
   otherSgaRateEnd: { initial: 0.005, lower: 0, upper: 0.03 },
 };
 
@@ -2240,10 +2245,7 @@ export default function Home() {
       const mean = observed.reduce((sum, value) => sum + value, 0) / observed.length;
       const standardDeviation = Math.sqrt(observed.reduce((sum, value) => sum + (value - mean) ** 2, 0) / observed.length);
       const benchmark = postBaseBenchmarkDefaults[key];
-      // Officer pay is independently estimated from the historical per-officer
-      // pay series.  The benchmark remains only as a fallback when no usable
-      // officer history exists.
-      if (benchmark && key !== "projectOfficerPayGrowth") {
+      if (benchmark) {
         nextDrivers[key] = clamp(benchmark.initial, defaultLower, defaultUpper);
         nextRanges[key] = [
           clamp(benchmark.lower, defaultLower, defaultUpper),
@@ -2266,6 +2268,15 @@ export default function Home() {
         : Math.max(boundedInitial, clamp(observedUpper + buffer, defaultLower, defaultUpper));
       nextDrivers[key] = boundedInitial;
       nextRanges[key] = [lower, upper];
+    }
+
+    for (const [postBaseKey, equipmentKey] of Object.entries(projectPostBaseDefaultMirrors) as [keyof Drivers, keyof Drivers][]) {
+      const [defaultLower, defaultUpper] = driverBounds[postBaseKey];
+      nextDrivers[postBaseKey] = clamp(nextDrivers[equipmentKey], defaultLower, defaultUpper);
+      nextRanges[postBaseKey] = [
+        clamp(nextRanges[equipmentKey][0], defaultLower, defaultUpper),
+        clamp(nextRanges[equipmentKey][1], defaultLower, defaultUpper),
+      ];
     }
 
     const applyOtherSynergyLift = (
