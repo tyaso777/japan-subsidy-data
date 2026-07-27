@@ -32,6 +32,30 @@ const assertOptimizationIsStable = (proposal) => {
   );
 };
 
+const assertHistoricalPayrollInputsAreExplicit = (proposal) => {
+  for (const row of proposal.historicalPlan) {
+    const expectedEmployeePayroll = Number((
+      (row.project.employeePayrollTotal ?? row.project.employeePay)
+      + (row.other.employeePayrollTotal ?? row.other.employeePay)
+    ).toFixed(2));
+    const expectedOfficerPayroll = Number((
+      (row.project.officerPayrollTotal ?? row.project.officerPay)
+      + (row.other.officerPayrollTotal ?? row.other.officerPay)
+    ).toFixed(2));
+
+    assert.equal(
+      proposal.inputValues[`actual:company:${row.year}:2-21`],
+      expectedEmployeePayroll,
+      `${row.year}年の2-21は確認用サンプルに実入力値として保存する`,
+    );
+    assert.equal(
+      proposal.inputValues[`actual:company:${row.year}:2-22`],
+      expectedOfficerPayroll,
+      `${row.year}年の2-22は確認用サンプルに実入力値として保存する`,
+    );
+  }
+};
+
 test("standard sample represents the completed two-pass planning workflow", async () => {
   const proposal = await proposalFromHtml(standardBaseName);
 
@@ -61,6 +85,7 @@ test("standard sample represents the completed two-pass planning workflow", asyn
   assert.equal(typeof proposal.historicalPlan[2].other.ordinaryIncome, "number");
   assert.equal(typeof proposal.historicalPlan[2].other.preTaxIncome, "number");
   assert.equal(typeof proposal.historicalPlan[2].other.netIncome, "number");
+  assertHistoricalPayrollInputsAreExplicit(proposal);
   assertOptimizationIsStable(proposal);
 });
 
@@ -76,6 +101,7 @@ test("partially unmet sample retains a visibly unattainable pay target", async (
       || proposal.adjustedDrivers.otherPayGrowthToBase === proposal.driverRanges.otherPayGrowthToBase[1],
     "an unattainable pay target should exhaust at least one relevant pay-growth range",
   );
+  assertHistoricalPayrollInputsAreExplicit(proposal);
   assertOptimizationIsStable(proposal);
 });
 
@@ -91,6 +117,7 @@ test("multiple unmet sample retains three deterministic unmet targets", async ()
   assert.equal(proposal.targets.projectSalesCagr.value, 35);
   assert.deepEqual(actualUnmet, [...expectedUnmet].sort());
   assert.equal(rerun.failed.length, 3);
+  assertHistoricalPayrollInputsAreExplicit(proposal);
   assertOptimizationIsStable(proposal);
 });
 
@@ -109,6 +136,7 @@ test("base-year launch sample has no project sales before the base year", async 
   assert.equal(proposal.forecastOverrides["2027:project:7-1"], 0);
   assert.equal(proposal.forecastOverrides["2028:project:7-1"], 6_000_000);
   assert.ok(proposal.forecastOverrides["2031:project:7-1"] > 6_000_000);
+  assertHistoricalPayrollInputsAreExplicit(proposal);
 });
 
 test("base-year launch Excel is an OOXML zip workbook", async () => {
