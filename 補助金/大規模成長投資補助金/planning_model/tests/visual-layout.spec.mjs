@@ -105,7 +105,7 @@ for (const width of viewportWidths) {
     await openStandalone(page, width);
     await page.getByRole("button", { name: /②\s*15指標・目標/ }).click();
 
-    const driverPanel = page.locator(".driver-target-table").locator("..");
+    const driverPanel = page.locator(".driver-target-table:visible").last().locator("..");
     await expect(driverPanel).toBeVisible();
     await driverPanel.scrollIntoViewIfNeeded();
     await page.evaluate(() => window.scrollBy(0, 260));

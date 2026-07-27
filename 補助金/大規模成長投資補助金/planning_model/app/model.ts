@@ -8,6 +8,10 @@ export type SegmentPlan = {
   cogs: number;
   employeePay: number;
   officerPay: number;
+  /** 第6次様式2-21。未入力時のみ販管費内訳のemployeePayへフォールバックする。 */
+  employeePayrollTotal?: number;
+  /** 第6次様式2-22。未入力時のみ販管費内訳のofficerPayへフォールバックする。 */
+  officerPayrollTotal?: number;
   depreciation: number;
   otherSga: number;
   headcount: number;
@@ -516,12 +520,15 @@ export function operatingProfit(segment: SegmentPlan) {
     - sgaDepreciation(segment) - researchDevelopment(segment) - segment.otherSga;
 }
 
+export const employeePayrollTotal = (segment: SegmentPlan) => segment.employeePayrollTotal ?? segment.employeePay;
+export const officerPayrollTotal = (segment: SegmentPlan) => segment.officerPayrollTotal ?? segment.officerPay;
+
 export function valueAdded(segment: SegmentPlan) {
-  return operatingProfit(segment) + segment.employeePay + segment.officerPay + segment.depreciation;
+  return operatingProfit(segment) + employeePayrollTotal(segment) + officerPayrollTotal(segment) + segment.depreciation;
 }
 
 export function total(a: SegmentPlan, b: SegmentPlan): SegmentPlan {
-  return {
+  const combined: SegmentPlan = {
     sales: a.sales + b.sales,
     cogs: a.cogs + b.cogs,
     employeePay: a.employeePay + b.employeePay,
@@ -541,6 +548,13 @@ export function total(a: SegmentPlan, b: SegmentPlan): SegmentPlan {
     preTaxIncome: preTaxIncome(a) + preTaxIncome(b),
     netIncome: netIncome(a) + netIncome(b),
   };
+  if (a.employeePayrollTotal !== undefined || b.employeePayrollTotal !== undefined) {
+    combined.employeePayrollTotal = employeePayrollTotal(a) + employeePayrollTotal(b);
+  }
+  if (a.officerPayrollTotal !== undefined || b.officerPayrollTotal !== undefined) {
+    combined.officerPayrollTotal = officerPayrollTotal(a) + officerPayrollTotal(b);
+  }
+  return combined;
 }
 
 export function calculateScaleDependentTargetDefaults(
@@ -621,6 +635,12 @@ function scaleSegment(segment: SegmentPlan, factor: number): SegmentPlan {
   if (segment.ordinaryIncome !== undefined) scaled.ordinaryIncome = round(segment.ordinaryIncome * factor);
   if (segment.preTaxIncome !== undefined) scaled.preTaxIncome = round(segment.preTaxIncome * factor);
   if (segment.netIncome !== undefined) scaled.netIncome = round(segment.netIncome * factor);
+  if (segment.employeePayrollTotal !== undefined) {
+    scaled.employeePayrollTotal = round(segment.employeePayrollTotal * factor);
+  }
+  if (segment.officerPayrollTotal !== undefined) {
+    scaled.officerPayrollTotal = round(segment.officerPayrollTotal * factor);
+  }
   return scaled;
 }
 

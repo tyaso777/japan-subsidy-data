@@ -35,6 +35,7 @@ export type ProposalData = {
 
 const moneySegmentFields = new Set([
   "sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga",
+  "employeePayrollTotal", "officerPayrollTotal",
   "employeeSalary", "employeeBonus", "officerCompensation", "officerBonus",
   "cogsDepreciation", "sgaDepreciation", "researchDevelopment",
   "ordinaryIncome", "preTaxIncome", "netIncome",

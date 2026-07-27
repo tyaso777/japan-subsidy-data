@@ -20,6 +20,7 @@ import {
   defaultTargets,
   Drivers,
   employeeBonus,
+  employeePayrollTotal,
   employeeSalary,
   generatePlan,
   hardTargetSummary,
@@ -33,6 +34,7 @@ import {
   ordinaryIncome,
   officerBonus,
   officerCompensation,
+  officerPayrollTotal,
   normalizeTimeline,
   retimeHistoricalPlan,
   retimeBalanceSheets,
@@ -539,16 +541,16 @@ const otherPlCalculatedFields: OtherPlCalculatedField[] = [
   { key: "operatingProfitMargin", modelCode: "M2-17", label: "営業利益率", unit: "%", indentLevel: 1, get: (rows, index) => { const segment = rows[index].other; return segmentRate(operatingProfit(segment), segment.sales); } },
   { key: "nonOperatingProfitLoss", modelCode: "M2-17A", label: "営業外損益（純額）", unit: "千円", indentLevel: 1, get: (rows, index) => nonOperatingProfitLoss(rows[index].other) },
   { key: "extraordinaryProfitLoss", modelCode: "M2-18A", label: "特別損益（純額）", unit: "千円", indentLevel: 1, get: (rows, index) => extraordinaryProfitLoss(rows[index].other) },
-  { key: "employeePayTotal", modelCode: "M2-21", label: "給与支給総額（常時使用する従業員）", unit: "千円", get: (rows, index) => rows[index].other.employeePay },
-  { key: "officerPayTotal", modelCode: "M2-22", label: "給与支給総額（役員）", unit: "千円", get: (rows, index) => rows[index].other.officerPay },
+  { key: "employeePayTotal", modelCode: "M2-21", label: "給与支給総額（常時使用する従業員）", unit: "千円", get: (rows, index) => employeePayrollTotal(rows[index].other) },
+  { key: "officerPayTotal", modelCode: "M2-22", label: "給与支給総額（役員）", unit: "千円", get: (rows, index) => officerPayrollTotal(rows[index].other) },
   { key: "depreciationTotal", modelCode: "M2-23", label: "減価償却費（合計）", unit: "千円", get: (rows, index) => rows[index].other.depreciation },
   { key: "valueAdded", modelCode: "M2-24", label: "付加価値額", unit: "千円", get: (rows, index) => valueAdded(rows[index].other) },
   { key: "valueAddedGrowth", modelCode: "M2-25", label: "付加価値増加率", unit: "%", indentLevel: 1, get: (rows, index) => segmentGrowth(valueAdded(rows[index].other), index ? valueAdded(rows[index - 1].other) : undefined) },
   { key: "valueAddedMargin", modelCode: "M2-26", label: "売上高付加価値率", unit: "%", indentLevel: 1, get: (rows, index) => segmentRate(valueAdded(rows[index].other), rows[index].other.sales) },
-  { key: "employeePayPerPerson", modelCode: "M2-29", label: "従業員1人当たり給与支給総額", unit: "千円/人", get: (rows, index) => { const segment = rows[index].other; return segment.headcount ? segment.employeePay / segment.headcount : 0; } },
-  { key: "employeePayPerPersonGrowth", modelCode: "M2-30", label: "従業員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = rows[index].other; const previous = index ? rows[index - 1].other : undefined; return segmentGrowth(current.headcount ? current.employeePay / current.headcount : 0, previous?.headcount ? previous.employeePay / previous.headcount : undefined); } },
-  { key: "officerPayPerPerson", modelCode: "M2-31", label: "役員1人当たり給与支給総額", unit: "千円/人", get: (rows, index) => { const segment = rows[index].other; return segment.officerCount ? segment.officerPay / segment.officerCount : 0; } },
-  { key: "officerPayPerPersonGrowth", modelCode: "M2-32", label: "役員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = rows[index].other; const previous = index ? rows[index - 1].other : undefined; return segmentGrowth(current.officerCount ? current.officerPay / current.officerCount : 0, previous?.officerCount ? previous.officerPay / previous.officerCount : undefined); } },
+  { key: "employeePayPerPerson", modelCode: "M2-29", label: "従業員1人当たり給与支給総額", unit: "千円/人", get: (rows, index) => { const segment = rows[index].other; return segment.headcount ? employeePayrollTotal(segment) / segment.headcount : 0; } },
+  { key: "employeePayPerPersonGrowth", modelCode: "M2-30", label: "従業員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = rows[index].other; const previous = index ? rows[index - 1].other : undefined; return segmentGrowth(current.headcount ? employeePayrollTotal(current) / current.headcount : 0, previous?.headcount ? employeePayrollTotal(previous) / previous.headcount : undefined); } },
+  { key: "officerPayPerPerson", modelCode: "M2-31", label: "役員1人当たり給与支給総額", unit: "千円/人", get: (rows, index) => { const segment = rows[index].other; return segment.officerCount ? officerPayrollTotal(segment) / segment.officerCount : 0; } },
+  { key: "officerPayPerPersonGrowth", modelCode: "M2-32", label: "役員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = rows[index].other; const previous = index ? rows[index - 1].other : undefined; return segmentGrowth(current.officerCount ? officerPayrollTotal(current) / current.officerCount : 0, previous?.officerCount ? officerPayrollTotal(previous) / previous.officerCount : undefined); } },
   { key: "laborProductivity", modelCode: "M2-33", label: "労働生産性", unit: "千円/人", get: (rows, index) => { const segment = rows[index].other; const people = segment.headcount + segment.officerCount; return people ? valueAdded(segment) / people : 0; } },
   { key: "ebitda", modelCode: "M2-34", label: "EBITDA", unit: "千円", get: (rows, index) => segmentEbitda(rows[index].other) },
   { key: "ebitdaMargin", modelCode: "M2-35", label: "EBITDAマージン", unit: "%", indentLevel: 1, get: (rows, index) => { const segment = rows[index].other; return segmentRate(segmentEbitda(segment), segment.sales); } },
@@ -1947,6 +1949,13 @@ export default function Home() {
     setInputValues((current) => setInputValue(current, inputKey.companyActual(historicalPlan[yearIndex].year, item.code), inputValue === null ? null : normalizePlanInput(inputValue, isCount)));
     setHistoricalPlan((current) => current.map((row, index) => {
       if (index !== yearIndex) return row;
+      if (inputValue === null && item.clearField) {
+        return {
+          ...row,
+          project: { ...row.project, [item.clearField]: undefined },
+          other: { ...row.other, [item.clearField]: undefined },
+        };
+      }
       if (inputValue === null && ["2-18", "2-19", "2-20"].includes(item.code)) {
         const field = ({ "2-18": "ordinaryIncome", "2-19": "preTaxIncome", "2-20": "netIncome" } as const)[item.code as "2-18" | "2-19" | "2-20"];
         return { ...row, other: { ...row.other, [field]: undefined } };
@@ -3068,6 +3077,9 @@ type CompanyActualInputRow = {
   unit?: string;
   indentLevel?: 1 | 2;
   groupStart?: boolean;
+  clearField?: "employeePayrollTotal" | "officerPayrollTotal";
+  noAutoProposal?: boolean;
+  warning?: (rows: YearPlan[], index: number) => string | undefined;
   get: (rows: YearPlan[], index: number) => number | undefined;
   set?: (row: YearPlan, value: number) => Partial<SegmentPlan>;
 };
@@ -3101,18 +3113,55 @@ const companyActualInputRows: CompanyActualInputRow[] = [
   { code: "2-18", label: "経常利益", get: (rows, index) => ordinaryIncome(companySegment(rows, index)), set: (row, value) => ({ ordinaryIncome: value - ordinaryIncome(row.project) }) },
   { code: "2-19", label: "税引前当期純利益", get: (rows, index) => preTaxIncome(companySegment(rows, index)), set: (row, value) => ({ preTaxIncome: value - preTaxIncome(row.project) }) },
   { code: "2-20", label: "当期純利益", get: (rows, index) => netIncome(companySegment(rows, index)), set: (row, value) => ({ netIncome: value - netIncome(row.project) }) },
-  { code: "2-21", label: "給与支給総額（常時使用する従業員）", groupStart: true, get: (rows, index) => companySegment(rows, index).employeePay },
-  { code: "2-22", label: "給与支給総額（役員）", get: (rows, index) => companySegment(rows, index).officerPay },
+  {
+    code: "2-21",
+    label: "給与支給総額（常時使用する従業員）",
+    groupStart: true,
+    clearField: "employeePayrollTotal",
+    noAutoProposal: true,
+    get: (rows, index) => {
+      const row = rows[index];
+      if (row.project.employeePayrollTotal === undefined && row.other.employeePayrollTotal === undefined) return undefined;
+      return employeePayrollTotal(companySegment(rows, index));
+    },
+    set: (row, value) => ({ employeePayrollTotal: value - employeePayrollTotal(row.project) }),
+    warning: (rows, index) => {
+      const official = companyActualInputRows.find((item) => item.code === "2-21")!.get(rows, index);
+      if (official === undefined) return undefined;
+      return Math.abs(official - companySegment(rows, index).employeePay) > 0.5
+        ? "2-11（販管費内訳）と差額があります。売上原価に含まれる給与等との整合を確認してください。"
+        : undefined;
+    },
+  },
+  {
+    code: "2-22",
+    label: "給与支給総額（役員）",
+    clearField: "officerPayrollTotal",
+    noAutoProposal: true,
+    get: (rows, index) => {
+      const row = rows[index];
+      if (row.project.officerPayrollTotal === undefined && row.other.officerPayrollTotal === undefined) return undefined;
+      return officerPayrollTotal(companySegment(rows, index));
+    },
+    set: (row, value) => ({ officerPayrollTotal: value - officerPayrollTotal(row.project) }),
+    warning: (rows, index) => {
+      const official = companyActualInputRows.find((item) => item.code === "2-22")!.get(rows, index);
+      if (official === undefined) return undefined;
+      return Math.abs(official - companySegment(rows, index).officerPay) > 0.5
+        ? "2-8（販管費内訳）と差額があります。売上原価に含まれる役員報酬等との整合を確認してください。"
+        : undefined;
+    },
+  },
   { code: "2-23", label: "減価償却費（合計）", get: (rows, index) => companySegment(rows, index).depreciation },
   { code: "2-24", label: "付加価値額", get: (rows, index) => valueAdded(companySegment(rows, index)) },
   { code: "2-25", label: "付加価値増加率", unit: "%", indentLevel: 1, get: (rows, index) => growth(valueAdded(companySegment(rows, index)), index ? valueAdded(companySegment(rows, index - 1)) : undefined) },
   { code: "2-26", label: "売上高付加価値率", unit: "%", indentLevel: 1, get: (rows, index) => { const company = companySegment(rows, index); return rate(valueAdded(company), company.sales); } },
   { code: "2-27", label: "常時使用する従業員数（就業時間換算）", unit: "人", get: (rows, index) => companySegment(rows, index).headcount, set: (row, value) => ({ headcount: Math.max(0, Math.round(value - row.project.headcount)) }) },
   { code: "2-28", label: "役員数", unit: "人", get: (rows, index) => companySegment(rows, index).officerCount, set: (row, value) => ({ officerCount: Math.max(0, Math.round(value - row.project.officerCount)) }) },
-  { code: "2-29", label: "従業員1人当たり給与支給総額", unit: "千円/人", get: (rows, index) => { const company = companySegment(rows, index); return company.headcount ? company.employeePay / company.headcount : 0; } },
-  { code: "2-30", label: "従業員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = companySegment(rows, index); const previous = index ? companySegment(rows, index - 1) : undefined; return growth(current.headcount ? current.employeePay / current.headcount : 0, previous?.headcount ? previous.employeePay / previous.headcount : undefined); } },
-  { code: "2-31", label: "役員1人当たり給与支給総額", unit: "千円/人", get: (rows, index) => { const company = companySegment(rows, index); return company.officerCount ? company.officerPay / company.officerCount : 0; } },
-  { code: "2-32", label: "役員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = companySegment(rows, index); const previous = index ? companySegment(rows, index - 1) : undefined; return growth(current.officerCount ? current.officerPay / current.officerCount : 0, previous?.officerCount ? previous.officerPay / previous.officerCount : undefined); } },
+  { code: "2-29", label: "従業員1人当たり給与支給総額", unit: "千円/人", get: (rows, index) => { const company = companySegment(rows, index); return company.headcount ? employeePayrollTotal(company) / company.headcount : 0; } },
+  { code: "2-30", label: "従業員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = companySegment(rows, index); const previous = index ? companySegment(rows, index - 1) : undefined; return growth(current.headcount ? employeePayrollTotal(current) / current.headcount : 0, previous?.headcount ? employeePayrollTotal(previous) / previous.headcount : undefined); } },
+  { code: "2-31", label: "役員1人当たり給与支給総額", unit: "千円/人", get: (rows, index) => { const company = companySegment(rows, index); return company.officerCount ? officerPayrollTotal(company) / company.officerCount : 0; } },
+  { code: "2-32", label: "役員1人当たり給与支給総額の上昇率", unit: "%", indentLevel: 1, get: (rows, index) => { const current = companySegment(rows, index); const previous = index ? companySegment(rows, index - 1) : undefined; return growth(current.officerCount ? officerPayrollTotal(current) / current.officerCount : 0, previous?.officerCount ? officerPayrollTotal(previous) / previous.officerCount : undefined); } },
   { code: "2-33", label: "労働生産性", unit: "千円/人", get: (rows, index) => { const company = companySegment(rows, index); const people = company.headcount + company.officerCount; return people ? valueAdded(company) / people : 0; } },
   { code: "2-34", label: "EBITDA", get: (rows, index) => { const company = companySegment(rows, index); return operatingProfit(company) + company.depreciation; } },
   { code: "2-35", label: "EBITDAマージン", unit: "%", indentLevel: 1, get: (rows, index) => { const company = companySegment(rows, index); return rate(operatingProfit(company) + company.depreciation, company.sales); } },
@@ -3135,7 +3184,7 @@ function HistoricalInputsEditor({ historical, inputValues, onHistoricalCompanyCh
   const visibleCompanyActualRows = omitCompanyActualCalculated ? companyActualInputRows.filter((item) => item.set) : companyActualInputRows;
   const visibleProjectActualRows = omitProjectActualCalculated ? projectOfficialDisplayRows.filter((item) => item.input) : projectOfficialDisplayRows.filter((item) => !item.fixed);
   return <div className="manual-sections spreadsheet-grid">
-    <div><h3 className="manual-table-heading"><span>会社全体にかかる損益計算書・関連計算項目（過去3期実績）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCompanyActualCalculated} onClick={() => setOmitCompanyActualCalculated((current) => !current)}>{omitCompanyActualCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目（金額は{moneyUnit}）</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{visibleCompanyActualRows.map((item) => <tr className={`${!item.set ? "emphasis" : ""}${item.groupStart ? " official-related-start" : ""}`} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.groupStart && <small>P/L関連計算項目</small>}{item.unit && <small>{displayedMoneyUnit(item.unit, moneyUnit)}</small>}</th>{historical.map((row, index) => { const value = item.get(historical, index); const isMoney = item.unit !== "人" && item.unit !== "%" && item.unit !== "倍"; return <td key={row.year}>{item.set ? isMoney ? <MoneyInput value={getInputValue(inputValues, inputKey.companyActual(row.year, item.code))} onCanonicalChange={(next) => onHistoricalCompanyChange(index, item, next)} /> : <input type="number" step="1" value={getInputValue(inputValues, inputKey.companyActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalCompanyChange(index, item, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{value === undefined ? "—" : isMoney ? <MoneyValue value={value} /> : number(value, item.unit === "人" ? 0 : 2)}</strong>}</td>; })}</tr>)}</tbody></table></div></div>
+    <div><h3 className="manual-table-heading"><span>会社全体にかかる損益計算書・関連計算項目（過去3期実績）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCompanyActualCalculated} onClick={() => setOmitCompanyActualCalculated((current) => !current)}>{omitCompanyActualCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目（金額は{moneyUnit}）</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{visibleCompanyActualRows.map((item) => <tr className={`${!item.set ? "emphasis" : ""}${item.groupStart ? " official-related-start" : ""}`} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.groupStart && <small>P/L関連計算項目</small>}{item.unit && <small>{displayedMoneyUnit(item.unit, moneyUnit)}</small>}</th>{historical.map((row, index) => { const value = item.get(historical, index); const warning = item.warning?.(historical, index); const isMoney = item.unit !== "人" && item.unit !== "%" && item.unit !== "倍"; return <td key={row.year}>{item.set ? isMoney ? <MoneyInput value={getInputValue(inputValues, inputKey.companyActual(row.year, item.code))} onCanonicalChange={(next) => onHistoricalCompanyChange(index, item, next)} /> : <input type="number" step="1" value={getInputValue(inputValues, inputKey.companyActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalCompanyChange(index, item, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{value === undefined ? "—" : isMoney ? <MoneyValue value={value} /> : number(value, item.unit === "人" ? 0 : 2)}</strong>}{warning && <small className="input-consistency-warning" role="status">{warning}</small>}</td>; })}</tr>)}</tbody></table></div></div>
     <div>
       <h3 className="manual-table-heading">
         <span>補助事業PL（過去3期実績）</span>
