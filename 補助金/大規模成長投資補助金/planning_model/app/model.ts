@@ -1269,12 +1269,6 @@ export function validatePlan(plan: YearPlan[], drivers: Drivers): Validation[] {
           results.push({ level: "error", title: `${name}に負数または未入力`, detail: `${String(field)}は0以上の数値にしてください。`, year: row.year });
         }
       }
-      const cogsRate = segment.sales ? segment.cogs / segment.sales : 0;
-      const sgaRate = segment.sales ? segment.otherSga / segment.sales : 0;
-      const margin = segment.sales ? operatingProfit(segment) / segment.sales : 0;
-      if (cogsRate < 0.45 || cogsRate > 0.88) results.push({ level: "warning", title: `${name}の原価率が暫定レンジ外`, detail: `原価率${(cogsRate * 100).toFixed(1)}%。業種別実績で根拠確認が必要です。`, year: row.year });
-      if (sgaRate < 0.04 || sgaRate > 0.25) results.push({ level: "warning", title: `${name}のその他販管費率が暫定レンジ外`, detail: `その他販管費率${(sgaRate * 100).toFixed(1)}%。固定費内訳を確認してください。`, year: row.year });
-      if (margin < -0.05 || margin > 0.3) results.push({ level: "warning", title: `${name}の営業利益率を要確認`, detail: `営業利益率${(margin * 100).toFixed(1)}%。過去実績・同業比較・能力増強効果で説明してください。`, year: row.year });
       if (segment.employeePay > 0 && segment.headcount <= 0) results.push({ level: "error", title: `${name}の従業員給与と常時使用する従業員数が不整合`, detail: "従業員給与がある場合は、常時使用する従業員数（就業時間換算）を入力してください。", year: row.year });
       if (segment.officerPay > 0 && segment.officerCount <= 0) results.push({ level: "error", title: `${name}の役員給与と役員数が不整合`, detail: "役員給与がある場合は役員数を入力してください。", year: row.year });
     }
@@ -1282,23 +1276,8 @@ export function validatePlan(plan: YearPlan[], drivers: Drivers): Validation[] {
     if (Math.abs(company.sales - row.project.sales - row.other.sales) > 0.0001) results.push({ level: "error", title: "全社合算不一致", detail: "補助事業とベース事業の合計が全社値と一致しません。", year: row.year });
   }
 
-  for (let i = 1; i < plan.length; i += 1) {
-    const previous = plan[i - 1];
-    const current = plan[i];
-    for (const segmentKey of ["project", "other"] as SegmentKey[]) {
-      const previousSegment = previous[segmentKey];
-      const currentSegment = current[segmentKey];
-      const salesChange = previousSegment.sales ? currentSegment.sales / previousSegment.sales - 1 : 0;
-      const payPerHeadBefore = previousSegment.employeePay / Math.max(previousSegment.headcount, 1);
-      const payPerHeadAfter = currentSegment.employeePay / Math.max(currentSegment.headcount, 1);
-      const payChange = payPerHeadBefore ? payPerHeadAfter / payPerHeadBefore - 1 : 0;
-      if (Math.abs(salesChange) > 0.4) results.push({ level: "warning", title: "売上の年度変動が大きい", detail: `${segmentKey === "project" ? "補助事業" : "ベース事業"}売上が前年比${(salesChange * 100).toFixed(1)}%。立上げ月・顧客別数量で説明が必要です。`, year: current.year });
-      if (payChange < 0 || payChange > 0.1) results.push({ level: "warning", title: "従業員1人当たり給与支給総額の年度変動を要確認", detail: `前年比${(payChange * 100).toFixed(1)}%。賃金表・採用構成との整合を確認してください。`, year: current.year });
-    }
-  }
-
   results.push(...validateCogsTransitions(plan, drivers));
-  if (!results.length) results.push({ level: "info", title: "暫定検証を通過", detail: "汎用レンジ内です。業種別・社内実績による根拠確認は別途必要です。" });
+  if (!results.length) results.push({ level: "info", title: "基本検証を通過", detail: "入力値の基本的な整合性に確認事項はありません。" });
   return results;
 }
 

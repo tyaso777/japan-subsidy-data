@@ -639,6 +639,30 @@ test("cogs transition validation reports annual improvements that make a rate ne
   assert.ok(validations.some((item) => item.title === "補助事業の原価率が0%を下回る設定"));
 });
 
+test("validation does not apply industry-agnostic provisional ranges", () => {
+  const plan = makePlan();
+  for (const row of plan) {
+    for (const segmentKey of ["project", "other"]) {
+      const segment = row[segmentKey];
+      segment.cogs = segment.sales * 0.20;
+      segment.otherSga = segment.sales * 0.35;
+      segment.employeePay = segment.sales * 0.15;
+      segment.headcount = 1;
+    }
+  }
+  plan[3].project.sales = plan[2].project.sales * 2;
+  plan[3].project.employeePay = plan[2].project.employeePay * 2;
+  plan[3].project.headcount = plan[2].project.headcount;
+
+  const validations = model.validatePlan(plan, model.sampleDrivers);
+
+  assert.equal(validations.some((item) => item.title.includes("原価率が暫定レンジ外")), false);
+  assert.equal(validations.some((item) => item.title.includes("その他販管費率が暫定レンジ外")), false);
+  assert.equal(validations.some((item) => item.title.includes("営業利益率を要確認")), false);
+  assert.equal(validations.some((item) => item.title.includes("売上の年度変動が大きい")), false);
+  assert.equal(validations.some((item) => item.title.includes("給与支給総額の年度変動を要確認")), false);
+});
+
 test("equipment-period other SGA assumption is an improvement point", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   const drivers = { ...model.sampleDrivers, projectSgaImprovementToBase: 0.03 };
