@@ -120,32 +120,53 @@ for (const width of viewportWidths) {
 
 test("diagnostic detail chart, value table, and keyboard navigator stay coordinated", async ({ page }) => {
   await openStandalone(page, 1440);
+  page.on("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "データ入出力" }).click();
+  await page.getByRole("button", { name: "最適化済み標準提案" }).click();
   await page.locator(".tabs button").nth(4).click();
 
+  const overview = page.locator(".diagnostic-overview-block");
   const detailLayout = page.locator(".diagnostic-detail-layout");
   const valuePanel = page.locator(".diagnostic-values-panel");
   const navigator = page.locator(".diagnostic-metric-navigator");
+  await expect(overview).toBeVisible();
   await expect(detailLayout).toBeVisible();
   await expect(valuePanel).toBeVisible();
   await expect(navigator).toBeVisible();
 
   const geometry = await page.evaluate(() => {
+    const overview = document.querySelector(".diagnostic-overview-block");
     const layout = document.querySelector(".diagnostic-detail-layout")?.getBoundingClientRect();
     const chart = document.querySelector(".diagnostic-detail-layout .trend-chart-card")?.getBoundingClientRect();
-    const values = document.querySelector(".diagnostic-values-panel")?.getBoundingClientRect();
-    const navigatorBox = document.querySelector(".diagnostic-metric-navigator")?.getBoundingClientRect();
-    return layout && chart && values && navigatorBox
+    const valuesElement = document.querySelector(".diagnostic-values-panel");
+    const values = valuesElement?.getBoundingClientRect();
+    const navigator = document.querySelector(".diagnostic-metric-navigator");
+    const navigatorBox = navigator?.getBoundingClientRect();
+    const groupsPanel = document.querySelector(".diagnostic-groups-panel");
+    return overview && layout && chart && valuesElement && values && navigator && navigatorBox && groupsPanel
       ? {
           chartRight: chart.right,
           valuesLeft: values.left,
+          chartHeight: chart.height,
+          valuesHeight: values.height,
+          valuesClientHeight: valuesElement.clientHeight,
+          valuesScrollHeight: valuesElement.scrollHeight,
+          valuesOverflowY: getComputedStyle(valuesElement).overflowY,
           layoutBottom: layout.bottom,
           navigatorTop: navigatorBox.top,
+          overviewContainsNavigator: overview.contains(navigator),
+          overviewContainsGroupsPanel: overview.contains(groupsPanel),
         }
       : null;
   });
   expect(geometry).not.toBeNull();
   expect(geometry.valuesLeft).toBeGreaterThanOrEqual(geometry.chartRight - 1);
+  expect(Math.abs(geometry.valuesHeight - geometry.chartHeight)).toBeLessThanOrEqual(2);
+  expect(geometry.valuesScrollHeight).toBeLessThanOrEqual(geometry.valuesClientHeight + 1);
+  expect(geometry.valuesOverflowY).not.toMatch(/auto|scroll/);
   expect(geometry.navigatorTop).toBeGreaterThanOrEqual(geometry.layoutBottom - 1);
+  expect(geometry.overviewContainsNavigator).toBe(true);
+  expect(geometry.overviewContainsGroupsPanel).toBe(false);
 
   const groups = navigator.locator(".diagnostic-metric-group");
   expect(await groups.count()).toBeGreaterThan(1);
@@ -164,5 +185,21 @@ test("diagnostic detail chart, value table, and keyboard navigator stay coordina
   const nextGroupTile = groups.nth(1).locator(".diagnostic-metric-tile").nth(1);
   await expect(nextGroupTile).toBeFocused();
   await expect(nextGroupTile).toHaveAttribute("aria-pressed", "true");
+
+  await page.locator(".diagnostic-groups-panel").scrollIntoViewIfNeeded();
+  const released = await page.evaluate(() => {
+    const chart = document.querySelector(".diagnostic-selected-chart")?.getBoundingClientRect();
+    const groupsPanel = document.querySelector(".diagnostic-groups-panel")?.getBoundingClientRect();
+    return chart && groupsPanel
+      ? {
+          chartBottom: chart.bottom,
+          groupsTop: groupsPanel.top,
+          chartTop: chart.top,
+        }
+      : null;
+  });
+  expect(released).not.toBeNull();
+  expect(released.chartBottom).toBeLessThanOrEqual(released.groupsTop + 2);
+  expect(released.chartTop).toBeLessThan(46);
   await expectNoPageOverflow(page);
 });

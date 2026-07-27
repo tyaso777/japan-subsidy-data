@@ -140,6 +140,10 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /className="diagnostic-detail-layout"/);
   assert.match(pageSource, /className="diagnostic-values-panel"/);
   assert.match(pageSource, /className="diagnostic-metric-navigator"/);
+  assert.match(
+    pageSource,
+    /className="diagnostic-overview-block"[\s\S]*className="diagnostic-selected-chart"[\s\S]*className="diagnostic-metric-navigator"/,
+  );
   assert.match(pageSource, /className="diagnostic-metric-tile"/);
   assert.match(pageSource, /case "ArrowLeft"/);
   assert.match(pageSource, /case "ArrowRight"/);
@@ -148,6 +152,8 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.diagnostic-detail-layout \{[^}]*grid-template-columns:/);
   assert.match(globalStyles, /\.diagnostic-values-panel \{/);
   assert.match(globalStyles, /\.diagnostic-metric-navigator \{/);
+  assert.match(globalStyles, /\.diagnostic-overview-block \{[^}]*position: relative;/);
+  assert.doesNotMatch(globalStyles, /\.diagnostic-values-panel \{[^}]*overflow:\s*auto;/);
   assert.match(pageSource, /diagnosticChart\.getBoundingClientRect\(\)/);
   assert.match(pageSource, /<th className="diagnostic-sparkline-column">推移<\/th>/);
   assert.match(pageSource, /<th className="diagnostic-series-column">区分<\/th>/);
