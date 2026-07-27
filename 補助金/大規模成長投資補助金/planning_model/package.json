@@ -13,6 +13,8 @@
     "benchmark:optimizer": "node scripts/benchmark-optimizer.mjs",
     "start": "vinext start",
     "test": "npm run build && node scripts/run-tests.mjs",
+    "test:ui": "npm run build:standalone && playwright test tests/visual-layout.spec.mjs",
+    "test:ui:update": "npm run build:standalone && playwright test tests/visual-layout.spec.mjs --update-snapshots",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"
   },
@@ -25,6 +27,7 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",
+    "@playwright/test": "^1.62.0",
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
