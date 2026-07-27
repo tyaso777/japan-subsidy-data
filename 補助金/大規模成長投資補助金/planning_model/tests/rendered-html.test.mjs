@@ -134,9 +134,16 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /--diagnostic-sticky-chart-height/);
   assert.match(pageSource, /diagnosticChart\.getBoundingClientRect\(\)/);
   assert.match(pageSource, /<th className="diagnostic-sparkline-column">推移<\/th>/);
+  assert.match(pageSource, /<th className="diagnostic-series-column">区分<\/th>/);
+  assert.match(pageSource, /className="diagnostic-period-heading"/);
+  assert.match(pageSource, /\["補助事業期間", "（基準年前年）"\]/);
+  assert.match(pageSource, /className="diagnostic-series-labels"/);
+  assert.match(pageSource, /className="diagnostic-values diagnostic-values-only"/);
   assert.match(pageSource, /setSelectedKey\(itemKey\)/);
   assert.match(pageSource, /<TrendChart title=\{selected\.row\.name\}/);
   assert.match(globalStyles, /\.diagnostic-sparkline-button\[aria-pressed="true"\]/);
+  assert.match(globalStyles, /\.diagnostic-series-column, \.diagnostic-series-cell/);
+  assert.match(globalStyles, /\.diagnostic-period-heading, \.diagnostic-period-cell/);
   assert.match(globalStyles, /\.wide-table, \.targets-table-wrap \{[^}]*overflow-x: auto; overflow-y: visible;/);
   assert.match(globalStyles, /\.balance-sheet-table \{[^}]*overflow-x: auto; overflow-y: visible;/);
   assert.match(globalStyles, /\.balance-sheet-heading-actions \{ display: flex;/);
