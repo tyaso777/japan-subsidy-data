@@ -73,7 +73,7 @@ test("all number inputs hide native spinner controls", () => {
   );
 });
 
-test("inflation is entered once as the first external premise and linked to C-4", () => {
+test("inflation is entered once as the first external premise and linked to C-7", () => {
   assert.match(
     pageSource,
     /<tr className="driver-group-heading external-premise-heading"[\s\S]*?共通・外部前提[\s\S]*?<tr className="driver-external-premise"[\s\S]*?<input aria-label="物価上昇率の外部前提"/,
@@ -86,6 +86,20 @@ test("inflation is entered once as the first external premise and linked to C-4"
   assert.match(
     stylesheet,
     /\.driver-external-premise-control \{ display: grid; grid-template-columns: minmax\(0, 1fr\) auto;/,
+  );
+});
+
+test("inflation review guidance belongs to the project pay-growth row, not the external-premise row", () => {
+  const inflationRowIndex = pageSource.indexOf("{inflationConditionCode}:");
+  const inflationHistoryIndex = pageSource.indexOf("{historicalPlan.slice(1).map", inflationRowIndex);
+  const inflationStatutoryBlock = pageSource.slice(inflationRowIndex, inflationHistoryIndex);
+
+  assert.ok(inflationRowIndex >= 0 && inflationHistoryIndex > inflationRowIndex);
+  assert.match(inflationStatutoryBlock, /<td className="statutory-condition">/);
+  assert.doesNotMatch(inflationStatutoryBlock, /<strong>/);
+  assert.match(
+    pageSource,
+    /const reviewNotes = \[\.\.\.new Set\(keys\.map\(\(key\) => driverReviewNote\(key\)\)/,
   );
 });
 

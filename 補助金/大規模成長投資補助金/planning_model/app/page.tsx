@@ -2815,7 +2815,7 @@ export default function Home() {
               <tr className="driver-group-heading external-premise-heading"><th><strong>共通・外部前提</strong></th><td aria-hidden="true" colSpan={7}></td></tr>
               <tr className="driver-external-premise">
                 <th><span className="driver-item-code">{inflationConditionCode}:</span> 物価上昇率<small>%/年／外部前提</small></th>
-                <td className="statutory-condition"><strong>最低でも物価上昇率を上回る程度でないと、審査上大幅に不利</strong></td>
+                <td className="statutory-condition">—</td>
                 {historicalPlan.slice(1).map((row) => <td className="driver-history" key={`inflation-reference-${row.year}`}>—</td>)}
                 <td className="driver-external-premise-value" colSpan={4}>
                   <label>
