@@ -104,6 +104,33 @@ export function buildCompanyPlRows(plan: YearPlan[]): ReportRow[] {
   ];
 }
 
+const zeroSegment = (segment: SegmentPlan): SegmentPlan => ({
+  ...segment,
+  sales: 0,
+  cogs: 0,
+  employeePay: 0,
+  officerPay: 0,
+  depreciation: 0,
+  otherSga: 0,
+  headcount: 0,
+  officerCount: 0,
+  employeeSalary: 0,
+  employeeBonus: 0,
+  officerCompensation: 0,
+  officerBonus: 0,
+  cogsDepreciation: 0,
+  sgaDepreciation: 0,
+  researchDevelopment: 0,
+  ordinaryIncome: 0,
+  preTaxIncome: 0,
+  netIncome: 0,
+});
+
+export function buildBaseBusinessPlRows(plan: YearPlan[]): ReportRow[] {
+  const baseOnly = plan.map((row) => ({ ...row, project: zeroSegment(row.project) }));
+  return buildCompanyPlRows(baseOnly).map((row) => ({ ...row, code: `M${row.code}` }));
+}
+
 export function buildProjectPlRows(plan: YearPlan[], marketGrowth: number): ReportRow[] {
   const values = (getter: (row: YearPlan, index: number) => number | undefined) => plan.map(getter);
   return [

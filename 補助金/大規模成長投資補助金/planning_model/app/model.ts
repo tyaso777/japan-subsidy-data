@@ -651,20 +651,25 @@ function withProportionalBreakdown(source: SegmentPlan, target: SegmentPlan): Se
 function withDriverBreakdowns(segment: SegmentPlan, drivers: Drivers, segmentKey: SegmentKey): SegmentPlan {
   const employeeSalaryShare = segmentKey === "project" ? drivers.projectEmployeeSalaryShare : drivers.otherEmployeeSalaryShare;
   const officerCompensationShare = segmentKey === "project" ? drivers.projectOfficerCompensationShare : drivers.otherOfficerCompensationShare;
+  const cogsDepreciationShare = Math.max(0, Math.min(1,
+    segmentKey === "project" ? drivers.projectCogsDepreciationShare : drivers.otherCogsDepreciationShare,
+  ));
   const researchDevelopmentRate = segmentKey === "project" ? drivers.projectResearchDevelopmentRate : drivers.otherResearchDevelopmentRate;
   const nonOperatingRate = segmentKey === "project" ? drivers.projectNonOperatingRate : drivers.otherNonOperatingRate;
   const extraordinaryRate = segmentKey === "project" ? drivers.projectExtraordinaryRate : drivers.otherExtraordinaryRate;
+  const totalDepreciation = round(segment.depreciation);
+  const depreciationInCogs = round(totalDepreciation * cogsDepreciationShare);
   const result: SegmentPlan = {
     ...segment,
     employeeSalary: round(segment.employeePay * employeeSalaryShare),
     employeeBonus: round(segment.employeePay * (1 - employeeSalaryShare)),
     officerCompensation: round(segment.officerPay * officerCompensationShare),
     officerBonus: round(segment.officerPay * (1 - officerCompensationShare)),
-    cogsDepreciation: round(cogsDepreciation(segment)),
-    sgaDepreciation: round(sgaDepreciation(segment)),
+    cogsDepreciation: depreciationInCogs,
+    sgaDepreciation: round(totalDepreciation - depreciationInCogs),
     researchDevelopment: round(segment.sales * researchDevelopmentRate),
   };
-  result.depreciation = round(result.cogsDepreciation + result.sgaDepreciation);
+  result.depreciation = totalDepreciation;
   result.ordinaryIncome = round(operatingProfit(result) + result.sales * nonOperatingRate);
   result.preTaxIncome = round(result.ordinaryIncome + result.sales * extraordinaryRate);
   result.netIncome = round(result.preTaxIncome * (1 - drivers.effectiveTaxRate));
@@ -1082,7 +1087,9 @@ export function calculateHistoricalDriverSeries(
     otherEmployeeSalaryShare: { mode: "level", values: levels((row) => ratio(employeeSalary(row.other), row.other.employeePay)) },
     projectOfficerCompensationShare: { mode: "level", values: levels((row) => ratio(officerCompensation(row.project), row.project.officerPay)) },
     otherOfficerCompensationShare: { mode: "level", values: levels((row) => ratio(officerCompensation(row.other), row.other.officerPay)) },
-    projectCogsDepreciationShare: { mode: "level", values: levels((row) => ratio(cogsDepreciation(row.project), row.project.depreciation)) },
+    // 補助事業の公式入力は減価償却費合計のみのため、初期配分率は
+    // ベース事業の実績内訳を参照し、②で明示的に上書きできるようにする。
+    projectCogsDepreciationShare: { mode: "level", values: levels((row) => ratio(cogsDepreciation(row.other), row.other.depreciation)) },
     otherCogsDepreciationShare: { mode: "level", values: levels((row) => ratio(cogsDepreciation(row.other), row.other.depreciation)) },
     projectResearchDevelopmentRate: { mode: "level", values: levels((row) => ratio(researchDevelopment(row.project), row.project.sales)) },
     otherResearchDevelopmentRate: { mode: "level", values: levels((row) => ratio(researchDevelopment(row.other), row.other.sales)) },

@@ -54,9 +54,9 @@ test("standard sample represents the completed two-pass planning workflow", asyn
     assert.equal(typeof proposal.inputValues[`actual:company:2025:${code}`], "number", `${code} must be saved as a round-six input`);
   }
   for (const year of [2023, 2024, 2025]) {
-    assert.equal(typeof proposal.inputValues[`actual:project:${year}:P2-4`], "number");
-    assert.equal(typeof proposal.inputValues[`actual:project:${year}:P2-14`], "number");
-    assert.equal(Object.hasOwn(proposal.inputValues, `actual:project:${year}:7-10`), false);
+    assert.equal(typeof proposal.inputValues[`actual:project:${year}:7-10`], "number");
+    assert.equal(Object.hasOwn(proposal.inputValues, `actual:project:${year}:P2-4`), false);
+    assert.equal(Object.hasOwn(proposal.inputValues, `actual:project:${year}:P2-14`), false);
   }
   assert.equal(typeof proposal.historicalPlan[2].other.ordinaryIncome, "number");
   assert.equal(typeof proposal.historicalPlan[2].other.preTaxIncome, "number");

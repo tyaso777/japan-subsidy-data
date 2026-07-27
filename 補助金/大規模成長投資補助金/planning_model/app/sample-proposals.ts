@@ -255,7 +255,7 @@ const commonProposal = (title: string, exportedAt: string, historicalPlan: YearP
       "7-1": row.project.sales, "7-4": row.project.sales - row.project.cogs,
       "7-6": operatingProfit(row.project), "7-8": row.project.employeePay,
       "7-9": row.project.officerPay,
-      "P2-4": cogsDepreciation(row.project), "P2-14": sgaDepreciation(row.project),
+      "7-10": row.project.depreciation,
       "7-13": row.project.headcount, "7-14": row.project.officerCount,
     };
     Object.entries(companyInputs).forEach(([code, value]) => { inputValues[inputKey.companyActual(row.year, code)] = round(value); });
@@ -497,8 +497,7 @@ export function createBaseYearLaunchSample(exportedAt: string) {
       [`${row.year}:project:7-6`]: round(operatingProfit(project)),
       [`${row.year}:project:7-8`]: round(project.employeePay),
       [`${row.year}:project:7-9`]: round(project.officerPay),
-      [`${row.year}:project:P2-4`]: round(cogsDepreciation(project)),
-      [`${row.year}:project:P2-14`]: round(sgaDepreciation(project)),
+      [`${row.year}:project:7-10`]: round(project.depreciation),
       [`${row.year}:project:7-13`]: round(project.headcount),
       [`${row.year}:project:7-14`]: round(project.officerCount),
     });

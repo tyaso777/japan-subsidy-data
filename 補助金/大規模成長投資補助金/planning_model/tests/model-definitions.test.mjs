@@ -125,10 +125,12 @@ test("accounting breakdowns and profit stages use explicit adjustment levels", (
     otherCogsDepreciationShare: 0.01,
   }, model.DEFAULT_TIMELINE);
   const changedReport3 = changedLegacyShares.find((row) => row.role === "report3");
-  assert.equal(model.cogsDepreciation(changedReport3.project), model.cogsDepreciation(report3.project));
-  assert.equal(model.sgaDepreciation(changedReport3.project), model.sgaDepreciation(report3.project));
-  assert.equal(model.cogsDepreciation(changedReport3.other), model.cogsDepreciation(report3.other));
-  assert.equal(model.sgaDepreciation(changedReport3.other), model.sgaDepreciation(report3.other));
+  assert.equal(changedReport3.project.depreciation, report3.project.depreciation);
+  assert.equal(changedReport3.other.depreciation, report3.other.depreciation);
+  assert.ok(Math.abs(model.cogsDepreciation(changedReport3.project) / changedReport3.project.depreciation - 0.99) < 0.002);
+  assert.ok(Math.abs(model.cogsDepreciation(changedReport3.other) / changedReport3.other.depreciation - 0.01) < 0.002);
+  assert.notEqual(model.cogsDepreciation(changedReport3.project), model.cogsDepreciation(report3.project));
+  assert.notEqual(model.cogsDepreciation(changedReport3.other), model.cogsDepreciation(report3.other));
   assert.ok(Math.abs(model.researchDevelopment(report3.project) / report3.project.sales - 0.02) < 0.002);
   assert.ok(Math.abs(model.researchDevelopment(report3.other) / report3.other.sales - 0.03) < 0.002);
   assert.ok(Math.abs(model.nonOperatingProfitLoss(report3.project) / report3.project.sales - 0.01) < 0.002);
@@ -139,7 +141,7 @@ test("accounting breakdowns and profit stages use explicit adjustment levels", (
   assert.ok(Math.abs(model.netIncome(company) / model.preTaxIncome(company) - 0.60) < 0.002);
 });
 
-test("future depreciation carries forward the latest expense-component ratios", () => {
+test("future depreciation keeps the total authoritative and splits it by explicit adjustment levels", () => {
   const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
   const latest = historical.at(-1);
   latest.project.cogsDepreciation = 800_000;
@@ -149,30 +151,39 @@ test("future depreciation carries forward the latest expense-component ratios", 
   latest.other.sgaDepreciation = 600_000;
   latest.other.depreciation = 1_600_000;
 
-  const totalSga = (segment) =>
-    segment.employeePay
-    + segment.officerPay
-    + model.sgaDepreciation(segment)
-    + model.researchDevelopment(segment)
-    + segment.otherSga;
-  const projectCogsRate = model.cogsDepreciation(latest.project) / latest.project.cogs;
-  const projectSgaRate = model.sgaDepreciation(latest.project) / totalSga(latest.project);
-  const baseCogsRate = model.cogsDepreciation(latest.other) / latest.other.cogs;
-  const baseSgaRate = model.sgaDepreciation(latest.other) / totalSga(latest.other);
-
-  const periodInputs = model.createForecastProjectPeriodInputs(latest, model.sampleDrivers, model.DEFAULT_TIMELINE);
-  for (const row of periodInputs) {
-    assert.ok(Math.abs(model.cogsDepreciation(row.project) / row.project.cogs - projectCogsRate) < 0.0001);
-    assert.ok(Math.abs(model.sgaDepreciation(row.project) / totalSga(row.project) - projectSgaRate) < 0.0001);
-  }
-
-  const plan = model.generatePlan(historical, model.sampleDrivers, model.DEFAULT_TIMELINE, periodInputs);
+  const drivers = {
+    ...model.sampleDrivers,
+    projectCogsDepreciationShare: 0.35,
+    otherCogsDepreciationShare: 0.60,
+  };
+  const periodInputs = model.createForecastProjectPeriodInputs(latest, drivers, model.DEFAULT_TIMELINE);
+  const plan = model.generatePlan(historical, drivers, model.DEFAULT_TIMELINE, periodInputs);
   for (const row of plan.slice(3)) {
-    assert.ok(Math.abs(model.cogsDepreciation(row.project) / row.project.cogs - projectCogsRate) < 0.0001);
-    assert.ok(Math.abs(model.sgaDepreciation(row.project) / totalSga(row.project) - projectSgaRate) < 0.0001);
-    assert.ok(Math.abs(model.cogsDepreciation(row.other) / row.other.cogs - baseCogsRate) < 0.0001);
-    assert.ok(Math.abs(model.sgaDepreciation(row.other) / totalSga(row.other) - baseSgaRate) < 0.0001);
+    assert.equal(
+      model.cogsDepreciation(row.project) + model.sgaDepreciation(row.project),
+      row.project.depreciation,
+    );
+    assert.equal(
+      model.cogsDepreciation(row.other) + model.sgaDepreciation(row.other),
+      row.other.depreciation,
+    );
+    assert.ok(Math.abs(model.cogsDepreciation(row.project) / row.project.depreciation - 0.35) < 0.002);
+    assert.ok(Math.abs(model.cogsDepreciation(row.other) / row.other.depreciation - 0.60) < 0.002);
   }
+});
+
+test("project depreciation allocation defaults from the base-business historical ratio", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  historical[0].project.depreciation = 1_000;
+  historical[0].project.cogsDepreciation = 900;
+  historical[0].project.sgaDepreciation = 100;
+  historical[0].other.depreciation = 2_000;
+  historical[0].other.cogsDepreciation = 500;
+  historical[0].other.sgaDepreciation = 1_500;
+
+  const series = model.calculateHistoricalDriverSeries(historical, model.sampleBalanceSheets);
+  assert.equal(series.projectCogsDepreciationShare.values[0], 0.25);
+  assert.equal(series.otherCogsDepreciationShare.values[0], 0.25);
 });
 
 test("relative planning metrics have fixed ceilings while absolute amounts are scale dependent", () => {
@@ -884,8 +895,9 @@ test("project-period inputs are preserved and report years start from the manual
   for (const key of ["sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga", "headcount", "officerCount"]) {
     assert.equal(base.project[key], projectBase[key]);
   }
-  assert.equal(model.cogsDepreciation(base.project), projectBase.cogsDepreciation);
-  assert.equal(model.sgaDepreciation(base.project), projectBase.sgaDepreciation);
+  const expectedCogsDepreciation = Math.round(projectBase.depreciation * model.sampleDrivers.projectCogsDepreciationShare * 1e6) / 1e6;
+  assert.equal(model.cogsDepreciation(base.project), expectedCogsDepreciation);
+  assert.equal(model.sgaDepreciation(base.project), projectBase.depreciation - expectedCogsDepreciation);
   assert.equal(model.cogsDepreciation(base.project) + model.sgaDepreciation(base.project), base.project.depreciation);
   assert.equal(report1.project.sales, 19_250_000);
 });
