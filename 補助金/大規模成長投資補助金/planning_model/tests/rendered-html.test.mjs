@@ -130,6 +130,11 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.diagnostic-groups \{[^}]*overflow: visible;/);
   assert.match(pageSource, /function DiagnosticSparkline\(/);
   assert.match(pageSource, /className="diagnostic-groups" aria-label="診断指標一覧"/);
+  assert.match(pageSource, /className="panel diagnostic-groups-panel"/);
+  assert.match(pageSource, /className="diagnostic-panel"/);
+  assert.doesNotMatch(pageSource, /className="panel table-panel diagnostic-panel"/);
+  assert.match(globalStyles, /\.diagnostic-groups-panel \{[^}]*padding:/);
+  assert.match(globalStyles, /\.diagnostic-panel \{[^}]*min-width: 0;/);
   assert.doesNotMatch(pageSource, /className="diagnostic-groups-scroll"/);
   assert.match(pageSource, /--diagnostic-sticky-chart-height/);
   assert.match(pageSource, /diagnosticChart\.getBoundingClientRect\(\)/);

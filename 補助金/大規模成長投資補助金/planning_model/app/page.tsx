@@ -3706,7 +3706,7 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
   return <section ref={diagnosticsRef} className="financial-diagnostics" aria-label="PL妥当性診断">
     <div className="diagnostic-heading"><div><h2>基本指標によるシミュレーション妥当性チェック</h2></div><p>「推移」の小さなチャートを選ぶと、詳細チャートが切り替わります。年度別数値は全社・補助事業・ベース事業の順です。</p></div>
     {selected && <div ref={selectedChartRef} className="diagnostic-selected-chart"><TrendChart title={selected.row.name} subtitle={`${selected.row.formula}｜${selected.row.check}`} unit={selected.row.unit === "千円/人" ? `${moneyUnit}/人` : selected.row.unit} plan={plan} zeroBaseline series={diagnosticChartSeries(plan, selected.row).map((series) => selected.row.unit === "千円/人" ? { ...series, values: series.values.map((value) => value === undefined ? undefined : toDisplayMoney(value, moneyUnit)) } : series)} /></div>}
-    <div className="diagnostic-groups" aria-label="診断指標一覧">{groups.map((group) => <article className="panel table-panel diagnostic-panel" key={group.title}><h3>{group.title}</h3><div className="wide-table diagnostic-table"><table><thead><tr><th>指標名</th><th>計算式</th><th>主な確認点</th><th className="diagnostic-sparkline-column">推移</th><th className="diagnostic-series-column">区分</th>{plan.map((row) => {
+    <div className="panel diagnostic-groups-panel"><div className="diagnostic-groups" aria-label="診断指標一覧">{groups.map((group) => <section className="diagnostic-panel" key={group.title}><h3>{group.title}</h3><div className="wide-table diagnostic-table"><table><thead><tr><th>指標名</th><th>計算式</th><th>主な確認点</th><th className="diagnostic-sparkline-column">推移</th><th className="diagnostic-series-column">区分</th>{plan.map((row) => {
       const roleLines = row.role === "beforeBase" ? ["補助事業期間", "（基準年前年）"] : [YEAR_ROLE_LABELS[row.role]];
       return <th className="diagnostic-period-heading" key={row.year}>{row.year}<small>{roleLines.map((line) => <span key={line}>{line}</span>)}</small></th>;
     })}</tr></thead><tbody>{group.rows.map((item) => {
@@ -3718,7 +3718,7 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
         const entry = entries.find((candidate) => candidate.label === label);
         return <strong key={label}>{entry ? formatted(entry.value, item.unit) : "—"}</strong>;
       })}</div></td>)}</tr>;
-    })}</tbody></table></div></article>)}</div>
+    })}</tbody></table></div></section>)}</div></div>
   </section>;
 }
 
