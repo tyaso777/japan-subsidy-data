@@ -352,10 +352,6 @@ const driverComparisonGroups: { label: string; rows: DriverComparisonRow[] }[] =
       { fixed: "effectiveTaxRate" },
     ],
   },
-  {
-    label: "外部前提",
-    rows: [{ fixed: "projectMarketGrowth" }],
-  },
 ];
 
 const forecastDriverKeys = driverGroups.flatMap((group) => group.keys);
@@ -379,15 +375,19 @@ const fixedForecastDriverKeys = new Set<keyof Drivers>([
 
 const conditionCode = (index: number) => `C-${index + 1}`;
 const inflationConditionCode = conditionCode(0);
-const projectLaunchSalesConditionCode = conditionCode(1);
+const marketGrowthConditionCode = conditionCode(1);
+const projectLaunchSalesConditionCode = conditionCode(2);
 const driverComparisonRows = driverComparisonGroups.flatMap((group) => group.rows);
-const driverItemCodes = Object.fromEntries(
-  driverComparisonRows.flatMap((row, index) =>
-    [row.equipment, row.postBase, row.fixed]
-      .filter((key): key is keyof Drivers => Boolean(key))
-      .map((key) => [key, conditionCode(index + 2)] as const),
+const driverItemCodes = {
+  projectMarketGrowth: marketGrowthConditionCode,
+  ...Object.fromEntries(
+    driverComparisonRows.flatMap((row, index) =>
+      [row.equipment, row.postBase, row.fixed]
+        .filter((key): key is keyof Drivers => Boolean(key))
+        .map((key) => [key, conditionCode(index + 3)] as const),
+    ),
   ),
-) as Partial<Record<keyof Drivers, string>>;
+} as Partial<Record<keyof Drivers, string>>;
 
 const equipmentPeriodStatisticalKeys = new Set<keyof Drivers>([
   "projectSalesGrowthToBase", "projectCogsRateToBase", "projectCogsImprovementToBase", "projectPayGrowthToBase",
@@ -2828,6 +2828,12 @@ export default function Home() {
                   <small>{driverItemCodes.projectPayGrowthToBase} 設備導入期間の下限へ反映</small>
                 </td>
               </tr>
+              <tr className="driver-external-premise">
+                <th><span className="driver-item-code">{marketGrowthConditionCode}:</span> 7-20 市場伸び率（年あたり）<small>%/年／外部前提</small></th>
+                <td className="statutory-condition">—</td>
+                {historicalPlan.slice(1).map((row) => <td className="driver-history" key={`market-growth-reference-${row.year}`}>—</td>)}
+                {renderFixedDriverCells("projectMarketGrowth")}
+              </tr>
               {driverComparisonGroups.flatMap((group) => [
                 <tr className="driver-group-heading" key={`group-${group.label}`}><th><strong>{group.label}</strong></th><td aria-hidden="true" colSpan={7}></td></tr>,
                 ...group.rows.flatMap((comparisonRow, rowIndex) => {
@@ -2878,7 +2884,7 @@ export default function Home() {
                 }),
               ])}
             </tbody></table></div>
-            <p className="footnote">前期・最新決算期は、計画値ではなく過去実績の参考値です。可変条件は許容下限・上限の中点を最適化前の計画値とし、表では独立した「計画初期値」欄を設けません。固定条件は下限・上限を持たないため、期間内の2列を結合した入力欄で表示します。表示されている下限・上限がそのまま最適化の探索範囲であり、別の非表示上限は設けません。制度条件や計算上成立しない値は別途バリデーションします。減価償却費は調整水準では生成せず、最新決算期の費用内比率を③将来データ入力へ横置きし、年度別入力を優先します。</p>
+              <p className="footnote">前期・最新決算期は、計画値ではなく過去実績の参考値です。固定条件は下限・上限を持たないため、期間内の2列を結合した入力欄で表示します。表示されている下限・上限がそのまま最適化の探索範囲であり、別の非表示上限は設けません。制度条件や計算上成立しない値は別途バリデーションします。減価償却費は調整水準では生成せず、最新決算期の費用内比率を③将来データ入力へ横置きし、年度別入力を優先します。</p>
             <div className="benchmark-note"><strong>基準年後のデフォルト</strong><span>売上高成長率 22%［15～30%］</span><span>補助事業1人当たり給与支給総額の年平均上昇率 7%［5～10%］</span><span>常時使用する従業員数（就業時間換算）の成長率 4%［0～8%］</span><span>原価率改善 1.5pt［0～2pt］</span><span>その他販管費率 過去平均-1.5pt［過去平均-4～+1pt］</span><span>役員1人当たり給与支給総額の年平均上昇率は過去3期の役員1人当たり給与から推計（計算不能時のみ7%［5～10%］）</span><span>ベース事業はシナジーを見込み、基準年後の売上成長率を設備導入期間＋2.0pt、原価率改善・給与・人員成長率を＋0.5pt</span><a href="https://chukentou-seichotoushi-hojo.jp/assets/documents/common/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公募・採択者中央値PDF ↗</a></div>
             {defaultNote && <p className="default-note">{defaultNote}</p>}
           </article>

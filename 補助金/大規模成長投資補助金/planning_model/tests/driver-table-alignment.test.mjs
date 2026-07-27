@@ -181,10 +181,11 @@ test("zero-history project sales amount is a separate row above the growth-rate 
 
 test("each displayed forecast-condition row has one unique condition number", () => {
   assert.match(pageSource, /const inflationConditionCode = conditionCode\(0\)/);
-  assert.match(pageSource, /const projectLaunchSalesConditionCode = conditionCode\(1\)/);
+  assert.match(pageSource, /const marketGrowthConditionCode = conditionCode\(1\)/);
+  assert.match(pageSource, /const projectLaunchSalesConditionCode = conditionCode\(2\)/);
   assert.match(
     pageSource,
-    /driverComparisonRows\.flatMap\(\(row, index\) =>[\s\S]*?conditionCode\(index \+ 2\)/,
+    /driverComparisonRows\.flatMap\(\(row, index\) =>[\s\S]*?conditionCode\(index \+ 3\)/,
   );
   assert.match(
     pageSource,
@@ -237,5 +238,31 @@ test("fixed forecast-condition header keeps its two-row layout and centering", (
   assert.doesNotMatch(
     stylesheet,
     /\.page-sticky-header-overlay thead th \{[^}]*height:\s*56px/,
+  );
+});
+
+test("market growth is the second external premise before business conditions", () => {
+  const inflationRowIndex = pageSource.indexOf("{inflationConditionCode}:");
+  const marketGrowthRowIndex = pageSource.indexOf("{marketGrowthConditionCode}:");
+  const businessGroupIndex = pageSource.indexOf("{driverComparisonGroups.flatMap", marketGrowthRowIndex);
+
+  assert.ok(inflationRowIndex >= 0, "物価上昇率の外部前提行が必要");
+  assert.ok(marketGrowthRowIndex > inflationRowIndex, "市場伸び率は物価上昇率の直後に置く");
+  assert.ok(businessGroupIndex > marketGrowthRowIndex, "外部前提は事業別の調整条件より前に置く");
+  assert.match(
+    pageSource,
+    /<span className="driver-item-code">\{marketGrowthConditionCode\}:<\/span> 7-20 市場伸び率（年あたり）/,
+  );
+  assert.match(pageSource, /renderFixedDriverCells\("projectMarketGrowth"\)/);
+});
+
+test("driver footnote omits obsolete initial-value implementation history", () => {
+  assert.doesNotMatch(
+    pageSource,
+    /可変条件は許容下限・上限の中点を最適化前の計画値とし、表では独立した「計画初期値」欄を設けません。/,
+  );
+  assert.match(
+    pageSource,
+    /前期・最新決算期は、計画値ではなく過去実績の参考値です。/,
   );
 });
