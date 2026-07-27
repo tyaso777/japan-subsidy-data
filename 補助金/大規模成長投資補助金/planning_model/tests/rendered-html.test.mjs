@@ -162,7 +162,7 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(globalStyles, /max-height: min\(76vh, 860px\)/);
   assert.match(pageSource, /function usePageStickyTableHeaders\(refreshKey: unknown\)/);
   assert.match(pageSource, /function useFloatingHorizontalTableScrollbar\(\)/);
-  assert.match(pageSource, /将来の減価償却費・支払利息は年度別に入力してください。本ツールは、固定資産台帳・借入返済表との自動連動には対応していません。/);
+  assert.match(pageSource, /将来の減価償却費は、最新決算期の「売上原価内減価償却費÷売上原価」と「販管費内減価償却費÷販管費」を横置きして自動予測し、年度別入力を優先します。支払利息は年度別に入力してください。本ツールは、固定資産台帳・借入返済表との自動連動には対応していません。/);
   assert.doesNotMatch(pageSource, /次段階で「固定資産台帳」と「借入返済表」を年度別に設けます/);
   assert.match(pageSource, /activeWrapper\.scrollLeft = scrollbar\.scrollLeft/);
   assert.match(pageSource, /overflowX === "auto" \|\| overflowX === "scroll"/);
@@ -209,7 +209,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /forecastSettingsReady/);
   assert.match(pageSource, /const accountingAssumptionDriverKeys/);
   assert.match(pageSource, /missingAccountingAssumptions\.length \? <p className="default-note" role="alert">/);
-  assert.match(pageSource, /減価償却費は③将来データ入力でP2-4とP2-14を直接入力します。/);
+  assert.match(pageSource, /最新決算期の費用内比率から自動予測し、年度別入力を優先/);
   assert.match(pageSource, /残額を従業員賞与として計算/);
   assert.match(pageSource, /残額を役員賞与として計算/);
   assert.match(pageSource, /経常利益＝営業利益＋売上高×設定率/);
@@ -281,7 +281,10 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /!requiredProjectDepreciationCodes\.has\(item\.code\) && projectAnchors\.has\(item\.code\)/);
   assert.match(pageSource, /!requiredProjectDepreciationDetailedKeys\.has\(item\.key\) && projectAnchors\.has\(item\.key\)/);
   assert.match(pageSource, /placeholder=\{required \? "未入力"/);
-  assert.match(pageSource, /空欄を自動予測または前年度値から補完しません/);
+  assert.match(pageSource, /最新決算期の費用内比率から自動予測/);
+  assert.match(pageSource, /function hasProjectDepreciationBaseline/);
+  assert.match(pageSource, /!hasProjectDepreciationBaseline\(historical, item\.code\)/);
+  assert.match(pageSource, /最新決算期の費用総額が0で減価償却費比率を算定できません/);
   assert.match(pageSource, /function ProjectDepreciationInputNotice/);
   assert.match(pageSource, /<ProjectDepreciationInputNotice items=\{missingProjectDepreciation\} context="年度別PL" \/>/);
   assert.match(pageSource, /<ProjectDepreciationInputNotice items=\{missingProjectDepreciation\} context="診断" \/>/);

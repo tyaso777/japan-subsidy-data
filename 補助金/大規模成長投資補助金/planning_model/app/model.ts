@@ -671,6 +671,46 @@ function withDriverBreakdowns(segment: SegmentPlan, drivers: Drivers, segmentKey
   return result;
 }
 
+export function sellingGeneralAdministrativeExpenses(segment: SegmentPlan): number {
+  return segment.employeePay
+    + segment.officerPay
+    + sgaDepreciation(segment)
+    + researchDevelopment(segment)
+    + segment.otherSga;
+}
+
+function withLatestExpenseDepreciationRatios(
+  latest: SegmentPlan,
+  target: SegmentPlan,
+  drivers: Drivers,
+  segmentKey: SegmentKey,
+): SegmentPlan {
+  const targetWithoutDepreciation = withDriverBreakdowns({
+    ...target,
+    depreciation: 0,
+    cogsDepreciation: 0,
+    sgaDepreciation: 0,
+  }, drivers, segmentKey);
+  const cogsRate = latest.cogs > 0 ? cogsDepreciation(latest) / latest.cogs : 0;
+  const latestSga = sellingGeneralAdministrativeExpenses(latest);
+  const sgaRate = latestSga > 0 ? sgaDepreciation(latest) / latestSga : 0;
+  const targetSgaWithoutDepreciation =
+    targetWithoutDepreciation.employeePay
+    + targetWithoutDepreciation.officerPay
+    + researchDevelopment(targetWithoutDepreciation)
+    + targetWithoutDepreciation.otherSga;
+  const nextCogsDepreciation = round(targetWithoutDepreciation.cogs * cogsRate);
+  const nextSgaDepreciation = round(
+    sgaRate > 0 && sgaRate < 1 ? targetSgaWithoutDepreciation * sgaRate / (1 - sgaRate) : 0,
+  );
+  return withDriverBreakdowns({
+    ...targetWithoutDepreciation,
+    cogsDepreciation: nextCogsDepreciation,
+    sgaDepreciation: nextSgaDepreciation,
+    depreciation: round(nextCogsDepreciation + nextSgaDepreciation),
+  }, drivers, segmentKey);
+}
+
 function historicalSegmentWithPayGrowth(segment: SegmentPlan, factor: number, yearsBeforeLatest: number): SegmentPlan {
   const scaled = scaleSegment(segment, factor);
   if (segment.headcount > 0) {
@@ -761,12 +801,14 @@ export function createForecastProjectPeriodInputs(
     const headcount = start.headcount * (1 + drivers.projectHeadcountGrowthToBase) ** elapsed;
     return {
       year: timeline.latestYear + elapsed,
-      project: withDriverBreakdowns(withProportionalBreakdown(start, {
+      project: withLatestExpenseDepreciationRatios(start, withProportionalBreakdown(start, {
         sales: round(sales),
         cogs: round(sales * cogsRate),
         employeePay: round(startPayPerHead * (1 + drivers.projectPayGrowthToBase) ** elapsed * headcount),
         officerPay: round(start.officerPay * (1 + drivers.projectOfficerPayGrowthToBase) ** elapsed),
-        depreciation: round(cogsDepreciation(start) + sgaDepreciation(start)),
+        depreciation: 0,
+        cogsDepreciation: 0,
+        sgaDepreciation: 0,
         otherSga: round(sales * lerp(startSgaRate, Math.max(0, startSgaRate - drivers.projectSgaImprovementToBase), progress)),
         headcount: Math.max(0, Math.round(headcount)),
         officerCount: Math.max(0, Math.round(start.officerCount)),
@@ -842,23 +884,27 @@ export function generatePlan(
       ? lerp(latestOtherSgaRate, otherBaseSgaRate, otherProgress)
       : lerp(otherBaseSgaRate, otherSgaRateEnd, otherProgress);
     const enteredProject = periodInputs.find((row) => row.year === year)?.project;
-    const rawProject = year <= timeline.baseYear ? structuredClone(enteredProject ?? emptyProject) : withProportionalBreakdown(projectBase, {
+    const rawProject = year <= timeline.baseYear ? structuredClone(enteredProject ?? emptyProject) : withLatestExpenseDepreciationRatios(latest.project, withProportionalBreakdown(projectBase, {
       sales: round(projectSales),
       cogs: round(projectSales * Math.min(0.99, Math.max(0.01, projectPostBaseInitialCogsRate - drivers.projectCogsImprovementAfterBase * Math.max(0, yearsAfterBase - 1)))),
       employeePay: round(baseProjectPayPerHead * (1 + drivers.projectPayGrowth) ** yearsAfterBase * projectHeadcount),
       officerPay: round(projectBase.officerPay * (1 + drivers.projectOfficerPayGrowth) ** yearsAfterBase),
-      depreciation: round(projectBase.depreciation),
+      depreciation: 0,
+      cogsDepreciation: 0,
+      sgaDepreciation: 0,
       otherSga: round(projectSales * lerp(baseProjectSgaRate, projectSgaRateEnd, projectProgress)),
       headcount: Math.max(0, Math.round(projectHeadcount)),
       officerCount: Math.max(0, Math.round(projectBase.officerCount)),
-    });
+    }), drivers, "project");
     const project = withDriverBreakdowns(rawProject, drivers, "project");
-    const other = withDriverBreakdowns(withProportionalBreakdown(latest.other, {
+    const other = withLatestExpenseDepreciationRatios(latest.other, withProportionalBreakdown(latest.other, {
       sales: round(otherSales),
       cogs: round(otherSales * otherCogsRate),
       employeePay: round(otherEmployeePay),
       officerPay: round(otherOfficerPay),
-      depreciation: round(latest.other.depreciation),
+      depreciation: 0,
+      cogsDepreciation: 0,
+      sgaDepreciation: 0,
       otherSga: round(otherSales * otherSgaRate),
       headcount: Math.max(0, Math.round(otherHeadcount)),
       officerCount: Math.max(0, Math.round(latest.other.officerCount)),

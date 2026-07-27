@@ -139,6 +139,42 @@ test("accounting breakdowns and profit stages use explicit adjustment levels", (
   assert.ok(Math.abs(model.netIncome(company) / model.preTaxIncome(company) - 0.60) < 0.002);
 });
 
+test("future depreciation carries forward the latest expense-component ratios", () => {
+  const historical = model.createHistoricalPlan(model.sampleBasePlan, model.DEFAULT_TIMELINE);
+  const latest = historical.at(-1);
+  latest.project.cogsDepreciation = 800_000;
+  latest.project.sgaDepreciation = 400_000;
+  latest.project.depreciation = 1_200_000;
+  latest.other.cogsDepreciation = 1_000_000;
+  latest.other.sgaDepreciation = 600_000;
+  latest.other.depreciation = 1_600_000;
+
+  const totalSga = (segment) =>
+    segment.employeePay
+    + segment.officerPay
+    + model.sgaDepreciation(segment)
+    + model.researchDevelopment(segment)
+    + segment.otherSga;
+  const projectCogsRate = model.cogsDepreciation(latest.project) / latest.project.cogs;
+  const projectSgaRate = model.sgaDepreciation(latest.project) / totalSga(latest.project);
+  const baseCogsRate = model.cogsDepreciation(latest.other) / latest.other.cogs;
+  const baseSgaRate = model.sgaDepreciation(latest.other) / totalSga(latest.other);
+
+  const periodInputs = model.createForecastProjectPeriodInputs(latest, model.sampleDrivers, model.DEFAULT_TIMELINE);
+  for (const row of periodInputs) {
+    assert.ok(Math.abs(model.cogsDepreciation(row.project) / row.project.cogs - projectCogsRate) < 0.0001);
+    assert.ok(Math.abs(model.sgaDepreciation(row.project) / totalSga(row.project) - projectSgaRate) < 0.0001);
+  }
+
+  const plan = model.generatePlan(historical, model.sampleDrivers, model.DEFAULT_TIMELINE, periodInputs);
+  for (const row of plan.slice(3)) {
+    assert.ok(Math.abs(model.cogsDepreciation(row.project) / row.project.cogs - projectCogsRate) < 0.0001);
+    assert.ok(Math.abs(model.sgaDepreciation(row.project) / totalSga(row.project) - projectSgaRate) < 0.0001);
+    assert.ok(Math.abs(model.cogsDepreciation(row.other) / row.other.cogs - baseCogsRate) < 0.0001);
+    assert.ok(Math.abs(model.sgaDepreciation(row.other) / totalSga(row.other) - baseSgaRate) < 0.0001);
+  }
+});
+
 test("relative planning metrics have fixed ceilings while absolute amounts are scale dependent", () => {
   assert.equal(model.metrics.length, 15);
   const scaleDependent = new Set(["companySalesIncrease", "projectSalesIncrease", "valueAddedIncrease", "employeePayIncrease", "officerPayIncrease"]);
