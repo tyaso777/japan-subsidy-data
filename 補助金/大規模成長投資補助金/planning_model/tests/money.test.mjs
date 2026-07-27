@@ -68,3 +68,29 @@ test("grouped money input text parses back to a number", () => {
   assert.equal(money.parseNumericInput(""), null);
   assert.equal(money.parseNumericInput("-"), null);
 });
+
+test("unit switching keeps the exact thousand-yen amount through display, focus, and editing", () => {
+  let canonical = money.fromDisplayMoney(
+    money.parseNumericInput("1,228,817"),
+    "千円",
+  );
+
+  assert.equal(canonical, 1_228_817);
+  assert.equal(money.formatDisplayMoney(canonical, "千円"), "1,228,817");
+
+  assert.equal(money.formatDisplayMoney(canonical, "百万円"), "1,228.82");
+  assert.equal(money.formatEditableMoney(canonical, "百万円"), "1,228.817");
+
+  assert.equal(money.formatDisplayMoney(canonical, "億円"), "12.29");
+  assert.equal(money.formatEditableMoney(canonical, "億円"), "12.28817");
+
+  canonical = money.fromDisplayMoney(
+    money.parseNumericInput("12.28918"),
+    "億円",
+  );
+
+  assert.equal(canonical, 1_228_918);
+  assert.equal(money.formatDisplayMoney(canonical, "百万円"), "1,228.92");
+  assert.equal(money.formatEditableMoney(canonical, "百万円"), "1,228.918");
+  assert.equal(money.formatDisplayMoney(canonical, "千円"), "1,228,918");
+});

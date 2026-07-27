@@ -6,6 +6,7 @@ import { build } from "esbuild";
 const projectDirectory = process.cwd();
 const runtimePath = path.join(projectDirectory, ".sample-proposal-test-runtime.mjs");
 const excelMappingRuntimePath = path.join(projectDirectory, ".excel-mapping-test-runtime.mjs");
+const proposalIoRuntimePath = path.join(projectDirectory, ".proposal-io-test-runtime.mjs");
 
 try {
   await build({
@@ -28,6 +29,16 @@ try {
     target: "node22",
     packages: "external",
   });
+  await build({
+    absWorkingDir: projectDirectory,
+    entryPoints: [path.join(projectDirectory, "app", "proposal-io.ts")],
+    outfile: proposalIoRuntimePath,
+    bundle: true,
+    platform: "node",
+    format: "esm",
+    target: "node22",
+    packages: "external",
+  });
   const testFiles = (await readdir(path.join(projectDirectory, "tests")))
     .filter((name) => name.endsWith(".test.mjs"))
     .map((name) => path.join("tests", name));
@@ -37,5 +48,9 @@ try {
   });
   process.exitCode = result.status ?? 1;
 } finally {
-  await Promise.all([rm(runtimePath, { force: true }), rm(excelMappingRuntimePath, { force: true })]);
+  await Promise.all([
+    rm(runtimePath, { force: true }),
+    rm(excelMappingRuntimePath, { force: true }),
+    rm(proposalIoRuntimePath, { force: true }),
+  ]);
 }
