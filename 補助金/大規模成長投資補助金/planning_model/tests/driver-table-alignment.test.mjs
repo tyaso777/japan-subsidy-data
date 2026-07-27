@@ -62,6 +62,32 @@ test("forecast-condition number inputs hide spinner controls that obscure compac
   );
 });
 
+test("all number inputs hide native spinner controls", () => {
+  assert.match(
+    stylesheet,
+    /input\[type="number"\] \{ appearance: textfield; -moz-appearance: textfield; \}/,
+  );
+  assert.match(
+    stylesheet,
+    /input\[type="number"\]::-webkit-inner-spin-button, input\[type="number"\]::-webkit-outer-spin-button \{ -webkit-appearance: none; margin: 0; \}/,
+  );
+});
+
+test("inflation reference unit has its own non-overlapping control area", () => {
+  assert.match(
+    pageSource,
+    /<span className="inflation-reference-control">[\s\S]*?<input aria-label="物価上昇率の参照値"[\s\S]*?<span>%\/年<\/span><\/span>/,
+  );
+  assert.match(
+    stylesheet,
+    /\.inflation-reference-input \{ display: grid; grid-template-columns: minmax\(0, 1fr\);/,
+  );
+  assert.match(
+    stylesheet,
+    /\.inflation-reference-control \{ display: grid; grid-template-columns: minmax\(0, 1fr\) auto;/,
+  );
+});
+
 test("forecast-condition controls are centered in their cells while numbers remain right aligned", () => {
   assert.match(
     stylesheet,
