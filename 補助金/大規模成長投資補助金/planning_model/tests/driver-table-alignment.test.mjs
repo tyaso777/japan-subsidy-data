@@ -109,6 +109,29 @@ test("invalid lower and upper bounds are announced immediately on the affected p
   );
 });
 
+test("driver review guidance stays in the statutory-condition column instead of overlapping range inputs", () => {
+  assert.doesNotMatch(
+    pageSource,
+    /const reviewNote = driverReviewNote\(key\)/,
+  );
+  assert.match(
+    pageSource,
+    /const reviewNotes = \[\.\.\.new Set\(keys\.map\(\(key\) => driverReviewNote\(key\)\)/,
+  );
+  assert.match(
+    pageSource,
+    /<td className="statutory-condition">[\s\S]*?\{reviewNotes\.map\(\(note\) => <small className="driver-review-note"/,
+  );
+  assert.match(
+    stylesheet,
+    /\.driver-target-table \.statutory-condition \.driver-review-note \{[^}]*white-space: normal;[^}]*overflow-wrap: anywhere;/,
+  );
+  assert.doesNotMatch(
+    stylesheet,
+    /\.driver-period-range-grid \.driver-review-note/,
+  );
+});
+
 test("zero-history project sales amount is a separate row above the growth-rate row", () => {
   const amountRowIndex = pageSource.indexOf('className="driver-adjustable project-launch-sales-row"');
   const amountCodeIndex = pageSource.indexOf("C-1A／C-1B:", amountRowIndex);

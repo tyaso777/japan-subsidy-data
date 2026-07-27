@@ -2400,7 +2400,6 @@ export default function Home() {
     const requirementError = driverRangeRequirementFailure(key, applicationCategory, rawLower);
     const rangeError = orderingError ?? requirementError;
     const statutoryFloor = driverRequirementFloor(key, applicationCategory);
-    const reviewNote = driverReviewNote(key);
     const inputMinimum = statutoryFloor === undefined
       ? undefined
       : percentDriver(key) ? statutoryFloor * 100 : statutoryFloor;
@@ -2423,7 +2422,6 @@ export default function Home() {
         {resultValue !== null && <small className="adjusted-value">結果 {number(resultValue, 2)}</small>}
         {rangeError && <small className="field-error driver-range-error" role="alert">{rangeError}</small>}
         {statutoryFloorLabel && !requirementError && <small className="driver-statutory-floor">{statutoryFloorLabel}</small>}
-        {reviewNote && <small className="driver-review-note">{reviewNote}</small>}
         {improvementWarning && <small className="field-warning driver-range-warning" role="status">{improvementWarning}</small>}
       </div>
     </td>;
@@ -2784,6 +2782,7 @@ export default function Home() {
                     ? "補助事業 売上成長率"
                     : tablePresentation.label;
                   const requirementLabels = [...new Set(keys.map((key) => driverRequirementLabel(key, applicationCategory, drivers.investment)).filter((label) => label !== "—"))];
+                  const reviewNotes = [...new Set(keys.map((key) => driverReviewNote(key)).filter((note): note is string => Boolean(note)))];
                   const constraintError = keys.some((key) => driverConstraintFailure(key, applicationCategory, drivers));
                   const adjustable = keys.some((key) => adjustableDriverKeys.includes(key));
                   const launchSalesAmountRow = launchSalesGrowthRow
@@ -2797,7 +2796,10 @@ export default function Home() {
                     : null;
                   const growthRow = <tr className={`${adjustable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={`${group.label}-${rowIndex}`}>
                     <th><span className="driver-item-code">{codes}:</span> {displayLabel}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{`${monetaryDriverKeys.has(referenceKey) ? moneyDisplayUnit : info.unit}／${history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}`}</small></th>
-                    <td className="statutory-condition"><strong>{requirementLabels.join("／") || "—"}</strong></td>
+                    <td className="statutory-condition">
+                      <strong>{requirementLabels.join("／") || "—"}</strong>
+                      {reviewNotes.map((note) => <small className="driver-review-note" key={note}>{note}</small>)}
+                    </td>
                     {history.values.slice(1).map((value, referenceIndex) => {
                       const index = referenceIndex + 1;
                       const referenceLevel = history.referenceLevels?.[index];
