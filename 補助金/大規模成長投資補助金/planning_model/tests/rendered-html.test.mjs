@@ -419,7 +419,7 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(pageSource, /<th>最適化での扱い<\/th>/);
   assert.match(pageSource, /const midpoint = \(normalizedRange\[0\] \+ normalizedRange\[1\]\) \/ 2/);
   assert.match(pageSource, /className="driver-fixed-common-value" colSpan=\{4\}/);
-  assert.match(pageSource, /className="driver-item-code">\{codes\}:/);
+  assert.match(pageSource, /className="driver-item-code">\{code\}:/);
   assert.match(globalStyles, /\.driver-item-code/);
   assert.match(pageSource, /const round5Benchmarks/);
   assert.match(pageSource, /companySalesCagr: \{ applicant: 20, accepted: 21, statistic: "中央値" \}/);

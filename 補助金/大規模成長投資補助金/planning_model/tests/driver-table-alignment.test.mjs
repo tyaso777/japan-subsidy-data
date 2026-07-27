@@ -166,21 +166,35 @@ test("driver review guidance stays in the statutory-condition column instead of 
 
 test("zero-history project sales amount is a separate row above the growth-rate row", () => {
   const amountRowIndex = pageSource.indexOf('className="driver-adjustable project-launch-sales-row"');
-  const amountCodeIndex = pageSource.indexOf("C-1A／C-1B:", amountRowIndex);
+  const amountCodeIndex = pageSource.indexOf("{projectLaunchSalesConditionCode}:", amountRowIndex);
   const firstYearRangeIndex = pageSource.indexOf('renderDriverPeriodCells("projectFirstYearSales")', amountCodeIndex);
   const baseYearRangeIndex = pageSource.indexOf('renderDriverPeriodCells("projectBaseYearSales")', firstYearRangeIndex);
   const growthRowIndex = pageSource.indexOf("const growthRow =", baseYearRangeIndex);
   assert.ok(amountRowIndex >= 0, "補助事業売上高の範囲入力行が必要");
-  assert.ok(amountCodeIndex > amountRowIndex, "範囲入力行にはC-1A／C-1Bを表示する");
+  assert.ok(amountCodeIndex > amountRowIndex, "範囲入力行には一意の表示番号を付ける");
   assert.ok(firstYearRangeIndex > amountCodeIndex, "設備導入期間の下限・上限には設備導入初年度売上高を置く");
   assert.ok(baseYearRangeIndex > firstYearRangeIndex, "基準年度側の下限・上限には基準年度売上高を置く");
   assert.ok(growthRowIndex > baseYearRangeIndex, "売上高入力行を売上成長率行より上に置く");
+  assert.doesNotMatch(pageSource, /C-1A|C-1B/);
+  assert.doesNotMatch(pageSource, /0始まりではCAGRを計算できません/);
+});
+
+test("each displayed forecast-condition row has one unique condition number", () => {
+  assert.match(pageSource, /const inflationConditionCode = conditionCode\(0\)/);
+  assert.match(pageSource, /const projectLaunchSalesConditionCode = conditionCode\(1\)/);
   assert.match(
     pageSource,
-    /const codes = launchSalesGrowthRow[\s\S]*?\? "C-1／C-9"/,
+    /driverComparisonRows\.flatMap\(\(row, index\) =>[\s\S]*?conditionCode\(index \+ 2\)/,
   );
-  assert.doesNotMatch(pageSource, /C-1A／C-1B／C-9/);
-  assert.doesNotMatch(pageSource, /0始まりではCAGRを計算できません/);
+  assert.match(
+    pageSource,
+    /const code = driverItemCodes\[referenceKey\] \?\? "";/,
+  );
+  assert.doesNotMatch(
+    pageSource,
+    /keys\.map\(\(key\) => driverItemCodes\[key\]\)\.filter\(Boolean\)\.join\("／"\)/,
+  );
+  assert.doesNotMatch(pageSource, /C-\d+／C-\d+/);
 });
 
 test("zero-history project sales anchors are adjustable within their own ranges", () => {

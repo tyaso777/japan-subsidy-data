@@ -377,8 +377,15 @@ const fixedForecastDriverKeys = new Set<keyof Drivers>([
 ]);
 
 const conditionCode = (index: number) => `C-${index + 1}`;
+const inflationConditionCode = conditionCode(0);
+const projectLaunchSalesConditionCode = conditionCode(1);
+const driverComparisonRows = driverComparisonGroups.flatMap((group) => group.rows);
 const driverItemCodes = Object.fromEntries(
-  forecastDriverKeys.map((key, index) => [key, conditionCode(index)]),
+  driverComparisonRows.flatMap((row, index) =>
+    [row.equipment, row.postBase, row.fixed]
+      .filter((key): key is keyof Drivers => Boolean(key))
+      .map((key) => [key, conditionCode(index + 2)] as const),
+  ),
 ) as Partial<Record<keyof Drivers, string>>;
 
 const equipmentPeriodStatisticalKeys = new Set<keyof Drivers>([
@@ -2802,7 +2809,7 @@ export default function Home() {
             <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th rowSpan={2}>調整条件<small>C-1～（Condition）</small></th><th rowSpan={2} className="driver-statutory-heading">制度上の必須条件<small>編集不可</small></th>{historicalPlan.slice(1).map((row) => <th rowSpan={2} className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th colSpan={2} className="driver-period-heading">設備導入期間<small>最新決算期 → 基準年</small></th><th colSpan={2} className="driver-period-heading">基準年後<small>基準年 → 事業化報告3年目</small></th></tr><tr><th className="driver-bound-heading">下限</th><th className="driver-bound-heading">上限</th><th className="driver-bound-heading">下限</th><th className="driver-bound-heading">上限</th></tr></thead><tbody>
               <tr className="driver-group-heading external-premise-heading"><th><strong>共通・外部前提</strong></th><td aria-hidden="true" colSpan={7}></td></tr>
               <tr className="driver-external-premise">
-                <th>物価上昇率<small>%/年／外部前提</small></th>
+                <th><span className="driver-item-code">{inflationConditionCode}:</span> 物価上昇率<small>%/年／外部前提</small></th>
                 <td className="statutory-condition"><strong>最低でも物価上昇率を上回る程度でないと、審査上大幅に不利</strong></td>
                 {historicalPlan.slice(1).map((row) => <td className="driver-history" key={`inflation-reference-${row.year}`}>—</td>)}
                 <td className="driver-external-premise-value" colSpan={4}>
@@ -2813,7 +2820,7 @@ export default function Home() {
                       <span>%/年</span>
                     </span>
                   </label>
-                  <small>C-4 設備導入期間の下限へ反映</small>
+                  <small>{driverItemCodes.projectPayGrowthToBase} 設備導入期間の下限へ反映</small>
                 </td>
               </tr>
               {driverComparisonGroups.flatMap((group) => [
@@ -2825,9 +2832,7 @@ export default function Home() {
                   const tablePresentation = driverTablePresentation(referenceKey, info.label);
                   const history = historicalDriverSeries[referenceKey];
                   const launchSalesGrowthRow = latestProjectSalesIsZero && comparisonRow.equipment === "projectSalesGrowthToBase";
-                  const codes = launchSalesGrowthRow
-                    ? "C-1／C-9"
-                    : keys.map((key) => driverItemCodes[key]).filter(Boolean).join("／");
+                  const code = driverItemCodes[referenceKey] ?? "";
                   const displayLabel = launchSalesGrowthRow
                     ? "補助事業 売上成長率"
                     : tablePresentation.label;
@@ -2837,7 +2842,7 @@ export default function Home() {
                   const adjustable = keys.some((key) => adjustableDriverKeys.includes(key));
                   const launchSalesAmountRow = launchSalesGrowthRow
                     ? <tr className="driver-adjustable project-launch-sales-row" key={`${group.label}-${rowIndex}-sales`}>
-                      <th><span className="driver-item-code">C-1A／C-1B:</span> 補助事業 売上高<small>千円／設備導入初年度・基準年度の許容範囲</small></th>
+                      <th><span className="driver-item-code">{projectLaunchSalesConditionCode}:</span> 補助事業 売上高<small>千円／設備導入初年度・基準年度の許容範囲</small></th>
                       <td className="statutory-condition">—</td>
                       {historicalPlan.slice(1).map((row) => <td className="driver-history" key={`project-launch-sales-${row.year}`}>—</td>)}
                       {renderDriverPeriodCells("projectFirstYearSales")}
@@ -2845,7 +2850,7 @@ export default function Home() {
                     </tr>
                     : null;
                   const growthRow = <tr className={`${adjustable ? "driver-adjustable" : "driver-fixed"} ${constraintError ? "driver-validation-error" : ""}`} key={`${group.label}-${rowIndex}`}>
-                    <th><span className="driver-item-code">{codes}:</span> {displayLabel}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{`${monetaryDriverKeys.has(referenceKey) ? moneyDisplayUnit : info.unit}／${history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}`}</small></th>
+                    <th><span className="driver-item-code">{code}:</span> {displayLabel}{tablePresentation.note && <small className="driver-period-note">{tablePresentation.note}</small>}<small>{`${monetaryDriverKeys.has(referenceKey) ? moneyDisplayUnit : info.unit}／${history.referenceLevels ? "各期率＋前年差改善pt" : history.mode === "change" ? "前年差・前年比" : history.mode === "level" ? "各期の水準" : "過去比較なし"}`}</small></th>
                     <td className="statutory-condition">
                       <strong>{requirementLabels.join("／") || "—"}</strong>
                       {reviewNotes.map((note) => <small className="driver-review-note" key={note}>{note}</small>)}
