@@ -137,6 +137,17 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.diagnostic-panel \{[^}]*min-width: 0;/);
   assert.doesNotMatch(pageSource, /className="diagnostic-groups-scroll"/);
   assert.match(pageSource, /--diagnostic-sticky-chart-height/);
+  assert.match(pageSource, /className="diagnostic-detail-layout"/);
+  assert.match(pageSource, /className="diagnostic-values-panel"/);
+  assert.match(pageSource, /className="diagnostic-metric-navigator"/);
+  assert.match(pageSource, /className="diagnostic-metric-tile"/);
+  assert.match(pageSource, /case "ArrowLeft"/);
+  assert.match(pageSource, /case "ArrowRight"/);
+  assert.match(pageSource, /case "ArrowUp"/);
+  assert.match(pageSource, /case "ArrowDown"/);
+  assert.match(globalStyles, /\.diagnostic-detail-layout \{[^}]*grid-template-columns:/);
+  assert.match(globalStyles, /\.diagnostic-values-panel \{/);
+  assert.match(globalStyles, /\.diagnostic-metric-navigator \{/);
   assert.match(pageSource, /diagnosticChart\.getBoundingClientRect\(\)/);
   assert.match(pageSource, /<th className="diagnostic-sparkline-column">推移<\/th>/);
   assert.match(pageSource, /<th className="diagnostic-series-column">区分<\/th>/);

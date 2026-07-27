@@ -3557,7 +3557,7 @@ function diagnosticChartSeries(plan: YearPlan[], row: DiagnosticRow): ChartSerie
   }));
 }
 
-function DiagnosticSparkline({ plan, row, selected, onSelect }: { plan: YearPlan[]; row: DiagnosticRow; selected: boolean; onSelect: () => void }) {
+function DiagnosticSparklineGraphic({ plan, row }: { plan: YearPlan[]; row: DiagnosticRow }) {
   const width = 116;
   const height = 44;
   const padding = 4;
@@ -3583,11 +3583,15 @@ function DiagnosticSparkline({ plan, row, selected, onSelect }: { plan: YearPlan
     }).join(" ");
   };
 
-  return <button type="button" className="diagnostic-sparkline-button" aria-pressed={selected} aria-label={`${row.name}の詳細チャートを表示`} onClick={onSelect}>
-    <svg className="diagnostic-sparkline" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${row.name}の年度推移`}>
+  return <svg className="diagnostic-sparkline" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${row.name}の年度推移`}>
       <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} />
       {series.map((item) => <path key={item.label} d={path(item)} stroke={item.color} />)}
-    </svg>
+    </svg>;
+}
+
+function DiagnosticSparkline({ plan, row, selected, onSelect }: { plan: YearPlan[]; row: DiagnosticRow; selected: boolean; onSelect: () => void }) {
+  return <button type="button" className="diagnostic-sparkline-button" aria-pressed={selected} aria-label={`${row.name}の詳細チャートを表示`} onClick={onSelect}>
+    <DiagnosticSparklineGraphic plan={plan} row={row} />
   </button>;
 }
 
@@ -3684,11 +3688,47 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
     const digits = unit === "千円/人" ? 2 : unit === "倍" ? 2 : 1;
     return unit === "千円/人" ? formatDisplayMoney(value, moneyUnit) : `${number(value, digits)}${unit}`;
   };
-  const allRows = groups.flatMap((group) => group.rows.map((row) => ({ key: `${group.title}:${row.name}`, row })));
+  const allRows = groups.flatMap((group, groupIndex) => group.rows.map((row, rowIndex) => ({ key: `${group.title}:${row.name}`, row, groupIndex, rowIndex })));
   const [selectedKey, setSelectedKey] = useState(allRows[0]?.key ?? "");
   const selected = allRows.find((entry) => entry.key === selectedKey) ?? allRows[0];
   const diagnosticsRef = useRef<HTMLElement>(null);
   const selectedChartRef = useRef<HTMLDivElement>(null);
+  const metricTileRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const selectedSeries = selected ? diagnosticChartSeries(plan, selected.row) : [];
+
+  const selectAndFocusMetric = (groupIndex: number, rowIndex: number) => {
+    const group = groups[groupIndex];
+    const row = group?.rows[rowIndex];
+    if (!group || !row) return;
+    const key = `${group.title}:${row.name}`;
+    setSelectedKey(key);
+    requestAnimationFrame(() => metricTileRefs.current[key]?.focus());
+  };
+
+  const handleMetricKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, groupIndex: number, rowIndex: number) => {
+    let nextGroup = groupIndex;
+    let nextRow = rowIndex;
+    switch (event.key) {
+      case "ArrowLeft":
+        nextRow = (rowIndex - 1 + groups[groupIndex].rows.length) % groups[groupIndex].rows.length;
+        break;
+      case "ArrowRight":
+        nextRow = (rowIndex + 1) % groups[groupIndex].rows.length;
+        break;
+      case "ArrowUp":
+        nextGroup = (groupIndex - 1 + groups.length) % groups.length;
+        nextRow = Math.min(rowIndex, groups[nextGroup].rows.length - 1);
+        break;
+      case "ArrowDown":
+        nextGroup = (groupIndex + 1) % groups.length;
+        nextRow = Math.min(rowIndex, groups[nextGroup].rows.length - 1);
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+    selectAndFocusMetric(nextGroup, nextRow);
+  };
 
   useEffect(() => {
     const root = diagnosticsRef.current;
@@ -3705,7 +3745,39 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
 
   return <section ref={diagnosticsRef} className="financial-diagnostics" aria-label="PL妥当性診断">
     <div className="diagnostic-heading"><div><h2>基本指標によるシミュレーション妥当性チェック</h2></div><p>「推移」の小さなチャートを選ぶと、詳細チャートが切り替わります。年度別数値は全社・補助事業・ベース事業の順です。</p></div>
-    {selected && <div ref={selectedChartRef} className="diagnostic-selected-chart"><TrendChart title={selected.row.name} subtitle={`${selected.row.formula}｜${selected.row.check}`} unit={selected.row.unit === "千円/人" ? `${moneyUnit}/人` : selected.row.unit} plan={plan} zeroBaseline series={diagnosticChartSeries(plan, selected.row).map((series) => selected.row.unit === "千円/人" ? { ...series, values: series.values.map((value) => value === undefined ? undefined : toDisplayMoney(value, moneyUnit)) } : series)} /></div>}
+    {selected && <div ref={selectedChartRef} className="diagnostic-selected-chart">
+      <div className="diagnostic-detail-layout">
+        <TrendChart title={selected.row.name} subtitle={`${selected.row.formula}｜${selected.row.check}`} unit={selected.row.unit === "千円/人" ? `${moneyUnit}/人` : selected.row.unit} plan={plan} zeroBaseline series={selectedSeries.map((series) => selected.row.unit === "千円/人" ? { ...series, values: series.values.map((value) => value === undefined ? undefined : toDisplayMoney(value, moneyUnit)) } : series)} />
+        <aside className="diagnostic-values-panel" aria-label={`${selected.row.name}の年度別数値`}>
+          <h3>年度別数値</h3>
+          <div className="diagnostic-values-table-wrap"><table><thead><tr><th>年度</th>{selectedSeries.map((series) => <th key={series.label}>{series.label}</th>)}</tr></thead><tbody>
+            {plan.map((year, index) => <tr key={year.year}><th>{year.year}<small>{YEAR_ROLE_LABELS[year.role]}</small></th>{selectedSeries.map((series) => <td key={series.label}>{formatted(series.values[index], selected.row.unit)}</td>)}</tr>)}
+          </tbody></table></div>
+        </aside>
+      </div>
+    </div>}
+    <nav className="diagnostic-metric-navigator" aria-label="診断指標を選択">
+      {groups.map((group, groupIndex) => <section className="diagnostic-metric-group" key={group.title}>
+        <h3>{group.title}</h3>
+        <div className="diagnostic-metric-grid">{group.rows.map((row, rowIndex) => {
+          const key = `${group.title}:${row.name}`;
+          const isSelected = key === selected?.key;
+          return <button
+            ref={(element) => { metricTileRefs.current[key] = element; }}
+            type="button"
+            className="diagnostic-metric-tile"
+            aria-pressed={isSelected}
+            tabIndex={isSelected ? 0 : -1}
+            key={key}
+            onClick={() => setSelectedKey(key)}
+            onKeyDown={(event) => handleMetricKeyDown(event, groupIndex, rowIndex)}
+          >
+            <DiagnosticSparklineGraphic plan={plan} row={row} />
+            <span>{row.name}</span>
+          </button>;
+        })}</div>
+      </section>)}
+    </nav>
     <div className="panel diagnostic-groups-panel"><div className="diagnostic-groups" aria-label="診断指標一覧">{groups.map((group) => <section className="diagnostic-panel" key={group.title}><h3>{group.title}</h3><div className="wide-table diagnostic-table"><table><thead><tr><th>指標名</th><th>計算式</th><th>主な確認点</th><th className="diagnostic-sparkline-column">推移</th><th className="diagnostic-series-column">区分</th>{plan.map((row) => {
       const roleLines = row.role === "beforeBase" ? ["補助事業期間", "（基準年前年）"] : [YEAR_ROLE_LABELS[row.role]];
       return <th className="diagnostic-period-heading" key={row.year}>{row.year}<small>{roleLines.map((line) => <span key={line}>{line}</span>)}</small></th>;

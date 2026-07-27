@@ -117,3 +117,52 @@ for (const width of viewportWidths) {
     await expect(page).toHaveScreenshot(`drivers-${width}.png`);
   });
 }
+
+test("diagnostic detail chart, value table, and keyboard navigator stay coordinated", async ({ page }) => {
+  await openStandalone(page, 1440);
+  await page.locator(".tabs button").nth(4).click();
+
+  const detailLayout = page.locator(".diagnostic-detail-layout");
+  const valuePanel = page.locator(".diagnostic-values-panel");
+  const navigator = page.locator(".diagnostic-metric-navigator");
+  await expect(detailLayout).toBeVisible();
+  await expect(valuePanel).toBeVisible();
+  await expect(navigator).toBeVisible();
+
+  const geometry = await page.evaluate(() => {
+    const layout = document.querySelector(".diagnostic-detail-layout")?.getBoundingClientRect();
+    const chart = document.querySelector(".diagnostic-detail-layout .trend-chart-card")?.getBoundingClientRect();
+    const values = document.querySelector(".diagnostic-values-panel")?.getBoundingClientRect();
+    const navigatorBox = document.querySelector(".diagnostic-metric-navigator")?.getBoundingClientRect();
+    return layout && chart && values && navigatorBox
+      ? {
+          chartRight: chart.right,
+          valuesLeft: values.left,
+          layoutBottom: layout.bottom,
+          navigatorTop: navigatorBox.top,
+        }
+      : null;
+  });
+  expect(geometry).not.toBeNull();
+  expect(geometry.valuesLeft).toBeGreaterThanOrEqual(geometry.chartRight - 1);
+  expect(geometry.navigatorTop).toBeGreaterThanOrEqual(geometry.layoutBottom - 1);
+
+  const groups = navigator.locator(".diagnostic-metric-group");
+  expect(await groups.count()).toBeGreaterThan(1);
+  const firstGroupTiles = groups.first().locator(".diagnostic-metric-tile");
+  expect(await firstGroupTiles.count()).toBeGreaterThan(1);
+
+  const firstTile = firstGroupTiles.nth(0);
+  const secondTile = firstGroupTiles.nth(1);
+  await firstTile.focus();
+  await expect(firstTile).toHaveAttribute("aria-pressed", "true");
+  await page.keyboard.press("ArrowRight");
+  await expect(secondTile).toBeFocused();
+  await expect(secondTile).toHaveAttribute("aria-pressed", "true");
+
+  await page.keyboard.press("ArrowDown");
+  const nextGroupTile = groups.nth(1).locator(".diagnostic-metric-tile").nth(1);
+  await expect(nextGroupTile).toBeFocused();
+  await expect(nextGroupTile).toHaveAttribute("aria-pressed", "true");
+  await expectNoPageOverflow(page);
+});
