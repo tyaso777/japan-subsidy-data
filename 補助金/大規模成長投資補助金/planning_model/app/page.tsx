@@ -83,6 +83,7 @@ import {
   metricRequirementLabel,
   normalizeDriverRangeForRequirements,
   normalizeDriverValueForRequirements,
+  projectPayGrowthToBaseFloor,
   systemConstraintFailures,
   type ApplicationCategory,
 } from "./application-rules";
@@ -1281,8 +1282,10 @@ export default function Home() {
     const rawUpper = getInputValue(inputValues, inputKey.driverRange(key, 1));
     const lower = rawLower === "" ? null : rawLower;
     const upper = rawUpper === "" ? null : rawUpper;
+    const rawInflationReference = getInputValue(inputValues, inputKey.assumption("inflationReference"));
+    const inflationReferencePercent = rawInflationReference === "" ? undefined : Number(rawInflationReference);
     return driverRangeOrderingFailure(lower, upper) !== null
-      || driverRangeRequirementFailure(key, applicationCategory, lower) !== null;
+      || driverRangeRequirementFailure(key, applicationCategory, lower, inflationReferencePercent) !== null;
   }), [activeForecastDriverKeys, applicationCategory, inputValues]);
   const missingAccountingAssumptions = useMemo(() => accountingAssumptionDriverKeys.filter((key) =>
     !hasInputValue(inputValues, inputKey.driver(key)),
@@ -1425,6 +1428,7 @@ export default function Home() {
   const sourceActual = useMemo(() => calculateMetrics(sourcePlan, drivers), [sourcePlan, drivers]);
   const actual = useMemo(() => calculateMetrics(plan, calculationDrivers), [plan, calculationDrivers]);
   const inflationReference = getInputValue(inputValues, inputKey.assumption("inflationReference"));
+  const inflationReferencePercent = inflationReference === "" ? undefined : Number(inflationReference);
   const inflationComparison = inflationReference === ""
     ? null
     : comparePayGrowthWithInflation(actual.companyPaySchedule, Number(inflationReference));
@@ -2122,6 +2126,27 @@ export default function Home() {
     setDrivers((current) => ({ ...current, [key]: midpoint }));
   }
 
+  function updateInflationReference(displayValue: number | null) {
+    clearAdjustment();
+    const normalized = displayValue === null ? null : Math.max(0, roundedInput(displayValue));
+    const floor = projectPayGrowthToBaseFloor(normalized);
+    const nextUpper = Math.max(floor, driverRanges.projectPayGrowthToBase[1]);
+    const nextRange: [number, number] = [floor, nextUpper];
+    const midpoint = (floor + nextUpper) / 2;
+    setInputValues((current) => {
+      let next = setInputValue(current, inputKey.assumption("inflationReference"), normalized);
+      if (normalized === null) return next;
+      next = setInputValue(next, inputKey.driverRange("projectPayGrowthToBase", 0), floor);
+      next = setInputValue(next, inputKey.driverRange("projectPayGrowthToBase", 1), nextUpper);
+      next = setInputValue(next, inputKey.driver("projectPayGrowthToBase"), midpoint);
+      return next;
+    });
+    if (normalized !== null) {
+      setDriverRanges((current) => ({ ...current, projectPayGrowthToBase: nextRange }));
+      setDrivers((current) => ({ ...current, projectPayGrowthToBase: midpoint }));
+    }
+  }
+
   function toggleDriverRangeSuggestion(metricKey: MetricKey, suggestion: DriverRangeSuggestion, checked: boolean) {
     const id = driverRangeSuggestionId(metricKey, suggestion);
     setSelectedAdjustmentSuggestions((current) => ({ ...current, [id]: checked }));
@@ -2311,6 +2336,11 @@ export default function Home() {
       clamp(nextDrivers.otherSgaRateEnd - 0.005, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]),
       clamp(nextDrivers.otherSgaRateEnd + 0.005, driverBounds.otherSgaRateEnd[0], driverBounds.otherSgaRateEnd[1]),
     ];
+    const inflationFloor = projectPayGrowthToBaseFloor(inflationReferencePercent);
+    nextRanges.projectPayGrowthToBase = [
+      Math.max(inflationFloor, nextRanges.projectPayGrowthToBase[0]),
+      Math.max(inflationFloor, nextRanges.projectPayGrowthToBase[1]),
+    ];
     for (const key of adjustableDriverKeys) {
       if (key === "projectFirstYearSales" || key === "projectBaseYearSales") continue;
       nextDrivers[key] = (nextRanges[key][0] + nextRanges[key][1]) / 2;
@@ -2397,15 +2427,19 @@ export default function Home() {
     const rawLower = lowerInput === "" ? null : lowerInput;
     const rawUpper = upperInput === "" ? null : upperInput;
     const orderingError = driverRangeOrderingFailure(rawLower, rawUpper);
-    const requirementError = driverRangeRequirementFailure(key, applicationCategory, rawLower);
+    const requirementError = driverRangeRequirementFailure(key, applicationCategory, rawLower, inflationReferencePercent);
     const rangeError = orderingError ?? requirementError;
-    const statutoryFloor = driverRequirementFloor(key, applicationCategory);
+    const statutoryFloor = key === "projectPayGrowthToBase"
+      ? projectPayGrowthToBaseFloor(inflationReferencePercent)
+      : driverRequirementFloor(key, applicationCategory);
     const inputMinimum = statutoryFloor === undefined
       ? undefined
       : percentDriver(key) ? statutoryFloor * 100 : statutoryFloor;
-    const statutoryFloorLabel = key === "projectPayGrowth" && statutoryFloor !== undefined
-      ? `制度下限 ${number(statutoryFloor * 100, 1)}%/年`
-      : "";
+    const statutoryFloorLabel = key === "projectPayGrowthToBase" && statutoryFloor !== undefined && statutoryFloor > 0
+      ? `外部前提下限 ${number(statutoryFloor * 100, 1)}%/年`
+      : key === "projectPayGrowth" && statutoryFloor !== undefined
+        ? `制度下限 ${number(statutoryFloor * 100, 1)}%/年`
+        : "";
     const improvementWarningLimit = cogsImprovementAnnualWarningLimit(key);
     const improvementMaximum = Math.max(
       rawLower ?? Number.NEGATIVE_INFINITY,
@@ -2468,7 +2502,7 @@ export default function Home() {
       .map((key) => ({
         key,
         error: driverRangeOrderingFailure(rangesToValidate[key][0], rangesToValidate[key][1])
-          ?? driverRangeRequirementFailure(key, applicationCategory, rangesToValidate[key][0]),
+          ?? driverRangeRequirementFailure(key, applicationCategory, rangesToValidate[key][0], inflationReferencePercent),
       }))
       .find(({ error }) => error !== null);
     if (invalidRange) {
@@ -2766,6 +2800,22 @@ export default function Home() {
             {missingAccountingAssumptions.length > 0 && <p className="default-note" role="alert">会計内訳・利益前提が未設定です。補助事業・ベース事業の各6項目と共通の実効税率を設定するまで、③将来データ入力では自動予測を表示しません。</p>}
             {invalidForecastDriverRangeKeys.length > 0 && <p className="driver-range-summary-error" role="alert">入力できない許容範囲があります。下限・上限の順序と、赤字で示した制度下限を確認してください。</p>}
             <div className="wide-table spreadsheet-grid driver-target-table"><table><thead><tr><th rowSpan={2}>調整条件<small>C-1～（Condition）</small></th><th rowSpan={2} className="driver-statutory-heading">制度上の必須条件<small>編集不可</small></th>{historicalPlan.slice(1).map((row) => <th rowSpan={2} className="driver-reference-heading" key={row.year}>{row.year}<small>過去実績・参考値<br />{YEAR_ROLE_LABELS[row.role]}</small></th>)}<th colSpan={2} className="driver-period-heading">設備導入期間<small>最新決算期 → 基準年</small></th><th colSpan={2} className="driver-period-heading">基準年後<small>基準年 → 事業化報告3年目</small></th></tr><tr><th className="driver-bound-heading">下限</th><th className="driver-bound-heading">上限</th><th className="driver-bound-heading">下限</th><th className="driver-bound-heading">上限</th></tr></thead><tbody>
+              <tr className="driver-group-heading external-premise-heading"><th><strong>共通・外部前提</strong></th><td aria-hidden="true" colSpan={7}></td></tr>
+              <tr className="driver-external-premise">
+                <th>物価上昇率<small>%/年／外部前提</small></th>
+                <td className="statutory-condition"><strong>最低でも物価上昇率を上回る程度でないと、審査上大幅に不利</strong></td>
+                {historicalPlan.slice(1).map((row) => <td className="driver-history" key={`inflation-reference-${row.year}`}>—</td>)}
+                <td className="driver-external-premise-value" colSpan={4}>
+                  <label>
+                    <span>外部前提値</span>
+                    <span className="driver-external-premise-control">
+                      <input aria-label="物価上昇率の外部前提" type="text" inputMode="decimal" value={inflationReference} placeholder="未設定" onChange={(event) => updateInflationReference(event.target.value === "" ? null : Number(event.target.value))} />
+                      <span>%/年</span>
+                    </span>
+                  </label>
+                  <small>C-4 設備導入期間の下限へ反映</small>
+                </td>
+              </tr>
               {driverComparisonGroups.flatMap((group) => [
                 <tr className="driver-group-heading" key={`group-${group.label}`}><th><strong>{group.label}</strong></th><td aria-hidden="true" colSpan={7}></td></tr>,
                 ...group.rows.flatMap((comparisonRow, rowIndex) => {
@@ -2842,7 +2892,7 @@ export default function Home() {
                 if (isSixthRoundReferenceMetric(definition.key)) return <tr className="reference-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>第6次評価対象外</small><span className="metric-role-badge reference">参考値</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{historicalPlan[historyIndex - 1]?.year}→{historicalPlan[historyIndex].year}（1年間）／{definition.unit}</small>{scaleDependent && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears)} {definition.unit}</small>}</> : "—"}</td>).slice(1)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{number(actual[definition.key])} {definition.unit}</td><td className="statutory-condition">—</td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">参考値</span></td></tr>;
                 const rowClass = basisRole === "result" ? "metric-result-row" : basisRole === "basis" ? "metric-basis-row" : "metric-independent-row";
                 const roleLabel = basisRole === "result" ? "自動算出" : basisRole === "basis" ? "目標設定" : "個別に目標設定";
-                return <tr className={rowClass} key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>{definition.sourceRound}</small><span className={`metric-role-badge ${basisRole}`}>{roleLabel}</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value, monetaryTargetKeys.has(definition.key) ? 0 : 1)}</strong><small>{history.mode === "change" ? `${historicalPlan[historyIndex - 1]?.year}→${historicalPlan[historyIndex].year}（1年間）／${definition.unit}` : definition.unit}</small>{scaleDependent && history.mode === "change" && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears, monetaryTargetKeys.has(definition.key) ? 0 : 1)} {definition.unit}</small>}</> : "—"}</td>).slice(1)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key], monetaryTargetKeys.has(definition.key) ? 0 : 1)} →</small>}{number(actual[definition.key], monetaryTargetKeys.has(definition.key) ? 0 : 1)} {definition.unit}</td><td className="statutory-condition"><strong>{metricRequirementLabel(definition.key, applicationCategory)}</strong>{definition.key === "companyPaySchedule" && <div className="inflation-comparison"><label className="inflation-reference-input"><span>物価上昇率（参照）</span><span className="inflation-reference-control"><input aria-label="物価上昇率の参照値" type="number" min="0" step="0.1" value={inflationReference} placeholder="未設定" onChange={(event) => setInputValues((current) => setInputValue(current, inputKey.assumption("inflationReference"), event.target.value === "" ? null : Number(event.target.value)))} /><span>%/年</span></span></label>{inflationComparison && <small className={`inflation-comparison-result ${inflationComparison.status}`}>計画 {number(actual.companyPaySchedule, 1)}% − 物価 {number(Number(inflationReference), 1)}% ＝ {inflationComparison.difference > 0 ? "+" : ""}{number(inflationComparison.difference, 1)}pt<span>{inflationComparison.status === "above" ? "物価上昇率超" : inflationComparison.status === "equal" ? "物価上昇率と同率" : "物価上昇率未満"}</span></small>}</div>}</td><td><input disabled={basisRole === "result"} aria-label={`${definition.label}目標値`} type="number" step={monetaryTargetKeys.has(definition.key) ? 1 : 0.1} value={getInputValue(inputValues, inputKey.target(definition.key, "value"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "value", event.target.value === "" ? null : Number(event.target.value))} /></td><td><input disabled={basisRole === "result"} type="number" min="1" max="10" step="1" value={integerPriority(target.weight)} onChange={(event) => updateTarget(definition.key, { weight: integerPriority(Number(event.target.value)) })} /></td><td className="target-judgement"><span className={`result-badge ${basisRole === "result" || !targetSet || status.ok ? "ok" : "bad"}`}>{basisRole === "result" ? "自動算出" : !targetSet ? "未設定" : status.ok ? "目標達成" : "目標未達"}</span></td></tr>;
+                return <tr className={rowClass} key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>{definition.sourceRound}</small><span className={`metric-role-badge ${basisRole}`}>{roleLabel}</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value, monetaryTargetKeys.has(definition.key) ? 0 : 1)}</strong><small>{history.mode === "change" ? `${historicalPlan[historyIndex - 1]?.year}→${historicalPlan[historyIndex].year}（1年間）／${definition.unit}` : definition.unit}</small>{scaleDependent && history.mode === "change" && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears, monetaryTargetKeys.has(definition.key) ? 0 : 1)} {definition.unit}</small>}</> : "—"}</td>).slice(1)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key], monetaryTargetKeys.has(definition.key) ? 0 : 1)} →</small>}{number(actual[definition.key], monetaryTargetKeys.has(definition.key) ? 0 : 1)} {definition.unit}</td><td className="statutory-condition"><strong>{metricRequirementLabel(definition.key, applicationCategory)}</strong>{definition.key === "companyPaySchedule" && <div className="inflation-comparison"><small className="inflation-comparison-reference">外部前提：物価上昇率 {inflationReference === "" ? "未設定" : `${number(Number(inflationReference), 1)}%/年`}</small>{inflationComparison && <small className={`inflation-comparison-result ${inflationComparison.status}`}>計画 {number(actual.companyPaySchedule, 1)}% − 物価 {number(Number(inflationReference), 1)}% ＝ {inflationComparison.difference > 0 ? "+" : ""}{number(inflationComparison.difference, 1)}pt<span>{inflationComparison.status === "above" ? "物価上昇率超" : inflationComparison.status === "equal" ? "物価上昇率と同率" : "物価上昇率未満"}</span></small>}</div>}</td><td><input disabled={basisRole === "result"} aria-label={`${definition.label}目標値`} type="number" step={monetaryTargetKeys.has(definition.key) ? 1 : 0.1} value={getInputValue(inputValues, inputKey.target(definition.key, "value"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "value", event.target.value === "" ? null : Number(event.target.value))} /></td><td><input disabled={basisRole === "result"} type="number" min="1" max="10" step="1" value={integerPriority(target.weight)} onChange={(event) => updateTarget(definition.key, { weight: integerPriority(Number(event.target.value)) })} /></td><td className="target-judgement"><span className={`result-badge ${basisRole === "result" || !targetSet || status.ok ? "ok" : "bad"}`}>{basisRole === "result" ? "自動算出" : !targetSet ? "未設定" : status.ok ? "目標達成" : "目標未達"}</span></td></tr>;
               })}
             </tbody></table></div>
             <p className="footnote round5-source-note">第5次公式参考値は、申請者全体と採択者の公表代表値です。原則は中央値ですが、「補助事業売上高／全社売上高」のみ平均値です。役員関連2指標は第5次に公表値がありません。<a href="https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公式資料 ↗</a></p>

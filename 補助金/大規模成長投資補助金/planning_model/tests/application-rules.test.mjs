@@ -8,7 +8,7 @@ const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const projectDirectory = path.resolve(testDirectory, "..");
 const compiled = (await build({
   absWorkingDir: projectDirectory,
-  entryPoints: ["./app/application-rules.ts"],
+  entryPoints: [path.join(projectDirectory, "app", "application-rules.ts")],
   bundle: true,
   write: false,
   platform: "node",
@@ -54,6 +54,21 @@ test("latest-to-base pay growth explains the inflation examination risk separate
   assert.match(rules.driverReviewNote("projectPayGrowthToBase"), /物価上昇率超を審査上重視/);
   assert.equal(rules.driverReviewNote("projectPayGrowth"), "");
   assert.equal(rules.driverReviewNote("projectSalesGrowth"), "");
+});
+
+test("entered inflation becomes the equipment-period project-pay lower floor", () => {
+  assert.equal(rules.projectPayGrowthToBaseFloor(undefined), 0);
+  assert.equal(rules.projectPayGrowthToBaseFloor(null), 0);
+  assert.equal(rules.projectPayGrowthToBaseFloor(-1), 0);
+  assert.equal(rules.projectPayGrowthToBaseFloor(2.5), 0.025);
+  assert.equal(
+    rules.driverRangeRequirementFailure("projectPayGrowthToBase", "general", 0.025, 2.5),
+    null,
+  );
+  assert.equal(
+    rules.driverRangeRequirementFailure("projectPayGrowthToBase", "general", 0.02, 2.5),
+    "外部前提下限2.5%/年以上で入力してください",
+  );
 });
 
 test("whole-company latest-to-base pay growth has a zero-percent statutory minimum", () => {

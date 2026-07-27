@@ -73,19 +73,25 @@ test("all number inputs hide native spinner controls", () => {
   );
 });
 
-test("inflation reference unit has its own non-overlapping control area", () => {
+test("inflation is entered once as the first external premise and linked to C-4", () => {
   assert.match(
     pageSource,
-    /<span className="inflation-reference-control">[\s\S]*?<input aria-label="物価上昇率の参照値"[\s\S]*?<span>%\/年<\/span><\/span>/,
+    /<tr className="driver-group-heading external-premise-heading"[\s\S]*?共通・外部前提[\s\S]*?<tr className="driver-external-premise"[\s\S]*?<input aria-label="物価上昇率の外部前提"/,
   );
   assert.match(
-    stylesheet,
-    /\.inflation-reference-input \{ display: grid; grid-template-columns: minmax\(0, 1fr\);/,
+    pageSource,
+    /function updateInflationReference\([\s\S]*?inputKey\.driverRange\("projectPayGrowthToBase", 0\)[\s\S]*?inputKey\.driverRange\("projectPayGrowthToBase", 1\)/,
   );
+  assert.doesNotMatch(pageSource, /aria-label="物価上昇率の参照値"/);
   assert.match(
     stylesheet,
-    /\.inflation-reference-control \{ display: grid; grid-template-columns: minmax\(0, 1fr\) auto;/,
+    /\.driver-external-premise-control \{ display: grid; grid-template-columns: minmax\(0, 1fr\) auto;/,
   );
+});
+
+test("metric table shows the external inflation premise only as a read-only comparison", () => {
+  assert.match(pageSource, /外部前提：物価上昇率/);
+  assert.doesNotMatch(pageSource, /inflation-reference-input/);
 });
 
 test("forecast-condition controls are centered in their cells while numbers remain right aligned", () => {
@@ -117,7 +123,7 @@ test("invalid lower and upper bounds are announced immediately on the affected p
   );
   assert.match(
     pageSource,
-    /const requirementError = driverRangeRequirementFailure\(key, applicationCategory, rawLower\)/,
+    /const requirementError = driverRangeRequirementFailure\(key, applicationCategory, rawLower, inflationReferencePercent\)/,
   );
   assert.equal(
     pageSource.match(/aria-invalid=\{rangeError \? "true" : undefined\}/g)?.length,

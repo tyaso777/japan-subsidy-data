@@ -183,10 +183,15 @@ input, select { border: 1px solid #d7d2c7; background: #fffefa; color: var(--ink
 .statutory-condition { min-width: 165px; max-width: 230px; color: #315b46; background: #f1f7f3; text-align: center; white-space: normal; line-height: 1.45; }
 .statutory-condition strong { display: block; margin-inline: auto; font-size: 11px; }
 .inflation-comparison { display: grid; gap: var(--space-2); margin-top: var(--space-2); padding-top: var(--space-2); border-top: 1px solid var(--border-soft); }
-.inflation-reference-input { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-1); align-items: start; color: var(--muted-readable); font-size: var(--text-xs); font-weight: 600; }
-.inflation-reference-control { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-1); align-items: center; min-width: 0; }
-.inflation-reference-control > span { white-space: nowrap; }
-.inflation-reference-input input { width: 100%; min-width: 0; padding: 5px 6px; text-align: right; }
+.driver-external-premise th,
+.driver-external-premise td { background: #f4f8f5; }
+.driver-external-premise-value { text-align: left; }
+.driver-external-premise-value label { display: grid; grid-template-columns: minmax(100px, 1fr) minmax(0, 180px); align-items: center; gap: var(--space-3); }
+.driver-external-premise-control { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-1); align-items: center; min-width: 0; }
+.driver-external-premise-control input { width: 100%; min-width: 0; padding: 5px 6px; text-align: right; }
+.driver-external-premise-control > span { white-space: nowrap; }
+.driver-external-premise-value > small { display: block; margin-top: var(--space-1); color: var(--muted-readable); font-size: var(--text-xs); text-align: right; }
+.inflation-comparison-reference { display: block; color: var(--muted-readable); font-size: var(--text-xs); line-height: 1.45; }
 .inflation-comparison-result { display: grid; gap: 2px; color: var(--muted-readable); font-size: var(--text-xs); line-height: 1.45; }
 .inflation-comparison-result span { font-weight: 700; }
 .inflation-comparison-result.above { color: var(--green); }

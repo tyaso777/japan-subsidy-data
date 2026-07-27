@@ -31,6 +31,11 @@ export function driverRequirementFloor(key: keyof Drivers, category: Application
   return undefined;
 }
 
+export function projectPayGrowthToBaseFloor(inflationPercent?: number | null) {
+  if (inflationPercent === null || inflationPercent === undefined || !Number.isFinite(inflationPercent)) return 0;
+  return Math.max(0, inflationPercent / 100);
+}
+
 export function driverReviewNote(key: keyof Drivers) {
   if (key === "projectPayGrowthToBase") {
     return "全社の足元賃上げは0%以上が必須。物価上昇率超を審査上重視";
@@ -62,11 +67,21 @@ export function driverRangeOrderingFailure(lower: number | null, upper: number |
   return lower > upper ? "下限は上限以下にしてください" : null;
 }
 
-export function driverRangeRequirementFailure(key: keyof Drivers, category: ApplicationCategory, lower: number | null) {
+export function driverRangeRequirementFailure(
+  key: keyof Drivers,
+  category: ApplicationCategory,
+  lower: number | null,
+  inflationPercent?: number | null,
+) {
   if (lower === null) return null;
-  const floor = driverRequirementFloor(key, category);
+  const floor = key === "projectPayGrowthToBase"
+    ? projectPayGrowthToBaseFloor(inflationPercent)
+    : driverRequirementFloor(key, category);
   if (floor === undefined || lower + 1e-12 >= floor) return null;
-  return `制度下限${(floor * 100).toFixed(1)}%/年以上で入力してください`;
+  const floorType = key === "projectPayGrowthToBase" && projectPayGrowthToBaseFloor(inflationPercent) > 0
+    ? "外部前提下限"
+    : "制度下限";
+  return `${floorType}${(floor * 100).toFixed(1)}%/年以上で入力してください`;
 }
 
 export function driverRequirementLabel(key: keyof Drivers, category: ApplicationCategory, investment: number) {
