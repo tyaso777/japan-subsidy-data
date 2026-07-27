@@ -4,6 +4,7 @@ import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import {
   buildMappedExcel,
   EXCEL_MAPPING_FORMAT,
+  mappedExcelOutputFileName,
   parseExcelMappingDefinition,
   previewExcelImport,
   validateExcelMappingDefinition,
@@ -16,7 +17,7 @@ const workbookBytes = () => zipSync({
   "xl/_rels/workbook.xml.rels": strToU8(`<?xml version="1.0"?><Relationships><Relationship Id="rId1" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Target="worksheets/sheet2.xml"/></Relationships>`),
   "xl/sharedStrings.xml": strToU8(`<?xml version="1.0"?><sst><si><t>1,500</t></si></sst>`),
   "xl/worksheets/sheet1.xml": strToU8(`<?xml version="1.0"?><worksheet><sheetData><row r="5"><c r="B5" t="s"><v>0</v></c><c r="C5"><v>0</v></c><c r="D5"><v>2750</v></c><c r="E5"><f>SUM(B5:D5)</f><v>4250</v></c></row></sheetData></worksheet>`),
-  "xl/worksheets/sheet2.xml": strToU8(`<?xml version="1.0"?><worksheet><sheetData><row r="4"><c r="B4" s="3"><v>13200</v></c><c r="C4" s="3"><v>14300</v></c><c r="D4" s="3"><v>15600</v></c></row></sheetData></worksheet>`),
+  "xl/worksheets/sheet2.xml": strToU8(`<?xml version="1.0"?><worksheet><sheetData><row r="4"><c r="B4" s="3" cm="4" vm="2" ph="1"><v>13200</v></c><c r="C4" s="3"><v>14300</v></c><c r="D4" s="3"><v>15600</v></c></row></sheetData></worksheet>`),
 });
 
 const target = (id, value = null) => ({ id, label: id, unit: "億円", writable: true, value });
@@ -66,6 +67,63 @@ test("exports into a copied workbook while preserving styles, formulas, and unre
   assert.match(sheet, /<c r="D5"><v>2750<\/v><\/c>/);
   assert.match(sheet, /<c r="E5"><f>SUM\(B5:D5\)<\/f><v>4250<\/v><\/c>/);
   assert.equal(result.previews.find((item) => item.target.endsWith("latest.2-1"))?.status, "empty");
+});
+
+test("changes only the mapped cell value without mutating the source workbook", () => {
+  const source = workbookBytes();
+  const sourceSnapshot = source.slice();
+  const sourceParts = unzipSync(source);
+  const valueOnlyMapping = {
+    format: EXCEL_MAPPING_FORMAT,
+    name: "value-only",
+    bindings: [
+      {
+        id: "styled-cell",
+        target: "balanceSheet.prePrevious.1-1",
+        excel: { sheet: "貸借対照表", cell: "B4", unit: "raw" },
+        direction: "export",
+      },
+    ],
+  };
+  const targets = new Map([
+    [
+      "balanceSheet.prePrevious.1-1",
+      { id: "balanceSheet.prePrevious.1-1", label: "assets", unit: "raw", writable: true, value: 21250 },
+    ],
+  ]);
+
+  const result = buildMappedExcel(source, valueOnlyMapping, targets);
+  assert.ok(result.bytes);
+
+  assert.deepEqual(source, sourceSnapshot, "入力された元Excelのバイト列を変更しない");
+  assert.notStrictEqual(result.bytes, source, "出力は元Excelとは別のバイト列として生成する");
+
+  const sourceAfterExport = unzipSync(source);
+  for (const [path, bytes] of Object.entries(sourceParts)) {
+    assert.deepEqual(sourceAfterExport[path], bytes, `元Excel内の ${path} を変更しない`);
+  }
+
+  const outputParts = unzipSync(result.bytes);
+  const targetPath = "xl/worksheets/sheet2.xml";
+  for (const [path, bytes] of Object.entries(sourceParts)) {
+    if (path !== targetPath) {
+      assert.deepEqual(outputParts[path], bytes, `出力Excel内の対象外ファイル ${path} を変更しない`);
+    }
+  }
+  assert.equal(
+    strFromU8(outputParts[targetPath]),
+    strFromU8(sourceParts[targetPath]).replace(
+      '<c r="B4" s="3" cm="4" vm="2" ph="1"><v>13200</v></c>',
+      '<c r="B4" s="3" cm="4" vm="2" ph="1"><v>21250</v></c>',
+    ),
+    "対象セルは値だけを書き換え、書式・メタデータ属性を保持する",
+  );
+});
+
+test("uses a distinct output file name instead of the source file name", () => {
+  assert.equal(mappedExcelOutputFileName("申請資料.xlsx"), "申請資料_シミュレーター出力.xlsx");
+  assert.equal(mappedExcelOutputFileName("申請資料.XLSM"), "申請資料_シミュレーター出力.xlsm");
+  assert.notEqual(mappedExcelOutputFileName("申請資料.xlsx"), "申請資料.xlsx");
 });
 
 test("stops export when a mapped destination is a formula cell", () => {

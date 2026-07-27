@@ -263,9 +263,19 @@ function replaceCellValue(xml: string, address: string, value: number) {
   const existing = pattern.exec(xml);
   if (!existing) throw new Error(`出力先セル ${address.toUpperCase()} がテンプレート内にありません。`);
   if (/<f(?:\s[^>]*)?>/.test(existing[2])) throw new Error(`出力先セル ${address.toUpperCase()} は数式セルです。入力セルを指定してください。`);
-  const style = /\bs="([^"]+)"/.exec(existing[1])?.[1];
-  const replacement = `<c r="${address.toUpperCase()}"${style ? ` s="${xmlEncode(style)}"` : ""}><v>${Number.isInteger(value) ? value : String(value)}</v></c>`;
+  const attributes = existing[1].replace(/\s+t="[^"]*"/i, "");
+  const encodedValue = String(value);
+  const body = /<v(?:\s[^>]*)?>[\s\S]*?<\/v>/i.test(existing[2])
+    ? existing[2].replace(/<v(?:\s[^>]*)?>[\s\S]*?<\/v>/i, `<v>${encodedValue}</v>`)
+    : `<v>${encodedValue}</v>`;
+  const replacement = `<c${attributes}>${body}</c>`;
   return xml.replace(pattern, replacement);
+}
+
+export function mappedExcelOutputFileName(sourceFileName: string) {
+  const extension = sourceFileName.toLowerCase().endsWith(".xlsm") ? "xlsm" : "xlsx";
+  const stem = sourceFileName.replace(/\.(xlsx|xlsm)$/i, "");
+  return `${stem}_シミュレーター出力.${extension}`;
 }
 
 export function buildMappedExcel(

@@ -60,6 +60,7 @@ import {
   EXCEL_MAPPING_COPILOT_PROMPT,
   EXCEL_MAPPING_EXAMPLE,
   EXCEL_MAPPING_MANUAL,
+  mappedExcelOutputFileName,
   parseExcelMappingDefinition,
   previewExcelImport,
   type ExcelMappingDefinition,
@@ -1861,14 +1862,14 @@ export default function Home() {
         return;
       }
       const extension = mappedExcelFileName.toLowerCase().endsWith(".xlsm") ? "xlsm" : "xlsx";
-      const stem = mappedExcelFileName.replace(/\.(xlsx|xlsm)$/i, "");
+      const outputFileName = mappedExcelOutputFileName(mappedExcelFileName);
       const outputBytes = new Uint8Array(result.bytes);
       downloadBlob(
         outputBytes.buffer,
-        `${stem}_シミュレーター出力.${extension}`,
+        outputFileName,
         extension === "xlsm" ? "application/vnd.ms-excel.sheet.macroEnabled.12" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       );
-      setExcelMappingNote(`元ファイルを変更せず「${stem}_シミュレーター出力.${extension}」として保存しました。`);
+      setExcelMappingNote(`元ファイルを変更せず「${outputFileName}」として保存しました。`);
     } catch (error) {
       setExcelMappingNote(error instanceof Error ? error.message : "Excel出力に失敗しました。");
     }
