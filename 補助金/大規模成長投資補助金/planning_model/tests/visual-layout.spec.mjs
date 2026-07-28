@@ -134,8 +134,9 @@ test("Excelマッピングで③の将来設備投資とPL固定値を取り込�
   await page.getByRole("button", { name: "③ 将来データ入力" }).click();
   await expect(page.getByRole("button", { name: "ベース事業PLを入力" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(".future-capex-table input").nth(2)).toHaveValue("1,200,000");
-  await expect(page.getByLabel("2028年 売上高（手入力固定値）").first()).toHaveValue("1,500,000");
-  await expect(page.getByLabel("2028年 売上高（手入力固定値）").nth(1)).toHaveValue("2,000,000");
+  await expect(page.getByLabel("2028年 売上高（手入力固定値）")).toHaveCount(1);
+  await expect(page.getByLabel("2028年 売上高（手入力固定値）")).toHaveValue("1,500,000");
+  await expect(page.getByLabel("2028年 売上高（空欄は自動予測）")).toHaveAttribute("placeholder", "2,000,000");
 });
 
 test("マッピング出力は手入力の有無にかかわらず現在の全社・補助・ベース予測値を書き出す", async ({ page }) => {
