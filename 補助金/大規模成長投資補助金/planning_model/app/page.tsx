@@ -2459,7 +2459,9 @@ export default function Home() {
     const historicalCapex = balanceSheets.map((row) => row.capex).filter((value) => Number.isFinite(value) && value > 0);
     const annualHistoricalCapex = historicalCapex.length ? historicalCapex.reduce((sum, value) => sum + value, 0) / historicalCapex.length : 0;
     const estimatedInvestment = annualHistoricalCapex * Math.max(1, timeline.baseYear - timeline.latestYear);
-    nextDrivers.investment = investmentEntered ? drivers.investment : clamp(estimatedInvestment || 15, driverBounds.investment[0], driverBounds.investment[1]);
+    const statutoryInvestmentMinimum = applicationRequirements(applicationCategory)?.investmentMinimum ?? driverBounds.investment[0];
+    const investmentMinimum = Math.max(driverBounds.investment[0], statutoryInvestmentMinimum);
+    nextDrivers.investment = investmentEntered ? drivers.investment : clamp(estimatedInvestment || investmentMinimum, investmentMinimum, driverBounds.investment[1]);
     nextDrivers.subsidy = hasInputValue(inputValues, inputKey.driver("subsidy"))
       ? drivers.subsidy
       : clamp(maximumSubsidyAmount(nextDrivers.investment), driverBounds.subsidy[0], driverBounds.subsidy[1]);

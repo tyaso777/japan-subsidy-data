@@ -93,6 +93,12 @@ test("provides a ready-to-use company-to-base conversion workbook and matching m
     previews.find((item) => item.target === "balanceSheet.latest.1-24")?.value,
     200_000_000,
   );
+  assert.equal(
+    previews
+      .filter((item) => ["futureCapex.project1.1-24", "futureCapex.beforeBase.1-24", "futureCapex.baseYear.1-24"].includes(item.target))
+      .reduce((sum, item) => sum + (item.value ?? 0), 0),
+    2_000_000_000,
+  );
 });
 
 test("assigns reusable relative names to every future planning period", () => {
