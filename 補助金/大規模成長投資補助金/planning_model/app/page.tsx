@@ -1474,13 +1474,18 @@ export default function Home() {
       if (menu !== openedMenu) menu.removeAttribute("open");
     });
   }
-  const sourcePlan = useMemo(
-    () => applyBusinessSegmentationMode(
-      applyForecastOverrides(autoPlan, forecastOverrides, futureInputBasis, drivers),
-      businessSegmentationMode,
-    ),
-    [autoPlan, businessSegmentationMode, forecastOverrides, futureInputBasis, drivers],
-  );
+  const sourcePlan = useMemo(() => {
+    const hasCompanyOverrides = Object.keys(forecastOverrides).some((key) => key.includes(":company:"));
+    const planWithOverrides = futureInputBasis === "other" && hasCompanyOverrides
+      ? applyForecastOverrides(
+        applyForecastOverrides(autoPlan, forecastOverrides, "company", drivers),
+        forecastOverrides,
+        "other",
+        drivers,
+      )
+      : applyForecastOverrides(autoPlan, forecastOverrides, futureInputBasis, drivers);
+    return applyBusinessSegmentationMode(planWithOverrides, businessSegmentationMode);
+  }, [autoPlan, businessSegmentationMode, forecastOverrides, futureInputBasis, drivers]);
   const visibleDriverComparisonGroups = useMemo(() => businessSegmentationMode === "split"
     ? driverComparisonGroups
     : driverComparisonGroups
@@ -2020,26 +2025,6 @@ export default function Home() {
     if (hasFutureOverride) {
       clearAdjustment();
       if (excelFutureCompanyImportMode === "convert-to-base" && hasFutureCompanyValue) {
-        const companyModePlan = applyForecastOverrides(autoPlan, nextForecastOverrides, "company", drivers);
-        companyModePlan.slice(3).forEach((row) => {
-          projectDetailedInputFields.forEach((item) => {
-            nextForecastOverrides[forecastOverrideKey(row.year, "project", item.key)] = normalizePlanInput(
-              item.get(row.project),
-              item.key === "headcount" || item.key === "officerCount",
-            );
-          });
-        });
-        for (const key of Object.keys(nextForecastOverrides)) {
-          if (key.includes(":company:") || key.includes(":other:")) delete nextForecastOverrides[key];
-        }
-        companyModePlan.slice(3).forEach((row) => {
-          otherPlInputFields.forEach((item) => {
-            nextForecastOverrides[forecastOverrideKey(row.year, "other", item.key)] = normalizePlanInput(
-              item.get(row.other),
-              item.key === "headcount" || item.key === "officerCount",
-            );
-          });
-        });
         setBusinessSegmentationMode("split");
         setFutureInputBasis("other");
         setExcelFutureCompanyImportMode("convert-to-base");
@@ -2056,6 +2041,16 @@ export default function Home() {
   function exportMappedExcel() {
     if (!excelMapping || !mappedExcelBytes || !mappedExcelFileName) {
       setExcelMappingNote("マッピング定義書と出力元Excelの両方を選択してください。");
+      return;
+    }
+    const exportsFuturePlan = excelMapping.bindings.some((binding) => {
+      if ((binding.direction ?? "both") === "import") return false;
+      const [dataset, period] = binding.target.split(".");
+      return ["companyPL", "projectPL", "basePL"].includes(dataset)
+        && !["prePrevious", "previous", "latest"].includes(period);
+    });
+    if (exportsFuturePlan && missingAccountingAssumptions.length > 0) {
+      setExcelMappingNote("将来PLは、③将来データ入力で会計前提を設定してから書き出してください。未設定の自動予測値は出力しません。");
       return;
     }
     try {
@@ -2315,10 +2310,16 @@ export default function Home() {
   function updateForecastOverride(year: number, segment: ForecastSegment, item: string, value: number | null) {
     clearAdjustment();
     const key = forecastOverrideKey(year, segment, item);
-    const integerValue = (segment === "project" && (item === "7-13" || item === "7-14"))
+    const projectOfficialCode = segment === "project"
+      ? projectDetailedInputFields.find((candidate) => candidate.key === item)?.modelCode
+      : undefined;
+    const integerValue = (segment === "project" && (item === "7-13" || item === "7-14" || item === "headcount" || item === "officerCount"))
       || (segment === "other" && (item === "headcount" || item === "officerCount"));
     setForecastOverrides((current) => {
       const next = { ...current };
+      if (projectOfficialCode?.startsWith("7-")) {
+        delete next[forecastOverrideKey(year, "project", projectOfficialCode)];
+      }
       if (value === null) delete next[key];
       else next[key] = normalizePlanInput(value, integerValue);
       return next;
@@ -3591,9 +3592,15 @@ function DetailedProjectInputsTable({ historical, effectivePlan, overrides, omit
               if (!item.input) return <td className="calculated-cell" key={row.year}><strong>{value === undefined ? "—" : <ModelValue value={value} unit={item.unit} digits={item.digits ?? 2} />}</strong>{value !== undefined && <small>自動計算</small>}</td>;
               const input = item.input;
               const key = forecastOverrideKey(row.year, "project", input.key);
-              const overridden = Object.prototype.hasOwnProperty.call(overrides, key);
+              const officialKey = input.modelCode.startsWith("7-")
+                ? forecastOverrideKey(row.year, "project", input.modelCode)
+                : key;
+              const overriddenKey = Object.prototype.hasOwnProperty.call(overrides, key)
+                ? key
+                : Object.prototype.hasOwnProperty.call(overrides, officialKey) ? officialKey : key;
+              const overridden = Object.prototype.hasOwnProperty.call(overrides, overriddenKey);
               const isMoney = item.unit === "千円" || item.unit === "千円/人";
-              return <td key={row.year}>{isMoney ? <MoneyInput className={`forecast-override${overridden ? " is-fixed" : ""}`} value={overridden ? overrides[key] : ""} canonicalPlaceholder={value ?? 0} ariaLabel={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onCanonicalChange={(next) => onForecastChange(row.year, "project", input.key, next)} /> : <input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="1" value={overridden ? overrides[key] : ""} placeholder={rawPlaceholder(value ?? 0, input.digits ?? 2)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", input.key, event.target.value === "" ? null : Number(event.target.value))} />}</td>;
+              return <td key={row.year}>{isMoney ? <MoneyInput className={`forecast-override${overridden ? " is-fixed" : ""}`} value={overridden ? overrides[overriddenKey] : ""} canonicalPlaceholder={value ?? 0} ariaLabel={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onCanonicalChange={(next) => onForecastChange(row.year, "project", input.key, next)} /> : <input className={`forecast-override${overridden ? " is-fixed" : ""}`} type="number" step="1" value={overridden ? overrides[overriddenKey] : ""} placeholder={rawPlaceholder(value ?? 0, input.digits ?? 2)} aria-label={`${row.year}年 ${item.label}（${overridden ? "手入力固定値" : "空欄は自動予測"}）`} onChange={(event) => onForecastChange(row.year, "project", input.key, event.target.value === "" ? null : Number(event.target.value))} />}</td>;
             })}
           </tr>,
         ])}
