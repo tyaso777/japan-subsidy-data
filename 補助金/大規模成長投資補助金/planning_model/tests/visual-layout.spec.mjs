@@ -134,6 +134,39 @@ test("diagnostic detail chart labels, legend, and keyboard navigator stay coordi
   expect(await pointLabels.count()).toBeGreaterThan(0);
   await expect(navigator).toBeVisible();
 
+  const labelCollisionReport = await page.evaluate(() => {
+    const labelGroups = Array.from(document.querySelectorAll(".diagnostic-detail-layout .trend-chart-point-label-group"));
+    const linePaths = Array.from(document.querySelectorAll(".diagnostic-detail-layout .trend-chart-line"));
+    const boxes = labelGroups.map((group) => ({ group, box: group.getBBox() }));
+    const labelsOverlap = boxes.some((left, leftIndex) => boxes.slice(leftIndex + 1).some((right) =>
+      left.box.x < right.box.x + right.box.width &&
+      left.box.x + left.box.width > right.box.x &&
+      left.box.y < right.box.y + right.box.height &&
+      left.box.y + left.box.height > right.box.y));
+    const unprotectedLineCollisions = boxes.filter(({ group, box }) => {
+      if (group.getAttribute("data-needs-background") === "true") return false;
+      return linePaths.some((path) => {
+        const length = path.getTotalLength();
+        for (let distance = 0; distance <= length; distance += 1) {
+          const point = path.getPointAtLength(distance);
+          if (
+            point.x >= box.x &&
+            point.x <= box.x + box.width &&
+            point.y >= box.y &&
+            point.y <= box.y + box.height
+          ) return true;
+        }
+        return false;
+      });
+    }).length;
+    const fallbackCount = labelGroups.filter((group) => group.getAttribute("data-needs-background") === "true").length;
+    const backgroundCount = document.querySelectorAll(".diagnostic-detail-layout .trend-chart-point-label-bg").length;
+    return { labelsOverlap, unprotectedLineCollisions, fallbackCount, backgroundCount };
+  });
+  expect(labelCollisionReport.labelsOverlap).toBe(false);
+  expect(labelCollisionReport.unprotectedLineCollisions).toBe(0);
+  expect(labelCollisionReport.backgroundCount).toBe(labelCollisionReport.fallbackCount);
+
   const geometry = await page.evaluate(() => {
     const overview = document.querySelector(".diagnostic-overview-block");
     const layout = document.querySelector(".diagnostic-detail-layout")?.getBoundingClientRect();

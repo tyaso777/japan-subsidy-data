@@ -93,6 +93,7 @@ import {
 } from "./application-rules";
 import { createOptimizationTargets, runPlanningOptimization } from "./proposal-optimization";
 import { niceChartScale } from "./chart-scale";
+import { layoutChartPointLabels, type ChartLabelInput, type ChartLineSegment } from "./chart-label-layout";
 
 type View = "summary" | "history" | "future" | "pl" | "targets" | "logic" | "io";
 const emptyDrivers = defaultDrivers;
@@ -3419,7 +3420,31 @@ function TrendChart({ title, subtitle, unit, plan, series, zeroBaseline, showPoi
     }).join(" ");
   };
   const axisLabel = (value: number) => number(value, scale.decimals);
-  const pointLabelOffsets = series.length <= 1 ? [-10] : series.length === 2 ? [-12, 15] : [-12, -27, 16, 30];
+  const pointLabelInputs: ChartLabelInput[] = showPointLabels
+    ? series.flatMap((item, seriesIndex) => item.values.flatMap((value, pointIndex) => {
+        if (value === undefined || !Number.isFinite(value)) return [];
+        return [{
+          id: `${seriesIndex}-${pointIndex}`,
+          x: x(pointIndex),
+          y: y(value),
+          text: number(value, chartValueDigits(unit)),
+          seriesIndex,
+          pointIndex,
+          anchor: pointIndex === 0 ? "start" as const : pointIndex === plan.length - 1 ? "end" as const : "middle" as const,
+        }];
+      }))
+    : [];
+  const chartSegments: ChartLineSegment[] = series.flatMap((item) =>
+    item.values.slice(0, -1).flatMap((value, pointIndex) => {
+      const nextValue = item.values[pointIndex + 1];
+      if (value === undefined || nextValue === undefined || !Number.isFinite(value) || !Number.isFinite(nextValue)) return [];
+      return [{ x1: x(pointIndex), y1: y(value), x2: x(pointIndex + 1), y2: y(nextValue) }];
+    }));
+  const positionedPointLabels = new Map(layoutChartPointLabels(
+    pointLabelInputs,
+    chartSegments,
+    { left: margin.left, top: margin.top, right: width - margin.right, bottom: margin.top + plotHeight },
+  ).map((label) => [label.id, label]));
 
   return <article className="trend-chart-card">
     <div className="trend-chart-title"><div><h3>{title}</h3><p>{subtitle}</p></div><span>{unit}</span></div>
@@ -3436,13 +3461,27 @@ function TrendChart({ title, subtitle, unit, plan, series, zeroBaseline, showPoi
         <path className="trend-chart-line forecast" d={pathFor(item.values, latestIndex, plan.length - 1)} stroke={item.color} />
         {item.values.map((value, index) => value === undefined || !Number.isFinite(value) ? null : <g key={`${item.label}-${plan[index].year}`}>
           <circle className={index <= latestIndex ? "trend-chart-point actual" : "trend-chart-point forecast"} cx={x(index)} cy={y(value)} r="3.3" stroke={item.color} fill={index <= latestIndex ? item.color : "var(--panel)"} />
-          {showPointLabels && <text
-            className="trend-chart-point-label"
-            x={x(index)}
-            y={y(value) + (pointLabelOffsets[seriesIndex] ?? 16)}
-            textAnchor={index === 0 ? "start" : index === plan.length - 1 ? "end" : "middle"}
-            style={{ fill: item.color }}
-          >{number(value, chartValueDigits(unit))}</text>}
+          {showPointLabels && (() => {
+            const label = positionedPointLabels.get(`${seriesIndex}-${index}`);
+            if (!label) return null;
+            return <g className="trend-chart-point-label-group" data-label-id={label.id} data-needs-background={label.needsBackground ? "true" : "false"}>
+              {label.needsBackground && <rect
+                className="trend-chart-point-label-bg"
+                x={label.box.left}
+                y={label.box.top}
+                width={label.box.right - label.box.left}
+                height={label.box.bottom - label.box.top}
+                rx="3"
+              />}
+              <text
+                className="trend-chart-point-label"
+                x={label.labelX}
+                y={label.labelY}
+                textAnchor={label.anchor}
+                style={{ fill: item.color }}
+              >{label.text}</text>
+            </g>;
+          })()}
         </g>)}
       </g>)}
       {plan.map((row, index) => <text className="trend-chart-year" key={row.year} x={x(index)} y={height - 15} textAnchor="middle">{row.year}</text>)}
