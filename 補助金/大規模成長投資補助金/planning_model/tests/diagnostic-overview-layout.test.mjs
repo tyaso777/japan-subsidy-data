@@ -24,7 +24,8 @@ test("診断概要は詳細チャートだけを選択ブロック内で固定�
   );
   assert.match(pageSource, /querySelectorAll<HTMLButtonElement>\("\.diagnostic-metric-tile"\)/);
   assert.match(pageSource, /getBoundingClientRect\(\)/);
-  assert.match(pageSource, /Math\.abs\(candidate\.crossDelta\) \* 3/);
+  assert.match(pageSource, /const nearestPrimary = Math\.min/);
+  assert.match(pageSource, /Math\.abs\(primaryDelta\) <= nearestPrimary \+ 8/);
   assert.match(pageSource, /data-metric-key=\{key\}/);
 });
 

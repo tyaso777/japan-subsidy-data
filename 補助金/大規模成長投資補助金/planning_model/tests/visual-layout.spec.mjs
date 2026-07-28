@@ -223,3 +223,31 @@ test("diagnostic detail chart labels, legend, and keyboard navigator stay coordi
   expect(released.chartTop).toBeLessThan(46);
   await expectNoPageOverflow(page);
 });
+
+test("wide diagnostic navigator moves down to the adjacent category before matching x farther away", async ({ page }) => {
+  await openStandalone(page, 1920);
+  page.on("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "データ入出力" }).click();
+  await page.getByRole("button", { name: "最適化済み標準提案" }).click();
+  await page.locator(".tabs button").nth(4).click();
+
+  const groups = page.locator(".diagnostic-metric-navigator .diagnostic-metric-group");
+  expect(await groups.count()).toBeGreaterThan(2);
+  const employeeTiles = groups.nth(1).locator(".diagnostic-metric-tile");
+  expect(await employeeTiles.count()).toBeGreaterThan(1);
+  const employeeFirstTile = employeeTiles.nth(0);
+  const employeeRowCount = await employeeFirstTile.evaluate((firstTile) => {
+    const group = firstTile.closest(".diagnostic-metric-group");
+    const tops = Array.from(group?.querySelectorAll(".diagnostic-metric-tile") ?? [])
+      .map((element) => Math.round(element.getBoundingClientRect().top));
+    return new Set(tops).size;
+  });
+  expect(employeeRowCount).toBe(1);
+
+  await employeeFirstTile.focus();
+  await page.keyboard.press("ArrowDown");
+  const focusedKey = await page.evaluate(() =>
+    document.activeElement instanceof HTMLElement ? document.activeElement.dataset.metricKey ?? null : null,
+  );
+  expect(focusedKey).toMatch(/^3\. 生産性:/);
+});

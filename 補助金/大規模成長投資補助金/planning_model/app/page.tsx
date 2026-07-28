@@ -3721,12 +3721,18 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
         const crossDelta = vertical ? center.x - currentCenter.x : center.y - currentCenter.y;
         return { element, primaryDelta, crossDelta };
       })
-      .filter(({ primaryDelta }) => forward ? primaryDelta > 4 : primaryDelta < -4)
-      .sort((a, b) => {
-        const score = (candidate: typeof a) => Math.abs(candidate.primaryDelta) + Math.abs(candidate.crossDelta) * 3;
-        return score(a) - score(b);
-      });
-    const target = candidates[0]?.element;
+      .filter(({ primaryDelta }) => forward ? primaryDelta > 4 : primaryDelta < -4);
+    let target: HTMLButtonElement | undefined;
+    if (vertical && candidates.length) {
+      const nearestPrimary = Math.min(...candidates.map(({ primaryDelta }) => Math.abs(primaryDelta)));
+      target = candidates
+        .filter(({ primaryDelta }) => Math.abs(primaryDelta) <= nearestPrimary + 8)
+        .sort((a, b) => Math.abs(a.crossDelta) - Math.abs(b.crossDelta) || Math.abs(a.primaryDelta) - Math.abs(b.primaryDelta))[0]?.element;
+    } else {
+      target = candidates
+        .filter(({ crossDelta }) => Math.abs(crossDelta) <= 8)
+        .sort((a, b) => Math.abs(a.primaryDelta) - Math.abs(b.primaryDelta))[0]?.element;
+    }
     const key = target?.dataset.metricKey;
     if (!target || !key) return;
     event.preventDefault();

@@ -147,7 +147,8 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(pageSource, /diagnostic-selected-chart/);
   assert.match(pageSource, /className="diagnostic-metric-tile"/);
   assert.match(pageSource, /querySelectorAll<HTMLButtonElement>\("\.diagnostic-metric-tile"\)/);
-  assert.match(pageSource, /Math\.abs\(candidate\.crossDelta\) \* 3/);
+  assert.match(pageSource, /const nearestPrimary = Math\.min/);
+  assert.match(pageSource, /Math\.abs\(primaryDelta\) <= nearestPrimary \+ 8/);
   assert.match(pageSource, /data-metric-key=\{key\}/);
   assert.match(globalStyles, /\.diagnostic-detail-layout \{[^}]*grid-template-columns:/);
   assert.doesNotMatch(globalStyles, /\.diagnostic-values-panel/);
