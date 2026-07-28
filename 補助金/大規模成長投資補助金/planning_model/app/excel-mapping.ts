@@ -446,7 +446,7 @@ const conversionBindings = (
 export const EXCEL_CONVERSION_SAMPLE_MAPPING: ExcelMappingDefinition = {
   format: EXCEL_MAPPING_FORMAT,
   name: "全社将来PLからベース事業へ変換するサンプル",
-  description: "同梱のサンプルExcelと組み合わせ、「全社－補助事業をベース事業へ変換」を選んで使用します。",
+  description: "同梱のサンプルExcelと組み合わせ、将来PLの入力方式で「ベース事業＋補助事業」を選んで使用します。",
   bindings: [
     ...conversionBindings("companyPL", "全社PL", conversionCompanyRows),
     ...conversionBindings("projectPL", "補助事業PL", conversionProjectRows),
@@ -488,7 +488,7 @@ export function buildExcelConversionSampleWorkbook() {
     sampleRowXml(1, [sampleInlineCell("A1", "任意Excel変換サンプル", 1)]),
     sampleRowXml(2, [sampleInlineCell("A2", "1. このExcelと「任意Excel変換サンプル_マッピング.json」を画面で選択します。")]),
     sampleRowXml(3, [sampleInlineCell("A3", "2. 取込範囲を「①過去＋③将来データ」にします。")]),
-    sampleRowXml(4, [sampleInlineCell("A4", "3. 「全社－補助事業をベース事業へ変換」を選び、取込内容を確認して反映します。")]),
+    sampleRowXml(4, [sampleInlineCell("A4", "3. 将来PLの入力方式で「ベース事業＋補助事業」を選び、取込内容を確認して反映します。")]),
     sampleRowXml(5, [sampleInlineCell("A5", "4. 全社PL－補助事業PLがベース事業PLの固定値になります。")]),
     sampleRowXml(7, [sampleInlineCell("A7", "注意：期は年度の絶対値ではなく、補助事業期間・基準年・事業化報告年の相対位置で対応します。", 3)]),
   ];
@@ -551,7 +551,7 @@ export const EXCEL_MAPPING_MANUAL = `# Excelマッピング定義書 作成マ�
 このシミュレーターと任意形式のExcel（.xlsx / .xlsm）のセルを、JSONのマッピング定義書で結びます。マクロ・書式・数式・非対象セルは保持し、出力時は元ファイルを上書きせず別Excelとして保存します。
 
 ## まず変換サンプルを試す
-画面の「変換サンプルExcel」と「対応JSON」を両方ダウンロードしてください。2ファイルをそれぞれ対象Excel・マッピング定義書として選び、取込範囲を「①過去＋③将来データ」、全社将来値の反映方法を「全社－補助事業をベース事業へ変換」にして確認・反映します。
+画面の「変換サンプルExcel」と「対応JSON」を両方ダウンロードしてください。2ファイルをそれぞれ対象Excel・マッピング定義書として選び、取込範囲を「①過去＋③将来データ」、将来PLの入力方式を「ベース事業＋補助事業」にして確認・反映します。
 サンプルExcelには全社PL、補助事業PL、設備投資の将来6期が入力済みです。会社全体－補助事業の差額が、ツール内のベース事業PLになります。
 
 ## Copilotへの依頼方法
@@ -587,7 +587,7 @@ ${JSON.stringify(EXCEL_MAPPING_EXAMPLE, null, 2)}
   - ベース事業PL: \`M2-1\`など
 
 将来PLの数値は手入力固定値として反映し、Excelの空欄は自動予測のまま残します。
-\`companyPL\` の将来期は、画面で「全社PLとして取り込む」か「全社－補助事業をベース事業へ変換」かを選べます。後者では、同じExcelから取り込んだ \`projectPL\`（未指定項目は現在の補助事業予測）を差し引き、\`basePL\` の固定値へ変換します。
+\`companyPL\` の将来期は、画面の「将来PLの入力方式（③と共通）」で「全社＋補助事業」か「ベース事業＋補助事業」かを選べます。後者では、同じExcelから取り込んだ \`projectPL\`（未指定項目は現在の補助事業予測）を差し引き、\`basePL\` の固定値へ変換します。この選択は③将来データ入力の方式と相互に同期します。
 \`basePL\` の将来期を直接取り込むと「ベース事業PLを入力」へ切り替わります。\`companyPL\` と \`basePL\` を同じ取込定義へ混在させることはできません。\`projectPL\` と \`futureCapex\` はどちらの入力方式でも使用できます。
 取込実行前に、画面で「①過去データのみ」または「①過去＋③将来データ」を選択します。初期値は「①過去データのみ」です。
 出力では、手入力固定値だけでなく、現在画面に反映されている自動予測・調整後の全社PL、補助事業PL、ベース事業PLも書き出します。

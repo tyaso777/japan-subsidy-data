@@ -125,7 +125,7 @@ test("Excelマッピングで③の将来設備投資とPL固定値を取り込�
   await expect(page.locator(".excel-mapping-status")).toContainText("取込候補 0件");
   await expect(page.locator(".excel-mapping-status")).toContainText("選択範囲外 3件");
   await page.getByRole("button", { name: "①過去＋③将来データ" }).click();
-  await page.getByRole("button", { name: "全社－補助事業をベース事業へ変換" }).click();
+  await page.getByRole("button", { name: "ベース事業＋補助事業" }).click();
   await page.getByRole("button", { name: "取込内容を確認" }).click();
   await expect(page.locator(".excel-mapping-status")).toContainText("取込候補 3件");
   await page.getByRole("button", { name: "確認した値を反映" }).click();
@@ -203,12 +203,27 @@ test("画面から変換サンプルExcelと対応JSONを取得してそのま�
     buffer: await readFile(await excelDownload.path()),
   });
   await page.getByRole("button", { name: "①過去＋③将来データ" }).click();
-  await page.getByRole("button", { name: "全社－補助事業をベース事業へ変換" }).click();
+  await page.getByRole("button", { name: "ベース事業＋補助事業" }).click();
   await page.getByRole("button", { name: "取込内容を確認" }).click();
 
   await expect(page.locator(".excel-mapping-status")).toContainText("エラー 0件");
   await expect(page.locator(".excel-mapping-preview")).toContainText("companyPL.baseYear.2-1");
   await expect(page.locator(".excel-mapping-preview")).toContainText("projectPL.baseYear.7-1");
+});
+
+test("Excel読み込み画面と③で将来PLの入力方式を相互に切り替えられる", async ({ page }) => {
+  await openStandalone(page, 1440);
+  await page.getByRole("button", { name: "データ入出力" }).click();
+
+  await page.getByRole("button", { name: "ベース事業＋補助事業" }).click();
+  await page.getByRole("button", { name: "③ 将来データ入力" }).click();
+  await expect(page.getByRole("button", { name: "ベース事業PLを入力" })).toHaveAttribute("aria-pressed", "true");
+
+  await page.getByRole("button", { name: "データ入出力" }).click();
+  await expect(page.getByRole("button", { name: "ベース事業＋補助事業" })).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "全社＋補助事業" }).click();
+  await page.getByRole("button", { name: "③ 将来データ入力" }).click();
+  await expect(page.getByRole("button", { name: "全社PLを入力" })).toHaveAttribute("aria-pressed", "true");
 });
 
 test("切り分けなし入力サンプルは全社と補助事業が一致する状態で読み込める", async ({ page }) => {

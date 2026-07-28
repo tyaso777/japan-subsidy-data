@@ -1324,7 +1324,7 @@ export default function Home() {
   const [excelMappingPreview, setExcelMappingPreview] = useState<ExcelMappingPreview[]>([]);
   const [excelMappingPreviewMode, setExcelMappingPreviewMode] = useState<"import" | "export" | null>(null);
   const [excelImportScope, setExcelImportScope] = useState<ExcelMappingImportScope>("history");
-  const [excelFutureCompanyImportMode, setExcelFutureCompanyImportMode] = useState<ExcelFutureCompanyImportMode>("company");
+  const [excelFutureCompanyImportMode, setExcelFutureCompanyImportMode] = useState<ExcelFutureCompanyImportMode>("convert-to-base");
   const [excelMappingNote, setExcelMappingNote] = useState("マッピング定義書と対象Excelを選択してください。");
   const [copilotPromptCopied, setCopilotPromptCopied] = useState(false);
   const futureMappingPeriods = useMemo(() => futureExcelMappingPeriods(timeline), [timeline]);
@@ -1769,6 +1769,7 @@ export default function Home() {
     setTargets(Object.fromEntries(Object.entries(proposal.targets).map(([key, target]) => [key, { ...target, max: target.max ?? defaultTargets[key as MetricKey].max, weight: integerPriority(target.weight) }])) as Record<MetricKey, Target>);
     setForecastOverrides(importedForecastOverrides);
     setFutureInputBasis(importedFutureInputBasis);
+    setExcelFutureCompanyImportMode(importedFutureInputBasis === "company" ? "company" : "convert-to-base");
     setMetricGroupBases({ ...defaultMetricGroupBases, ...(proposal.metricGroupBases ?? {}) });
     setApplicationCategory(proposal.applicationCategory ?? defaultApplicationCategory);
     if (proposal.inputValues) {
@@ -1932,12 +1933,15 @@ export default function Home() {
   }
 
   function changeExcelFutureCompanyImportMode(mode: ExcelFutureCompanyImportMode) {
-    setExcelFutureCompanyImportMode(mode);
+    if (mode === "convert-to-base" && businessSegmentationMode === "wholeCompanyAsProject") {
+      setBusinessSegmentationMode("split");
+    }
+    changeFutureInputBasis(mode === "company" ? "company" : "other");
     setExcelMappingPreview([]);
     setExcelMappingPreviewMode(null);
     setExcelMappingNote(mode === "company"
-      ? "Excelの全社将来値を、全社PLの固定値として取り込みます。"
-      : "Excelの全社将来値から補助事業値を差し引き、ベース事業PLの固定値へ変換します。");
+      ? "将来PLを「全社＋補助事業」で入力します。Excelの全社将来値は全社PLの固定値になります。"
+      : "将来PLを「ベース事業＋補助事業」で入力します。Excelの全社将来値は差額でベース事業へ変換します。");
   }
 
   function applyMappedExcelImport() {
@@ -2040,8 +2044,10 @@ export default function Home() {
         });
         setBusinessSegmentationMode("split");
         setFutureInputBasis("other");
+        setExcelFutureCompanyImportMode("convert-to-base");
       } else if (importedFutureBasis) {
         setFutureInputBasis(importedFutureBasis);
+        setExcelFutureCompanyImportMode(importedFutureBasis === "company" ? "company" : "convert-to-base");
       }
       setForecastOverrides(nextForecastOverrides);
     }
@@ -2321,6 +2327,7 @@ export default function Home() {
   function changeFutureInputBasis(basis: FutureInputBasis) {
     clearAdjustment();
     setFutureInputBasis(basis);
+    setExcelFutureCompanyImportMode(basis === "company" ? "company" : "convert-to-base");
   }
 
   function changeBusinessSegmentationMode(mode: BusinessSegmentationMode) {
@@ -2328,6 +2335,7 @@ export default function Home() {
     setBusinessSegmentationMode(mode);
     if (mode === "wholeCompanyAsProject") {
       setFutureInputBasis("company");
+      setExcelFutureCompanyImportMode("company");
       setForecastOverrides((current) => Object.fromEntries(
         Object.entries(current).filter(([key]) => !key.includes(":other:") && !key.includes(":project:")),
       ));
@@ -2892,17 +2900,19 @@ export default function Home() {
                 <button type="button" className={excelImportScope === "history-and-future" ? "active" : ""} aria-pressed={excelImportScope === "history-and-future"} onClick={() => changeExcelImportScope("history-and-future")}>①過去＋③将来データ</button>
               </div>
             </div>
-            {excelImportScope === "history-and-future" && <div className="excel-import-scope">
+            <div className="excel-import-scope">
               <div>
-                <strong>全社将来値の反映方法</strong>
-                <small>Excelが全社PLでも、ツール内では補助事業＋ベース事業へ分けて進められます。</small>
+                <strong>将来PLの入力方式（③と共通）</strong>
+                <small>ここで切り替えると、③将来データ入力の方式も同時に切り替わります。</small>
               </div>
-              <div className="mode-switch" role="group" aria-label="全社将来値の反映方法">
-                <button type="button" className={excelFutureCompanyImportMode === "company" ? "active" : ""} aria-pressed={excelFutureCompanyImportMode === "company"} onClick={() => changeExcelFutureCompanyImportMode("company")}>全社PLとして取り込む</button>
-                <button type="button" className={excelFutureCompanyImportMode === "convert-to-base" ? "active" : ""} aria-pressed={excelFutureCompanyImportMode === "convert-to-base"} onClick={() => changeExcelFutureCompanyImportMode("convert-to-base")}>全社－補助事業をベース事業へ変換</button>
+              <div className="mode-switch" role="group" aria-label="将来PLの入力方式（③と共通）">
+                <button type="button" className={excelFutureCompanyImportMode === "company" ? "active" : ""} aria-pressed={excelFutureCompanyImportMode === "company"} onClick={() => changeExcelFutureCompanyImportMode("company")}>全社＋補助事業</button>
+                <button type="button" className={excelFutureCompanyImportMode === "convert-to-base" ? "active" : ""} aria-pressed={excelFutureCompanyImportMode === "convert-to-base"} onClick={() => changeExcelFutureCompanyImportMode("convert-to-base")}>ベース事業＋補助事業</button>
               </div>
-              {excelFutureCompanyImportMode === "convert-to-base" && <p className="footnote">Excelから取り込んだ補助事業値を優先し、未指定項目は現在の補助事業予測を使って差し引きます。変換後は「ベース事業PLを入力」に切り替わります。</p>}
-            </div>}
+              <p className="footnote">{excelFutureCompanyImportMode === "convert-to-base"
+                ? "Excelに全社値がある場合は、取り込んだ補助事業値（未指定項目は現在の予測）を差し引いてベース事業へ変換します。"
+                : "Excelの全社値と補助事業値をそれぞれ固定値として取り込み、ベース事業は差額で自動計算します。"}</p>
+            </div>
             <div className="excel-mapping-resources">
               <span>まず変換を試す：Excelと対応JSONをセットで使用</span>
               <button type="button" onClick={downloadExcelConversionSample}>変換サンプルExcel</button>
