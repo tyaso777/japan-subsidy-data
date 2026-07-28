@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import test from "node:test";
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import {
   buildMappedExcel,
-  buildExcelConversionSampleWorkbook,
   EXCEL_CONVERSION_SAMPLE_MAPPING,
   EXCEL_MAPPING_FORMAT,
   filterExcelMappingImportPreviews,
@@ -46,7 +47,16 @@ test("validates and parses declarative mapping definitions", () => {
 
 test("provides a ready-to-use company-to-base conversion workbook and matching mapping", () => {
   assert.equal(validateExcelMappingDefinition(EXCEL_CONVERSION_SAMPLE_MAPPING).length, 0);
-  const workbook = buildExcelConversionSampleWorkbook();
+  assert.equal(EXCEL_CONVERSION_SAMPLE_MAPPING.bindings.length, 213);
+  assert.equal(
+    EXCEL_CONVERSION_SAMPLE_MAPPING.bindings.every((binding) => binding.excel.sheet === "②補助事業情報"),
+    true,
+  );
+  const workbook = new Uint8Array(readFileSync(path.resolve(
+    "public",
+    "examples",
+    "任意Excel変換サンプル_第6次公式A002.xlsx",
+  )));
   assert.equal(Buffer.from(workbook.subarray(0, 2)).toString("ascii"), "PK");
 
   const targets = new Map(EXCEL_CONVERSION_SAMPLE_MAPPING.bindings.map((binding) => {
@@ -62,7 +72,11 @@ test("provides a ready-to-use company-to-base conversion workbook and matching m
   const previews = previewExcelImport(workbook, EXCEL_CONVERSION_SAMPLE_MAPPING, targets);
 
   assert.equal(previews.length, EXCEL_CONVERSION_SAMPLE_MAPPING.bindings.length);
-  assert.equal(previews.every((item) => item.status === "ready"), true);
+  assert.equal(
+    previews.every((item) => item.status === "ready"),
+    true,
+    JSON.stringify(previews.filter((item) => item.status !== "ready").slice(0, 10), null, 2),
+  );
   assert.equal(
     previews.find((item) => item.target === "companyPL.baseYear.2-1")?.value,
     3_400_000_000,
@@ -174,6 +188,23 @@ test("exports into a copied workbook while preserving styles, formulas, and unre
   assert.match(sheet, /<c r="D5"><v>2750<\/v><\/c>/);
   assert.match(sheet, /<c r="E5"><f>SUM\(B5:D5\)<\/f><v>4250<\/v><\/c>/);
   assert.equal(result.previews.find((item) => item.target.endsWith("latest.2-1"))?.status, "empty");
+});
+
+test("exports into an official-style self-closing empty input cell", () => {
+  const parts = unzipSync(workbookBytes());
+  parts["xl/worksheets/sheet1.xml"] = strToU8(
+    strFromU8(parts["xl/worksheets/sheet1.xml"]).replace('<c r="B5" t="s"><v>0</v></c>', '<c r="B5" s="73"/>'),
+  );
+  const targets = new Map([
+    ["companyPL.prePrevious.2-1", target("companyPL.prePrevious.2-1", 21.25)],
+    ["companyPL.previous.2-1", target("companyPL.previous.2-1", null)],
+    ["companyPL.latest.2-1", target("companyPL.latest.2-1", null)],
+  ]);
+
+  const result = buildMappedExcel(zipSync(parts), mapping, targets);
+  assert.ok(result.bytes);
+  const sheet = strFromU8(unzipSync(result.bytes)["xl/worksheets/sheet1.xml"]);
+  assert.match(sheet, /<c r="B5" s="73"><v>2125<\/v><\/c>/);
 });
 
 test("changes only the mapped cell value without mutating the source workbook", () => {

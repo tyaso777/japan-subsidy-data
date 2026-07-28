@@ -178,19 +178,19 @@ test("マッピング出力は手入力の有無にかかわらず現在の全�
   expect(values[0]).toBeCloseTo(values[1] + values[2], 2);
 });
 
-test("画面から変換サンプルExcelと対応JSONを取得してそのまま取込確認できる", async ({ page }) => {
+test("第6次公式A002サンプルを①と③へ取り込み将来の全社・補助・ベースPLを埋められる", async ({ page }) => {
   await openStandalone(page, 1440);
   await page.getByRole("button", { name: "データ入出力" }).click();
 
   const excelDownloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "変換サンプルExcel" }).click();
+  await page.getByRole("button", { name: "第6次公式A002サンプル" }).click();
   const excelDownload = await excelDownloadPromise;
-  expect(excelDownload.suggestedFilename()).toBe("任意Excel変換サンプル_全社・補助事業.xlsx");
+  expect(excelDownload.suggestedFilename()).toBe("任意Excel変換サンプル_第6次公式A002.xlsx");
 
   const mappingDownloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "対応JSON" }).click();
+  await page.getByRole("button", { name: "公式対応JSON" }).click();
   const mappingDownload = await mappingDownloadPromise;
-  expect(mappingDownload.suggestedFilename()).toBe("任意Excel変換サンプル_マッピング.json");
+  expect(mappingDownload.suggestedFilename()).toBe("任意Excel変換サンプル_第6次公式A002_マッピング.json");
 
   await page.locator('input[accept*=".json"]').setInputFiles({
     name: mappingDownload.suggestedFilename(),
@@ -209,6 +209,13 @@ test("画面から変換サンプルExcelと対応JSONを取得してそのま�
   await expect(page.locator(".excel-mapping-status")).toContainText("エラー 0件");
   await expect(page.locator(".excel-mapping-preview")).toContainText("companyPL.baseYear.2-1");
   await expect(page.locator(".excel-mapping-preview")).toContainText("projectPL.baseYear.7-1");
+  await page.getByRole("button", { name: "確認した値を反映" }).click();
+  await page.getByRole("button", { name: "② 15指標・目標" }).click();
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "過去3期からデフォルト設定" }).click();
+  await page.getByRole("button", { name: "③ 将来データ入力" }).click();
+  await expect(page.getByLabel("2028年 売上高（手入力固定値）").first()).toHaveValue("700,000");
+  await expect(page.getByLabel("2028年 売上高（手入力固定値）").nth(1)).toHaveValue("2,700,000");
 });
 
 test("Excel読み込み画面と③で将来PLの入力方式を相互に切り替えられる", async ({ page }) => {

@@ -60,7 +60,6 @@ import {
 import { buildProposalHtml, buildProposalXlsx, downloadBlob, normalizeProposalMoneyUnit, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
 import { formatDisplayMoney, formatEditableMoney, formatNumericInput, fromDisplayMoney, INTERNAL_MONEY_UNIT, moneyDisplayFractionDigits, moneyEditableFractionDigits, moneyUnitLabel, normalizeInternalMoney, okuToInternalMoney, parseNumericInput, toDisplayMoney, type MoneyDisplayUnit } from "./money";
 import {
-  buildExcelConversionSampleWorkbook,
   buildMappedExcel,
   EXCEL_CONVERSION_SAMPLE_MAPPING,
   EXCEL_MAPPING_COPILOT_PROMPT,
@@ -2087,17 +2086,20 @@ export default function Home() {
   }
 
   function downloadExcelConversionSample() {
-    downloadBlob(
-      buildExcelConversionSampleWorkbook(),
-      "任意Excel変換サンプル_全社・補助事業.xlsx",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    );
+    const anchor = document.createElement("a");
+    anchor.href = window.location.protocol === "file:"
+      ? "public/examples/任意Excel変換サンプル_第6次公式A002.xlsx"
+      : "/examples/任意Excel変換サンプル_第6次公式A002.xlsx";
+    anchor.download = "任意Excel変換サンプル_第6次公式A002.xlsx";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
   }
 
   function downloadExcelConversionSampleMapping() {
     downloadBlob(
       JSON.stringify(EXCEL_CONVERSION_SAMPLE_MAPPING, null, 2),
-      "任意Excel変換サンプル_マッピング.json",
+      "任意Excel変換サンプル_第6次公式A002_マッピング.json",
       "application/json;charset=utf-8",
     );
   }
@@ -2914,9 +2916,9 @@ export default function Home() {
                 : "Excelの全社値と補助事業値をそれぞれ固定値として取り込み、ベース事業は差額で自動計算します。"}</p>
             </div>
             <div className="excel-mapping-resources">
-              <span>まず変換を試す：Excelと対応JSONをセットで使用</span>
-              <button type="button" onClick={downloadExcelConversionSample}>変換サンプルExcel</button>
-              <button type="button" onClick={downloadExcelConversionSampleMapping}>対応JSON</button>
+              <span>第6次公式様式で①過去＋③将来の変換を試す</span>
+              <button type="button" onClick={downloadExcelConversionSample}>第6次公式A002サンプル</button>
+              <button type="button" onClick={downloadExcelConversionSampleMapping}>公式対応JSON</button>
             </div>
             <div className="excel-mapping-resources">
               <span>自社Excel用のマッピングを作る資料</span>
