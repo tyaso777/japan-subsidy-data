@@ -132,9 +132,6 @@ function MoneyInput({
   const editableValue = value === "" ? "" : formatEditableMoney(Number(value), unit);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(displayedValue);
-  useEffect(() => {
-    if (!editing) setDraft(displayedValue);
-  }, [displayedValue, editing]);
   return <input
     type="text"
     inputMode="decimal"
