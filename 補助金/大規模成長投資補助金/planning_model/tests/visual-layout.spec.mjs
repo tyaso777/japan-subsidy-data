@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { strToU8, zipSync } from "fflate";
 import { pathToFileURL } from "node:url";
 import path from "node:path";
 
@@ -84,6 +85,51 @@ async function expectRowControlsDoNotOverlap(locator) {
   });
   expect(overlaps).toEqual([]);
 }
+
+function futureMappingWorkbook() {
+  return zipSync({
+    "[Content_Types].xml": strToU8("keep-content-types"),
+    "xl/workbook.xml": strToU8(`<?xml version="1.0"?><workbook xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="将来計画" sheetId="1" r:id="rId1"/></sheets></workbook>`),
+    "xl/_rels/workbook.xml.rels": strToU8(`<?xml version="1.0"?><Relationships><Relationship Id="rId1" Target="worksheets/sheet1.xml"/></Relationships>`),
+    "xl/worksheets/sheet1.xml": strToU8(`<?xml version="1.0"?><worksheet><sheetData><row r="2"><c r="B2"><v>1200</v></c></row><row r="3"><c r="B3"><v>3500</v></c></row><row r="4"><c r="B4"><v>1500</v></c></row></sheetData></worksheet>`),
+  });
+}
+
+test("Excelマッピングで③の将来設備投資とPL固定値を取り込む", async ({ page }) => {
+  await openStandalone(page, 1440);
+  await page.getByRole("button", { name: "データ入出力" }).click();
+  await page.getByRole("button", { name: "最適化済み標準提案" }).click();
+
+  const mapping = {
+    format: "growth-investment-excel-mapping/v1",
+    name: "将来取込UIテスト",
+    bindings: [
+      { id: "capex", target: "futureCapex.baseYear.1-24", excel: { sheet: "将来計画", cell: "B2", unit: "百万円" }, direction: "import" },
+      { id: "company-sales", target: "companyPL.baseYear.2-1", excel: { sheet: "将来計画", cell: "B3", unit: "百万円" }, direction: "import" },
+      { id: "project-sales", target: "projectPL.baseYear.7-1", excel: { sheet: "将来計画", cell: "B4", unit: "百万円" }, direction: "import" },
+    ],
+  };
+  await page.locator('input[accept*=".json"]').setInputFiles({
+    name: "future-mapping.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(mapping)),
+  });
+  await page.locator('input[accept=".xlsx,.xlsm"]').setInputFiles({
+    name: "future-plan.xlsx",
+    mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    buffer: Buffer.from(futureMappingWorkbook()),
+  });
+  await page.getByRole("button", { name: "取込内容を確認" }).click();
+  await expect(page.locator(".excel-mapping-status")).toContainText("取込候補 3件");
+  await page.getByRole("button", { name: "確認した値を反映" }).click();
+  await expect(page.locator(".excel-mapping-status")).toContainText("3件を反映");
+
+  await page.getByRole("button", { name: "③ 将来データ入力" }).click();
+  await expect(page.getByRole("button", { name: "全社PLを入力" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".future-capex-table input").nth(2)).toHaveValue("1,200,000");
+  await expect(page.getByLabel("2028年 売上高（手入力固定値）").first()).toHaveValue("1,500,000");
+  await expect(page.getByLabel("2028年 売上高（手入力固定値）").nth(1)).toHaveValue("3,500,000");
+});
 
 for (const width of viewportWidths) {
   test(`過去データ表の固定表示と横幅を ${width}px で維持する`, async ({ page }) => {

@@ -52,6 +52,12 @@ export type ExcelMappingPreview = {
   message: string;
 };
 
+export type FutureExcelMappingPeriod = {
+  id: string;
+  year: number;
+  label: string;
+};
+
 type WorkbookParts = {
   files: Record<string, Uint8Array>;
   sheets: Map<string, string>;
@@ -87,6 +93,42 @@ const targetDirectionAllows = (binding: ExcelMappingBinding, direction: "import"
 const roundTo = (value: number, digits?: number) => digits === undefined
   ? value
   : Math.round((value + Number.EPSILON) * 10 ** digits) / 10 ** digits;
+
+export function futureExcelMappingPeriods(timeline: { latestYear: number; baseYear: number }): FutureExcelMappingPeriod[] {
+  const latestYear = Math.round(timeline.latestYear);
+  const baseYear = Math.max(latestYear + 1, Math.round(timeline.baseYear));
+  const periods: FutureExcelMappingPeriod[] = [];
+  let projectPeriod = 1;
+  for (let year = latestYear + 1; year <= baseYear + 3; year += 1) {
+    if (year < baseYear - 1) {
+      periods.push({ id: `project${projectPeriod}`, year, label: `補助事業期間${projectPeriod}年目` });
+      projectPeriod += 1;
+    } else if (year === baseYear - 1) {
+      periods.push({ id: "beforeBase", year, label: "基準年前年" });
+    } else if (year === baseYear) {
+      periods.push({ id: "baseYear", year, label: "基準年" });
+    } else {
+      const reportYear = year - baseYear;
+      periods.push({ id: `report${reportYear}`, year, label: `事業化報告${reportYear}年目` });
+    }
+  }
+  return periods;
+}
+
+const futurePeriodPattern = /^(?:project[1-4]|beforeBase|baseYear|report[1-3])$/;
+
+export function futureInputBasisForMappedTargets(targets: string[]): "company" | "other" | null {
+  let company = false;
+  let other = false;
+  for (const target of targets) {
+    const [dataset, period] = target.split(".");
+    if (!futurePeriodPattern.test(period ?? "")) continue;
+    if (dataset === "companyPL") company = true;
+    if (dataset === "basePL") other = true;
+  }
+  if (company && other) throw new Error("将来の全社PLとベース事業PLを同時には取り込めません。どちらか一方のマッピングにしてください。");
+  return company ? "company" : other ? "other" : null;
+}
 
 export function validateExcelMappingDefinition(value: unknown): string[] {
   const errors: string[] = [];
@@ -315,7 +357,7 @@ export function buildMappedExcel(
 
 export const EXCEL_MAPPING_EXAMPLE: ExcelMappingDefinition = {
   format: EXCEL_MAPPING_FORMAT,
-  name: "任意Excel・過去3期入力例",
+  name: "任意Excel・過去3期／将来入力例",
   description: "シート名とセル番地を対象Excelに合わせて変更してください。",
   bindings: [
     { id: "company-sales-pre-previous", target: "companyPL.prePrevious.2-1", excel: { sheet: "損益計算書", cell: "B5", unit: "百万円" }, direction: "both", required: true, transform: { round: 2 } },
@@ -324,6 +366,9 @@ export const EXCEL_MAPPING_EXAMPLE: ExcelMappingDefinition = {
     { id: "bs-assets-pre-previous", target: "balanceSheet.prePrevious.1-1", excel: { sheet: "貸借対照表", cell: "B4", unit: "百万円" }, direction: "both", transform: { round: 2 } },
     { id: "bs-assets-previous", target: "balanceSheet.previous.1-1", excel: { sheet: "貸借対照表", cell: "C4", unit: "百万円" }, direction: "both", transform: { round: 2 } },
     { id: "bs-assets-latest", target: "balanceSheet.latest.1-1", excel: { sheet: "貸借対照表", cell: "D4", unit: "百万円" }, direction: "both", transform: { round: 2 } },
+    { id: "capex-base-year", target: "futureCapex.baseYear.1-24", excel: { sheet: "設備投資", cell: "G4", unit: "百万円" }, direction: "both", transform: { round: 2 } },
+    { id: "company-sales-base-year", target: "companyPL.baseYear.2-1", excel: { sheet: "損益計算書", cell: "G5", unit: "百万円" }, direction: "both", transform: { round: 2 } },
+    { id: "project-sales-base-year", target: "projectPL.baseYear.7-1", excel: { sheet: "補助事業PL", cell: "G5", unit: "百万円" }, direction: "both", transform: { round: 2 } },
   ],
 };
 
@@ -358,10 +403,27 @@ ${JSON.stringify(EXCEL_MAPPING_EXAMPLE, null, 2)}
 \`\`\`
 
 ## target
-安定識別子は \`データ区分.期.第6次様式番号\` です。
-- データ区分: \`balanceSheet\` / \`companyPL\` / \`projectPL\`
-- 期: \`prePrevious\`（前々期）/ \`previous\`（前期）/ \`latest\`（最新決算期）
-- 第6次様式番号: 例 \`1-1\`、\`2-1\`、\`7-1\`
+安定識別子は \`データ区分.期.項目番号\` です。
+- データ区分:
+  - \`balanceSheet\`: 過去B/S
+  - \`futureCapex\`: 将来の1-24 新規設備投資による支出
+  - \`companyPL\`: 会社全体PL
+  - \`projectPL\`: 補助事業PL
+  - \`basePL\`: ベース事業PL
+- 過去の期: \`prePrevious\`（前々期）/ \`previous\`（前期）/ \`latest\`（最新決算期）
+- 将来の期:
+  - \`project1\`～\`project4\`: 基準年前々年以前の補助事業期間（存在する期だけ使用）
+  - \`beforeBase\`: 基準年前年
+  - \`baseYear\`: 基準年
+  - \`report1\`～\`report3\`: 事業化報告1～3年目
+- 項目番号:
+  - B/S・設備投資: \`1-1\`、\`1-24\`など
+  - 会社全体PL: \`2-1\`など
+  - 補助事業PL: \`7-1\`など
+  - ベース事業PL: \`M2-1\`など
+
+将来PLの数値は手入力固定値として反映し、Excelの空欄は自動予測のまま残します。
+\`companyPL\` の将来期を取り込むと「全社PLを入力」、\`basePL\` の将来期を取り込むと「ベース事業PLを入力」へ自動的に切り替わります。両方を同じ定義書へ混在させることはできません。\`projectPL\` と \`futureCapex\` はどちらの入力方式でも使用できます。
 
 ## excel
 - sheet: Excelの正確なシート名

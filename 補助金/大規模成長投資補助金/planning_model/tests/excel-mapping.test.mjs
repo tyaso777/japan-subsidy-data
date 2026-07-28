@@ -4,6 +4,8 @@ import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import {
   buildMappedExcel,
   EXCEL_MAPPING_FORMAT,
+  futureExcelMappingPeriods,
+  futureInputBasisForMappedTargets,
   mappedExcelOutputFileName,
   parseExcelMappingDefinition,
   previewExcelImport,
@@ -37,6 +39,62 @@ test("validates and parses declarative mapping definitions", () => {
   assert.throws(() => parseExcelMappingDefinition("{bad json"), /JSON/);
   const duplicate = { ...mapping, bindings: [...mapping.bindings, { ...mapping.bindings[0], id: "duplicate", excel: { ...mapping.bindings[0].excel, cell: "F5" } }] };
   assert.match(validateExcelMappingDefinition(duplicate).join("\n"), /取込先が重複/);
+});
+
+test("assigns reusable relative names to every future planning period", () => {
+  assert.deepEqual(
+    futureExcelMappingPeriods({ latestYear: 2025, baseYear: 2028 }),
+    [
+      { id: "project1", year: 2026, label: "補助事業期間1年目" },
+      { id: "beforeBase", year: 2027, label: "基準年前年" },
+      { id: "baseYear", year: 2028, label: "基準年" },
+      { id: "report1", year: 2029, label: "事業化報告1年目" },
+      { id: "report2", year: 2030, label: "事業化報告2年目" },
+      { id: "report3", year: 2031, label: "事業化報告3年目" },
+    ],
+  );
+  assert.deepEqual(
+    futureExcelMappingPeriods({ latestYear: 2025, baseYear: 2031 }).slice(0, 4),
+    [
+      { id: "project1", year: 2026, label: "補助事業期間1年目" },
+      { id: "project2", year: 2027, label: "補助事業期間2年目" },
+      { id: "project3", year: 2028, label: "補助事業期間3年目" },
+      { id: "project4", year: 2029, label: "補助事業期間4年目" },
+    ],
+  );
+});
+
+test("selects the future PL input basis from mapped targets and rejects mixed bases", () => {
+  assert.equal(
+    futureInputBasisForMappedTargets([
+      "companyPL.baseYear.2-1",
+      "projectPL.report1.7-1",
+      "futureCapex.report1.1-24",
+    ]),
+    "company",
+  );
+  assert.equal(
+    futureInputBasisForMappedTargets([
+      "basePL.beforeBase.M2-1",
+      "projectPL.report3.7-10",
+    ]),
+    "other",
+  );
+  assert.equal(
+    futureInputBasisForMappedTargets([
+      "companyPL.latest.2-1",
+      "projectPL.latest.7-1",
+    ]),
+    null,
+    "過去3期だけのマッピングでは将来PL入力方式を変更しない",
+  );
+  assert.throws(
+    () => futureInputBasisForMappedTargets([
+      "companyPL.baseYear.2-1",
+      "basePL.baseYear.M2-1",
+    ]),
+    /全社PLとベース事業PL/,
+  );
 });
 
 test("imports shared strings, explicit zero, and unit conversions without confusing blank and zero", () => {
