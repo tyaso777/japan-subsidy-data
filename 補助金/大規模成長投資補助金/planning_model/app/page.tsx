@@ -708,6 +708,7 @@ const createFutureCapex = (settings: TimelineSettings) => {
 
 type ForecastOverrides = Record<string, number>;
 type FutureInputBasis = "company" | "other";
+type ExcelFutureCompanyImportMode = "company" | "convert-to-base";
 type ForecastSegment = SegmentKey | "company";
 const forecastOverrideKey = (year: number, segment: ForecastSegment, item: string) => `${year}:${segment}:${item}`;
 
@@ -1321,6 +1322,7 @@ export default function Home() {
   const [excelMappingPreview, setExcelMappingPreview] = useState<ExcelMappingPreview[]>([]);
   const [excelMappingPreviewMode, setExcelMappingPreviewMode] = useState<"import" | "export" | null>(null);
   const [excelImportScope, setExcelImportScope] = useState<ExcelMappingImportScope>("history");
+  const [excelFutureCompanyImportMode, setExcelFutureCompanyImportMode] = useState<ExcelFutureCompanyImportMode>("company");
   const [excelMappingNote, setExcelMappingNote] = useState("マッピング定義書と対象Excelを選択してください。");
   const [copilotPromptCopied, setCopilotPromptCopied] = useState(false);
   const futureMappingPeriods = useMemo(() => futureExcelMappingPeriods(timeline), [timeline]);
@@ -1372,18 +1374,16 @@ export default function Home() {
           value: hasInputValue(inputValues, key) ? inputValues[key] : null,
         });
       });
-      if (businessSegmentationMode === "split") {
-        projectOfficialInputRows.forEach((item) => {
-          const key = inputKey.projectActual(year, item.code);
-          targets.set(`projectPL.${period}.${item.code}`, {
-            id: `projectPL.${period}.${item.code}`,
-            label: `${YEAR_ROLE_LABELS[history.role]} 補助事業PL ${item.code} ${item.label}`,
-            unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
-            writable: true,
-            value: hasInputValue(inputValues, key) ? inputValues[key] : null,
-          });
+      projectOfficialInputRows.forEach((item) => {
+        const key = inputKey.projectActual(year, item.code);
+        targets.set(`projectPL.${period}.${item.code}`, {
+          id: `projectPL.${period}.${item.code}`,
+          label: `${YEAR_ROLE_LABELS[history.role]} 補助事業PL ${item.code} ${item.label}`,
+          unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
+          writable: true,
+          value: hasInputValue(inputValues, key) ? inputValues[key] : null,
         });
-      }
+      });
     });
     futureMappingPeriods.forEach((period) => {
       const capexIndex = futureCapex.findIndex((row) => row.year === period.year);
@@ -1409,33 +1409,31 @@ export default function Home() {
           value: Object.prototype.hasOwnProperty.call(forecastOverrides, key) ? forecastOverrides[key] : null,
         });
       });
-      if (businessSegmentationMode === "split") {
-        projectOfficialInputRows.forEach((item) => {
-          const key = forecastOverrideKey(period.year, "project", item.code);
-          const id = `projectPL.${period.id}.${item.code}`;
-          targets.set(id, {
-            id,
-            label: `${period.label} 補助事業PL ${item.code} ${item.label}`,
-            unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
-            writable: true,
-            value: Object.prototype.hasOwnProperty.call(forecastOverrides, key) ? forecastOverrides[key] : null,
-          });
+      projectOfficialInputRows.forEach((item) => {
+        const key = forecastOverrideKey(period.year, "project", item.code);
+        const id = `projectPL.${period.id}.${item.code}`;
+        targets.set(id, {
+          id,
+          label: `${period.label} 補助事業PL ${item.code} ${item.label}`,
+          unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
+          writable: true,
+          value: Object.prototype.hasOwnProperty.call(forecastOverrides, key) ? forecastOverrides[key] : null,
         });
-        otherPlInputFields.forEach((item) => {
-          const key = forecastOverrideKey(period.year, "other", item.key);
-          const id = `basePL.${period.id}.${item.modelCode}`;
-          targets.set(id, {
-            id,
-            label: `${period.label} ベース事業PL ${item.modelCode} ${item.label}`,
-            unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
-            writable: true,
-            value: Object.prototype.hasOwnProperty.call(forecastOverrides, key) ? forecastOverrides[key] : null,
-          });
+      });
+      otherPlInputFields.forEach((item) => {
+        const key = forecastOverrideKey(period.year, "other", item.key);
+        const id = `basePL.${period.id}.${item.modelCode}`;
+        targets.set(id, {
+          id,
+          label: `${period.label} ベース事業PL ${item.modelCode} ${item.label}`,
+          unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
+          writable: true,
+          value: Object.prototype.hasOwnProperty.call(forecastOverrides, key) ? forecastOverrides[key] : null,
         });
-      }
+      });
     });
     return targets;
-  }, [businessSegmentationMode, forecastOverrides, futureCapex, futureMappingPeriods, historicalPlan, inputValues]);
+  }, [forecastOverrides, futureCapex, futureMappingPeriods, historicalPlan, inputValues]);
 
   useEffect(() => {
     const closeProposalMenus = (event: PointerEvent) => {
@@ -1497,6 +1495,42 @@ export default function Home() {
   [businessSegmentationMode]);
   const plan = adjustedPlan ?? sourcePlan;
   const calculationDrivers = adjustedDrivers ?? drivers;
+  const excelExportMappingTargets = useMemo(() => {
+    const targets = new Map(
+      [...excelMappingTargets].map(([id, target]) => [id, { ...target }] as const),
+    );
+    const periodNames = ["prePrevious", "previous", "latest"] as const;
+    periodNames.forEach((period, index) => {
+      companyActualInputRows.filter((item) => item.set).forEach((item) => {
+        const id = `companyPL.${period}.${item.code}`;
+        const target = targets.get(id);
+        if (target) target.value = item.get(plan, index) ?? null;
+      });
+      projectOfficialInputRows.forEach((item) => {
+        const id = `projectPL.${period}.${item.code}`;
+        const target = targets.get(id);
+        if (target) target.value = item.get(plan[index].project);
+      });
+    });
+    futureMappingPeriods.forEach((period) => {
+      const index = plan.findIndex((row) => row.year === period.year);
+      if (index < 0) return;
+      const row = plan[index];
+      companyActualInputRows.filter((item) => item.set).forEach((item) => {
+        const target = targets.get(`companyPL.${period.id}.${item.code}`);
+        if (target) target.value = item.get(plan, index) ?? null;
+      });
+      projectOfficialInputRows.forEach((item) => {
+        const target = targets.get(`projectPL.${period.id}.${item.code}`);
+        if (target) target.value = item.get(row.project);
+      });
+      otherPlInputFields.forEach((item) => {
+        const target = targets.get(`basePL.${period.id}.${item.modelCode}`);
+        if (target) target.value = item.get(row.other);
+      });
+    });
+    return targets;
+  }, [excelMappingTargets, futureMappingPeriods, plan]);
   const sourceActual = useMemo(() => calculateMetrics(sourcePlan, drivers), [sourcePlan, drivers]);
   const actual = useMemo(() => calculateMetrics(plan, calculationDrivers), [plan, calculationDrivers]);
   const inflationReference = getInputValue(inputValues, inputKey.assumption("inflationReference"));
@@ -1895,6 +1929,15 @@ export default function Home() {
     setExcelMappingNote(scope === "history" ? "取込範囲を「①過去データのみ」に設定しました。" : "取込範囲を「①過去＋③将来データ」に設定しました。");
   }
 
+  function changeExcelFutureCompanyImportMode(mode: ExcelFutureCompanyImportMode) {
+    setExcelFutureCompanyImportMode(mode);
+    setExcelMappingPreview([]);
+    setExcelMappingPreviewMode(null);
+    setExcelMappingNote(mode === "company"
+      ? "Excelの全社将来値を、全社PLの固定値として取り込みます。"
+      : "Excelの全社将来値から補助事業値を差し引き、ベース事業PLの固定値へ変換します。");
+  }
+
   function applyMappedExcelImport() {
     const ready = excelMappingPreview.filter((item) => item.status === "ready" && item.value !== null);
     if (!ready.length) {
@@ -1903,7 +1946,9 @@ export default function Home() {
     }
     const periodIndex: Record<string, number> = { prePrevious: 0, previous: 1, latest: 2 };
     const importedFutureBasis = futureInputBasisForMappedTargets(ready.map((item) => item.target));
-    if (importedFutureBasis) changeFutureInputBasis(importedFutureBasis);
+    const nextForecastOverrides = { ...forecastOverrides };
+    let hasFutureOverride = false;
+    let hasFutureCompanyValue = false;
     let applied = 0;
     for (const preview of ready) {
       const [dataset, period, code] = preview.target.split(".");
@@ -1939,23 +1984,64 @@ export default function Home() {
         } else if (dataset === "companyPL") {
           const item = companyActualInputRows.find((candidate) => candidate.code === code && candidate.set);
           if (item) {
-            updateForecastOverride(futurePeriod.year, "company", item.code, preview.value);
+            nextForecastOverrides[forecastOverrideKey(futurePeriod.year, "company", item.code)] = normalizePlanInput(preview.value, item.unit === "人");
+            hasFutureOverride = true;
+            hasFutureCompanyValue = true;
             applied += 1;
           }
         } else if (dataset === "projectPL") {
           const item = projectOfficialInputRows.find((candidate) => candidate.code === code);
           if (item) {
-            updateForecastOverride(futurePeriod.year, "project", item.code, preview.value);
+            nextForecastOverrides[forecastOverrideKey(futurePeriod.year, "project", item.code)] = normalizePlanInput(
+              preview.value,
+              item.code === "7-13" || item.code === "7-14",
+            );
+            hasFutureOverride = true;
             applied += 1;
           }
         } else if (dataset === "basePL") {
           const item = otherPlInputFields.find((candidate) => candidate.modelCode === code);
           if (item) {
-            updateForecastOverride(futurePeriod.year, "other", item.key, preview.value);
+            nextForecastOverrides[forecastOverrideKey(futurePeriod.year, "other", item.key)] = normalizePlanInput(
+              preview.value,
+              item.key === "headcount" || item.key === "officerCount",
+            );
+            hasFutureOverride = true;
             applied += 1;
           }
         }
       }
+    }
+    if (hasFutureOverride) {
+      clearAdjustment();
+      if (excelFutureCompanyImportMode === "convert-to-base" && hasFutureCompanyValue) {
+        const companyModePlan = applyForecastOverrides(autoPlan, nextForecastOverrides, "company", drivers);
+        companyModePlan.slice(3).forEach((row) => {
+          projectOfficialInputRows.forEach((officialItem) => {
+            const detailedItem = projectDetailedInputFields.find((item) => item.modelCode === officialItem.code);
+            const officialKey = forecastOverrideKey(row.year, "project", officialItem.code);
+            if (detailedItem && Object.prototype.hasOwnProperty.call(nextForecastOverrides, officialKey)) {
+              nextForecastOverrides[forecastOverrideKey(row.year, "project", detailedItem.key)] = nextForecastOverrides[officialKey];
+            }
+          });
+        });
+        for (const key of Object.keys(nextForecastOverrides)) {
+          if (key.includes(":company:") || key.includes(":other:")) delete nextForecastOverrides[key];
+        }
+        companyModePlan.slice(3).forEach((row) => {
+          otherPlInputFields.forEach((item) => {
+            nextForecastOverrides[forecastOverrideKey(row.year, "other", item.key)] = normalizePlanInput(
+              item.get(row.other),
+              item.key === "headcount" || item.key === "officerCount",
+            );
+          });
+        });
+        setBusinessSegmentationMode("split");
+        setFutureInputBasis("other");
+      } else if (importedFutureBasis) {
+        setFutureInputBasis(importedFutureBasis);
+      }
+      setForecastOverrides(nextForecastOverrides);
     }
     setExcelMappingNote(`${applied}件を反映しました。0は明示的な0、空欄は未設定のまま保持しています。`);
     if (applied > 0) showLoadNotice(`Excelから${applied}件の値を読み込みました。`);
@@ -1967,7 +2053,7 @@ export default function Home() {
       return;
     }
     try {
-      const result = buildMappedExcel(mappedExcelBytes, excelMapping, excelMappingTargets);
+      const result = buildMappedExcel(mappedExcelBytes, excelMapping, excelExportMappingTargets);
       setExcelMappingPreview(result.previews);
       setExcelMappingPreviewMode("export");
       if (!result.bytes) {
@@ -2788,6 +2874,17 @@ export default function Home() {
                 <button type="button" className={excelImportScope === "history-and-future" ? "active" : ""} aria-pressed={excelImportScope === "history-and-future"} onClick={() => changeExcelImportScope("history-and-future")}>①過去＋③将来データ</button>
               </div>
             </div>
+            {excelImportScope === "history-and-future" && <div className="excel-import-scope">
+              <div>
+                <strong>全社将来値の反映方法</strong>
+                <small>Excelが全社PLでも、ツール内では補助事業＋ベース事業へ分けて進められます。</small>
+              </div>
+              <div className="mode-switch" role="group" aria-label="全社将来値の反映方法">
+                <button type="button" className={excelFutureCompanyImportMode === "company" ? "active" : ""} aria-pressed={excelFutureCompanyImportMode === "company"} onClick={() => changeExcelFutureCompanyImportMode("company")}>全社PLとして取り込む</button>
+                <button type="button" className={excelFutureCompanyImportMode === "convert-to-base" ? "active" : ""} aria-pressed={excelFutureCompanyImportMode === "convert-to-base"} onClick={() => changeExcelFutureCompanyImportMode("convert-to-base")}>全社－補助事業をベース事業へ変換</button>
+              </div>
+              {excelFutureCompanyImportMode === "convert-to-base" && <p className="footnote">Excelから取り込んだ補助事業値を優先し、未指定項目は現在の補助事業予測を使って差し引きます。変換後は「ベース事業PLを入力」に切り替わります。</p>}
+            </div>}
             <div className="excel-mapping-resources">
               <span>Copilotへ対象Excelと一緒に渡す資料</span>
               <button type="button" onClick={() => { void copyExcelMappingCopilotPrompt(); }}>

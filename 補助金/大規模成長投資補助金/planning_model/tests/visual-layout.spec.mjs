@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { strToU8, zipSync } from "fflate";
+import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
+import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import path from "node:path";
 
@@ -124,16 +125,57 @@ test("Excelマッピングで③の将来設備投資とPL固定値を取り込�
   await expect(page.locator(".excel-mapping-status")).toContainText("取込候補 0件");
   await expect(page.locator(".excel-mapping-status")).toContainText("選択範囲外 3件");
   await page.getByRole("button", { name: "①過去＋③将来データ" }).click();
+  await page.getByRole("button", { name: "全社－補助事業をベース事業へ変換" }).click();
   await page.getByRole("button", { name: "取込内容を確認" }).click();
   await expect(page.locator(".excel-mapping-status")).toContainText("取込候補 3件");
   await page.getByRole("button", { name: "確認した値を反映" }).click();
   await expect(page.locator(".excel-mapping-status")).toContainText("3件を反映");
 
   await page.getByRole("button", { name: "③ 将来データ入力" }).click();
-  await expect(page.getByRole("button", { name: "全社PLを入力" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "ベース事業PLを入力" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(".future-capex-table input").nth(2)).toHaveValue("1,200,000");
   await expect(page.getByLabel("2028年 売上高（手入力固定値）").first()).toHaveValue("1,500,000");
-  await expect(page.getByLabel("2028年 売上高（手入力固定値）").nth(1)).toHaveValue("3,500,000");
+  await expect(page.getByLabel("2028年 売上高（手入力固定値）").nth(1)).toHaveValue("2,000,000");
+});
+
+test("マッピング出力は手入力の有無にかかわらず現在の全社・補助・ベース予測値を書き出す", async ({ page }) => {
+  await openStandalone(page, 1440);
+  await page.getByRole("button", { name: "データ入出力" }).click();
+  await page.getByRole("button", { name: "最適化済み標準提案" }).click();
+
+  const mapping = {
+    format: "growth-investment-excel-mapping/v1",
+    name: "実効予測値出力UIテスト",
+    bindings: [
+      { id: "company-sales", target: "companyPL.baseYear.2-1", excel: { sheet: "将来計画", cell: "B2", unit: "円" }, direction: "export" },
+      { id: "project-sales", target: "projectPL.baseYear.7-1", excel: { sheet: "将来計画", cell: "B3", unit: "円" }, direction: "export" },
+      { id: "base-sales", target: "basePL.baseYear.M2-1", excel: { sheet: "将来計画", cell: "B4", unit: "円" }, direction: "export" },
+    ],
+  };
+  await page.locator('input[accept*=".json"]').setInputFiles({
+    name: "effective-export-mapping.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(mapping)),
+  });
+  await page.locator('input[accept=".xlsx,.xlsm"]').setInputFiles({
+    name: "effective-plan.xlsx",
+    mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    buffer: Buffer.from(futureMappingWorkbook()),
+  });
+
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "別Excelとして出力" }).click();
+  const download = await downloadPromise;
+  const downloadedBytes = new Uint8Array(await readFile(await download.path()));
+  const files = unzipSync(downloadedBytes);
+  const sheet = strFromU8(files["xl/worksheets/sheet1.xml"]);
+  const values = ["B2", "B3", "B4"].map((cell) => {
+    const match = sheet.match(new RegExp(`<c[^>]*r="${cell}"[^>]*>.*?<v>([^<]+)</v>`, "s"));
+    return Number(match?.[1]);
+  });
+
+  expect(values.every((value) => Number.isFinite(value) && value > 0)).toBe(true);
+  expect(values[0]).toBeCloseTo(values[1] + values[2], 2);
 });
 
 test("切り分けなし入力サンプルは全社と補助事業が一致する状態で読み込める", async ({ page }) => {
