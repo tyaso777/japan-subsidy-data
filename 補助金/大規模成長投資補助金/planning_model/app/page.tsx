@@ -2923,7 +2923,7 @@ export default function Home() {
                 <button type="button" className={excelFutureCompanyImportMode === "convert-to-base" ? "active" : ""} aria-pressed={excelFutureCompanyImportMode === "convert-to-base"} onClick={() => changeExcelFutureCompanyImportMode("convert-to-base")}>ベース事業＋補助事業</button>
               </div>
               <p className="footnote">{excelFutureCompanyImportMode === "convert-to-base"
-                ? "Excelに全社値がある場合は、取り込んだ補助事業値（未指定項目は現在の予測）を差し引いてベース事業へ変換します。"
+                ? "Excelの全社値と補助事業値を固定値として保持し、ベース事業は差額として自動計算します。未入力項目と内部明細は会計前提の変更に追従します。"
                 : "Excelの全社値と補助事業値をそれぞれ固定値として取り込み、ベース事業は差額で自動計算します。"}</p>
             </div>
             <div className="excel-mapping-resources">
@@ -2939,6 +2939,7 @@ export default function Home() {
               <button type="button" onClick={downloadExcelMappingManual}>定義書作成マニュアル</button>
               <button type="button" onClick={downloadExcelMappingExample}>JSONサンプル</button>
             </div>
+            <p className="footnote">Excelの空欄は既存値を消去しません。変更せず保持し、数値の0だけを明示的な0として反映します。.xlsmの既存マクロは保持されますが、安全性は検証しないため、信頼できるファイルだけを開いてください。</p>
             {excelMappingPreview.length > 0 && (
               <div className="excel-mapping-preview">
                 <div className="excel-mapping-preview-heading">

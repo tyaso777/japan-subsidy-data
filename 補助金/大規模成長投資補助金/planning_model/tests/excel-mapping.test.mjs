@@ -7,6 +7,7 @@ import {
   buildMappedExcel,
   EXCEL_CONVERSION_SAMPLE_MAPPING,
   EXCEL_MAPPING_FORMAT,
+  EXCEL_MAPPING_MANUAL,
   filterExcelMappingImportPreviews,
   futureExcelMappingPeriods,
   futureInputBasisForMappedTargets,
@@ -325,4 +326,11 @@ test("rejects an oversized workbook before attempting to unzip it", () => {
     () => previewExcelImport(oversized, mapping, new Map()),
     /50MB以下/,
   );
+});
+
+test("documents blank-cell, macro, and dynamic company-to-base behavior", () => {
+  assert.match(EXCEL_MAPPING_MANUAL, /空欄は既存値を消去しません/);
+  assert.match(EXCEL_MAPPING_MANUAL, /\.xlsmの既存マクロは保持されます/);
+  assert.match(EXCEL_MAPPING_MANUAL, /ベース事業は差額として自動計算/);
+  assert.doesNotMatch(EXCEL_MAPPING_MANUAL, /basePL.*固定値へ変換/);
 });
