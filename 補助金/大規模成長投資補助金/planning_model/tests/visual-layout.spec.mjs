@@ -213,12 +213,12 @@ test("第6次公式A002サンプルを①と③へ取り込み将来の全社・
   await page.getByRole("button", { name: "確認した値を反映" }).click();
   await page.getByRole("button", { name: "① 過去データ入力" }).click();
   await expect(page.getByRole("row", { name: /^1-1 資産総額 / }).getByRole("textbox").nth(2)).toHaveValue("2,200,000");
-  await page.getByRole("button", { name: "② 15指標・目標" }).click();
-  page.once("dialog", (dialog) => dialog.accept());
-  await page.getByRole("button", { name: "過去3期からデフォルト設定" }).click();
   await page.getByRole("button", { name: "③ 将来データ入力" }).click();
+  await expect(page.getByRole("button", { name: "過去3期から会計前提を設定" })).toBeVisible();
   await expect(page.getByLabel("2028年 売上高（手入力固定値）").first()).toHaveValue("700,000");
   await expect(page.getByLabel("2028年 売上高（手入力固定値）").nth(1)).toHaveValue("2,700,000");
+  await page.getByRole("button", { name: "過去3期から会計前提を設定" }).click();
+  await expect(page.getByRole("button", { name: "過去3期から会計前提を設定" })).toHaveCount(0);
 });
 
 test("Excel読み込み画面と③で将来PLの入力方式を相互に切り替えられる", async ({ page }) => {

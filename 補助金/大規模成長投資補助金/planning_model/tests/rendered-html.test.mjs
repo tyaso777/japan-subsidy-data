@@ -239,7 +239,10 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /forecastSettingsStarted/);
   assert.match(pageSource, /forecastSettingsReady/);
   assert.match(pageSource, /const accountingAssumptionDriverKeys/);
-  assert.match(pageSource, /missingAccountingAssumptions\.length \? <p className="default-note" role="alert">/);
+  assert.doesNotMatch(pageSource, /missingAccountingAssumptions\.length \? <p className="default-note" role="alert">[\s\S]*? : <FutureInputsEditor/);
+  assert.match(pageSource, /過去3期から会計前提を設定[\s\S]*?<FutureInputsEditor/);
+  assert.match(globalStyles, /\.accounting-assumptions-pending \.forecast-override:not\(\.is-fixed\)::placeholder \{ color: transparent; \}/);
+  assert.match(globalStyles, /\.accounting-assumptions-pending \.calculated-cell::after \{ content: "前提未設定"/);
   assert.match(pageSource, /補助事業の減価償却費は公式7-10の合計額を入力し、売上原価内・販管費内の内訳は②のベース事業構成比で計算します/);
   assert.match(pageSource, /残額を従業員賞与として計算/);
   assert.match(pageSource, /残額を役員賞与として計算/);

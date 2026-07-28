@@ -120,6 +120,13 @@ main { width: min(calc(100% - 48px), 1920px); margin: 0 auto; padding: var(--spa
 .default-button { border: 1px solid #b9cfc1; background: var(--green-soft); color: var(--green); padding: 11px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; }
 .default-button:hover { filter: brightness(.97); }
 .default-note { margin: 12px 0 0; padding: 11px 13px; border-left: 3px solid var(--green); background: #eef6f0; color: #3f5e4d; font-size: 12px; line-height: 1.6; }
+.accounting-assumption-notice { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); }
+.accounting-assumption-notice .default-button { flex: 0 0 auto; }
+.accounting-assumptions-pending .forecast-override:not(.is-fixed)::placeholder { color: transparent; }
+.accounting-assumptions-pending .calculated-cell { position: relative; }
+.accounting-assumptions-pending .calculated-cell strong,
+.accounting-assumptions-pending .calculated-cell small { visibility: hidden; }
+.accounting-assumptions-pending .calculated-cell::after { content: "前提未設定"; position: absolute; inset: 50% var(--space-2) auto; transform: translateY(-50%); color: var(--muted); font-size: var(--text-xs); text-align: right; white-space: nowrap; }
 .benchmark-note { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); margin-top: var(--space-3); padding: var(--space-3); background: var(--surface-warm); border-left: 3px solid var(--amber); font-size: var(--text-xs); }.benchmark-note strong { margin-right: var(--space-1); }.benchmark-note span { color: #525e58; }.benchmark-note a { margin-left: auto; color: var(--green); font-weight: 700; }
 .workflow-actions { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 16px 18px; border: 1px solid #d6d1c5; border-radius: 14px; background: rgba(255, 253, 248, .72); color: var(--muted); font-size: 13px; }
 
