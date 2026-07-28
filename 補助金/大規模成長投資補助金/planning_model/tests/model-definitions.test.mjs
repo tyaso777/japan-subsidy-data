@@ -22,6 +22,17 @@ const model = commonJsModule.exports;
 const cagr = (start, end, years) => ((end / start) ** (1 / years) - 1) * 100;
 const makePlan = (settings = model.DEFAULT_TIMELINE) => model.generatePlan(model.createHistoricalPlan(model.sampleBasePlan, settings), model.sampleDrivers, settings);
 
+test("whole-company-as-project mode preserves company totals and clears base business", () => {
+  const plan = makePlan();
+  const companyBefore = plan.map((row) => model.total(row.project, row.other));
+  const normalized = model.applyBusinessSegmentationMode(plan, "wholeCompanyAsProject");
+
+  assert.deepEqual(normalized.map((row) => row.project), companyBefore);
+  assert.ok(normalized.every((row) => Object.values(row.other).every((value) => value === 0)));
+  assert.notEqual(normalized, plan);
+  assert.deepEqual(model.applyBusinessSegmentationMode(plan, "split"), plan);
+});
+
 test("application starts without sample company, project, balance-sheet, or driver values", () => {
   const segmentValues = [...Object.values(model.basePlan.project), ...Object.values(model.basePlan.other)];
   assert.ok(segmentValues.every((value) => value === 0));

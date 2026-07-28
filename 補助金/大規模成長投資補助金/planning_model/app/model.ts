@@ -2,6 +2,7 @@ import { normalizeInternalMoney, okuToInternalMoney } from "./money";
 
 export type SegmentKey = "project" | "other";
 export type Mode = "auto" | "manual";
+export type BusinessSegmentationMode = "split" | "wholeCompanyAsProject";
 
 export type SegmentPlan = {
   sales: number;
@@ -299,17 +300,27 @@ export const sampleDrivers: Drivers = {
   localBenchmark: 23,
 };
 
-const emptySegment = (): SegmentPlan => ({
+export const emptySegment = (): SegmentPlan => ({
   sales: 0,
   cogs: 0,
   employeePay: 0,
   officerPay: 0,
+  employeePayrollTotal: 0,
+  officerPayrollTotal: 0,
   depreciation: 0,
   cogsDepreciation: 0,
   sgaDepreciation: 0,
   otherSga: 0,
   headcount: 0,
   officerCount: 0,
+  employeeSalary: 0,
+  employeeBonus: 0,
+  officerCompensation: 0,
+  officerBonus: 0,
+  researchDevelopment: 0,
+  ordinaryIncome: 0,
+  preTaxIncome: 0,
+  netIncome: 0,
 });
 
 export const basePlan: YearPlan = {
@@ -555,6 +566,18 @@ export function total(a: SegmentPlan, b: SegmentPlan): SegmentPlan {
     combined.officerPayrollTotal = officerPayrollTotal(a) + officerPayrollTotal(b);
   }
   return combined;
+}
+
+export function applyBusinessSegmentationMode(
+  plan: YearPlan[],
+  mode: BusinessSegmentationMode,
+): YearPlan[] {
+  if (mode === "split") return plan;
+  return plan.map((row) => ({
+    ...row,
+    project: total(row.project, row.other),
+    other: emptySegment(),
+  }));
 }
 
 export function calculateScaleDependentTargetDefaults(

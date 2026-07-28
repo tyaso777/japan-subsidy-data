@@ -1,5 +1,5 @@
 import { strToU8, unzipSync, zipSync } from "fflate";
-import { isSixthRoundReferenceMetric, operatingProfit, total, valueAdded, type BalanceSheetPlan, type Drivers, type MetricKey, type SegmentPlan, type Target, type TimelineSettings, type YearPlan } from "./model";
+import { isSixthRoundReferenceMetric, operatingProfit, total, valueAdded, type BalanceSheetPlan, type BusinessSegmentationMode, type Drivers, type MetricKey, type SegmentPlan, type Target, type TimelineSettings, type YearPlan } from "./model";
 import { buildBalanceSheetRows, buildBaseBusinessPlRows, buildCompanyPlRows, buildDiagnosticGroups, buildProjectPlRows, periodLabels, type ReportRow } from "./report-data";
 import { hasInputValue, inputKey, type InputValues } from "./input-values";
 import { type MetricGroupBasis, type MetricGroupKey } from "./metric-groups";
@@ -7,7 +7,7 @@ import { applicationCategoryLabels, defaultApplicationCategory, driverRequiremen
 import { niceChartScale } from "./chart-scale";
 import { INTERNAL_MONEY_UNIT, toDisplayMoney } from "./money";
 
-export const PROPOSAL_FORMAT = "growth-investment-proposal/v2";
+export const PROPOSAL_FORMAT = "growth-investment-proposal/v3";
 
 export type ProposalData = {
   format: typeof PROPOSAL_FORMAT;
@@ -16,6 +16,7 @@ export type ProposalData = {
   title: string;
   exportedAt: string;
   timeline: TimelineSettings;
+  businessSegmentationMode: BusinessSegmentationMode;
   historicalPlan: YearPlan[];
   balanceSheets: BalanceSheetPlan[];
   futureCapex: { year: number; value: number }[];
@@ -215,7 +216,7 @@ const htmlTrendChart = (title: string, subtitle: string, unit: string, plan: Yea
   return `<article class="chart-card"><div class="chart-title"><div><h3>${htmlEscape(title)}</h3><p>${htmlEscape(subtitle)}</p></div><span>${htmlEscape(unit)}</span></div><svg class="chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${htmlEscape(`${title}の年度推移。実線は過去実績、破線は将来予測。`)}"><rect class="chart-future-area" x="${x(latestIndex)}" y="${margin.top}" width="${Math.max(0, width - margin.right - x(latestIndex))}" height="${plotHeight}"/>${grids}${baseIndex >= 0 ? `<g><line class="chart-base-line" x1="${x(baseIndex)}" y1="${margin.top}" x2="${x(baseIndex)}" y2="${margin.top + plotHeight}"/><text class="chart-boundary-label" x="${x(baseIndex)}" y="${margin.top + 12}" text-anchor="middle">基準年</text></g>` : ""}<text class="chart-boundary-label" x="${x(latestIndex) + 7}" y="${margin.top + plotHeight - 8}">予測</text>${lines}${years}</svg><div class="chart-legend">${legend}</div></article>`;
 };
 
-const htmlDiagnosticCharts = (plan: YearPlan[]) => {
+const htmlDiagnosticCharts = (plan: YearPlan[], businessSegmentationMode: BusinessSegmentationMode) => {
   const company = plan.map((row) => total(row.project, row.other));
   const chartRate = (numerator: number, denominator: number) => denominator ? numerator / denominator * 100 : undefined;
   const perEmployee = (segment: SegmentPlan) => segment.headcount ? segment.employeePay / segment.headcount : undefined;
@@ -226,12 +227,15 @@ const htmlDiagnosticCharts = (plan: YearPlan[]) => {
     return base && Number.isFinite(base) ? values.map((value) => value === undefined ? undefined : value / base * 100) : values.map(() => undefined);
   };
   const colors = { company: "#1f6f54", project: "#d88b15", other: "#56738f" };
+  const visibleSeries = <T extends { label: string }>(series: T[]) => businessSegmentationMode === "wholeCompanyAsProject"
+    ? series.filter((item) => !item.label.includes("ベース事業"))
+    : series;
   const charts = [
-    htmlTrendChart("売上高", "全社と事業別の規模・成長ペース", "千円", plan, [
+    htmlTrendChart("売上高", "全社と事業別の規模・成長ペース", "千円", plan, visibleSeries([
       { label: "全社", color: colors.company, values: company.map((segment) => segment.sales) },
       { label: "補助事業", color: colors.project, values: plan.map((row) => row.project.sales) },
       { label: "ベース事業", color: colors.other, values: plan.map((row) => row.other.sales) },
-    ]),
+    ])),
     htmlTrendChart("収益性（全社）", "原価・その他販管費・営業利益の率", "%", plan, [
       { label: "売上原価率", color: colors.project, values: company.map((segment) => chartRate(segment.cogs, segment.sales)) },
       { label: "その他販管費率", color: colors.other, values: company.map((segment) => chartRate(segment.otherSga, segment.sales)) },
@@ -241,11 +245,11 @@ const htmlDiagnosticCharts = (plan: YearPlan[]) => {
       { label: "従業員数", color: colors.other, values: indexed(company.map((segment) => segment.headcount)) },
       { label: "従業員1人当たり給与", color: colors.company, values: indexed(company.map(perEmployee)) },
     ]),
-    htmlTrendChart("労働生産性", "付加価値額÷（従業員数＋役員数）", "千円/人", plan, [
+    htmlTrendChart("労働生産性", "付加価値額÷（従業員数＋役員数）", "千円/人", plan, visibleSeries([
       { label: "全社", color: colors.company, values: company.map(productivity) },
       { label: "補助事業", color: colors.project, values: plan.map((row) => productivity(row.project)) },
       { label: "ベース事業", color: colors.other, values: plan.map((row) => productivity(row.other)) },
-    ]),
+    ])),
   ].join("");
   return `<section class="chart-section"><h2>診断チャート｜主要指標の推移</h2><p class="chart-intro">過去実績から将来予測へのつながり、基準年の段差、事業間の乖離を視覚的に確認します。</p><div class="chart-grid">${charts}</div><p class="chart-note"><span class="solid-sample"></span>実線：過去実績 <span class="dash-sample"></span>破線：将来予測</p></section>`;
 };
@@ -260,7 +264,7 @@ function reportParts(context: ProposalExportContext) {
     companyRows: buildCompanyPlRows(effectivePlan),
     projectRows: buildProjectPlRows(effectivePlan, proposal.drivers.projectMarketGrowth),
     baseRows: buildBaseBusinessPlRows(effectivePlan),
-    diagnostics: buildDiagnosticGroups(effectivePlan, proposal.balanceSheets, proposal.futureCapex),
+    diagnostics: buildDiagnosticGroups(effectivePlan, proposal.balanceSheets, proposal.futureCapex, proposal.businessSegmentationMode),
   };
 }
 
@@ -484,16 +488,21 @@ export function buildProposalHtml({ proposal, effectivePlan, metricRows }: Propo
   const balanceHeader = htmlPeriodHeader(effectivePlan.slice(0, proposal.balanceSheets.length));
   const category = proposal.applicationCategory ?? defaultApplicationCategory;
   const categoryLabel = category ? applicationCategoryLabels[category] : "未選択";
-  const metricBody = metricRows.map((row) => row.key === "localBenchmark"
+  const metricBody = metricRows.map((row) => proposal.businessSegmentationMode === "wholeCompanyAsProject" && row.key === "projectSalesShare"
+    ? `<tr><th>${htmlEscape(row.label)}<small>全社＝補助事業のため構造上100%</small></th><td>${display(row.actual, row.unit)}</td><td>—</td><td>—</td><td>判定対象外</td></tr>`
+    : row.key === "localBenchmark"
     ? `<tr><th>${htmlEscape(row.label)}<small>第6次定義：${htmlEscape(row.round6Formula)}</small></th><td>${display(proposalInput(proposal, inputKey.driver("localBenchmark"), row.actual), row.unit)}</td><td>—</td><td>—</td><td>固定入力・判定対象外</td></tr>`
     : isSixthRoundReferenceMetric(row.key)
       ? `<tr><th>${htmlEscape(row.label)}<small>第6次定義：${htmlEscape(row.round6Formula)}</small><small>第6次評価対象外・参考値</small></th><td>${display(row.actual, row.unit)}</td><td>—</td><td>—</td><td>参考値・判定対象外</td></tr>`
     : (() => { const target = proposalInput(proposal, inputKey.target(row.key, "value"), row.target); const achieved = target === undefined ? "目標未設定" : row.actual >= target ? "目標達成" : "目標未達"; return `<tr><th>${htmlEscape(row.label)}<small>第6次定義：${htmlEscape(row.round6Formula)}</small></th><td>${display(row.actual, row.unit)}</td><td>${htmlEscape(metricRequirementLabel(row.key, category))}</td><td>${display(target, row.unit)}</td><td>${achieved}</td></tr>`; })()).join("");
   const diagnosticSections = parts.diagnostics.map((group) => htmlSection(`基本指標による妥当性チェック｜${group.title}`, `<th>指標名</th><th>計算式</th><th>主な確認点</th>${planHeader}`, group.rows.map((row) => `<tr><th>${htmlEscape(row.name)}<small>${htmlEscape(row.unit)}</small></th><td class="copy">${htmlEscape(row.formula)}</td><td class="copy">${htmlEscape(row.check)}</td>${row.values.map((period) => `<td>${period.map((entry) => `<span class="diagnostic-value"><small>${htmlEscape(entry.label)}</small>${display(entry.value, row.unit)}</span>`).join("")}</td>`).join("")}</tr>`).join(""))).join("");
-  const diagnosticCharts = htmlDiagnosticCharts(effectivePlan);
+  const diagnosticCharts = htmlDiagnosticCharts(effectivePlan, proposal.businessSegmentationMode);
   const auditRows = inputAuditRows(proposal).map(([key, value]) => `<tr><th>${htmlEscape(key)}</th><td>${display(value, "")}</td><td>${value === 0 ? "明示的な0" : "入力済み"}</td><td>—</td><td>—</td></tr>`).join("");
-  const driverRows = (Object.keys(proposal.drivers) as (keyof Drivers)[]).filter((key) => key !== "localBenchmark" && !hiddenLegacyDriverKeys.has(key)).map((key) => { const percent = !["investment", "subsidy", "projectFirstYearSales", "projectBaseYearSales"].includes(key); const factor = percent ? 100 : 1; const range = fixedOutputDriverKeys.has(key) ? undefined : proposal.driverRanges[key]; const value = proposalInput(proposal, inputKey.driver(key), proposal.drivers[key]); const lower = range ? proposalInput(proposal, inputKey.driverRange(key, 0), range[0]) : undefined; const upper = range ? proposalInput(proposal, inputKey.driverRange(key, 1), range[1]) : undefined; return `<tr><th>${htmlEscape(driverNames[key] ?? key)}</th><td>${display(value === undefined ? undefined : value * factor, percent ? "%" : "千円")}</td><td>${htmlEscape(driverRequirementLabel(key, category, proposal.drivers.investment))}</td><td>${display(lower === undefined ? undefined : lower * factor, percent ? "%" : "")}</td><td>${display(upper === undefined ? undefined : upper * factor, percent ? "%" : "")}</td></tr>`; }).join("") + `<tr class="emphasis"><th colspan="5">入力データ監査（一覧にないキーは未設定／Null）</th></tr>${auditRows}`;
-  return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${htmlEscape(proposal.title)}</title><style>${proposalHtmlStyles}</style></head><body><main class="report"><header class="cover"><p>大規模成長投資補助金 6次公募対応</p><h1>${htmlEscape(proposal.title)}</h1><p>入力実績、将来計画、目標、妥当性診断を一体で整理した提案計画書</p><p>使用単位は各表に表示します。入力値・自動計算値・最適化結果を区別し、未入力・暫定値を明示します。</p><div class="meta"><span>申請区分 ${htmlEscape(categoryLabel)}</span><span>最新決算期 ${proposal.timeline.latestYear}</span><span>基準年度 ${proposal.timeline.baseYear}</span><span>出力日時 ${htmlEscape(proposal.exportedAt)}</span></div></header>${htmlSection("15指標・目標", "<th>指標・第6次定義</th><th>計画値</th><th>制度上の必須条件</th><th>目標値</th><th>判定</th>", metricBody)}${htmlSection("1-1～1-25 貸借対照表等（入力結果）", `<th>第6次様式項目</th>${balanceHeader}`, htmlReportRows(parts.balanceRows))}${htmlSection("会社全体にかかる損益計算書（P/L）", `<th>第6次様式項目</th>${planHeader}`, htmlReportRows(parts.companyRows))}${htmlSection("補助事業にかかる収支計画", `<th>第6次様式項目</th>${planHeader}`, htmlReportRows(parts.projectRows))}${htmlSection("ベース事業にかかる損益計算書（P/L）", `<th>内部管理項目</th>${planHeader}`, htmlReportRows(parts.baseRows))}${diagnosticCharts}${diagnosticSections}${htmlSection("調整条件と根拠", "<th>調整項目</th><th>計画初期値</th><th>制度上の必須条件</th><th>許容下限</th><th>許容上限</th>", driverRows)}<p class="note">このファイルは「成長投資計画シミュレーター（Ver. 大規模成長投資補助金 6次公募）」に再取込できます。</p><script id="growth-proposal-data" type="application/json">${payload}</script><script>${proposalHtmlInteractionScript}</script></main></body></html>`;
+  const driverRows = (Object.keys(proposal.drivers) as (keyof Drivers)[]).filter((key) => key !== "localBenchmark" && !hiddenLegacyDriverKeys.has(key) && (proposal.businessSegmentationMode === "split" || !key.startsWith("other"))).map((key) => { const percent = !["investment", "subsidy", "projectFirstYearSales", "projectBaseYearSales"].includes(key); const factor = percent ? 100 : 1; const range = fixedOutputDriverKeys.has(key) ? undefined : proposal.driverRanges[key]; const value = proposalInput(proposal, inputKey.driver(key), proposal.drivers[key]); const lower = range ? proposalInput(proposal, inputKey.driverRange(key, 0), range[0]) : undefined; const upper = range ? proposalInput(proposal, inputKey.driverRange(key, 1), range[1]) : undefined; return `<tr><th>${htmlEscape(driverNames[key] ?? key)}</th><td>${display(value === undefined ? undefined : value * factor, percent ? "%" : "千円")}</td><td>${htmlEscape(driverRequirementLabel(key, category, proposal.drivers.investment))}</td><td>${display(lower === undefined ? undefined : lower * factor, percent ? "%" : "")}</td><td>${display(upper === undefined ? undefined : upper * factor, percent ? "%" : "")}</td></tr>`; }).join("") + `<tr class="emphasis"><th colspan="5">入力データ監査（一覧にないキーは未設定／Null）</th></tr>${auditRows}`;
+  const baseBusinessSection = proposal.businessSegmentationMode === "split"
+    ? htmlSection("ベース事業にかかる損益計算書（P/L）", `<th>内部管理項目</th>${planHeader}`, htmlReportRows(parts.baseRows))
+    : "";
+  return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${htmlEscape(proposal.title)}</title><style>${proposalHtmlStyles}</style></head><body><main class="report"><header class="cover"><p>大規模成長投資補助金 6次公募対応</p><h1>${htmlEscape(proposal.title)}</h1><p>入力実績、将来計画、目標、妥当性診断を一体で整理した提案計画書</p><p>使用単位は各表に表示します。入力値・自動計算値・最適化結果を区別し、未入力・暫定値を明示します。</p><div class="meta"><span>申請区分 ${htmlEscape(categoryLabel)}</span><span>最新決算期 ${proposal.timeline.latestYear}</span><span>基準年度 ${proposal.timeline.baseYear}</span><span>出力日時 ${htmlEscape(proposal.exportedAt)}</span></div></header>${htmlSection("15指標・目標", "<th>指標・第6次定義</th><th>計画値</th><th>制度上の必須条件</th><th>目標値</th><th>判定</th>", metricBody)}${htmlSection("1-1～1-25 貸借対照表等（入力結果）", `<th>第6次様式項目</th>${balanceHeader}`, htmlReportRows(parts.balanceRows))}${htmlSection("会社全体にかかる損益計算書（P/L）", `<th>第6次様式項目</th>${planHeader}`, htmlReportRows(parts.companyRows))}${htmlSection("補助事業にかかる収支計画", `<th>第6次様式項目</th>${planHeader}`, htmlReportRows(parts.projectRows))}${baseBusinessSection}${diagnosticCharts}${diagnosticSections}${htmlSection("調整条件と根拠", "<th>調整項目</th><th>計画初期値</th><th>制度上の必須条件</th><th>許容下限</th><th>許容上限</th>", driverRows)}<p class="note">このファイルは「成長投資計画シミュレーター（Ver. 大規模成長投資補助金 6次公募）」に再取込できます。</p><script id="growth-proposal-data" type="application/json">${payload}</script><script>${proposalHtmlInteractionScript}</script></main></body></html>`;
 }
 
 export function buildProposalXlsx({ proposal, effectivePlan, metricRows }: ProposalExportContext) {
@@ -512,7 +521,7 @@ export function buildProposalXlsx({ proposal, effectivePlan, metricRows }: Propo
     rowXml(5, ["申請区分", category ? applicationCategoryLabels[category] : "未選択"]),
     rowXml(6, ["出力内容", "使用単位／入力値／自動計算値／最適化結果／未入力／暫定値／診断チャート（HTML出力）／妥当性チェック"]),
     rowXml(7, ["15指標・目標（指標名に第6次定義を併記）", "計画値", "単位", "制度上の必須条件", "目標値", "判定"], "header"),
-    ...metricRows.map((item, index) => { const definedLabel = `${item.label}（第6次定義：${item.round6Formula}）`; const target = proposalInput(proposal, inputKey.target(item.key, "value"), item.target); const actualValue = reportNumericValue(item.actual, item.unit); const targetValue = reportNumericValue(target, item.unit); return rowXml(index + 8, item.key === "localBenchmark" ? [definedLabel, proposalInput(proposal, inputKey.driver("localBenchmark"), item.actual), item.unit, undefined, undefined, "固定入力・判定対象外"] : isSixthRoundReferenceMetric(item.key) ? [definedLabel, actualValue, item.unit, undefined, undefined, "参考値・第6次評価対象外"] : [definedLabel, actualValue, item.unit, metricRequirementLabel(item.key, category), targetValue, target === undefined ? "目標未設定" : item.actual >= target ? "目標達成" : "目標未達"]); }),
+    ...metricRows.map((item, index) => { const definedLabel = `${item.label}（第6次定義：${item.round6Formula}）`; const target = proposalInput(proposal, inputKey.target(item.key, "value"), item.target); const actualValue = reportNumericValue(item.actual, item.unit); const targetValue = reportNumericValue(target, item.unit); return rowXml(index + 8, proposal.businessSegmentationMode === "wholeCompanyAsProject" && item.key === "projectSalesShare" ? [`${definedLabel}（全社＝補助事業のため構造上100%）`, actualValue, item.unit, undefined, undefined, "判定対象外"] : item.key === "localBenchmark" ? [definedLabel, proposalInput(proposal, inputKey.driver("localBenchmark"), item.actual), item.unit, undefined, undefined, "固定入力・判定対象外"] : isSixthRoundReferenceMetric(item.key) ? [definedLabel, actualValue, item.unit, undefined, undefined, "参考値・第6次評価対象外"] : [definedLabel, actualValue, item.unit, metricRequirementLabel(item.key, category), targetValue, target === undefined ? "目標未設定" : item.actual >= target ? "目標達成" : "目標未達"]); }),
   ];
   const diagnosticRows: string[] = [rowXml(1, ["基本指標によるシミュレーション妥当性チェック", "計算式", "主な確認点", ...parts.periods], "title"), rowXml(2, ["指標名", "計算式", "主な確認点", ...parts.periods], "header")];
   let diagnosticRow = 3;
@@ -520,14 +529,29 @@ export function buildProposalXlsx({ proposal, effectivePlan, metricRows }: Propo
     diagnosticRows.push(rowXml(diagnosticRow++, [group.title, ...Array(parts.periods.length + 2).fill("")], "header"));
     for (const item of group.rows) diagnosticRows.push(rowXml(diagnosticRow++, [`${item.name}（${item.unit}）`, item.formula, item.check, ...item.values.map((period) => period.map((entry) => `${entry.label} ${display(entry.value, item.unit)}`).join(" / "))]));
   }
-  const assumptionRows = [rowXml(1, ["調整条件と根拠", "計画初期値", "制度上の必須条件", "許容下限", "許容上限"], "title"), rowXml(2, ["調整項目", "計画初期値", "制度上の必須条件", "許容下限", "許容上限"], "header"), ...(Object.keys(proposal.drivers) as (keyof Drivers)[]).filter((key) => key !== "localBenchmark" && !hiddenLegacyDriverKeys.has(key)).map((key, index) => { const percent = !["investment", "subsidy", "projectFirstYearSales", "projectBaseYearSales"].includes(key); const factor = percent ? 100 : 1; const range = fixedOutputDriverKeys.has(key) ? undefined : proposal.driverRanges[key]; const value = proposalInput(proposal, inputKey.driver(key), proposal.drivers[key]); const lower = range ? proposalInput(proposal, inputKey.driverRange(key, 0), range[0]) : undefined; const upper = range ? proposalInput(proposal, inputKey.driverRange(key, 1), range[1]) : undefined; const outputUnit = percent ? "%" : "千円"; return rowXml(index + 3, [driverNames[key] ?? key, reportNumericValue(value === undefined ? undefined : value * factor, outputUnit), driverRequirementLabel(key, category, proposal.drivers.investment), reportNumericValue(lower === undefined ? undefined : lower * factor, outputUnit), reportNumericValue(upper === undefined ? undefined : upper * factor, outputUnit)]); })];
+  const assumptionRows = [rowXml(1, ["調整条件と根拠", "計画初期値", "制度上の必須条件", "許容下限", "許容上限"], "title"), rowXml(2, ["調整項目", "計画初期値", "制度上の必須条件", "許容下限", "許容上限"], "header"), ...(Object.keys(proposal.drivers) as (keyof Drivers)[]).filter((key) => key !== "localBenchmark" && !hiddenLegacyDriverKeys.has(key) && (proposal.businessSegmentationMode === "split" || !key.startsWith("other"))).map((key, index) => { const percent = !["investment", "subsidy", "projectFirstYearSales", "projectBaseYearSales"].includes(key); const factor = percent ? 100 : 1; const range = fixedOutputDriverKeys.has(key) ? undefined : proposal.driverRanges[key]; const value = proposalInput(proposal, inputKey.driver(key), proposal.drivers[key]); const lower = range ? proposalInput(proposal, inputKey.driverRange(key, 0), range[0]) : undefined; const upper = range ? proposalInput(proposal, inputKey.driverRange(key, 1), range[1]) : undefined; const outputUnit = percent ? "%" : "千円"; return rowXml(index + 3, [driverNames[key] ?? key, reportNumericValue(value === undefined ? undefined : value * factor, outputUnit), driverRequirementLabel(key, category, proposal.drivers.investment), reportNumericValue(lower === undefined ? undefined : lower * factor, outputUnit), reportNumericValue(upper === undefined ? undefined : upper * factor, outputUnit)]); })];
   const auditSheetRows = [rowXml(1, [`入力データ監査（Null／0区別・金額の保存単位は${INTERNAL_MONEY_UNIT}）`, "保存値", "状態"], "title"), rowXml(2, ["入力キー", "保存値", "状態"], "header"), ...inputAuditRows(proposal).map(([key, value], index) => rowXml(index + 3, [key, value, value === 0 ? "明示的な0" : "入力済み"]))];
   const chunks = encodeBase64(JSON.stringify(proposal)).match(/.{1,30000}/g) ?? [];
   const dataRows = [rowXml(1, [PROPOSAL_FORMAT], "header"), ...chunks.map((chunk, index) => rowXml(index + 2, [chunk]))];
 
-  const sheetNames = ["提案計画サマリー", "貸借対照表等", "会社全体PL", "補助事業収支", "ベース事業PL", "妥当性診断", "前提・目標", "入力データ監査", "モデルデータ"];
-  const sheetRows = [summaryRows, reportSheet("1-1～1-25 貸借対照表等（入力結果）", parts.balancePeriods, parts.balanceRows), reportSheet("会社全体にかかる損益計算書（P/L）", parts.periods, parts.companyRows), reportSheet("補助事業にかかる収支計画", parts.periods, parts.projectRows), reportSheet("ベース事業にかかる損益計算書（P/L）", parts.periods, parts.baseRows), diagnosticRows, assumptionRows, auditSheetRows, dataRows];
-  const sheetWidths = [[68, 80, 14, 34, 16, 18], [54, ...Array(parts.balancePeriods.length).fill(18)], [54, ...Array(parts.periods.length).fill(18)], [58, ...Array(parts.periods.length).fill(18)], [58, ...Array(parts.periods.length).fill(18)], [42, 42, 48, ...Array(parts.periods.length).fill(22)], [68, 18, 38, 18, 18], [72, 18, 18], [120]];
+  const sheets: { name: string; rows: string[]; widths: number[] }[] = [
+    { name: "提案計画サマリー", rows: summaryRows, widths: [68, 80, 14, 34, 16, 18] },
+    { name: "貸借対照表等", rows: reportSheet("1-1～1-25 貸借対照表等（入力結果）", parts.balancePeriods, parts.balanceRows), widths: [54, ...Array(parts.balancePeriods.length).fill(18)] },
+    { name: "会社全体PL", rows: reportSheet("会社全体にかかる損益計算書（P/L）", parts.periods, parts.companyRows), widths: [54, ...Array(parts.periods.length).fill(18)] },
+    { name: "補助事業収支", rows: reportSheet("補助事業にかかる収支計画", parts.periods, parts.projectRows), widths: [58, ...Array(parts.periods.length).fill(18)] },
+    ...(proposal.businessSegmentationMode === "split" ? [{
+      name: "ベース事業PL",
+      rows: reportSheet("ベース事業にかかる損益計算書（P/L）", parts.periods, parts.baseRows),
+      widths: [58, ...Array(parts.periods.length).fill(18)],
+    }] : []),
+    { name: "妥当性診断", rows: diagnosticRows, widths: [42, 42, 48, ...Array(parts.periods.length).fill(22)] },
+    { name: "前提・目標", rows: assumptionRows, widths: [68, 18, 38, 18, 18] },
+    { name: "入力データ監査", rows: auditSheetRows, widths: [72, 18, 18] },
+    { name: "モデルデータ", rows: dataRows, widths: [120] },
+  ];
+  const sheetNames = sheets.map((sheet) => sheet.name);
+  const sheetRows = sheets.map((sheet) => sheet.rows);
+  const sheetWidths = sheets.map((sheet) => sheet.widths);
   const contentOverrides = sheetNames.map((_, index) => `<Override PartName="/xl/worksheets/sheet${index + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("");
   const workbookSheets = sheetNames.map((name, index) => `<sheet name="${xmlEscape(name)}" sheetId="${index + 1}"${name === "モデルデータ" ? ' state="hidden"' : ""} r:id="rId${index + 1}"/>`).join("");
   const workbookRelationships = sheetNames.map((_, index) => `<Relationship Id="rId${index + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${index + 1}.xml"/>`).join("");

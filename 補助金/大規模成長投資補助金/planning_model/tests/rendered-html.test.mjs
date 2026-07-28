@@ -362,7 +362,10 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /診断タブに進む →/);
   assert.match(pageSource, /投資計画 計画値/);
   assert.doesNotMatch(pageSource, /第6次定義：計画値/);
-  assert.match(pageSource, /function DiagnosticCharts\(\{ plan \}/);
+  assert.match(pageSource, /function DiagnosticCharts\(\{ plan, businessSegmentationMode \}/);
+  assert.match(pageSource, />補助事業との切り分けなし<\/button>/);
+  assert.match(pageSource, /applyBusinessSegmentationMode/);
+  assert.match(pageSource, /businessSegmentationMode === "split" && <PlTable title="ベース事業PL/);
   assert.match(pageSource, /主要指標の推移チャート/);
   assert.match(pageSource, /niceChartScale/);
   assert.match(pageSource, /const \[moneyDisplayUnit, setMoneyDisplayUnit\] = useState<MoneyDisplayUnit>\("千円"\)/);

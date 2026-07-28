@@ -5,6 +5,8 @@ import {
   basePlan,
   balanceSheetDerived,
   BalanceSheetPlan,
+  BusinessSegmentationMode,
+  applyBusinessSegmentationMode,
   calculateHistoricalDriverSeries,
   calculateHistoricalMetricSeries,
   calculateMetrics,
@@ -1253,11 +1255,16 @@ export default function Home() {
   const [targets, setTargets] = useState<Record<MetricKey, Target>>(clone(defaultTargets));
   const [inputValues, setInputValues] = useState<InputValues>(() => createInitialInputValues());
   const [applicationCategory, setApplicationCategory] = useState<ApplicationCategory>(defaultApplicationCategory);
+  const [businessSegmentationMode, setBusinessSegmentationMode] = useState<BusinessSegmentationMode>("split");
   const latestProjectSalesIsZero = historicalPlan[2].project.sales <= 0;
-  const activeForecastDriverKeys = useMemo<(keyof Drivers)[]>(() => latestProjectSalesIsZero
-    ? [...forecastDriverKeys.filter((key) => key !== "projectSalesGrowthToBase"), "projectFirstYearSales", "projectBaseYearSales"]
-    : forecastDriverKeys,
-  [latestProjectSalesIsZero]);
+  const activeForecastDriverKeys = useMemo<(keyof Drivers)[]>(() => {
+    const relevantKeys = businessSegmentationMode === "wholeCompanyAsProject"
+      ? forecastDriverKeys.filter((key) => !key.startsWith("other"))
+      : forecastDriverKeys;
+    return latestProjectSalesIsZero
+      ? [...relevantKeys.filter((key) => key !== "projectSalesGrowthToBase"), "projectFirstYearSales", "projectBaseYearSales"]
+      : relevantKeys;
+  }, [businessSegmentationMode, latestProjectSalesIsZero]);
   const forecastSettingsStarted = useMemo(() => activeForecastDriverKeys.some((key) =>
     hasInputValue(inputValues, inputKey.driver(key))
     || hasInputValue(inputValues, inputKey.driverRange(key, 0))
@@ -1281,16 +1288,22 @@ export default function Home() {
       || driverRangeRequirementFailure(key, applicationCategory, lower, inflationReferencePercent) !== null;
   }), [activeForecastDriverKeys, applicationCategory, inputValues]);
   const missingAccountingAssumptions = useMemo(() => accountingAssumptionDriverKeys.filter((key) =>
+    (businessSegmentationMode === "split" || !key.startsWith("other"))
+    &&
     !hasInputValue(inputValues, inputKey.driver(key)),
-  ), [inputValues]);
+  ), [businessSegmentationMode, inputValues]);
   const [metricGroupBases, setMetricGroupBases] = useState<Record<MetricGroupKey, MetricGroupBasis>>({ ...defaultMetricGroupBases });
   const [forecastOverrides, setForecastOverrides] = useState<ForecastOverrides>({});
   const [futureInputBasis, setFutureInputBasis] = useState<FutureInputBasis>("other");
-  const projectPeriodInputs = useMemo(
-    () => createForecastProjectPeriodInputs(historicalPlan[2], drivers, timeline),
-    [historicalPlan, drivers, timeline],
+  const forecastHistoricalPlan = useMemo(
+    () => applyBusinessSegmentationMode(historicalPlan, businessSegmentationMode),
+    [businessSegmentationMode, historicalPlan],
   );
-  const autoPlan = useMemo(() => generatePlan(historicalPlan, drivers, timeline, projectPeriodInputs), [historicalPlan, drivers, timeline, projectPeriodInputs]);
+  const projectPeriodInputs = useMemo(
+    () => createForecastProjectPeriodInputs(forecastHistoricalPlan[2], drivers, timeline),
+    [forecastHistoricalPlan, drivers, timeline],
+  );
+  const autoPlan = useMemo(() => generatePlan(forecastHistoricalPlan, drivers, timeline, projectPeriodInputs), [forecastHistoricalPlan, drivers, timeline, projectPeriodInputs]);
   const [adjustedPlan, setAdjustedPlan] = useState<YearPlan[] | null>(null);
   const [adjustedDrivers, setAdjustedDrivers] = useState<Drivers | null>(null);
   const [selectedAdjustmentSuggestions, setSelectedAdjustmentSuggestions] = useState<Record<string, boolean>>({});
@@ -1328,9 +1341,10 @@ export default function Home() {
       || adjustedPlan !== null
       || historicalDefaultsApplied
       || applicationCategory !== defaultApplicationCategory
+      || businessSegmentationMode !== "split"
       || futureInputBasis !== "other"
       || JSON.stringify(timeline) !== JSON.stringify(DEFAULT_TIMELINE);
-  }, [adjustedPlan, applicationCategory, forecastOverrides, futureInputBasis, historicalDefaultsApplied, inputValues, timeline]);
+  }, [adjustedPlan, applicationCategory, businessSegmentationMode, forecastOverrides, futureInputBasis, historicalDefaultsApplied, inputValues, timeline]);
   const excelMappingTargets = useMemo(() => {
     const targets = new Map<string, ExcelMappingTarget>();
     const periodNames = ["prePrevious", "previous", "latest"] as const;
@@ -1358,16 +1372,18 @@ export default function Home() {
           value: hasInputValue(inputValues, key) ? inputValues[key] : null,
         });
       });
-      projectOfficialInputRows.forEach((item) => {
-        const key = inputKey.projectActual(year, item.code);
-        targets.set(`projectPL.${period}.${item.code}`, {
-          id: `projectPL.${period}.${item.code}`,
-          label: `${YEAR_ROLE_LABELS[history.role]} 補助事業PL ${item.code} ${item.label}`,
-          unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
-          writable: true,
-          value: hasInputValue(inputValues, key) ? inputValues[key] : null,
+      if (businessSegmentationMode === "split") {
+        projectOfficialInputRows.forEach((item) => {
+          const key = inputKey.projectActual(year, item.code);
+          targets.set(`projectPL.${period}.${item.code}`, {
+            id: `projectPL.${period}.${item.code}`,
+            label: `${YEAR_ROLE_LABELS[history.role]} 補助事業PL ${item.code} ${item.label}`,
+            unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
+            writable: true,
+            value: hasInputValue(inputValues, key) ? inputValues[key] : null,
+          });
         });
-      });
+      }
     });
     futureMappingPeriods.forEach((period) => {
       const capexIndex = futureCapex.findIndex((row) => row.year === period.year);
@@ -1393,31 +1409,33 @@ export default function Home() {
           value: Object.prototype.hasOwnProperty.call(forecastOverrides, key) ? forecastOverrides[key] : null,
         });
       });
-      projectOfficialInputRows.forEach((item) => {
-        const key = forecastOverrideKey(period.year, "project", item.code);
-        const id = `projectPL.${period.id}.${item.code}`;
-        targets.set(id, {
-          id,
-          label: `${period.label} 補助事業PL ${item.code} ${item.label}`,
-          unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
-          writable: true,
-          value: Object.prototype.hasOwnProperty.call(forecastOverrides, key) ? forecastOverrides[key] : null,
+      if (businessSegmentationMode === "split") {
+        projectOfficialInputRows.forEach((item) => {
+          const key = forecastOverrideKey(period.year, "project", item.code);
+          const id = `projectPL.${period.id}.${item.code}`;
+          targets.set(id, {
+            id,
+            label: `${period.label} 補助事業PL ${item.code} ${item.label}`,
+            unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
+            writable: true,
+            value: Object.prototype.hasOwnProperty.call(forecastOverrides, key) ? forecastOverrides[key] : null,
+          });
         });
-      });
-      otherPlInputFields.forEach((item) => {
-        const key = forecastOverrideKey(period.year, "other", item.key);
-        const id = `basePL.${period.id}.${item.modelCode}`;
-        targets.set(id, {
-          id,
-          label: `${period.label} ベース事業PL ${item.modelCode} ${item.label}`,
-          unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
-          writable: true,
-          value: Object.prototype.hasOwnProperty.call(forecastOverrides, key) ? forecastOverrides[key] : null,
+        otherPlInputFields.forEach((item) => {
+          const key = forecastOverrideKey(period.year, "other", item.key);
+          const id = `basePL.${period.id}.${item.modelCode}`;
+          targets.set(id, {
+            id,
+            label: `${period.label} ベース事業PL ${item.modelCode} ${item.label}`,
+            unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
+            writable: true,
+            value: Object.prototype.hasOwnProperty.call(forecastOverrides, key) ? forecastOverrides[key] : null,
+          });
         });
-      });
+      }
     });
     return targets;
-  }, [forecastOverrides, futureCapex, futureMappingPeriods, historicalPlan, inputValues]);
+  }, [businessSegmentationMode, forecastOverrides, futureCapex, futureMappingPeriods, historicalPlan, inputValues]);
 
   useEffect(() => {
     const closeProposalMenus = (event: PointerEvent) => {
@@ -1457,7 +1475,26 @@ export default function Home() {
       if (menu !== openedMenu) menu.removeAttribute("open");
     });
   }
-  const sourcePlan = useMemo(() => applyForecastOverrides(autoPlan, forecastOverrides, futureInputBasis, drivers), [autoPlan, forecastOverrides, futureInputBasis, drivers]);
+  const sourcePlan = useMemo(
+    () => applyBusinessSegmentationMode(
+      applyForecastOverrides(autoPlan, forecastOverrides, futureInputBasis, drivers),
+      businessSegmentationMode,
+    ),
+    [autoPlan, businessSegmentationMode, forecastOverrides, futureInputBasis, drivers],
+  );
+  const visibleDriverComparisonGroups = useMemo(() => businessSegmentationMode === "split"
+    ? driverComparisonGroups
+    : driverComparisonGroups
+      .map((group) => ({
+        ...group,
+        rows: group.rows.filter((row) =>
+          [row.equipment, row.postBase, row.fixed]
+            .filter((key): key is keyof Drivers => Boolean(key))
+            .every((key) => !key.startsWith("other")),
+        ),
+      }))
+      .filter((group) => group.rows.length > 0),
+  [businessSegmentationMode]);
   const plan = adjustedPlan ?? sourcePlan;
   const calculationDrivers = adjustedDrivers ?? drivers;
   const sourceActual = useMemo(() => calculateMetrics(sourcePlan, drivers), [sourcePlan, drivers]);
@@ -1487,11 +1524,20 @@ export default function Home() {
     return combined.length ? [...combined, ...modelValidations.filter((item) => item.level !== "info")] : modelValidations;
   }, [plan, calculationDrivers, statutoryFailures]);
   const optimizationTargets = useMemo(
-    () => createOptimizationTargets(targets, inputValues, metricGroupBases),
-    [targets, inputValues, metricGroupBases],
+    () => {
+      const created = createOptimizationTargets(targets, inputValues, metricGroupBases);
+      return businessSegmentationMode === "wholeCompanyAsProject"
+        ? { ...created, projectSalesShare: { ...created.projectSalesShare, policy: "monitor" as const } }
+        : created;
+    },
+    [businessSegmentationMode, targets, inputValues, metricGroupBases],
   );
   const hardSummary = useMemo(() => hardTargetSummary(actual, optimizationTargets), [actual, optimizationTargets]);
-  const targetManagedMetrics = metrics.filter((definition) => !isOptimizationExcludedMetric(definition.key) && metricBasisRole(definition.key, metricGroupBases) !== "result");
+  const targetManagedMetrics = metrics.filter((definition) =>
+    !isOptimizationExcludedMetric(definition.key)
+    && !(businessSegmentationMode === "wholeCompanyAsProject" && definition.key === "projectSalesShare")
+    && metricBasisRole(definition.key, metricGroupBases) !== "result",
+  );
   const achieved = targetManagedMetrics.filter((definition) => hasInputValue(inputValues, inputKey.target(definition.key, "value")) && targetStatus(definition, actual[definition.key], targets[definition.key]).ok).length;
   const basePlanYear = plan.find((row) => row.role === "base")!;
   const report3 = plan.find((row) => row.role === "report3")!;
@@ -1502,7 +1548,10 @@ export default function Home() {
     const sourceHistorical = sourcePlan.slice(0, 3);
     const candidateActual = (candidateDrivers: Drivers) => {
       const period = createForecastProjectPeriodInputs(sourceHistorical[2], candidateDrivers, timeline);
-      const candidatePlan = applyForecastOverrides(generatePlan(sourceHistorical, candidateDrivers, timeline, period), forecastOverrides, futureInputBasis, candidateDrivers);
+      const candidatePlan = applyBusinessSegmentationMode(
+        applyForecastOverrides(generatePlan(sourceHistorical, candidateDrivers, timeline, period), forecastOverrides, futureInputBasis, candidateDrivers),
+        businessSegmentationMode,
+      );
       return calculateMetrics(candidatePlan, candidateDrivers);
     };
     for (const definition of targetManagedMetrics) {
@@ -1585,7 +1634,7 @@ export default function Home() {
         .map((candidate) => candidate.suggestion);
     }
     return suggestions;
-  }, [adjustedDrivers, actual, driverRanges, forecastOverrides, futureInputBasis, optimizationTargets, sourcePlan, targetManagedMetrics, timeline]);
+  }, [adjustedDrivers, actual, businessSegmentationMode, driverRanges, forecastOverrides, futureInputBasis, optimizationTargets, sourcePlan, targetManagedMetrics, timeline]);
 
   function clearAdjustment() {
     setAdjustedPlan(null);
@@ -1600,7 +1649,8 @@ export default function Home() {
       title: proposalTitle.trim() || "成長投資計画 提案計画",
       exportedAt: new Date().toISOString(),
       timeline: clone(timeline),
-      historicalPlan: clone(historicalPlan),
+      businessSegmentationMode,
+      historicalPlan: clone(forecastHistoricalPlan),
       balanceSheets: clone(balanceSheets),
       futureCapex: clone(futureCapex),
       drivers: clone(drivers),
@@ -1660,9 +1710,12 @@ export default function Home() {
       importedAdjustedDrivers.projectPayGrowthToBase = normalizeDriverValueForRequirements("projectPayGrowthToBase", importedAdjustedDrivers.projectPayGrowthToBase);
     }
     const importedTimeline = normalizeTimeline(proposal.timeline);
-    const importedHistoricalPlan = clone(proposal.historicalPlan);
+    const importedBusinessSegmentationMode = proposal.businessSegmentationMode;
+    const importedHistoricalPlan = applyBusinessSegmentationMode(clone(proposal.historicalPlan), importedBusinessSegmentationMode);
     const importedForecastOverrides = clone(proposal.forecastOverrides ?? {});
-    const importedFutureInputBasis = proposal.futureInputBasis ?? "other";
+    const importedFutureInputBasis = importedBusinessSegmentationMode === "wholeCompanyAsProject"
+      ? "company"
+      : proposal.futureInputBasis;
     const importedRanges = { ...clone(driverBounds), ...clone(proposal.driverRanges) };
     for (const key of Object.keys(driverBounds) as (keyof Drivers)[]) {
       const importedRange = importedRanges[key] ?? driverBounds[key];
@@ -1672,6 +1725,7 @@ export default function Home() {
     setProposalTitle(proposal.title || "成長投資計画 提案計画");
     setTimeline(importedTimeline);
     setHistoricalPlan(importedHistoricalPlan);
+    setBusinessSegmentationMode(importedBusinessSegmentationMode);
     setBalanceSheets(clone(proposal.balanceSheets));
     setFutureCapex(clone(proposal.futureCapex));
     setDrivers(importedDrivers);
@@ -1758,7 +1812,10 @@ export default function Home() {
       const adjustedPeriodInputs = createForecastProjectPeriodInputs(importedHistoricalPlan[2], importedAdjustedDrivers, importedTimeline);
       const adjustedAutoPlan = generatePlan(importedHistoricalPlan, importedAdjustedDrivers, importedTimeline, adjustedPeriodInputs);
       setAdjustedDrivers(importedAdjustedDrivers);
-      setAdjustedPlan(applyForecastOverrides(adjustedAutoPlan, importedForecastOverrides, importedFutureInputBasis, importedAdjustedDrivers ?? importedDrivers));
+      setAdjustedPlan(applyBusinessSegmentationMode(
+        applyForecastOverrides(adjustedAutoPlan, importedForecastOverrides, importedFutureInputBasis, importedAdjustedDrivers ?? importedDrivers),
+        importedBusinessSegmentationMode,
+      ));
       setSolveNote("保存済みの最適化結果を表示しています。");
     }
     setDefaultNote("");
@@ -2054,7 +2111,7 @@ export default function Home() {
     clearAdjustment();
     const isCount = item.unit === "人";
     setInputValues((current) => setInputValue(current, inputKey.companyActual(historicalPlan[yearIndex].year, item.code), inputValue === null ? null : normalizePlanInput(inputValue, isCount)));
-    setHistoricalPlan((current) => current.map((row, index) => {
+    setHistoricalPlan((current) => applyBusinessSegmentationMode(current.map((row, index) => {
       if (index !== yearIndex) return row;
       if (inputValue === null && item.clearField) {
         return {
@@ -2075,7 +2132,7 @@ export default function Home() {
           ...Object.fromEntries(Object.entries(patch).map(([field, residual]) => [field, normalizePlanInput(residual ?? 0, field === "headcount" || field === "officerCount")])),
         },
       };
-    }));
+    }), businessSegmentationMode));
   }
 
   function updateBalanceSheet(yearIndex: number, field: keyof BalanceSheetPlan, value: number | null) {
@@ -2153,6 +2210,17 @@ export default function Home() {
   function changeFutureInputBasis(basis: FutureInputBasis) {
     clearAdjustment();
     setFutureInputBasis(basis);
+  }
+
+  function changeBusinessSegmentationMode(mode: BusinessSegmentationMode) {
+    clearAdjustment();
+    setBusinessSegmentationMode(mode);
+    if (mode === "wholeCompanyAsProject") {
+      setFutureInputBasis("company");
+      setForecastOverrides((current) => Object.fromEntries(
+        Object.entries(current).filter(([key]) => !key.includes(":other:") && !key.includes(":project:")),
+      ));
+    }
   }
 
   function updateTarget(key: MetricKey, patch: Partial<Target>) {
@@ -2592,7 +2660,10 @@ export default function Home() {
     await new Promise<void>((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
     try {
       const optimizationDrivers = driverOverride ?? drivers;
-      const planTransform = (candidate: YearPlan[]) => applyForecastOverrides(candidate, forecastOverrides, futureInputBasis, optimizationDrivers);
+      const planTransform = (candidate: YearPlan[]) => applyBusinessSegmentationMode(
+        applyForecastOverrides(candidate, forecastOverrides, futureInputBasis, optimizationDrivers),
+        businessSegmentationMode,
+      );
       const result = runPlanningOptimization({
         drivers: optimizationDrivers,
         historicalPlan,
@@ -2774,9 +2845,9 @@ export default function Home() {
           <div className="stat-card"><span>補助事業付加価値増加</span><strong>{number(actual.valueAddedIncrease, 0)} 千円</strong><small>基準年比</small></div>
           <div className="stat-card"><span>補助金1円当たり効果</span><strong>{number(actual.valueAddedSubsidyRatio, 0)}%</strong><small>{hasInputValue(inputValues, inputKey.target("valueAddedSubsidyRatio", "value")) ? `目標 ${number(targets.valueAddedSubsidyRatio.value, 0)}%` : "目標 未設定"}</small></div>
 
-          <DiagnosticCharts plan={plan} />
+          <DiagnosticCharts plan={plan} businessSegmentationMode={businessSegmentationMode} />
           <BehaviorChangeTable plan={plan} balanceSheets={balanceSheets} futureCapex={futureCapex} timeline={timeline} />
-          <FinancialDiagnostics plan={plan} balanceSheets={balanceSheets} futureCapex={futureCapex} />
+          <FinancialDiagnostics plan={plan} balanceSheets={balanceSheets} futureCapex={futureCapex} businessSegmentationMode={businessSegmentationMode} />
 
           <article className="panel metric-overview">
             <div className="panel-heading"><div><p className="card-kicker">目標ギャップ</p><h2>優先して直す指標</h2></div><button className="text-button" onClick={() => goToView("targets")}>15指標を編集 →</button></div>
@@ -2847,7 +2918,18 @@ export default function Home() {
             <code>設備投資 → 固定資産 → 減価償却費（P/L）　／　借入金 → 支払利息 → 経常利益（P/L）</code>
             <p>実務上は連動しますが、第6次の公式Excel自体はB/S残高から減価償却費や支払利息を自動算定していません。公式上の直接参照は主に、P/LのEBITDAを使う1-25 EBITDA有利子負債倍率です。本モデルでも、過去B/Sを入力しただけで手入力P/Lを上書きしません。将来の減価償却費・支払利息は年度別に入力してください。本ツールは、固定資産台帳・借入返済表との自動連動には対応していません。補助事業の減価償却費は公式7-10の合計額を入力し、売上原価内・販管費内の内訳は②のベース事業構成比で計算します。</p>
           </article>
-          <article className="panel table-panel"><div className="panel-heading"><div><h2>会社全体PL・補助事業PL（過去3期）</h2></div><span className="pill green">必須手入力</span></div><HistoricalInputsEditor historical={historicalPlan} inputValues={inputValues} onHistoricalCompanyChange={updateHistoricalCompanyOfficial} onHistoricalProjectChange={updateHistoricalProjectOfficial} /></article>
+          <article className="panel table-panel">
+            <div className="panel-heading"><div><h2>会社全体PL・補助事業PL（過去3期）</h2></div><span className="pill green">必須手入力</span></div>
+            <div className="future-basis-setting">
+              <div><strong>事業の切り分け</strong><small>元データで補助事業とベース事業を分けられるかを選びます</small></div>
+              <div className="mode-switch" role="group" aria-label="事業の切り分け">
+                <button type="button" className={businessSegmentationMode === "split" ? "active" : ""} aria-pressed={businessSegmentationMode === "split"} onClick={() => changeBusinessSegmentationMode("split")}>補助事業とベース事業を切り分ける</button>
+                <button type="button" className={businessSegmentationMode === "wholeCompanyAsProject" ? "active" : ""} aria-pressed={businessSegmentationMode === "wholeCompanyAsProject"} onClick={() => changeBusinessSegmentationMode("wholeCompanyAsProject")}>補助事業との切り分けなし</button>
+              </div>
+            </div>
+            {businessSegmentationMode === "wholeCompanyAsProject" && <p className="default-note">会社全体の入力値をそのまま補助事業として扱います。ベース事業は0となり、ベース事業の入力・表・グラフ・比較診断は表示しません。</p>}
+            <HistoricalInputsEditor historical={historicalPlan} inputValues={inputValues} businessSegmentationMode={businessSegmentationMode} onHistoricalCompanyChange={updateHistoricalCompanyOfficial} onHistoricalProjectChange={updateHistoricalProjectOfficial} />
+          </article>
           <div className="workflow-actions"><span>過去実績を入力できたら、次に現実的な将来水準を設定します。</span><button className="solve-button" onClick={() => goToView("targets")}>15指標・目標へ →</button></div>
         </section>
       )}
@@ -2857,7 +2939,7 @@ export default function Home() {
           <div className="section-intro"><div><h2>自動予測を確認し、必要なセルだけ上書き</h2></div><p>青枠の空欄には原則として自動予測値を表示します。補助事業の減価償却費は公式7-10の合計額を年度別に入力でき、内訳のP2-4・P2-14は②で設定するベース事業の構成比から自動計算します。</p></div>
           <p id="grid-operation-status" className="grid-operation-status" aria-live="polite">セルを選択して、Excelから複数セルをそのまま貼り付けできます。直前の変更はCtrl＋Zで戻せます。</p>
           <article className="panel table-panel"><div className="panel-heading"><div><h2>1-24 新規設備投資による支出（過去3期参照 → 将来計画）</h2></div><span className="pill green">{futureCapex.some((row) => hasInputValue(inputValues, inputKey.futureCapex(row.year))) ? `入力合計 ${number(futureCapex.reduce((sum, row) => sum + row.value, 0), 0)} 千円` : "年度別計画 未入力"}</span></div><FutureCapexEditor balanceSheets={balanceSheets} historical={historicalPlan} futureCapex={futureCapex} inputValues={inputValues} onChange={updateFutureCapex} /><p className="footnote">左側の過去3期は参照表示です。年度別設備投資は補助事業投資額から自動配分しません。事業計画に基づく各年度の金額を入力してください。入力値は設備投資に関する診断へ反映します。</p></article>
-          <article className="panel table-panel"><div className="panel-heading"><div><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">7-10合計を年度別入力</span></div><div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>公式様式を直接作るか、事業別の詳細PLを積み上げるかを選びます</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>ベース事業PLを入力</button></div></div>{missingAccountingAssumptions.length ? <p className="default-note" role="alert">②15指標・目標で「会計内訳・利益前提」を設定してください。給与・賞与、役員報酬・賞与、研究開発費、営業外損益、特別損益、税率が未設定のまま将来PLを補完することはありません。補助事業の減価償却費は公式7-10の合計を年度別入力し、内訳は②のベース事業構成比で計算します。</p> : <FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} drivers={calculationDrivers} onForecastChange={updateForecastOverride} />}<p className="footnote">「全社PLを入力」は、会社全体2-1～2-36と補助事業7-1～7-20・内部管理P2-Xを入力して公式Excelを完成させる方式です。「ベース事業PLを入力」は、補助事業とベース事業を同じ詳細項目で入力し、合計から会社全体PLを作る方式です。</p></article>
+          <article className="panel table-panel"><div className="panel-heading"><div><h2>補助事業期間 → 事業化報告3年目</h2></div><span className="pill blue-pill">7-10合計を年度別入力</span></div>{businessSegmentationMode === "split" ? <div className="future-basis-setting"><div><strong>将来PLの入力方式</strong><small>公式様式を直接作るか、事業別の詳細PLを積み上げるかを選びます</small></div><div className="mode-switch" role="group" aria-label="将来PLの入力方式"><button type="button" className={futureInputBasis === "company" ? "active" : ""} aria-pressed={futureInputBasis === "company"} onClick={() => changeFutureInputBasis("company")}>全社PLを入力</button><button type="button" className={futureInputBasis === "other" ? "active" : ""} aria-pressed={futureInputBasis === "other"} onClick={() => changeFutureInputBasis("other")}>ベース事業PLを入力</button></div></div> : <p className="default-note">全社PLへの入力が補助事業へそのまま反映されます。</p>}{missingAccountingAssumptions.length ? <p className="default-note" role="alert">②15指標・目標で「会計内訳・利益前提」を設定してください。給与・賞与、役員報酬・賞与、研究開発費、営業外損益、特別損益、税率が未設定のまま将来PLを補完することはありません。</p> : <FutureInputsEditor historical={historicalPlan} autoPlan={autoPlan} effectivePlan={sourcePlan} overrides={forecastOverrides} inputValues={inputValues} futureInputBasis={futureInputBasis} businessSegmentationMode={businessSegmentationMode} drivers={calculationDrivers} onForecastChange={updateForecastOverride} />}<p className="footnote">{businessSegmentationMode === "wholeCompanyAsProject" ? "会社全体＝補助事業として入力し、ベース事業は作成しません。" : "「全社PLを入力」は会社全体と補助事業を入力する方式です。「ベース事業PLを入力」は補助事業とベース事業を積み上げる方式です。"}</p></article>
           <div className="workflow-actions"><div><span>上書きしたセルを固定して再最適化できます。再最適化後もこの画面に留まります。</span>{adjustedPlan && <p className="solve-note">{solveNote}</p>}</div><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("targets")}>← 15指標・目標へ戻る</button><button className="solve-button" disabled={isSolving} aria-busy={isSolving} onClick={() => void solve()}>{isSolving ? "計算中…" : "上書き内容を反映して再最適化"}</button><button className="reset-button" onClick={() => goToView("pl")}>年度別PLへ →</button></div></div>
         </section>
       )}
@@ -2868,7 +2950,7 @@ export default function Home() {
           {adjustedPlan && <div className="comparison-banner"><strong>入力値は保存されています。</strong><span>各セルを「入力値 → 調整案」で表示しています。</span></div>}
           <CompanyTable plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} />
           <OfficialProjectTable plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} drivers={calculationDrivers} />
-          <PlTable title="ベース事業PL（モデル内訳・申請書外）" plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} segment="other" />
+          {businessSegmentationMode === "split" && <PlTable title="ベース事業PL（モデル内訳・申請書外）" plan={plan} sourcePlan={adjustedPlan ? sourcePlan : undefined} segment="other" />}
           <div className="workflow-actions"><span>年度別PLを確認したら、診断画面で計画推移と妥当性を確認します。</span><div className="target-action-buttons"><button className="reset-button" onClick={() => goToView("future")}>← 将来データ入力に戻る</button><button className="solve-button" onClick={() => goToView("summary")}>診断タブに進む →</button></div></div>
         </section>
       )}
@@ -2903,7 +2985,7 @@ export default function Home() {
                 {historicalPlan.slice(1).map((row) => <td className="driver-history" key={`market-growth-reference-${row.year}`}>—</td>)}
                 {renderFixedDriverCells("projectMarketGrowth")}
               </tr>
-              {driverComparisonGroups.flatMap((group) => [
+              {visibleDriverComparisonGroups.flatMap((group) => [
                 <tr className="driver-group-heading" key={`group-${group.label}`}><th><strong>{group.label}</strong></th><td aria-hidden="true" colSpan={7}></td></tr>,
                 ...group.rows.flatMap((comparisonRow, rowIndex) => {
                   const keys = [comparisonRow.equipment, comparisonRow.postBase, comparisonRow.fixed].filter((key): key is keyof Drivers => Boolean(key));
@@ -3290,9 +3372,10 @@ function BalanceSheetRowTitle({ code, label, indentLevel = 0 }: { code: string; 
   return <span className="balance-sheet-row-title"><span className="balance-sheet-row-code">{code}</span><span className={`balance-sheet-row-label pl-row-indent-${indentLevel}`}>{label}</span></span>;
 }
 
-function HistoricalInputsEditor({ historical, inputValues, onHistoricalCompanyChange, onHistoricalProjectChange }: {
+function HistoricalInputsEditor({ historical, inputValues, businessSegmentationMode, onHistoricalCompanyChange, onHistoricalProjectChange }: {
   historical: YearPlan[];
   inputValues: InputValues;
+  businessSegmentationMode: BusinessSegmentationMode;
   onHistoricalCompanyChange: (yearIndex: number, item: CompanyActualInputRow, value: number | null) => void;
   onHistoricalProjectChange: (yearIndex: number, item: ProjectOfficialInputRow, value: number | null) => void;
 }) {
@@ -3303,7 +3386,7 @@ function HistoricalInputsEditor({ historical, inputValues, onHistoricalCompanyCh
   const visibleProjectActualRows = omitProjectActualCalculated ? projectOfficialDisplayRows.filter((item) => item.input) : projectOfficialDisplayRows.filter((item) => !item.fixed);
   return <div className="manual-sections spreadsheet-grid">
     <div><h3 className="manual-table-heading"><span>会社全体にかかる損益計算書・関連計算項目（過去3期実績）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCompanyActualCalculated} onClick={() => setOmitCompanyActualCalculated((current) => !current)}>{omitCompanyActualCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3><div className="wide-table actuals-three-year-table"><table><thead><tr><th>第6次様式項目（金額は{moneyUnit}）</th>{historical.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead><tbody>{visibleCompanyActualRows.map((item) => <tr className={`${!item.set ? "emphasis" : ""}${item.groupStart ? " official-related-start" : ""}`} key={item.code}><th><PlRowTitle code={item.code} label={item.label} indentLevel={item.indentLevel} />{item.groupStart && <small>P/L関連計算項目</small>}{item.unit && <small>{displayedMoneyUnit(item.unit, moneyUnit)}</small>}</th>{historical.map((row, index) => { const value = item.get(historical, index); const warning = item.warning?.(historical, index); const isMoney = item.unit !== "人" && item.unit !== "%" && item.unit !== "倍"; return <td key={row.year}>{item.set ? isMoney ? <MoneyInput value={getInputValue(inputValues, inputKey.companyActual(row.year, item.code))} onCanonicalChange={(next) => onHistoricalCompanyChange(index, item, next)} /> : <input type="number" step="1" value={getInputValue(inputValues, inputKey.companyActual(row.year, item.code))} placeholder="未入力" onChange={(event) => onHistoricalCompanyChange(index, item, event.target.value === "" ? null : Number(event.target.value))} /> : <strong>{value === undefined ? "—" : isMoney ? <MoneyValue value={value} /> : number(value, item.unit === "人" ? 0 : 2)}</strong>}{warning && <small className="input-consistency-warning" role="status">{warning}</small>}</td>; })}</tr>)}</tbody></table></div></div>
-    <div>
+    {businessSegmentationMode === "split" && <div>
       <h3 className="manual-table-heading">
         <span>補助事業PL（過去3期実績）</span>
         <button type="button" className="calculated-row-toggle" aria-pressed={omitProjectActualCalculated} onClick={() => setOmitProjectActualCalculated((current) => !current)}>
@@ -3316,8 +3399,8 @@ function HistoricalInputsEditor({ historical, inputValues, onHistoricalCompanyCh
         return <td className="calculated-cell" key={row.year}><strong>{calculatedValue === undefined ? "—" : <ModelValue value={calculatedValue} unit={item.unit} digits={item.unit === "千円" || item.unit === "千円/人" ? undefined : item.digits} />}</strong><small>{item.code === "P2-4" || item.code === "P2-14" ? "②配分率から自動計算" : "自動計算"}</small></td>;
       })}</tr>)}</tbody></table></div>
       <p className="footnote">7-2・7-3・7-5・7-7・7-11・7-12・7-15～7-19は入力済みの過去実績から自動計算します。公式7-10「減価償却費（合計）」は必須入力です。P2-4とP2-14は補助事業の詳細PL用の内部管理項目で、②に設定したベース事業の減価償却費構成比から自動計算します。</p>
-    </div>
-    <p className="footnote">ベース事業の過去3期は「会社全体－補助事業」で自動算出するため、重複入力しません。</p>
+    </div>}
+    <p className="footnote">{businessSegmentationMode === "split" ? "ベース事業の過去3期は「会社全体－補助事業」で自動算出するため、重複入力しません。" : "会社全体の過去3期を補助事業の過去実績として使用します。"}</p>
   </div>;
 }
 
@@ -3371,13 +3454,14 @@ function DetailedProjectInputsTable({ historical, effectivePlan, overrides, omit
   </div>;
 }
 
-function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, inputValues, futureInputBasis, drivers, onForecastChange }: {
+function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, inputValues, futureInputBasis, businessSegmentationMode, drivers, onForecastChange }: {
   historical: YearPlan[];
   autoPlan: YearPlan[];
   effectivePlan: YearPlan[];
   overrides: ForecastOverrides;
   inputValues: InputValues;
   futureInputBasis: FutureInputBasis;
+  businessSegmentationMode: BusinessSegmentationMode;
   drivers: Drivers;
   onForecastChange: (year: number, segment: ForecastSegment, item: string, value: number | null) => void;
 }) {
@@ -3393,7 +3477,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
   const visibleCompanyRows = omitCompanyCalculated ? companyActualInputRows.filter((item) => item.set) : companyActualInputRows;
   const visibleOtherRows = omitOtherCalculated ? otherPlDisplayRows.filter((item) => item.input) : otherPlDisplayRows;
   return <div className="manual-sections spreadsheet-grid">
-    {futureInputBasis === "company" ? <div>
+    {businessSegmentationMode === "split" && (futureInputBasis === "company" ? <div>
       <h3 className="manual-table-heading"><span>補助事業収支計画（7-1～7-20：過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitProjectCalculated} onClick={() => setOmitProjectCalculated((current) => !current)}>{omitProjectCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
       <div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は{moneyUnit}）</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year} className="forecast-heading">{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・空欄は原則自動予測</small></th>)}</tr></thead>
         <tbody>{visibleProjectRows.map((item) => <tr className={!item.input ? "calculated-row" : ""} key={item.code}>
@@ -3415,7 +3499,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
         </tr>)}</tbody>
       </table></div>
       <p className="footnote">7-1・7-4・7-6・7-8・7-9・7-10・7-13・7-14が入力値です。7-10は第6次公式Excelに合わせて減価償却費の合計額を年度別に入力します。内部管理用のP2-4・P2-14は、②で設定するベース事業の構成比を用いて自動計算します。7-2・7-3・7-5・7-7・7-11・7-12・7-15～7-19は第6次Excelと同じ関係式で自動計算し、7-20は「15指標・目標」の市場伸び率を参照します。</p>
-    </div> : <DetailedProjectInputsTable historical={historical} effectivePlan={effectivePlan} overrides={overrides} omitCalculated={omitProjectCalculated} onToggleCalculated={() => setOmitProjectCalculated((current) => !current)} onForecastChange={onForecastChange} />}
+    </div> : <DetailedProjectInputsTable historical={historical} effectivePlan={effectivePlan} overrides={overrides} omitCalculated={omitProjectCalculated} onToggleCalculated={() => setOmitProjectCalculated((current) => !current)} onForecastChange={onForecastChange} />)}
     <div>
       <h3 className="manual-table-heading"><span>会社全体の損益計算書・関連計算項目（2-1～2-36：過去3期参照 → 将来）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitCompanyCalculated} onClick={() => setOmitCompanyCalculated((current) => !current)}>{omitCompanyCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
       <div className="wide-table"><table><thead><tr><th>第6次様式項目（金額は{moneyUnit}）</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・参照</small></th>)}{futureRows.map((row) => <th key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}</small></th>)}</tr></thead>
@@ -3439,7 +3523,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
       </table></div>
       <p className="footnote">2-1～2-20を損益計算書、2-21～2-36を給与・付加価値・人数・EBITDAの「P/L関連計算項目」として区切っています。2-18～2-20・2-27・2-28は第6次様式に合わせた入力項目です。将来の2-18～2-20は直近実績の営業外損益率・特別損益率・税引後利益率を基に自動予測し、必要な年度だけ上書きできます。</p>
     </div>
-    <div>
+    {businessSegmentationMode === "split" && <div>
       <h3 className="manual-table-heading"><span>ベース事業PL・関連計算項目（M2-1～M2-36：過去3期参照 → 事業化報告3年目）</span><button type="button" className="calculated-row-toggle" aria-pressed={omitOtherCalculated} onClick={() => setOmitOtherCalculated((current) => !current)}>{omitOtherCalculated ? "自動計算項目を表示する" : "自動計算項目を省略する"}</button></h3>
       <div className="wide-table"><table><thead><tr><th>第6次様式2-1～2-36準拠の内部管理項目</th>{historical.map((row) => <th className="historical-heading" key={row.year}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・全社－補助事業</small></th>)}{futureRows.map((row) => <th key={row.year} className={futureInputBasis === "other" ? "forecast-heading" : undefined}>{row.year}<small>{YEAR_ROLE_LABELS[row.role]}・{futureInputBasis === "other" ? "空欄は自動予測" : "自動算出"}</small></th>)}</tr></thead>
         <tbody>
@@ -3464,7 +3548,7 @@ function FutureInputsEditor({ historical, autoPlan, effectivePlan, overrides, in
         </tbody>
       </table></div>
       <p className="footnote">「ベース事業PLを入力」では、会社全体2-1～2-36と同じ会計順序で入力します。「全社PLを入力」では、公式7-1～7-20から確実に差額算出できる項目だけを表示し、補助事業側の内訳が不足する賞与・減価償却費区分・経常利益以下などは「—」とします。</p>
-    </div>
+    </div>}
   </div>;
 }
 
@@ -3610,7 +3694,7 @@ function TrendChart({ title, subtitle, unit, plan, series, zeroBaseline, showPoi
   </article>;
 }
 
-function DiagnosticCharts({ plan }: { plan: YearPlan[] }) {
+function DiagnosticCharts({ plan, businessSegmentationMode }: { plan: YearPlan[]; businessSegmentationMode: BusinessSegmentationMode }) {
   const [zeroBaseline, setZeroBaseline] = useState(true);
   const moneyUnit = useContext(MoneyDisplayUnitContext);
   const company = plan.map((row) => total(row.project, row.other));
@@ -3624,15 +3708,18 @@ function DiagnosticCharts({ plan }: { plan: YearPlan[] }) {
   };
   const colors = { company: "var(--chart-company)", project: "var(--chart-project)", other: "var(--chart-other)" };
   const displayMoney = (value: number | undefined) => value === undefined ? undefined : toDisplayMoney(value, moneyUnit);
+  const visibleSeries = (series: ChartSeries[]) => businessSegmentationMode === "wholeCompanyAsProject"
+    ? series.filter((item) => !item.label.includes("ベース事業"))
+    : series;
 
   return <section className="diagnostic-charts" aria-labelledby="diagnostic-chart-heading">
     <div className="diagnostic-chart-heading"><div><h2 id="diagnostic-chart-heading">主要指標の推移チャート</h2><small>金額単位：{moneyUnitLabel(moneyUnit)}（上部の共通設定に連動）</small></div><div className="diagnostic-chart-controls"><div className="chart-scale-control"><span>縦軸の最小値</span><div className="mode-switch" role="group" aria-label="チャートの縦軸最小値"><button type="button" className={zeroBaseline ? "active" : ""} aria-pressed={zeroBaseline} onClick={() => setZeroBaseline(true)}>0から開始</button><button type="button" className={!zeroBaseline ? "active" : ""} aria-pressed={!zeroBaseline} onClick={() => setZeroBaseline(false)}>データ範囲を拡大</button></div><small>負の値を含む場合は、値が切れない範囲まで自動調整します。</small></div></div></div>
     <div className="diagnostic-chart-grid">
-      <TrendChart title="売上高" subtitle="全社と事業別の規模・成長ペース" unit={moneyUnit} plan={plan} zeroBaseline={zeroBaseline} series={[
+      <TrendChart title="売上高" subtitle="全社と事業別の規模・成長ペース" unit={moneyUnit} plan={plan} zeroBaseline={zeroBaseline} series={visibleSeries([
         { label: "全社", color: colors.company, values: company.map((segment) => displayMoney(segment.sales)) },
         { label: "補助事業", color: colors.project, values: plan.map((row) => displayMoney(row.project.sales)) },
         { label: "ベース事業", color: colors.other, values: plan.map((row) => displayMoney(row.other.sales)) },
-      ]} />
+      ])} />
       <TrendChart title="収益性（全社）" subtitle="原価・その他販管費・営業利益の率" unit="%" plan={plan} zeroBaseline={zeroBaseline} series={[
         { label: "売上原価率", color: colors.project, values: company.map((segment) => chartRate(segment.cogs, segment.sales)) },
         { label: "その他販管費率", color: colors.other, values: company.map((segment) => chartRate(segment.otherSga, segment.sales)) },
@@ -3642,11 +3729,11 @@ function DiagnosticCharts({ plan }: { plan: YearPlan[] }) {
         { label: "従業員数", color: colors.other, values: indexed(company.map((segment) => segment.headcount)) },
         { label: "従業員1人当たり給与", color: colors.company, values: indexed(company.map(perEmployee)) },
       ]} />
-      <TrendChart title="労働生産性" subtitle="付加価値額÷（従業員数＋役員数）" unit={`${moneyUnit}/人`} plan={plan} zeroBaseline={zeroBaseline} series={[
+      <TrendChart title="労働生産性" subtitle="付加価値額÷（従業員数＋役員数）" unit={`${moneyUnit}/人`} plan={plan} zeroBaseline={zeroBaseline} series={visibleSeries([
         { label: "全社", color: colors.company, values: company.map((segment) => displayMoney(productivity(segment))) },
         { label: "補助事業", color: colors.project, values: plan.map((row) => displayMoney(productivity(row.project))) },
         { label: "ベース事業", color: colors.other, values: plan.map((row) => displayMoney(productivity(row.other))) },
-      ]} />
+      ])} />
     </div>
     <p className="trend-chart-note"><span className="solid-sample" />実線：過去実績 <span className="dash-sample" />破線：将来予測。チャートは診断用であり、数値の編集は「将来データ入力」で行います。</p>
   </section>;
@@ -3761,14 +3848,14 @@ function DiagnosticSparkline({ plan, row, selected, onSelect }: { plan: YearPlan
   </button>;
 }
 
-function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: YearPlan[]; balanceSheets: BalanceSheetPlan[]; futureCapex: { year: number; value: number }[] }) {
+function FinancialDiagnostics({ plan, balanceSheets, futureCapex, businessSegmentationMode }: { plan: YearPlan[]; balanceSheets: BalanceSheetPlan[]; futureCapex: { year: number; value: number }[]; businessSegmentationMode: BusinessSegmentationMode }) {
   const moneyUnit = useContext(MoneyDisplayUnitContext);
   const company = (row: YearPlan) => total(row.project, row.other);
   const segments = (row: YearPlan) => [
     { label: "全社", value: company(row) },
     { label: "補助", value: row.project },
     { label: "ベース", value: row.other },
-  ];
+  ].filter((entry) => businessSegmentationMode === "split" || entry.label !== "ベース");
   const segmentValues = (row: YearPlan, calculator: (segment: SegmentPlan) => number | undefined) =>
     segments(row).map((entry) => ({ label: entry.label, value: calculator(entry.value) }));
   const pairedValues = (row: YearPlan, calculator: (segment: SegmentPlan) => number | undefined) => [
@@ -3790,7 +3877,7 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
   const perEmployee = (amount: number, segment: SegmentPlan) => segment.headcount ? amount / segment.headcount : undefined;
   const payrollPerEmployee = (segment: SegmentPlan) => perEmployee(segment.employeePay, segment);
 
-  const groups: { title: string; rows: DiagnosticRow[] }[] = [
+  const allGroups: { title: string; rows: DiagnosticRow[] }[] = [
     {
       title: "1. 収益性",
       rows: [
@@ -3848,6 +3935,9 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
       ],
     },
   ];
+  const groups = businessSegmentationMode === "wholeCompanyAsProject"
+    ? allGroups.filter((group) => !group.title.startsWith("5."))
+    : allGroups;
 
   const formatted = (value: number | undefined, unit: DiagnosticRow["unit"]) => {
     if (value === undefined || !Number.isFinite(value)) return "—";

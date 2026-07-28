@@ -17,6 +17,7 @@ import {
   valueAdded,
   YEAR_ROLE_LABELS,
   type BalanceSheetPlan,
+  type BusinessSegmentationMode,
   type SegmentPlan,
   type YearPlan,
 } from "./model";
@@ -161,8 +162,9 @@ export function buildProjectPlRows(plan: YearPlan[], marketGrowth: number): Repo
   ];
 }
 
-export function buildDiagnosticGroups(plan: YearPlan[], balanceSheets: BalanceSheetPlan[], futureCapex: { year: number; value: number }[]): DiagnosticReportGroup[] {
-  const segments = (row: YearPlan) => [{ label: "全社", value: company(row) }, { label: "補助", value: row.project }, { label: "ベース", value: row.other }];
+export function buildDiagnosticGroups(plan: YearPlan[], balanceSheets: BalanceSheetPlan[], futureCapex: { year: number; value: number }[], businessSegmentationMode: BusinessSegmentationMode = "split"): DiagnosticReportGroup[] {
+  const segments = (row: YearPlan) => [{ label: "全社", value: company(row) }, { label: "補助", value: row.project }, { label: "ベース", value: row.other }]
+    .filter((entry) => businessSegmentationMode === "split" || entry.label !== "ベース");
   const segmentValues = (row: YearPlan, calculator: (segment: SegmentPlan) => number | undefined) => segments(row).map((entry) => ({ label: entry.label, value: calculator(entry.value) }));
   const pairedValues = (row: YearPlan, calculator: (segment: SegmentPlan) => number | undefined) => [{ label: "補助", value: calculator(row.project) }, { label: "ベース", value: calculator(row.other) }];
   const previous = (index: number, key: "company" | "project" | "other") => !index ? undefined : key === "company" ? company(plan[index - 1]) : plan[index - 1][key];
@@ -171,7 +173,7 @@ export function buildDiagnosticGroups(plan: YearPlan[], balanceSheets: BalanceSh
   const payPerEmployee = (segment: SegmentPlan) => perEmployee(segment.employeePay, segment);
   const opMargin = (segment: SegmentPlan) => rate(operatingProfit(segment), segment.sales);
   const make = (name: string, formula: string, check: string, unit: string, calculator: (row: YearPlan, index: number) => { label: string; value: number | undefined }[]): DiagnosticReportRow => ({ name, formula, check, unit, values: plan.map(calculator) });
-  return [
+  const groups = [
     { title: "1. 収益性", rows: [
       make("売上高成長率", "当年売上高 ÷ 前年売上高－1", "売上が能力・人員を超えて急増していないか", "%", (row, index) => segments(row).map((entry) => { const key = entry.label === "全社" ? "company" : entry.label === "補助" ? "project" : "other"; return { label: entry.label, value: growth(entry.value.sales, previous(index, key)?.sales) }; })),
       make("売上原価率", "売上原価 ÷ 売上高", "原価率が過去実績から急改善していないか", "%", (row) => segmentValues(row, (s) => rate(s.cogs, s.sales))),
@@ -214,6 +216,9 @@ export function buildDiagnosticGroups(plan: YearPlan[], balanceSheets: BalanceSh
       make("全社利益増加への補助事業寄与率", "補助事業営業利益の前年差 ÷ 全社営業利益の前年差", "全社利益改善を補助事業だけへ寄せていないか", "%", (row, index) => [{ label: "寄与率", value: index ? rate(operatingProfit(row.project) - operatingProfit(plan[index - 1].project), operatingProfit(company(row)) - operatingProfit(company(plan[index - 1]))) : undefined }]),
     ] },
   ];
+  return businessSegmentationMode === "wholeCompanyAsProject"
+    ? groups.filter((group) => !group.title.startsWith("5."))
+    : groups;
 }
 
 export function periodLabels(plan: YearPlan[]) {

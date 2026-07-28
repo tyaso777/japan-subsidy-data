@@ -53,3 +53,16 @@ test("customer-facing proposal Excel covers every required output area and value
     assert.match(packageText, new RegExp(label), `Excel output is missing: ${label}`);
   }
 });
+
+test("whole-company-as-project output omits base-business sections and comparison diagnostics", () => {
+  const context = exportContext();
+  context.proposal.businessSegmentationMode = "wholeCompanyAsProject";
+
+  const html = proposalIo.buildProposalHtml(context);
+  assert.doesNotMatch(html, /<h2>ベース事業にかかる損益計算書（P\/L）<\/h2>/);
+  assert.doesNotMatch(html, /基本指標による妥当性チェック｜5\. 補助事業とベース事業の比較/);
+
+  const files = unzipSync(proposalIo.buildProposalXlsx(context));
+  const workbook = strFromU8(files["xl/workbook.xml"]);
+  assert.doesNotMatch(workbook, /name="ベース事業PL"/);
+});

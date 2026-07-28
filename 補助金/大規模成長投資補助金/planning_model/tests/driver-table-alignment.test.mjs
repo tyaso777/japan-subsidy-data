@@ -258,7 +258,7 @@ test("fixed forecast-condition header keeps its two-row layout and centering", (
 test("market growth is the second external premise before business conditions", () => {
   const inflationRowIndex = pageSource.indexOf("{inflationConditionCode}:");
   const marketGrowthRowIndex = pageSource.indexOf("{marketGrowthConditionCode}:");
-  const businessGroupIndex = pageSource.indexOf("{driverComparisonGroups.flatMap", marketGrowthRowIndex);
+  const businessGroupIndex = pageSource.indexOf("{visibleDriverComparisonGroups.flatMap", marketGrowthRowIndex);
 
   assert.ok(inflationRowIndex >= 0, "物価上昇率の外部前提行が必要");
   assert.ok(marketGrowthRowIndex > inflationRowIndex, "市場伸び率は物価上昇率の直後に置く");

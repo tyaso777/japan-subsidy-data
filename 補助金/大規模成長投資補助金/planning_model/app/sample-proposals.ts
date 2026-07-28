@@ -281,6 +281,7 @@ const commonProposal = (title: string, exportedAt: string, historicalPlan: YearP
     title,
     exportedAt,
     timeline: { ...DEFAULT_TIMELINE },
+    businessSegmentationMode: "split",
     historicalPlan,
     balanceSheets,
     futureCapex: capex,
