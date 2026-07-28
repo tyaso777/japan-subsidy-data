@@ -3,6 +3,7 @@ import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 export const EXCEL_MAPPING_FORMAT = "growth-investment-excel-mapping/v1";
 
 export type ExcelMappingDirection = "import" | "export" | "both";
+export type ExcelMappingImportScope = "history" | "history-and-future";
 export type ExcelMappingUnit = "raw" | "円" | "千円" | "百万円" | "億円" | "%" | "人" | "年" | "倍";
 export type ExcelPercentMode = "display" | "fraction";
 
@@ -128,6 +129,16 @@ export function futureInputBasisForMappedTargets(targets: string[]): "company" |
   }
   if (company && other) throw new Error("将来の全社PLとベース事業PLを同時には取り込めません。どちらか一方のマッピングにしてください。");
   return company ? "company" : other ? "other" : null;
+}
+
+const historicalPeriodNames = new Set(["prePrevious", "previous", "latest"]);
+
+export function filterExcelMappingImportPreviews<T extends { target: string }>(
+  previews: T[],
+  scope: ExcelMappingImportScope,
+): T[] {
+  if (scope === "history-and-future") return previews;
+  return previews.filter((preview) => historicalPeriodNames.has(preview.target.split(".")[1] ?? ""));
 }
 
 export function validateExcelMappingDefinition(value: unknown): string[] {
@@ -424,6 +435,7 @@ ${JSON.stringify(EXCEL_MAPPING_EXAMPLE, null, 2)}
 
 将来PLの数値は手入力固定値として反映し、Excelの空欄は自動予測のまま残します。
 \`companyPL\` の将来期を取り込むと「全社PLを入力」、\`basePL\` の将来期を取り込むと「ベース事業PLを入力」へ自動的に切り替わります。両方を同じ定義書へ混在させることはできません。\`projectPL\` と \`futureCapex\` はどちらの入力方式でも使用できます。
+取込実行前に、画面で「①過去データのみ」または「①過去＋③将来データ」を選択します。初期値は「①過去データのみ」です。
 
 ## excel
 - sheet: Excelの正確なシート名

@@ -119,6 +119,11 @@ test("Excelマッピングで③の将来設備投資とPL固定値を取り込�
     mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     buffer: Buffer.from(futureMappingWorkbook()),
   });
+  await expect(page.getByRole("button", { name: "①過去データのみ" })).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "取込内容を確認" }).click();
+  await expect(page.locator(".excel-mapping-status")).toContainText("取込候補 0件");
+  await expect(page.locator(".excel-mapping-status")).toContainText("選択範囲外 3件");
+  await page.getByRole("button", { name: "①過去＋③将来データ" }).click();
   await page.getByRole("button", { name: "取込内容を確認" }).click();
   await expect(page.locator(".excel-mapping-status")).toContainText("取込候補 3件");
   await page.getByRole("button", { name: "確認した値を反映" }).click();

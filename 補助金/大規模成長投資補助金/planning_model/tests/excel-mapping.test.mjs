@@ -4,6 +4,7 @@ import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import {
   buildMappedExcel,
   EXCEL_MAPPING_FORMAT,
+  filterExcelMappingImportPreviews,
   futureExcelMappingPeriods,
   futureInputBasisForMappedTargets,
   mappedExcelOutputFileName,
@@ -94,6 +95,23 @@ test("selects the future PL input basis from mapped targets and rejects mixed ba
       "basePL.baseYear.M2-1",
     ]),
     /全社PLとベース事業PL/,
+  );
+});
+
+test("limits mapped imports to historical data unless future data is explicitly included", () => {
+  const previews = [
+    { target: "companyPL.latest.2-1" },
+    { target: "balanceSheet.previous.1-1" },
+    { target: "futureCapex.baseYear.1-24" },
+    { target: "projectPL.report1.7-1" },
+  ];
+  assert.deepEqual(
+    filterExcelMappingImportPreviews(previews, "history").map((item) => item.target),
+    ["companyPL.latest.2-1", "balanceSheet.previous.1-1"],
+  );
+  assert.deepEqual(
+    filterExcelMappingImportPreviews(previews, "history-and-future").map((item) => item.target),
+    previews.map((item) => item.target),
   );
 });
 

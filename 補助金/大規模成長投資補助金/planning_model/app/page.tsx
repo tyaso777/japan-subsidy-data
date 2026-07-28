@@ -62,12 +62,14 @@ import {
   EXCEL_MAPPING_COPILOT_PROMPT,
   EXCEL_MAPPING_EXAMPLE,
   EXCEL_MAPPING_MANUAL,
+  filterExcelMappingImportPreviews,
   futureExcelMappingPeriods,
   futureInputBasisForMappedTargets,
   mappedExcelOutputFileName,
   parseExcelMappingDefinition,
   previewExcelImport,
   type ExcelMappingDefinition,
+  type ExcelMappingImportScope,
   type ExcelMappingPreview,
   type ExcelMappingTarget,
 } from "./excel-mapping";
@@ -1296,6 +1298,7 @@ export default function Home() {
   const [mappedExcelFileName, setMappedExcelFileName] = useState("");
   const [excelMappingPreview, setExcelMappingPreview] = useState<ExcelMappingPreview[]>([]);
   const [excelMappingPreviewMode, setExcelMappingPreviewMode] = useState<"import" | "export" | null>(null);
+  const [excelImportScope, setExcelImportScope] = useState<ExcelMappingImportScope>("history");
   const [excelMappingNote, setExcelMappingNote] = useState("マッピング定義書と対象Excelを選択してください。");
   const [copilotPromptCopied, setCopilotPromptCopied] = useState(false);
   const futureMappingPeriods = useMemo(() => futureExcelMappingPeriods(timeline), [timeline]);
@@ -1803,18 +1806,27 @@ export default function Home() {
       return;
     }
     try {
-      const preview = previewExcelImport(mappedExcelBytes, excelMapping, excelMappingTargets);
+      const allPreviews = previewExcelImport(mappedExcelBytes, excelMapping, excelMappingTargets);
+      const preview = filterExcelMappingImportPreviews(allPreviews, excelImportScope);
       futureInputBasisForMappedTargets(preview.map((item) => item.target));
       setExcelMappingPreview(preview);
       setExcelMappingPreviewMode("import");
       const ready = preview.filter((item) => item.status === "ready").length;
       const errors = preview.filter((item) => item.status === "error").length;
-      setExcelMappingNote(`取込候補 ${ready}件、エラー ${errors}件です。内容を確認してから反映してください。`);
+      const excluded = allPreviews.length - preview.length;
+      setExcelMappingNote(`取込候補 ${ready}件、エラー ${errors}件${excluded ? `、選択範囲外 ${excluded}件` : ""}です。内容を確認してから反映してください。`);
     } catch (error) {
       setExcelMappingPreview([]);
       setExcelMappingPreviewMode(null);
       setExcelMappingNote(error instanceof Error ? error.message : "Excelの確認に失敗しました。");
     }
+  }
+
+  function changeExcelImportScope(scope: ExcelMappingImportScope) {
+    setExcelImportScope(scope);
+    setExcelMappingPreview([]);
+    setExcelMappingPreviewMode(null);
+    setExcelMappingNote(scope === "history" ? "取込範囲を「①過去データのみ」に設定しました。" : "取込範囲を「①過去＋③将来データ」に設定しました。");
   }
 
   function applyMappedExcelImport() {
@@ -2681,6 +2693,13 @@ export default function Home() {
                   <button type="button" onClick={exportMappedExcel}>別Excelとして出力</button>
                 </div>
               </section>
+            </div>
+            <div className="excel-import-scope">
+              <div><strong>取込範囲</strong><small>Excelの将来値を③の手入力固定値として反映するか選択します。</small></div>
+              <div className="mode-switch" role="group" aria-label="Excelの取込範囲">
+                <button type="button" className={excelImportScope === "history" ? "active" : ""} aria-pressed={excelImportScope === "history"} onClick={() => changeExcelImportScope("history")}>①過去データのみ</button>
+                <button type="button" className={excelImportScope === "history-and-future" ? "active" : ""} aria-pressed={excelImportScope === "history-and-future"} onClick={() => changeExcelImportScope("history-and-future")}>①過去＋③将来データ</button>
+              </div>
             </div>
             <div className="excel-mapping-resources">
               <span>Copilotへ対象Excelと一緒に渡す資料</span>
