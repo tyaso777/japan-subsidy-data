@@ -138,7 +138,7 @@ test("renders the planning model shell", async () => {
   assert.doesNotMatch(pageSource, /className="diagnostic-groups-scroll"/);
   assert.doesNotMatch(pageSource, /--diagnostic-sticky-chart-height/);
   assert.match(pageSource, /className="diagnostic-detail-layout"/);
-  assert.match(pageSource, /className="diagnostic-values-panel"/);
+  assert.doesNotMatch(pageSource, /className="diagnostic-values-panel"/);
   assert.match(pageSource, /className="diagnostic-metric-navigator"/);
   assert.match(
     pageSource,
@@ -151,10 +151,12 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /case "ArrowUp"/);
   assert.match(pageSource, /case "ArrowDown"/);
   assert.match(globalStyles, /\.diagnostic-detail-layout \{[^}]*grid-template-columns:/);
-  assert.match(globalStyles, /\.diagnostic-values-panel \{/);
+  assert.doesNotMatch(globalStyles, /\.diagnostic-values-panel/);
   assert.match(globalStyles, /\.diagnostic-metric-navigator \{/);
   assert.match(globalStyles, /\.diagnostic-overview-block \{[^}]*position: relative;/);
-  assert.doesNotMatch(globalStyles, /\.diagnostic-values-panel \{[^}]*overflow:\s*auto;/);
+  assert.match(pageSource, /<TrendChart showPointLabels title=\{selected\.row\.name\}/);
+  assert.match(pageSource, /className="trend-chart-point-label"/);
+  assert.match(globalStyles, /\.trend-chart-point-label \{/);
   assert.match(pageSource, /diagnosticChart\.getBoundingClientRect\(\)/);
   assert.match(pageSource, /<th className="diagnostic-sparkline-column">推移<\/th>/);
   assert.match(pageSource, /<th className="diagnostic-series-column">区分<\/th>/);
@@ -163,7 +165,6 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /className="diagnostic-series-labels"/);
   assert.match(pageSource, /className="diagnostic-values diagnostic-values-only"/);
   assert.match(pageSource, /setSelectedKey\(itemKey\)/);
-  assert.match(pageSource, /<TrendChart title=\{selected\.row\.name\}/);
   assert.match(globalStyles, /\.diagnostic-sparkline-button\[aria-pressed="true"\]/);
   assert.match(globalStyles, /\.diagnostic-series-column, \.diagnostic-series-cell/);
   assert.match(globalStyles, /\.diagnostic-period-heading, \.diagnostic-period-cell/);

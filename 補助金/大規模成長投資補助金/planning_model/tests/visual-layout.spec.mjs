@@ -118,7 +118,7 @@ for (const width of viewportWidths) {
   });
 }
 
-test("diagnostic detail chart, value table, and keyboard navigator stay coordinated", async ({ page }) => {
+test("diagnostic detail chart labels, legend, and keyboard navigator stay coordinated", async ({ page }) => {
   await openStandalone(page, 1440);
   page.on("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "データ入出力" }).click();
@@ -127,31 +127,27 @@ test("diagnostic detail chart, value table, and keyboard navigator stay coordina
 
   const overview = page.locator(".diagnostic-overview-block");
   const detailLayout = page.locator(".diagnostic-detail-layout");
-  const valuePanel = page.locator(".diagnostic-values-panel");
+  const pointLabels = page.locator(".diagnostic-detail-layout .trend-chart-point-label");
   const navigator = page.locator(".diagnostic-metric-navigator");
   await expect(overview).toBeVisible();
   await expect(detailLayout).toBeVisible();
-  await expect(valuePanel).toBeVisible();
+  expect(await pointLabels.count()).toBeGreaterThan(0);
   await expect(navigator).toBeVisible();
 
   const geometry = await page.evaluate(() => {
     const overview = document.querySelector(".diagnostic-overview-block");
     const layout = document.querySelector(".diagnostic-detail-layout")?.getBoundingClientRect();
     const chart = document.querySelector(".diagnostic-detail-layout .trend-chart-card")?.getBoundingClientRect();
-    const valuesElement = document.querySelector(".diagnostic-values-panel");
-    const values = valuesElement?.getBoundingClientRect();
+    const legend = document.querySelector(".diagnostic-detail-layout .trend-chart-legend")?.getBoundingClientRect();
     const navigator = document.querySelector(".diagnostic-metric-navigator");
     const navigatorBox = navigator?.getBoundingClientRect();
     const groupsPanel = document.querySelector(".diagnostic-groups-panel");
-    return overview && layout && chart && valuesElement && values && navigator && navigatorBox && groupsPanel
+    return overview && layout && chart && legend && navigator && navigatorBox && groupsPanel
       ? {
-          chartRight: chart.right,
-          valuesLeft: values.left,
           chartHeight: chart.height,
-          valuesHeight: values.height,
-          valuesClientHeight: valuesElement.clientHeight,
-          valuesScrollHeight: valuesElement.scrollHeight,
-          valuesOverflowY: getComputedStyle(valuesElement).overflowY,
+          layoutHeight: layout.height,
+          legendBottom: legend.bottom,
+          chartBottom: chart.bottom,
           layoutBottom: layout.bottom,
           navigatorTop: navigatorBox.top,
           overviewContainsNavigator: overview.contains(navigator),
@@ -160,10 +156,8 @@ test("diagnostic detail chart, value table, and keyboard navigator stay coordina
       : null;
   });
   expect(geometry).not.toBeNull();
-  expect(geometry.valuesLeft).toBeGreaterThanOrEqual(geometry.chartRight - 1);
-  expect(Math.abs(geometry.valuesHeight - geometry.chartHeight)).toBeLessThanOrEqual(2);
-  expect(geometry.valuesScrollHeight).toBeLessThanOrEqual(geometry.valuesClientHeight + 1);
-  expect(geometry.valuesOverflowY).not.toMatch(/auto|scroll/);
+  expect(Math.abs(geometry.layoutHeight - geometry.chartHeight)).toBeLessThanOrEqual(2);
+  expect(geometry.legendBottom).toBeLessThanOrEqual(geometry.chartBottom + 1);
   expect(geometry.navigatorTop).toBeGreaterThanOrEqual(geometry.layoutBottom - 1);
   expect(geometry.overviewContainsNavigator).toBe(true);
   expect(geometry.overviewContainsGroupsPanel).toBe(false);

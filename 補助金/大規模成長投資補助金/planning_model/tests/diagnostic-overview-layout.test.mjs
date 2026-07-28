@@ -31,33 +31,27 @@ test("狭幅では詳細チャートの固定を解除して縦積みにする",
   );
 });
 
-test("年度別数値表は詳細チャートと同じ高さに収める", () => {
+test("年度別数値は大チャートの各点へ表示して右表を置かない", () => {
   assert.match(
-    css,
-    /\.diagnostic-values-panel\s*\{[^}]*overflow:\s*hidden;/s,
+    pageSource,
+    /<TrendChart showPointLabels title=\{selected\.row\.name\}/,
   );
-  assert.match(
-    css,
-    /\.diagnostic-values-table-wrap\s*\{[^}]*min-height:\s*0;[^}]*overflow-y:\s*hidden;/s,
-  );
-  assert.match(
-    css,
-    /\.diagnostic-values-panel table\s*\{[^}]*height:\s*100%;[^}]*table-layout:\s*fixed;/s,
-  );
-  assert.match(
-    css,
-    /\.diagnostic-values-panel tbody th small\s*\{[^}]*display:\s*inline;[^}]*margin-left:\s*6px;/s,
-  );
+  assert.match(pageSource, /className="trend-chart-point-label"/);
+  assert.doesNotMatch(pageSource, /className="diagnostic-values-panel"/);
+  assert.doesNotMatch(css, /\.diagnostic-values-panel/);
+  assert.match(css, /\.diagnostic-detail-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\);/s);
 });
 
-test("固定中の年度別数値表から背後のミニチャートが透けない", () => {
+test("大チャートの凡例をカード内に収めてミニチャートと重ねない", () => {
   assert.match(
     css,
-    /\.diagnostic-detail-layout\s*\{[^}]*background:\s*var\(--paper\);[^}]*isolation:\s*isolate;/s,
+    /\.diagnostic-detail-layout \.trend-chart-card\s*\{[^}]*display:\s*grid;[^}]*grid-template-rows:\s*auto minmax\(0,\s*1fr\) auto;[^}]*overflow:\s*hidden;/s,
   );
   assert.match(
     css,
-    /\.diagnostic-values-panel\s*\{[^}]*background:\s*var\(--panel\);/s,
+    /\.diagnostic-detail-layout \.trend-chart-svg\s*\{[^}]*min-height:\s*0;[^}]*height:\s*100%;/s,
   );
+  assert.match(css, /\.diagnostic-detail-layout \.trend-chart-legend\s*\{[^}]*align-self:\s*end;/s);
+  assert.match(css, /\.trend-chart-point-label\s*\{[^}]*paint-order:\s*stroke fill;/s);
   assert.doesNotMatch(css, /var\(--surface\)/);
 });

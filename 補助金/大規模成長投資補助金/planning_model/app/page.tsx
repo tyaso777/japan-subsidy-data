@@ -3394,10 +3394,10 @@ const chartValueDigits = (unit: string) => {
   return 1;
 };
 
-function TrendChart({ title, subtitle, unit, plan, series, zeroBaseline }: { title: string; subtitle: string; unit: string; plan: YearPlan[]; series: ChartSeries[]; zeroBaseline: boolean }) {
-  const width = 720;
+function TrendChart({ title, subtitle, unit, plan, series, zeroBaseline, showPointLabels = false }: { title: string; subtitle: string; unit: string; plan: YearPlan[]; series: ChartSeries[]; zeroBaseline: boolean; showPointLabels?: boolean }) {
+  const width = showPointLabels ? 1200 : 720;
   const height = 270;
-  const margin = { top: 22, right: 22, bottom: 42, left: 54 };
+  const margin = { top: showPointLabels ? 34 : 22, right: showPointLabels ? 34 : 22, bottom: 42, left: 54 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
   const latestIndex = Math.max(0, plan.findIndex((row) => row.role === "latest"));
@@ -3419,6 +3419,7 @@ function TrendChart({ title, subtitle, unit, plan, series, zeroBaseline }: { tit
     }).join(" ");
   };
   const axisLabel = (value: number) => number(value, scale.decimals);
+  const pointLabelOffsets = series.length <= 1 ? [-10] : series.length === 2 ? [-12, 15] : [-12, -27, 16, 30];
 
   return <article className="trend-chart-card">
     <div className="trend-chart-title"><div><h3>{title}</h3><p>{subtitle}</p></div><span>{unit}</span></div>
@@ -3430,10 +3431,19 @@ function TrendChart({ title, subtitle, unit, plan, series, zeroBaseline }: { tit
       })}
       {baseIndex >= 0 && <g><line className="trend-chart-base-line" x1={x(baseIndex)} y1={margin.top} x2={x(baseIndex)} y2={margin.top + plotHeight} /><text className="trend-chart-boundary-label" x={x(baseIndex)} y={margin.top + 12} textAnchor="middle">基準年</text></g>}
       <text className="trend-chart-boundary-label" x={x(latestIndex) + 7} y={margin.top + plotHeight - 8}>予測</text>
-      {series.map((item) => <g key={item.label}>
+      {series.map((item, seriesIndex) => <g key={item.label}>
         <path className="trend-chart-line actual" d={pathFor(item.values, 0, latestIndex)} stroke={item.color} />
         <path className="trend-chart-line forecast" d={pathFor(item.values, latestIndex, plan.length - 1)} stroke={item.color} />
-        {item.values.map((value, index) => value === undefined || !Number.isFinite(value) ? null : <circle key={`${item.label}-${plan[index].year}`} className={index <= latestIndex ? "trend-chart-point actual" : "trend-chart-point forecast"} cx={x(index)} cy={y(value)} r="3.3" stroke={item.color} fill={index <= latestIndex ? item.color : "var(--panel)"} />)}
+        {item.values.map((value, index) => value === undefined || !Number.isFinite(value) ? null : <g key={`${item.label}-${plan[index].year}`}>
+          <circle className={index <= latestIndex ? "trend-chart-point actual" : "trend-chart-point forecast"} cx={x(index)} cy={y(value)} r="3.3" stroke={item.color} fill={index <= latestIndex ? item.color : "var(--panel)"} />
+          {showPointLabels && <text
+            className="trend-chart-point-label"
+            x={x(index)}
+            y={y(value) + (pointLabelOffsets[seriesIndex] ?? 16)}
+            textAnchor={index === 0 ? "start" : index === plan.length - 1 ? "end" : "middle"}
+            style={{ fill: item.color }}
+          >{number(value, chartValueDigits(unit))}</text>}
+        </g>)}
       </g>)}
       {plan.map((row, index) => <text className="trend-chart-year" key={row.year} x={x(index)} y={height - 15} textAnchor="middle">{row.year}</text>)}
     </svg>
@@ -3729,16 +3739,10 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
   };
 
   return <section className="financial-diagnostics" aria-label="PL妥当性診断">
-    <div className="diagnostic-heading"><div><h2>基本指標によるシミュレーション妥当性チェック</h2></div><p>「推移」の小さなチャートを選ぶと、詳細チャートが切り替わります。年度別数値は全社・補助事業・ベース事業の順です。</p></div>
+    <div className="diagnostic-heading"><div><h2>基本指標によるシミュレーション妥当性チェック</h2></div><p>ミニチャートを選ぶと詳細チャートが切り替わります。各点の数値は全社・補助事業・ベース事業の系列色で表示します。</p></div>
     <div className="diagnostic-overview-block">
     {selected && <div className="diagnostic-detail-layout">
-        <TrendChart title={selected.row.name} subtitle={`${selected.row.formula}｜${selected.row.check}`} unit={selected.row.unit === "千円/人" ? `${moneyUnit}/人` : selected.row.unit} plan={plan} zeroBaseline series={selectedSeries.map((series) => selected.row.unit === "千円/人" ? { ...series, values: series.values.map((value) => value === undefined ? undefined : toDisplayMoney(value, moneyUnit)) } : series)} />
-        <aside className="diagnostic-values-panel" aria-label={`${selected.row.name}の年度別数値`}>
-          <h3>年度別数値</h3>
-          <div className="diagnostic-values-table-wrap"><table><thead><tr><th>年度</th>{selectedSeries.map((series) => <th key={series.label}>{series.label}</th>)}</tr></thead><tbody>
-            {plan.map((year, index) => <tr key={year.year}><th>{year.year}<small>{YEAR_ROLE_LABELS[year.role]}</small></th>{selectedSeries.map((series) => <td key={series.label}>{formatted(series.values[index], selected.row.unit)}</td>)}</tr>)}
-          </tbody></table></div>
-        </aside>
+        <TrendChart showPointLabels title={selected.row.name} subtitle={`${selected.row.formula}｜${selected.row.check}`} unit={selected.row.unit === "千円/人" ? `${moneyUnit}/人` : selected.row.unit} plan={plan} zeroBaseline series={selectedSeries.map((series) => selected.row.unit === "千円/人" ? { ...series, values: series.values.map((value) => value === undefined ? undefined : toDisplayMoney(value, moneyUnit)) } : series)} />
       </div>}
     <nav className="diagnostic-metric-navigator" aria-label="診断指標を選択">
       {groups.map((group, groupIndex) => <section className="diagnostic-metric-group" key={group.title}>
