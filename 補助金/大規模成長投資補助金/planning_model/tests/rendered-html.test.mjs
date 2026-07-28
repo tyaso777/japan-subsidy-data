@@ -178,8 +178,8 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /code: "1-2", label: "うち流動資産"[\s\S]*?indentLevel: 1/);
   assert.match(pageSource, /code: "1-3", label: "うち現金及び預金"[\s\S]*?indentLevel: 2/);
   assert.match(pageSource, /code: "1-6", label: "うち建物及び構築物"[\s\S]*?indentLevel: 3/);
-  assert.match(pageSource, /BalanceSheetEditor[\s\S]*?<PlRowTitle code=\{item\.code\} label=\{item\.label\} indentLevel=\{item\.indentLevel\}/);
-  assert.match(globalStyles, /\.pl-row-indent-3 \{ padding-inline-start: var\(--space-8\); \}/);
+  assert.match(pageSource, /BalanceSheetEditor[\s\S]*?<BalanceSheetRowTitle code=\{item\.code\} label=\{item\.label\} indentLevel=\{item\.indentLevel\}/);
+  assert.match(globalStyles, /\.pl-row-indent-3 \{ padding-inline-start: calc\(var\(--space-6\) \+ var\(--space-4\)\); \}/);
   assert.match(pageSource, /omitUnused \? rows\.filter\(\(item\) => item\.code === "1-24"\) : rows/);
   assert.match(pageSource, /入力済みのB\/S値は保持されます/);
   assert.match(pageSource, /B\/S全項目を表示して入力してください/);

@@ -118,6 +118,29 @@ for (const width of viewportWidths) {
   });
 }
 
+test("balance-sheet codes stay aligned while only labels follow the A002 hierarchy", async ({ page }) => {
+  await openStandalone(page, 1440);
+  const positions = await page.locator(".balance-sheet-row-title").evaluateAll((titles) =>
+    Object.fromEntries(titles.map((title) => {
+      const code = title.querySelector(".balance-sheet-row-code");
+      const label = title.querySelector(".balance-sheet-row-label");
+      const labelStyle = label ? getComputedStyle(label) : null;
+      return [code?.textContent ?? "", {
+        codeLeft: code?.getBoundingClientRect().left ?? 0,
+        labelTextLeft: (label?.getBoundingClientRect().left ?? 0) + Number.parseFloat(labelStyle?.paddingInlineStart ?? "0"),
+      }];
+    })));
+
+  const codeLefts = Object.values(positions).map((position) => position.codeLeft);
+  expect(Math.max(...codeLefts) - Math.min(...codeLefts)).toBeLessThanOrEqual(1);
+  expect(positions["1-2"].labelTextLeft).toBeGreaterThan(positions["1-1"].labelTextLeft);
+  expect(positions["1-3"].labelTextLeft).toBeGreaterThan(positions["1-2"].labelTextLeft);
+  expect(positions["1-5"].labelTextLeft).toBeGreaterThan(positions["1-4"].labelTextLeft);
+  expect(positions["1-6"].labelTextLeft).toBeGreaterThan(positions["1-5"].labelTextLeft);
+  expect(Math.abs(positions["1-19"].labelTextLeft - positions["1-1"].labelTextLeft)).toBeLessThanOrEqual(1);
+  expect(Math.abs(positions["1-22"].labelTextLeft - positions["1-20"].labelTextLeft)).toBeLessThanOrEqual(1);
+});
+
 test("diagnostic detail chart labels, legend, and keyboard navigator stay coordinated", async ({ page }) => {
   await openStandalone(page, 1440);
   page.on("dialog", (dialog) => dialog.accept());
