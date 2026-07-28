@@ -3,6 +3,8 @@ import test from "node:test";
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import {
   buildMappedExcel,
+  buildExcelConversionSampleWorkbook,
+  EXCEL_CONVERSION_SAMPLE_MAPPING,
   EXCEL_MAPPING_FORMAT,
   filterExcelMappingImportPreviews,
   futureExcelMappingPeriods,
@@ -40,6 +42,35 @@ test("validates and parses declarative mapping definitions", () => {
   assert.throws(() => parseExcelMappingDefinition("{bad json"), /JSON/);
   const duplicate = { ...mapping, bindings: [...mapping.bindings, { ...mapping.bindings[0], id: "duplicate", excel: { ...mapping.bindings[0].excel, cell: "F5" } }] };
   assert.match(validateExcelMappingDefinition(duplicate).join("\n"), /取込先が重複/);
+});
+
+test("provides a ready-to-use company-to-base conversion workbook and matching mapping", () => {
+  assert.equal(validateExcelMappingDefinition(EXCEL_CONVERSION_SAMPLE_MAPPING).length, 0);
+  const workbook = buildExcelConversionSampleWorkbook();
+  assert.equal(Buffer.from(workbook.subarray(0, 2)).toString("ascii"), "PK");
+
+  const targets = new Map(EXCEL_CONVERSION_SAMPLE_MAPPING.bindings.map((binding) => {
+    const count = binding.excel.unit === "人";
+    return [binding.target, {
+      id: binding.target,
+      label: binding.target,
+      unit: count ? "人" : "円",
+      writable: true,
+      value: null,
+    }];
+  }));
+  const previews = previewExcelImport(workbook, EXCEL_CONVERSION_SAMPLE_MAPPING, targets);
+
+  assert.equal(previews.length, EXCEL_CONVERSION_SAMPLE_MAPPING.bindings.length);
+  assert.equal(previews.every((item) => item.status === "ready"), true);
+  assert.equal(
+    previews.find((item) => item.target === "companyPL.baseYear.2-1")?.value,
+    3_400_000_000,
+  );
+  assert.equal(
+    previews.find((item) => item.target === "projectPL.baseYear.7-1")?.value,
+    700_000_000,
+  );
 });
 
 test("assigns reusable relative names to every future planning period", () => {

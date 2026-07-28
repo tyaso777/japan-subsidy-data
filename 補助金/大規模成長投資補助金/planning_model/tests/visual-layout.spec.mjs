@@ -178,6 +178,39 @@ test("マッピング出力は手入力の有無にかかわらず現在の全�
   expect(values[0]).toBeCloseTo(values[1] + values[2], 2);
 });
 
+test("画面から変換サンプルExcelと対応JSONを取得してそのまま取込確認できる", async ({ page }) => {
+  await openStandalone(page, 1440);
+  await page.getByRole("button", { name: "データ入出力" }).click();
+
+  const excelDownloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "変換サンプルExcel" }).click();
+  const excelDownload = await excelDownloadPromise;
+  expect(excelDownload.suggestedFilename()).toBe("任意Excel変換サンプル_全社・補助事業.xlsx");
+
+  const mappingDownloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "対応JSON" }).click();
+  const mappingDownload = await mappingDownloadPromise;
+  expect(mappingDownload.suggestedFilename()).toBe("任意Excel変換サンプル_マッピング.json");
+
+  await page.locator('input[accept*=".json"]').setInputFiles({
+    name: mappingDownload.suggestedFilename(),
+    mimeType: "application/json",
+    buffer: await readFile(await mappingDownload.path()),
+  });
+  await page.locator('input[accept=".xlsx,.xlsm"]').setInputFiles({
+    name: excelDownload.suggestedFilename(),
+    mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    buffer: await readFile(await excelDownload.path()),
+  });
+  await page.getByRole("button", { name: "①過去＋③将来データ" }).click();
+  await page.getByRole("button", { name: "全社－補助事業をベース事業へ変換" }).click();
+  await page.getByRole("button", { name: "取込内容を確認" }).click();
+
+  await expect(page.locator(".excel-mapping-status")).toContainText("エラー 0件");
+  await expect(page.locator(".excel-mapping-preview")).toContainText("companyPL.baseYear.2-1");
+  await expect(page.locator(".excel-mapping-preview")).toContainText("projectPL.baseYear.7-1");
+});
+
 test("切り分けなし入力サンプルは全社と補助事業が一致する状態で読み込める", async ({ page }) => {
   await openStandalone(page, 1440);
   await page.getByRole("button", { name: "データ入出力" }).click();

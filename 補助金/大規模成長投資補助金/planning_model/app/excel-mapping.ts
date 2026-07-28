@@ -383,6 +383,155 @@ export const EXCEL_MAPPING_EXAMPLE: ExcelMappingDefinition = {
   ],
 };
 
+const conversionSamplePeriods = [
+  { id: "project1", label: "補助事業期間1年目" },
+  { id: "beforeBase", label: "基準年前年" },
+  { id: "baseYear", label: "基準年" },
+  { id: "report1", label: "事業化報告1年目" },
+  { id: "report2", label: "事業化報告2年目" },
+  { id: "report3", label: "事業化報告3年目" },
+] as const;
+
+type ConversionSampleRow = {
+  code: string;
+  label: string;
+  unit: "百万円" | "人";
+  values: number[];
+};
+
+const conversionCompanyRows: ConversionSampleRow[] = [
+  { code: "2-1", label: "売上高", unit: "百万円", values: [3000, 3200, 3400, 3600, 3800, 4000] },
+  { code: "2-3", label: "売上原価", unit: "百万円", values: [1800, 1900, 2000, 2100, 2200, 2300] },
+  { code: "2-4", label: "うち減価償却費", unit: "百万円", values: [80, 85, 90, 95, 100, 105] },
+  { code: "2-7", label: "販売費及び一般管理費", unit: "百万円", values: [700, 740, 780, 820, 860, 900] },
+  { code: "2-9", label: "うち役員報酬", unit: "百万円", values: [30, 31, 32, 33, 34, 35] },
+  { code: "2-10", label: "うち役員賞与", unit: "百万円", values: [5, 5, 6, 6, 7, 7] },
+  { code: "2-12", label: "うち従業員の給与", unit: "百万円", values: [400, 420, 440, 460, 480, 500] },
+  { code: "2-13", label: "うち従業員の賞与", unit: "百万円", values: [50, 52, 54, 56, 58, 60] },
+  { code: "2-14", label: "うち減価償却費", unit: "百万円", values: [50, 52, 54, 56, 58, 60] },
+  { code: "2-15", label: "うち研究開発費", unit: "百万円", values: [30, 32, 34, 36, 38, 40] },
+  { code: "2-18", label: "経常利益", unit: "百万円", values: [480, 535, 590, 645, 700, 755] },
+  { code: "2-19", label: "税引前当期純利益", unit: "百万円", values: [470, 525, 580, 635, 690, 745] },
+  { code: "2-20", label: "当期純利益", unit: "百万円", values: [330, 368, 406, 445, 483, 522] },
+  { code: "2-27", label: "常時使用する従業員数", unit: "人", values: [120, 124, 128, 132, 136, 140] },
+  { code: "2-28", label: "役員数", unit: "人", values: [6, 6, 6, 6, 6, 6] },
+];
+
+const conversionProjectRows: ConversionSampleRow[] = [
+  { code: "7-1", label: "売上高", unit: "百万円", values: [500, 600, 700, 800, 900, 1000] },
+  { code: "7-4", label: "売上総利益", unit: "百万円", values: [200, 240, 280, 320, 360, 400] },
+  { code: "7-6", label: "営業利益", unit: "百万円", values: [60, 80, 100, 120, 140, 160] },
+  { code: "7-8", label: "従業員給与支給総額", unit: "百万円", values: [80, 90, 100, 110, 120, 130] },
+  { code: "7-9", label: "役員給与支給総額", unit: "百万円", values: [10, 11, 12, 13, 14, 15] },
+  { code: "7-10", label: "減価償却費（合計）", unit: "百万円", values: [20, 25, 30, 35, 40, 45] },
+  { code: "7-13", label: "常時使用する従業員数", unit: "人", values: [20, 24, 28, 32, 36, 40] },
+  { code: "7-14", label: "役員数", unit: "人", values: [2, 2, 2, 2, 2, 2] },
+];
+
+const sampleColumn = (index: number) => String.fromCharCode("B".charCodeAt(0) + index);
+const conversionBindings = (
+  dataset: "companyPL" | "projectPL",
+  sheet: string,
+  rows: ConversionSampleRow[],
+): ExcelMappingBinding[] => rows.flatMap((row, rowIndex) =>
+  conversionSamplePeriods.map((period, periodIndex) => ({
+    id: `sample-${dataset}-${period.id}-${row.code}`,
+    target: `${dataset}.${period.id}.${row.code}`,
+    excel: { sheet, cell: `${sampleColumn(periodIndex)}${rowIndex + 4}`, unit: row.unit },
+    direction: "both",
+    transform: row.unit === "百万円" ? { round: 2 } : { round: 0 },
+  })),
+);
+
+export const EXCEL_CONVERSION_SAMPLE_MAPPING: ExcelMappingDefinition = {
+  format: EXCEL_MAPPING_FORMAT,
+  name: "全社将来PLからベース事業へ変換するサンプル",
+  description: "同梱のサンプルExcelと組み合わせ、「全社－補助事業をベース事業へ変換」を選んで使用します。",
+  bindings: [
+    ...conversionBindings("companyPL", "全社PL", conversionCompanyRows),
+    ...conversionBindings("projectPL", "補助事業PL", conversionProjectRows),
+    ...conversionSamplePeriods.map((period, periodIndex) => ({
+      id: `sample-futureCapex-${period.id}`,
+      target: `futureCapex.${period.id}.1-24`,
+      excel: { sheet: "設備投資", cell: `${sampleColumn(periodIndex)}4`, unit: "百万円" as const },
+      direction: "both" as const,
+      transform: { round: 2 },
+    })),
+  ],
+};
+
+const sampleInlineCell = (address: string, value: string, style = 0) =>
+  `<c r="${address}" t="inlineStr" s="${style}"><is><t>${xmlEncode(value)}</t></is></c>`;
+const sampleNumericCell = (address: string, value: number, style = 0) =>
+  `<c r="${address}" s="${style}"><v>${value}</v></c>`;
+const sampleRowXml = (rowNumber: number, cells: string[]) =>
+  `<row r="${rowNumber}">${cells.join("")}</row>`;
+const sampleWorksheet = (rows: string[], widths: number[]) =>
+  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="2" topLeftCell="A3" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>${widths.map((width, index) => `<col min="${index + 1}" max="${index + 1}" width="${width}" customWidth="1"/>`).join("")}</cols><sheetData>${rows.join("")}</sheetData><autoFilter ref="A2:G${rows.length}"/></worksheet>`;
+
+const samplePlRows = (title: string, rows: ConversionSampleRow[]) => [
+  sampleRowXml(1, [sampleInlineCell("A1", title, 1), sampleInlineCell("B1", "金額単位：百万円／人数単位：人", 1)]),
+  sampleRowXml(2, [
+    sampleInlineCell("A2", "項目", 2),
+    ...conversionSamplePeriods.map((period, index) => sampleInlineCell(`${sampleColumn(index)}2`, period.label, 2)),
+  ]),
+  sampleRowXml(3, [sampleInlineCell("A3", "入力例です。値を変更してマッピング取込・出力を試せます。", 3)]),
+  ...rows.map((row, rowIndex) => sampleRowXml(rowIndex + 4, [
+    sampleInlineCell(`A${rowIndex + 4}`, `${row.code} ${row.label}（${row.unit}）`),
+    ...row.values.map((value, periodIndex) => sampleNumericCell(`${sampleColumn(periodIndex)}${rowIndex + 4}`, value, row.unit === "人" ? 5 : 4)),
+  ])),
+];
+
+export function buildExcelConversionSampleWorkbook() {
+  const sheetNames = ["使い方", "全社PL", "補助事業PL", "設備投資"];
+  const instructionRows = [
+    sampleRowXml(1, [sampleInlineCell("A1", "任意Excel変換サンプル", 1)]),
+    sampleRowXml(2, [sampleInlineCell("A2", "1. このExcelと「任意Excel変換サンプル_マッピング.json」を画面で選択します。")]),
+    sampleRowXml(3, [sampleInlineCell("A3", "2. 取込範囲を「①過去＋③将来データ」にします。")]),
+    sampleRowXml(4, [sampleInlineCell("A4", "3. 「全社－補助事業をベース事業へ変換」を選び、取込内容を確認して反映します。")]),
+    sampleRowXml(5, [sampleInlineCell("A5", "4. 全社PL－補助事業PLがベース事業PLの固定値になります。")]),
+    sampleRowXml(7, [sampleInlineCell("A7", "注意：期は年度の絶対値ではなく、補助事業期間・基準年・事業化報告年の相対位置で対応します。", 3)]),
+  ];
+  const capexRows = [
+    sampleRowXml(1, [sampleInlineCell("A1", "将来設備投資", 1), sampleInlineCell("B1", "金額単位：百万円", 1)]),
+    sampleRowXml(2, [
+      sampleInlineCell("A2", "項目", 2),
+      ...conversionSamplePeriods.map((period, index) => sampleInlineCell(`${sampleColumn(index)}2`, period.label, 2)),
+    ]),
+    sampleRowXml(3, [sampleInlineCell("A3", "設備投資額も同時に取り込めます。", 3)]),
+    sampleRowXml(4, [
+      sampleInlineCell("A4", "1-24 新規設備投資による支出（百万円）"),
+      ...[100, 200, 500, 150, 100, 80].map((value, index) => sampleNumericCell(`${sampleColumn(index)}4`, value, 4)),
+    ]),
+  ];
+  const sheetRows = [
+    instructionRows,
+    samplePlRows("会社全体の将来PL入力例", conversionCompanyRows),
+    samplePlRows("補助事業の将来PL入力例", conversionProjectRows),
+    capexRows,
+  ];
+  const workbookSheets = sheetNames.map((name, index) =>
+    `<sheet name="${xmlEncode(name)}" sheetId="${index + 1}" r:id="rId${index + 1}"/>`,
+  ).join("");
+  const workbookRelationships = sheetNames.map((_, index) =>
+    `<Relationship Id="rId${index + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${index + 1}.xml"/>`,
+  ).join("");
+  const contentOverrides = sheetNames.map((_, index) =>
+    `<Override PartName="/xl/worksheets/sheet${index + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`,
+  ).join("");
+  const files: Record<string, Uint8Array> = {
+    "[Content_Types].xml": strToU8(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>${contentOverrides}<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>`),
+    "_rels/.rels": strToU8(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`),
+    "xl/workbook.xml": strToU8(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView/></bookViews><sheets>${workbookSheets}</sheets></workbook>`),
+    "xl/_rels/workbook.xml.rels": strToU8(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${workbookRelationships}<Relationship Id="rId${sheetNames.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`),
+    "xl/styles.xml": strToU8(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="#,##0.00"/></numFmts><fonts count="2"><font><sz val="11"/><name val="Yu Gothic"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Yu Gothic"/></font></fonts><fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF176B52"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFFF3CD"/></patternFill></fill></fills><borders count="2"><border/><border><left style="thin"><color rgb="FFD8D2C4"/></left><right style="thin"><color rgb="FFD8D2C4"/></right><top style="thin"><color rgb="FFD8D2C4"/></top><bottom style="thin"><color rgb="FFD8D2C4"/></bottom></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="6"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/><xf numFmtId="0" fontId="0" fillId="3" borderId="0" xfId="0" applyFill="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/><xf numFmtId="3" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`),
+  };
+  sheetRows.forEach((rows, index) => {
+    files[`xl/worksheets/sheet${index + 1}.xml`] = strToU8(sampleWorksheet(rows, index === 0 ? [110] : [48, 20, 20, 20, 20, 20, 20]));
+  });
+  return zipSync(files, { level: 6 });
+}
+
 export const EXCEL_MAPPING_COPILOT_PROMPT = `添付したExcelを確認し、添付した「Excelマッピング定義書 作成マニュアル」とJSONサンプルに従って、成長投資計画シミュレーター用のマッピング定義書を作成してください。
 
 要件:
@@ -400,6 +549,10 @@ export const EXCEL_MAPPING_MANUAL = `# Excelマッピング定義書 作成マ�
 
 ## 目的
 このシミュレーターと任意形式のExcel（.xlsx / .xlsm）のセルを、JSONのマッピング定義書で結びます。マクロ・書式・数式・非対象セルは保持し、出力時は元ファイルを上書きせず別Excelとして保存します。
+
+## まず変換サンプルを試す
+画面の「変換サンプルExcel」と「対応JSON」を両方ダウンロードしてください。2ファイルをそれぞれ対象Excel・マッピング定義書として選び、取込範囲を「①過去＋③将来データ」、全社将来値の反映方法を「全社－補助事業をベース事業へ変換」にして確認・反映します。
+サンプルExcelには全社PL、補助事業PL、設備投資の将来6期が入力済みです。会社全体－補助事業の差額が、ツール内のベース事業PLになります。
 
 ## Copilotへの依頼方法
 対象Excel、このマニュアル、JSONサンプルを渡し、次のプロンプトで依頼します。

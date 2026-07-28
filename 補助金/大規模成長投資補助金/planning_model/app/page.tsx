@@ -60,7 +60,9 @@ import {
 import { buildProposalHtml, buildProposalXlsx, downloadBlob, normalizeProposalMoneyUnit, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
 import { formatDisplayMoney, formatEditableMoney, formatNumericInput, fromDisplayMoney, INTERNAL_MONEY_UNIT, moneyDisplayFractionDigits, moneyEditableFractionDigits, moneyUnitLabel, normalizeInternalMoney, okuToInternalMoney, parseNumericInput, toDisplayMoney, type MoneyDisplayUnit } from "./money";
 import {
+  buildExcelConversionSampleWorkbook,
   buildMappedExcel,
+  EXCEL_CONVERSION_SAMPLE_MAPPING,
   EXCEL_MAPPING_COPILOT_PROMPT,
   EXCEL_MAPPING_EXAMPLE,
   EXCEL_MAPPING_MANUAL,
@@ -2078,6 +2080,22 @@ export default function Home() {
     downloadBlob(JSON.stringify(EXCEL_MAPPING_EXAMPLE, null, 2), "Excelマッピング定義書_サンプル.json", "application/json;charset=utf-8");
   }
 
+  function downloadExcelConversionSample() {
+    downloadBlob(
+      buildExcelConversionSampleWorkbook(),
+      "任意Excel変換サンプル_全社・補助事業.xlsx",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    );
+  }
+
+  function downloadExcelConversionSampleMapping() {
+    downloadBlob(
+      JSON.stringify(EXCEL_CONVERSION_SAMPLE_MAPPING, null, 2),
+      "任意Excel変換サンプル_マッピング.json",
+      "application/json;charset=utf-8",
+    );
+  }
+
   function downloadExcelMappingManual() {
     downloadBlob(EXCEL_MAPPING_MANUAL, "Excelマッピング定義書_作成マニュアル.md", "text/markdown;charset=utf-8");
   }
@@ -2886,7 +2904,12 @@ export default function Home() {
               {excelFutureCompanyImportMode === "convert-to-base" && <p className="footnote">Excelから取り込んだ補助事業値を優先し、未指定項目は現在の補助事業予測を使って差し引きます。変換後は「ベース事業PLを入力」に切り替わります。</p>}
             </div>}
             <div className="excel-mapping-resources">
-              <span>Copilotへ対象Excelと一緒に渡す資料</span>
+              <span>まず変換を試す：Excelと対応JSONをセットで使用</span>
+              <button type="button" onClick={downloadExcelConversionSample}>変換サンプルExcel</button>
+              <button type="button" onClick={downloadExcelConversionSampleMapping}>対応JSON</button>
+            </div>
+            <div className="excel-mapping-resources">
+              <span>自社Excel用のマッピングを作る資料</span>
               <button type="button" onClick={() => { void copyExcelMappingCopilotPrompt(); }}>
                 {copilotPromptCopied ? "コピー済み" : "Copilot指示をコピー"}
               </button>
