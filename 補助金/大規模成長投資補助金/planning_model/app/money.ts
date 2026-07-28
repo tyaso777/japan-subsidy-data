@@ -1,29 +1,29 @@
-export const INTERNAL_MONEY_UNIT = "千円" as const;
+export const INTERNAL_MONEY_UNIT = "円" as const;
 export type MoneyDisplayUnit = "千円" | "百万円" | "億円";
 
-const THOUSAND_YEN_PER_UNIT: Record<MoneyDisplayUnit, number> = {
-  千円: 1,
-  百万円: 1_000,
-  億円: 100_000,
+const YEN_PER_UNIT: Record<MoneyDisplayUnit, number> = {
+  千円: 1_000,
+  百万円: 1_000_000,
+  億円: 100_000_000,
 };
 
 /** Canonicalize a monetary amount at the model boundary. */
 export const normalizeInternalMoney = (value: number) =>
   Number.isFinite(value) ? Math.round(value) : 0;
 
-/** Convert an entered/displayed amount to the canonical integer 千円 value. */
+/** Convert an entered/displayed amount to the canonical integer 円 value. */
 export const fromDisplayMoney = (value: number, unit: MoneyDisplayUnit) =>
-  normalizeInternalMoney(value * THOUSAND_YEN_PER_UNIT[unit]);
+  normalizeInternalMoney(value * YEN_PER_UNIT[unit]);
 
-/** Convert a canonical integer 千円 value for display only. */
+/** Convert a canonical integer 円 value for display only. */
 export const toDisplayMoney = (value: number, unit: MoneyDisplayUnit) =>
-  normalizeInternalMoney(value) / THOUSAND_YEN_PER_UNIT[unit];
+  normalizeInternalMoney(value) / YEN_PER_UNIT[unit];
 
 export const moneyDisplayFractionDigits = (unit: MoneyDisplayUnit) =>
   unit === "千円" ? 0 : 2;
 
 export const moneyEditableFractionDigits = (unit: MoneyDisplayUnit) =>
-  unit === "千円" ? 0 : unit === "百万円" ? 3 : 5;
+  unit === "千円" ? 3 : unit === "百万円" ? 6 : 8;
 
 /** Format canonical money for reading without exposing unnecessary conversion decimals. */
 export const formatDisplayMoney = (value: number, unit: MoneyDisplayUnit) =>
@@ -33,7 +33,7 @@ export const formatDisplayMoney = (value: number, unit: MoneyDisplayUnit) =>
     maximumFractionDigits: moneyDisplayFractionDigits(unit),
   });
 
-/** Format canonical money for editing without losing any thousand-yen precision. */
+/** Format canonical money for editing without losing any yen precision. */
 export const formatEditableMoney = (value: number, unit: MoneyDisplayUnit) =>
   toDisplayMoney(value, unit).toLocaleString("ja-JP", {
     useGrouping: true,
@@ -74,8 +74,8 @@ export const parseNumericInput = (value: string) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
-/** One-time migration helper for proposal/sample data created by the old 億円 model. */
-export const legacyOkuToInternalMoney = (value: number) =>
+/** Convert concise 億円 constants into canonical integer 円 values. */
+export const okuToInternalMoney = (value: number) =>
   fromDisplayMoney(value, "億円");
 
 export const moneyUnitLabel = (unit: MoneyDisplayUnit) =>

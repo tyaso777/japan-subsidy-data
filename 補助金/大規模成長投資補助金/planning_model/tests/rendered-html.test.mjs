@@ -402,7 +402,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /event\.target\.value === "" \? null/);
   assert.match(inputValueSource, /A missing key means "not entered"/);
   assert.match(inputValueSource, /else next\[key\] = value/);
-  assert.match(proposalSource, /入力データ監査（Null／0区別）/);
+  assert.match(proposalSource, /入力データ監査（Null／0区別・金額の保存単位は\$\{INTERNAL_MONEY_UNIT\}）/);
   assert.match(proposalSource, /class="table-section"/);
   assert.match(proposalSource, /section>h2\{position:sticky;top:0/);
   assert.match(proposalSource, /tbody th:first-child\{position:sticky;left:0/);
@@ -522,11 +522,11 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /proposal\.applicationCategory \?\? defaultApplicationCategory/);
   assert.match(modelSource, /sweep < 10/);
   assert.doesNotMatch(modelSource, /sweep < 4/);
-  assert.match(applicationRulesSource, /investmentMinimum: legacyOkuToInternalMoney\(category === "hundredBillion" \? 15 : 20\)/);
+  assert.match(applicationRulesSource, /investmentMinimum: okuToInternalMoney\(category === "hundredBillion" \? 15 : 20\)/);
   assert.match(applicationRulesSource, /projectPayCagrMinimum: category === "general" \? 5 : 4\.5/);
-  assert.match(applicationRulesSource, /drivers\.subsidy > legacyOkuToInternalMoney\(50\)/);
+  assert.match(applicationRulesSource, /drivers\.subsidy > okuToInternalMoney\(50\)/);
   assert.match(applicationRulesSource, /maximumSubsidyAmount\(drivers\.investment\)/);
-  assert.match(applicationRulesSource, /Math\.floor\(exactMaximum\)/);
+  assert.match(applicationRulesSource, /Math\.floor\(exactMaximum \/ 1_000\) \* 1_000/);
   assert.match(pageSource, /driverConstraintFailure\(key, applicationCategory, drivers\)/);
   assert.match(pageSource, /proposal\.adjustedDrivers/);
   assert.match(pageSource, /setAdjustedDrivers\(importedAdjustedDrivers\)/);

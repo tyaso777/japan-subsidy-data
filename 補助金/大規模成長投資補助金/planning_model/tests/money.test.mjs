@@ -19,39 +19,39 @@ const compile = async (relativePath) => {
 
 const money = await compile("app/money.ts");
 
-test("monetary amounts are stored as integer thousand-yen values", () => {
-  assert.equal(money.INTERNAL_MONEY_UNIT, "千円");
-  assert.equal(money.fromDisplayMoney(1.23456, "億円"), 123456);
-  assert.equal(money.fromDisplayMoney(12.3456, "百万円"), 12346);
-  assert.equal(money.fromDisplayMoney(12345.6, "千円"), 12346);
+test("monetary amounts are stored as integer yen values", () => {
+  assert.equal(money.INTERNAL_MONEY_UNIT, "円");
+  assert.equal(money.fromDisplayMoney(1.23456, "億円"), 123_456_000);
+  assert.equal(money.fromDisplayMoney(12.3456, "百万円"), 12_345_600);
+  assert.equal(money.fromDisplayMoney(12345.6, "千円"), 12_345_600);
   assert.ok(Number.isInteger(money.fromDisplayMoney(1.23456, "億円")));
 });
 
-test("display conversion never mutates the canonical thousand-yen value", () => {
-  const canonical = 123456;
+test("display conversion never mutates the canonical yen value", () => {
+  const canonical = 123_456_000;
   assert.equal(money.toDisplayMoney(canonical, "千円"), 123456);
   assert.equal(money.toDisplayMoney(canonical, "百万円"), 123.456);
   assert.equal(money.toDisplayMoney(canonical, "億円"), 1.23456);
-  assert.equal(canonical, 123456);
+  assert.equal(canonical, 123_456_000);
 });
 
 test("displayed money uses at most two decimals without trailing zeroes", () => {
-  assert.equal(money.formatDisplayMoney(4_364_800, "百万円"), "4,364.8");
-  assert.equal(money.formatDisplayMoney(1_228_817, "百万円"), "1,228.82");
-  assert.equal(money.formatDisplayMoney(4_364_800, "億円"), "43.65");
-  assert.equal(money.formatDisplayMoney(4_800_000, "億円"), "48");
-  assert.equal(money.formatDisplayMoney(4_800_000, "千円"), "4,800,000");
+  assert.equal(money.formatDisplayMoney(4_364_800_000, "百万円"), "4,364.8");
+  assert.equal(money.formatDisplayMoney(1_228_817_000, "百万円"), "1,228.82");
+  assert.equal(money.formatDisplayMoney(4_364_800_000, "億円"), "43.65");
+  assert.equal(money.formatDisplayMoney(4_800_000_000, "億円"), "48");
+  assert.equal(money.formatDisplayMoney(4_800_000_000, "千円"), "4,800,000");
 });
 
-test("focused money inputs reveal the exact canonical thousand-yen value", () => {
-  assert.equal(money.formatEditableMoney(1_228_817, "百万円"), "1,228.817");
-  assert.equal(money.formatEditableMoney(1_228_817, "億円"), "12.28817");
-  assert.equal(money.formatEditableMoney(1_228_817, "千円"), "1,228,817");
+test("focused money inputs reveal the exact canonical yen value", () => {
+  assert.equal(money.formatEditableMoney(1_228_817_345, "百万円"), "1,228.817345");
+  assert.equal(money.formatEditableMoney(1_228_817_345, "億円"), "12.28817345");
+  assert.equal(money.formatEditableMoney(1_228_817_345, "千円"), "1,228,817.345");
 });
 
-test("legacy billion-yen proposal amounts migrate exactly once", () => {
-  assert.equal(money.legacyOkuToInternalMoney(80), 8_000_000);
-  assert.equal(money.legacyOkuToInternalMoney(0.01), 1_000);
+test("billion-yen constants become canonical integer yen", () => {
+  assert.equal(money.okuToInternalMoney(80), 8_000_000_000);
+  assert.equal(money.okuToInternalMoney(0.01), 1_000_000);
   assert.equal(money.normalizeInternalMoney(34.855999999999995), 35);
 });
 
@@ -69,28 +69,30 @@ test("grouped money input text parses back to a number", () => {
   assert.equal(money.parseNumericInput("-"), null);
 });
 
-test("unit switching keeps the exact thousand-yen amount through display, focus, and editing", () => {
+test("unit switching keeps the exact yen amount through display, focus, and editing", () => {
   let canonical = money.fromDisplayMoney(
-    money.parseNumericInput("1,228,817"),
+    money.parseNumericInput("1,228,817.345"),
     "千円",
   );
 
-  assert.equal(canonical, 1_228_817);
+  assert.equal(canonical, 1_228_817_345);
   assert.equal(money.formatDisplayMoney(canonical, "千円"), "1,228,817");
+  assert.equal(money.formatEditableMoney(canonical, "千円"), "1,228,817.345");
 
   assert.equal(money.formatDisplayMoney(canonical, "百万円"), "1,228.82");
-  assert.equal(money.formatEditableMoney(canonical, "百万円"), "1,228.817");
+  assert.equal(money.formatEditableMoney(canonical, "百万円"), "1,228.817345");
 
   assert.equal(money.formatDisplayMoney(canonical, "億円"), "12.29");
-  assert.equal(money.formatEditableMoney(canonical, "億円"), "12.28817");
+  assert.equal(money.formatEditableMoney(canonical, "億円"), "12.28817345");
 
   canonical = money.fromDisplayMoney(
-    money.parseNumericInput("12.28918"),
+    money.parseNumericInput("12.28918345"),
     "億円",
   );
 
-  assert.equal(canonical, 1_228_918);
+  assert.equal(canonical, 1_228_918_345);
   assert.equal(money.formatDisplayMoney(canonical, "百万円"), "1,228.92");
-  assert.equal(money.formatEditableMoney(canonical, "百万円"), "1,228.918");
+  assert.equal(money.formatEditableMoney(canonical, "百万円"), "1,228.918345");
   assert.equal(money.formatDisplayMoney(canonical, "千円"), "1,228,918");
+  assert.equal(money.formatEditableMoney(canonical, "千円"), "1,228,918.345");
 });

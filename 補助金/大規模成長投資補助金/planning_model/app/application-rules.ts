@@ -1,5 +1,5 @@
 import type { Drivers, MetricKey, YearPlan } from "./model";
-import { legacyOkuToInternalMoney, toDisplayMoney } from "./money";
+import { okuToInternalMoney, toDisplayMoney } from "./money";
 
 export type ApplicationCategory = "" | "general" | "hundredBillion";
 export const defaultApplicationCategory: Exclude<ApplicationCategory, ""> = "general";
@@ -12,14 +12,14 @@ export const applicationCategoryLabels: Record<Exclude<ApplicationCategory, "">,
 export function applicationRequirements(category: ApplicationCategory) {
   if (!category) return null;
   return {
-    investmentMinimum: legacyOkuToInternalMoney(category === "hundredBillion" ? 15 : 20),
+    investmentMinimum: okuToInternalMoney(category === "hundredBillion" ? 15 : 20),
     projectPayCagrMinimum: category === "general" ? 5 : 4.5,
   };
 }
 
 export function maximumSubsidyAmount(investment: number) {
-  const exactMaximum = Math.min(legacyOkuToInternalMoney(50), Math.max(0, investment) / 3);
-  return Math.floor(exactMaximum);
+  const exactMaximum = Math.min(okuToInternalMoney(50), Math.max(0, investment) / 3);
+  return Math.floor(exactMaximum / 1_000) * 1_000;
 }
 
 export function driverRequirementFloor(key: keyof Drivers, category: ApplicationCategory = "") {
@@ -102,7 +102,7 @@ export function driverConstraintFailure(key: keyof Drivers, category: Applicatio
   }
   if (key === "subsidy") {
     if (drivers.subsidy < 0) return "0億円以上で入力してください";
-    if (drivers.subsidy > legacyOkuToInternalMoney(50)) return "制度上限50億円以下で入力してください";
+    if (drivers.subsidy > okuToInternalMoney(50)) return "制度上限50億円以下で入力してください";
     const maximum = maximumSubsidyAmount(drivers.investment);
     if (drivers.subsidy > maximum + 1e-9) return `投資額の1/3以下（現在${toDisplayMoney(maximum, "億円").toFixed(2)}億円以下）で入力してください`;
   }

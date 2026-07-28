@@ -1,4 +1,4 @@
-import { legacyOkuToInternalMoney, normalizeInternalMoney } from "./money";
+import { normalizeInternalMoney, okuToInternalMoney } from "./money";
 
 export type SegmentKey = "project" | "other";
 export type Mode = "auto" | "manual";
@@ -183,12 +183,12 @@ export const YEAR_ROLE_LABELS: Record<YearRole, string> = {
 const segmentFromLegacyOku = (segment: SegmentPlan): SegmentPlan => Object.fromEntries(
   Object.entries(segment).map(([key, value]) => [
     key,
-    key === "headcount" || key === "officerCount" ? value : legacyOkuToInternalMoney(value),
+    key === "headcount" || key === "officerCount" ? value : okuToInternalMoney(value),
   ]),
 ) as SegmentPlan;
 
 const balanceSheetFromLegacyOku = (row: BalanceSheetPlan): BalanceSheetPlan => Object.fromEntries(
-  Object.entries(row).map(([key, value]) => [key, key === "year" ? value : legacyOkuToInternalMoney(value)]),
+  Object.entries(row).map(([key, value]) => [key, key === "year" ? value : okuToInternalMoney(value)]),
 ) as BalanceSheetPlan;
 
 export const sampleBasePlan: YearPlan = {
@@ -294,8 +294,8 @@ export const sampleDrivers: Drivers = {
   projectSgaRateEnd: 0.015,
   otherSgaRateEnd: 0.005,
   projectOfficerPayGrowth: 0.06,
-  investment: legacyOkuToInternalMoney(45),
-  subsidy: legacyOkuToInternalMoney(15),
+  investment: okuToInternalMoney(45),
+  subsidy: okuToInternalMoney(15),
   localBenchmark: 23,
 };
 
@@ -412,8 +412,8 @@ export const driverBounds: Record<keyof Drivers, [number, number]> = {
   otherExtraordinaryRate: [-0.5, 0.5],
   effectiveTaxRate: [0, 0.6],
   projectSalesGrowthToBase: [-0.05, 0.4],
-  projectFirstYearSales: [0, legacyOkuToInternalMoney(100000)],
-  projectBaseYearSales: [0, legacyOkuToInternalMoney(100000)],
+  projectFirstYearSales: [0, okuToInternalMoney(100000)],
+  projectBaseYearSales: [0, okuToInternalMoney(100000)],
   projectCogsImprovementToBase: [0, 0.02],
   projectPayGrowthToBase: [0, 0.1],
   projectHeadcountGrowthToBase: [-0.03, 0.2],
@@ -437,8 +437,8 @@ export const driverBounds: Record<keyof Drivers, [number, number]> = {
   projectSgaRateEnd: [0, 0.03],
   otherSgaRateEnd: [0, 0.03],
   projectOfficerPayGrowth: [0, 0.1],
-  investment: [legacyOkuToInternalMoney(15), legacyOkuToInternalMoney(200)],
-  subsidy: [legacyOkuToInternalMoney(1), legacyOkuToInternalMoney(50)],
+  investment: [okuToInternalMoney(15), okuToInternalMoney(200)],
+  subsidy: [okuToInternalMoney(1), okuToInternalMoney(50)],
   localBenchmark: [0, 100],
 };
 

@@ -20,12 +20,12 @@ new Function("module", "exports", compiled)(commonJsModule, commonJsModule.expor
 const rules = commonJsModule.exports;
 
 test("subsidy ceiling is truncated to integer thousand-yen precision", () => {
-  assert.equal(rules.maximumSubsidyAmount(2_300_000), 766_666);
-  assert.match(rules.driverRequirementLabel("subsidy", "general", 2_300_000), /現在上限7\.67億円/);
+  assert.equal(rules.maximumSubsidyAmount(2_300_000_000), 766_666_000);
+  assert.match(rules.driverRequirementLabel("subsidy", "general", 2_300_000_000), /現在上限7\.67億円/);
 
-  const drivers = { investment: 2_300_000, subsidy: 766_666 };
+  const drivers = { investment: 2_300_000_000, subsidy: 766_666_000 };
   assert.equal(rules.driverConstraintFailure("subsidy", "general", drivers), null);
-  assert.match(rules.driverConstraintFailure("subsidy", "general", { ...drivers, subsidy: 766_667 }), /7\.67億円以下/);
+  assert.match(rules.driverConstraintFailure("subsidy", "general", { ...drivers, subsidy: 766_666_001 }), /7\.67億円以下/);
 });
 
 test("equipment-period project pay growth cannot fall below the statutory zero-percent floor", () => {

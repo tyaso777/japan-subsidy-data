@@ -19,7 +19,9 @@ const launchSample = createBaseYearLaunchSample(exportedAt);
 async function buildAndVerify(proposal: ProposalData, effectivePlan: ReturnType<typeof generatePlan>, baseName: string) {
   const actual = calculateMetrics(effectivePlan, proposal.adjustedDrivers ?? proposal.drivers);
   const metricRows = metrics.map((definition) => ({
+    key: definition.key,
     label: definition.label,
+    round6Formula: definition.round6Formula,
     unit: definition.unit,
     actual: actual[definition.key],
     target: proposal.targets[definition.key].value,

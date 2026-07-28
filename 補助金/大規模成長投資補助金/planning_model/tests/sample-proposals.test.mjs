@@ -59,20 +59,20 @@ const assertHistoricalPayrollInputsAreExplicit = (proposal) => {
 test("standard sample represents the completed two-pass planning workflow", async () => {
   const proposal = await proposalFromHtml(standardBaseName);
 
-  assert.equal(proposal.forecastOverrides["2029:other:sales"], 8_513_000);
-  assert.equal(proposal.forecastOverrides["2029:project:7-8"], 790_000);
+  assert.equal(proposal.forecastOverrides["2029:other:sales"], 8_513_000_000);
+  assert.equal(proposal.forecastOverrides["2029:project:7-8"], 790_000_000);
   assert.equal(proposal.futureInputBasis, "other");
   assert.equal(proposal.drivers.projectPayGrowth, 0.07, "planning input should retain the pre-optimization default");
   assert.ok(proposal.adjustedDrivers.projectPayGrowth > 0.08, "future pay override should be offset so the official pay-growth metric remains near the median");
   assert.ok(Math.abs(proposal.adjustedDrivers.projectSalesGrowth - 0.22) < 0.001, "saved result should remain near the fifth-round accepted-company median");
   assert.ok(proposal.adjustedDrivers.projectSalesGrowth <= proposal.driverRanges.projectSalesGrowth[1]);
-  assert.equal(proposal.drivers.subsidy, 766_000);
-  assert.equal(proposal.drivers.investment, 2_300_000);
+  assert.equal(proposal.drivers.subsidy, 766_000_000);
+  assert.equal(proposal.drivers.investment, 2_300_000_000);
   assert.ok(
     proposal.futureCapex.every((row) => row.value === 0 && !Object.hasOwn(proposal.inputValues, `future-capex:${row.year}`)),
     "the investment adjustment level must not be allocated automatically to annual capex",
   );
-  assert.equal(proposal.targets.companySalesIncrease.value, 8_240_000);
+  assert.equal(proposal.targets.companySalesIncrease.value, 8_240_000_000);
   assert.equal(proposal.targets.companySalesCagr.value, 15);
   for (const code of ["2-18", "2-19", "2-20", "2-27", "2-28"]) {
     assert.equal(typeof proposal.inputValues[`actual:company:2025:${code}`], "number", `${code} must be saved as a round-six input`);
@@ -87,6 +87,12 @@ test("standard sample represents the completed two-pass planning workflow", asyn
   assert.equal(typeof proposal.historicalPlan[2].other.netIncome, "number");
   assertHistoricalPayrollInputsAreExplicit(proposal);
   assertOptimizationIsStable(proposal);
+});
+
+test("generated samples include every sixth-round metric definition", async () => {
+  const html = await readFile(path.join(projectDirectory, "examples", `${standardBaseName}.html`), "utf8");
+  assert.doesNotMatch(html, /第6次定義：undefined/);
+  assert.match(html, /第6次定義：基準年→事業化報告3年目（3年CAGR）/);
 });
 
 test("partially unmet sample retains a visibly unattainable pay target", async () => {
@@ -134,8 +140,8 @@ test("base-year launch sample has no project sales before the base year", async 
   assert.equal(proposal.metricGroupBases.companySales, "rate");
   assert.equal(proposal.forecastOverrides["2026:project:7-1"], 0);
   assert.equal(proposal.forecastOverrides["2027:project:7-1"], 0);
-  assert.equal(proposal.forecastOverrides["2028:project:7-1"], 6_000_000);
-  assert.ok(proposal.forecastOverrides["2031:project:7-1"] > 6_000_000);
+  assert.equal(proposal.forecastOverrides["2028:project:7-1"], 6_000_000_000);
+  assert.ok(proposal.forecastOverrides["2031:project:7-1"] > 6_000_000_000);
   assertHistoricalPayrollInputsAreExplicit(proposal);
 });
 

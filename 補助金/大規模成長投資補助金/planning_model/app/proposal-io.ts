@@ -5,14 +5,14 @@ import { hasInputValue, inputKey, type InputValues } from "./input-values";
 import { type MetricGroupBasis, type MetricGroupKey } from "./metric-groups";
 import { applicationCategoryLabels, defaultApplicationCategory, driverRequirementLabel, metricRequirementLabel, type ApplicationCategory } from "./application-rules";
 import { niceChartScale } from "./chart-scale";
-import { INTERNAL_MONEY_UNIT, legacyOkuToInternalMoney } from "./money";
+import { INTERNAL_MONEY_UNIT, toDisplayMoney } from "./money";
 
-export const PROPOSAL_FORMAT = "growth-investment-proposal/v1";
+export const PROPOSAL_FORMAT = "growth-investment-proposal/v2";
 
 export type ProposalData = {
   format: typeof PROPOSAL_FORMAT;
-  /** Canonical monetary storage unit. Missing means the legacy 億円 model. */
-  moneyUnit?: typeof INTERNAL_MONEY_UNIT;
+  /** Canonical monetary storage unit. */
+  moneyUnit: typeof INTERNAL_MONEY_UNIT;
   title: string;
   exportedAt: string;
   timeline: TimelineSettings;
@@ -33,90 +33,11 @@ export type ProposalData = {
   applicationCategory?: ApplicationCategory;
 };
 
-const moneySegmentFields = new Set([
-  "sales", "cogs", "employeePay", "officerPay", "depreciation", "otherSga",
-  "employeePayrollTotal", "officerPayrollTotal",
-  "employeeSalary", "employeeBonus", "officerCompensation", "officerBonus",
-  "cogsDepreciation", "sgaDepreciation", "researchDevelopment",
-  "ordinaryIncome", "preTaxIncome", "netIncome",
-]);
-const moneyDriverKeys = new Set<keyof Drivers>(["projectFirstYearSales", "projectBaseYearSales", "investment", "subsidy"]);
-const moneyMetricKeys = new Set<MetricKey>([
-  "companySalesIncrease", "projectSalesIncrease", "valueAddedIncrease",
-  "employeePayIncrease", "officerPayIncrease",
-]);
-const moneyForecastOverrideFields = new Set([
-  ...moneySegmentFields,
-  "2-1", "2-3", "2-4", "2-5", "2-7", "2-8", "2-9", "2-10",
-  "2-11", "2-12", "2-13", "2-14", "2-15", "2-16", "2-18", "2-19",
-  "2-20", "2-21", "2-22", "2-23", "2-24", "2-29", "2-31", "2-33",
-  "2-34", "7-1", "7-4", "7-6", "7-8", "7-9", "7-10", "7-11",
-  "7-15", "7-17", "7-19", "P2-4", "P2-14",
-]);
-
-const migrateSegmentFromLegacyOku = (segment: SegmentPlan): SegmentPlan => Object.fromEntries(
-  Object.entries(segment).map(([key, value]) => [
-    key,
-    moneySegmentFields.has(key) && typeof value === "number" ? legacyOkuToInternalMoney(value) : value,
-  ]),
-) as SegmentPlan;
-
-/**
- * Converts proposal files created before the canonical 千円 model exactly once.
- * New files are returned unchanged. Legacy `inputValues` are rebuilt from the
- * migrated domain model by the caller, avoiding a second, key-guessing conversion.
- */
 export function normalizeProposalMoneyUnit(proposal: ProposalData): ProposalData {
-  if (proposal.moneyUnit === INTERNAL_MONEY_UNIT) return proposal;
-  const convertDriverRecord = <T extends Partial<Record<keyof Drivers, number>>>(source: T): T =>
-    Object.fromEntries(Object.entries(source).map(([key, value]) => [
-      key,
-      moneyDriverKeys.has(key as keyof Drivers) && typeof value === "number"
-        ? legacyOkuToInternalMoney(value)
-        : value,
-    ])) as T;
-  const convertedRanges = Object.fromEntries(Object.entries(proposal.driverRanges).map(([key, range]) => [
-    key,
-    moneyDriverKeys.has(key as keyof Drivers)
-      ? range.map(legacyOkuToInternalMoney) as [number, number]
-      : range,
-  ])) as Record<keyof Drivers, [number, number]>;
-  const convertedTargets = Object.fromEntries(Object.entries(proposal.targets).map(([key, target]) => [
-    key,
-    moneyMetricKeys.has(key as MetricKey)
-      ? {
-          ...target,
-          value: legacyOkuToInternalMoney(target.value),
-          max: target.max === undefined ? undefined : legacyOkuToInternalMoney(target.max),
-        }
-      : target,
-  ])) as Record<MetricKey, Target>;
-  const convertedOverrides = Object.fromEntries(Object.entries(proposal.forecastOverrides ?? {}).map(([key, value]) => {
-    const field = key.split(":").at(-1) ?? "";
-    return [key, moneyForecastOverrideFields.has(field) ? legacyOkuToInternalMoney(value) : value];
-  }));
-  return {
-    ...proposal,
-    moneyUnit: INTERNAL_MONEY_UNIT,
-    historicalPlan: proposal.historicalPlan.map((row) => ({
-      ...row,
-      project: migrateSegmentFromLegacyOku(row.project),
-      other: migrateSegmentFromLegacyOku(row.other),
-    })),
-    balanceSheets: proposal.balanceSheets.map((row) => Object.fromEntries(
-      Object.entries(row).map(([key, value]) => [
-        key,
-        key !== "year" && typeof value === "number" ? legacyOkuToInternalMoney(value) : value,
-      ]),
-    ) as BalanceSheetPlan),
-    futureCapex: proposal.futureCapex.map((row) => ({ ...row, value: legacyOkuToInternalMoney(row.value) })),
-    drivers: convertDriverRecord(proposal.drivers),
-    adjustedDrivers: proposal.adjustedDrivers ? convertDriverRecord(proposal.adjustedDrivers) : undefined,
-    driverRanges: convertedRanges,
-    targets: convertedTargets,
-    forecastOverrides: convertedOverrides,
-    inputValues: undefined,
-  };
+  if (proposal.moneyUnit !== INTERNAL_MONEY_UNIT) {
+    throw new Error(`この提案計画は金額単位「${INTERNAL_MONEY_UNIT}」の現行形式ではありません。`);
+  }
+  return proposal;
 }
 
 export type ProposalExportContext = {
@@ -228,7 +149,18 @@ const fixedOutputDriverKeys = new Set<keyof Drivers>([
   "otherOfficerPayGrowthToBase", "otherOfficerPayGrowth",
 ]);
 
-const display = (value: number | undefined, unit: string) => value === undefined || !Number.isFinite(value) ? "—" : `${value.toLocaleString("ja-JP", { maximumFractionDigits: unit === "千円/人" ? 2 : unit === "千円" ? 0 : 2, minimumFractionDigits: 0 })}${unit ? ` ${unit}` : ""}`;
+const reportNumericValue = (value: number | undefined, unit: string) =>
+  value === undefined || !Number.isFinite(value)
+    ? value
+    : unit === "千円" || unit === "千円/人"
+      ? toDisplayMoney(value, "千円")
+      : value;
+const display = (value: number | undefined, unit: string) => {
+  const displayed = reportNumericValue(value, unit);
+  return displayed === undefined || !Number.isFinite(displayed)
+    ? "—"
+    : `${displayed.toLocaleString("ja-JP", { maximumFractionDigits: unit === "千円/人" ? 2 : unit === "千円" ? 0 : 2, minimumFractionDigits: 0 })}${unit ? ` ${unit}` : ""}`;
+};
 const htmlPeriodHeader = (plan: YearPlan[]) => plan.map((row) => `<th>${row.year}<small>${htmlEscape(roleLabels[row.role] ?? row.role)}</small></th>`).join("");
 const htmlReportRows = (rows: ReportRow[]) => rows.map((row) => `<tr class="${row.emphasis ? "emphasis" : ""}"><th>${row.code} ${htmlEscape(row.label)}<small>${htmlEscape(row.unit)}</small></th>${row.values.map((value) => `<td>${display(value, row.unit)}</td>`).join("")}</tr>`).join("");
 const htmlSection = (title: string, columns: string, rows: string, note = "") => `<section class="table-section"><h2>${htmlEscape(title)}</h2><div class="table-wrap"><table><thead><tr>${columns}</tr></thead><tbody>${rows}</tbody></table></div>${note ? `<p class="note">${htmlEscape(note)}</p>` : ""}</section>`;
@@ -247,7 +179,10 @@ const htmlTrendChart = (title: string, subtitle: string, unit: string, plan: Yea
   const plotHeight = height - margin.top - margin.bottom;
   const latestIndex = Math.max(0, plan.findIndex((row) => row.role === "latest"));
   const baseIndex = plan.findIndex((row) => row.role === "base");
-  const finiteValues = series.flatMap((item) => item.values).filter((value): value is number => value !== undefined && Number.isFinite(value));
+  const displayedSeries = unit === "千円" || unit === "千円/人"
+    ? series.map((item) => ({ ...item, values: item.values.map((value) => reportNumericValue(value, unit)) }))
+    : series;
+  const finiteValues = displayedSeries.flatMap((item) => item.values).filter((value): value is number => value !== undefined && Number.isFinite(value));
   const scale = niceChartScale(finiteValues, { zeroBaseline: true });
   const minValue = scale.min;
   const maxValue = scale.max;
@@ -271,9 +206,9 @@ const htmlTrendChart = (title: string, subtitle: string, unit: string, plan: Yea
     const gridY = y(gridValue);
     return `<g><line class="chart-gridline" x1="${margin.left}" y1="${gridY}" x2="${width - margin.right}" y2="${gridY}"/><text class="chart-axis-label" x="${margin.left - 9}" y="${gridY + 4}" text-anchor="end">${htmlEscape(axisLabel(gridValue))}</text></g>`;
   }).join("");
-  const lines = series.map((item) => `<g><path class="chart-line actual" d="${pathFor(item.values, 0, latestIndex)}" stroke="${item.color}"/><path class="chart-line forecast" d="${pathFor(item.values, latestIndex, plan.length - 1)}" stroke="${item.color}"/>${item.values.map((value, index) => value === undefined || !Number.isFinite(value) ? "" : `<circle class="chart-point ${index <= latestIndex ? "actual" : "forecast"}" cx="${x(index)}" cy="${y(value)}" r="3.3" stroke="${item.color}" fill="${index <= latestIndex ? item.color : "#fff"}"/>`).join("")}</g>`).join("");
+  const lines = displayedSeries.map((item) => `<g><path class="chart-line actual" d="${pathFor(item.values, 0, latestIndex)}" stroke="${item.color}"/><path class="chart-line forecast" d="${pathFor(item.values, latestIndex, plan.length - 1)}" stroke="${item.color}"/>${item.values.map((value, index) => value === undefined || !Number.isFinite(value) ? "" : `<circle class="chart-point ${index <= latestIndex ? "actual" : "forecast"}" cx="${x(index)}" cy="${y(value)}" r="3.3" stroke="${item.color}" fill="${index <= latestIndex ? item.color : "#fff"}"/>`).join("")}</g>`).join("");
   const years = plan.map((row, index) => `<text class="chart-year" x="${x(index)}" y="${height - 15}" text-anchor="middle">${row.year}</text>`).join("");
-  const legend = series.map((item) => {
+  const legend = displayedSeries.map((item) => {
     const lastValue = [...item.values].reverse().find((value) => value !== undefined && Number.isFinite(value));
     return `<span><i style="background:${item.color}"></i>${htmlEscape(item.label)}<strong>${lastValue === undefined ? "—" : display(lastValue, "")}</strong></span>`;
   }).join("");
@@ -553,7 +488,7 @@ export function buildProposalHtml({ proposal, effectivePlan, metricRows }: Propo
     ? `<tr><th>${htmlEscape(row.label)}<small>第6次定義：${htmlEscape(row.round6Formula)}</small></th><td>${display(proposalInput(proposal, inputKey.driver("localBenchmark"), row.actual), row.unit)}</td><td>—</td><td>—</td><td>固定入力・判定対象外</td></tr>`
     : isSixthRoundReferenceMetric(row.key)
       ? `<tr><th>${htmlEscape(row.label)}<small>第6次定義：${htmlEscape(row.round6Formula)}</small><small>第6次評価対象外・参考値</small></th><td>${display(row.actual, row.unit)}</td><td>—</td><td>—</td><td>参考値・判定対象外</td></tr>`
-    : (() => { const target = proposalInput(proposal, inputKey.target(row.key, "value"), row.target); const achieved = target === undefined ? "目標未設定" : row.actual >= target ? "目標達成" : "目標未達"; return `<tr><th>${htmlEscape(row.label)}<small>第6次定義：${htmlEscape(row.round6Formula)}</small></th><td>${Number.isFinite(row.actual) ? row.actual.toFixed(2) : "—"} ${htmlEscape(row.unit)}</td><td>${htmlEscape(metricRequirementLabel(row.key, category))}</td><td>${display(target, row.unit)}</td><td>${achieved}</td></tr>`; })()).join("");
+    : (() => { const target = proposalInput(proposal, inputKey.target(row.key, "value"), row.target); const achieved = target === undefined ? "目標未設定" : row.actual >= target ? "目標達成" : "目標未達"; return `<tr><th>${htmlEscape(row.label)}<small>第6次定義：${htmlEscape(row.round6Formula)}</small></th><td>${display(row.actual, row.unit)}</td><td>${htmlEscape(metricRequirementLabel(row.key, category))}</td><td>${display(target, row.unit)}</td><td>${achieved}</td></tr>`; })()).join("");
   const diagnosticSections = parts.diagnostics.map((group) => htmlSection(`基本指標による妥当性チェック｜${group.title}`, `<th>指標名</th><th>計算式</th><th>主な確認点</th>${planHeader}`, group.rows.map((row) => `<tr><th>${htmlEscape(row.name)}<small>${htmlEscape(row.unit)}</small></th><td class="copy">${htmlEscape(row.formula)}</td><td class="copy">${htmlEscape(row.check)}</td>${row.values.map((period) => `<td>${period.map((entry) => `<span class="diagnostic-value"><small>${htmlEscape(entry.label)}</small>${display(entry.value, row.unit)}</span>`).join("")}</td>`).join("")}</tr>`).join(""))).join("");
   const diagnosticCharts = htmlDiagnosticCharts(effectivePlan);
   const auditRows = inputAuditRows(proposal).map(([key, value]) => `<tr><th>${htmlEscape(key)}</th><td>${display(value, "")}</td><td>${value === 0 ? "明示的な0" : "入力済み"}</td><td>—</td><td>—</td></tr>`).join("");
@@ -567,7 +502,7 @@ export function buildProposalXlsx({ proposal, effectivePlan, metricRows }: Propo
   const reportSheet = (title: string, periods: string[], rows: ReportRow[]) => [
     rowXml(1, [title, ...Array(periods.length).fill("")], "title"),
     rowXml(2, ["第6次様式項目", ...periods], "header"),
-    ...rows.map((item, index) => rowXml(index + 3, [`${item.code} ${item.label}（${item.unit}）`, ...item.values], item.emphasis ? "emphasis" : "normal")),
+    ...rows.map((item, index) => rowXml(index + 3, [`${item.code} ${item.label}（${item.unit}）`, ...item.values.map((value) => reportNumericValue(value, item.unit))], item.emphasis ? "emphasis" : "normal")),
   ];
   const summaryRows = [
     rowXml(1, [proposal.title, "値"], "title"),
@@ -577,7 +512,7 @@ export function buildProposalXlsx({ proposal, effectivePlan, metricRows }: Propo
     rowXml(5, ["申請区分", category ? applicationCategoryLabels[category] : "未選択"]),
     rowXml(6, ["出力内容", "使用単位／入力値／自動計算値／最適化結果／未入力／暫定値／診断チャート（HTML出力）／妥当性チェック"]),
     rowXml(7, ["15指標・目標（指標名に第6次定義を併記）", "計画値", "単位", "制度上の必須条件", "目標値", "判定"], "header"),
-    ...metricRows.map((item, index) => { const definedLabel = `${item.label}（第6次定義：${item.round6Formula}）`; const target = proposalInput(proposal, inputKey.target(item.key, "value"), item.target); return rowXml(index + 8, item.key === "localBenchmark" ? [definedLabel, proposalInput(proposal, inputKey.driver("localBenchmark"), item.actual), item.unit, undefined, undefined, "固定入力・判定対象外"] : isSixthRoundReferenceMetric(item.key) ? [definedLabel, item.actual, item.unit, undefined, undefined, "参考値・第6次評価対象外"] : [definedLabel, item.actual, item.unit, metricRequirementLabel(item.key, category), target, target === undefined ? "目標未設定" : item.actual >= target ? "目標達成" : "目標未達"]); }),
+    ...metricRows.map((item, index) => { const definedLabel = `${item.label}（第6次定義：${item.round6Formula}）`; const target = proposalInput(proposal, inputKey.target(item.key, "value"), item.target); const actualValue = reportNumericValue(item.actual, item.unit); const targetValue = reportNumericValue(target, item.unit); return rowXml(index + 8, item.key === "localBenchmark" ? [definedLabel, proposalInput(proposal, inputKey.driver("localBenchmark"), item.actual), item.unit, undefined, undefined, "固定入力・判定対象外"] : isSixthRoundReferenceMetric(item.key) ? [definedLabel, actualValue, item.unit, undefined, undefined, "参考値・第6次評価対象外"] : [definedLabel, actualValue, item.unit, metricRequirementLabel(item.key, category), targetValue, target === undefined ? "目標未設定" : item.actual >= target ? "目標達成" : "目標未達"]); }),
   ];
   const diagnosticRows: string[] = [rowXml(1, ["基本指標によるシミュレーション妥当性チェック", "計算式", "主な確認点", ...parts.periods], "title"), rowXml(2, ["指標名", "計算式", "主な確認点", ...parts.periods], "header")];
   let diagnosticRow = 3;
@@ -585,8 +520,8 @@ export function buildProposalXlsx({ proposal, effectivePlan, metricRows }: Propo
     diagnosticRows.push(rowXml(diagnosticRow++, [group.title, ...Array(parts.periods.length + 2).fill("")], "header"));
     for (const item of group.rows) diagnosticRows.push(rowXml(diagnosticRow++, [`${item.name}（${item.unit}）`, item.formula, item.check, ...item.values.map((period) => period.map((entry) => `${entry.label} ${display(entry.value, item.unit)}`).join(" / "))]));
   }
-  const assumptionRows = [rowXml(1, ["調整条件と根拠", "計画初期値", "制度上の必須条件", "許容下限", "許容上限"], "title"), rowXml(2, ["調整項目", "計画初期値", "制度上の必須条件", "許容下限", "許容上限"], "header"), ...(Object.keys(proposal.drivers) as (keyof Drivers)[]).filter((key) => key !== "localBenchmark" && !hiddenLegacyDriverKeys.has(key)).map((key, index) => { const percent = !["investment", "subsidy", "projectFirstYearSales", "projectBaseYearSales"].includes(key); const factor = percent ? 100 : 1; const range = fixedOutputDriverKeys.has(key) ? undefined : proposal.driverRanges[key]; const value = proposalInput(proposal, inputKey.driver(key), proposal.drivers[key]); const lower = range ? proposalInput(proposal, inputKey.driverRange(key, 0), range[0]) : undefined; const upper = range ? proposalInput(proposal, inputKey.driverRange(key, 1), range[1]) : undefined; return rowXml(index + 3, [driverNames[key] ?? key, value === undefined ? undefined : value * factor, driverRequirementLabel(key, category, proposal.drivers.investment), lower === undefined ? undefined : lower * factor, upper === undefined ? undefined : upper * factor]); })];
-  const auditSheetRows = [rowXml(1, ["入力データ監査（Null／0区別）", "保存値", "状態"], "title"), rowXml(2, ["入力キー", "保存値", "状態"], "header"), ...inputAuditRows(proposal).map(([key, value], index) => rowXml(index + 3, [key, value, value === 0 ? "明示的な0" : "入力済み"]))];
+  const assumptionRows = [rowXml(1, ["調整条件と根拠", "計画初期値", "制度上の必須条件", "許容下限", "許容上限"], "title"), rowXml(2, ["調整項目", "計画初期値", "制度上の必須条件", "許容下限", "許容上限"], "header"), ...(Object.keys(proposal.drivers) as (keyof Drivers)[]).filter((key) => key !== "localBenchmark" && !hiddenLegacyDriverKeys.has(key)).map((key, index) => { const percent = !["investment", "subsidy", "projectFirstYearSales", "projectBaseYearSales"].includes(key); const factor = percent ? 100 : 1; const range = fixedOutputDriverKeys.has(key) ? undefined : proposal.driverRanges[key]; const value = proposalInput(proposal, inputKey.driver(key), proposal.drivers[key]); const lower = range ? proposalInput(proposal, inputKey.driverRange(key, 0), range[0]) : undefined; const upper = range ? proposalInput(proposal, inputKey.driverRange(key, 1), range[1]) : undefined; const outputUnit = percent ? "%" : "千円"; return rowXml(index + 3, [driverNames[key] ?? key, reportNumericValue(value === undefined ? undefined : value * factor, outputUnit), driverRequirementLabel(key, category, proposal.drivers.investment), reportNumericValue(lower === undefined ? undefined : lower * factor, outputUnit), reportNumericValue(upper === undefined ? undefined : upper * factor, outputUnit)]); })];
+  const auditSheetRows = [rowXml(1, [`入力データ監査（Null／0区別・金額の保存単位は${INTERNAL_MONEY_UNIT}）`, "保存値", "状態"], "title"), rowXml(2, ["入力キー", "保存値", "状態"], "header"), ...inputAuditRows(proposal).map(([key, value], index) => rowXml(index + 3, [key, value, value === 0 ? "明示的な0" : "入力済み"]))];
   const chunks = encodeBase64(JSON.stringify(proposal)).match(/.{1,30000}/g) ?? [];
   const dataRows = [rowXml(1, [PROPOSAL_FORMAT], "header"), ...chunks.map((chunk, index) => rowXml(index + 2, [chunk]))];
 

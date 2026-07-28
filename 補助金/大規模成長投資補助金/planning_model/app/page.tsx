@@ -56,7 +56,7 @@ import {
   YearPlan,
 } from "./model";
 import { buildProposalHtml, buildProposalXlsx, downloadBlob, normalizeProposalMoneyUnit, parseProposalFile, PROPOSAL_FORMAT, ProposalData } from "./proposal-io";
-import { formatDisplayMoney, formatEditableMoney, formatNumericInput, fromDisplayMoney, INTERNAL_MONEY_UNIT, legacyOkuToInternalMoney, moneyDisplayFractionDigits, moneyEditableFractionDigits, moneyUnitLabel, normalizeInternalMoney, parseNumericInput, toDisplayMoney, type MoneyDisplayUnit } from "./money";
+import { formatDisplayMoney, formatEditableMoney, formatNumericInput, fromDisplayMoney, INTERNAL_MONEY_UNIT, moneyDisplayFractionDigits, moneyEditableFractionDigits, moneyUnitLabel, normalizeInternalMoney, okuToInternalMoney, parseNumericInput, toDisplayMoney, type MoneyDisplayUnit } from "./money";
 import {
   buildMappedExcel,
   EXCEL_MAPPING_COPILOT_PROMPT,
@@ -114,6 +114,7 @@ function MoneyInput({
   className,
   ariaLabel,
   ariaInvalid,
+  disabled,
 }: {
   value: number | string;
   onCanonicalChange: (value: number | null) => void;
@@ -122,6 +123,7 @@ function MoneyInput({
   className?: string;
   ariaLabel?: string;
   ariaInvalid?: boolean;
+  disabled?: boolean;
 }) {
   const unit = useContext(MoneyDisplayUnitContext);
   const displayDigits = moneyDisplayFractionDigits(unit);
@@ -141,6 +143,7 @@ function MoneyInput({
     className={className}
     aria-label={ariaLabel}
     aria-invalid={ariaInvalid}
+    disabled={disabled}
     onFocus={() => {
       setEditing(true);
       setDraft(editableValue);
@@ -429,15 +432,15 @@ type Round5Benchmark = { applicant: number; accepted: number; statistic: "中央
 
 const round5Benchmarks: Partial<Record<MetricKey, Round5Benchmark>> = {
   companySalesCagr: { applicant: 20, accepted: 21, statistic: "中央値" },
-  companySalesIncrease: { applicant: legacyOkuToInternalMoney(67.1), accepted: legacyOkuToInternalMoney(82.4), statistic: "中央値" },
+  companySalesIncrease: { applicant: okuToInternalMoney(67.1), accepted: okuToInternalMoney(82.4), statistic: "中央値" },
   companyPaySchedule: { applicant: 2.3, accepted: 2.5, statistic: "中央値" },
   projectSalesShare: { applicant: 80, accepted: 89, statistic: "平均値" },
   projectSalesCagr: { applicant: 22, accepted: 22, statistic: "中央値" },
-  projectSalesIncrease: { applicant: legacyOkuToInternalMoney(57.4), accepted: legacyOkuToInternalMoney(74.8), statistic: "中央値" },
+  projectSalesIncrease: { applicant: okuToInternalMoney(57.4), accepted: okuToInternalMoney(74.8), statistic: "中央値" },
   laborProductivityCagr: { applicant: 21, accepted: 21, statistic: "中央値" },
-  valueAddedIncrease: { applicant: legacyOkuToInternalMoney(19.9), accepted: legacyOkuToInternalMoney(28.1), statistic: "中央値" },
+  valueAddedIncrease: { applicant: okuToInternalMoney(19.9), accepted: okuToInternalMoney(28.1), statistic: "中央値" },
   employeePayCagr: { applicant: 6.5, accepted: 7, statistic: "中央値" },
-  employeePayIncrease: { applicant: legacyOkuToInternalMoney(2.8), accepted: legacyOkuToInternalMoney(3.9), statistic: "中央値" },
+  employeePayIncrease: { applicant: okuToInternalMoney(2.8), accepted: okuToInternalMoney(3.9), statistic: "中央値" },
   investmentSalesRatio: { applicant: 64, accepted: 61, statistic: "中央値" },
   valueAddedSubsidyRatio: { applicant: 171, accepted: 213, statistic: "中央値" },
   localBenchmark: { applicant: 23, accepted: 23, statistic: "中央値" },
@@ -666,7 +669,7 @@ function number(value: number, digits = 1) {
 function Round5BenchmarkCell({ metricKey, unit }: { metricKey: MetricKey; unit: string }) {
   const benchmark = round5Benchmarks[metricKey];
   if (!benchmark) return <td className="round5-benchmark unavailable">—<small>第5次公表なし</small></td>;
-  return <td className="round5-benchmark"><strong>採択者 {number(benchmark.accepted)} {unit}</strong><small>申請者 {number(benchmark.applicant)} {unit}</small><small>{benchmark.statistic}</small></td>;
+  return <td className="round5-benchmark"><strong>採択者 <MetricDisplayValue metricKey={metricKey} value={benchmark.accepted} unit={unit} /></strong><small>申請者 <MetricDisplayValue metricKey={metricKey} value={benchmark.applicant} unit={unit} /></small><small>{benchmark.statistic}</small></td>;
 }
 
 function roundedInput(value: number, digits = 2) {
@@ -679,6 +682,15 @@ const monetaryTargetKeys = new Set<MetricKey>([
   "companySalesIncrease", "projectSalesIncrease", "valueAddedIncrease",
   "employeePayIncrease", "officerPayIncrease",
 ]);
+
+function MetricDisplayValue({ metricKey, value, unit, digits = 1, showUnit = true }: { metricKey: MetricKey; value: number; unit: string; digits?: number; showUnit?: boolean }) {
+  const moneyUnit = useContext(MoneyDisplayUnitContext);
+  if (monetaryTargetKeys.has(metricKey)) {
+    return <>{formatDisplayMoney(value, moneyUnit)}{showUnit ? ` ${moneyUnit}` : ""}</>;
+  }
+  return <>{number(value, digits)}{showUnit ? ` ${unit}` : ""}</>;
+}
+
 const monetaryDriverKeys = new Set<keyof Drivers>(["investment", "subsidy", "projectFirstYearSales", "projectBaseYearSales"]);
 const normalizePlanInput = (value: number, isCount = false) => isCount ? roundedInput(value, 0) : normalizeInternalMoney(value);
 
@@ -1334,7 +1346,7 @@ export default function Home() {
         targets.set(`balanceSheet.${period}.${item.code}`, {
           id: `balanceSheet.${period}.${item.code}`,
           label: `${YEAR_ROLE_LABELS[history.role]} B/S ${item.code} ${item.label}`,
-          unit: "千円",
+          unit: INTERNAL_MONEY_UNIT,
           writable: true,
           value: hasInputValue(inputValues, key) ? inputValues[key] : null,
         });
@@ -1344,7 +1356,7 @@ export default function Home() {
         targets.set(`companyPL.${period}.${item.code}`, {
           id: `companyPL.${period}.${item.code}`,
           label: `${YEAR_ROLE_LABELS[history.role]} 全社PL ${item.code} ${item.label}`,
-          unit: item.unit === "%" ? "%" : item.unit === "人" ? "人" : "千円",
+          unit: item.unit === "%" ? "%" : item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
           writable: true,
           value: hasInputValue(inputValues, key) ? inputValues[key] : null,
         });
@@ -1354,7 +1366,7 @@ export default function Home() {
         targets.set(`projectPL.${period}.${item.code}`, {
           id: `projectPL.${period}.${item.code}`,
           label: `${YEAR_ROLE_LABELS[history.role]} 補助事業PL ${item.code} ${item.label}`,
-          unit: item.unit === "人" ? "人" : "千円",
+          unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
           writable: true,
           value: hasInputValue(inputValues, key) ? inputValues[key] : null,
         });
@@ -1368,7 +1380,7 @@ export default function Home() {
         targets.set(id, {
           id,
           label: `${period.label} 1-24 新規設備投資による支出`,
-          unit: "千円",
+          unit: INTERNAL_MONEY_UNIT,
           writable: true,
           value: hasInputValue(inputValues, key) ? inputValues[key] : null,
         });
@@ -1379,7 +1391,7 @@ export default function Home() {
         targets.set(id, {
           id,
           label: `${period.label} 全社PL ${item.code} ${item.label}`,
-          unit: item.unit === "%" ? "%" : item.unit === "人" ? "人" : "千円",
+          unit: item.unit === "%" ? "%" : item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
           writable: true,
           value: Object.prototype.hasOwnProperty.call(forecastOverrides, key) ? forecastOverrides[key] : null,
         });
@@ -1390,7 +1402,7 @@ export default function Home() {
         targets.set(id, {
           id,
           label: `${period.label} 補助事業PL ${item.code} ${item.label}`,
-          unit: item.unit === "人" ? "人" : "千円",
+          unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
           writable: true,
           value: Object.prototype.hasOwnProperty.call(forecastOverrides, key) ? forecastOverrides[key] : null,
         });
@@ -1401,7 +1413,7 @@ export default function Home() {
         targets.set(id, {
           id,
           label: `${period.label} ベース事業PL ${item.modelCode} ${item.label}`,
-          unit: item.unit === "人" ? "人" : "千円",
+          unit: item.unit === "人" ? "人" : INTERNAL_MONEY_UNIT,
           writable: true,
           value: Object.prototype.hasOwnProperty.call(forecastOverrides, key) ? forecastOverrides[key] : null,
         });
@@ -2783,8 +2795,8 @@ export default function Home() {
                   <div className="metric-row" key={definition.key}>
                     <span className={`status-dot ${fixedInput || referenceMetric || basisRole === "result" || !targetSet || status.ok ? "ok" : "bad"}`} />
                     <div><strong>{definition.label}</strong><small>{definition.sourceRound}</small></div>
-                    <span className="metric-value">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key])} →</small>}{number(actual[definition.key])}{definition.unit}</span>
-                    <span className="metric-target">{fixedInput ? "固定入力・判定対象外" : referenceMetric ? "参考値・第6次評価対象外" : basisRole === "result" ? "自動算出" : targetSet ? `目標 ${number(target.value)}${definition.unit}` : "目標 未設定"}</span>
+                    <span className="metric-value">{adjustedPlan && <small className="before-metric"><MetricDisplayValue metricKey={definition.key} value={sourceActual[definition.key]} unit={definition.unit} showUnit={false} /> →</small>}<MetricDisplayValue metricKey={definition.key} value={actual[definition.key]} unit={definition.unit} /></span>
+                    <span className="metric-target">{fixedInput ? "固定入力・判定対象外" : referenceMetric ? "参考値・第6次評価対象外" : basisRole === "result" ? "自動算出" : targetSet ? <>目標 <MetricDisplayValue metricKey={definition.key} value={target.value} unit={definition.unit} /></> : "目標 未設定"}</span>
                   </div>
                 );
               })}
@@ -2965,10 +2977,10 @@ export default function Home() {
                 const scaleDependent = scaleDependentMetricKeys.has(definition.key);
                 const basisRole = metricBasisRole(definition.key, metricGroupBases);
                 if (definition.key === "localBenchmark") return <tr className="fixed-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>外部で算出した点数を転記する固定値</small></td>{history.values.map((_value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>—</td>).slice(1)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td><input aria-label="ローカルベンチマーク固定値" type="number" step="1" value={getInputValue(inputValues, inputKey.driver("localBenchmark"))} placeholder="未入力" onChange={(event) => updateDriver("localBenchmark", event.target.value === "" ? null : Number(event.target.value))} /></td><td className="statutory-condition">—</td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">判定対象外</span></td></tr>;
-                if (isSixthRoundReferenceMetric(definition.key)) return <tr className="reference-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>第6次評価対象外</small><span className="metric-role-badge reference">参考値</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value)}</strong><small>{historicalPlan[historyIndex - 1]?.year}→{historicalPlan[historyIndex].year}（1年間）／{definition.unit}</small>{scaleDependent && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears)} {definition.unit}</small>}</> : "—"}</td>).slice(1)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{number(actual[definition.key])} {definition.unit}</td><td className="statutory-condition">—</td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">参考値</span></td></tr>;
+                if (isSixthRoundReferenceMetric(definition.key)) return <tr className="reference-metric-row" key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>第6次評価対象外</small><span className="metric-role-badge reference">参考値</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong><MetricDisplayValue metricKey={definition.key} value={value} unit={definition.unit} showUnit={false} /></strong><small>{historicalPlan[historyIndex - 1]?.year}→{historicalPlan[historyIndex].year}（1年間）／{displayedMoneyUnit(definition.unit, moneyDisplayUnit)}</small>{scaleDependent && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：<MetricDisplayValue metricKey={definition.key} value={value * targetComparisonYears} unit={definition.unit} /></small>}</> : "—"}</td>).slice(1)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric"><MetricDisplayValue metricKey={definition.key} value={actual[definition.key]} unit={definition.unit} /></td><td className="statutory-condition">—</td><td><span className="no-range">—</span></td><td><span className="no-range">—</span></td><td><span className="result-badge ok">参考値</span></td></tr>;
                 const rowClass = basisRole === "result" ? "metric-result-row" : basisRole === "basis" ? "metric-basis-row" : "metric-independent-row";
                 const roleLabel = basisRole === "result" ? "自動算出" : basisRole === "basis" ? "目標設定" : "個別に目標設定";
-                return <tr className={rowClass} key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>{definition.sourceRound}</small><span className={`metric-role-badge ${basisRole}`}>{roleLabel}</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong>{number(value, monetaryTargetKeys.has(definition.key) ? 0 : 1)}</strong><small>{history.mode === "change" ? `${historicalPlan[historyIndex - 1]?.year}→${historicalPlan[historyIndex].year}（1年間）／${definition.unit}` : definition.unit}</small>{scaleDependent && history.mode === "change" && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：{number(value * targetComparisonYears, monetaryTargetKeys.has(definition.key) ? 0 : 1)} {definition.unit}</small>}</> : "—"}</td>).slice(1)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{adjustedPlan && <small className="before-metric">{number(sourceActual[definition.key], monetaryTargetKeys.has(definition.key) ? 0 : 1)} →</small>}{number(actual[definition.key], monetaryTargetKeys.has(definition.key) ? 0 : 1)} {definition.unit}</td><td className="statutory-condition"><strong>{metricRequirementLabel(definition.key, applicationCategory)}</strong>{definition.key === "companyPaySchedule" && <div className="inflation-comparison"><small className="inflation-comparison-reference">外部前提：物価上昇率 {inflationReference === "" ? "未設定" : `${number(Number(inflationReference), 1)}%/年`}</small>{inflationComparison && <small className={`inflation-comparison-result ${inflationComparison.status}`}>計画 {number(actual.companyPaySchedule, 1)}% − 物価 {number(Number(inflationReference), 1)}% ＝ {inflationComparison.difference > 0 ? "+" : ""}{number(inflationComparison.difference, 1)}pt<span>{inflationComparison.status === "above" ? "物価上昇率超" : inflationComparison.status === "equal" ? "物価上昇率と同率" : "物価上昇率未満"}</span></small>}</div>}</td><td><input disabled={basisRole === "result"} aria-label={`${definition.label}目標値`} type="number" step={monetaryTargetKeys.has(definition.key) ? 1 : 0.1} value={getInputValue(inputValues, inputKey.target(definition.key, "value"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "value", event.target.value === "" ? null : Number(event.target.value))} /></td><td><input disabled={basisRole === "result"} type="number" min="1" max="10" step="1" value={integerPriority(target.weight)} onChange={(event) => updateTarget(definition.key, { weight: integerPriority(Number(event.target.value)) })} /></td><td className="target-judgement"><span className={`result-badge ${basisRole === "result" || !targetSet || status.ok ? "ok" : "bad"}`}>{basisRole === "result" ? "自動算出" : !targetSet ? "未設定" : status.ok ? "目標達成" : "目標未達"}</span></td></tr>;
+                return <tr className={rowClass} key={definition.key}><td>{index + 1}</td><td><strong>{definition.label}</strong><small className="metric-definition">第6次定義：{definition.round6Formula}</small><small>{definition.sourceRound}</small><span className={`metric-role-badge ${basisRole}`}>{roleLabel}</span></td>{history.values.map((value, historyIndex) => <td className="historical-metric" key={`${definition.key}-${historicalPlan[historyIndex].year}`}>{Number.isFinite(value) ? <><strong><MetricDisplayValue metricKey={definition.key} value={value} unit={definition.unit} showUnit={false} /></strong><small>{history.mode === "change" ? `${historicalPlan[historyIndex - 1]?.year}→${historicalPlan[historyIndex].year}（1年間）／${displayedMoneyUnit(definition.unit, moneyDisplayUnit)}` : displayedMoneyUnit(definition.unit, moneyDisplayUnit)}</small>{scaleDependent && history.mode === "change" && <small className="period-equivalent">同額ペースの{targetComparisonYears}年単純換算：<MetricDisplayValue metricKey={definition.key} value={value * targetComparisonYears} unit={definition.unit} /></small>}</> : "—"}</td>).slice(1)}<Round5BenchmarkCell metricKey={definition.key} unit={definition.unit} /><td className="numeric">{adjustedPlan && <small className="before-metric"><MetricDisplayValue metricKey={definition.key} value={sourceActual[definition.key]} unit={definition.unit} showUnit={false} /> →</small>}<MetricDisplayValue metricKey={definition.key} value={actual[definition.key]} unit={definition.unit} /></td><td className="statutory-condition"><strong>{metricRequirementLabel(definition.key, applicationCategory)}</strong>{definition.key === "companyPaySchedule" && <div className="inflation-comparison"><small className="inflation-comparison-reference">外部前提：物価上昇率 {inflationReference === "" ? "未設定" : `${number(Number(inflationReference), 1)}%/年`}</small>{inflationComparison && <small className={`inflation-comparison-result ${inflationComparison.status}`}>計画 {number(actual.companyPaySchedule, 1)}% − 物価 {number(Number(inflationReference), 1)}% ＝ {inflationComparison.difference > 0 ? "+" : ""}{number(inflationComparison.difference, 1)}pt<span>{inflationComparison.status === "above" ? "物価上昇率超" : inflationComparison.status === "equal" ? "物価上昇率と同率" : "物価上昇率未満"}</span></small>}</div>}</td><td>{monetaryTargetKeys.has(definition.key) ? <MoneyInput disabled={basisRole === "result"} ariaLabel={`${definition.label}目標値`} value={getInputValue(inputValues, inputKey.target(definition.key, "value"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onCanonicalChange={(value) => updateTargetBound(definition.key, "value", value)} /> : <input disabled={basisRole === "result"} aria-label={`${definition.label}目標値`} type="number" step="0.1" value={getInputValue(inputValues, inputKey.target(definition.key, "value"))} placeholder={scaleDependent ? "デフォルト設定後に算出" : "未設定"} onChange={(event) => updateTargetBound(definition.key, "value", event.target.value === "" ? null : Number(event.target.value))} />}</td><td><input disabled={basisRole === "result"} type="number" min="1" max="10" step="1" value={integerPriority(target.weight)} onChange={(event) => updateTarget(definition.key, { weight: integerPriority(Number(event.target.value)) })} /></td><td className="target-judgement"><span className={`result-badge ${basisRole === "result" || !targetSet || status.ok ? "ok" : "bad"}`}>{basisRole === "result" ? "自動算出" : !targetSet ? "未設定" : status.ok ? "目標達成" : "目標未達"}</span></td></tr>;
               })}
             </tbody></table></div>
             <p className="footnote round5-source-note">第5次公式参考値は、申請者全体と採択者の公表代表値です。原則は中央値ですが、「補助事業売上高／全社売上高」のみ平均値です。役員関連2指標は第5次に公表値がありません。<a href="https://chukentou-seichotoushi-hojo.jp/assets/lp/documents/5ji_median.pdf" target="_blank" rel="noreferrer">第5次公式資料 ↗</a></p>
@@ -3007,7 +3019,7 @@ export default function Home() {
                   return target.policy === "hard" && !targetStatus(definition, actual[definition.key], target).ok;
                 }).map((definition) => {
                   const suggestions = targetAdjustmentSuggestions[definition.key] ?? [];
-                  return <tr key={definition.key}><th>{standaloneMetricLabel(definition)}<small>第6次定義：{definition.round6Formula}</small></th><td>{number(optimizationTargets[definition.key].value)} {definition.unit}</td><td><strong>{number(actual[definition.key])} {definition.unit}</strong></td><td>{suggestions.length ? <div className="unmet-target-suggestions">{suggestions.map((suggestion) => <label className="target-adjustment-suggestion" key={driverRangeSuggestionId(definition.key, suggestion)}><input type="checkbox" checked={Boolean(selectedAdjustmentSuggestions[driverRangeSuggestionId(definition.key, suggestion)])} onChange={(event) => toggleDriverRangeSuggestion(definition.key, suggestion, event.target.checked)} /><span>{suggestion.text}</span></label>)}</div> : <span className="no-effective-suggestion">現在の許容範囲では有効な拡張候補を特定できません。入力済み将来PLまたは目標値との整合を確認してください。</span>}</td></tr>;
+                  return <tr key={definition.key}><th>{standaloneMetricLabel(definition)}<small>第6次定義：{definition.round6Formula}</small></th><td><MetricDisplayValue metricKey={definition.key} value={optimizationTargets[definition.key].value} unit={definition.unit} /></td><td><strong><MetricDisplayValue metricKey={definition.key} value={actual[definition.key]} unit={definition.unit} /></strong></td><td>{suggestions.length ? <div className="unmet-target-suggestions">{suggestions.map((suggestion) => <label className="target-adjustment-suggestion" key={driverRangeSuggestionId(definition.key, suggestion)}><input type="checkbox" checked={Boolean(selectedAdjustmentSuggestions[driverRangeSuggestionId(definition.key, suggestion)])} onChange={(event) => toggleDriverRangeSuggestion(definition.key, suggestion, event.target.checked)} /><span>{suggestion.text}</span></label>)}</div> : <span className="no-effective-suggestion">現在の許容範囲では有効な拡張候補を特定できません。入力済み将来PLまたは目標値との整合を確認してください。</span>}</td></tr>;
                 })}
               </tbody></table></div>
             </section>}
@@ -3671,7 +3683,7 @@ function BehaviorChangeTable({ plan, balanceSheets, futureCapex, timeline }: { p
     { code: "4-7", label: "年間売上成長率（補助事業実施時）", unit: "%", company: cagr(companyBase.sales, companyAt(report3).sales, 3), formula: "基準年→事業化報告3年目の全社売上高CAGR" },
   ];
   const display = (value: number | undefined, unit: "千円" | "%") => value === undefined || !Number.isFinite(value) ? "算出不可" : unit === "千円" ? `${formatDisplayMoney(value, moneyUnit)} ${moneyUnit}` : `${number(value, 2)} %`;
-  return <article className="panel table-panel behavior-change-panel"><div className="panel-heading"><div><h2>行動変容に係る数値（自動計算）</h2></div><span className="pill green">4-1～4-7</span></div><div className="wide-table"><table><thead><tr><th>第6次様式項目</th><th>全社</th><th>補助事業</th><th>HTMLでの計算根拠</th></tr></thead><tbody>{rows.map((row) => <tr key={row.code}><th>{row.code} {row.label}<small>{row.unit}</small></th><td><strong>{display(row.company, row.unit)}</strong></td><td><strong>{row.project === undefined ? "—" : display(row.project, row.unit)}</strong></td><td className="formula-cell">{row.formula}</td></tr>)}</tbody></table></div><p className="footnote">第6次入力ガイドの②補助事業情報 4-1～4-7を再現しています。賃上げ率は基準年の従業員数が0人の場合のみ、役員1人当たり給与支給総額で代替します。投資額は内部・公式様式とも千円単位で保持しています。</p></article>;
+  return <article className="panel table-panel behavior-change-panel"><div className="panel-heading"><div><h2>行動変容に係る数値（自動計算）</h2></div><span className="pill green">4-1～4-7</span></div><div className="wide-table"><table><thead><tr><th>第6次様式項目</th><th>全社</th><th>補助事業</th><th>HTMLでの計算根拠</th></tr></thead><tbody>{rows.map((row) => <tr key={row.code}><th>{row.code} {row.label}<small>{row.unit}</small></th><td><strong>{display(row.company, row.unit)}</strong></td><td><strong>{row.project === undefined ? "—" : display(row.project, row.unit)}</strong></td><td className="formula-cell">{row.formula}</td></tr>)}</tbody></table></div><p className="footnote">第6次入力ガイドの②補助事業情報 4-1～4-7を再現しています。賃上げ率は基準年の従業員数が0人の場合のみ、役員1人当たり給与支給総額で代替します。投資額は内部では円単位、公式様式では千円単位で扱います。</p></article>;
 }
 
 type OfficialRow = {

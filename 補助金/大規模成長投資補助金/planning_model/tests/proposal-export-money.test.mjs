@@ -17,17 +17,16 @@ const exportContext = () => {
   return { proposal, effectivePlan, metricRows: [] };
 };
 
-test("proposal HTML exports the exact canonical thousand-yen amount", () => {
+test("proposal HTML converts canonical yen to the displayed thousand-yen unit", () => {
   const html = proposalIo.buildProposalHtml(exportContext());
 
-  assert.match(html, />1,228,817 千円</);
-  assert.doesNotMatch(html, />1,228\.82</);
+  assert.match(html, />1,229 千円</);
 });
 
-test("proposal Excel exports the exact canonical thousand-yen amount", () => {
+test("proposal Excel converts canonical yen to an exact thousand-yen numeric value", () => {
   const xlsx = proposalIo.buildProposalXlsx(exportContext());
   const files = unzipSync(xlsx);
   const companySheet = strFromU8(files["xl/worksheets/sheet3.xml"]);
 
-  assert.match(companySheet, /<v>1228817<\/v>/);
+  assert.match(companySheet, /<v>1228\.817<\/v>/);
 });

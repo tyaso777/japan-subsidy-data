@@ -33,7 +33,7 @@ import { INTERNAL_MONEY_UNIT } from "./money";
 import { inputKey, type InputValues } from "./input-values";
 import { defaultMetricGroupBases } from "./metric-groups";
 import { createOptimizationTargets, runPlanningOptimization } from "./proposal-optimization";
-import { legacyOkuToInternalMoney } from "./money";
+import { okuToInternalMoney } from "./money";
 
 const clone = <T,>(value: T): T => structuredClone(value);
 const round = (value: number) => Number(value.toFixed(2));
@@ -63,8 +63,8 @@ const standardWorkflowInitialDrivers = {
   projectSgaRateEnd: 0.015,
   otherSgaRateEnd: 0.005,
   projectOfficerPayGrowth: 0.05380116959064325,
-  investment: legacyOkuToInternalMoney(23),
-  subsidy: legacyOkuToInternalMoney(7.66),
+  investment: okuToInternalMoney(23),
+  subsidy: okuToInternalMoney(7.66),
   localBenchmark: 23,
 };
 
@@ -94,8 +94,8 @@ const standardWorkflowAdjustedDrivers = {
   projectSgaRateEnd: 0.014999737221599106,
   otherSgaRateEnd: 0.005026523443170271,
   projectOfficerPayGrowth: 0.05379522273680665,
-  investment: legacyOkuToInternalMoney(23),
-  subsidy: legacyOkuToInternalMoney(7.66),
+  investment: okuToInternalMoney(23),
+  subsidy: okuToInternalMoney(7.66),
 };
 
 const standardWorkflowRanges: typeof driverBounds = {
@@ -131,18 +131,18 @@ const standardWorkflowRanges: typeof driverBounds = {
 const standardWorkflowTargets = clone(defaultTargets);
 Object.assign(standardWorkflowTargets, {
   companySalesCagr: { ...standardWorkflowTargets.companySalesCagr, value: 15 },
-  companySalesIncrease: { ...standardWorkflowTargets.companySalesIncrease, value: legacyOkuToInternalMoney(82.4), max: legacyOkuToInternalMoney(252.69) },
+  companySalesIncrease: { ...standardWorkflowTargets.companySalesIncrease, value: okuToInternalMoney(82.4), max: okuToInternalMoney(252.69) },
   companyPaySchedule: { ...standardWorkflowTargets.companyPaySchedule, value: 2 },
   projectSalesShare: { ...standardWorkflowTargets.projectSalesShare, value: 60 },
-  projectSalesIncrease: { ...standardWorkflowTargets.projectSalesIncrease, value: legacyOkuToInternalMoney(74.8), max: legacyOkuToInternalMoney(136.84) },
-  valueAddedIncrease: { ...standardWorkflowTargets.valueAddedIncrease, value: legacyOkuToInternalMoney(18.78), max: legacyOkuToInternalMoney(33.43) },
-  employeePayIncrease: { ...standardWorkflowTargets.employeePayIncrease, value: legacyOkuToInternalMoney(2.85), max: legacyOkuToInternalMoney(3.74) },
+  projectSalesIncrease: { ...standardWorkflowTargets.projectSalesIncrease, value: okuToInternalMoney(74.8), max: okuToInternalMoney(136.84) },
+  valueAddedIncrease: { ...standardWorkflowTargets.valueAddedIncrease, value: okuToInternalMoney(18.78), max: okuToInternalMoney(33.43) },
+  employeePayIncrease: { ...standardWorkflowTargets.employeePayIncrease, value: okuToInternalMoney(2.85), max: okuToInternalMoney(3.74) },
   investmentSalesRatio: { ...standardWorkflowTargets.investmentSalesRatio, value: 15 },
 });
 
 const standardWorkflowOverrides: Record<string, number> = {
-  "2029:other:sales": legacyOkuToInternalMoney(85.13),
-  "2029:project:7-8": legacyOkuToInternalMoney(7.9),
+  "2029:other:sales": okuToInternalMoney(85.13),
+  "2029:project:7-8": okuToInternalMoney(7.9),
 };
 
 const partiallyUnmetAdjustedDrivers = {
@@ -461,14 +461,14 @@ export function createBaseYearLaunchSample(exportedAt: string) {
   };
   const historicalPlan = createHistoricalPlan(latest, DEFAULT_TIMELINE);
   const launchBase: SegmentPlan = {
-    sales: legacyOkuToInternalMoney(60),
-    cogs: legacyOkuToInternalMoney(39),
-    employeePay: legacyOkuToInternalMoney(4.8),
-    officerPay: legacyOkuToInternalMoney(0.3),
-    depreciation: legacyOkuToInternalMoney(4.5),
-    cogsDepreciation: legacyOkuToInternalMoney(1.13),
-    sgaDepreciation: legacyOkuToInternalMoney(3.37),
-    otherSga: legacyOkuToInternalMoney(6),
+    sales: okuToInternalMoney(60),
+    cogs: okuToInternalMoney(39),
+    employeePay: okuToInternalMoney(4.8),
+    officerPay: okuToInternalMoney(0.3),
+    depreciation: okuToInternalMoney(4.5),
+    cogsDepreciation: okuToInternalMoney(1.13),
+    sgaDepreciation: okuToInternalMoney(3.37),
+    otherSga: okuToInternalMoney(6),
     headcount: 48,
     officerCount: 2,
   };
