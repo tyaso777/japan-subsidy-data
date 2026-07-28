@@ -1053,7 +1053,7 @@ function usePageStickyTableHeaders(refreshKey: unknown) {
 
         let targetTop = tabsBottom;
         const diagnosticRoot = wrapper.closest<HTMLElement>(".financial-diagnostics");
-        const diagnosticChart = diagnosticRoot?.querySelector<HTMLElement>(".diagnostic-selected-chart");
+        const diagnosticChart = diagnosticRoot?.querySelector<HTMLElement>(".diagnostic-detail-layout");
         if (diagnosticChart) {
           const chartRect = diagnosticChart.getBoundingClientRect();
           if (chartRect.top <= tabsBottom + 2 && chartRect.bottom > targetTop) targetTop = chartRect.bottom;
@@ -3691,8 +3691,6 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
   const allRows = groups.flatMap((group, groupIndex) => group.rows.map((row, rowIndex) => ({ key: `${group.title}:${row.name}`, row, groupIndex, rowIndex })));
   const [selectedKey, setSelectedKey] = useState(allRows[0]?.key ?? "");
   const selected = allRows.find((entry) => entry.key === selectedKey) ?? allRows[0];
-  const diagnosticsRef = useRef<HTMLElement>(null);
-  const selectedChartRef = useRef<HTMLDivElement>(null);
   const metricTileRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const selectedSeries = selected ? diagnosticChartSeries(plan, selected.row) : [];
 
@@ -3730,24 +3728,10 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
     selectAndFocusMetric(nextGroup, nextRow);
   };
 
-  useEffect(() => {
-    const root = diagnosticsRef.current;
-    const chart = selectedChartRef.current;
-    if (!root || !chart) return;
-    const updateStickyChartHeight = () => {
-      root.style.setProperty("--diagnostic-sticky-chart-height", `${chart.offsetHeight}px`);
-    };
-    updateStickyChartHeight();
-    const observer = new ResizeObserver(updateStickyChartHeight);
-    observer.observe(chart);
-    return () => observer.disconnect();
-  }, [selectedKey]);
-
-  return <section ref={diagnosticsRef} className="financial-diagnostics" aria-label="PL妥当性診断">
+  return <section className="financial-diagnostics" aria-label="PL妥当性診断">
     <div className="diagnostic-heading"><div><h2>基本指標によるシミュレーション妥当性チェック</h2></div><p>「推移」の小さなチャートを選ぶと、詳細チャートが切り替わります。年度別数値は全社・補助事業・ベース事業の順です。</p></div>
     <div className="diagnostic-overview-block">
-    {selected && <div ref={selectedChartRef} className="diagnostic-selected-chart">
-      <div className="diagnostic-detail-layout">
+    {selected && <div className="diagnostic-detail-layout">
         <TrendChart title={selected.row.name} subtitle={`${selected.row.formula}｜${selected.row.check}`} unit={selected.row.unit === "千円/人" ? `${moneyUnit}/人` : selected.row.unit} plan={plan} zeroBaseline series={selectedSeries.map((series) => selected.row.unit === "千円/人" ? { ...series, values: series.values.map((value) => value === undefined ? undefined : toDisplayMoney(value, moneyUnit)) } : series)} />
         <aside className="diagnostic-values-panel" aria-label={`${selected.row.name}の年度別数値`}>
           <h3>年度別数値</h3>
@@ -3755,8 +3739,7 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
             {plan.map((year, index) => <tr key={year.year}><th>{year.year}<small>{YEAR_ROLE_LABELS[year.role]}</small></th>{selectedSeries.map((series) => <td key={series.label}>{formatted(series.values[index], selected.row.unit)}</td>)}</tr>)}
           </tbody></table></div>
         </aside>
-      </div>
-    </div>}
+      </div>}
     <nav className="diagnostic-metric-navigator" aria-label="診断指標を選択">
       {groups.map((group, groupIndex) => <section className="diagnostic-metric-group" key={group.title}>
         <h3>{group.title}</h3>

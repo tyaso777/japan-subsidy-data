@@ -188,7 +188,7 @@ test("diagnostic detail chart, value table, and keyboard navigator stay coordina
 
   await page.locator(".diagnostic-groups-panel").scrollIntoViewIfNeeded();
   const released = await page.evaluate(() => {
-    const chart = document.querySelector(".diagnostic-selected-chart")?.getBoundingClientRect();
+    const chart = document.querySelector(".diagnostic-detail-layout")?.getBoundingClientRect();
     const groupsPanel = document.querySelector(".diagnostic-groups-panel")?.getBoundingClientRect();
     return chart && groupsPanel
       ? {

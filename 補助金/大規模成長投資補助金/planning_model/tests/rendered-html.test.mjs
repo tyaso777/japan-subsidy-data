@@ -125,8 +125,8 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.table-panel \{ overflow: visible;/);
   assert.match(globalStyles, /\.table-panel > \.panel-heading \{ position: sticky; top: 46px; z-index: 18;/);
   assert.match(globalStyles, /\.manual-sections > div > h3 \{ position: sticky; top: 46px; z-index: 18;/);
-  assert.match(globalStyles, /\.diagnostic-panel > h3 \{ position: sticky; top: calc\(46px \+ var\(--diagnostic-sticky-chart-height, 0px\)\); z-index: 18;/);
-  assert.match(globalStyles, /\.diagnostic-selected-chart \{ position: sticky; top: 46px; z-index: 20;/);
+  assert.match(globalStyles, /\.diagnostic-panel > h3 \{ position: sticky; top: 46px; z-index: 18;/);
+  assert.match(globalStyles, /\.diagnostic-detail-layout \{[\s\S]*?position: sticky;[\s\S]*?top: 46px;[\s\S]*?z-index: 20;/);
   assert.match(globalStyles, /\.diagnostic-groups \{[^}]*overflow: visible;/);
   assert.match(pageSource, /function DiagnosticSparkline\(/);
   assert.match(pageSource, /className="diagnostic-groups" aria-label="診断指標一覧"/);
@@ -136,14 +136,15 @@ test("renders the planning model shell", async () => {
   assert.match(globalStyles, /\.diagnostic-groups-panel \{[^}]*padding:/);
   assert.match(globalStyles, /\.diagnostic-panel \{[^}]*min-width: 0;/);
   assert.doesNotMatch(pageSource, /className="diagnostic-groups-scroll"/);
-  assert.match(pageSource, /--diagnostic-sticky-chart-height/);
+  assert.doesNotMatch(pageSource, /--diagnostic-sticky-chart-height/);
   assert.match(pageSource, /className="diagnostic-detail-layout"/);
   assert.match(pageSource, /className="diagnostic-values-panel"/);
   assert.match(pageSource, /className="diagnostic-metric-navigator"/);
   assert.match(
     pageSource,
-    /className="diagnostic-overview-block"[\s\S]*className="diagnostic-selected-chart"[\s\S]*className="diagnostic-metric-navigator"/,
+    /className="diagnostic-overview-block"[\s\S]*className="diagnostic-detail-layout"[\s\S]*className="diagnostic-metric-navigator"/,
   );
+  assert.doesNotMatch(pageSource, /diagnostic-selected-chart/);
   assert.match(pageSource, /className="diagnostic-metric-tile"/);
   assert.match(pageSource, /case "ArrowLeft"/);
   assert.match(pageSource, /case "ArrowRight"/);
