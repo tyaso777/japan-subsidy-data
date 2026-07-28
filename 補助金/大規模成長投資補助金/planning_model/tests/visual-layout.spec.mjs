@@ -209,7 +209,10 @@ test("第6次公式A002サンプルを①と③へ取り込み将来の全社・
   await expect(page.locator(".excel-mapping-status")).toContainText("エラー 0件");
   await expect(page.locator(".excel-mapping-preview")).toContainText("companyPL.baseYear.2-1");
   await expect(page.locator(".excel-mapping-preview")).toContainText("projectPL.baseYear.7-1");
+  await expect(page.locator(".excel-mapping-preview")).toContainText("balanceSheet.latest.1-1");
   await page.getByRole("button", { name: "確認した値を反映" }).click();
+  await page.getByRole("button", { name: "① 過去データ入力" }).click();
+  await expect(page.getByRole("row", { name: /^1-1 資産総額 / }).getByRole("textbox").nth(2)).toHaveValue("2,200,000");
   await page.getByRole("button", { name: "② 15指標・目標" }).click();
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "過去3期からデフォルト設定" }).click();

@@ -47,7 +47,7 @@ test("validates and parses declarative mapping definitions", () => {
 
 test("provides a ready-to-use company-to-base conversion workbook and matching mapping", () => {
   assert.equal(validateExcelMappingDefinition(EXCEL_CONVERSION_SAMPLE_MAPPING).length, 0);
-  assert.equal(EXCEL_CONVERSION_SAMPLE_MAPPING.bindings.length, 213);
+  assert.equal(EXCEL_CONVERSION_SAMPLE_MAPPING.bindings.length, 270);
   assert.equal(
     EXCEL_CONVERSION_SAMPLE_MAPPING.bindings.every((binding) => binding.excel.sheet === "②補助事業情報"),
     true,
@@ -84,6 +84,14 @@ test("provides a ready-to-use company-to-base conversion workbook and matching m
   assert.equal(
     previews.find((item) => item.target === "projectPL.baseYear.7-1")?.value,
     700_000_000,
+  );
+  assert.equal(
+    previews.find((item) => item.target === "balanceSheet.latest.1-1")?.value,
+    2_200_000_000,
+  );
+  assert.equal(
+    previews.find((item) => item.target === "balanceSheet.latest.1-24")?.value,
+    200_000_000,
   );
 });
 

@@ -440,6 +440,28 @@ const officialProjectRows: OfficialSampleRow[] = [
   { code: "7-14", row: 163, unit: "人" },
 ];
 
+const officialBalanceSheetRows: OfficialSampleRow[] = [
+  { code: "1-1", row: 20, unit: "千円" },
+  { code: "1-2", row: 21, unit: "千円" },
+  { code: "1-3", row: 22, unit: "千円" },
+  { code: "1-4", row: 23, unit: "千円" },
+  { code: "1-5", row: 24, unit: "千円" },
+  { code: "1-6", row: 25, unit: "千円" },
+  { code: "1-7", row: 26, unit: "千円" },
+  { code: "1-8", row: 27, unit: "千円" },
+  { code: "1-9", row: 28, unit: "千円" },
+  { code: "1-10", row: 29, unit: "千円" },
+  { code: "1-13", row: 32, unit: "千円" },
+  { code: "1-14", row: 33, unit: "千円" },
+  { code: "1-15", row: 34, unit: "千円" },
+  { code: "1-16", row: 35, unit: "千円" },
+  { code: "1-17", row: 36, unit: "千円" },
+  { code: "1-19", row: 38, unit: "千円" },
+  { code: "1-20", row: 39, unit: "千円" },
+  { code: "1-21", row: 40, unit: "千円" },
+  { code: "1-24", row: 43, unit: "千円" },
+];
+
 const officialBindings = (
   dataset: "companyPL" | "projectPL",
   rows: OfficialSampleRow[],
@@ -453,11 +475,22 @@ const officialBindings = (
   })),
 );
 
+const officialBalanceSheetBindings: ExcelMappingBinding[] = officialBalanceSheetRows.flatMap((row) =>
+  officialHistoricalPeriods.map((period) => ({
+    id: `official-sixth-balanceSheet-${period.id}-${row.code}`,
+    target: `balanceSheet.${period.id}.${row.code}`,
+    excel: { sheet: officialSampleSheet, cell: `${period.column}${row.row}`, unit: row.unit },
+    direction: "both",
+    transform: { round: 2 },
+  })),
+);
+
 export const EXCEL_CONVERSION_SAMPLE_MAPPING: ExcelMappingDefinition = {
   format: EXCEL_MAPPING_FORMAT,
   name: "第6次公式A002・過去3期／将来PL変換サンプル",
-  description: "第6次公募の公式A002様式に入力したサンプルです。①過去データと③将来データをまとめて取り込めます。",
+  description: "第6次公募の公式A002様式に入力したサンプルです。過去B/S・過去PLを含む①と、③将来データをまとめて取り込めます。",
   bindings: [
+    ...officialBalanceSheetBindings,
     ...officialBindings("companyPL", officialCompanyRows),
     ...officialBindings("projectPL", officialProjectRows),
     ...officialFuturePeriods.map((period) => ({
@@ -490,7 +523,7 @@ export const EXCEL_MAPPING_MANUAL = `# Excelマッピング定義書 作成マ�
 
 ## まず変換サンプルを試す
 画面の「第6次公式A002サンプル」と「公式対応JSON」を両方ダウンロードしてください。2ファイルをそれぞれ対象Excel・マッピング定義書として選び、取込範囲を「①過去＋③将来データ」、将来PLの入力方式を「ベース事業＋補助事業」にして確認・反映します。
-サンプルは第6次公募の公式A002様式を保ったまま、全社PLと補助事業PLの過去3期・将来6期、将来設備投資を入力済みです。会社全体－補助事業の差額が、ツール内のベース事業PLになります。
+サンプルは第6次公募の公式A002様式を保ったまま、過去B/S、全社PLと補助事業PLの過去3期・将来6期、将来設備投資を入力済みです。会社全体－補助事業の差額が、ツール内のベース事業PLになります。
 初回利用時に③の表がまだ表示されない場合は、②「15指標・目標」で「過去3期からデフォルト設定」を実行してください。会計内訳・利益前提が揃うと、取り込んだ固定値を保ったまま③の全社・補助事業・ベース事業PLを確認できます。
 
 ## Copilotへの依頼方法
