@@ -2022,12 +2022,11 @@ export default function Home() {
       if (excelFutureCompanyImportMode === "convert-to-base" && hasFutureCompanyValue) {
         const companyModePlan = applyForecastOverrides(autoPlan, nextForecastOverrides, "company", drivers);
         companyModePlan.slice(3).forEach((row) => {
-          projectOfficialInputRows.forEach((officialItem) => {
-            const detailedItem = projectDetailedInputFields.find((item) => item.modelCode === officialItem.code);
-            const officialKey = forecastOverrideKey(row.year, "project", officialItem.code);
-            if (detailedItem && Object.prototype.hasOwnProperty.call(nextForecastOverrides, officialKey)) {
-              nextForecastOverrides[forecastOverrideKey(row.year, "project", detailedItem.key)] = nextForecastOverrides[officialKey];
-            }
+          projectDetailedInputFields.forEach((item) => {
+            nextForecastOverrides[forecastOverrideKey(row.year, "project", item.key)] = normalizePlanInput(
+              item.get(row.project),
+              item.key === "headcount" || item.key === "officerCount",
+            );
           });
         });
         for (const key of Object.keys(nextForecastOverrides)) {

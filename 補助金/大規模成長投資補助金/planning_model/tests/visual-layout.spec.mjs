@@ -217,6 +217,7 @@ test("第6次公式A002サンプルを①と③へ取り込み将来の全社・
   await expect(page.getByRole("button", { name: "過去3期から会計前提を設定" })).toBeVisible();
   await expect(page.getByLabel("2028年 売上高（手入力固定値）").first()).toHaveValue("700,000");
   await expect(page.getByLabel("2028年 売上高（手入力固定値）").nth(1)).toHaveValue("2,700,000");
+  await expect(page.getByLabel("2028年 うち従業員の給与（手入力固定値）")).toHaveCount(2);
   await page.getByRole("button", { name: "過去3期から会計前提を設定" }).click();
   await expect(page.getByRole("button", { name: "過去3期から会計前提を設定" })).toHaveCount(0);
 });
