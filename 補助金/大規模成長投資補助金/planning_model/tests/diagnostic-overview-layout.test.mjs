@@ -22,6 +22,10 @@ test("診断概要は詳細チャートだけを選択ブロック内で固定�
     pageSource,
     /className="diagnostic-overview-block"[\s\S]*?\{selected && <div className="diagnostic-detail-layout"[\s\S]*?<nav className="diagnostic-metric-navigator"/,
   );
+  assert.match(pageSource, /querySelectorAll<HTMLButtonElement>\("\.diagnostic-metric-tile"\)/);
+  assert.match(pageSource, /getBoundingClientRect\(\)/);
+  assert.match(pageSource, /Math\.abs\(candidate\.crossDelta\) \* 3/);
+  assert.match(pageSource, /data-metric-key=\{key\}/);
 });
 
 test("狭幅では詳細チャートの固定を解除して縦積みにする", () => {

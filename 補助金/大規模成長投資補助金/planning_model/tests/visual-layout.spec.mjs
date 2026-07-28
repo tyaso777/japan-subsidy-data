@@ -175,10 +175,36 @@ test("diagnostic detail chart labels, legend, and keyboard navigator stay coordi
   await expect(secondTile).toBeFocused();
   await expect(secondTile).toHaveAttribute("aria-pressed", "true");
 
+  const employeeGroupTiles = groups.nth(1).locator(".diagnostic-metric-tile");
+  const employeeTileCount = await employeeGroupTiles.count();
+  expect(employeeTileCount).toBeGreaterThan(1);
+  const employeeFirstTile = employeeGroupTiles.nth(0);
+  const expectedDownKey = await employeeFirstTile.evaluate((current) => {
+    const currentRect = current.getBoundingClientRect();
+    const currentCenter = { x: currentRect.left + currentRect.width / 2, y: currentRect.top + currentRect.height / 2 };
+    return Array.from(current.closest(".diagnostic-metric-group")?.querySelectorAll(".diagnostic-metric-tile") ?? [])
+      .filter((element) => element !== current)
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          key: element.getAttribute("data-metric-key"),
+          primary: rect.top + rect.height / 2 - currentCenter.y,
+          cross: rect.left + rect.width / 2 - currentCenter.x,
+        };
+      })
+      .filter(({ primary }) => primary > 4)
+      .sort((a, b) => a.primary + Math.abs(a.cross) * 3 - (b.primary + Math.abs(b.cross) * 3))[0]?.key ?? null;
+  });
+  expect(expectedDownKey).toContain("2. 人件費・賃上げ:");
+  await employeeFirstTile.focus();
   await page.keyboard.press("ArrowDown");
-  const nextGroupTile = groups.nth(1).locator(".diagnostic-metric-tile").nth(1);
-  await expect(nextGroupTile).toBeFocused();
-  await expect(nextGroupTile).toHaveAttribute("aria-pressed", "true");
+  const focusedMetric = await page.evaluate(() => {
+    const active = document.activeElement;
+    return active instanceof HTMLElement
+      ? { key: active.dataset.metricKey ?? null, pressed: active.getAttribute("aria-pressed") }
+      : null;
+  });
+  expect(focusedMetric).toEqual({ key: expectedDownKey, pressed: "true" });
 
   await page.locator(".diagnostic-groups-panel").scrollIntoViewIfNeeded();
   const released = await page.evaluate(() => {

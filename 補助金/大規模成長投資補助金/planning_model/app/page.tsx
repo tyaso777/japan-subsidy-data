@@ -3704,38 +3704,34 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
   const metricTileRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const selectedSeries = selected ? diagnosticChartSeries(plan, selected.row) : [];
 
-  const selectAndFocusMetric = (groupIndex: number, rowIndex: number) => {
-    const group = groups[groupIndex];
-    const row = group?.rows[rowIndex];
-    if (!group || !row) return;
-    const key = `${group.title}:${row.name}`;
-    setSelectedKey(key);
-    requestAnimationFrame(() => metricTileRefs.current[key]?.focus());
-  };
-
-  const handleMetricKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, groupIndex: number, rowIndex: number) => {
-    let nextGroup = groupIndex;
-    let nextRow = rowIndex;
-    switch (event.key) {
-      case "ArrowLeft":
-        nextRow = (rowIndex - 1 + groups[groupIndex].rows.length) % groups[groupIndex].rows.length;
-        break;
-      case "ArrowRight":
-        nextRow = (rowIndex + 1) % groups[groupIndex].rows.length;
-        break;
-      case "ArrowUp":
-        nextGroup = (groupIndex - 1 + groups.length) % groups.length;
-        nextRow = Math.min(rowIndex, groups[nextGroup].rows.length - 1);
-        break;
-      case "ArrowDown":
-        nextGroup = (groupIndex + 1) % groups.length;
-        nextRow = Math.min(rowIndex, groups[nextGroup].rows.length - 1);
-        break;
-      default:
-        return;
-    }
+  const handleMetricKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) return;
+    const navigator = event.currentTarget.closest(".diagnostic-metric-navigator");
+    if (!navigator) return;
+    const currentRect = event.currentTarget.getBoundingClientRect();
+    const currentCenter = { x: currentRect.left + currentRect.width / 2, y: currentRect.top + currentRect.height / 2 };
+    const vertical = event.key === "ArrowUp" || event.key === "ArrowDown";
+    const forward = event.key === "ArrowRight" || event.key === "ArrowDown";
+    const candidates = Array.from(navigator.querySelectorAll<HTMLButtonElement>(".diagnostic-metric-tile"))
+      .filter((element) => element !== event.currentTarget)
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        const center = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+        const primaryDelta = vertical ? center.y - currentCenter.y : center.x - currentCenter.x;
+        const crossDelta = vertical ? center.x - currentCenter.x : center.y - currentCenter.y;
+        return { element, primaryDelta, crossDelta };
+      })
+      .filter(({ primaryDelta }) => forward ? primaryDelta > 4 : primaryDelta < -4)
+      .sort((a, b) => {
+        const score = (candidate: typeof a) => Math.abs(candidate.primaryDelta) + Math.abs(candidate.crossDelta) * 3;
+        return score(a) - score(b);
+      });
+    const target = candidates[0]?.element;
+    const key = target?.dataset.metricKey;
+    if (!target || !key) return;
     event.preventDefault();
-    selectAndFocusMetric(nextGroup, nextRow);
+    setSelectedKey(key);
+    target.focus();
   };
 
   return <section className="financial-diagnostics" aria-label="PL妥当性診断">
@@ -3745,20 +3741,21 @@ function FinancialDiagnostics({ plan, balanceSheets, futureCapex }: { plan: Year
         <TrendChart showPointLabels title={selected.row.name} subtitle={`${selected.row.formula}｜${selected.row.check}`} unit={selected.row.unit === "千円/人" ? `${moneyUnit}/人` : selected.row.unit} plan={plan} zeroBaseline series={selectedSeries.map((series) => selected.row.unit === "千円/人" ? { ...series, values: series.values.map((value) => value === undefined ? undefined : toDisplayMoney(value, moneyUnit)) } : series)} />
       </div>}
     <nav className="diagnostic-metric-navigator" aria-label="診断指標を選択">
-      {groups.map((group, groupIndex) => <section className="diagnostic-metric-group" key={group.title}>
+      {groups.map((group) => <section className="diagnostic-metric-group" key={group.title}>
         <h3>{group.title}</h3>
-        <div className="diagnostic-metric-grid">{group.rows.map((row, rowIndex) => {
+        <div className="diagnostic-metric-grid">{group.rows.map((row) => {
           const key = `${group.title}:${row.name}`;
           const isSelected = key === selected?.key;
           return <button
             ref={(element) => { metricTileRefs.current[key] = element; }}
             type="button"
             className="diagnostic-metric-tile"
+            data-metric-key={key}
             aria-pressed={isSelected}
             tabIndex={isSelected ? 0 : -1}
             key={key}
             onClick={() => setSelectedKey(key)}
-            onKeyDown={(event) => handleMetricKeyDown(event, groupIndex, rowIndex)}
+            onKeyDown={handleMetricKeyDown}
           >
             <DiagnosticSparklineGraphic plan={plan} row={row} />
             <span>{row.name}</span>

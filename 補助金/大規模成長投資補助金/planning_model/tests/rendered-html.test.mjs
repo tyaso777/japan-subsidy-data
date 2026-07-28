@@ -146,10 +146,9 @@ test("renders the planning model shell", async () => {
   );
   assert.doesNotMatch(pageSource, /diagnostic-selected-chart/);
   assert.match(pageSource, /className="diagnostic-metric-tile"/);
-  assert.match(pageSource, /case "ArrowLeft"/);
-  assert.match(pageSource, /case "ArrowRight"/);
-  assert.match(pageSource, /case "ArrowUp"/);
-  assert.match(pageSource, /case "ArrowDown"/);
+  assert.match(pageSource, /querySelectorAll<HTMLButtonElement>\("\.diagnostic-metric-tile"\)/);
+  assert.match(pageSource, /Math\.abs\(candidate\.crossDelta\) \* 3/);
+  assert.match(pageSource, /data-metric-key=\{key\}/);
   assert.match(globalStyles, /\.diagnostic-detail-layout \{[^}]*grid-template-columns:/);
   assert.doesNotMatch(globalStyles, /\.diagnostic-values-panel/);
   assert.match(globalStyles, /\.diagnostic-metric-navigator \{/);
