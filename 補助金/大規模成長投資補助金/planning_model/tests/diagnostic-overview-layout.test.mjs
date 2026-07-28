@@ -29,10 +29,14 @@ test("診断概要は詳細チャートだけを選択ブロック内で固定�
   assert.match(pageSource, /data-metric-key=\{key\}/);
 });
 
-test("狭幅では詳細チャートの固定を解除して縦積みにする", () => {
+test("詳細チャートはタブレット幅で固定を維持しスマートフォン幅だけ解除する", () => {
   assert.match(
     css,
-    /@media\s*\(max-width:\s*1100px\)[\s\S]*?\.diagnostic-detail-layout\s*\{[^}]*position:\s*static;[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\);/s,
+    /@media\s*\(max-width:\s*720px\)[\s\S]*?\.diagnostic-detail-layout\s*\{[^}]*position:\s*static;[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\);/s,
+  );
+  assert.doesNotMatch(
+    css,
+    /@media\s*\(max-width:\s*1100px\)\s*\{\s*\.diagnostic-detail-layout\s*\{[^}]*position:\s*static;/s,
   );
 });
 

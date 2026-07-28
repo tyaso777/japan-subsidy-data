@@ -251,3 +251,18 @@ test("wide diagnostic navigator moves down to the adjacent category before match
   );
   expect(focusedKey).toMatch(/^3\. 生産性:/);
 });
+
+test("diagnostic chart stays sticky at tablet width and releases only at phone width", async ({ page }) => {
+  await openStandalone(page, 900);
+  page.on("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "データ入出力" }).click();
+  await page.getByRole("button", { name: "最適化済み標準提案" }).click();
+  await page.locator(".tabs button").nth(4).click();
+
+  const detailLayout = page.locator(".diagnostic-detail-layout");
+  await expect(detailLayout).toBeVisible();
+  expect(await detailLayout.evaluate((element) => getComputedStyle(element).position)).toBe("sticky");
+
+  await page.setViewportSize({ width: 700, height: 900 });
+  expect(await detailLayout.evaluate((element) => getComputedStyle(element).position)).toBe("static");
+});
