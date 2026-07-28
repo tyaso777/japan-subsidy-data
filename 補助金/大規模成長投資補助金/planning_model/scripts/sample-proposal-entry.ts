@@ -7,7 +7,7 @@ import {
   metrics,
 } from "../app/model";
 import { buildProposalHtml, buildProposalXlsx, parseProposalFile, type ProposalData } from "../app/proposal-io";
-import { createBaseYearLaunchSample, createMultipleUnmetSampleProposal, createPartiallyUnmetSampleProposal, createStandardSampleEffectivePlan, createStandardSampleProposal } from "../app/sample-proposals";
+import { createBaseYearLaunchSample, createMultipleUnmetSampleProposal, createPartiallyUnmetSampleProposal, createStandardSampleEffectivePlan, createStandardSampleProposal, createWholeCompanyHistoricalOnlySampleProposal } from "../app/sample-proposals";
 
 const outputDirectory = path.resolve(process.cwd(), "examples");
 const exportedAt = "2026-07-22T00:00:00.000Z";
@@ -15,6 +15,7 @@ const standardProposal = createStandardSampleProposal(exportedAt);
 const partiallyUnmetProposal = createPartiallyUnmetSampleProposal(exportedAt);
 const multipleUnmetProposal = createMultipleUnmetSampleProposal(exportedAt);
 const launchSample = createBaseYearLaunchSample(exportedAt);
+const wholeCompanyProposal = createWholeCompanyHistoricalOnlySampleProposal(exportedAt);
 
 async function buildAndVerify(proposal: ProposalData, effectivePlan: ReturnType<typeof generatePlan>, baseName: string) {
   const actual = calculateMetrics(effectivePlan, proposal.adjustedDrivers ?? proposal.drivers);
@@ -73,6 +74,8 @@ if (failedMultipleTargets.length !== multipleUnmetKeys.length) {
 }
 const multipleUnmetOutput = await buildAndVerify(multipleUnmetProposal, multipleUnmetPlan, "成長投資計画_提案計画サンプル_複数目標未達");
 const launchOutput = await buildAndVerify(launchSample.proposal, launchSample.effectivePlan, "成長投資計画_提案計画サンプル_基準年売上開始");
+const wholeCompanyPlan = createStandardSampleEffectivePlan(wholeCompanyProposal);
+const wholeCompanyOutput = await buildAndVerify(wholeCompanyProposal, wholeCompanyPlan, "成長投資計画_入力サンプル_切り分けなし");
 
 await mkdir(outputDirectory, { recursive: true });
 await Promise.all([
@@ -84,6 +87,8 @@ await Promise.all([
   writeFile(path.join(outputDirectory, "成長投資計画_提案計画サンプル_複数目標未達.xlsx"), multipleUnmetOutput.xlsx),
   writeFile(path.join(outputDirectory, "成長投資計画_提案計画サンプル_基準年売上開始.html"), launchOutput.html, "utf8"),
   writeFile(path.join(outputDirectory, "成長投資計画_提案計画サンプル_基準年売上開始.xlsx"), launchOutput.xlsx),
+  writeFile(path.join(outputDirectory, "成長投資計画_入力サンプル_切り分けなし.html"), wholeCompanyOutput.html, "utf8"),
+  writeFile(path.join(outputDirectory, "成長投資計画_入力サンプル_切り分けなし.xlsx"), wholeCompanyOutput.xlsx),
 ]);
 
 console.log(outputDirectory);

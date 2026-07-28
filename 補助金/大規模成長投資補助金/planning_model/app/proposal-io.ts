@@ -152,7 +152,7 @@ const fixedOutputDriverKeys = new Set<keyof Drivers>([
 
 const reportNumericValue = (value: number | undefined, unit: string) =>
   value === undefined || !Number.isFinite(value)
-    ? value
+    ? undefined
     : unit === "千円" || unit === "千円/人"
       ? toDisplayMoney(value, "千円")
       : value;

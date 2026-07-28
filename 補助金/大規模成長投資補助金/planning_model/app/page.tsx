@@ -75,7 +75,7 @@ import {
   type ExcelMappingPreview,
   type ExcelMappingTarget,
 } from "./excel-mapping";
-import { createBaseYearLaunchHistoricalOnlySampleProposal, createHistoricalOnlySampleProposal, createMultipleUnmetSampleProposal, createPartiallyUnmetSampleProposal, createStandardSampleProposal } from "./sample-proposals";
+import { createBaseYearLaunchHistoricalOnlySampleProposal, createHistoricalOnlySampleProposal, createMultipleUnmetSampleProposal, createPartiallyUnmetSampleProposal, createStandardSampleProposal, createWholeCompanyHistoricalOnlySampleProposal } from "./sample-proposals";
 import { getInputValue, hasInputValue, inputKey, setInputValue, type InputValues } from "./input-values";
 import { defaultMetricGroupBases, metricBasisRole, metricLinkGroups, type MetricGroupBasis, type MetricGroupKey } from "./metric-groups";
 import {
@@ -2071,6 +2071,13 @@ export default function Home() {
     showLoadNotice("「基準年売上開始ケース（過去3期入力済み）」を読み込みました。");
   }
 
+  function loadWholeCompanySample() {
+    if (!confirmSampleReplacement()) return;
+    applyProposal(createWholeCompanyHistoricalOnlySampleProposal(new Date().toISOString()));
+    setFileNote("全社と補助事業が一致し、ベース事業を0とする過去3期入力済みサンプルを読み込みました");
+    showLoadNotice("「切り分けなしケース（全社＝補助事業）」を読み込みました。");
+  }
+
   function updateHistorical(yearIndex: number, segment: SegmentKey, field: keyof SegmentPlan, value: number) {
     clearAdjustment();
     const isCount = field === "headcount" || field === "officerCount";
@@ -2817,6 +2824,7 @@ export default function Home() {
                 <span>過去データ入力後から、設定・最適化を自分で進めます。</span>
                 <button onClick={loadHistoricalOnlySample}>標準ケース（過去3期入力済み）</button>
                 <button onClick={loadBaseYearLaunchSample}>基準年売上開始ケース（過去3期入力済み）</button>
+                <button onClick={loadWholeCompanySample}>切り分けなしケース（全社＝補助事業）</button>
               </section>
               <section className="result-sample-section">
                 <strong>シミュレーション結果を見る</strong>

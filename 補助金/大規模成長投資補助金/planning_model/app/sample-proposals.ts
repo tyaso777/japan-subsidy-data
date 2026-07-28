@@ -1,4 +1,5 @@
 import {
+  applyBusinessSegmentationMode,
   createHistoricalPlan,
   createForecastProjectPeriodInputs,
   cogsDepreciation,
@@ -411,7 +412,10 @@ export function createStandardSampleEffectivePlan(proposal: ProposalData) {
   const calculationDrivers = proposal.adjustedDrivers ?? proposal.drivers;
   const periodInputs = createForecastProjectPeriodInputs(historical[2], calculationDrivers, proposal.timeline);
   const plan = generatePlan(historical, calculationDrivers, proposal.timeline, periodInputs);
-  return applySampleForecastOverrides(plan, proposal);
+  return applyBusinessSegmentationMode(
+    applySampleForecastOverrides(plan, proposal),
+    proposal.businessSegmentationMode,
+  );
 }
 
 export function createHistoricalOnlySampleProposal(exportedAt: string): ProposalData {
@@ -421,6 +425,21 @@ export function createHistoricalOnlySampleProposal(exportedAt: string): Proposal
     createHistoricalPlan(sampleBasePlan, DEFAULT_TIMELINE),
   );
   return clearFutureSettings(proposal);
+}
+
+export function createWholeCompanyHistoricalOnlySampleProposal(exportedAt: string): ProposalData {
+  const historicalPlan = applyBusinessSegmentationMode(
+    createHistoricalPlan(sampleBasePlan, DEFAULT_TIMELINE),
+    "wholeCompanyAsProject",
+  );
+  const proposal = clearFutureSettings(commonProposal(
+    "成長投資計画 切り分けなし入力サンプル",
+    exportedAt,
+    historicalPlan,
+  ));
+  proposal.businessSegmentationMode = "wholeCompanyAsProject";
+  proposal.futureInputBasis = "company";
+  return proposal;
 }
 
 function clearFutureSettings(proposal: ProposalData): ProposalData {

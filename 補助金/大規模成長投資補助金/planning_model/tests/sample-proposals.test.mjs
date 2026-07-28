@@ -3,12 +3,14 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { pathToFileURL, fileURLToPath } from "node:url";
+import { unzipSync } from "fflate";
 
 const projectDirectory = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const baseName = "成長投資計画_提案計画サンプル_基準年売上開始";
 const standardBaseName = "成長投資計画_提案計画サンプル";
 const partiallyUnmetBaseName = "成長投資計画_提案計画サンプル_一部目標未達";
 const multipleUnmetBaseName = "成長投資計画_提案計画サンプル_複数目標未達";
+const wholeCompanyBaseName = "成長投資計画_入力サンプル_切り分けなし";
 const runtimePath = path.join(projectDirectory, ".sample-proposal-test-runtime.mjs");
 const sampleRuntime = await import(`${pathToFileURL(runtimePath).href}?v=${Date.now()}`);
 
@@ -148,4 +150,40 @@ test("base-year launch sample has no project sales before the base year", async 
 test("base-year launch Excel is an OOXML zip workbook", async () => {
   const xlsx = await readFile(path.join(projectDirectory, "examples", `${baseName}.xlsx`));
   assert.equal(xlsx.subarray(0, 2).toString("ascii"), "PK");
+});
+
+test("whole-company sample treats every company amount as the subsidy project", async () => {
+  const proposal = await proposalFromHtml(wholeCompanyBaseName);
+  const effectivePlan = sampleRuntime.createStandardSampleEffectivePlan(proposal);
+
+  assert.equal(proposal.title, "成長投資計画 切り分けなし入力サンプル");
+  assert.equal(proposal.businessSegmentationMode, "wholeCompanyAsProject");
+  assert.equal(proposal.futureInputBasis, "company");
+  for (const row of proposal.historicalPlan) {
+    assert.ok(Object.values(row.other).every((value) => value === 0), `${row.year}年のベース事業は0`);
+    assert.equal(
+      proposal.inputValues[`actual:company:${row.year}:2-1`],
+      proposal.inputValues[`actual:project:${row.year}:7-1`],
+      `${row.year}年の全社売上高と補助事業売上高は一致`,
+    );
+  }
+  for (const row of effectivePlan) {
+    assert.ok(Object.values(row.other).every((value) => value === 0), `${row.year}年の出力でもベース事業は0`);
+  }
+});
+
+test("whole-company input sample Excel is an OOXML zip workbook", async () => {
+  const xlsx = await readFile(path.join(projectDirectory, "examples", `${wholeCompanyBaseName}.xlsx`));
+  assert.equal(xlsx.subarray(0, 2).toString("ascii"), "PK");
+});
+
+test("incomplete input samples render non-finite metrics as blank instead of NaN", async () => {
+  const html = await readFile(path.join(projectDirectory, "examples", `${wholeCompanyBaseName}.html`), "utf8");
+  const xlsx = await readFile(path.join(projectDirectory, "examples", `${wholeCompanyBaseName}.xlsx`));
+  const workbookXml = Object.values(unzipSync(xlsx))
+    .map((entry) => Buffer.from(entry).toString("utf8"))
+    .join("\n");
+
+  assert.doesNotMatch(html, />NaN</);
+  assert.doesNotMatch(workbookXml, />NaN</);
 });

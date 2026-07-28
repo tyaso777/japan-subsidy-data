@@ -423,6 +423,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, />出力 <span aria-hidden="true">▾<\/span>/);
   assert.doesNotMatch(pageSource, />サンプル <span aria-hidden="true">▾<\/span>/);
   assert.match(pageSource, /<button onClick=\{loadHistoricalOnlySample\}>標準ケース/);
+  assert.match(pageSource, /<button onClick=\{loadWholeCompanySample\}>切り分けなしケース（全社＝補助事業）/);
   assert.match(pageSource, /<button className="sample-result-button" onClick=\{loadSampleProposal\}>最適化済み標準提案/);
   assert.doesNotMatch(pageSource, />HTML出力<\/button>/);
   assert.match(globalStyles, /proposal-action-menu-items/);

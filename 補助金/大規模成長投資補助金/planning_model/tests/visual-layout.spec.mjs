@@ -136,6 +136,17 @@ test("Excelマッピングで③の将来設備投資とPL固定値を取り込�
   await expect(page.getByLabel("2028年 売上高（手入力固定値）").nth(1)).toHaveValue("3,500,000");
 });
 
+test("切り分けなし入力サンプルは全社と補助事業が一致する状態で読み込める", async ({ page }) => {
+  await openStandalone(page, 1440);
+  await page.getByRole("button", { name: "データ入出力" }).click();
+  await page.getByRole("button", { name: "切り分けなしケース（全社＝補助事業）" }).click();
+  await page.getByRole("button", { name: "① 過去データ入力" }).click();
+
+  await expect(page.getByRole("button", { name: "補助事業との切り分けなし" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText("会社全体の入力値をそのまま補助事業として扱います。")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "補助事業（7-10）" })).toHaveCount(0);
+});
+
 test("切り分けなしでは全社入力だけを使いベース事業の画面を出さない", async ({ page }) => {
   await openStandalone(page, 1440);
 
