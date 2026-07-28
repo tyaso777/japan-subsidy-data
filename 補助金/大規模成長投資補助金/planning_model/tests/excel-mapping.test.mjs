@@ -10,6 +10,7 @@ import {
   filterExcelMappingImportPreviews,
   futureExcelMappingPeriods,
   futureInputBasisForMappedTargets,
+  MAX_MAPPED_EXCEL_FILE_BYTES,
   mappedExcelOutputFileName,
   parseExcelMappingDefinition,
   previewExcelImport,
@@ -98,6 +99,19 @@ test("provides a ready-to-use company-to-base conversion workbook and matching m
       .filter((item) => ["futureCapex.project1.1-24", "futureCapex.beforeBase.1-24", "futureCapex.baseYear.1-24"].includes(item.target))
       .reduce((sum, item) => sum + (item.value ?? 0), 0),
     2_000_000_000,
+  );
+
+  const exportTargets = new Map(previews.map((item) => {
+    const sourceTarget = targets.get(item.target);
+    return [item.target, { ...sourceTarget, value: item.value }];
+  }));
+  const exported = buildMappedExcel(workbook, EXCEL_CONVERSION_SAMPLE_MAPPING, exportTargets);
+  assert.ok(exported.bytes);
+  const roundTrip = previewExcelImport(exported.bytes, EXCEL_CONVERSION_SAMPLE_MAPPING, targets);
+  assert.deepEqual(
+    roundTrip.map((item) => item.value),
+    previews.map((item) => item.value),
+    "公式A002の全マッピング値が取込→出力→再取込で一致する",
   );
 });
 
@@ -197,10 +211,13 @@ test("exports into a copied workbook while preserving styles, formulas, and unre
   const output = unzipSync(result.bytes);
   assert.deepEqual([...output["custom/keep.bin"]], [1, 2, 3, 4]);
   const sheet = strFromU8(output["xl/worksheets/sheet1.xml"]);
+  const workbook = strFromU8(output["xl/workbook.xml"]);
   assert.match(sheet, /<c r="B5"><v>2125<\/v><\/c>/);
   assert.match(sheet, /<c r="C5"><v>0<\/v><\/c>/);
   assert.match(sheet, /<c r="D5"><v>2750<\/v><\/c>/);
   assert.match(sheet, /<c r="E5"><f>SUM\(B5:D5\)<\/f><v>4250<\/v><\/c>/);
+  assert.match(workbook, /fullCalcOnLoad="1"/);
+  assert.match(workbook, /forceFullCalc="1"/);
   assert.equal(result.previews.find((item) => item.target.endsWith("latest.2-1"))?.status, "empty");
 });
 
@@ -258,7 +275,7 @@ test("changes only the mapped cell value without mutating the source workbook", 
   const outputParts = unzipSync(result.bytes);
   const targetPath = "xl/worksheets/sheet2.xml";
   for (const [path, bytes] of Object.entries(sourceParts)) {
-    if (path !== targetPath) {
+    if (path !== targetPath && path !== "xl/workbook.xml") {
       assert.deepEqual(outputParts[path], bytes, `出力Excel内の対象外ファイル ${path} を変更しない`);
     }
   }
@@ -288,4 +305,24 @@ test("stops export when a mapped destination is a formula cell", () => {
   const result = buildMappedExcel(workbookBytes(), formulaMapping, targets);
   assert.equal(result.bytes, null);
   assert.match(result.previews[0].message, /数式セル/);
+});
+
+test("stops import from a formula cell because its cached value may be stale", () => {
+  const formulaMapping = {
+    format: EXCEL_MAPPING_FORMAT,
+    name: "formula-import",
+    bindings: [{ id: "formula", target: "companyPL.latest.2-1", excel: { sheet: "損益計算書", cell: "E5", unit: "百万円" }, direction: "import" }],
+  };
+  const targets = new Map([["companyPL.latest.2-1", target("companyPL.latest.2-1")]]);
+  const result = previewExcelImport(workbookBytes(), formulaMapping, targets);
+  assert.equal(result[0].status, "error");
+  assert.match(result[0].message, /数式セル/);
+});
+
+test("rejects an oversized workbook before attempting to unzip it", () => {
+  const oversized = new Uint8Array(MAX_MAPPED_EXCEL_FILE_BYTES + 1);
+  assert.throws(
+    () => previewExcelImport(oversized, mapping, new Map()),
+    /50MB以下/,
+  );
 });

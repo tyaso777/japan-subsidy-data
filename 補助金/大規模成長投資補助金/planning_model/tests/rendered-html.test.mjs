@@ -229,6 +229,7 @@ test("renders the planning model shell", async () => {
   assert.match(pageSource, /定義書作成マニュアル/);
   assert.match(pageSource, /Copilot指示をコピー/);
   assert.match(pageSource, /navigator\.clipboard\?\.writeText/);
+  assert.match(pageSource, /MAX_MAPPED_EXCEL_FILE_BYTES/);
   assert.match(excelMappingSource, /growth-investment-excel-mapping\/v1/);
   assert.match(excelMappingSource, /EXCEL_MAPPING_COPILOT_PROMPT/);
   assert.match(excelMappingSource, /空欄と0は区別/);

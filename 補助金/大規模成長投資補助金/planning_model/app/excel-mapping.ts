@@ -1,6 +1,9 @@
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 
 export const EXCEL_MAPPING_FORMAT = "growth-investment-excel-mapping/v1";
+export const MAX_MAPPED_EXCEL_FILE_BYTES = 50 * 1024 * 1024;
+const MAX_MAPPED_EXCEL_ENTRY_COUNT = 5_000;
+const MAX_MAPPED_EXCEL_UNCOMPRESSED_BYTES = 250 * 1024 * 1024;
 
 export type ExcelMappingDirection = "import" | "export" | "both";
 export type ExcelMappingImportScope = "history" | "history-and-future";
@@ -191,11 +194,22 @@ export function parseExcelMappingDefinition(text: string): ExcelMappingDefinitio
 }
 
 function workbookParts(bytes: Uint8Array): WorkbookParts {
+  if (bytes.byteLength > MAX_MAPPED_EXCEL_FILE_BYTES) {
+    throw new Error("Excelファイルが大きすぎます。50MB以下のファイルを指定してください。");
+  }
   let files: Record<string, Uint8Array>;
   try {
     files = unzipSync(bytes);
   } catch {
     throw new Error("Excelファイルを開けません。.xlsx または .xlsm のOOXMLファイルを指定してください。");
+  }
+  const entries = Object.values(files);
+  if (entries.length > MAX_MAPPED_EXCEL_ENTRY_COUNT) {
+    throw new Error("Excelファイル内の項目数が多すぎます。内容を整理したファイルを指定してください。");
+  }
+  const uncompressedBytes = entries.reduce((total, entry) => total + entry.byteLength, 0);
+  if (uncompressedBytes > MAX_MAPPED_EXCEL_UNCOMPRESSED_BYTES) {
+    throw new Error("展開後のExcelファイルが大きすぎます。内容を整理したファイルを指定してください。");
   }
   const workbookXml = files["xl/workbook.xml"] ? strFromU8(files["xl/workbook.xml"]) : "";
   const relationshipsXml = files["xl/_rels/workbook.xml.rels"] ? strFromU8(files["xl/_rels/workbook.xml.rels"]) : "";
@@ -243,6 +257,11 @@ function readCell(xml: string, address: string, sharedStrings: string[]): number
   if (type === "str" || type === "e") return xmlDecode(raw);
   const numeric = Number(raw);
   return Number.isFinite(numeric) ? numeric : xmlDecode(raw);
+}
+
+function cellHasFormula(xml: string, address: string) {
+  const cell = new RegExp(`<(?:\\w+:)?c\\b[^>]*\\br="${address.toUpperCase()}"[^>]*>([\\s\\S]*?)<\\/(?:\\w+:)?c>`, "i").exec(xml);
+  return cell ? /<(?:\w+:)?f(?:\s[^>]*)?>/i.test(cell[1]) : false;
 }
 
 function parseNumericCell(value: number | string | boolean | null): number | null {
@@ -296,7 +315,11 @@ export function previewExcelImport(
     if (!target.writable) return { bindingId: binding.id, target: binding.target, targetLabel: target.label, sheet: binding.excel.sheet, cell: binding.excel.cell, rawValue: null, value: null, status: "error", message: "自動計算項目には取り込めません。" };
     const path = workbook.sheets.get(binding.excel.sheet);
     if (!path || !workbook.files[path]) return { bindingId: binding.id, target: binding.target, targetLabel: target.label, sheet: binding.excel.sheet, cell: binding.excel.cell, rawValue: null, value: null, status: "error", message: "指定シートが見つかりません。" };
-    const rawValue = readCell(strFromU8(workbook.files[path]), binding.excel.cell, workbook.sharedStrings);
+    const worksheetXml = strFromU8(workbook.files[path]);
+    if (cellHasFormula(worksheetXml, binding.excel.cell)) {
+      return { bindingId: binding.id, target: binding.target, targetLabel: target.label, sheet: binding.excel.sheet, cell: binding.excel.cell, rawValue: null, value: null, status: "error", message: "数式セルです。再計算済みの入力セルを指定してください。" };
+    }
+    const rawValue = readCell(worksheetXml, binding.excel.cell, workbook.sharedStrings);
     if (rawValue === null || rawValue === "") {
       return { bindingId: binding.id, target: binding.target, targetLabel: target.label, sheet: binding.excel.sheet, cell: binding.excel.cell, rawValue, value: null, status: binding.required ? "error" : "empty", message: binding.required ? "必須セルが空欄です。" : "空欄のため変更しません。" };
     }
@@ -329,6 +352,19 @@ function replaceCellValue(xml: string, address: string, value: number) {
     : `<v>${encodedValue}</v>`;
   const replacement = `<c${attributes}>${body}</c>`;
   return xml.replace(pattern, replacement);
+}
+
+function enableFullCalculationOnOpen(xml: string) {
+  const calcPrPattern = /<((?:\w+:)?calcPr)\b([^>]*?)(?:\/>|>[\s\S]*?<\/\1>)/i;
+  if (calcPrPattern.test(xml)) {
+    return xml.replace(calcPrPattern, (_match, tag: string, attributes: string) => {
+      const preserved = attributes.replace(/\s+(?:calcMode|fullCalcOnLoad|forceFullCalc)="[^"]*"/gi, "");
+      return `<${tag}${preserved} calcMode="auto" fullCalcOnLoad="1" forceFullCalc="1"/>`;
+    });
+  }
+  const closingWorkbook = /<\/((?:\w+:)?workbook)>/i;
+  if (!closingWorkbook.test(xml)) return xml;
+  return xml.replace(closingWorkbook, '<calcPr calcMode="auto" fullCalcOnLoad="1" forceFullCalc="1"/></$1>');
 }
 
 export function mappedExcelOutputFileName(sourceFileName: string) {
@@ -369,6 +405,8 @@ export function buildMappedExcel(
     }
   }
   if (previews.some((item) => item.status === "error")) return { bytes: null, previews };
+  const workbookPath = "xl/workbook.xml";
+  workbook.files[workbookPath] = strToU8(enableFullCalculationOnOpen(strFromU8(workbook.files[workbookPath])));
   return { bytes: zipSync(workbook.files, { level: 6 }), previews };
 }
 

@@ -68,6 +68,7 @@ import {
   filterExcelMappingImportPreviews,
   futureExcelMappingPeriods,
   futureInputBasisForMappedTargets,
+  MAX_MAPPED_EXCEL_FILE_BYTES,
   mappedExcelOutputFileName,
   parseExcelMappingDefinition,
   previewExcelImport,
@@ -1898,6 +1899,14 @@ export default function Home() {
       setMappedExcelBytes(null);
       setMappedExcelFileName("");
       setExcelMappingNote(".xlsx または .xlsm を指定してください。");
+      return;
+    }
+    if (file.size > MAX_MAPPED_EXCEL_FILE_BYTES) {
+      setMappedExcelBytes(null);
+      setMappedExcelFileName("");
+      setExcelMappingPreview([]);
+      setExcelMappingPreviewMode(null);
+      setExcelMappingNote("Excelファイルが大きすぎます。50MB以下のファイルを指定してください。");
       return;
     }
     setMappedExcelBytes(new Uint8Array(await file.arrayBuffer()));
