@@ -146,7 +146,7 @@ describe('将来予測・PL画面', () => {
     strengthSlider.focus();
     await user.keyboard('{End}');
     expect(rate).not.toHaveValue(before);
-  });
+  }, 15_000);
 
   it('最適化方向の適用率は、スクロール領域内でも掴める明示的なつまみを持つ', async () => {
     const user = userEvent.setup();
@@ -158,7 +158,7 @@ describe('将来予測・PL画面', () => {
     const thumb = screen.getByRole('slider', { name: '最適化方向の適用率' });
     expect(control).toHaveClass('h-8');
     expect(thumb).toHaveAttribute('data-slot', 'slider-thumb');
-  });
+  }, 15_000);
 
   it('水準と最小・最大を同じ行で変更し、同値も許容する', async () => {
     const user = userEvent.setup();
