@@ -13,6 +13,7 @@ import type { BalanceSheetRecord, HistoricalPlInput, ProgramConfiguration } from
 import type { MoneyDisplayUnit } from '../domain/value-units';
 import { calculatePl } from '../domain/financials';
 import { defaultForecastRange, normalizeForecastRanges } from '../domain/forecast-range';
+import { optimizeForecastRangesFromActuals, type HistoricalRangeOptimizationResult } from '../domain/historical-range-optimization';
 
 export type BusinessScope = 'base' | 'subsidy';
 export type ModelSnapshot = {
@@ -41,6 +42,7 @@ type ModelActions = {
   updateBalanceSheet: (yearIndex: number, field: string, value: number) => void;
   updateHistoricalPl: (scope: BusinessScope, yearIndex: number, field: keyof HistoricalPlInput, value: number) => void;
   updateMetricActual: (metricId: string, value: number) => void;
+  optimizeForecastRangesFromActuals: () => HistoricalRangeOptimizationResult;
   updateForecastPeriod: (seriesId: string, periodId: string, patch: Partial<Pick<ForecastPeriod, 'annualGrowthRate' | 'startAdjustment' | 'range'>>) => void;
   updateForecastLayer: (seriesId: string, periodId: string, patch: Partial<ForecastEffectLayers>) => void;
   splitForecastAtYear: (year: number) => void;
@@ -189,6 +191,12 @@ export function createModelStore(program?: unknown): StoreApi<ModelStore> {
         ...snapshot,
         actuals: { ...snapshot.actuals, metricInputs: { ...snapshot.actuals.metricInputs, [metricId]: value } },
       })),
+      optimizeForecastRangesFromActuals: () => {
+        const snapshot = currentSnapshot();
+        const result = optimizeForecastRangesFromActuals(snapshot.forecast, snapshot.program, snapshot.actuals.basePl, snapshot.actuals.subsidyPl);
+        applyMutation((current) => ({ ...current, forecast: result.forecast }));
+        return result;
+      },
       updateForecastPeriod: (seriesId, periodId, patch) => applyMutation((snapshot) => ({
         ...snapshot,
         forecast: {

@@ -1,4 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { Sparkles } from 'lucide-react';
+import { Button } from '../../components/ui/button';
 import { FinancialTable } from '../../components/FinancialTable';
 import { calculateHistoricalPl } from '../../domain/financials';
 import { balanceSheetRows, historicalPlRows, type HistoricalPlEditableField } from '../../domain/rows';
@@ -7,6 +9,7 @@ import { useModelStore } from '../../store/model-store-context';
 import { PeriodEditor } from './PeriodEditor';
 
 export function ActualsPage() {
+  const [rangeStatus, setRangeStatus] = useState('');
   const program = useModelStore((state) => state.program);
   const balanceSheets = useModelStore((state) => state.actuals.balanceSheets);
   const base = useModelStore((state) => state.actuals.basePl);
@@ -15,6 +18,7 @@ export function ActualsPage() {
   const updateHistoricalBoundary = useModelStore((state) => state.updateHistoricalBoundary);
   const updateBalanceSheet = useModelStore((state) => state.updateBalanceSheet);
   const updateHistoricalPl = useModelStore((state) => state.updateHistoricalPl);
+  const optimizeForecastRanges = useModelStore((state) => state.optimizeForecastRangesFromActuals);
   const moneyUnit = useModelStore((state) => state.preferences.moneyUnit);
   const beginTransaction = useModelStore((state) => state.beginTransaction);
   const commitTransaction = useModelStore((state) => state.commitTransaction);
@@ -33,5 +37,6 @@ export function ActualsPage() {
     <FinancialTable testId="historical-bs" title="全社 B/S（1-1～1-25）" years={years} yearLabels={yearLabels} records={balanceSheetsWithMetrics} rows={balanceSheetRows} moneyUnit={moneyUnit} onEditStart={beginTransaction} onEditEnd={commitTransaction} onChange={(index, field, value) => updateBalanceSheet(index, String(field), value)} />
     <FinancialTable testId="historical-pl-base" title="ベース事業 P/L" prefix="M2-" years={years} yearLabels={yearLabels} records={calculatedBase} rows={historicalPlRows} moneyUnit={moneyUnit} onEditStart={beginTransaction} onEditEnd={commitTransaction} onChange={(index, field, value) => updateHistoricalPl('base', index, field as HistoricalPlEditableField, value)} />
     <FinancialTable testId="historical-pl-subsidy" title="補助事業 P/L" prefix="7-" years={years} yearLabels={yearLabels} records={calculatedSubsidy} rows={historicalPlRows} moneyUnit={moneyUnit} onEditStart={beginTransaction} onEditEnd={commitTransaction} onChange={(index, field, value) => updateHistoricalPl('subsidy', index, field as HistoricalPlEditableField, value)} />
+    <section className="flex items-center justify-between gap-4 border-t-[3px] border-orange bg-surface px-4.5 py-3.5"><div><h3 className="m-0 text-sm font-bold">将来予測の初期範囲</h3><p className="mt-0.5 mb-0 text-[10px] text-muted-foreground">入力した過去実績の変化率と制度ベンチマークから、最小値・最大値と中点の水準を設定します。</p>{rangeStatus && <p role="status" className="mt-1 mb-0 text-[10px] font-bold text-teal">{rangeStatus}</p>}</div><Button variant="outline" onClick={() => { const result = optimizeForecastRanges(); setRangeStatus(`水準範囲を更新しました（${result.updatedPeriods}期間、実績不足による推奨範囲 ${result.fallbackPeriods}期間）`); }}><Sparkles />過去実績から水準範囲を適正化</Button></section>
   </main>;
 }

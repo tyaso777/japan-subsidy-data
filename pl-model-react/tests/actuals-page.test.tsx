@@ -125,4 +125,16 @@ describe('期間・過去実績', () => {
     await user.keyboard('{Control>}z{/Control}');
     expect(sales).toHaveValue(900);
   });
+
+  it('過去B/S・P/L入力後に水準範囲を適正化し、将来予測へ反映する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: '過去実績から水準範囲を適正化' }));
+    expect(screen.getByText(/水準範囲を更新しました/)).toBeVisible();
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    expect(screen.getByLabelText('補助事業期間 売上高 最小値')).not.toHaveValue(-10);
+    expect(screen.getByLabelText('補助事業期間 売上高 最大値')).not.toHaveValue(50);
+  });
 });

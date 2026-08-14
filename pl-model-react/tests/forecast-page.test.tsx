@@ -10,6 +10,8 @@ describe('将来予測・PL画面', () => {
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
 
     expect(screen.getByRole('heading', { name: '将来予測・調整水準' })).toBeVisible();
+    expect(screen.getByText('金額単位：百万円')).toBeVisible();
+    expect(screen.queryByText('内部：円')).not.toBeInTheDocument();
     expect(screen.getAllByText('原価率').length).toBeGreaterThan(0);
     expect(screen.getAllByText('研究開発費の売上高比率').length).toBeGreaterThan(0);
     expect(screen.getAllByText('実効税率').length).toBeGreaterThan(0);
@@ -51,6 +53,27 @@ describe('将来予測・PL画面', () => {
     await user.keyboard('{Control>}z{/Control}');
     expect(rate).toHaveValue(8);
     expect(chart.querySelector('[data-line-phase="forecast"]')?.getAttribute('points')).toBe(before);
+  });
+
+  it('水準設定の率と範囲は内部精度を保ったまま小数点以下2桁で表示する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    const rate = screen.getByLabelText('補助事業期間 売上高 年間変化');
+    const min = screen.getByLabelText('補助事業期間 売上高 最小値');
+    const max = screen.getByLabelText('補助事業期間 売上高 最大値');
+    const slider = screen.getByRole('slider', { name: '補助事業期間 売上高 水準' });
+    fireEvent.change(rate, { target: { value: '5.4093567' } });
+    fireEvent.change(min, { target: { value: '5.11695' } });
+    fireEvent.change(max, { target: { value: '5.70175' } });
+
+    expect(rate).toHaveValue(5.41);
+    expect(min).toHaveValue(5.12);
+    expect(max).toHaveValue(5.7);
+    expect(slider).toHaveAttribute('min', '5.12');
+    expect(slider).toHaveAttribute('max', '5.7');
+    expect((Number(slider.getAttribute('max')) - Number(slider.getAttribute('min'))) / Number(slider.getAttribute('step'))).toBeCloseTo(58);
   });
 
   it('Ctrl+1・2・3で全社・ベース・補助事業を切り替える', async () => {
@@ -119,8 +142,22 @@ describe('将来予測・PL画面', () => {
     await user.click(screen.getByRole('button', { name: '目標を満たす水準案を作成' }));
     expect(screen.getByTestId('optimization-proposal')).toBeVisible();
     expect(rate).toHaveValue(before);
-    fireEvent.change(screen.getByRole('slider', { name: '最適化方向の適用率' }), { target: { value: 100 } });
+    const strengthSlider = screen.getByRole('slider', { name: '最適化方向の適用率' });
+    strengthSlider.focus();
+    await user.keyboard('{End}');
     expect(rate).not.toHaveValue(before);
+  });
+
+  it('最適化方向の適用率は、スクロール領域内でも掴める明示的なつまみを持つ', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    await user.click(screen.getByRole('button', { name: '目標を満たす水準案を作成' }));
+
+    const control = screen.getByTestId('optimization-strength-control');
+    const thumb = screen.getByRole('slider', { name: '最適化方向の適用率' });
+    expect(control).toHaveClass('h-8');
+    expect(thumb).toHaveAttribute('data-slot', 'slider-thumb');
   });
 
   it('水準と最小・最大を同じ行で変更し、同値も許容する', async () => {
