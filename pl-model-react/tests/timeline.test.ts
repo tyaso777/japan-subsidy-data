@@ -1,0 +1,46 @@
+import { describe, expect, it } from 'vitest';
+import { buildTimelineYearLabels, createDefaultProgram, normalizeProgram, resolveTimeline, setPeriodEndYear } from '../src/domain/timeline';
+
+describe('制度期間', () => {
+  it('通常年の区間内呼称へ特別年の呼称を重ねる', () => {
+    const labels = buildTimelineYearLabels(createDefaultProgram());
+    expect(labels[2025]).toEqual({ primary: '最新決算期' });
+    expect(labels[2028]).toEqual({ primary: '基準年', secondary: '補助事業期間3年目' });
+    expect(labels[2031]).toEqual({ primary: '事業化報告期間3年目' });
+  });
+  it('過去実績の翌年から事業期間を連続させる', () => {
+    const program = createDefaultProgram();
+    const changed = setPeriodEndYear(program, 0, 2029);
+
+    expect(changed.timeline.periods[0].endYear).toBe(2029);
+    expect(changed.timeline.periods[1].startYear).toBe(2030);
+    expect(resolveTimeline(changed).years).toEqual([2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032]);
+  });
+
+  it('期間終了年に紐づく特別年を解決する', () => {
+    const resolved = resolveTimeline(createDefaultProgram());
+    expect(resolved.specialYears.find((year) => year.id === 'base')?.year).toBe(2028);
+  });
+
+  it('補助金審査で使う成長・給与・最新期固定指標を既定搭載する', () => {
+    expect(createDefaultProgram().definitions.managementMetrics.map((metric) => metric.id)).toEqual([
+      'company-sales-growth', 'company-value-added-growth', 'company-productivity-growth',
+      'latest-ebitda-margin', 'latest-sales-investment-ratio', 'latest-equity-ratio', 'latest-roa',
+      'employee-pay-growth', 'employee-payroll-growth',
+    ]);
+  });
+
+  it('循環参照を含む制度定義は読み込まず安全な既定値へ戻す', () => {
+    const invalid = createDefaultProgram();
+    invalid.program.name = '循環する制度';
+    invalid.definitions.commonNumericDefinitions = [
+      { id: 'A', label: 'A', formula: '[B][t]', outputPoint: 't' },
+      { id: 'B', label: 'B', formula: '[A][t]', outputPoint: 't' },
+    ];
+
+    const normalized = normalizeProgram(invalid);
+
+    expect(normalized.program.name).not.toBe('循環する制度');
+    expect(normalized.definitions.commonNumericDefinitions.map((definition) => definition.id)).toContain('付加価値額');
+  });
+});

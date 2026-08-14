@@ -1,0 +1,162 @@
+import { describe, expect, it } from 'vitest';
+import { buildForecastPl, fitForecastPlCell, fitForecastSeriesPoint, mergeForecastSegment, projectForecastSeries, projectSeries, splitForecastSegment, synchronizeForecastTimeline, type ForecastModel, type ForecastSeries } from '../src/domain/forecast-engine';
+import { calculatePl } from '../src/domain/financials';
+import { baseHistoricalPl } from '../src/domain/sample-data';
+
+describe('将来予測計算サービス', () => {
+  it('期間開始時増減と期間別成長率をUIなしで計算する', () => {
+    const result = projectSeries(2025, 100, [
+      { id: 'A', startYear: 2026, endYear: 2028, annualGrowthRate: 10, startAdjustment: 20 },
+      { id: 'B', startYear: 2029, endYear: 2030, annualGrowthRate: 5, startAdjustment: 50 },
+    ]);
+    expect(result.map((point) => point.year)).toEqual([2025, 2026, 2027, 2028, 2029, 2030]);
+    [100, 132, 145.2, 159.72, 220.206, 231.2163].forEach((value, index) => {
+      expect(result[index].value).toBeCloseTo(value, 8);
+    });
+  });
+
+  it('比率・人員・給与水準から将来P/Lを全行生成する', () => {
+    const latest = baseHistoricalPl.at(-1)!;
+    const make = (id: string, baseValue: number, annualGrowthRate: number, projectionMode: 'compound' | 'linear' = 'compound') => ({
+      id: `base-${id}`, label: id, scope: 'base' as const, valueKind: id.includes('Rate') || id.includes('Share') ? 'percent' as const : 'money' as const,
+      projectionMode, baseYear: 2025, baseValue,
+      periods: [{ id: 'subsidy', startYear: 2026, endYear: 2027, annualGrowthRate, startAdjustment: 0 }],
+    });
+    const model: ForecastModel = { series: [
+      make('sales', latest.sales, 10),
+      { ...make('headcount', latest.headcount, 0), valueKind: 'fte' },
+      { ...make('payPerPerson', calculatePl(latest).employeePayPerPerson, 5), valueKind: 'moneyPerPerson' },
+      make('cogsRate', 60, -1, 'linear'), make('cogsDepRate', 4, 0, 'linear'), make('sgaDepRate', 2, 0, 'linear'),
+      make('researchDevelopmentRate', 2, 0, 'linear'), make('otherSgaRate', 7, -.5, 'linear'), make('officerPay', 18_000_000, 2),
+      make('employeeSalaryShare', 95, 0, 'linear'), make('officerCompensationShare', 90, 0, 'linear'),
+      make('nonOperatingRate', -.6, 0, 'linear'), make('extraordinaryRate', 0, 0, 'linear'), make('taxRate', 30, 0, 'linear'),
+      { ...make('officerCount', 4, 0), valueKind: 'count' },
+    ] };
+
+    const result = buildForecastPl(model, 'base', latest);
+    expect(result).toHaveLength(2);
+    expect(result[0].input.sales).toBeCloseTo(1_100_000_000);
+    expect(result[0].input.cogs).toBeCloseTo(649_000_000);
+    expect(result[0].calculated.operatingProfit).toBeGreaterThan(0);
+    expect(result[1].calculated.salesGrowthRate).toBeCloseTo(10);
+    expect(result[0].input.netIncome).toBeCloseTo(result[0].calculated.preTaxIncome * .7);
+  });
+
+  it('期間分割だけでは予測値を変えず、全系列を同じ境界で分割する', () => {
+    const model: ForecastModel = {
+      segments: [{ id: 'A', definitionId: 'subsidy', startYear: 2026, endYear: 2029 }],
+      series: [
+        { id: 'base-sales', label: '売上高', scope: 'base', valueKind: 'money', baseYear: 2025, baseValue: 100, periods: [{ id: 'A', startYear: 2026, endYear: 2029, annualGrowthRate: 10, startAdjustment: 20 }] },
+        { id: 'base-headcount', label: 'FTE', scope: 'base', valueKind: 'fte', baseYear: 2025, baseValue: 10, periods: [{ id: 'A', startYear: 2026, endYear: 2029, annualGrowthRate: 5, startAdjustment: 1 }] },
+      ],
+    };
+    const before = model.series.map((series) => projectForecastSeries(series).map((point) => point.value));
+    const split = splitForecastSegment(model, 2028);
+    expect(split.segments).toHaveLength(2);
+    expect(split.series.every((series) => series.periods.length === 2)).toBe(true);
+    expect(split.series.map((series) => projectForecastSeries(series).map((point) => point.value))).toEqual(before);
+    expect(mergeForecastSegment(split, split.segments![1].id).segments).toHaveLength(1);
+  });
+
+  it('固定額・単年ステップ・単年スポット・成長加速度を独立レイヤーとして合成する', () => {
+    const series: ForecastSeries = {
+      id: 'base-sales', label: '売上高', scope: 'base' as const, valueKind: 'money' as const, baseYear: 2025, baseValue: 100,
+      periods: [{
+        id: 'A', startYear: 2026, endYear: 2028, annualGrowthRate: 10, startAdjustment: 0,
+        layers: { fixedAnnualIncrement: 5, steps: { 2027: 20 }, spots: { 2027: 30 }, acceleration: 1 },
+      }],
+    };
+    const values = projectForecastSeries(series).map((point) => point.value);
+    expect(values[1]).toBeCloseTo(116);
+    expect(values[2]).toBeGreaterThan(176);
+    expect(values[3]).toBeLessThan(values[2] * 1.5);
+
+    const withoutSpot = structuredClone(series);
+    withoutSpot.periods[0].layers!.spots = {};
+    const noSpotValues = projectForecastSeries(withoutSpot).map((point) => point.value);
+    expect(values[2] - noSpotValues[2]).toBeCloseTo(30);
+    expect(values[3] - noSpotValues[3]).toBeCloseTo(0);
+  });
+
+  it('効果レイヤーを持つ期間も、分割だけなら各年の値が完全に変わらない', () => {
+    const model: ForecastModel = {
+      segments: [{ id: 'A', definitionId: 'subsidy', startYear: 2026, endYear: 2029 }],
+      series: [{
+        id: 'base-sales', label: '売上高', scope: 'base', valueKind: 'money', projectionMode: 'compound',
+        baseYear: 2025, baseValue: 100,
+        periods: [{
+          id: 'A', startYear: 2026, endYear: 2029, annualGrowthRate: 10, startAdjustment: 20,
+          layers: { fixedAnnualIncrement: 5, steps: { 2027: 20 }, spots: { 2028: 30 }, acceleration: 1 },
+        }],
+      }],
+    };
+    const before = projectForecastSeries(model.series[0]).map((point) => point.value);
+    const split = splitForecastSegment(model, 2028);
+    expect(projectForecastSeries(split.series[0]).map((point) => point.value)).toEqual(before);
+  });
+
+  it('表入力と点ドラッグで共有する逆算により指定年の値へ連続的に収束する', () => {
+    const series: ForecastSeries = { id: 'base-sales', label: '売上高', scope: 'base', valueKind: 'money', projectionMode: 'compound', baseYear: 2025, baseValue: 100, periods: [{ id: 'A', startYear: 2026, endYear: 2028, annualGrowthRate: 5, startAdjustment: 0 }] };
+    const fitted = fitForecastSeriesPoint(series, 2027, 150);
+    expect(projectForecastSeries(fitted).find((point) => point.year === 2027)?.value).toBeCloseTo(150, 6);
+    expect(fitted.periods[0].annualGrowthRate).toBeGreaterThan(5);
+  });
+
+  it('基準値0からの立上げは開始時増減を逆算する', () => {
+    const series: ForecastSeries = { id: 'subsidy-sales', label: '売上高', scope: 'subsidy', valueKind: 'money', projectionMode: 'compound', baseYear: 2025, baseValue: 0, periods: [{ id: 'A', startYear: 2026, endYear: 2028, annualGrowthRate: 10, startAdjustment: 0 }] };
+    const fitted = fitForecastSeriesPoint(series, 2026, 100);
+    expect(projectForecastSeries(fitted).find((point) => point.year === 2026)?.value).toBeCloseTo(100, 6);
+    expect(fitted.periods[0].startAdjustment).toBeGreaterThan(0);
+  });
+
+  it('将来P/Lの売上高セルから対応する売上水準を逆算する', () => {
+    const latest = baseHistoricalPl.at(-1)!;
+    const make = (id: string, baseValue: number, mode: 'compound' | 'linear' = 'compound'): ForecastSeries => ({ id: `base-${id}`, label: id, scope: 'base', valueKind: id.includes('Rate') ? 'percent' : 'money', projectionMode: mode, baseYear: 2025, baseValue, periods: [{ id: 'A', startYear: 2026, endYear: 2028, annualGrowthRate: 5, startAdjustment: 0 }] });
+    const model: ForecastModel = { series: [make('sales', latest.sales), make('cogsRate', 60, 'linear')] };
+    const before = structuredClone(model);
+    const fitted = fitForecastPlCell(model, 'base', latest, 2027, 'sales', 1_500_000_000);
+    expect(model).toEqual(before);
+    expect(buildForecastPl(fitted, 'base', latest).find((row) => row.year === 2027)?.calculated.sales).toBeCloseTo(1_500_000_000, 2);
+  });
+
+  it('営業利益などの計算行も因果関係に対応する水準へ逆算する', () => {
+    const latest = baseHistoricalPl.at(-1)!;
+    const make = (id: string, baseValue: number, mode: 'compound' | 'linear' = 'compound'): ForecastSeries => ({ id: `base-${id}`, label: id, scope: 'base', valueKind: id.includes('Rate') ? 'percent' : 'money', projectionMode: mode, baseYear: 2025, baseValue, periods: [{ id: 'A', startYear: 2026, endYear: 2028, annualGrowthRate: 0, startAdjustment: 0 }] });
+    const model: ForecastModel = { series: [
+      make('sales', latest.sales), make('cogsRate', 62, 'linear'), make('otherSgaRate', 7, 'linear'),
+      make('headcount', latest.headcount), make('payPerPerson', calculatePl(latest).employeePayPerPerson),
+    ] };
+    const current = buildForecastPl(model, 'base', latest).find((row) => row.year === 2027)!.calculated.operatingProfit;
+    const fitted = fitForecastPlCell(model, 'base', latest, 2027, 'operatingProfit', current + 50_000_000);
+    const result = buildForecastPl(fitted, 'base', latest).find((row) => row.year === 2027)!.calculated.operatingProfit;
+    expect(result).toBeCloseTo(current + 50_000_000, 2);
+    expect(fitted.series.find((series) => series.id === 'base-otherSgaRate')?.periods[0].annualGrowthRate).not.toBe(0);
+  });
+
+  it('個社期間の変更後も追加分割を保持し、全系列を連続した年度へ同期する', () => {
+    const model: ForecastModel = {
+      segments: [
+        { id: 'subsidy', definitionId: 'subsidy', startYear: 2026, endYear: 2026 },
+        { id: 'subsidy~2027', definitionId: 'subsidy', startYear: 2027, endYear: 2028 },
+        { id: 'report', definitionId: 'report', startYear: 2029, endYear: 2031 },
+      ],
+      series: [{ id: 'base-sales', label: '売上高', scope: 'base', valueKind: 'money', baseYear: 2025, baseValue: 100, periods: [
+        { id: 'subsidy', startYear: 2026, endYear: 2026, annualGrowthRate: 5, startAdjustment: 0 },
+        { id: 'subsidy~2027', startYear: 2027, endYear: 2028, annualGrowthRate: 8, startAdjustment: 0 },
+        { id: 'report', startYear: 2029, endYear: 2031, annualGrowthRate: 10, startAdjustment: 0 },
+      ] }],
+    };
+    const synchronized = synchronizeForecastTimeline(model, [
+      { definitionId: 'subsidy', startYear: 2026, endYear: 2030 },
+      { definitionId: 'report', startYear: 2031, endYear: 2033 },
+    ]);
+    expect(synchronized.segments).toEqual([
+      { id: 'subsidy', definitionId: 'subsidy', startYear: 2026, endYear: 2026 },
+      { id: 'subsidy~2027', definitionId: 'subsidy', startYear: 2027, endYear: 2030 },
+      { id: 'report', definitionId: 'report', startYear: 2031, endYear: 2033 },
+    ]);
+    expect(synchronized.series[0].periods.map((period) => [period.id, period.startYear, period.endYear, period.annualGrowthRate])).toEqual([
+      ['subsidy', 2026, 2026, 5], ['subsidy~2027', 2027, 2030, 8], ['report', 2031, 2033, 10],
+    ]);
+  });
+});

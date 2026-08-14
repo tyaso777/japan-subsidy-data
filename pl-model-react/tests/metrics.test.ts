@@ -1,0 +1,66 @@
+import { describe, expect, it } from 'vitest';
+import { createDefaultProgram, setPeriodEndYear } from '../src/domain/timeline';
+import { evaluateManagementMetric, inferMetricPeriodKind, resolveMetricTimePoints, validateMetricDefinition } from '../src/domain/metrics';
+import { calculatePlSeries } from '../src/domain/financials';
+import { baseHistoricalPl } from '../src/domain/sample-data';
+import type { ManagementMetricDefinition } from '../src/domain/types';
+
+const metric = (points: ManagementMetricDefinition['timePoints']): ManagementMetricDefinition => ({
+  id: 'growth', label: '成長率', enabled: true, scope: 'company', timePoints: points,
+  formula: '(([売上高][C] / [売上高][A]) ^ (1 / YEARS(A, C)) - 1) * 100',
+  outputUnit: '% / 年', target: 10, direction: 'min', optimization: 'adjustable',
+});
+
+describe('制度共通の経営指標定義', () => {
+  it('使用時点の個数から1〜4時点以上を自動表示する', () => {
+    expect(inferMetricPeriodKind(metric([{ id: 'A', anchor: { type: 'historicalEnd' }, offset: 0 }]))).toBe('1時点指標');
+    expect(inferMetricPeriodKind(metric([
+      { id: 'A', anchor: { type: 'historicalEnd' }, offset: 0 },
+      { id: 'B', anchor: { type: 'specialYear', specialYearId: 'base' }, offset: 0 },
+      { id: 'C', anchor: { type: 'periodEnd', periodId: 'report' }, offset: 0 },
+      { id: 'D', anchor: { type: 'periodEnd', periodId: 'report' }, offset: 1 },
+    ]))).toBe('4時点指標');
+  });
+
+  it('区間・特別年・調整年数から実年を解決し、個社期間変更へ追随する', () => {
+    const program = createDefaultProgram();
+    const definition = metric([
+      { id: 'A', anchor: { type: 'historicalEnd' }, offset: 0 },
+      { id: 'B', anchor: { type: 'specialYear', specialYearId: 'base' }, offset: -1 },
+      { id: 'C', anchor: { type: 'periodEnd', periodId: 'report' }, offset: 0 },
+    ]);
+    expect(resolveMetricTimePoints(definition, program)).toEqual({ A: 2025, B: 2027, C: 2031 });
+    expect(resolveMetricTimePoints(definition, setPeriodEndYear(program, 0, 2030))).toEqual({ A: 2025, B: 2029, C: 2033 });
+  });
+
+  it('削除した時点や未定義時点を式が参照していれば明示的に拒否する', () => {
+    const invalid = metric([
+      { id: 'A', anchor: { type: 'historicalEnd' }, offset: 0 },
+      { id: 'C', anchor: { type: 'periodEnd', periodId: 'report' }, offset: 0 },
+    ]);
+    expect(() => validateMetricDefinition({ ...invalid, formula: '[売上高][B] / [売上高][A]' })).toThrow('時点B');
+    expect(validateMetricDefinition(invalid)).toBe(invalid);
+  });
+
+  it('共通数値定義を各時点で再利用して経営指標を評価する', () => {
+    const program = createDefaultProgram();
+    const records = new Map(calculatePlSeries(baseHistoricalPl).map((record, index) => [2023 + index, record]));
+    const definition: ManagementMetricDefinition = {
+      ...metric([
+        { id: 'A', anchor: { type: 'historicalEnd' }, offset: -1 },
+        { id: 'B', anchor: { type: 'historicalEnd' }, offset: 0 },
+      ]),
+      formula: '[付加価値額][B] / [付加価値額][A]',
+    };
+    const result = evaluateManagementMetric(definition, program, { records });
+    expect(result.value).toBeGreaterThan(1);
+    expect(result.years).toEqual({ A: 2024, B: 2025 });
+  });
+
+  it('実績入力を要求する固定参照指標は未入力を区別する', () => {
+    const program = createDefaultProgram();
+    const definition = { ...program.definitions.managementMetrics[3], requiresActualInput: true };
+    expect(evaluateManagementMetric(definition, program, { records: new Map() }).status).toBe('missing-actual');
+    expect(evaluateManagementMetric(definition, program, { records: new Map(), actualInputs: { [definition.id]: 12.5 } }).value).toBe(12.5);
+  });
+});
