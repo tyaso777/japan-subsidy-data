@@ -24,4 +24,24 @@ describe('GitHub Actions build workflow', () => {
     expect(workflow).toContain('path: pl-model-react/dist/')
     expect(workflow).toContain('if-no-files-found: error')
   })
+
+  it('packages a public download and publishes it as the latest GitHub Release', () => {
+    expect(existsSync(workflowPath)).toBe(true)
+
+    const workflow = readFileSync(workflowPath, 'utf8')
+
+    expect(workflow).toContain('release:')
+    expect(workflow).toContain('needs: build')
+    expect(workflow).toMatch(/release:[\s\S]+permissions:\s+contents: write/)
+    expect(workflow).toMatch(/uses: actions\/download-artifact@v\d+/)
+    expect(workflow).toContain(
+      'zip -j pl-model-react-dist.zip release-assets/index.html release-assets/subsidy-program.js',
+    )
+    expect(workflow).toContain('GH_TOKEN: ${{ github.token }}')
+    expect(workflow).toContain('GH_REPO: ${{ github.repository }}')
+    expect(workflow).toContain('tag="pl-model-react-${short_sha}"')
+    expect(workflow).toContain('gh release create "$tag" pl-model-react-dist.zip')
+    expect(workflow).toContain('gh release upload "$tag" pl-model-react-dist.zip --clobber')
+    expect(workflow).toContain('--latest')
+  })
 })
