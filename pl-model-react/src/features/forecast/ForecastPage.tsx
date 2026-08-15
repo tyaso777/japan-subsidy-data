@@ -155,7 +155,7 @@ export function ForecastPage() {
       <div><p className="mb-1 flex items-center gap-1 text-[10px] font-extrabold tracking-[.08em] text-orange"><SlidersHorizontal className="size-3" />FORECAST &amp; PL</p><h2 className="m-0 text-xl font-bold">将来予測・調整水準</h2></div>
       <div><div className="flex rounded-lg bg-[#e8e6df] p-1">{(['company', 'base', 'subsidy'] as Scope[]).map((item) => <Button key={item} variant="ghost" size="sm" className={cn(scope === item && 'bg-navy text-white hover:bg-navy/90 hover:text-white')} onClick={() => setScope(item)}>{scopeLabels[item]}</Button>)}</div><p className="mt-1 mb-0 text-center text-[9px] text-muted-foreground">Ctrl+1 / Ctrl+2 / Ctrl+3</p></div>
     </section>
-    <div data-testid="forecast-layout" className="grid grid-cols-[clamp(360px,26vw,500px)_minmax(0,1fr)_clamp(320px,22vw,420px)] items-start gap-3">
+    <div data-testid="forecast-layout" className="grid grid-cols-[clamp(360px,26vw,500px)_minmax(0,1fr)_clamp(320px,22vw,420px)] items-start gap-3 [&>aside]:top-16 [&>aside]:max-h-[calc(100vh-76px)]">
       <aside data-testid="forecast-settings-panel" className="sticky top-3 max-h-[calc(100vh-24px)] overflow-y-auto border border-line bg-surface p-2.5">
         <div className="mb-2 flex items-center justify-between"><div><h3 className="m-0 text-base font-bold">水準設定</h3><p className="m-0 text-[10px] text-muted-foreground">{scope === 'company' ? '全社合算ではベース事業の水準を表示' : scopeLabels[scope]}・右端は開始時増減</p></div><Badge variant="outline">金額単位：{moneyUnitLabel(unit)}</Badge></div>
         {scope === 'company' && <p className="mb-2 rounded bg-soft p-2 text-[10px] text-muted-foreground">全社合算はベース事業と補助事業から自動計算します。水準を変更する場合は各事業へ切り替えてください。</p>}

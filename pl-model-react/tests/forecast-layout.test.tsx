@@ -17,6 +17,10 @@ describe('将来予測画面のワイドレイアウト', () => {
     );
     expect(screen.getByTestId('forecast-settings-panel')).toHaveClass('p-2.5');
     expect(screen.getByTestId('forecast-metrics-panel')).toHaveClass('p-2.5');
+    expect(screen.getByTestId('forecast-layout')).toHaveClass(
+      '[&>aside]:top-16',
+      '[&>aside]:max-h-[calc(100vh-76px)]',
+    );
 
     const headers = screen.getAllByTestId('forecast-period-header');
     expect(headers).toHaveLength(2);

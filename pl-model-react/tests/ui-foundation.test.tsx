@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
@@ -19,5 +19,17 @@ describe('共通UI基盤', () => {
     expect(definition.querySelector('svg')).toBeInTheDocument();
     await user.click(definition);
     expect(definition).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('画面タブと共通操作をスクロール中も上端に固定する', () => {
+    render(<App />);
+
+    const toolbar = screen.getByTestId('app-toolbar');
+    expect(toolbar).toHaveClass('sticky', 'top-0', 'z-50');
+    expect(within(toolbar).getByRole('navigation', { name: '主要画面' })).toBeVisible();
+    expect(within(toolbar).getByLabelText('金額表示単位')).toBeVisible();
+    expect(within(toolbar).getByRole('button', { name: '案件JSON' })).toBeVisible();
+    expect(within(toolbar).getByRole('button', { name: '元に戻す Ctrl+Z' })).toBeVisible();
+    expect(within(toolbar).getByRole('button', { name: 'やり直す Ctrl+Y' })).toBeVisible();
   });
 });
