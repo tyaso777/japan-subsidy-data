@@ -33,6 +33,8 @@ describe('制度定義画面', () => {
     for (const [id, title, action] of sections) {
       const header = screen.getByTestId(`definition-section-header-${id}`);
       expect(header).toHaveClass('sticky', 'top-12', 'z-30');
+      expect(header).toHaveClass('bg-surface');
+      expect(header).not.toHaveClass('bg-surface/95', 'backdrop-blur');
       expect(within(header).getByRole('heading', { name: title })).toBeVisible();
       expect(within(header).getByRole('button', { name: action })).toBeVisible();
     }
