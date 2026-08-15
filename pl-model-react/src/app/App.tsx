@@ -31,6 +31,10 @@ function AppContent() {
     { id: 'forecast', label: '03 将来予測・PL', icon: ChartNoAxesCombined },
     { id: 'logic', label: '04 ロジックマップ', icon: Workflow },
   ], []);
+  const navigateToPage = (nextPage: Page) => {
+    setPage(nextPage);
+    requestAnimationFrame(() => document.querySelector<HTMLElement>('[data-testid="app-toolbar"]')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' }));
+  };
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
       if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
@@ -47,10 +51,10 @@ function AppContent() {
     <div data-testid="app-toolbar" className="sticky top-0 z-50 flex items-center justify-end gap-2 border-x border-b border-line bg-surface/95 px-3 py-2 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-surface/90 max-[1100px]:overflow-x-auto"><nav aria-label="主要画面" className="flex gap-0.5 rounded-lg bg-[#e8e6df] p-1">{pages.map((item) => {
         const Icon = item.icon;
         const active = page === item.id;
-        return <Button key={item.id} variant="ghost" size="sm" aria-current={active ? 'page' : undefined} className={cn('max-[1100px]:flex-1', active && 'bg-navy text-white hover:bg-navy/90 hover:text-white')} onClick={() => setPage(item.id)}><Icon aria-hidden="true" />{item.label}</Button>;
+        return <Button key={item.id} variant="ghost" size="sm" aria-current={active ? 'page' : undefined} className={cn('max-[1100px]:flex-1', active && 'bg-navy text-white hover:bg-navy/90 hover:text-white')} onClick={() => navigateToPage(item.id)}><Icon aria-hidden="true" />{item.label}</Button>;
       })}</nav><Select value={moneyUnit} onValueChange={setMoneyUnit}><SelectTrigger aria-label="金額表示単位" size="sm" className="w-28 bg-surface"><SelectValue /></SelectTrigger><SelectContent>{moneyDisplayUnits.map((unit) => <SelectItem key={unit.id} value={unit.id}>{unit.label}</SelectItem>)}</SelectContent></Select><ModelFileMenu /><div className="flex gap-1"><Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" aria-label="元に戻す Ctrl+Z" disabled={!canUndo} onClick={undo}><Undo2 /></Button></TooltipTrigger><TooltipContent>元に戻す Ctrl+Z</TooltipContent></Tooltip><Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" aria-label="やり直す Ctrl+Y" disabled={!canRedo} onClick={redo}><Redo2 /></Button></TooltipTrigger><TooltipContent>やり直す Ctrl+Y</TooltipContent></Tooltip></div></div>
     {page === 'definition' && <ProgramDefinitionPage />}
-    {page === 'actuals' && <ActualsPage />}
+    {page === 'actuals' && <ActualsPage onNext={() => navigateToPage('forecast')} />}
     {page === 'forecast' && <ForecastPage />}
     {page === 'logic' && <LogicMapPage />}
   </div></TooltipProvider>;

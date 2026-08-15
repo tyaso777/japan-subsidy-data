@@ -150,4 +150,14 @@ describe('期間・過去実績', () => {
     expect(screen.getByLabelText('補助事業期間 売上高 最小値')).not.toHaveValue(-10);
     expect(screen.getByLabelText('補助事業期間 売上高 最大値')).not.toHaveValue(50);
   });
+
+  it('最下部の次へボタンから将来予測・PLへ移動する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: '次へ：03 将来予測・PL' }));
+
+    expect(screen.getByRole('button', { name: '03 将来予測・PL' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('将来予測・調整水準')).toBeVisible();
+  });
 });
