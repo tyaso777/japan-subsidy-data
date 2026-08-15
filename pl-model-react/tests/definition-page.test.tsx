@@ -43,19 +43,14 @@ describe('制度定義画面', () => {
     expect(card).not.toHaveTextContent('使用時点 B');
   });
 
-  it('制度JSONを画面上で検証してから適用する', async () => {
+  it('制度JSONの直接編集を見せず制度定義ファイルへ一本化する', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '01 制度定義' }));
-    await user.click(screen.getByRole('button', { name: '制度JSONを編集' }));
-    const source = screen.getByLabelText('制度JSONソース');
-    const parsed = JSON.parse((source as HTMLTextAreaElement).value);
-    parsed.program.name = 'JSON編集制度';
-    fireEvent.change(source, { target: { value: JSON.stringify(parsed) } });
-    await user.click(screen.getByRole('button', { name: '制度JSONを検証' }));
-    expect(screen.getByRole('status')).toHaveTextContent('検証OK');
-    await user.click(screen.getByRole('button', { name: '制度JSONを適用' }));
-    expect(screen.getByLabelText('制度名')).toHaveValue('JSON編集制度');
+    expect(screen.queryByRole('button', { name: '制度JSONを編集' })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('制度JSONソース')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '制度定義ファイル' })).toBeVisible();
+    expect(screen.getByText(/制度定義ファイルとして定義します/)).toBeVisible();
   });
 
   it('制度で不要になった経営指標を削除できる', async () => {

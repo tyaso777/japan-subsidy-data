@@ -8,6 +8,7 @@ describe('ロジックマップ画面', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '04 ロジックマップ' }));
+    expect(screen.getByText(/制度定義ファイルで定義した数式/)).toBeVisible();
 
     const map = screen.getByTestId('definition-logic-map');
     expect(within(map).getByRole('heading', { name: '人件費' })).toBeVisible();

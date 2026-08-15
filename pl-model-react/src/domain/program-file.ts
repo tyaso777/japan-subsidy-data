@@ -9,7 +9,7 @@ export function serializeProgramScript(program: ProgramConfiguration): string {
 
 export function parseProgramScript(source: string): ProgramConfiguration {
   const match = source.match(assignment);
-  if (!match) throw new Error('制度JSは window.PL_SUBSIDY_PROGRAM = {...}; 形式で指定してください');
+  if (!match) throw new Error('制度定義ファイルは window.PL_SUBSIDY_PROGRAM = {...}; 形式で指定してください');
   let value: unknown;
   try {
     value = JSON.parse(match[1]);
@@ -20,7 +20,7 @@ export function parseProgramScript(source: string): ProgramConfiguration {
         .replace(/([{,]\s*)([A-Za-z_$][A-Za-z0-9_$]*)(\s*:)/g, '$1"$2"$3')
         .replace(/,\s*([}\]])/g, '$1');
       value = JSON.parse(json);
-    } catch { throw new Error('制度JSのオブジェクトは安全なJSONまたは静的オブジェクト形式で記述してください'); }
+    } catch { throw new Error('制度定義ファイルのオブジェクトは安全なJSONまたは静的オブジェクト形式で記述してください'); }
   }
   return programConfigurationSchema.parse(value);
 }

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { parseProgramScript, serializeProgramScript } from '../src/domain/program-file';
 import { createDefaultProgram } from '../src/domain/timeline';
 
-describe('制度JSファイル', () => {
+describe('制度定義ファイル', () => {
   it('実行せずにwindow.PL_SUBSIDY_PROGRAM代入形式を往復する', () => {
     const program = createDefaultProgram();
     const source = serializeProgramScript(program);
@@ -11,7 +11,7 @@ describe('制度JSファイル', () => {
   });
 
   it('任意コードと不正な制度定義を拒否する', () => {
-    expect(() => parseProgramScript('alert(1)')).toThrow('制度JS');
+    expect(() => parseProgramScript('alert(1)')).toThrow('制度定義ファイル');
     expect(() => parseProgramScript('window.PL_SUBSIDY_PROGRAM = {"bad":true};')).toThrow();
   });
 
