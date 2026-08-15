@@ -26,6 +26,8 @@ describe('共通UI基盤', () => {
 
     const toolbar = screen.getByTestId('app-toolbar');
     expect(toolbar).toHaveClass('sticky', 'top-0', 'z-50');
+    expect(toolbar).toHaveClass('bg-surface');
+    expect(toolbar).not.toHaveClass('bg-surface/95', 'backdrop-blur');
     expect(within(toolbar).getByRole('navigation', { name: '主要画面' })).toBeVisible();
     expect(within(toolbar).getByLabelText('金額表示単位')).toBeVisible();
     expect(within(toolbar).getByRole('button', { name: '案件JSON' })).toBeVisible();
