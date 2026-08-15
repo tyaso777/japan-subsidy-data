@@ -24,6 +24,19 @@ describe('期間・過去実績', () => {
     expect(within(subsidySection).getByText('営業利益')).toBeVisible();
   });
 
+  it('各財務表の見出しを表の表示中だけ上部ツールバー直下へ固定する', () => {
+    render(<App />);
+
+    for (const testId of ['historical-bs', 'historical-pl-base', 'historical-pl-subsidy']) {
+      const section = screen.getByTestId(testId);
+      const stickyHeader = within(section).getByTestId(`${testId}-sticky-header`);
+      expect(section).toHaveClass('relative', 'isolate');
+      expect(stickyHeader).toHaveClass('sticky', 'top-12', 'z-40');
+      expect(within(stickyHeader).getByText('科目')).toBeVisible();
+      expect(within(stickyHeader).getByText('最新決算期')).toBeVisible();
+    }
+  });
+
   it('終了年を変えると次期間の開始年を連動させる', async () => {
     const user = userEvent.setup();
     render(<App />);
