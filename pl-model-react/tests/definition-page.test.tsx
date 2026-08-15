@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
@@ -17,6 +17,25 @@ describe('制度定義画面', () => {
     await user.click(screen.getByRole('button', { name: '特別年を追加' }));
     expect(screen.getByLabelText('特別年3 呼称')).toBeVisible();
     expect(screen.getByLabelText('特別年3 調整年数')).toHaveValue(0);
+  });
+
+  it('各定義ブロックのタイトルと追加操作を表示中は上部へ固定する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+
+    const sections = [
+      ['periods', '区間名の定義', '区間を追加'],
+      ['special-years', '特別年の呼称', '特別年を追加'],
+      ['numeric-definitions', '共通数値定義', '共通数値定義を追加'],
+      ['management-metrics', '経営指標・目標', '経営指標を追加'],
+    ];
+    for (const [id, title, action] of sections) {
+      const header = screen.getByTestId(`definition-section-header-${id}`);
+      expect(header).toHaveClass('sticky', 'top-12', 'z-30');
+      expect(within(header).getByRole('heading', { name: title })).toBeVisible();
+      expect(within(header).getByRole('button', { name: action })).toBeVisible();
+    }
   });
 
   it('削除不可の過去実績も制度上の区間名として編集できる', async () => {
