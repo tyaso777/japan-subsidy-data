@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>目標最適化方法の説明</title>
+  <style>
+    :root { color-scheme: light; --navy:#173f5b; --teal:#15877d; --orange:#c95b24; --ink:#102a43; --muted:#60758a; --line:#cfdae2; --soft:#f2f3ef; --surface:#fffdfa; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin:0; background:#f5f3ed; color:var(--ink); font-family:"Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif; line-height:1.75; }
+    main { width:min(1040px,calc(100% - 32px)); margin:24px auto 64px; }
+    header, section { background:var(--surface); border:1px solid var(--line); }
+    header { padding:32px 40px; border-top:5px solid var(--navy); }
+    section { margin-top:18px; padding:28px 40px; }
+    h1 { margin:0 0 8px; font-size:30px; line-height:1.35; }
+    h2 { margin:0 0 18px; padding-bottom:8px; border-bottom:3px solid var(--navy); font-size:23px; }
+    h3 { margin:28px 0 8px; font-size:18px; }
+    h4 { margin:20px 0 6px; font-size:15px; }
+    p { margin:8px 0; }
+    a { color:var(--teal); }
+    .eyebrow { color:var(--orange); font-size:12px; font-weight:800; letter-spacing:.12em; }
+    .lead { margin:0; color:var(--muted); }
+    .toc { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 24px; margin-top:18px; }
+    .toc a { padding:7px 10px; border-left:3px solid var(--teal); background:var(--soft); text-decoration:none; font-weight:700; }
+    .summary-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .card { padding:18px; border:1px solid var(--line); border-top:4px solid var(--teal); background:#fff; }
+    .card h3 { margin:0 0 6px; }
+    .tag { display:inline-block; margin-bottom:8px; padding:2px 8px; border-radius:99px; background:var(--soft); color:var(--muted); font-size:12px; font-weight:700; }
+    .formula { margin:12px 0; padding:14px 16px; overflow-x:auto; border-left:4px solid var(--orange); background:#f8f6f0; font-family:Cambria,"Times New Roman",serif; font-size:17px; white-space:nowrap; }
+    .note, .warning { margin:14px 0; padding:12px 15px; border:1px solid var(--line); background:#eef6f5; }
+    .warning { border-color:#e4b79d; background:#fff3ec; }
+    table { width:100%; border-collapse:collapse; margin:12px 0; font-size:14px; }
+    th, td { padding:10px 12px; border:1px solid var(--line); text-align:left; vertical-align:top; }
+    th { background:var(--soft); }
+    code { padding:.08em .3em; background:var(--soft); border-radius:3px; font-family:Consolas,monospace; }
+    ul, ol { padding-left:1.4em; }
+    .back { display:inline-block; margin-top:18px; }
+    @media (max-width:720px) { main{width:min(100% - 16px,1040px);margin-top:8px} header,section{padding:22px 18px}.summary-grid,.toc{grid-template-columns:1fr} h1{font-size:24px} }
+    @media print { body{background:#fff} main{width:100%;margin:0} header,section{break-inside:avoid;border-color:#aaa} .toc{display:none} }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">PL MODEL / OPTIMIZATION REFERENCE</div>
+    <h1>目標最適化方法の説明</h1>
+    <p class="lead">経営指標の目標を満たす水準案を、どのような基準と計算で作るかを説明します。前半は実務向けの簡易説明、後半は現在の実装に一致する数学的仕様です。</p>
+    <nav class="toc" aria-label="目次">
+      <a href="#simple">1. はじめに：4方式の簡易説明</a>
+      <a href="#selection">2. 選び方</a>
+      <a href="#mathematics">3. 数学的仕様</a>
+      <a href="#algorithm">4. 探索アルゴリズムと限界</a>
+    </nav>
+  </header>
+
+  <section id="simple">
+    <h2>1. はじめに：4方式の簡易説明</h2>
+    <div class="summary-grid">
+      <article class="card">
+        <span class="tag">標準案</span>
+        <h3>最小変更</h3>
+        <p>現在の計画をなるべく崩さず、設定範囲に対する変更割合の合計が小さくなる案を探します。大きな変更を一つへ集中させるより、複数項目へ小さく分散する場合があります。</p>
+        <p><strong>向く場面：</strong>まず現状に近い無理の少ない案を見たいとき。</p>
+      </article>
+      <article class="card">
+        <span class="tag">集中を回避</span>
+        <h3>バランス</h3>
+        <p>一つの水準だけが極端に変わることを強く避けます。最大の変更割合を抑えながら、売上、原価、人員などへ変更負担を分散します。</p>
+        <p><strong>向く場面：</strong>一つの施策だけに依存しない計画を作りたいとき。</p>
+      </article>
+      <article class="card">
+        <span class="tag">説明を簡単に</span>
+        <h3>最少項目</h3>
+        <p>目標改善への効率が高い水準を先に選び、変更する項目数そのものを抑えます。少数の施策へ変更が集中するため、説明は簡単ですが、一項目の変更幅は大きくなり得ます。</p>
+        <p><strong>向く場面：</strong>変更理由を明快にし、確認する設定数を減らしたいとき。</p>
+      </article>
+      <article class="card">
+        <span class="tag">施策順を尊重</span>
+        <h3>優先順位</h3>
+        <p>水準設定の定義順に、一項目ずつ改善できるところまで調整します。現在は画面・モデル上の並び順を使用し、改善効率による並べ替えはしません。</p>
+        <p><strong>向く場面：</strong>「まず売上、次に原価」のように、調整する順序を重視するとき。</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="selection">
+    <h2>2. どれを選ぶか</h2>
+    <table>
+      <thead><tr><th>方式</th><th>最も重視するもの</th><th>主な利点</th><th>主な注意点</th></tr></thead>
+      <tbody>
+        <tr><td>最小変更</td><td>現在値からの変更量</td><td>現状に近い標準案になる</td><td>変更項目が複数に分散し得る</td></tr>
+        <tr><td>バランス</td><td>最大の変更割合を抑えること</td><td>一つの前提への依存を避ける</td><td>変更項目数が増えやすい</td></tr>
+        <tr><td>最少項目</td><td>変更する項目数</td><td>説明・確認が簡単になる</td><td>選ばれた項目の変更幅が大きくなり得る</td></tr>
+        <tr><td>優先順位</td><td>あらかじめ決めた調整順</td><td>施策方針を反映しやすい</td><td>定義順が悪いと非効率な項目が先に動く</td></tr>
+      </tbody>
+    </table>
+    <div class="note"><strong>推奨する比較順：</strong>まず「最小変更」を基準案として確認し、「最少項目」で単純な代替案を見ます。一項目への依存が強ければ「バランス」と比較し、明確な施策順がある場合に「優先順位」を使います。</div>
+    <h3>探索範囲は別に選びます</h3>
+    <p><strong>水準内最適化</strong>では、画面のMin・Maxをハード制約として扱い、その範囲を超えません。まず通常想定の中で案を作る場合に使います。</p>
+    <p><strong>水準外最適化</strong>では、元のMin・Maxを推奨範囲として残し、超過量へペナルティを付けながら外側も探索します。一度の実行で必要なMin・Maxの更新、更新後の再最適化、最適水準の100%適用まで行います。実行後も適用率スライダーで最適化前へ戻し、途中水準と比較できます。</p>
+  </section>
+
+  <section id="mathematics">
+    <h2>3. 数学的仕様</h2>
+    <p>以下は現在のプログラムが実際に用いている定義です。概念上の説明ではなく、実装式に対応しています。</p>
+
+    <h3>3.1 最適化変数と制約</h3>
+    <p>事業・期間ごとの水準設定を変数 <var>x<sub>i</sub></var>、最適化前の値を <var>b<sub>i</sub></var>、設定最小値と最大値を <var>L<sub>i</sub></var>、<var>U<sub>i</sub></var> とします。水準内最適化では次がハード制約です。</p>
+    <div class="formula">L<sub>i</sub> &le; x<sub>i</sub> &le; U<sub>i</sub></div>
+    <p>現在の最適化対象は、会社合算系列を除く各事業・各期間の年次変化水準 <code>annualGrowthRate</code> です。すべての開始時増減を同時最適化しているわけではありません。</p>
+
+    <h3>3.2 経営指標のハード制約</h3>
+    <p>指標 <var>j</var> の計算値を <var>v<sub>j</sub>(x)</var>、目標を <var>T<sub>j</sub></var> とします。「以上」の不足と「以下」の超過を、それぞれ次のように求めます。</p>
+    <div class="formula">d<sub>j</sub>(x) = max(0, T<sub>j</sub> − v<sub>j</sub>(x))　［以上の場合］</div>
+    <div class="formula">d<sub>j</sub>(x) = max(0, v<sub>j</sub>(x) − T<sub>j</sub>)　［以下の場合］</div>
+    <p>「使用する」が有効かつ「目標最適化で変化する」すべての指標について、<var>d<sub>j</sub>(x)=0</var> を必須条件とします。数値誤差の許容幅は <var>max(1, |T<sub>j</sub>|) × 10<sup>−8</sup></var> です。</p>
+    <div class="formula">ℱ = { x | L<sub>i</sub> ≤ x<sub>i</sub> ≤ U<sub>i</sub>, d<sub>j</sub>(x) = 0　for all j }</div>
+    <p>この <var>ℱ</var> が目標達成案の制約集合です。候補が一つでも制約集合に入った後は、変更コストが小さくても未達候補へ戻りません。指標を計算できない場合は固定点数へ変換せず、「評価不能」として最適化結果から分離します。</p>
+    <p>まだ制約集合へ到達していない候補同士では、次の正規化違反量を比較します。</p>
+    <div class="formula">r<sub>j</sub>(x) = d<sub>j</sub>(x) / max(1, |T<sub>j</sub>|)</div>
+    <p>最初に <var>max<sub>j</sub> r<sub>j</sub>(x)</var>、次に <var>Σ<sub>j</sub> r<sub>j</sub>(x)<sup>2</sup></var> が小さい候補を選びます。これにより一指標だけを犠牲にした合計点の改善を避けます。</p>
+
+    <h3>3.3 水準変更量の正規化</h3>
+    <p>水準ごとに単位と設定幅が違うため、絶対差ではなく設定可能幅で正規化します。Min・Maxは水準内最適化ではハード制約、水準外最適化ではユーザーが通常許容する調整余地です。</p>
+    <div class="formula">R<sub>i</sub> = max(U<sub>i</sub> − L<sub>i</sub>, 0.01)</div>
+    <div class="formula">z<sub>i</sub>(x) = (x<sub>i</sub> − b<sub>i</sub>) / R<sub>i</sub></div>
+    <div class="formula">q<sub>i</sub>(x) = z<sub>i</sub>(x)<sup>2</sup></div>
+    <p>たとえば幅60の設定を6動かす場合と、幅10の設定を1動かす場合は、どちらも <var>z=0.1</var>、<var>q=0.01</var> です。Min・Maxを変更すれば調整余地に対する相対的な変更負担も変わるため、最適解が多少変化すること自体は正常です。</p>
+    <p>水準外最適化では、Min・Maxから外れた距離を元の幅 <var>R<sub>i</sub></var> で正規化し、追加ペナルティを課します。</p>
+    <div class="formula">e<sub>i</sub>(x) = distance(x<sub>i</sub>, [L<sub>i</sub>, U<sub>i</sub>]) / R<sub>i</sub></div>
+    <div class="formula">P<sub>outside</sub>(x) = Σ<sub>i</sub> { 5e<sub>i</sub>(x)<sup>2</sup> + 20max(0, e<sub>i</sub>(x) − 0.5)<sup>2</sup> }</div>
+    <p>このため、同じ目標を達成できるなら通常範囲内の案が優先され、範囲外が必要な場合も超過が小さく偏りの少ない案が選ばれます。</p>
+
+    <h3>3.4 最小変更の第2目的</h3>
+    <div class="formula">J<sub>minimum</sub>(x) = Σ<sub>i</sub> q<sub>i</sub>(x),　subject to x ∈ ℱ</div>
+    <p>全目標を満たす制約集合の中で、正規化変更量の二乗和を最小化します。これはL2型の変更コストです。二乗和の性質上、大きな変更一つより、小さな変更複数へ分散したほうが低コストになる場合があります。</p>
+
+    <h3>3.5 バランスの第2目的</h3>
+    <div class="formula">J<sub>balanced</sub>(x) = max<sub>i</sub> q<sub>i</sub>(x) + 0.05 × { Σ<sub>i</sub> q<sub>i</sub>(x) / n },　subject to x ∈ ℱ</div>
+    <p><var>n</var> は最適化変数数です。最大の正規化変更量を抑えるL∞型の考え方に、候補間の差をつけるため小さな平均L2項を加えています。無関係な変数が増えただけで最大変更ペナルティが増えない式です。</p>
+
+    <h3>3.6 最少項目の第2目的</h3>
+    <p>変更された項目数を次のように数えます。</p>
+    <div class="formula">A(x) = #{ i | q<sub>i</sub>(x) &gt; 10<sup>−12</sup> }</div>
+    <div class="formula">J<sub>sparse</sub>(x) = A(x) + 0.001 × Σ<sub>i</sub> q<sub>i</sub>(x),　subject to x ∈ ℱ</div>
+    <p>変更項目数を最優先し、同じ項目数なら変更量の小さい案を選ぶL0型の近似です。探索前に、各水準を設定幅の5%だけ上下へ仮変更し、制約違反の改善効率が高い順へ並べ替えます。</p>
+    <div class="formula">h<sub>i</sub> = max(0.05 × (U<sub>i</sub> − L<sub>i</sub>), 0.01)</div>
+    <p>厳密な混合整数最適化ではないため、数学的に最少の項目数を常に保証するものではありません。</p>
+
+    <h3>3.7 優先順位</h3>
+    <div class="formula">J<sub>priority</sub>(x) = Σ<sub>i</sub> q<sub>i</sub>(x),　subject to x ∈ ℱ</div>
+    <p>探索を <var>x<sub>1</sub> → x<sub>2</sub> → … → x<sub>n</sub></var> の定義順で行い、制約集合へ到達した時点で下位項目を解放しません。現在は専用の優先順位入力ではなく、モデル上の水準設定順を利用します。</p>
+
+    <h3>3.8 適用率</h3>
+    <p>最適化案を <var>x<sub>i</sub>*</var>、適用率を0～100の <var>r</var> とすると、画面へ反映する値は直線補間です。</p>
+    <div class="formula">x<sub>i</sub>(r) = clamp( b<sub>i</sub> + (r / 100) × (x<sub>i</sub>* − b<sub>i</sub>), L<sub>i</sub>, U<sub>i</sub> )</div>
+    <p>0%は最適化前、50%は中間、100%は最適化案です。適用率を動かすたびに再最適化するのではありません。</p>
+  </section>
+
+  <section id="algorithm">
+    <h2>4. 探索アルゴリズムと限界</h2>
+    <h3>4.1 座標降下法に近い探索</h3>
+    <p>現在は外部の数理最適化ソルバーではなく、変数を一つずつ上下に試す座標降下法に近い方式です。標準の初期ステップ幅は2、最大反復回数は40、最小ステップ幅は0.01です。</p>
+    <ol>
+      <li>バランス型では、各変数を初期ステップだけ仮変更し、目標未達の改善効率が高い順へ並べる。</li>
+      <li>一つの変数について現在値＋ステップと現在値−ステップを試す。</li>
+      <li>評価関数が下がる方向を採用する。</li>
+      <li>改善しなければステップを半分にする。</li>
+      <li>最小ステップ幅に達するか、反復上限まで続ける。</li>
+    </ol>
+    <div class="warning"><strong>重要：</strong>現在の探索は大域的最適解を保証しません。二項目を同時に動かした場合だけ改善するケース、局所解が複数あるケース、強い非線形相互作用があるケースでは、より良い案を見逃す可能性があります。</div>
+
+    <h3>4.2 制約優先の二段階比較</h3>
+    <p>候補比較は、目標未達と変更コストを加算しません。次の順序で辞書式に比較します。</p>
+    <ol>
+      <li>計算不能な指標数を減らす。</li>
+      <li>未達中は最大の正規化違反量、次に違反量二乗和を減らす。</li>
+      <li>全目標を満たした後だけ、選択方式の変更コストを減らす。</li>
+    </ol>
+
+    <h3>4.3 水準外探索とドメイン制約</h3>
+    <p>設定範囲内で制約集合へ到達しなかった場合、水準外最適化は元の幅を基準に数値探索窓を段階的に広げ、各段階でPLと全指標を再計算します。局所感応度だけを延長して上限・下限を決める方式ではありません。</p>
+    <p>売上成長率200%などの任意の安全限界は設けません。探索窓の反復回数は計算時間を管理する数値計算上の予算であり、業務上の上限ではありません。探索で解が見つからない場合も「数学的に達成不能」とは判定せず、探索済みの最良案として表示します。</p>
+    <p>一方、モデルとして成立しない候補は<strong>ドメイン制約</strong>で除外します。現在は、複利成長率が−100%以下になること、および金額・人数・FTE・一人当たり金額・指数・倍率の将来値が負または非有限になることを許可しません。</p>
+
+    <h3>4.4 現在の方式の位置づけ</h3>
+    <p>現在の4方式は、計画案を高速に比較し、ユーザーが適用率で段階的に採用するための説明可能なヒューリスティックです。法令・公募要領上の適合性や将来業績を保証するものではなく、最終案は各水準とP/Lの整合性を確認して決定してください。</p>
+    <a class="back" href="#simple">簡易説明へ戻る</a>
+  </section>
+</main>
+</body>
+</html>

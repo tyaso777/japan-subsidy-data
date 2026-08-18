@@ -4,6 +4,27 @@ import { describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
 
 describe('将来予測・PL画面', () => {
+  it('最終年度の全社売上高と事業別配分を設定して固定・解除できる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    const allocation = screen.getByTestId('final-year-sales-allocation');
+    expect(within(allocation).getByText('2031年')).toBeVisible();
+    const companySales = within(allocation).getByLabelText('最終年度 全社売上高目標');
+    const baseShare = within(allocation).getByLabelText('ベース事業 配分率');
+    await user.clear(companySales);
+    await user.type(companySales, '2000');
+    await user.clear(baseShare);
+    await user.type(baseShare, '65');
+    expect(within(allocation).getByText('補助事業 35.00%')).toBeVisible();
+    await user.click(within(allocation).getByRole('button', { name: '配分を売上高へ反映して固定' }));
+    expect(within(allocation).getByText('売上高配分を固定中')).toBeVisible();
+    expect(screen.getByLabelText('補助事業期間 売上高 水準')).toBeDisabled();
+
+    await user.click(within(allocation).getByRole('button', { name: '売上高配分の固定を解除' }));
+    expect(screen.getByLabelText('補助事業期間 売上高 水準')).toBeEnabled();
+  });
   it('全水準とチャート・PL表・事業比較を同じ画面で切り替える', async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -15,7 +36,7 @@ describe('将来予測・PL画面', () => {
     expect(screen.getAllByText('原価率').length).toBeGreaterThan(0);
     expect(screen.getAllByText('研究開発費の売上高比率').length).toBeGreaterThan(0);
     expect(screen.getAllByText('実効税率').length).toBeGreaterThan(0);
-    expect(screen.getAllByRole('img', { name: /推移チャート/ })).toHaveLength(10);
+    expect(screen.getAllByRole('img', { name: /推移チャート/ })).toHaveLength(36);
     expect(screen.getByRole('img', { name: '売上原価の内訳 推移チャート' })).toBeVisible();
     expect(screen.getByRole('img', { name: '人件費の内訳 推移チャート' })).toBeVisible();
     expect(screen.getByRole('img', { name: '従業員数（就業時間換算） 推移チャート' })).toBeVisible();
@@ -37,6 +58,95 @@ describe('将来予測・PL画面', () => {
     expect(screen.getAllByRole('img', { name: /推移チャート/ })).toHaveLength(6);
   });
 
+  it('全社・ベース・補助・事業比較を個別に表示し、1区分だけなら一覧表示にする', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    const display = screen.getByTestId('forecast-chart-sections');
+    expect(screen.getByTestId('forecast-chart-display-controls')).toHaveClass(
+      'sticky',
+      'top-28',
+      'z-30',
+      'bg-surface',
+      'before:h-3',
+      'before:bg-canvas',
+    );
+    expect(display).toHaveAttribute('data-layout', 'comparison-with-businesses');
+    expect(screen.getAllByTestId('forecast-chart-section')).toHaveLength(4);
+    expect(screen.getByTestId('forecast-comparison-section')).toHaveAttribute('data-placement', 'full-width');
+    expect(screen.getByTestId('forecast-comparison-chart-list')).toHaveClass('grid-cols-3');
+    expect(screen.getByTestId('forecast-business-columns')).toHaveStyle({ gridTemplateColumns: 'repeat(3, minmax(220px, 1fr))' });
+    for (const list of screen.getAllByTestId('forecast-business-chart-list')) {
+      expect(list).toHaveAttribute('data-layout', 'column');
+      expect(list).toHaveClass('grid-cols-1');
+    }
+    for (const label of ['全社合算', 'ベース事業', '補助事業', '事業比較']) {
+      expect(screen.getByRole('button', { name: `${label}を非表示` })).toHaveAttribute('aria-pressed', 'true');
+    }
+
+    await user.click(screen.getByRole('button', { name: '全社合算を非表示' }));
+    await user.click(screen.getByRole('button', { name: '補助事業を非表示' }));
+    await user.click(screen.getByRole('button', { name: '事業比較を非表示' }));
+
+    expect(display).toHaveAttribute('data-layout', 'single');
+    expect(screen.getAllByTestId('forecast-chart-section')).toHaveLength(1);
+    expect(screen.getAllByRole('img', { name: /推移チャート/ })).toHaveLength(10);
+    expect(screen.getByTestId('forecast-business-chart-list')).toHaveAttribute('data-layout', 'overview');
+    expect(screen.getByTestId('forecast-business-chart-list')).toHaveClass('grid-cols-3');
+    expect(screen.getByRole('button', { name: 'ベース事業を非表示' })).toBeDisabled();
+
+    await user.click(screen.getByRole('button', { name: '事業比較を表示' }));
+    expect(display).toHaveAttribute('data-layout', 'comparison-with-businesses');
+    expect(screen.getByTestId('forecast-comparison-section')).toHaveAttribute('data-placement', 'full-width');
+    expect(screen.getByTestId('forecast-business-columns')).toHaveStyle({ gridTemplateColumns: 'minmax(0, 1fr)' });
+    expect(screen.getAllByTestId('forecast-chart-section')).toHaveLength(2);
+    expect(screen.getAllByRole('img', { name: /推移チャート/ })).toHaveLength(16);
+  });
+
+  it('横並びチャートがあふれる場合だけ画面下部へスクロールバーを常時表示し、チャート領域と同期する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    const scrollbar = screen.getByTestId('forecast-chart-horizontal-scrollbar');
+    const content = screen.getByTestId('forecast-chart-scroll-content');
+    let scrollWidth = 1200;
+    Object.defineProperty(content, 'clientWidth', { configurable: true, value: 600 });
+    Object.defineProperty(content, 'scrollWidth', { configurable: true, get: () => scrollWidth });
+    content.getBoundingClientRect = () => ({ left: 100, right: 700, width: 600, top: 100, bottom: 900, height: 800, x: 100, y: 100, toJSON: () => ({}) }) as DOMRect;
+    fireEvent(window, new Event('resize'));
+    expect(scrollbar).toHaveClass('fixed', 'bottom-0', 'overflow-x-scroll');
+    expect(scrollbar).toBeVisible();
+    expect(scrollbar).toHaveAttribute('aria-hidden', 'false');
+
+    content.scrollLeft = 140;
+    fireEvent.scroll(content);
+    expect(scrollbar.scrollLeft).toBe(140);
+
+    scrollbar.scrollLeft = 260;
+    fireEvent.scroll(scrollbar);
+    expect(content.scrollLeft).toBe(260);
+
+    scrollWidth = 600;
+    fireEvent(window, new Event('resize'));
+    expect(scrollbar).toHaveClass('invisible');
+    expect(scrollbar).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('チャート本体の高さを維持しながら見出しと余白を圧縮し、軸文字を読みやすくする', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    const chart = screen.getByRole('img', { name: '売上高・利益額 推移チャート' });
+    const card = chart.closest('article');
+    expect(card).toHaveClass('p-2', 'self-start');
+    expect(chart).toHaveClass('h-38');
+    expect(chart.querySelector('text')).toHaveAttribute('font-size', '10');
+    expect(card?.querySelector('[data-testid="forecast-chart-heading"]')).toHaveClass('flex');
+  });
+
   it('成長率を編集すると同じカードの予測値へ即時反映しUndoできる', async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -53,6 +163,63 @@ describe('将来予測・PL画面', () => {
     await user.keyboard('{Control>}z{/Control}');
     expect(rate).toHaveValue(8);
     expect(chart.querySelector('[data-line-phase="forecast"]')?.getAttribute('points')).toBe(before);
+  });
+
+  it('水準設定を対応するPL科目が上から現れる順に表示する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    const firstPeriod = screen.getAllByTestId('forecast-period-column')[0];
+    const labels = within(firstPeriod).getAllByTestId('forecast-setting-row-header').map((header) => header.querySelector('strong')?.textContent);
+    expect(labels).toEqual([
+      '売上高',
+      '原価率',
+      '原価内減価償却費率',
+      '役員人件費',
+      '役員給与のうち報酬割合',
+      '従業員給与のうち給与割合',
+      '販管費内減価償却費率',
+      '研究開発費の売上高比率',
+      'その他販管費率',
+      '営業外損益の売上高比率',
+      '特別損益の売上高比率',
+      '実効税率',
+      '従業員数（就業時間換算）',
+      '役員数',
+      '1人当たり給与',
+    ]);
+  });
+
+  it('水準設定の数値入力は空欄と負号を入力途中として保持できる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    const rate = screen.getByLabelText('補助事業期間 売上高 年間変化');
+
+    await user.clear(rate);
+    expect(rate).toHaveValue(null);
+    await user.type(rate, '-3');
+    expect(rate).toHaveValue(-3);
+    await user.tab();
+    expect(rate).toHaveValue(-3);
+  });
+
+  it('開始時増減を空欄のまま離れた場合は以前の値へ戻さず0として保存する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    const adjustment = screen.getByLabelText('補助事業期間 売上高 開始時増減');
+
+    await user.clear(adjustment);
+    await user.type(adjustment, '100');
+    await user.tab();
+    expect(adjustment).toHaveValue(100);
+
+    await user.clear(adjustment);
+    expect(adjustment).toHaveValue(null);
+    await user.tab();
+    expect(adjustment).toHaveValue(0);
   });
 
   it('水準設定の率と範囲は内部精度を保ったまま小数点以下2桁で表示する', async () => {
@@ -86,6 +253,30 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByText('全社合算ではベース事業の水準を表示・右端は開始時増減')).toBeVisible();
     expect(screen.getByLabelText('補助事業期間 売上高 年間変化')).toBeDisabled();
     expect(screen.queryByRole('slider', { name: '売上高・利益額 2026年 売上高' })).not.toBeInTheDocument();
+  });
+
+  it('Ctrl+4・5・6でチャート・PL表・事業比較を切り替える', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    const chartTab = screen.getByRole('tab', { name: 'チャート' });
+    const tableTab = screen.getByRole('tab', { name: 'PL表' });
+    const comparisonTab = screen.getByRole('tab', { name: '事業比較' });
+    expect(chartTab).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByText('Ctrl+4 / 5 / 6')).toBeVisible();
+
+    await user.keyboard('{Control>}5{/Control}');
+    expect(tableTab).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('forecast-pl-table')).toBeVisible();
+
+    await user.keyboard('{Control>}6{/Control}');
+    expect(comparisonTab).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getAllByRole('img', { name: /推移チャート/ })).toHaveLength(6);
+
+    await user.keyboard('{Control>}4{/Control}');
+    expect(chartTab).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getAllByRole('img', { name: /推移チャート/ })).toHaveLength(36);
   });
 
   it('チャート上の操作で期間を分割・解除し、左の設定列と境界線を同期する', async () => {
@@ -140,13 +331,91 @@ describe('将来予測・PL画面', () => {
     const rate = screen.getByLabelText('補助事業期間 売上高 年間変化');
     const before = Number((rate as HTMLInputElement).value);
     await user.click(screen.getByRole('button', { name: '目標を満たす水準案を作成' }));
-    expect(screen.getByTestId('optimization-proposal')).toBeVisible();
+    expect(await screen.findByTestId('optimization-proposal', {}, { timeout: 30_000 })).toBeVisible();
     expect(rate).toHaveValue(before);
     const strengthSlider = screen.getByRole('slider', { name: '最適化方向の適用率' });
     strengthSlider.focus();
     await user.keyboard('{End}');
     expect(rate).not.toHaveValue(before);
+  }, 35_000);
+
+  it('最適化方法を最小変更・バランス・最少項目・優先順位から選択し、提案へ使用方式を表示する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    const method = screen.getByRole('combobox', { name: '最適化方法' });
+    expect(method).toHaveValue('minimum-change');
+    expect(within(method).getByRole('option', { name: 'バランス' })).toBeVisible();
+    expect(within(method).getByRole('option', { name: '最少項目' })).toBeVisible();
+    expect(within(method).getByRole('option', { name: '優先順位' })).toBeVisible();
+    expect(screen.getByRole('link', { name: '最適化方法の詳しい説明' })).toHaveAttribute('href', './docs/optimization-methods.html');
+    await user.selectOptions(method, 'sparse');
+    await user.click(screen.getByRole('button', { name: '目標を満たす水準案を作成' }));
+
+    expect(await screen.findByTestId('optimization-proposal')).toHaveTextContent('最少項目');
   }, 15_000);
+
+  it('水準案の計算中を表示し、適用率を変更一覧より先に操作できる', async () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    const createButton = screen.getByRole('button', { name: '目標を満たす水準案を作成' });
+
+    fireEvent.click(createButton);
+    expect(createButton).toBeDisabled();
+    expect(createButton).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('status')).toHaveTextContent('水準案を計算中');
+    expect(screen.getByTestId('optimization-spinner')).toHaveClass('animate-spin', 'will-change-transform');
+
+    const proposal = await screen.findByTestId('optimization-proposal', {}, { timeout: 15_000 });
+    const strength = within(proposal).getByRole('slider', { name: '最適化方向の適用率' });
+    const direction = within(proposal).getByText(/最適化方向・/);
+    expect(strength.compareDocumentPosition(direction) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  }, 20_000);
+
+  it('水準外最適化は一度の実行で必要なMin・Maxを更新し、適用率で最適値へ動かせる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    await user.click(screen.getByRole('button', { name: 'すべて編集' }));
+    const target = screen.getByRole('spinbutton', { name: '全社売上高成長率 目標値' });
+    await user.clear(target);
+    await user.type(target, '100');
+    await user.selectOptions(screen.getByRole('combobox', { name: '探索範囲' }), 'outside-levels');
+    const rates = screen.getAllByLabelText(/年間変化$/) as HTMLInputElement[];
+    const bounds = screen.getAllByLabelText(/(最小値|最大値)$/) as HTMLInputElement[];
+    const ratesBeforeOptimization = rates.map((input) => input.value);
+    const boundsBeforeOptimization = bounds.map((input) => input.value);
+    await user.click(screen.getByRole('button', { name: '目標を満たす水準案を作成' }));
+
+    const report = await screen.findByTestId('optimization-feasibility-report', {}, { timeout: 30_000 });
+    expect(report).toHaveTextContent('現在のMin・Max内では目標未達');
+    expect(report).toHaveTextContent('全社売上高成長率');
+    expect(report).toHaveTextContent('目標との差');
+    expect(report).toHaveTextContent('水準外最適化を追加探索中');
+    expect(within(report).getByTestId('expansion-search-spinner')).toHaveClass('animate-spin', 'will-change-transform');
+
+    const proposal = screen.getByTestId('optimization-proposal');
+    const summary = within(proposal).getByTestId('optimization-status-summary');
+    const strength = within(proposal).getByTestId('optimization-strength-control');
+    expect(summary.compareDocumentPosition(strength) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(strength.compareDocumentPosition(report) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    const expansionPlan = await screen.findByTestId('optimization-expansion-plan', {}, { timeout: 30_000 });
+    expect(within(expansionPlan).queryByRole('checkbox')).not.toBeInTheDocument();
+    expect(within(expansionPlan).getByText('推奨水準範囲')).toBeInTheDocument();
+    expect(within(expansionPlan).queryByRole('button', { name: /適用|再計算/ })).not.toBeInTheDocument();
+    expect(rates.map((input) => input.value)).not.toEqual(ratesBeforeOptimization);
+    expect(bounds.map((input) => input.value)).not.toEqual(boundsBeforeOptimization);
+    expect(screen.getByTestId('optimization-application-result')).toHaveTextContent(/上限・下限と最適水準を100%適用/);
+    const strengthSlider = screen.getByRole('slider', { name: '最適化方向の適用率' });
+    const applicationResult = screen.getByTestId('optimization-application-result');
+    expect(strengthSlider.compareDocumentPosition(applicationResult) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(strengthSlider).toHaveAttribute('aria-valuenow', '100');
+    await user.click(strengthSlider);
+    await user.keyboard('{Home}');
+    expect(rates.map((input) => input.value)).toEqual(ratesBeforeOptimization);
+  }, 60_000);
 
   it('最適化方向の適用率は、スクロール領域内でも掴める明示的なつまみを持つ', async () => {
     const user = userEvent.setup();
@@ -154,11 +423,25 @@ describe('将来予測・PL画面', () => {
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
     await user.click(screen.getByRole('button', { name: '目標を満たす水準案を作成' }));
 
+    await screen.findByTestId('optimization-proposal', {}, { timeout: 30_000 });
     const control = screen.getByTestId('optimization-strength-control');
     const thumb = screen.getByRole('slider', { name: '最適化方向の適用率' });
     expect(control).toHaveClass('h-8');
     expect(thumb).toHaveAttribute('data-slot', 'slider-thumb');
-  }, 15_000);
+  }, 35_000);
+
+  it('探索範囲を水準内最適化と水準外最適化から選択できる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    const rangeMode = screen.getByRole('combobox', { name: '探索範囲' });
+    expect(rangeMode).toHaveValue('within-levels');
+    expect(within(rangeMode).getByRole('option', { name: '水準内最適化' })).toBeInTheDocument();
+    expect(within(rangeMode).getByRole('option', { name: '水準外最適化' })).toBeInTheDocument();
+    await user.selectOptions(rangeMode, 'outside-levels');
+    expect(rangeMode).toHaveValue('outside-levels');
+  });
 
   it('水準と最小・最大を同じ行で変更し、同値も許容する', async () => {
     const user = userEvent.setup();
@@ -172,11 +455,19 @@ describe('将来予測・PL画面', () => {
     expect(max).toHaveValue(10);
   });
 
+  it('実効税率は固定値として水準変更できない', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    expect(screen.getByLabelText('補助事業期間 実効税率 年間変化')).toBeDisabled();
+    expect(screen.getByLabelText('補助事業期間 実効税率 水準')).toBeDisabled();
+  });
+
   it('期間水準ごとに固定額・単年・加速度の効果レイヤーを編集する', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
-    await user.click(screen.getByRole('button', { name: '補助事業期間 売上高 変動設定' }));
+    await user.click(screen.getByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' }));
     const fixed = screen.getByLabelText('補助事業期間 売上高 毎年固定増減');
     await user.clear(fixed); await user.type(fixed, '10');
     expect(fixed).toHaveValue(10);

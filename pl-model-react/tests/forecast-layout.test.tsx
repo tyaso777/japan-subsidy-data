@@ -1,7 +1,14 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
+import { availableSettingsPanelHeight, settingsPeriodMinWidth, shouldAutoCollapseSettings } from '../src/features/forecast/ForecastPage';
+
+const nativeResizeObserver = globalThis.ResizeObserver;
+
+afterEach(() => {
+  globalThis.ResizeObserver = nativeResizeObserver;
+});
 
 describe('将来予測画面のワイドレイアウト', () => {
   it('広い画面を活用し、左右パネルと期間見出しを横方向に揃える', async () => {
@@ -15,12 +22,32 @@ describe('将来予測画面のワイドレイアウト', () => {
     expect(screen.getByTestId('forecast-layout')).toHaveClass(
       'grid-cols-[clamp(360px,26vw,500px)_minmax(0,1fr)_clamp(320px,22vw,420px)]',
     );
-    expect(screen.getByTestId('forecast-settings-panel')).toHaveClass('p-2.5');
-    expect(screen.getByTestId('forecast-metrics-panel')).toHaveClass('p-2.5');
+    expect(screen.getByTestId('forecast-settings-panel')).toHaveClass('overflow-x-scroll', 'overflow-y-auto', 'p-2.5');
+    expect(screen.getByTestId('forecast-period-grid')).toHaveClass('min-w-0');
+    expect(screen.getByTestId('forecast-period-grid')).not.toHaveClass('overflow-x-auto');
+    expect(screen.getByTestId('forecast-metrics-panel')).toHaveClass('p-2.5', 'overflow-y-scroll');
+    expect(screen.getByTestId('forecast-metrics-panel')).toHaveStyle({ scrollbarGutter: 'stable', paddingRight: '18px' });
     expect(screen.getByTestId('forecast-layout')).toHaveClass(
-      '[&>aside]:top-16',
-      '[&>aside]:max-h-[calc(100vh-76px)]',
+      '[&>aside]:top-28',
+      '[&>aside]:max-h-[calc(100vh-124px)]',
     );
+
+    const stickyLayer = screen.getByTestId('forecast-operation-sticky-layer');
+    expect(stickyLayer).toHaveClass('sticky', 'top-[57px]', 'z-40', 'bg-surface');
+    expect(stickyLayer).toHaveClass(
+      "before:content-['']",
+      'before:absolute',
+      'before:inset-x-0',
+      'before:bottom-full',
+      'before:h-3',
+      'before:bg-surface',
+    );
+    const operationBar = screen.getByTestId('forecast-operation-bar');
+    expect(operationBar).not.toHaveClass('sticky');
+    expect(within(operationBar).getByRole('button', { name: 'ベース事業' })).toBeVisible();
+    expect(within(operationBar).getByRole('tab', { name: 'チャート' })).toBeVisible();
+    expect(within(operationBar).getByLabelText('期間分割操作')).toBeVisible();
+    expect(within(screen.getByTestId('forecast-heading')).queryByRole('button', { name: 'ベース事業' })).not.toBeInTheDocument();
 
     const headers = screen.getAllByTestId('forecast-period-header');
     expect(headers).toHaveLength(2);
@@ -30,7 +57,52 @@ describe('将来予測画面のワイドレイアウト', () => {
     });
   });
 
-  it('水準値をスライダー中央上に置き、開始時増減を点線で分離する', async () => {
+  it('期間列の実幅が狭い場合だけ変動設定を自動的に折り畳む', () => {
+    expect(shouldAutoCollapseSettings(500, 2)).toBe(false);
+    expect(shouldAutoCollapseSettings(420, 2)).toBe(true);
+    expect(shouldAutoCollapseSettings(0, 2)).toBe(false);
+    expect(settingsPeriodMinWidth(3, true)).toBe('210px');
+    expect(settingsPeriodMinWidth(3, false)).toBe('150px');
+    expect(availableSettingsPanelHeight(900, 180)).toBe(708);
+    expect(availableSettingsPanelHeight(900, 20)).toBe(776);
+  });
+
+  it('狭い水準設定では変動設定を自動収納し、必要なら手動で再表示できる', async () => {
+    class NarrowResizeObserver {
+      constructor(private readonly callback: ResizeObserverCallback) {}
+      observe(target: Element) {
+        this.callback([{ target, contentRect: { width: 420 } } as ResizeObserverEntry], this as unknown as ResizeObserver);
+      }
+      unobserve() {}
+      disconnect() {}
+    }
+    globalThis.ResizeObserver = NarrowResizeObserver as unknown as typeof ResizeObserver;
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    const panel = screen.getByTestId('forecast-settings-panel');
+    const layout = screen.getByTestId('forecast-layout');
+    const row = screen.getByTestId('forecast-setting-row-base-sales-subsidy');
+    const toggle = within(panel).getByRole('button', { name: '変動設定を表示' });
+    expect(layout).toHaveClass('grid-cols-[clamp(320px,20vw,380px)_minmax(0,1fr)_clamp(320px,22vw,420px)]');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(within(row).queryByTestId('forecast-start-adjustment-group')).not.toBeInTheDocument();
+    expect(within(row).queryByRole('button', { name: '補助事業期間 売上高 変動設定' })).not.toBeInTheDocument();
+
+    await user.click(toggle);
+    expect(toggle).toHaveAccessibleName('変動設定を隠す');
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(layout).toHaveClass('grid-cols-[clamp(360px,26vw,500px)_minmax(0,1fr)_clamp(320px,22vw,420px)]');
+    expect(within(row).getByTestId('forecast-start-adjustment-group')).toBeVisible();
+
+    await user.click(within(row).getByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' }));
+    expect(within(row).getByLabelText('補助事業期間 売上高 毎年固定増減')).toBeVisible();
+    await user.click(within(panel).getByRole('button', { name: '変動設定を隠す' }));
+    expect(within(row).queryByLabelText('補助事業期間 売上高 毎年固定増減')).not.toBeInTheDocument();
+  });
+
+  it('水準値を項目名の横へ置き、開始時増減を点線で分離する', async () => {
     const user = userEvent.setup();
     render(<App />);
     const forecastButton = screen.getAllByRole('button').find((button) => button.textContent?.startsWith('03 '));
@@ -38,10 +110,17 @@ describe('将来予測画面のワイドレイアウト', () => {
 
     const row = screen.getByTestId('forecast-setting-row-base-sales-subsidy');
     expect(row).toBeVisible();
-    expect(screen.getByLabelText('補助事業期間 売上高 年間変化')).toHaveAttribute('data-position', 'slider-top');
+    const rowHeader = within(row).getByTestId('forecast-setting-row-header');
+    const annualChange = within(rowHeader).getByLabelText('補助事業期間 売上高 年間変化');
+    expect(annualChange).toHaveAttribute('data-position', 'item-name');
+    expect(annualChange).toHaveClass('h-5', 'w-11');
+    expect(row).toHaveClass('py-1');
     expect(within(row).getByTestId('forecast-level-slider-group')).toHaveClass('grid-cols-[38px_minmax(44px,1fr)_38px]');
+    within(row).getAllByLabelText(/補助事業期間 売上高 (最小値|最大値)/).forEach((input) => expect(input).toHaveClass('h-5'));
     expect(within(row).getByTestId('forecast-start-adjustment-group')).toHaveClass('border-l', 'border-dashed');
-    expect(within(row).getByRole('button', { name: '補助事業期間 売上高 変動設定' })).toHaveTextContent('変動設定');
+    expect(screen.getByRole('button', { name: '変動設定を隠す' })).toHaveAttribute('aria-expanded', 'true');
+    expect(within(row).queryByRole('button', { name: '補助事業期間 売上高 変動設定' })).not.toBeInTheDocument();
+    expect(within(row).getByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' })).toHaveAttribute('title', '固定増減などの詳細設定');
     expect(within(row).queryByText('効果')).not.toBeInTheDocument();
   });
 });

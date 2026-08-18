@@ -26,12 +26,24 @@ export type ForecastSeries = {
   scope: 'company' | 'base' | 'subsidy';
   valueKind: import('./value-units').ValueKind;
   projectionMode?: 'compound' | 'linear';
+  /** fixed は全期間で基準値を維持し、水準適正化・目標最適化の対象外とする。 */
+  changePolicy?: 'adjustable' | 'fixed';
   baseYear: number;
   baseValue: number;
   periods: ForecastPeriod[];
 };
 
-export type ForecastModel = { segments?: ForecastSegment[]; series: ForecastSeries[] };
+export type FinalYearSalesAllocation = {
+  finalYear: number;
+  companySales: number;
+  baseSharePercent: number;
+};
+
+export type ForecastModel = {
+  segments?: ForecastSegment[];
+  series: ForecastSeries[];
+  finalYearSalesAllocation?: FinalYearSalesAllocation;
+};
 
 import { calculatePl } from './financials';
 import type { HistoricalPlCalculated, HistoricalPlInput } from './types';
@@ -43,8 +55,8 @@ export function projectSeries(baseYear: number, baseValue: number, periods: Fore
   for (const period of periods) {
     if (period.endYear < period.startYear) throw new Error(`期間 ${period.id} の終了年が開始年より前です`);
     for (let year = period.startYear; year <= period.endYear; year += 1) {
-      if (year === period.startYear) value += period.startAdjustment;
       value *= 1 + period.annualGrowthRate / 100;
+      if (year === period.startYear) value += period.startAdjustment;
       points.push({ year, value, periodId: period.id });
     }
   }
@@ -54,11 +66,11 @@ export function projectSeries(baseYear: number, baseValue: number, periods: Fore
 export function projectForecastSeries(series: ForecastSeries): ForecastPoint[] {
   const points: ForecastPoint[] = [{ year: series.baseYear, value: series.baseValue }];
   let value = series.baseValue;
-  const lineages = new Map<string, { origin: number; startYear: number }>();
+  const lineages = new Map<string, { origin: number; startYear: number; startAdjustment: number }>();
   for (const period of series.periods) {
     if (period.endYear < period.startYear) throw new Error(`期間 ${period.id} の終了年が開始年より前です`);
     const lineageKey = period.lineageId ?? period.id;
-    const lineage = lineages.get(lineageKey) ?? { origin: value + period.startAdjustment, startYear: period.startYear };
+    const lineage = lineages.get(lineageKey) ?? { origin: value, startYear: period.startYear, startAdjustment: period.startAdjustment };
     lineages.set(lineageKey, lineage);
     const origin = lineage.origin;
     const layers = period.layers ?? { fixedAnnualIncrement: 0, steps: {}, spots: {}, acceleration: 0 };
@@ -67,13 +79,14 @@ export function projectForecastSeries(series: ForecastSeries): ForecastPoint[] {
       const step = Object.entries(layers.steps).reduce((sum, [stepYear, amount]) => Number(stepYear) <= year ? sum + amount : sum, 0);
       const spot = layers.spots[year] ?? 0;
       if (series.projectionMode === 'linear') {
-        value = origin + period.annualGrowthRate * elapsed + layers.acceleration * elapsed * (elapsed + 1) / 2 + layers.fixedAnnualIncrement * elapsed + step + spot;
+        value = origin + period.annualGrowthRate * elapsed + lineage.startAdjustment + layers.acceleration * elapsed * (elapsed + 1) / 2 + layers.fixedAnnualIncrement * elapsed + step + spot;
       } else {
         const baseRate = period.annualGrowthRate / 100;
         const baseline = origin * (1 + baseRate) ** elapsed;
         let accelerated = origin;
         for (let cursor = 1; cursor <= elapsed; cursor += 1) accelerated *= 1 + baseRate + layers.acceleration * cursor / 100;
-        value = baseline + (accelerated - baseline) + layers.fixedAnnualIncrement * elapsed + step + spot;
+        const compoundedStartAdjustment = lineage.startAdjustment * (1 + baseRate) ** Math.max(0, elapsed - 1);
+        value = baseline + (accelerated - baseline) + compoundedStartAdjustment + layers.fixedAnnualIncrement * elapsed + step + spot;
       }
       points.push({ year, value, periodId: period.id });
     }
@@ -84,7 +97,7 @@ export function projectForecastSeries(series: ForecastSeries): ForecastPoint[] {
 export function fitForecastSeriesPoint(series: ForecastSeries, year: number, target: number): ForecastSeries {
   const result = structuredClone(series);
   const period = result.periods.find((candidate) => year >= candidate.startYear && year <= candidate.endYear);
-  if (!period || !Number.isFinite(target)) return result;
+  if (!period || !Number.isFinite(target) || result.changePolicy === 'fixed') return result;
   period.lineageId = undefined;
   const valueAtYear = () => projectForecastSeries(result).find((point) => point.year === year)?.value ?? NaN;
   const improve = (field: 'annualGrowthRate' | 'startAdjustment', epsilon: number) => {
@@ -104,6 +117,35 @@ export function fitForecastSeriesPoint(series: ForecastSeries, year: number, tar
   };
   if (!improve('annualGrowthRate', .001)) improve('startAdjustment', Math.max(1e-6, Math.abs(target) * 1e-6));
   if (period.range) period.range = { min: Math.min(period.range.min, period.annualGrowthRate), max: Math.max(period.range.max, period.annualGrowthRate) };
+  return result;
+}
+
+export function applyFinalYearSalesAllocation(model: ForecastModel, allocation: FinalYearSalesAllocation): ForecastModel {
+  const companySales = Math.max(0, Number(allocation.companySales));
+  const baseSharePercent = Math.max(0, Math.min(100, Number(allocation.baseSharePercent)));
+  const targets = new Map([
+    ['base-sales', companySales * baseSharePercent / 100],
+    ['subsidy-sales', companySales * (100 - baseSharePercent) / 100],
+  ]);
+  const series = model.series.map((candidate) => {
+    const target = targets.get(candidate.id);
+    if (target === undefined) return structuredClone(candidate);
+    const adjustable = { ...candidate, changePolicy: 'adjustable' as const };
+    return { ...fitForecastSeriesPoint(adjustable, allocation.finalYear, target), changePolicy: 'fixed' as const };
+  });
+  return {
+    ...model,
+    series,
+    finalYearSalesAllocation: { finalYear: allocation.finalYear, companySales, baseSharePercent },
+  };
+}
+
+export function clearFinalYearSalesAllocation(model: ForecastModel): ForecastModel {
+  const result = structuredClone(model);
+  delete result.finalYearSalesAllocation;
+  result.series = result.series.map((series) => series.id === 'base-sales' || series.id === 'subsidy-sales'
+    ? { ...series, changePolicy: 'adjustable' }
+    : series);
   return result;
 }
 
@@ -128,7 +170,7 @@ export function fitForecastPlCell(model: ForecastModel, scope: 'base' | 'subsidy
   const result = structuredClone(model);
   const series = result.series.find((candidate) => candidate.id === `${scope}-${driver}`);
   const period = series?.periods.find((candidate) => year >= candidate.startYear && year <= candidate.endYear);
-  if (!series || !period) return result;
+  if (!series || !period || series.changePolicy === 'fixed') return result;
   period.lineageId = undefined;
   const evaluate = () => Number(buildForecastPl(result, scope, latest).find((row) => row.year === year)?.calculated[field]);
   const improve = (parameter: 'annualGrowthRate' | 'startAdjustment', epsilon: number) => {
@@ -166,6 +208,7 @@ export function splitForecastSegment(model: ForecastModel, splitYear: number): F
   const first = { ...source, endYear: splitYear - 1 };
   const second = { ...source, id: nextId, startYear: splitYear };
   return {
+    ...model,
     segments: [...segments.slice(0, index), first, second, ...segments.slice(index + 1)],
     series: model.series.map((series) => ({
       ...series,
@@ -188,6 +231,7 @@ export function mergeForecastSegment(model: ForecastModel, segmentId: string): F
   const previous = segments[index - 1];
   const current = segments[index];
   return {
+    ...model,
     segments: [...segments.slice(0, index - 1), { ...previous, endYear: current.endYear }, ...segments.slice(index + 1)],
     series: model.series.map((series) => {
       const previousPeriod = series.periods.find((period) => period.id === previous.id);
@@ -211,7 +255,8 @@ export function synchronizeForecastTimeline(model: ForecastModel, timeline: Time
       };
     });
   });
-  return {
+  const synchronized: ForecastModel = {
+    ...model,
     segments,
     series: model.series.map((series) => ({
       ...series,
@@ -225,6 +270,11 @@ export function synchronizeForecastTimeline(model: ForecastModel, timeline: Time
       }),
     })),
   };
+  const finalYear = Math.max(...segments.map((segment) => segment.endYear));
+  return synchronized.finalYearSalesAllocation?.finalYear !== undefined
+    && synchronized.finalYearSalesAllocation.finalYear !== finalYear
+    ? clearFinalYearSalesAllocation(synchronized)
+    : synchronized;
 }
 
 export type ForecastPlYear = { year: number; input: HistoricalPlInput; calculated: HistoricalPlCalculated };
@@ -261,7 +311,7 @@ export function buildForecastPl(model: ForecastModel, scope: 'base' | 'subsidy',
       netIncome: 0, headcount, officerCount: Math.max(0, value('officerCount', index, previous.officerCount)),
     };
     const preTaxIncome = calculatePl(draft, previous).preTaxIncome;
-    const taxRate = value('taxRate', index, 30) / 100;
+    const taxRate = Math.max(0, Math.min(100, value('taxRate', index, 30))) / 100;
     const input = { ...draft, netIncome: preTaxIncome * (1 - taxRate) };
     const calculated = calculatePl(input, previous);
     rows.push({ year: salesPoint.year, input, calculated });

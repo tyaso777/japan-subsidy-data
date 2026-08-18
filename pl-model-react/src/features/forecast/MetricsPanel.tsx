@@ -1,15 +1,25 @@
 import { useMemo, useState } from 'react';
+import { LoaderCircle } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Slider } from '../../components/ui/slider';
 import { Textarea } from '../../components/ui/textarea';
 import { evaluateManagementMetric } from '../../domain/metrics';
 import { metricAttainmentColor, metricAttainmentScore } from '../../domain/metric-attainment';
-import { applyOptimizationStrength, createMetricOptimizationProposal, type OptimizationProposal } from '../../domain/optimization';
-import type { HistoricalPlCalculated, ManagementMetricDefinition } from '../../domain/types';
+import { applyOptimizationExpansionPlan, applyOptimizationStrength, type OptimizationProposal, type OptimizationRangeMode, type OptimizationStrategy } from '../../domain/optimization';
+import type { HistoricalPlCalculated, ManagementMetricDefinition, ProgramConfiguration } from '../../domain/types';
 import { useModelStore } from '../../store/model-store-context';
+import { calculateMetricOptimization, calculateMetricOptimizationExpansion } from './optimization-worker-client';
 
 type Timeline = { years: number[]; records: HistoricalPlCalculated[] };
+
+const strategyLabels: Record<OptimizationStrategy, string> = { 'minimum-change': '最小変更', balanced: 'バランス', sparse: '最少項目', priority: '優先順位' };
+const strategyDescriptions: Record<OptimizationStrategy, string> = {
+  'minimum-change': '目標達成に必要な変更を複数の水準へ分散',
+  balanced: '一つの水準へ変更が集中しないよう最大変更率を抑制',
+  sparse: '目標改善効率の高い水準を選び、変更する項目数を抑制',
+  priority: '水準設定の上から順に、必要なところまで調整',
+};
 
 function position(value: number, min: number, max: number) { return Math.max(0, Math.min(100, (value - min) / (max - min || 1) * 100)); }
 
@@ -43,10 +53,37 @@ function MetricBullet({ metric, timeline, editing }: { metric: ManagementMetricD
   </article>;
 }
 
+function FeasibilityReport({ proposal, program, rangeMode, isExpansionSearching }: {
+  proposal: OptimizationProposal;
+  program: ProgramConfiguration;
+  rangeMode: OptimizationRangeMode;
+  isExpansionSearching: boolean;
+}) {
+  if (proposal.feasibility === 'feasible') return null;
+  const unavailable = proposal.metricDiagnostics.filter((metric) => metric.status === 'unavailable');
+  const unmet = proposal.metricDiagnostics.filter((metric) => metric.status === 'unmet');
+  return <section data-testid="optimization-feasibility-report" className="mt-3 rounded border border-orange/45 bg-orange/5 p-2.5 text-[10px]">
+    <strong className="block text-[12px] text-orange">{proposal.feasibility === 'unavailable' ? '指標を計算できないため最適化不能' : '目標未達の詳細'}</strong>
+    {proposal.feasibility === 'infeasible' && <p className="mt-0.5 mb-0 text-muted-foreground">{isExpansionSearching ? '現在のMin・Max内では目標未達です。Min・Max超過にペナルティを付けた水準外探索を続けています。' : rangeMode === 'outside-levels' ? '今回の数値探索では達成解を確認できませんでした。これは数学的な達成不能を意味しません。探索済みの最良案と必要な水準範囲を表示します。' : '現在のMin・Max内では目標未達です。水準外最適化へ切り替えると、Min・Maxを推奨範囲として扱い、必要な範囲を追加探索できます。'}</p>}
+    {unavailable.length > 0 && <div className="mt-2"><b>計算できない指標</b>{unavailable.map((metric) => <div key={metric.id} className="mt-1 border-t border-orange/20 pt-1">{metric.label}</div>)}</div>}
+    {unmet.length > 0 && <div className="mt-2"><b>未達の指標</b>{unmet.map((metric) => <div key={metric.id} className="mt-1 border-t border-orange/20 pt-1"><strong>{metric.label}</strong><div>最大限調整した場合の値：{metric.value?.toFixed(2)} {metric.unit}</div><div>目標：{metric.direction === 'min' ? '≥' : '≤'} {metric.target} {metric.unit}</div><div>目標との差：{metric.gap?.toFixed(2)} {metric.unit}</div></div>)}</div>}
+    {isExpansionSearching ? <div className="mt-2 flex items-center gap-2 rounded border border-teal/30 bg-teal/5 p-2 text-teal" role="status"><LoaderCircle data-testid="expansion-search-spinner" className="animate-spin will-change-transform [animation-duration:850ms]" aria-hidden="true" /><div><b className="block">水準外最適化を追加探索中…</b><small>ドメイン制約を守りながら、Min・Max外の候補を段階的に検証しています。</small></div></div> : proposal.expansionPlan ? <div className="mt-2 rounded border border-orange/35 bg-surface p-2" data-testid="optimization-expansion-plan"><div className="flex items-center justify-between gap-2"><b>推奨水準範囲</b><span className={`rounded px-1.5 py-0.5 font-bold ${proposal.expansionPlan.status === 'feasible' ? 'bg-teal/10 text-teal' : 'bg-orange/10 text-orange'}`}>{proposal.expansionPlan.status === 'feasible' ? '全目標を達成見込み' : '探索済みの最良案'}</span></div><p className="mt-1 mb-0 text-muted-foreground">元のMin・Maxからの超過へペナルティを付け、PLと全指標を再計算して得た組合せです。</p>{proposal.expansionPlan.entries.map((entry) => {
+      const periodLabel = program.definitions.periods.find((period) => period.id === entry.periodId)?.label ?? entry.periodId;
+      const boundaryLabel = entry.boundary === 'max' ? '上限' : '下限';
+      return <div key={`${entry.seriesId}-${entry.periodId}-${entry.boundary}`} className="mt-1 border-t border-line pt-1"><strong>{entry.seriesLabel} / {periodLabel}</strong><div>{boundaryLabel}：{entry.before.toFixed(2)} → <strong className="text-orange">{entry.after.toFixed(2)}</strong></div>{entry.affectedMetricLabels.length > 0 && <small className="text-muted-foreground">主に改善：{entry.affectedMetricLabels.join('、')}</small>}</div>;
+    })}<p className="mt-2 mb-0 rounded bg-teal/5 px-2 py-1 text-teal">このMin・Maxと最適水準は水準外最適化の実行時に適用済みです。適用率スライダーで最適化前まで戻して比較できます。</p></div> : proposal.feasibility === 'infeasible' && rangeMode === 'outside-levels' && <p className="mt-2 mb-0 text-muted-foreground">現在の数値探索では、有効な水準範囲を特定できませんでした。</p>}
+  </section>;
+}
+
 export function MetricsPanel({ company, base, subsidy }: { company: Timeline; base: Timeline; subsidy: Timeline }) {
   const [editing, setEditing] = useState(false);
+  const [strategy, setStrategy] = useState<OptimizationStrategy>('minimum-change');
+  const [rangeMode, setRangeMode] = useState<OptimizationRangeMode>('within-levels');
   const [proposal, setProposal] = useState<OptimizationProposal>();
   const [strength, setStrength] = useState(0);
+  const [isOptimizing, setIsOptimizing] = useState(false);
+  const [isExpansionSearching, setIsExpansionSearching] = useState(false);
+  const [applicationResult, setApplicationResult] = useState<string[]>();
   const metrics = useModelStore((state) => state.program.definitions.managementMetrics);
   const program = useModelStore((state) => state.program);
   const forecast = useModelStore((state) => state.forecast);
@@ -54,11 +91,69 @@ export function MetricsPanel({ company, base, subsidy }: { company: Timeline; ba
   const replaceForecast = useModelStore((state) => state.replaceForecast);
   const begin = useModelStore((state) => state.beginTransaction);
   const commit = useModelStore((state) => state.commitTransaction);
-  const createProposal = () => { setProposal(createMetricOptimizationProposal(forecast, program, actuals.basePl, actuals.subsidyPl, actuals.metricInputs)); setStrength(0); };
+  const calculateProposal = (sourceForecast: typeof forecast) => {
+    setIsOptimizing(true);
+    setIsExpansionSearching(false);
+    setProposal(undefined);
+    setStrength(0);
+    window.setTimeout(async () => {
+      try {
+        const input = { model: sourceForecast, program, baseActuals: actuals.basePl, subsidyActuals: actuals.subsidyPl, actualInputs: actuals.metricInputs, strategy, rangeMode };
+        const initial = await calculateMetricOptimization(input);
+        setProposal(initial);
+        if (initial.feasibility === 'infeasible' && rangeMode === 'outside-levels') {
+          setIsExpansionSearching(true);
+          // A separate worker keeps the progress indicator and strength slider
+          // responsive while the CPU-heavy expansion search is running.
+          window.setTimeout(async () => {
+            try {
+              const expansionPlan = await calculateMetricOptimizationExpansion(input, initial);
+              if (!expansionPlan) return;
+              const proposalWithExpansion = { ...initial, expansionPlan };
+              const expanded = applyOptimizationExpansionPlan(proposalWithExpansion);
+              const applied = expansionPlan.entries.map((entry) => {
+                const period = program.definitions.periods.find((candidate) => candidate.id === entry.periodId)?.label ?? entry.periodId;
+                return `${entry.seriesLabel}／${period} ${entry.boundary === 'max' ? '上限' : '下限'} ${entry.before.toFixed(2)} → ${entry.after.toFixed(2)}`;
+              });
+              const optimizedInExpandedRange = await calculateMetricOptimization({ ...input, model: expanded });
+              const completedProposal = { ...optimizedInExpandedRange, expansionPlan };
+              begin();
+              replaceForecast(applyOptimizationStrength(completedProposal, 100));
+              commit();
+              setApplicationResult(applied);
+              setProposal(completedProposal);
+              setStrength(100);
+            } finally {
+              setIsExpansionSearching(false);
+            }
+          }, 500);
+        }
+      } finally {
+        setIsOptimizing(false);
+      }
+    }, 0);
+  };
+  const createProposal = () => {
+    setApplicationResult(undefined);
+    calculateProposal(forecast);
+  };
   const apply = (nextStrength: number) => {
     begin();
     setStrength(nextStrength);
     if (proposal) replaceForecast(applyOptimizationStrength(proposal, nextStrength));
   };
-  return <aside data-testid="forecast-metrics-panel" className="sticky top-3 max-h-[calc(100vh-24px)] overflow-y-auto border border-line bg-surface p-2.5"><div className="mb-1 flex items-center justify-between gap-2"><div><h3 className="m-0 text-base font-bold">経営指標・目標</h3><p className="m-0 text-[10px] text-muted-foreground">制度式で全社・事業別を同時評価</p></div><Button variant={editing ? 'default' : 'outline'} size="sm" onClick={() => setEditing((value) => !value)}>{editing ? '編集完了' : 'すべて編集'}</Button></div><div>{metrics.map((metric) => <MetricBullet key={metric.id} metric={metric} editing={editing} timeline={metric.scope === 'company' ? company : metric.scope === 'base' ? base : subsidy} />)}</div><Button className="mt-2 w-full" onClick={createProposal}>目標を満たす水準案を作成</Button>{proposal && <section data-testid="optimization-proposal" className="mt-3 border-t-[3px] border-orange bg-background p-3"><div className="flex items-center justify-between"><strong className="text-sm">最適化方向</strong><span className="text-[10px] text-muted-foreground">PLは適用率で段階反映</span></div><div className="mt-2 max-h-32 overflow-y-auto">{proposal.changes.map((change) => <div key={`${change.seriesId}-${change.periodId}`} className="grid grid-cols-[1fr_48px] items-center border-t border-line py-1 text-[9px]"><span>{change.seriesId} / {change.periodId}</span><strong className={change.direction === 'up' ? 'text-teal' : 'text-orange'}>{change.direction === 'up' ? '↗' : '↘'} {Math.abs(change.delta).toFixed(1)}</strong></div>)}</div><label className="mt-3 block text-[10px] font-bold">最適化方向の適用率 <span className="float-right text-orange">{strength}%</span><Slider aria-label="最適化方向の適用率" data-testid="optimization-strength-control" className="mt-1 h-8 cursor-pointer [&_[data-slot=slider-thumb]]:size-5" min={0} max={100} step={1} value={[strength]} onPointerCancel={commit} onLostPointerCapture={commit} onValueChange={(values) => apply(values[0] ?? 0)} onValueCommit={commit} onBlur={commit} /></label></section>}</aside>;
+  return <aside data-testid="forecast-metrics-panel" style={{ scrollbarGutter: 'stable', paddingRight: '18px' }} className="sticky top-3 max-h-[calc(100vh-24px)] overflow-y-scroll border border-line bg-surface p-2.5">
+    <div className="mb-1 flex items-center justify-between gap-2"><div><h3 className="m-0 text-base font-bold">経営指標・目標</h3><p className="m-0 text-[10px] text-muted-foreground">制度式で全社・事業別を同時評価</p></div><Button variant={editing ? 'default' : 'outline'} size="sm" onClick={() => setEditing((value) => !value)}>{editing ? '編集完了' : 'すべて編集'}</Button></div>
+    <div>{metrics.map((metric) => <MetricBullet key={metric.id} metric={metric} editing={editing} timeline={metric.scope === 'company' ? company : metric.scope === 'base' ? base : subsidy} />)}</div>
+    <div className="mt-2 rounded border border-line bg-background p-2"><div className="grid grid-cols-2 gap-2"><label className="grid grid-cols-[auto_1fr] items-center gap-2 text-[10px] font-bold">最適化方法<select aria-label="最適化方法" className="h-7 min-w-0 rounded border border-input bg-surface px-2 text-[10px]" value={strategy} onChange={(event) => { setStrategy(event.target.value as OptimizationStrategy); setProposal(undefined); setStrength(0); setApplicationResult(undefined); }}><option value="minimum-change">最小変更</option><option value="balanced">バランス</option><option value="sparse">最少項目</option><option value="priority">優先順位</option></select></label><label className="grid grid-cols-[auto_1fr] items-center gap-2 text-[10px] font-bold">探索範囲<select aria-label="探索範囲" className="h-7 min-w-0 rounded border border-input bg-surface px-2 text-[10px]" value={rangeMode} onChange={(event) => { setRangeMode(event.target.value as OptimizationRangeMode); setProposal(undefined); setStrength(0); setApplicationResult(undefined); }}><option value="within-levels">水準内最適化</option><option value="outside-levels">水準外最適化</option></select></label></div><div className="mt-1 flex items-start justify-between gap-2"><p className="m-0 text-[9px] text-muted-foreground">{rangeMode === 'within-levels' ? '現在のMin・Maxを超えない範囲で最適化' : 'Min・Max超過にペナルティを付け、必要な範囲を適応探索'}・{strategyDescriptions[strategy]}</p><a className="shrink-0 text-[9px] font-bold text-teal underline underline-offset-2" href="./docs/optimization-methods.html" target="_blank" rel="noreferrer">最適化方法の詳しい説明</a></div></div>
+    <Button className="mt-2 w-full" disabled={isOptimizing || isExpansionSearching} aria-busy={isOptimizing || isExpansionSearching} onClick={createProposal}>{isOptimizing ? <><LoaderCircle data-testid="optimization-spinner" className="animate-spin will-change-transform [animation-duration:850ms]" aria-hidden="true" /><span role="status">水準案を計算中…</span></> : isExpansionSearching ? <><LoaderCircle className="animate-spin will-change-transform [animation-duration:850ms]" aria-hidden="true" />水準外の目標達成案を探索中…</> : '目標を満たす水準案を作成'}</Button>
+    {proposal && <section data-testid="optimization-proposal" className="mt-3 border-t-[3px] border-orange bg-background p-3">
+      <div data-testid="optimization-status-summary" aria-live="polite" className={`mb-2 flex items-center justify-between rounded px-2 py-1.5 text-[11px] font-bold ${proposal.feasibility === 'feasible' ? 'bg-teal/10 text-teal' : 'bg-orange/10 text-orange'}`}><span>{proposal.feasibility === 'feasible' ? '目標達成' : proposal.feasibility === 'infeasible' ? '目標未達' : '評価不能'}</span><span className="text-[9px] font-normal">{proposal.feasibility === 'feasible' ? '選択した探索範囲で達成できます' : proposal.feasibility === 'infeasible' ? rangeMode === 'within-levels' ? '現在のMin・Max内の最良案' : '水準外の候補も探索中／探索済み' : '必要な実績値を確認してください'}</span></div>
+      <label className="block text-[10px] font-bold">最適化方向の適用率 <span className="float-right text-orange">{strength}%</span><Slider aria-label="最適化方向の適用率" data-testid="optimization-strength-control" className="mt-1 h-8 cursor-pointer [&_[data-slot=slider-thumb]]:size-5" min={0} max={100} step={1} value={[strength]} onPointerCancel={commit} onLostPointerCapture={commit} onValueChange={(values) => apply(values[0] ?? 0)} onValueCommit={commit} onBlur={commit} /></label>
+      {applicationResult && <section data-testid="optimization-application-result" aria-live="polite" className="mt-2 rounded border border-teal/40 bg-teal/5 p-2 text-[10px] text-teal"><strong>水準外最適化を完了しました（{applicationResult.length}項目）</strong><p className="my-1 text-muted-foreground">1回の実行で必要な上限・下限と最適水準を100%適用しました。スライダーで最適化前まで戻して比較できます。</p>{applicationResult.slice(0, 3).map((line) => <div key={line} className="border-t border-teal/15 py-0.5">{line}</div>)}{applicationResult.length > 3 && <small>ほか{applicationResult.length - 3}項目</small>}</section>}
+      <FeasibilityReport proposal={proposal} program={program} rangeMode={rangeMode} isExpansionSearching={isExpansionSearching} />
+      <div className="mt-3 flex items-center justify-between border-t border-line pt-3"><strong className="text-sm">最適化方向・{strategyLabels[proposal.strategy]}</strong><span className="text-[10px] text-muted-foreground">PLは適用率で段階反映</span></div>
+      <div className="mt-2 max-h-32 overflow-y-auto">{proposal.changes.map((change) => <div key={`${change.seriesId}-${change.periodId}`} className="grid grid-cols-[1fr_48px] items-center border-t border-line py-1 text-[9px]"><span>{change.seriesId} / {change.periodId}</span><strong className={change.direction === 'up' ? 'text-teal' : 'text-orange'}>{change.direction === 'up' ? '↗' : '↘'} {Math.abs(change.delta).toFixed(1)}</strong></div>)}</div>
+    </section>}
+  </aside>;
 }

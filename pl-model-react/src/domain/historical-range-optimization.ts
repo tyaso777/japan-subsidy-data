@@ -146,6 +146,24 @@ export function optimizeForecastRangesFromActuals(
 
   forecast.series.filter((series) => series.scope !== 'company').forEach((series) => {
     const source = actuals[series.scope as Scope];
+    if (series.changePolicy === 'fixed' || driverId(series) === 'taxRate') {
+      const latest = source.at(-1);
+      if (driverId(series) === 'taxRate') {
+        series.changePolicy = 'fixed';
+        series.baseValue = latest && latest.preTaxIncome > 0
+          ? Math.max(0, Math.min(100, (1 - latest.netIncome / latest.preTaxIncome) * 100))
+          : 30;
+      }
+      series.periods.forEach((period) => {
+        period.annualGrowthRate = 0;
+        period.startAdjustment = 0;
+        period.range = { min: 0, max: 0 };
+        period.layers = { fixedAnnualIncrement: 0, steps: {}, spots: {}, acceleration: 0 };
+        period.lineageId = undefined;
+        updatedPeriods += 1;
+      });
+      return;
+    }
     const derived = baseRange(series, source);
     series.periods.forEach((period) => {
       const phase = phaseForPeriod(forecast, program, period.id);

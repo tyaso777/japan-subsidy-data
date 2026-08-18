@@ -62,4 +62,16 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(period.range!.max).toBeLessThanOrEqual(0);
     expect(period.annualGrowthRate).toBeLessThan(0);
   });
+
+  it('実効税率は赤字実績から変化率を作らず、固定値として保持する', () => {
+    const state = createModelStore().getState();
+    const subsidyTax = state.forecast.series.find((series) => series.id === 'subsidy-taxRate')!;
+    expect(subsidyTax.baseValue).toBe(30);
+    expect(subsidyTax.changePolicy).toBe('fixed');
+
+    const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
+    const optimizedTax = result.forecast.series.find((series) => series.id === 'subsidy-taxRate')!;
+    expect(optimizedTax.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);
+    expect(optimizedTax.periods.every((period) => period.range?.min === 0 && period.range.max === 0)).toBe(true);
+  });
 });

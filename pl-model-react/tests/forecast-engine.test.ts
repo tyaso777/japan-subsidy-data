@@ -1,18 +1,56 @@
 import { describe, expect, it } from 'vitest';
-import { buildForecastPl, fitForecastPlCell, fitForecastSeriesPoint, mergeForecastSegment, projectForecastSeries, projectSeries, splitForecastSegment, synchronizeForecastTimeline, type ForecastModel, type ForecastSeries } from '../src/domain/forecast-engine';
+import { applyFinalYearSalesAllocation, buildForecastPl, clearFinalYearSalesAllocation, fitForecastPlCell, fitForecastSeriesPoint, mergeForecastSegment, projectForecastSeries, projectSeries, splitForecastSegment, synchronizeForecastTimeline, type ForecastModel, type ForecastSeries } from '../src/domain/forecast-engine';
 import { calculatePl } from '../src/domain/financials';
 import { baseHistoricalPl } from '../src/domain/sample-data';
 
 describe('将来予測計算サービス', () => {
+  it('最終年度の全社売上高を事業別配分へ合わせ、売上高を最適化対象外として固定できる', () => {
+    const sales = (scope: 'base' | 'subsidy', baseValue: number): ForecastSeries => ({
+      id: `${scope}-sales`, label: '売上高', scope, valueKind: 'money', projectionMode: 'compound',
+      baseYear: 2025, baseValue,
+      periods: [{ id: 'report', startYear: 2026, endYear: 2028, annualGrowthRate: 5, startAdjustment: 0, range: { min: -10, max: 50 } }],
+    });
+    const model: ForecastModel = { series: [sales('base', 500), sales('subsidy', 100)] };
+
+    const allocated = applyFinalYearSalesAllocation(model, { finalYear: 2028, companySales: 1_000, baseSharePercent: 60 });
+    expect(projectForecastSeries(allocated.series[0]).at(-1)?.value).toBeCloseTo(600, 6);
+    expect(projectForecastSeries(allocated.series[1]).at(-1)?.value).toBeCloseTo(400, 6);
+    expect(allocated.series.map((series) => series.changePolicy)).toEqual(['fixed', 'fixed']);
+    expect(allocated.finalYearSalesAllocation).toEqual({ finalYear: 2028, companySales: 1_000, baseSharePercent: 60 });
+
+    const cleared = clearFinalYearSalesAllocation(allocated);
+    expect(cleared.finalYearSalesAllocation).toBeUndefined();
+    expect(cleared.series.map((series) => series.changePolicy)).toEqual(['adjustable', 'adjustable']);
+
+    const rescheduled = synchronizeForecastTimeline(allocated, [{ definitionId: 'report', startYear: 2026, endYear: 2029 }]);
+    expect(rescheduled.finalYearSalesAllocation).toBeUndefined();
+    expect(rescheduled.series.map((series) => series.changePolicy)).toEqual(['adjustable', 'adjustable']);
+  });
   it('期間開始時増減と期間別成長率をUIなしで計算する', () => {
     const result = projectSeries(2025, 100, [
       { id: 'A', startYear: 2026, endYear: 2028, annualGrowthRate: 10, startAdjustment: 20 },
       { id: 'B', startYear: 2029, endYear: 2030, annualGrowthRate: 5, startAdjustment: 50 },
     ]);
     expect(result.map((point) => point.year)).toEqual([2025, 2026, 2027, 2028, 2029, 2030]);
-    [100, 132, 145.2, 159.72, 220.206, 231.2163].forEach((value, index) => {
+    [100, 130, 143, 157.3, 215.165, 225.92325].forEach((value, index) => {
       expect(result[index].value).toBeCloseTo(value, 8);
     });
+  });
+
+  it('売上高の開始時増減額は初年度の成長計算後に加算し、翌年度から合計額を成長させる', () => {
+    const series: ForecastSeries = {
+      id: 'base-sales', label: '売上高', scope: 'base', valueKind: 'money', projectionMode: 'compound',
+      baseYear: 2025, baseValue: 1_000,
+      periods: [{ id: 'subsidy', startYear: 2026, endYear: 2028, annualGrowthRate: 8, startAdjustment: 100_000_000 }],
+    };
+
+    const expected = [
+      1_000,
+      100_001_080,
+      108_001_166.4,
+      116_641_259.712,
+    ];
+    projectForecastSeries(series).forEach((point, index) => expect(point.value).toBeCloseTo(expected[index], 6));
   });
 
   it('比率・人員・給与水準から将来P/Lを全行生成する', () => {

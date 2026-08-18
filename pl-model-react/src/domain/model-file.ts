@@ -19,6 +19,7 @@ const forecastSeriesSchema = z.object({
   id: z.string(), label: z.string(), scope: z.enum(['company', 'base', 'subsidy']),
   valueKind: z.enum(['money', 'percent', 'point', 'fte', 'count', 'moneyPerPerson', 'multiple', 'index']),
   projectionMode: z.enum(['compound', 'linear']).optional(),
+  changePolicy: z.enum(['adjustable', 'fixed']).optional(),
   baseYear: z.number().int(), baseValue: z.number(), periods: z.array(forecastPeriodSchema),
 });
 
@@ -33,6 +34,9 @@ const snapshotSchema = z.object({
   forecast: z.object({
     segments: z.array(z.object({ id: z.string(), definitionId: z.string(), startYear: z.number().int(), endYear: z.number().int() })).optional(),
     series: z.array(forecastSeriesSchema),
+    finalYearSalesAllocation: z.object({
+      finalYear: z.number().int(), companySales: z.number().nonnegative(), baseSharePercent: z.number().min(0).max(100),
+    }).optional(),
   }),
 });
 

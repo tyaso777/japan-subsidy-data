@@ -2,6 +2,8 @@ import { createStore, type StoreApi } from 'zustand/vanilla';
 import { createDefaultProgram, normalizeProgram, setPeriodEndYear } from '../domain/timeline';
 import { balanceSheets, baseHistoricalPl, subsidyHistoricalPl } from '../domain/sample-data';
 import {
+  applyFinalYearSalesAllocation,
+  clearFinalYearSalesAllocation,
   mergeForecastSegment,
   splitForecastSegment,
   synchronizeForecastTimeline,
@@ -45,6 +47,8 @@ type ModelActions = {
   optimizeForecastRangesFromActuals: () => HistoricalRangeOptimizationResult;
   updateForecastPeriod: (seriesId: string, periodId: string, patch: Partial<Pick<ForecastPeriod, 'annualGrowthRate' | 'startAdjustment' | 'range'>>) => void;
   updateForecastLayer: (seriesId: string, periodId: string, patch: Partial<ForecastEffectLayers>) => void;
+  updateFinalYearSalesAllocation: (companySales: number, baseSharePercent: number) => void;
+  clearFinalYearSalesAllocation: () => void;
   splitForecastAtYear: (year: number) => void;
   mergeForecastPeriod: (segmentId: string) => void;
   beginTransaction: () => void;
@@ -71,7 +75,7 @@ function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInpu
   const forScope = (scope: BusinessScope, latest: HistoricalPlInput, growth: { sales: number; headcount: number; pay: number }) => {
     const calculated = calculatePl(latest);
     const compound = (id: string, label: string, valueKind: import('../domain/value-units').ValueKind, baseValue: number, rate: number) => ({ id: `${scope}-${id}`, label, scope, valueKind, projectionMode: 'compound' as const, baseYear, baseValue, periods: periods(rate, 'compound') });
-    const linear = (id: string, label: string, baseValue: number, change = 0) => ({ id: `${scope}-${id}`, label, scope, valueKind: 'percent' as const, projectionMode: 'linear' as const, baseYear, baseValue, periods: periods(change, 'linear') });
+    const linear = (id: string, label: string, baseValue: number, change = 0, changePolicy: 'adjustable' | 'fixed' = 'adjustable') => ({ id: `${scope}-${id}`, label, scope, valueKind: 'percent' as const, projectionMode: 'linear' as const, changePolicy, baseYear, baseValue, periods: periods(change, 'linear').map((period) => changePolicy === 'fixed' ? { ...period, annualGrowthRate: 0, range: { min: 0, max: 0 } } : period) });
     return [
       compound('sales', '売上高', 'money', latest.sales, growth.sales),
       compound('headcount', '従業員数（就業時間換算）', 'fte', latest.headcount, growth.headcount),
@@ -86,7 +90,7 @@ function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInpu
       linear('officerCompensationShare', '役員給与のうち報酬割合', calculated.officerPay ? latest.officerCompensation / calculated.officerPay * 100 : 90),
       linear('nonOperatingRate', '営業外損益の売上高比率', latest.sales ? latest.nonOperating / latest.sales * 100 : 0),
       linear('extraordinaryRate', '特別損益の売上高比率', latest.sales ? latest.extraordinary / latest.sales * 100 : 0),
-      linear('taxRate', '実効税率', calculated.preTaxIncome ? (1 - latest.netIncome / calculated.preTaxIncome) * 100 : 30),
+      linear('taxRate', '実効税率', calculated.preTaxIncome > 0 ? Math.max(0, Math.min(100, (1 - latest.netIncome / calculated.preTaxIncome) * 100)) : 30, 0, 'fixed'),
       compound('officerCount', '役員数', 'count', latest.officerCount, 0),
     ];
   };
@@ -234,6 +238,17 @@ export function createModelStore(program?: unknown): StoreApi<ModelStore> {
             }),
           } : series),
         },
+      })),
+      updateFinalYearSalesAllocation: (companySales, baseSharePercent) => applyMutation((snapshot) => {
+        const finalYear = Math.max(...(snapshot.forecast.segments ?? snapshot.program.timeline.periods).map((period) => period.endYear));
+        return {
+          ...snapshot,
+          forecast: applyFinalYearSalesAllocation(snapshot.forecast, { finalYear, companySales, baseSharePercent }),
+        };
+      }),
+      clearFinalYearSalesAllocation: () => applyMutation((snapshot) => ({
+        ...snapshot,
+        forecast: clearFinalYearSalesAllocation(snapshot.forecast),
       })),
       splitForecastAtYear: (year) => applyMutation((snapshot) => ({
         ...snapshot,
