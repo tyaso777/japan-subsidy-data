@@ -38,7 +38,8 @@ describe('期間・過去実績', () => {
       const stickyHeader = within(section).getByTestId(`${testId}-sticky-header`);
       expect(section).toHaveClass('relative', 'isolate');
       expect(stickyHeader).toHaveClass('sticky', 'top-12', 'z-40');
-      expect(within(stickyHeader).getByText('科目')).toBeVisible();
+      expect(within(stickyHeader).getByText('科目番号')).toBeVisible();
+      expect(within(stickyHeader).getByText('科目名')).toBeVisible();
       expect(within(stickyHeader).getByText('最新決算期')).toBeVisible();
     }
   });
@@ -177,6 +178,25 @@ describe('期間・過去実績', () => {
     fireEvent.copy(receivable2024, { clipboardData: { setData: (_type: string, value: string) => { copied = value; } } });
 
     expect(copied).toBe('1050\t1115\n555\t599');
+  });
+
+  it('科目番号から3期目までドラッグするだけで5列をExcel向けTSVとしてコピーする', () => {
+    render(<App />);
+    const table = screen.getByTestId('historical-bs');
+    const codeCell = within(table).getByText('1-1').closest<HTMLElement>('[data-grid-cell="true"]');
+    const finalValue = screen.getByLabelText('全社 B/S（1-1～1-25） 2025年 資産総額');
+    const finalCell = finalValue.closest<HTMLElement>('[data-grid-cell="true"]');
+    expect(codeCell).not.toBeNull();
+    expect(finalCell).not.toBeNull();
+
+    fireEvent.mouseDown(codeCell!, { button: 0, buttons: 1 });
+    fireEvent.mouseEnter(finalCell!, { buttons: 1 });
+    fireEvent.mouseUp(window);
+    let copied = '';
+    expect(document.activeElement).toBe(codeCell);
+    fireEvent.copy(document.activeElement!, { clipboardData: { setData: (_type: string, value: string) => { copied = value; } } });
+
+    expect(copied).toBe('1-1\t資産総額\t1050\t1115\t1208');
   });
 
   it('過去P/Lでは空欄を維持し、自動計算行を飛ばして入力行だけ更新する', async () => {

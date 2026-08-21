@@ -16,4 +16,8 @@ describe('Excel互換の表クリップボード', () => {
   it('選択範囲を装飾のないTSVとして書き出す', () => {
     expect(serializeTabularClipboard([[180, 195], [210, 225]])).toBe('180\t195\n210\t225');
   });
+
+  it('科目番号・科目名と数値を同じTSVへ書き出す', () => {
+    expect(serializeTabularClipboard([['1-1', '資産総額', 1050, 1115, 1185]])).toBe('1-1\t資産総額\t1050\t1115\t1185');
+  });
 });
