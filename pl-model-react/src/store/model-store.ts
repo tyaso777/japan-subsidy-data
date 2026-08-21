@@ -27,6 +27,7 @@ export type ModelSnapshot = {
     metricInputs: Record<string, number>;
   };
   forecast: ForecastModel;
+  caseSettings: { metricTargets: Record<string, number> };
 };
 
 type ModelPreferences = { moneyUnit: MoneyDisplayUnit };
@@ -44,10 +45,11 @@ type ModelActions = {
   updateBalanceSheet: (yearIndex: number, field: string, value: number) => void;
   updateHistoricalPl: (scope: BusinessScope, yearIndex: number, field: keyof HistoricalPlInput, value: number) => void;
   updateMetricActual: (metricId: string, value: number) => void;
+  updateMetricTarget: (metricId: string, value: number | null) => void;
   optimizeForecastRangesFromActuals: () => HistoricalRangeOptimizationResult;
   updateForecastPeriod: (seriesId: string, periodId: string, patch: Partial<Pick<ForecastPeriod, 'annualGrowthRate' | 'startAdjustment' | 'range'>>) => void;
   updateForecastLayer: (seriesId: string, periodId: string, patch: Partial<ForecastEffectLayers>) => void;
-  updateFinalYearSalesAllocation: (companySales: number, baseSharePercent: number) => void;
+  updateFinalYearSalesAllocation: (baseSharePercent: number) => void;
   clearFinalYearSalesAllocation: () => void;
   splitForecastAtYear: (year: number) => void;
   mergeForecastPeriod: (segmentId: string) => void;
@@ -108,7 +110,7 @@ function initialSnapshot(programInput?: unknown): ModelSnapshot {
     subsidyPl: structuredClone(subsidyHistoricalPl),
     metricInputs: {},
   };
-  return { program, actuals, forecast: defaultForecast(program, actuals.basePl, actuals.subsidyPl) };
+  return { program, actuals, forecast: defaultForecast(program, actuals.basePl, actuals.subsidyPl), caseSettings: { metricTargets: {} } };
 }
 
 export function createModelStore(program?: unknown): StoreApi<ModelStore> {
@@ -116,7 +118,7 @@ export function createModelStore(program?: unknown): StoreApi<ModelStore> {
   const future: ModelSnapshot[] = [];
   let transactionBase: ModelSnapshot | null = null;
   return createStore<ModelStore>((set, get) => {
-    const currentSnapshot = (): ModelSnapshot => ({ program: get().program, actuals: get().actuals, forecast: get().forecast });
+    const currentSnapshot = (): ModelSnapshot => ({ program: get().program, actuals: get().actuals, forecast: get().forecast, caseSettings: get().caseSettings });
     const applyMutation = (mutate: (snapshot: ModelSnapshot) => ModelSnapshot) => {
       const current = currentSnapshot();
       const next = mutate(current);
@@ -239,11 +241,17 @@ export function createModelStore(program?: unknown): StoreApi<ModelStore> {
           } : series),
         },
       })),
-      updateFinalYearSalesAllocation: (companySales, baseSharePercent) => applyMutation((snapshot) => {
+      updateMetricTarget: (metricId, value) => applyMutation((snapshot) => {
+        const metricTargets = { ...snapshot.caseSettings.metricTargets };
+        if (value === null || !Number.isFinite(value)) delete metricTargets[metricId];
+        else metricTargets[metricId] = value;
+        return { ...snapshot, caseSettings: { ...snapshot.caseSettings, metricTargets } };
+      }),
+      updateFinalYearSalesAllocation: (baseSharePercent) => applyMutation((snapshot) => {
         const finalYear = Math.max(...(snapshot.forecast.segments ?? snapshot.program.timeline.periods).map((period) => period.endYear));
         return {
           ...snapshot,
-          forecast: applyFinalYearSalesAllocation(snapshot.forecast, { finalYear, companySales, baseSharePercent }),
+          forecast: applyFinalYearSalesAllocation(snapshot.forecast, { finalYear, baseSharePercent }),
         };
       }),
       clearFinalYearSalesAllocation: () => applyMutation((snapshot) => ({

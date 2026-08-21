@@ -1,7 +1,7 @@
 import type { ForecastModel } from './forecast-engine';
 import { buildForecastPl, projectForecastSeries } from './forecast-engine';
 import { calculatePlSeries, combinePlInputs } from './financials';
-import { evaluateManagementMetric } from './metrics';
+import { evaluateManagementMetric, resolveMetricTarget } from './metrics';
 import type { HistoricalPlCalculated, HistoricalPlInput, ProgramConfiguration } from './types';
 import { clampToForecastRange, defaultForecastRange, normalizeForecastRanges } from './forecast-range';
 import { orderForecastSeriesByPl } from './forecast-series-order';
@@ -57,6 +57,7 @@ export type OptimizationConstraintMeasurement = {
   target: number;
   direction: 'min' | 'max';
   unit: string;
+  tolerance?: number;
 };
 
 export type OptimizationMetricDiagnostic = OptimizationConstraintMeasurement & {
@@ -290,10 +291,33 @@ function constraintDiagnostics(measurements: OptimizationConstraintMeasurement[]
     const rawGap = measurement.direction === 'min'
       ? Math.max(0, measurement.target - measurement.value!)
       : Math.max(0, measurement.value! - measurement.target);
-    const tolerance = Math.max(1, Math.abs(measurement.target)) * 1e-8;
+    const tolerance = measurement.tolerance ?? Math.max(1, Math.abs(measurement.target)) * 1e-8;
     const gap = rawGap <= tolerance ? 0 : rawGap;
     return { ...measurement, status: gap === 0 ? 'met' as const : 'unmet' as const, gap };
   });
+}
+
+function finalYearSalesAllocationConstraints(model: ForecastModel): OptimizationConstraintMeasurement[] {
+  const allocation = model.finalYearSalesAllocation;
+  if (!allocation) return [];
+  const salesAt = (scope: 'base' | 'subsidy') => {
+    const series = model.series.find((candidate) => candidate.id === `${scope}-sales`);
+    return series ? projectForecastSeries(series).find((point) => point.year === allocation.finalYear)?.value : undefined;
+  };
+  const baseSales = salesAt('base');
+  const subsidySales = salesAt('subsidy');
+  const total = (baseSales ?? 0) + (subsidySales ?? 0);
+  const value = Number.isFinite(baseSales) && Number.isFinite(subsidySales) && total > 0
+    ? baseSales! / total * 100
+    : undefined;
+  const shared = {
+    label: '最終年度 ベース事業売上高配分率', value,
+    target: allocation.baseSharePercent, unit: '%', tolerance: .05,
+  };
+  return [
+    { ...shared, id: 'final-year-sales-allocation-min', direction: 'min' },
+    { ...shared, id: 'final-year-sales-allocation-max', direction: 'max' },
+  ];
 }
 
 function isBetterConstraintScore(candidate: ConstraintScore, current: ConstraintScore) {
@@ -602,6 +626,10 @@ export function createConstrainedOptimizationProposal(model: ForecastModel, eval
   const strategy = options.strategy ?? 'minimum-change';
   const baseline = normalizeForecastRanges(model);
   const optimized = structuredClone(baseline);
+  const evaluateAllConstraints = (candidate: ForecastModel) => [
+    ...evaluateConstraints(candidate),
+    ...finalYearSalesAllocationConstraints(candidate),
+  ];
   const parameters = orderForecastSeriesByPl(optimized.series).filter((series) => series.scope !== 'company' && series.changePolicy !== 'fixed').flatMap((series) => series.periods.map((period) => {
     const configured = period.range ?? defaultForecastRange(series.projectionMode);
     const preferredSeries = options.preferredModel?.series.find((candidate) => candidate.id === series.id);
@@ -611,7 +639,7 @@ export function createConstrainedOptimizationProposal(model: ForecastModel, eval
   }));
   const score = (candidate: ForecastModel): ConstraintScore => {
     if (!satisfiesForecastDomain(candidate)) return { unavailableCount: Number.MAX_SAFE_INTEGER, feasible: false, maxViolation: Number.POSITIVE_INFINITY, totalViolation: Number.POSITIVE_INFINITY, cost: Number.POSITIVE_INFINITY };
-    const diagnostics = constraintDiagnostics(evaluateConstraints(candidate));
+    const diagnostics = constraintDiagnostics(evaluateAllConstraints(candidate));
     const unavailableCount = diagnostics.filter((metric) => metric.status === 'unavailable').length;
     const violations = diagnostics.filter((metric) => metric.status === 'unmet').map((metric) => metric.gap! / Math.max(1, Math.abs(metric.target)));
     return {
@@ -624,7 +652,7 @@ export function createConstrainedOptimizationProposal(model: ForecastModel, eval
   };
   const initialScore = score(optimized);
   const finalScore = constrainedStrategies[strategy]({ model: optimized, parameters, evaluate: score, score: initialScore, iterations: options.iterations ?? 40, initialStep: options.initialStep ?? 2, minimumStep: options.minimumStep ?? .01 });
-  const metricDiagnostics = constraintDiagnostics(evaluateConstraints(optimized));
+  const metricDiagnostics = constraintDiagnostics(evaluateAllConstraints(optimized));
   const feasibility = metricDiagnostics.some((metric) => metric.status === 'unavailable')
     ? 'unavailable' as const
     : metricDiagnostics.some((metric) => metric.status === 'unmet')
@@ -639,7 +667,7 @@ export function createConstrainedOptimizationProposal(model: ForecastModel, eval
     changes: proposalChanges(baseline, optimized),
     feasibility,
     metricDiagnostics,
-    boundDiagnostics: boundDiagnostics(baseline, optimized, metricDiagnostics, evaluateConstraints, parameters),
+    boundDiagnostics: boundDiagnostics(baseline, optimized, metricDiagnostics, evaluateAllConstraints, parameters),
   };
   if (options.includeExpansionPlan !== false) proposal.expansionPlan = createOptimizationExpansionPlan(baseline, proposal, evaluateConstraints, options);
   return proposal;
@@ -675,25 +703,25 @@ export function buildOptimizationTimelines(model: ForecastModel, baseActuals: Hi
   return { company, base, subsidy };
 }
 
-function metricConstraintEvaluator(program: ProgramConfiguration, baseActuals: HistoricalPlInput[], subsidyActuals: HistoricalPlInput[], actualInputs: Record<string, number>) {
+function metricConstraintEvaluator(program: ProgramConfiguration, baseActuals: HistoricalPlInput[], subsidyActuals: HistoricalPlInput[], actualInputs: Record<string, number>, metricTargets: Record<string, number>) {
   return (candidate: ForecastModel): OptimizationConstraintMeasurement[] => {
     const timelines = buildOptimizationTimelines(candidate, baseActuals, subsidyActuals);
     return program.definitions.managementMetrics.filter((metric) => metric.enabled && metric.optimization === 'adjustable').map((metric) => {
       const selected = metric.scope === 'company' ? timelines.company : metric.scope === 'base' ? timelines.base : timelines.subsidy;
       const evaluation = evaluateManagementMetric(metric, program, { records: new Map(selected.years.map((year, index) => [year, selected.records[index]])), actualInputs });
-      return { id: metric.id, label: metric.label, value: Number.isFinite(evaluation.value) ? evaluation.value : undefined, target: metric.target, direction: metric.direction, unit: metric.outputUnit };
+      return { id: metric.id, label: metric.label, value: Number.isFinite(evaluation.value) ? evaluation.value : undefined, target: resolveMetricTarget(metric, metricTargets[metric.id]).effectiveTarget, direction: metric.direction, unit: metric.outputUnit };
     });
   };
 }
 
-export function createMetricOptimizationProposal(model: ForecastModel, program: ProgramConfiguration, baseActuals: HistoricalPlInput[], subsidyActuals: HistoricalPlInput[], actualInputs: Record<string, number>, strategy: OptimizationStrategy = 'minimum-change', options: Omit<Options, 'strategy'> = {}): OptimizationProposal {
-  return createConstrainedOptimizationProposal(model, metricConstraintEvaluator(program, baseActuals, subsidyActuals, actualInputs), { ...options, strategy });
+export function createMetricOptimizationProposal(model: ForecastModel, program: ProgramConfiguration, baseActuals: HistoricalPlInput[], subsidyActuals: HistoricalPlInput[], actualInputs: Record<string, number>, strategy: OptimizationStrategy = 'minimum-change', options: Omit<Options, 'strategy'> = {}, metricTargets: Record<string, number> = {}): OptimizationProposal {
+  return createConstrainedOptimizationProposal(model, metricConstraintEvaluator(program, baseActuals, subsidyActuals, actualInputs, metricTargets), { ...options, strategy });
 }
 
-export function createMetricOptimizationExpansionPlan(model: ForecastModel, initial: OptimizationProposal, program: ProgramConfiguration, baseActuals: HistoricalPlInput[], subsidyActuals: HistoricalPlInput[], actualInputs: Record<string, number>, strategy: OptimizationStrategy = 'minimum-change'): OptimizationExpansionPlan | undefined {
-  return createOptimizationExpansionPlan(model, initial, metricConstraintEvaluator(program, baseActuals, subsidyActuals, actualInputs), { strategy });
+export function createMetricOptimizationExpansionPlan(model: ForecastModel, initial: OptimizationProposal, program: ProgramConfiguration, baseActuals: HistoricalPlInput[], subsidyActuals: HistoricalPlInput[], actualInputs: Record<string, number>, strategy: OptimizationStrategy = 'minimum-change', metricTargets: Record<string, number> = {}): OptimizationExpansionPlan | undefined {
+  return createOptimizationExpansionPlan(model, initial, metricConstraintEvaluator(program, baseActuals, subsidyActuals, actualInputs, metricTargets), { strategy });
 }
 
-export function createMetricOptimizationExpansionPlanAsync(model: ForecastModel, initial: OptimizationProposal, program: ProgramConfiguration, baseActuals: HistoricalPlInput[], subsidyActuals: HistoricalPlInput[], actualInputs: Record<string, number>, strategy: OptimizationStrategy = 'minimum-change'): Promise<OptimizationExpansionPlan | undefined> {
-  return createOptimizationExpansionPlanAsync(model, initial, metricConstraintEvaluator(program, baseActuals, subsidyActuals, actualInputs), { strategy });
+export function createMetricOptimizationExpansionPlanAsync(model: ForecastModel, initial: OptimizationProposal, program: ProgramConfiguration, baseActuals: HistoricalPlInput[], subsidyActuals: HistoricalPlInput[], actualInputs: Record<string, number>, strategy: OptimizationStrategy = 'minimum-change', metricTargets: Record<string, number> = {}): Promise<OptimizationExpansionPlan | undefined> {
+  return createOptimizationExpansionPlanAsync(model, initial, metricConstraintEvaluator(program, baseActuals, subsidyActuals, actualInputs, metricTargets), { strategy });
 }

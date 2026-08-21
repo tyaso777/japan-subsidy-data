@@ -28,6 +28,7 @@ const managementMetricSchema = z.object({
   id: z.string(), label: z.string(), enabled: z.boolean(), scope: z.enum(['company', 'base', 'subsidy']),
   timePoints: z.array(z.object({ id: z.string(), anchor: metricTimeAnchorSchema, offset: z.number().int() })).min(1),
   formula: z.string(), outputUnit: z.string(), target: z.number(), direction: z.enum(['min', 'max']),
+  targetPolicy: z.enum(['reference', 'minimum', 'maximum']).default('reference'),
   optimization: z.enum(['adjustable', 'fixed']), requiresActualInput: z.boolean().optional(),
 });
 

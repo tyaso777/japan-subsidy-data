@@ -10,6 +10,7 @@ export type MetricOptimizationInput = {
   baseActuals: HistoricalPlInput[];
   subsidyActuals: HistoricalPlInput[];
   actualInputs: Record<string, number>;
+  metricTargets: Record<string, number>;
   strategy: OptimizationStrategy;
   rangeMode: OptimizationRangeMode;
 };
@@ -45,13 +46,13 @@ function runInWorker<T>(request: WorkerRequest, fallback: () => T): Promise<T> {
 export function calculateMetricOptimization(input: MetricOptimizationInput) {
   return runInWorker<OptimizationProposal>(
     { kind: 'proposal', ...input },
-    () => createMetricOptimizationProposal(input.model, input.program, input.baseActuals, input.subsidyActuals, input.actualInputs, input.strategy, { includeExpansionPlan: false }),
+    () => createMetricOptimizationProposal(input.model, input.program, input.baseActuals, input.subsidyActuals, input.actualInputs, input.strategy, { includeExpansionPlan: false }, input.metricTargets),
   );
 }
 
 export function calculateMetricOptimizationExpansion(input: MetricOptimizationInput, initial: OptimizationProposal) {
   if (typeof globalThis.Worker === 'undefined') {
-    return createMetricOptimizationExpansionPlanAsync(input.model, initial, input.program, input.baseActuals, input.subsidyActuals, input.actualInputs, input.strategy);
+    return createMetricOptimizationExpansionPlanAsync(input.model, initial, input.program, input.baseActuals, input.subsidyActuals, input.actualInputs, input.strategy, input.metricTargets);
   }
   return runInWorker<OptimizationExpansionPlan | undefined>({ kind: 'expansion', initial, ...input }, () => undefined);
 }

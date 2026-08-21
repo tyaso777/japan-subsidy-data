@@ -1,4 +1,24 @@
-import type { ManagementMetricDefinition, MetricTimeAnchor, ProgramConfiguration } from './types';
+import type { ManagementMetricDefinition, MetricTargetPolicy, MetricTimeAnchor, ProgramConfiguration } from './types';
+
+export type MetricTargetResolution = {
+  programTarget: number;
+  companyTarget?: number;
+  effectiveTarget: number;
+  source: 'program' | 'company';
+  policy: MetricTargetPolicy;
+};
+
+export function resolveMetricTarget(metric: ManagementMetricDefinition, companyTarget?: number): MetricTargetResolution {
+  const policy = metric.targetPolicy ?? 'reference';
+  if (!Number.isFinite(companyTarget)) return { programTarget: metric.target, effectiveTarget: metric.target, source: 'program', policy };
+  const individual = Number(companyTarget);
+  const effectiveTarget = policy === 'minimum'
+    ? Math.max(metric.target, individual)
+    : policy === 'maximum'
+      ? Math.min(metric.target, individual)
+      : individual;
+  return { programTarget: metric.target, companyTarget: individual, effectiveTarget, source: 'company', policy };
+}
 import type { HistoricalPlCalculated } from './types';
 import { evaluateNumericDefinitions } from './definition-graph';
 import { evaluateFormula } from './formula-engine';

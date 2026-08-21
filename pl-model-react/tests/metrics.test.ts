@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createDefaultProgram, setPeriodEndYear } from '../src/domain/timeline';
-import { evaluateManagementMetric, inferMetricPeriodKind, resolveMetricTimePoints, validateMetricDefinition } from '../src/domain/metrics';
+import { evaluateManagementMetric, inferMetricPeriodKind, resolveMetricTarget, resolveMetricTimePoints, validateMetricDefinition } from '../src/domain/metrics';
 import { calculatePlSeries } from '../src/domain/financials';
 import { baseHistoricalPl } from '../src/domain/sample-data';
 import type { ManagementMetricDefinition } from '../src/domain/types';
@@ -12,6 +12,16 @@ const metric = (points: ManagementMetricDefinition['timePoints']): ManagementMet
 });
 
 describe('制度共通の経営指標定義', () => {
+  it('制度目標と個社目標から制度ポリシーに従う実効目標を解決する', () => {
+    const base = metric([]);
+    expect(resolveMetricTarget(base)).toMatchObject({ programTarget: 10, effectiveTarget: 10, source: 'program' });
+    expect(resolveMetricTarget(base, 12)).toMatchObject({ companyTarget: 12, effectiveTarget: 12, source: 'company' });
+    expect(resolveMetricTarget({ ...base, targetPolicy: 'minimum' }, 8).effectiveTarget).toBe(10);
+    expect(resolveMetricTarget({ ...base, targetPolicy: 'minimum' }, 12).effectiveTarget).toBe(12);
+    expect(resolveMetricTarget({ ...base, targetPolicy: 'maximum' }, 12).effectiveTarget).toBe(10);
+    expect(resolveMetricTarget({ ...base, targetPolicy: 'maximum' }, 8).effectiveTarget).toBe(8);
+  });
+
   it('使用時点の個数から1〜4時点以上を自動表示する', () => {
     expect(inferMetricPeriodKind(metric([{ id: 'A', anchor: { type: 'historicalEnd' }, offset: 0 }]))).toBe('1時点指標');
     expect(inferMetricPeriodKind(metric([

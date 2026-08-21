@@ -37,12 +37,13 @@ export function ModelFileMenu() {
   const program = useModelStore((state) => state.program);
   const actuals = useModelStore((state) => state.actuals);
   const forecast = useModelStore((state) => state.forecast);
+  const caseSettings = useModelStore((state) => state.caseSettings);
   const replaceSnapshot = useModelStore((state) => state.replaceSnapshot);
   const inputRef = useRef<HTMLInputElement>(null);
   const handleRef = useRef<ModelFileHandle | null>(null);
   const [fileName, setFileName] = useState<string>();
   const [error, setError] = useState<string>();
-  const json = () => serializeModelFile({ program, actuals, forecast });
+  const json = () => serializeModelFile({ program, actuals, forecast, caseSettings });
 
   const loadFile = async (file: File, handle?: ModelFileHandle) => {
     try {

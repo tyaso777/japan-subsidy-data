@@ -5,6 +5,7 @@ import { financialInputFractionDigits, financialInputStep, formatFinancialValue,
 import { cn } from '../lib/utils';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { NumberInput } from './ui/number-input';
 import type { TimelineYearLabel } from '../domain/timeline';
 
 type Props<T extends object> = {
@@ -74,7 +75,7 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
             }
             const field = row.field;
             return <td className="h-8 border-t border-line px-0.5 py-1 text-right tabular-nums" key={years[index]}>{field && onChange
-              ? <Input className="ml-auto h-6 w-[min(120px,100%)] rounded px-0.5 py-0 text-right text-[10px]" aria-label={`${title} ${years[index]}年 ${row.label}`} type="number" step={financialInputStep(kind, moneyUnit)} value={toDisplayFinancialValue(Number(record[field]), kind, moneyUnit)} onFocus={onEditStart} onBlur={onEditEnd} onChange={(event) => onChange(index, field, fromDisplayFinancialValue(Number(event.target.value), kind, moneyUnit))} />
+              ? <NumberInput className="ml-auto h-6 w-[min(120px,100%)] rounded px-0.5 py-0 text-right text-[10px]" aria-label={`${title} ${years[index]}年 ${row.label}`} step={financialInputStep(kind, moneyUnit)} value={toDisplayFinancialValue(Number(record[field]), kind, moneyUnit)} onEditingStart={onEditStart} onEditingEnd={onEditEnd} onValueChange={(value) => onChange(index, field, fromDisplayFinancialValue(value, kind, moneyUnit))} />
               : formatFinancialValue(field ? Number(record[field]) : 0, kind, moneyUnit)}</td>;
           })}
         </tr>)}</tbody>

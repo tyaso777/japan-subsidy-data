@@ -35,7 +35,6 @@ export type ForecastSeries = {
 
 export type FinalYearSalesAllocation = {
   finalYear: number;
-  companySales: number;
   baseSharePercent: number;
 };
 
@@ -121,31 +120,17 @@ export function fitForecastSeriesPoint(series: ForecastSeries, year: number, tar
 }
 
 export function applyFinalYearSalesAllocation(model: ForecastModel, allocation: FinalYearSalesAllocation): ForecastModel {
-  const companySales = Math.max(0, Number(allocation.companySales));
   const baseSharePercent = Math.max(0, Math.min(100, Number(allocation.baseSharePercent)));
-  const targets = new Map([
-    ['base-sales', companySales * baseSharePercent / 100],
-    ['subsidy-sales', companySales * (100 - baseSharePercent) / 100],
-  ]);
-  const series = model.series.map((candidate) => {
-    const target = targets.get(candidate.id);
-    if (target === undefined) return structuredClone(candidate);
-    const adjustable = { ...candidate, changePolicy: 'adjustable' as const };
-    return { ...fitForecastSeriesPoint(adjustable, allocation.finalYear, target), changePolicy: 'fixed' as const };
-  });
   return {
     ...model,
-    series,
-    finalYearSalesAllocation: { finalYear: allocation.finalYear, companySales, baseSharePercent },
+    series: structuredClone(model.series),
+    finalYearSalesAllocation: { finalYear: allocation.finalYear, baseSharePercent },
   };
 }
 
 export function clearFinalYearSalesAllocation(model: ForecastModel): ForecastModel {
   const result = structuredClone(model);
   delete result.finalYearSalesAllocation;
-  result.series = result.series.map((series) => series.id === 'base-sales' || series.id === 'subsidy-sales'
-    ? { ...series, changePolicy: 'adjustable' }
-    : series);
   return result;
 }
 

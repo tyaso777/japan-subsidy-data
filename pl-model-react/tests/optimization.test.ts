@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { applyOptimizationExpansionPlan, applyOptimizationStrength, createConstrainedOptimizationProposal, createMetricOptimizationExpansionPlan, createMetricOptimizationProposal, createOptimizationExpansionPlan, createOptimizationProposal } from '../src/domain/optimization';
+import { applyOptimizationExpansionPlan, applyOptimizationStrength, buildOptimizationTimelines, createConstrainedOptimizationProposal, createMetricOptimizationExpansionPlan, createMetricOptimizationProposal, createOptimizationExpansionPlan, createOptimizationProposal } from '../src/domain/optimization';
 import { projectForecastSeries, type ForecastModel } from '../src/domain/forecast-engine';
+import { baseHistoricalPl, subsidyHistoricalPl } from '../src/domain/sample-data';
 import { createModelStore } from '../src/store/model-store';
 
 const model = (): ForecastModel => ({
@@ -223,6 +224,21 @@ describe('目標最適化提案', () => {
     expect(Math.abs(widerRate - narrowerRate), `Min=-10: ${widerRate}, Min=-9: ${narrowerRate}`).toBeLessThan(2);
   }, 30_000);
 
+  it('個社目標がある指標は制度目標ではなく実効目標を制約に使う', () => {
+    const state = createModelStore().getState();
+    const proposal = createMetricOptimizationProposal(
+      state.forecast,
+      state.program,
+      state.actuals.basePl,
+      state.actuals.subsidyPl,
+      state.actuals.metricInputs,
+      'minimum-change',
+      { iterations: 1, includeExpansionPlan: false },
+      { 'company-sales-growth': 42 },
+    );
+    expect(proposal.metricDiagnostics.find((metric) => metric.id === 'company-sales-growth')?.target).toBe(42);
+  });
+
   it('デフォルト案件は過去実績で範囲適正化後も、拡張範囲から目標達成案を作れる', () => {
     const store = createModelStore();
     store.getState().optimizeForecastRangesFromActuals();
@@ -283,6 +299,37 @@ describe('目標最適化提案', () => {
     expect(applyOptimizationStrength(proposal, 0).series[0].periods[0].annualGrowthRate).toBe(baseRate);
     expect(applyOptimizationStrength(proposal, 50).series[0].periods[0].annualGrowthRate).toBeCloseTo((baseRate + targetRate) / 2);
     expect(applyOptimizationStrength(proposal, 100)).toEqual(proposal.optimized);
+  });
+
+  it('配分率は現在PLを変えず、最適化結果と適用率に応じて段階反映する', () => {
+    const original: ForecastModel = {
+      segments: [{ id: 'A', definitionId: 'plan', startYear: 2026, endYear: 2028 }],
+      finalYearSalesAllocation: { finalYear: 2028, baseSharePercent: 60 },
+      series: [
+        { id: 'base-sales', label: '売上高', scope: 'base', valueKind: 'money', projectionMode: 'compound', baseYear: 2025, baseValue: 500, periods: [{ id: 'A', startYear: 2026, endYear: 2028, annualGrowthRate: 5, startAdjustment: 0, range: { min: -10, max: 50 } }] },
+        { id: 'subsidy-sales', label: '売上高', scope: 'subsidy', valueKind: 'money', projectionMode: 'compound', baseYear: 2025, baseValue: 100, periods: [{ id: 'A', startYear: 2026, endYear: 2028, annualGrowthRate: 5, startAdjustment: 0, range: { min: -10, max: 50 } }] },
+      ],
+    };
+    const proposal = createConstrainedOptimizationProposal(original, (candidate) => [{
+      id: 'total-sales', label: '全社売上高',
+      value: candidate.series.reduce((sum, series) => sum + projectForecastSeries(series).at(-1)!.value, 0),
+      target: 800, direction: 'min', unit: '百万円',
+    }], { iterations: 60, initialStep: 4, includeExpansionPlan: false });
+    const totals: number[] = [];
+    const shares: number[] = [];
+
+    for (const strength of [0, 50, 100]) {
+      const timelines = buildOptimizationTimelines(applyOptimizationStrength(proposal, strength), baseHistoricalPl, subsidyHistoricalPl);
+      const baseSales = timelines.base.records.at(-1)!.sales;
+      const subsidySales = timelines.subsidy.records.at(-1)!.sales;
+      totals.push(baseSales + subsidySales);
+      shares.push(baseSales / (baseSales + subsidySales) * 100);
+    }
+    expect(shares[0]).toBeCloseTo(500 / 600 * 100, 8);
+    expect(shares[1]).toBeLessThan(shares[0]);
+    expect(shares[1]).toBeGreaterThan(60);
+    expect(shares[2]).toBeCloseTo(60, 1);
+    expect(totals[2]).toBeGreaterThan(totals[0]);
   });
 
   it('目標達成度が同じなら最適化開始時からの変更量が小さい案を選ぶ', () => {

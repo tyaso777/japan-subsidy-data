@@ -4,7 +4,7 @@ import { calculatePl } from '../src/domain/financials';
 import { baseHistoricalPl } from '../src/domain/sample-data';
 
 describe('将来予測計算サービス', () => {
-  it('最終年度の全社売上高を事業別配分へ合わせ、売上高を最適化対象外として固定できる', () => {
+  it('最終年度配分率は最適化条件として保存し、設定時点のPLは変更しない', () => {
     const sales = (scope: 'base' | 'subsidy', baseValue: number): ForecastSeries => ({
       id: `${scope}-sales`, label: '売上高', scope, valueKind: 'money', projectionMode: 'compound',
       baseYear: 2025, baseValue,
@@ -12,19 +12,25 @@ describe('将来予測計算サービス', () => {
     });
     const model: ForecastModel = { series: [sales('base', 500), sales('subsidy', 100)] };
 
-    const allocated = applyFinalYearSalesAllocation(model, { finalYear: 2028, companySales: 1_000, baseSharePercent: 60 });
-    expect(projectForecastSeries(allocated.series[0]).at(-1)?.value).toBeCloseTo(600, 6);
-    expect(projectForecastSeries(allocated.series[1]).at(-1)?.value).toBeCloseTo(400, 6);
-    expect(allocated.series.map((series) => series.changePolicy)).toEqual(['fixed', 'fixed']);
-    expect(allocated.finalYearSalesAllocation).toEqual({ finalYear: 2028, companySales: 1_000, baseSharePercent: 60 });
+    const allocated = applyFinalYearSalesAllocation(model, { finalYear: 2028, baseSharePercent: 60 });
+    expect(projectForecastSeries(allocated.series[0]).at(-1)?.value).toBeCloseTo(578.8125, 6);
+    expect(projectForecastSeries(allocated.series[1]).at(-1)?.value).toBeCloseTo(115.7625, 6);
+    expect(allocated.series.map((series) => series.changePolicy)).toEqual([undefined, undefined]);
+    expect(allocated.finalYearSalesAllocation).toEqual({ finalYear: 2028, baseSharePercent: 60 });
+
+    const baseFinal = buildForecastPl(allocated, 'base', { ...baseHistoricalPl.at(-1)!, sales: 500 }).at(-1)!.input.sales;
+    const subsidyFinal = buildForecastPl(allocated, 'subsidy', { ...baseHistoricalPl.at(-1)!, sales: 100 }).at(-1)!.input.sales;
+    expect(baseFinal).toBeCloseTo(578.8125, 6);
+    expect(subsidyFinal).toBeCloseTo(115.7625, 6);
+    expect(baseFinal / (baseFinal + subsidyFinal) * 100).toBeCloseTo(500 / 600 * 100, 8);
 
     const cleared = clearFinalYearSalesAllocation(allocated);
     expect(cleared.finalYearSalesAllocation).toBeUndefined();
-    expect(cleared.series.map((series) => series.changePolicy)).toEqual(['adjustable', 'adjustable']);
+    expect(cleared.series.map((series) => series.changePolicy)).toEqual([undefined, undefined]);
 
     const rescheduled = synchronizeForecastTimeline(allocated, [{ definitionId: 'report', startYear: 2026, endYear: 2029 }]);
     expect(rescheduled.finalYearSalesAllocation).toBeUndefined();
-    expect(rescheduled.series.map((series) => series.changePolicy)).toEqual(['adjustable', 'adjustable']);
+    expect(rescheduled.series.map((series) => series.changePolicy)).toEqual([undefined, undefined]);
   });
   it('期間開始時増減と期間別成長率をUIなしで計算する', () => {
     const result = projectSeries(2025, 100, [

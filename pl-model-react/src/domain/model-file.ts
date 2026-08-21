@@ -35,9 +35,10 @@ const snapshotSchema = z.object({
     segments: z.array(z.object({ id: z.string(), definitionId: z.string(), startYear: z.number().int(), endYear: z.number().int() })).optional(),
     series: z.array(forecastSeriesSchema),
     finalYearSalesAllocation: z.object({
-      finalYear: z.number().int(), companySales: z.number().nonnegative(), baseSharePercent: z.number().min(0).max(100),
+      finalYear: z.number().int(), baseSharePercent: z.number().min(0).max(100),
     }).optional(),
   }),
+  caseSettings: z.object({ metricTargets: z.record(z.string(), z.number()).default({}) }).default({ metricTargets: {} }),
 });
 
 const modelFileSchema = z.object({ fileVersion: z.literal('1'), model: snapshotSchema });

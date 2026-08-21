@@ -33,6 +33,7 @@ export type MetricTimeAnchor =
   | { type: 'periodStart' | 'periodEnd'; periodId: string };
 
 export type MetricTimePoint = { id: string; anchor: MetricTimeAnchor; offset: number };
+export type MetricTargetPolicy = 'reference' | 'minimum' | 'maximum';
 
 export type ManagementMetricDefinition = {
   id: string;
@@ -43,6 +44,7 @@ export type ManagementMetricDefinition = {
   formula: string;
   outputUnit: string;
   target: number;
+  targetPolicy?: MetricTargetPolicy;
   direction: 'min' | 'max';
   optimization: 'adjustable' | 'fixed';
   requiresActualInput?: boolean;
