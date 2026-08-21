@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
@@ -143,6 +143,55 @@ describe('期間・過去実績', () => {
     expect(sales).toHaveValue(1234);
     await user.keyboard('{Control>}z{/Control}');
     expect(sales).toHaveValue(900);
+  });
+
+  it('Excelの複数セルを一括貼り付けし、一度のUndoで全件を戻す', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const cash2023 = screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額');
+
+    await user.click(cash2023);
+    fireEvent.paste(cash2023, { clipboardData: { getData: () => '111\t222\n333\t444' } });
+
+    expect(cash2023).toHaveValue(111);
+    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2024年 資産総額')).toHaveValue(222);
+    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 うち流動資産')).toHaveValue(333);
+    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2024年 うち流動資産')).toHaveValue(444);
+    expect(within(screen.getByTestId('historical-bs')).getByText('4件を貼り付けました')).toBeInTheDocument();
+
+    await user.keyboard('{Control>}z{/Control}');
+    expect(cash2023).toHaveValue(1050);
+    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2024年 資産総額')).toHaveValue(1115);
+    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 うち流動資産')).toHaveValue(555);
+    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2024年 うち流動資産')).toHaveValue(599);
+  });
+
+  it('Shiftで選択した範囲をExcel向けTSVとしてコピーする', () => {
+    render(<App />);
+    const cash2023 = screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額');
+    const receivable2024 = screen.getByLabelText('全社 B/S（1-1～1-25） 2024年 うち流動資産');
+    fireEvent.click(cash2023);
+    fireEvent.click(receivable2024, { shiftKey: true });
+    let copied = '';
+
+    fireEvent.copy(receivable2024, { clipboardData: { setData: (_type: string, value: string) => { copied = value; } } });
+
+    expect(copied).toBe('1050\t1115\n555\t599');
+  });
+
+  it('過去P/Lでは空欄を維持し、自動計算行を飛ばして入力行だけ更新する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const sales2023 = screen.getByLabelText('ベース事業 P/L 2023年 売上高');
+
+    await user.click(sales2023);
+    fireEvent.paste(sales2023, { clipboardData: { getData: () => '1,100\t\n5%\t5\n660\t690' } });
+
+    expect(sales2023).toHaveValue(1100);
+    expect(screen.getByLabelText('ベース事業 P/L 2024年 売上高')).toHaveValue(950);
+    expect(screen.getByLabelText('ベース事業 P/L 2023年 売上原価')).toHaveValue(660);
+    expect(screen.getByLabelText('ベース事業 P/L 2024年 売上原価')).toHaveValue(690);
+    expect(within(screen.getByTestId('historical-pl-base')).getByText('3件を貼り付けました（2件は入力対象外）')).toBeInTheDocument();
   });
 
   it('過去B/S・P/L入力後に水準範囲を適正化し、将来予測へ反映する', async () => {

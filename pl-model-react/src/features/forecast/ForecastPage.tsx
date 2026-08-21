@@ -1,7 +1,7 @@
 ﻿import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { BarChart3, ChevronDown, SlidersHorizontal, Table2 } from 'lucide-react';
 import type { CSSProperties, RefObject } from 'react';
-import { FinancialTable } from '../../components/FinancialTable';
+import { FinancialTable, type FinancialTableValueUpdate } from '../../components/FinancialTable';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { NumberInput } from '../../components/ui/number-input';
@@ -29,6 +29,7 @@ const scopeLabels: Record<Scope, string> = { company: '全社合算', base: 'ベ
 const chartDisplayLabels: Record<ChartDisplay, string> = { ...scopeLabels, comparison: '事業比較' };
 const chartDisplayOrder: ChartDisplay[] = ['company', 'base', 'subsidy', 'comparison'];
 const colors = ['#183b56', '#167d78', '#c75b24', '#7c5c8e', '#9a7222'];
+const calculatedPlFields: Record<string, keyof HistoricalPlCalculated> = { '2': 'salesGrowthRate', '5': 'grossProfit', '6': 'grossProfitMargin', '7': 'sga', '8': 'officerPay', '11': 'employeePay', '16': 'operatingProfit', '17': 'operatingProfitMargin', '18': 'ordinaryIncome', '19': 'preTaxIncome', '23': 'depreciation', '24': 'valueAdded', '25': 'valueAddedGrowthRate', '29': 'employeePayPerPerson', '33': 'laborProductivity', '34': 'ebitda', '35': 'ebitdaMargin' };
 
 const MIN_SETTINGS_PERIOD_WIDTH = 220;
 
@@ -271,6 +272,19 @@ export function ForecastPage() {
     clearFinalYearSalesAllocation();
   };
   const selected = scope === 'base' ? base : scope === 'subsidy' ? subsidy : company;
+  const applyForecastPlValues = (updates: FinancialTableValueUpdate<HistoricalPlCalculated>[]) => {
+    if (scope === 'company') return;
+    let nextModel = model;
+    for (const { yearIndex, row, value } of updates) {
+      const field = (row.field as keyof HistoricalPlCalculated | undefined) ?? calculatedPlFields[row.code];
+      const year = selected.years[yearIndex];
+      if (!field || year === undefined) continue;
+      nextModel = scope === 'subsidy'
+        ? fitForecastPlCell(nextModel, 'subsidy', subsidyActuals.at(-1)!, year, field, value)
+        : fitForecastPlCell(nextModel, 'base', baseActuals.at(-1)!, year, field, value);
+    }
+    replaceForecast(nextModel);
+  };
   const settingsScope = scope === 'subsidy' ? 'subsidy' : 'base';
   const settings = orderForecastSeriesByPl(model.series.filter((series) => series.scope === settingsScope));
   const segments = model.segments ?? program.timeline.periods.map((period) => ({ id: period.definitionId, definitionId: period.definitionId, startYear: period.startYear, endYear: period.endYear }));
@@ -393,19 +407,7 @@ export function ForecastPage() {
               </>}
             </div>
           </TabsContent>
-          <TabsContent value="table"><FinancialTable testId="forecast-pl-table" title={`${scopeLabels[scope]} P/L`} years={selected.years} yearLabels={yearLabels} records={selected.records} rows={historicalPlRows} moneyUnit={unit} editableFromIndex={baseActuals.length} onRowSelect={(row) => setSelectedLogicCode(row.code)} onEditStart={beginTransaction} onEditEnd={commitTransaction} onValueChange={scope === 'company' ? undefined : (yearIndex, row, target) => {
-            const calculatedFields: Record<string, keyof HistoricalPlCalculated> = { '2': 'salesGrowthRate', '5': 'grossProfit', '6': 'grossProfitMargin', '7': 'sga', '8': 'officerPay', '11': 'employeePay', '16': 'operatingProfit', '17': 'operatingProfitMargin', '18': 'ordinaryIncome', '19': 'preTaxIncome', '23': 'depreciation', '24': 'valueAdded', '25': 'valueAddedGrowthRate', '29': 'employeePayPerPerson', '33': 'laborProductivity', '34': 'ebitda', '35': 'ebitdaMargin' };
-            const field = (row.field as keyof HistoricalPlCalculated | undefined) ?? calculatedFields[row.code];
-            if (!field) return;
-            const year = selected.years[yearIndex];
-            if (scope === 'subsidy') replaceForecast(fitForecastPlCell(model, 'subsidy', subsidyActuals.at(-1)!, year, field, target));
-            else if (scope === 'base') replaceForecast(fitForecastPlCell(model, 'base', baseActuals.at(-1)!, year, field, target));
-            else {
-              const currentCompany = Number(company.records[yearIndex][field]);
-              const currentBase = Number(base.records[yearIndex][field]);
-              replaceForecast(fitForecastPlCell(model, 'base', baseActuals.at(-1)!, year, field, currentBase + target - currentCompany));
-            }
-          }} /></TabsContent>
+          <TabsContent value="table"><FinancialTable testId="forecast-pl-table" title={`${scopeLabels[scope]} P/L`} years={selected.years} yearLabels={yearLabels} records={selected.records} rows={historicalPlRows} moneyUnit={unit} editableFromIndex={baseActuals.length} onRowSelect={(row) => setSelectedLogicCode(row.code)} onEditStart={beginTransaction} onEditEnd={commitTransaction} onValueChange={scope === 'company' ? undefined : (yearIndex, row, value) => applyForecastPlValues([{ yearIndex, row, value }])} onValuesChange={scope === 'company' ? undefined : applyForecastPlValues} /></TabsContent>
       </section>
       <MetricsPanel company={company} base={base} subsidy={subsidy} optimization={optimization} />
     </div>

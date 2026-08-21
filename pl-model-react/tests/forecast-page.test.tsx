@@ -542,6 +542,25 @@ describe('将来予測・PL画面', () => {
     expect(profit).toHaveValue(300);
   });
 
+  it('将来PLもExcelの複数セルを一括貼り付けできる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    await user.click(screen.getByRole('tab', { name: 'PL表' }));
+    const sales2026 = screen.getByLabelText('ベース事業 P/L 2026年 売上高');
+
+    await user.click(sales2026);
+    fireEvent.paste(sales2026, { clipboardData: { getData: () => '1100\t1210' } });
+
+    expect(sales2026).toHaveValue(1100);
+    expect(screen.getByLabelText('ベース事業 P/L 2027年 売上高')).toHaveValue(1210);
+    expect(within(screen.getByTestId('forecast-pl-table')).getByText('2件を貼り付けました')).toBeInTheDocument();
+
+    await user.keyboard('{Control>}z{/Control}');
+    expect(sales2026).toHaveValue(1080);
+    expect(screen.getByLabelText('ベース事業 P/L 2027年 売上高')).toHaveValue(1166.4);
+  });
+
   it('科目列を抑えて決算数値列へ表示幅を配分する', async () => {
     const user = userEvent.setup();
     render(<App />);
