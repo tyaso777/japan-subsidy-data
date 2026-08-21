@@ -258,6 +258,27 @@ describe('将来予測・PL画面', () => {
     expect(adjustment).toHaveValue(0);
   });
 
+  it('変動設定内で開始時固定値と開始時増減を併用できる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    const fixed = screen.getByLabelText('補助事業期間 売上高 開始時固定値');
+    const adjustment = screen.getByLabelText('補助事業期間 売上高 開始時増減');
+
+    expect(fixed).toHaveValue(null);
+    await user.type(fixed, '1200');
+    await user.tab();
+    await user.clear(adjustment);
+    await user.type(adjustment, '50');
+    await user.tab();
+    expect(fixed).toHaveValue(1200);
+    expect(adjustment).toHaveValue(50);
+
+    await user.clear(fixed);
+    await user.tab();
+    expect(fixed).toHaveValue(null);
+  });
+
   it('水準設定の率と範囲は内部精度を保ったまま小数点以下2桁で表示する', async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -579,6 +600,21 @@ describe('将来予測・PL画面', () => {
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
 
     expect(screen.getByLabelText('ベース事業 P/L 2028年 売上高')).toHaveValue(1259.7);
+  });
+
+  it('将来PLでS番号の補足指標を独立して表示・非表示にできる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    await user.click(screen.getByRole('tab', { name: 'PL表' }));
+    const table = screen.getByTestId('forecast-pl-table');
+
+    expect(within(table).getByText('原価率')).toBeInTheDocument();
+    expect(within(table).getByText('実効税率')).toBeInTheDocument();
+    await user.click(within(table).getByRole('button', { name: '補足指標を隠す' }));
+    expect(within(table).queryByText('原価率')).not.toBeInTheDocument();
+    await user.click(within(table).getByRole('button', { name: '補足指標を表示' }));
+    expect(within(table).getByText('原価率')).toBeInTheDocument();
   });
 
   it('将来チャートは閲覧専用で、点をドラッグまたはキー操作できない', async () => {

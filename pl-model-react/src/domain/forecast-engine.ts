@@ -5,6 +5,8 @@ export type ForecastPeriod = {
   startYear: number;
   endYear: number;
   annualGrowthRate: number;
+  /** null/省略時は前年から通常計算し、指定時は期間初年度の計算起点をこの値へ置換する。 */
+  startValue?: number | null;
   startAdjustment: number;
   range?: { min: number; max: number };
   layers?: ForecastEffectLayers;
@@ -55,7 +57,7 @@ export function projectSeries(baseYear: number, baseValue: number, periods: Fore
     if (period.endYear < period.startYear) throw new Error(`期間 ${period.id} の終了年が開始年より前です`);
     for (let year = period.startYear; year <= period.endYear; year += 1) {
       value *= 1 + period.annualGrowthRate / 100;
-      if (year === period.startYear) value += period.startAdjustment;
+      if (year === period.startYear) value = (period.startValue ?? value) + period.startAdjustment;
       points.push({ year, value, periodId: period.id });
     }
   }
@@ -65,11 +67,11 @@ export function projectSeries(baseYear: number, baseValue: number, periods: Fore
 export function projectForecastSeries(series: ForecastSeries): ForecastPoint[] {
   const points: ForecastPoint[] = [{ year: series.baseYear, value: series.baseValue }];
   let value = series.baseValue;
-  const lineages = new Map<string, { origin: number; startYear: number; startAdjustment: number }>();
+  const lineages = new Map<string, { origin: number; startYear: number; startValue: number | null; startAdjustment: number }>();
   for (const period of series.periods) {
     if (period.endYear < period.startYear) throw new Error(`期間 ${period.id} の終了年が開始年より前です`);
     const lineageKey = period.lineageId ?? period.id;
-    const lineage = lineages.get(lineageKey) ?? { origin: value, startYear: period.startYear, startAdjustment: period.startAdjustment };
+    const lineage = lineages.get(lineageKey) ?? { origin: value, startYear: period.startYear, startValue: period.startValue ?? null, startAdjustment: period.startAdjustment };
     lineages.set(lineageKey, lineage);
     const origin = lineage.origin;
     const layers = period.layers ?? { fixedAnnualIncrement: 0, steps: {}, spots: {}, acceleration: 0 };
@@ -78,14 +80,21 @@ export function projectForecastSeries(series: ForecastSeries): ForecastPoint[] {
       const step = Object.entries(layers.steps).reduce((sum, [stepYear, amount]) => Number(stepYear) <= year ? sum + amount : sum, 0);
       const spot = layers.spots[year] ?? 0;
       if (series.projectionMode === 'linear') {
-        value = origin + period.annualGrowthRate * elapsed + lineage.startAdjustment + layers.acceleration * elapsed * (elapsed + 1) / 2 + layers.fixedAnnualIncrement * elapsed + step + spot;
+        const start = lineage.startValue ?? origin + period.annualGrowthRate;
+        value = start + lineage.startAdjustment + period.annualGrowthRate * (elapsed - 1) + layers.acceleration * elapsed * (elapsed + 1) / 2 + layers.fixedAnnualIncrement * elapsed + step + spot;
       } else {
         const baseRate = period.annualGrowthRate / 100;
-        const baseline = origin * (1 + baseRate) ** elapsed;
-        let accelerated = origin;
-        for (let cursor = 1; cursor <= elapsed; cursor += 1) accelerated *= 1 + baseRate + layers.acceleration * cursor / 100;
-        const compoundedStartAdjustment = lineage.startAdjustment * (1 + baseRate) ** Math.max(0, elapsed - 1);
-        value = baseline + (accelerated - baseline) + compoundedStartAdjustment + layers.fixedAnnualIncrement * elapsed + step + spot;
+        if (lineage.startValue === null) {
+          const baseline = origin * (1 + baseRate) ** elapsed;
+          let accelerated = origin;
+          for (let cursor = 1; cursor <= elapsed; cursor += 1) accelerated *= 1 + baseRate + layers.acceleration * cursor / 100;
+          const compoundedStartAdjustment = lineage.startAdjustment * (1 + baseRate) ** Math.max(0, elapsed - 1);
+          value = baseline + (accelerated - baseline) + compoundedStartAdjustment + layers.fixedAnnualIncrement * elapsed + step + spot;
+        } else {
+          let compounded = lineage.startValue + lineage.startAdjustment;
+          for (let cursor = 2; cursor <= elapsed; cursor += 1) compounded *= 1 + baseRate + layers.acceleration * cursor / 100;
+          value = compounded + layers.fixedAnnualIncrement * elapsed + step + spot;
+        }
       }
       points.push({ year, value, periodId: period.id });
     }
@@ -155,9 +164,27 @@ export function fitForecastPlCell(model: ForecastModel, scope: 'base' | 'subsidy
   const result = structuredClone(model);
   const series = result.series.find((candidate) => candidate.id === `${scope}-${driver}`);
   const period = series?.periods.find((candidate) => year >= candidate.startYear && year <= candidate.endYear);
-  if (!series || !period || series.changePolicy === 'fixed') return result;
+  if (!series || !period) return result;
   period.lineageId = undefined;
   const evaluate = () => Number(buildForecastPl(result, scope, latest).find((row) => row.year === year)?.calculated[field]);
+  if (series.changePolicy === 'fixed') {
+    if (period.startValue === null || period.startValue === undefined) {
+      period.startValue = projectForecastSeries(series).find((point) => point.year === period.startYear)?.value ?? series.baseValue;
+    }
+    for (let iteration = 0; iteration < 36; iteration += 1) {
+      const current = evaluate();
+      const error = target - current;
+      if (Math.abs(error) <= Math.max(1e-5, Math.abs(target) * 1e-10)) break;
+      const before: number = period.startValue;
+      const epsilon = Math.max(1e-6, Math.abs(before) * 1e-6);
+      period.startValue = before + epsilon;
+      const derivative = (evaluate() - current) / epsilon;
+      period.startValue = before;
+      if (!Number.isFinite(derivative) || Math.abs(derivative) < 1e-12) break;
+      period.startValue = before + error / derivative;
+    }
+    return result;
+  }
   const improve = (parameter: 'annualGrowthRate' | 'startAdjustment', epsilon: number) => {
     for (let iteration = 0; iteration < 36; iteration += 1) {
       const current = evaluate();
@@ -202,7 +229,7 @@ export function splitForecastSegment(model: ForecastModel, splitYear: number): F
         const lineageId = period.lineageId ?? period.id;
         return [
           { ...period, lineageId, endYear: splitYear - 1 },
-          { ...period, id: nextId, lineageId, startYear: splitYear, startAdjustment: 0 },
+          { ...period, id: nextId, lineageId, startYear: splitYear, startValue: null, startAdjustment: 0 },
         ];
       }),
     })),
@@ -250,8 +277,8 @@ export function synchronizeForecastTimeline(model: ForecastModel, timeline: Time
         const containingSegment = oldSegments.find((old) => old.definitionId === segment.definitionId && segment.startYear >= old.startYear && segment.startYear <= old.endYear);
         const inherited = exact ?? series.periods.find((period) => period.id === containingSegment?.id) ?? series.periods[index - 1] ?? series.periods.at(-1);
         return inherited
-          ? { ...inherited, id: segment.id, startYear: segment.startYear, endYear: segment.endYear, startAdjustment: exact ? inherited.startAdjustment : 0 }
-          : { id: segment.id, startYear: segment.startYear, endYear: segment.endYear, annualGrowthRate: 0, startAdjustment: 0 };
+          ? { ...inherited, id: segment.id, startYear: segment.startYear, endYear: segment.endYear, startValue: exact ? inherited.startValue ?? null : null, startAdjustment: exact ? inherited.startAdjustment : 0 }
+          : { id: segment.id, startYear: segment.startYear, endYear: segment.endYear, annualGrowthRate: 0, startValue: null, startAdjustment: 0 };
       }),
     })),
   };

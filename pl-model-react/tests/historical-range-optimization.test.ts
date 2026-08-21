@@ -74,4 +74,20 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(optimizedTax.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);
     expect(optimizedTax.periods.every((period) => period.range?.min === 0 && period.range.max === 0)).toBe(true);
   });
+
+  it('補足比率は直近実績を最初の期間の開始時固定値とし、年間変化を0にする', () => {
+    const state = createModelStore().getState();
+    const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
+    const research = result.forecast.series.find((series) => series.id === 'base-researchDevelopmentRate')!;
+    const latest = state.actuals.basePl.at(-1)!;
+
+    expect(research.changePolicy).toBe('fixed');
+    expect(research.periods[0].startValue).toBeCloseTo(latest.researchDevelopment / latest.sales * 100);
+    expect(research.periods.slice(1).every((period) => period.startValue === null)).toBe(true);
+    expect(research.periods.every((period) => period.annualGrowthRate === 0 && period.startAdjustment === 0)).toBe(true);
+    expect(research.periods.every((period) => period.range?.min === 0 && period.range.max === 0)).toBe(true);
+
+    const cogs = result.forecast.series.find((series) => series.id === 'base-cogsRate')!;
+    expect(cogs.changePolicy).toBe('adjustable');
+  });
 });

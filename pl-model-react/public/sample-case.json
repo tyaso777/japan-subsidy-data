@@ -538,7 +538,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -549,7 +550,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             }
           ]
         },
@@ -571,7 +573,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -582,7 +585,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             }
           ]
         },
@@ -604,7 +608,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -615,7 +620,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             }
           ]
         },
@@ -638,7 +644,8 @@
               "range": {
                 "min": -20,
                 "max": 20
-              }
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -649,7 +656,8 @@
               "range": {
                 "min": -20,
                 "max": 20
-              }
+              },
+              "startValue": null
             }
           ]
         },
@@ -659,7 +667,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": 2.5,
           "periods": [
@@ -670,9 +678,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -681,9 +690,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -693,7 +703,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": 1.7000000000000002,
           "periods": [
@@ -704,9 +714,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -715,9 +726,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -727,7 +739,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": 1.7999999999999998,
           "periods": [
@@ -738,9 +750,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -749,9 +762,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -761,7 +775,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": 7.6,
           "periods": [
@@ -769,23 +783,25 @@
               "id": "subsidy",
               "startYear": 2026,
               "endYear": 2028,
-              "annualGrowthRate": -0.5,
+              "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
               "startYear": 2029,
               "endYear": 2031,
-              "annualGrowthRate": -0.5,
+              "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -807,7 +823,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -818,7 +835,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             }
           ]
         },
@@ -828,7 +846,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": 95.07575757575758,
           "periods": [
@@ -839,9 +857,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -850,9 +869,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -862,7 +882,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": 90,
           "periods": [
@@ -873,9 +893,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -884,9 +905,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -896,7 +918,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": -0.6,
           "periods": [
@@ -907,9 +929,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -918,9 +941,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -930,7 +954,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": 0,
           "periods": [
@@ -941,9 +965,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -952,9 +977,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -977,7 +1003,8 @@
               "range": {
                 "min": 0,
                 "max": 0
-              }
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -988,7 +1015,8 @@
               "range": {
                 "min": 0,
                 "max": 0
-              }
+              },
+              "startValue": null
             }
           ]
         },
@@ -1010,7 +1038,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1021,7 +1050,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             }
           ]
         },
@@ -1043,7 +1073,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1054,7 +1085,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             }
           ]
         },
@@ -1076,7 +1108,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1087,7 +1120,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             }
           ]
         },
@@ -1109,7 +1143,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1120,7 +1155,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             }
           ]
         },
@@ -1143,7 +1179,8 @@
               "range": {
                 "min": -20,
                 "max": 20
-              }
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1154,7 +1191,8 @@
               "range": {
                 "min": -20,
                 "max": 20
-              }
+              },
+              "startValue": null
             }
           ]
         },
@@ -1164,7 +1202,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": 4,
           "periods": [
@@ -1175,9 +1213,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1186,9 +1225,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -1198,7 +1238,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": 2,
           "periods": [
@@ -1209,9 +1249,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1220,9 +1261,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -1232,7 +1274,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": 4,
           "periods": [
@@ -1243,9 +1285,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1254,9 +1297,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -1266,7 +1310,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": 8,
           "periods": [
@@ -1274,23 +1318,25 @@
               "id": "subsidy",
               "startYear": 2026,
               "endYear": 2028,
-              "annualGrowthRate": -0.5,
+              "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
               "startYear": 2029,
               "endYear": 2031,
-              "annualGrowthRate": -0.5,
+              "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -1312,7 +1358,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1323,7 +1370,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             }
           ]
         },
@@ -1333,7 +1381,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": 94.44444444444444,
           "periods": [
@@ -1344,9 +1392,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1355,9 +1404,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -1367,7 +1417,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": 88,
           "periods": [
@@ -1378,9 +1428,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1389,9 +1440,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -1401,7 +1453,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": -1,
           "periods": [
@@ -1412,9 +1464,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1423,9 +1476,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -1435,7 +1489,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "adjustable",
+          "changePolicy": "fixed",
           "baseYear": 2025,
           "baseValue": 0,
           "periods": [
@@ -1446,9 +1500,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1457,9 +1512,10 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
-              }
+                "min": 0,
+                "max": 0
+              },
+              "startValue": null
             }
           ]
         },
@@ -1482,7 +1538,8 @@
               "range": {
                 "min": 0,
                 "max": 0
-              }
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1493,7 +1550,8 @@
               "range": {
                 "min": 0,
                 "max": 0
-              }
+              },
+              "startValue": null
             }
           ]
         },
@@ -1515,7 +1573,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             },
             {
               "id": "report",
@@ -1526,7 +1585,8 @@
               "range": {
                 "min": -10,
                 "max": 50
-              }
+              },
+              "startValue": null
             }
           ]
         }

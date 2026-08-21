@@ -43,6 +43,22 @@ describe('将来予測計算サービス', () => {
     });
   });
 
+  it('開始時固定値を通常成長後の値より優先し、開始時増減を加えてから翌年以降を成長させる', () => {
+    const compound = projectForecastSeries({
+      id: 'base-sales', label: '売上高', scope: 'base', valueKind: 'money', projectionMode: 'compound',
+      baseYear: 2025, baseValue: 100,
+      periods: [{ id: 'A', startYear: 2026, endYear: 2027, annualGrowthRate: 10, startValue: 200, startAdjustment: 20 }],
+    });
+    [100, 220, 242].forEach((value, index) => expect(compound[index].value).toBeCloseTo(value));
+
+    const linear = projectForecastSeries({
+      id: 'base-rate', label: '比率', scope: 'base', valueKind: 'percent', projectionMode: 'linear',
+      baseYear: 2025, baseValue: 50,
+      periods: [{ id: 'A', startYear: 2026, endYear: 2027, annualGrowthRate: 2, startValue: 80, startAdjustment: 3 }],
+    });
+    expect(linear.map((point) => point.value)).toEqual([50, 83, 85]);
+  });
+
   it('売上高の開始時増減額は初年度の成長計算後に加算し、翌年度から合計額を成長させる', () => {
     const series: ForecastSeries = {
       id: 'base-sales', label: '売上高', scope: 'base', valueKind: 'money', projectionMode: 'compound',

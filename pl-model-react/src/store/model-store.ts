@@ -47,7 +47,7 @@ type ModelActions = {
   updateMetricActual: (metricId: string, value: number) => void;
   updateMetricTarget: (metricId: string, value: number | null) => void;
   optimizeForecastRangesFromActuals: () => HistoricalRangeOptimizationResult;
-  updateForecastPeriod: (seriesId: string, periodId: string, patch: Partial<Pick<ForecastPeriod, 'annualGrowthRate' | 'startAdjustment' | 'range'>>) => void;
+  updateForecastPeriod: (seriesId: string, periodId: string, patch: Partial<Pick<ForecastPeriod, 'annualGrowthRate' | 'startValue' | 'startAdjustment' | 'range'>>) => void;
   updateForecastLayer: (seriesId: string, periodId: string, patch: Partial<ForecastEffectLayers>) => void;
   updateFinalYearSalesAllocation: (baseSharePercent: number) => void;
   clearFinalYearSalesAllocation: () => void;
@@ -74,7 +74,7 @@ function sameSnapshot(left: ModelSnapshot, right: ModelSnapshot): boolean {
 
 function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInput[], subsidyPl: HistoricalPlInput[]): ForecastModel {
   const baseYear = program.timeline.historical.endYear;
-  const periods = (change: number, projectionMode: 'compound' | 'linear'): ForecastPeriod[] => program.timeline.periods.map((period) => ({ id: period.definitionId, startYear: period.startYear, endYear: period.endYear, annualGrowthRate: change, startAdjustment: 0, range: defaultForecastRange(projectionMode) }));
+  const periods = (change: number, projectionMode: 'compound' | 'linear'): ForecastPeriod[] => program.timeline.periods.map((period) => ({ id: period.definitionId, startYear: period.startYear, endYear: period.endYear, annualGrowthRate: change, startValue: null, startAdjustment: 0, range: defaultForecastRange(projectionMode) }));
   const forScope = (scope: BusinessScope, latest: HistoricalPlInput, growth: { sales: number; headcount: number; pay: number }) => {
     const calculated = calculatePl(latest);
     const compound = (id: string, label: string, valueKind: import('../domain/value-units').ValueKind, baseValue: number, rate: number) => ({ id: `${scope}-${id}`, label, scope, valueKind, projectionMode: 'compound' as const, baseYear, baseValue, periods: periods(rate, 'compound') });
@@ -84,15 +84,15 @@ function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInpu
       compound('headcount', '従業員数（就業時間換算）', 'fte', latest.headcount, growth.headcount),
       compound('payPerPerson', '1人当たり給与', 'moneyPerPerson', calculated.employeePayPerPerson, growth.pay),
       linear('cogsRate', '原価率', latest.sales ? latest.cogs / latest.sales * 100 : 0, -1),
-      linear('cogsDepRate', '原価内減価償却費率', latest.sales ? latest.cogsDepreciation / latest.sales * 100 : 0),
-      linear('sgaDepRate', '販管費内減価償却費率', latest.sales ? latest.sgaDepreciation / latest.sales * 100 : 0),
-      linear('researchDevelopmentRate', '研究開発費の売上高比率', latest.sales ? latest.researchDevelopment / latest.sales * 100 : 0),
-      linear('otherSgaRate', 'その他販管費率', latest.sales ? latest.otherSga / latest.sales * 100 : 0, -.5),
+      linear('cogsDepRate', '原価内減価償却費率', latest.sales ? latest.cogsDepreciation / latest.sales * 100 : 0, 0, 'fixed'),
+      linear('sgaDepRate', '販管費内減価償却費率', latest.sales ? latest.sgaDepreciation / latest.sales * 100 : 0, 0, 'fixed'),
+      linear('researchDevelopmentRate', '研究開発費の売上高比率', latest.sales ? latest.researchDevelopment / latest.sales * 100 : 0, 0, 'fixed'),
+      linear('otherSgaRate', 'その他販管費率', latest.sales ? latest.otherSga / latest.sales * 100 : 0, 0, 'fixed'),
       compound('officerPay', '役員人件費', 'money', calculated.officerPay, 2),
-      linear('employeeSalaryShare', '従業員給与のうち給与割合', calculated.employeePay ? latest.employeeSalary / calculated.employeePay * 100 : 95),
-      linear('officerCompensationShare', '役員給与のうち報酬割合', calculated.officerPay ? latest.officerCompensation / calculated.officerPay * 100 : 90),
-      linear('nonOperatingRate', '営業外損益の売上高比率', latest.sales ? latest.nonOperating / latest.sales * 100 : 0),
-      linear('extraordinaryRate', '特別損益の売上高比率', latest.sales ? latest.extraordinary / latest.sales * 100 : 0),
+      linear('employeeSalaryShare', '従業員給与のうち給与割合', calculated.employeePay ? latest.employeeSalary / calculated.employeePay * 100 : 95, 0, 'fixed'),
+      linear('officerCompensationShare', '役員給与のうち報酬割合', calculated.officerPay ? latest.officerCompensation / calculated.officerPay * 100 : 90, 0, 'fixed'),
+      linear('nonOperatingRate', '営業外損益の売上高比率', latest.sales ? latest.nonOperating / latest.sales * 100 : 0, 0, 'fixed'),
+      linear('extraordinaryRate', '特別損益の売上高比率', latest.sales ? latest.extraordinary / latest.sales * 100 : 0, 0, 'fixed'),
       linear('taxRate', '実効税率', calculated.preTaxIncome > 0 ? Math.max(0, Math.min(100, (1 - latest.netIncome / calculated.preTaxIncome) * 100)) : 30, 0, 'fixed'),
       compound('officerCount', '役員数', 'count', latest.officerCount, 0),
     ];

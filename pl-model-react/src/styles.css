@@ -51,24 +51,7 @@
     gap: 0.25rem;
   }
 
-  .forecast-start-adjustment-group {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 64px;
-    align-items: center;
-    gap: 0.5rem;
-    border-top: 1px dashed var(--color-line);
-    border-left-width: 0;
-    padding-top: 0.25rem;
-    padding-left: 0;
-  }
-
-  .forecast-start-adjustment-group small {
-    text-align: left;
-    font-size: 8px;
-  }
-
-  .forecast-start-adjustment-group input {
+  [data-testid="forecast-start-adjustment-group"] input {
     width: 100%;
-    margin-top: 0;
   }
 }

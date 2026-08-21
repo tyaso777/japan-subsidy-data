@@ -8,6 +8,8 @@ export type FinancialRow<T> = {
   indent?: 1 | 2;
   valueKind?: ValueKind;
   calculated?: boolean;
+  /** P/L本表を補う水準・比率。S番号で表示し、本表とは独立して表示切替する。 */
+  supplementary?: boolean;
   value?: (record: T, index: number, records: T[]) => number | null;
 };
 
@@ -43,26 +45,36 @@ export const historicalPlRows: FinancialRow<HistoricalPlCalculated>[] = [
   { code: '1', label: '売上高', field: 'sales' },
   { code: '2', label: '売上高成長率', valueKind: 'percent', indent: 1, calculated: true, value: (row) => row.salesGrowthRate },
   { code: '3', label: '売上原価', field: 'cogs' },
+  { code: 'S1', label: '原価率', valueKind: 'percent', indent: 1, calculated: true, supplementary: true, value: (row) => row.cogsRate },
   { code: '4', label: 'うち減価償却費（原価）', field: 'cogsDepreciation', indent: 1 },
+  { code: 'S2', label: '原価内減価償却費率', valueKind: 'percent', indent: 2, calculated: true, supplementary: true, value: (row) => row.sales ? row.cogsDepreciation / row.sales * 100 : 0 },
   { code: '5', label: '売上総利益', calculated: true, value: (row) => row.grossProfit },
   { code: '6', label: '売上総利益率', valueKind: 'percent', indent: 1, calculated: true, value: (row) => row.grossProfitMargin },
   { code: '7', label: '販売費及び一般管理費', calculated: true, value: (row) => row.sga },
   { code: '8', label: 'うち役員の人件費', indent: 1, calculated: true, value: (row) => row.officerPay },
   { code: '9', label: 'うち役員報酬', field: 'officerCompensation', indent: 2 },
   { code: '10', label: 'うち役員賞与', field: 'officerBonus', indent: 2 },
+  { code: 'S7', label: '役員給与のうち報酬割合', valueKind: 'percent', indent: 2, calculated: true, supplementary: true, value: (row) => row.officerPay ? row.officerCompensation / row.officerPay * 100 : 0 },
   { code: '11', label: 'うち従業員の人件費', indent: 1, calculated: true, value: (row) => row.employeePay },
   { code: '12', label: 'うち従業員の給与', field: 'employeeSalary', indent: 2 },
   { code: '13', label: 'うち従業員の賞与', field: 'employeeBonus', indent: 2 },
+  { code: 'S6', label: '従業員給与のうち給与割合', valueKind: 'percent', indent: 2, calculated: true, supplementary: true, value: (row) => row.employeePay ? row.employeeSalary / row.employeePay * 100 : 0 },
   { code: '14', label: 'うち減価償却費（販管費）', field: 'sgaDepreciation', indent: 1 },
+  { code: 'S3', label: '販管費内減価償却費率', valueKind: 'percent', indent: 2, calculated: true, supplementary: true, value: (row) => row.sales ? row.sgaDepreciation / row.sales * 100 : 0 },
   { code: '15', label: 'うち研究開発費', field: 'researchDevelopment', indent: 1 },
+  { code: 'S4', label: '研究開発費の売上高比率', valueKind: 'percent', indent: 2, calculated: true, supplementary: true, value: (row) => row.sales ? row.researchDevelopment / row.sales * 100 : 0 },
   { code: '15A', label: 'その他販管費', field: 'otherSga', indent: 1 },
+  { code: 'S5', label: 'その他販管費率', valueKind: 'percent', indent: 2, calculated: true, supplementary: true, value: (row) => row.otherSgaRate },
   { code: '16', label: '営業利益', calculated: true, value: (row) => row.operatingProfit },
   { code: '17', label: '営業利益率', valueKind: 'percent', indent: 1, calculated: true, value: (row) => row.operatingProfitMargin },
   { code: '17A', label: '営業外損益（純額）', field: 'nonOperating', indent: 1 },
+  { code: 'S8', label: '営業外損益の売上高比率', valueKind: 'percent', indent: 2, calculated: true, supplementary: true, value: (row) => row.sales ? row.nonOperating / row.sales * 100 : 0 },
   { code: '18', label: '経常利益', calculated: true, value: (row) => row.ordinaryIncome },
   { code: '18A', label: '特別損益（純額）', field: 'extraordinary', indent: 1 },
+  { code: 'S9', label: '特別損益の売上高比率', valueKind: 'percent', indent: 2, calculated: true, supplementary: true, value: (row) => row.sales ? row.extraordinary / row.sales * 100 : 0 },
   { code: '19', label: '税引前当期純利益', calculated: true, value: (row) => row.preTaxIncome },
   { code: '20', label: '当期純利益', field: 'netIncome' },
+  { code: 'S10', label: '実効税率', valueKind: 'percent', indent: 1, calculated: true, supplementary: true, value: (row) => row.preTaxIncome > 0 ? (1 - row.netIncome / row.preTaxIncome) * 100 : null },
   { code: '23', label: '減価償却費（合計）', calculated: true, value: (row) => row.depreciation },
   { code: '24', label: '付加価値額', calculated: true, value: (row) => row.valueAdded },
   { code: '25', label: '付加価値増加率', valueKind: 'percent', indent: 1, calculated: true, value: (row) => row.valueAddedGrowthRate },

@@ -148,14 +148,17 @@ export function optimizeForecastRangesFromActuals(
     const source = actuals[series.scope as Scope];
     if (series.changePolicy === 'fixed' || driverId(series) === 'taxRate') {
       const latest = source.at(-1);
+      const latestLevel = valuesForDriver(driverId(series), source).at(-1);
       if (driverId(series) === 'taxRate') {
         series.changePolicy = 'fixed';
         series.baseValue = latest && latest.preTaxIncome > 0
           ? Math.max(0, Math.min(100, (1 - latest.netIncome / latest.preTaxIncome) * 100))
           : 30;
       }
-      series.periods.forEach((period) => {
+      if (Number.isFinite(latestLevel)) series.baseValue = latestLevel!;
+      series.periods.forEach((period, index) => {
         period.annualGrowthRate = 0;
+        period.startValue = index === 0 && Number.isFinite(latestLevel) ? latestLevel! : null;
         period.startAdjustment = 0;
         period.range = { min: 0, max: 0 };
         period.layers = { fixedAnnualIncrement: 0, steps: {}, spots: {}, acceleration: 0 };
