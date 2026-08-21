@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/ta
 import { buildForecastPl, fitForecastPlCell, type ForecastSeries } from '../../domain/forecast-engine';
 import { orderForecastSeriesByPl } from '../../domain/forecast-series-order';
 import { calculatePlSeries, combinePlInputs } from '../../domain/financials';
-import { historicalPlRows } from '../../domain/rows';
+import { forecastPlRows } from '../../domain/rows';
 import type { HistoricalPlCalculated, HistoricalPlInput } from '../../domain/types';
 import { formatFinancialValue, fromDisplayFinancialValue, moneyUnitLabel, roundFinancialInputValue, toDisplayFinancialValue, type MoneyDisplayUnit, type ValueKind } from '../../domain/value-units';
 import { cn } from '../../lib/utils';
@@ -29,7 +29,7 @@ const scopeLabels: Record<Scope, string> = { company: '全社合算', base: 'ベ
 const chartDisplayLabels: Record<ChartDisplay, string> = { ...scopeLabels, comparison: '事業比較' };
 const chartDisplayOrder: ChartDisplay[] = ['company', 'base', 'subsidy', 'comparison'];
 const colors = ['#183b56', '#167d78', '#c75b24', '#7c5c8e', '#9a7222'];
-const calculatedPlFields: Record<string, keyof HistoricalPlCalculated> = { '2': 'salesGrowthRate', '5': 'grossProfit', '6': 'grossProfitMargin', '7': 'sga', '8': 'officerPay', '11': 'employeePay', '16': 'operatingProfit', '17': 'operatingProfitMargin', '18': 'ordinaryIncome', '19': 'preTaxIncome', '23': 'depreciation', '24': 'valueAdded', '25': 'valueAddedGrowthRate', '29': 'employeePayPerPerson', '33': 'laborProductivity', '34': 'ebitda', '35': 'ebitdaMargin' };
+const calculatedPlFields: Record<string, keyof HistoricalPlCalculated> = { '2': 'salesGrowthRate', '5': 'grossProfit', '6': 'grossProfitMargin', '7': 'sga', '8': 'officerPay', '11': 'employeePay', '16': 'operatingProfit', '17': 'operatingProfitMargin', '18': 'ordinaryIncome', '19': 'preTaxIncome', '23': 'depreciation', '24': 'valueAdded', '25': 'valueAddedGrowthRate', '29': 'employeePayPerPerson', '30': 'employeePayPerPersonGrowthRate', '33': 'laborProductivity', '34': 'ebitda', '35': 'ebitdaMargin' };
 
 const MIN_SETTINGS_PERIOD_WIDTH = 220;
 
@@ -416,7 +416,7 @@ export function ForecastPage() {
               </>}
             </div>
           </TabsContent>
-          <TabsContent value="table"><FinancialTable testId="forecast-pl-table" title={`${scopeLabels[scope]} P/L`} years={selected.years} yearLabels={yearLabels} records={selected.records} rows={historicalPlRows} moneyUnit={unit} editableFromIndex={baseActuals.length} onRowSelect={(row) => setSelectedLogicCode(row.code)} onEditStart={beginTransaction} onEditEnd={commitTransaction} onValueChange={scope === 'company' ? undefined : (yearIndex, row, value) => applyForecastPlValues([{ yearIndex, row, value }])} onValuesChange={scope === 'company' ? undefined : applyForecastPlValues} /></TabsContent>
+          <TabsContent value="table"><FinancialTable testId="forecast-pl-table" title={`${scopeLabels[scope]} P/L`} years={selected.years} yearLabels={yearLabels} records={selected.records} rows={forecastPlRows} moneyUnit={unit} editableFromIndex={baseActuals.length} onRowSelect={(row) => setSelectedLogicCode(row.code)} onEditStart={beginTransaction} onEditEnd={commitTransaction} onValueChange={scope === 'company' ? undefined : (yearIndex, row, value) => applyForecastPlValues([{ yearIndex, row, value }])} onValuesChange={scope === 'company' ? undefined : applyForecastPlValues} /></TabsContent>
       </section>
       <MetricsPanel company={company} base={base} subsidy={subsidy} optimization={optimization} />
     </div>

@@ -1,4 +1,4 @@
-import { historicalPlRows } from './rows';
+import { forecastPlRows } from './rows';
 
 export type PlLogicNode = {
   code: string;
@@ -38,12 +38,13 @@ const logicByCode: Record<string, Omit<PlLogicNode, 'code' | 'label'>> = {
   '27': { formula: '前年FTE × (1 + FTE成長率)', dependsOn: [], settings: ['従業員数（就業時間換算）'] },
   '28': { formula: '前年役員数 × (1 + 成長率)', dependsOn: [], settings: ['役員数'] },
   '29': { formula: '従業員給与総額 ÷ FTE', dependsOn: ['12', '13', '27'], settings: ['1人当たり給与'] },
+  '30': { formula: '当年1人当たり給与 ÷ 前年1人当たり給与 − 1', dependsOn: ['29'], settings: ['1人当たり給与'] },
   '33': { formula: '付加価値額 ÷ (FTE + 役員数)', dependsOn: ['24', '27', '28'], settings: [] },
   '34': { formula: '営業利益 + 減価償却費', dependsOn: ['16', '23'], settings: [] },
   '35': { formula: 'EBITDA ÷ 売上高', dependsOn: ['34', '1'], settings: [] },
 };
 
-export const plLogicNodes: PlLogicNode[] = historicalPlRows.map((row) => ({
+export const plLogicNodes: PlLogicNode[] = forecastPlRows.map((row) => ({
   code: row.code,
   label: row.label,
   ...(logicByCode[row.code] ?? { formula: '入力値', dependsOn: [], settings: [] }),

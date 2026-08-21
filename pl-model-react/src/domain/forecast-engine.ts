@@ -146,7 +146,7 @@ export function clearFinalYearSalesAllocation(model: ForecastModel): ForecastMod
 const plDriverByField: Partial<Record<keyof HistoricalPlCalculated, string>> = {
   sales: 'sales', salesGrowthRate: 'sales',
   headcount: 'headcount', laborProductivity: 'headcount',
-  employeePayPerPerson: 'payPerPerson', employeePay: 'payPerPerson', employeeSalary: 'payPerPerson', employeeBonus: 'payPerPerson',
+  employeePayPerPerson: 'payPerPerson', employeePayPerPersonGrowthRate: 'payPerPerson', employeePay: 'payPerPerson', employeeSalary: 'payPerPerson', employeeBonus: 'payPerPerson',
   cogs: 'cogsRate', grossProfit: 'cogsRate', grossProfitMargin: 'cogsRate',
   cogsDepreciation: 'cogsDepRate', sgaDepreciation: 'sgaDepRate', depreciation: 'sgaDepRate',
   researchDevelopment: 'researchDevelopmentRate', otherSga: 'otherSgaRate', sga: 'otherSgaRate',

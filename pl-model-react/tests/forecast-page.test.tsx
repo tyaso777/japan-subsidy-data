@@ -613,6 +613,21 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByLabelText('ベース事業 P/L 2028年 売上高')).toHaveValue(1259.7);
   });
 
+  it('従業員給与・賞与の直後に1人当たり給与と成長率を表示する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    await user.click(screen.getByRole('tab', { name: 'PL表' }));
+
+    const table = screen.getByTestId('forecast-pl-table');
+    const labels = within(table).getAllByRole('row').map((row) => row.textContent ?? '');
+    const bonusIndex = labels.findIndex((label) => label.includes('うち従業員の賞与'));
+    expect(labels[bonusIndex + 1]).toContain('1人当たり給与');
+    expect(labels[bonusIndex + 2]).toContain('1人当たり給与成長率');
+    expect(within(table).getByLabelText('ベース事業 P/L 2026年 1人当たり給与')).toBeVisible();
+    expect(within(table).getByLabelText('ベース事業 P/L 2026年 1人当たり給与成長率')).toBeVisible();
+  });
+
   it('将来PLでS番号の補足指標を独立して表示・非表示にできる', async () => {
     const user = userEvent.setup();
     render(<App />);
