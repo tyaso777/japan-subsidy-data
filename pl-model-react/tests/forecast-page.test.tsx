@@ -241,19 +241,23 @@ describe('将来予測・PL画面', () => {
     expect(rate).toHaveValue(-3);
   });
 
-  it('開始時増減を空欄のまま離れた場合は以前の値へ戻さず0として保存する', async () => {
+  it('開始時増減を消した瞬間に0として再計算し、空欄表示はフォーカス中だけ維持する', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    await user.click(screen.getByRole('tab', { name: 'PL表' }));
     const adjustment = screen.getByLabelText('補助事業期間 売上高 開始時増減');
+    const firstYearSales = screen.getByLabelText('ベース事業 P/L 2026年 売上高');
 
     await user.clear(adjustment);
     await user.type(adjustment, '100');
     await user.tab();
     expect(adjustment).toHaveValue(100);
+    expect(firstYearSales).toHaveValue(1180);
 
     await user.clear(adjustment);
     expect(adjustment).toHaveValue(null);
+    expect(firstYearSales).toHaveValue(1080);
     await user.tab();
     expect(adjustment).toHaveValue(0);
   });
