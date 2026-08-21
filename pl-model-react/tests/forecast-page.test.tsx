@@ -399,15 +399,15 @@ describe('将来予測・PL画面', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
-    const rate = screen.getByLabelText('補助事業期間 売上高 年間変化');
-    const before = Number((rate as HTMLInputElement).value);
+    const rates = screen.getAllByLabelText(/年間変化$/) as HTMLInputElement[];
+    const before = rates.map((rate) => rate.value);
     await user.click(screen.getByRole('button', { name: '目標を満たす水準案を作成' }));
     expect(await screen.findByTestId('optimization-proposal', {}, { timeout: 30_000 })).toBeVisible();
-    expect(rate).toHaveValue(before);
+    expect(rates.map((rate) => rate.value)).toEqual(before);
     const strengthSlider = screen.getByRole('slider', { name: '最適化方向の適用率' });
     strengthSlider.focus();
     await user.keyboard('{End}');
-    expect(rate).not.toHaveValue(before);
+    expect(rates.some((rate, index) => rate.value !== before[index])).toBe(true);
   }, 35_000);
 
   it('最適化方法を最小変更・バランス・最少項目・優先順位から選択し、提案へ使用方式を表示する', async () => {
@@ -526,12 +526,23 @@ describe('将来予測・PL画面', () => {
     expect(max).toHaveValue(10);
   });
 
-  it('実効税率は固定値として水準変更できない', async () => {
+  it('実効税率は年間変化を固定しつつ開始時固定値と開始時増減を編集できる', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
     expect(screen.getByLabelText('補助事業期間 実効税率 年間変化')).toBeDisabled();
     expect(screen.getByLabelText('補助事業期間 実効税率 水準')).toBeDisabled();
+    expect(screen.getByLabelText('補助事業期間 実効税率 開始時固定値')).toBeEnabled();
+    expect(screen.getByLabelText('補助事業期間 実効税率 開始時増減')).toBeEnabled();
+  });
+
+  it('原価率は初期状態でMin=Max=0となり、範囲を広げるまで水準をロックする', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    expect(screen.getByLabelText('補助事業期間 原価率 最小値')).toHaveValue(0);
+    expect(screen.getByLabelText('補助事業期間 原価率 最大値')).toHaveValue(0);
+    expect(screen.getByLabelText('補助事業期間 原価率 水準')).toBeDisabled();
   });
 
   it('期間水準ごとに固定額・単年・加速度の効果レイヤーを編集する', async () => {

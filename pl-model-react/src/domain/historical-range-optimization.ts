@@ -72,7 +72,7 @@ function valuesForDriver(driver: string, rows: HistoricalPlCalculated[]): number
       case 'officerCompensationShare': return ratio(row.officerCompensation, row.officerPay);
       case 'nonOperatingRate': return ratio(row.nonOperating, row.sales);
       case 'extraordinaryRate': return ratio(row.extraordinary, row.sales);
-      case 'taxRate': return row.preTaxIncome ? (1 - row.netIncome / row.preTaxIncome) * 100 : Number.NaN;
+      case 'taxRate': return row.preTaxIncome > 0 ? (1 - row.netIncome / row.preTaxIncome) * 100 : Number.NaN;
       case 'officerCount': return row.officerCount;
       default: return Number.NaN;
     }
@@ -146,19 +146,32 @@ export function optimizeForecastRangesFromActuals(
 
   forecast.series.filter((series) => series.scope !== 'company').forEach((series) => {
     const source = actuals[series.scope as Scope];
-    if (series.changePolicy === 'fixed' || driverId(series) === 'taxRate') {
-      const latest = source.at(-1);
+    const driver = driverId(series);
+    if (series.changePolicy === 'fixed' || driver === 'taxRate') {
       const latestLevel = valuesForDriver(driverId(series), source).at(-1);
-      if (driverId(series) === 'taxRate') {
+      const fixedLevel = Number.isFinite(latestLevel) ? latestLevel! : driver === 'taxRate' ? 30 : series.baseValue;
+      if (driver === 'taxRate') {
         series.changePolicy = 'fixed';
-        series.baseValue = latest && latest.preTaxIncome > 0
-          ? Math.max(0, Math.min(100, (1 - latest.netIncome / latest.preTaxIncome) * 100))
-          : 30;
       }
-      if (Number.isFinite(latestLevel)) series.baseValue = latestLevel!;
+      series.baseValue = fixedLevel;
       series.periods.forEach((period, index) => {
         period.annualGrowthRate = 0;
-        period.startValue = index === 0 && Number.isFinite(latestLevel) ? latestLevel! : null;
+        period.startValue = index === 0 ? fixedLevel : null;
+        period.startAdjustment = 0;
+        period.range = { min: 0, max: 0 };
+        period.layers = { fixedAnnualIncrement: 0, steps: {}, spots: {}, acceleration: 0 };
+        period.lineageId = undefined;
+        updatedPeriods += 1;
+      });
+      return;
+    }
+    if (driver === 'cogsRate') {
+      const latestLevel = valuesForDriver(driver, source).at(-1);
+      const fixedLevel = Number.isFinite(latestLevel) ? latestLevel! : series.baseValue;
+      series.baseValue = fixedLevel;
+      series.periods.forEach((period, index) => {
+        period.annualGrowthRate = 0;
+        period.startValue = index === 0 ? fixedLevel : null;
         period.startAdjustment = 0;
         period.range = { min: 0, max: 0 };
         period.layers = { fixedAnnualIncrement: 0, steps: {}, spots: {}, acceleration: 0 };

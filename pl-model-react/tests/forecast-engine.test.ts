@@ -100,6 +100,14 @@ describe('将来予測計算サービス', () => {
     expect(result[0].calculated.operatingProfit).toBeGreaterThan(0);
     expect(result[1].calculated.salesGrowthRate).toBeCloseTo(10);
     expect(result[0].input.netIncome).toBeCloseTo(result[0].calculated.preTaxIncome * .7);
+
+    const lossModel = structuredClone(model);
+    const lossCogsRate = lossModel.series.find((series) => series.id === 'base-cogsRate')!;
+    lossCogsRate.baseValue = 150;
+    lossCogsRate.periods[0].annualGrowthRate = 0;
+    const loss = buildForecastPl(lossModel, 'base', latest)[0];
+    expect(loss.calculated.preTaxIncome).toBeLessThan(0);
+    expect(loss.input.netIncome).toBeCloseTo(loss.calculated.preTaxIncome);
   });
 
   it('期間分割だけでは予測値を変えず、全系列を同じ境界で分割する', () => {

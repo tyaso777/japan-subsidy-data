@@ -38,6 +38,20 @@ describe('目標最適化提案', () => {
     expect(expansion).toBeUndefined();
   });
 
+  it('MinとMaxが同値の調整系列は水準内・水準外のどちらでもロックする', () => {
+    const constrained = model();
+    constrained.series[0].periods[0] = { ...constrained.series[0].periods[0], annualGrowthRate: 0, range: { min: 0, max: 0 } };
+    const evaluate = (candidate: ForecastModel) => [{ id: 'growth', label: '成長率', value: candidate.series[0].periods[0].annualGrowthRate, target: 10, direction: 'min' as const, unit: '%' }];
+
+    const proposal = createConstrainedOptimizationProposal(constrained, evaluate, { includeExpansionPlan: false });
+    const expansion = createOptimizationExpansionPlan(constrained, proposal, evaluate);
+
+    expect(proposal.feasibility).toBe('infeasible');
+    expect(proposal.optimized.series[0].periods[0].annualGrowthRate).toBe(0);
+    expect(proposal.changes).toHaveLength(0);
+    expect(expansion).toBeUndefined();
+  });
+
   it('達成不能時は未達指標・境界到達・必要な境界拡張の概算を返す', () => {
     const constrained = model();
     constrained.series[0].periods[0] = { ...constrained.series[0].periods[0], startYear: 2026, endYear: 2026, annualGrowthRate: 0, range: { min: 0, max: 20 } };

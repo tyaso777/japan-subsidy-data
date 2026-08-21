@@ -639,11 +639,11 @@
               "id": "subsidy",
               "startYear": 2026,
               "endYear": 2028,
-              "annualGrowthRate": -1,
+              "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
+                "min": 0,
+                "max": 0
               },
               "startValue": null
             },
@@ -651,11 +651,11 @@
               "id": "report",
               "startYear": 2029,
               "endYear": 2031,
-              "annualGrowthRate": -1,
+              "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
+                "min": 0,
+                "max": 0
               },
               "startValue": null
             }
@@ -1174,11 +1174,11 @@
               "id": "subsidy",
               "startYear": 2026,
               "endYear": 2028,
-              "annualGrowthRate": -1,
+              "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
+                "min": 0,
+                "max": 0
               },
               "startValue": null
             },
@@ -1186,11 +1186,11 @@
               "id": "report",
               "startYear": 2029,
               "endYear": 2031,
-              "annualGrowthRate": -1,
+              "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -20,
-                "max": 20
+                "min": 0,
+                "max": 0
               },
               "startValue": null
             }

@@ -78,12 +78,12 @@ function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInpu
   const forScope = (scope: BusinessScope, latest: HistoricalPlInput, growth: { sales: number; headcount: number; pay: number }) => {
     const calculated = calculatePl(latest);
     const compound = (id: string, label: string, valueKind: import('../domain/value-units').ValueKind, baseValue: number, rate: number) => ({ id: `${scope}-${id}`, label, scope, valueKind, projectionMode: 'compound' as const, baseYear, baseValue, periods: periods(rate, 'compound') });
-    const linear = (id: string, label: string, baseValue: number, change = 0, changePolicy: 'adjustable' | 'fixed' = 'adjustable') => ({ id: `${scope}-${id}`, label, scope, valueKind: 'percent' as const, projectionMode: 'linear' as const, changePolicy, baseYear, baseValue, periods: periods(change, 'linear').map((period) => changePolicy === 'fixed' ? { ...period, annualGrowthRate: 0, range: { min: 0, max: 0 } } : period) });
+    const linear = (id: string, label: string, baseValue: number, change = 0, changePolicy: 'adjustable' | 'fixed' = 'adjustable', initiallyLocked = false) => ({ id: `${scope}-${id}`, label, scope, valueKind: 'percent' as const, projectionMode: 'linear' as const, changePolicy, baseYear, baseValue, periods: periods(change, 'linear').map((period) => changePolicy === 'fixed' || initiallyLocked ? { ...period, annualGrowthRate: 0, range: { min: 0, max: 0 } } : period) });
     return [
       compound('sales', '売上高', 'money', latest.sales, growth.sales),
       compound('headcount', '従業員数（就業時間換算）', 'fte', latest.headcount, growth.headcount),
       compound('payPerPerson', '1人当たり給与', 'moneyPerPerson', calculated.employeePayPerPerson, growth.pay),
-      linear('cogsRate', '原価率', latest.sales ? latest.cogs / latest.sales * 100 : 0, -1),
+      linear('cogsRate', '原価率', latest.sales ? latest.cogs / latest.sales * 100 : 0, 0, 'adjustable', true),
       linear('cogsDepRate', '原価内減価償却費率', latest.sales ? latest.cogsDepreciation / latest.sales * 100 : 0, 0, 'fixed'),
       linear('sgaDepRate', '販管費内減価償却費率', latest.sales ? latest.sgaDepreciation / latest.sales * 100 : 0, 0, 'fixed'),
       linear('researchDevelopmentRate', '研究開発費の売上高比率', latest.sales ? latest.researchDevelopment / latest.sales * 100 : 0, 0, 'fixed'),

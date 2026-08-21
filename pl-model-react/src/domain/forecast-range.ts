@@ -10,6 +10,10 @@ export function clampToForecastRange(value: number, range: ForecastRange): numbe
   return Math.max(range.min, Math.min(range.max, value));
 }
 
+export function isForecastRangeLocked(range: ForecastRange): boolean {
+  return Math.abs(range.max - range.min) < 1e-12;
+}
+
 export function normalizeForecastRanges(model: ForecastModel): ForecastModel {
   const normalized = structuredClone(model);
   normalized.series.forEach((series) => {

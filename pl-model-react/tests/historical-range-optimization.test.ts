@@ -34,12 +34,10 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
     const sales = result.forecast.series.find((series) => series.id === 'subsidy-sales')!.periods.find((item) => item.id === 'report')!;
     const pay = result.forecast.series.find((series) => series.id === 'subsidy-payPerPerson')!.periods.find((item) => item.id === 'report')!;
-    const cogs = result.forecast.series.find((series) => series.id === 'subsidy-cogsRate')!.periods.find((item) => item.id === 'report')!;
 
     expect(sales.range).toEqual({ min: 15, max: 30 });
     expect(sales.annualGrowthRate).toBe(22.5);
     expect(pay.range).toEqual({ min: 5, max: 10 });
-    expect(cogs.range).toEqual({ min: -3, max: 0 });
   });
 
   it('基準年後のベース事業は設備導入期間の範囲へシナジー補正する', () => {
@@ -54,13 +52,17 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(postBase.annualGrowthRate).toBeCloseTo((postBase.range!.min + postBase.range!.max) / 2);
   });
 
-  it('原価率は過去の率の前年差を用い、改善時は負の水準になる', () => {
+  it('原価率は直近値を開始時固定値とし、Min=Max=0の間は年間変化をロックする', () => {
     const state = createModelStore().getState();
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
-    const period = result.forecast.series.find((series) => series.id === 'base-cogsRate')!.periods.find((item) => item.id === 'subsidy')!;
+    const cogs = result.forecast.series.find((series) => series.id === 'base-cogsRate')!;
+    const latest = state.actuals.basePl.at(-1)!;
 
-    expect(period.range!.max).toBeLessThanOrEqual(0);
-    expect(period.annualGrowthRate).toBeLessThan(0);
+    expect(cogs.changePolicy).toBe('adjustable');
+    expect(cogs.periods[0].startValue).toBeCloseTo(latest.cogs / latest.sales * 100);
+    expect(cogs.periods.slice(1).every((period) => period.startValue === null)).toBe(true);
+    expect(cogs.periods.every((period) => period.range?.min === 0 && period.range.max === 0)).toBe(true);
+    expect(cogs.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);
   });
 
   it('実効税率は赤字実績から変化率を作らず、固定値として保持する', () => {
@@ -71,6 +73,8 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
 
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
     const optimizedTax = result.forecast.series.find((series) => series.id === 'subsidy-taxRate')!;
+    expect(optimizedTax.baseValue).toBe(30);
+    expect(optimizedTax.periods[0].startValue).toBe(30);
     expect(optimizedTax.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);
     expect(optimizedTax.periods.every((period) => period.range?.min === 0 && period.range.max === 0)).toBe(true);
   });

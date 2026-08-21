@@ -324,7 +324,8 @@ export function buildForecastPl(model: ForecastModel, scope: 'base' | 'subsidy',
     };
     const preTaxIncome = calculatePl(draft, previous).preTaxIncome;
     const taxRate = Math.max(0, Math.min(100, value('taxRate', index, 30))) / 100;
-    const input = { ...draft, netIncome: preTaxIncome * (1 - taxRate) };
+    const taxExpense = Math.max(0, preTaxIncome) * taxRate;
+    const input = { ...draft, netIncome: preTaxIncome - taxExpense };
     const calculated = calculatePl(input, previous);
     rows.push({ year: salesPoint.year, input, calculated });
     previous = input;
