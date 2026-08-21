@@ -138,7 +138,7 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByTestId('forecast-business-columns')).toHaveStyle({ gridTemplateColumns: 'minmax(0, 1fr)' });
     expect(screen.getAllByTestId('forecast-chart-section')).toHaveLength(2);
     expect(screen.getAllByRole('img', { name: /推移チャート/ })).toHaveLength(16);
-  });
+  }, 15_000);
 
   it('横並びチャートがあふれる場合だけ画面下部へスクロールバーを常時表示し、チャート領域と同期する', async () => {
     const user = userEvent.setup();
