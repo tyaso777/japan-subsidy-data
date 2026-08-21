@@ -18,7 +18,7 @@ const fallbackRanges: Record<string, Record<Scope, Range>> = {
   payPerPerson: { base: { min: 0, max: 6 }, subsidy: { min: 0, max: 6 } },
   cogsRate: { base: { min: -2, max: 0 }, subsidy: { min: -2, max: 0 } },
   otherSgaRate: { base: { min: -2, max: 0 }, subsidy: { min: -2, max: 0 } },
-  officerPay: { base: { min: 0, max: 6 }, subsidy: { min: 0, max: 6 } },
+  officerPayPerPerson: { base: { min: 0, max: 6 }, subsidy: { min: 0, max: 6 } },
   officerCount: { base: { min: 0, max: 0 }, subsidy: { min: 0, max: 0 } },
 };
 
@@ -31,7 +31,7 @@ function driverId(series: ForecastSeries): string {
 function hardRange(driver: string, scope: Scope, projectionMode: ForecastSeries['projectionMode']): Range {
   if (driver === 'sales') return scope === 'subsidy' ? { min: -5, max: 40 } : { min: -10, max: 20 };
   if (driver === 'headcount') return scope === 'subsidy' ? { min: -3, max: 20 } : { min: -5, max: 10 };
-  if (driver === 'payPerPerson' || driver === 'officerPay') return scope === 'subsidy' ? { min: 0, max: 10 } : { min: 0, max: 8 };
+  if (driver === 'payPerPerson' || driver === 'officerPayPerPerson') return scope === 'subsidy' ? { min: 0, max: 10 } : { min: 0, max: 8 };
   if (driver === 'cogsRate' || driver === 'otherSgaRate') return { min: -3, max: 0 };
   if (driver === 'officerCount') return { min: -10, max: 20 };
   return projectionMode === 'linear' ? { min: -20, max: 20 } : { min: -10, max: 50 };
@@ -67,7 +67,7 @@ function valuesForDriver(driver: string, rows: HistoricalPlCalculated[]): number
       case 'sgaDepRate': return ratio(row.sgaDepreciation, row.sales);
       case 'researchDevelopmentRate': return ratio(row.researchDevelopment, row.sales);
       case 'otherSgaRate': return row.otherSgaRate;
-      case 'officerPay': return row.officerPay;
+      case 'officerPayPerPerson': return row.officerPayPerPerson;
       case 'employeeSalaryShare': return ratio(row.employeeSalary, row.employeePay);
       case 'officerCompensationShare': return ratio(row.officerCompensation, row.officerPay);
       case 'nonOperatingRate': return ratio(row.nonOperating, row.sales);

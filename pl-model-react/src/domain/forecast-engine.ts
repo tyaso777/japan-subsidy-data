@@ -152,7 +152,7 @@ const plDriverByField: Partial<Record<keyof HistoricalPlCalculated, string>> = {
   researchDevelopment: 'researchDevelopmentRate', otherSga: 'otherSgaRate', sga: 'otherSgaRate',
   operatingProfit: 'otherSgaRate', operatingProfitMargin: 'otherSgaRate', valueAdded: 'otherSgaRate', valueAddedGrowthRate: 'otherSgaRate',
   ebitda: 'otherSgaRate', ebitdaMargin: 'otherSgaRate',
-  officerPay: 'officerPay', officerCompensation: 'officerPay', officerBonus: 'officerPay', officerCount: 'officerCount',
+  officerPay: 'officerPayPerPerson', officerPayPerPerson: 'officerPayPerPerson', officerPayPerPersonGrowthRate: 'officerPayPerPerson', officerCompensation: 'officerPayPerPerson', officerBonus: 'officerPayPerPerson', officerCount: 'officerCount',
   nonOperating: 'nonOperatingRate', ordinaryIncome: 'nonOperatingRate',
   extraordinary: 'extraordinaryRate', preTaxIncome: 'extraordinaryRate',
   netIncome: 'taxRate',
@@ -304,7 +304,10 @@ export function buildForecastPl(model: ForecastModel, scope: 'base' | 'subsidy',
     const employeePayPerPerson = Math.max(0, value('payPerPerson', index, calculatePl(previous).employeePayPerPerson));
     const employeePay = headcount * employeePayPerPerson;
     const employeeSalaryShare = value('employeeSalaryShare', index, 95) / 100;
-    const officerPay = Math.max(0, value('officerPay', index, calculatePl(previous).officerPay));
+    const officerCount = Math.max(0, value('officerCount', index, previous.officerCount));
+    const previousCalculated = calculatePl(previous);
+    const officerPayPerPerson = Math.max(0, value('officerPayPerPerson', index, previousCalculated.officerPayPerPerson));
+    const officerPay = officerCount * officerPayPerPerson;
     const officerCompensationShare = value('officerCompensationShare', index, 90) / 100;
     const cogs = sales * value('cogsRate', index, previous.sales ? previous.cogs / previous.sales * 100 : 0) / 100;
     const cogsDepreciation = sales * value('cogsDepRate', index, 0) / 100;
@@ -320,7 +323,7 @@ export function buildForecastPl(model: ForecastModel, scope: 'base' | 'subsidy',
       officerCompensation: officerPay * officerCompensationShare,
       officerBonus: officerPay * (1 - officerCompensationShare),
       sgaDepreciation, researchDevelopment, otherSga, nonOperating, extraordinary,
-      netIncome: 0, headcount, officerCount: Math.max(0, value('officerCount', index, previous.officerCount)),
+      netIncome: 0, headcount, officerCount,
     };
     const preTaxIncome = calculatePl(draft, previous).preTaxIncome;
     const taxRate = Math.max(0, Math.min(100, value('taxRate', index, 30))) / 100;

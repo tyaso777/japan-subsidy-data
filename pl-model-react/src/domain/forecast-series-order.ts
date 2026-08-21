@@ -8,7 +8,7 @@ const plDriverOrder = [
   'sales',
   'cogsRate',
   'cogsDepRate',
-  'officerPay',
+  'officerPayPerPerson',
   'officerCompensationShare',
   'employeeSalaryShare',
   'sgaDepRate',

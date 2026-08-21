@@ -14,6 +14,8 @@ describe('過去P/L自動計算', () => {
     expect(result.salesGrowthRate).toBeCloseTo((1_000_000_000 / 950_000_000 - 1) * 100);
     expect(result.headcountGrowthRate).toBeCloseTo((118 / 114 - 1) * 100);
     expect(result.employeePayPerPersonGrowthRate).toBeCloseTo(((132_000_000 / 118) / (124_000_000 / 114) - 1) * 100);
+    expect(result.officerPayPerPerson).toBeCloseTo(18_000_000 / 4);
+    expect(result.officerPayPerPersonGrowthRate).toBeCloseTo(((18_000_000 / 4) / (17_000_000 / 4) - 1) * 100);
     expect(result.employeePayGrowthRate).toBeCloseTo((132_000_000 / 124_000_000 - 1) * 100);
     expect(result.cogsRate).toBe(62);
     expect(result.otherSgaRate).toBe(7.6);

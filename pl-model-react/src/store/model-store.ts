@@ -88,7 +88,7 @@ function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInpu
       linear('sgaDepRate', '販管費内減価償却費率', latest.sales ? latest.sgaDepreciation / latest.sales * 100 : 0, 0, 'fixed'),
       linear('researchDevelopmentRate', '研究開発費の売上高比率', latest.sales ? latest.researchDevelopment / latest.sales * 100 : 0, 0, 'fixed'),
       linear('otherSgaRate', 'その他販管費率', latest.sales ? latest.otherSga / latest.sales * 100 : 0, 0, 'fixed'),
-      compound('officerPay', '役員人件費', 'money', calculated.officerPay, 2),
+      compound('officerPayPerPerson', '役員1人当たり給与支給総額', 'moneyPerPerson', calculated.officerPayPerPerson, 2),
       linear('employeeSalaryShare', '従業員給与のうち給与割合', calculated.employeePay ? latest.employeeSalary / calculated.employeePay * 100 : 95, 0, 'fixed'),
       linear('officerCompensationShare', '役員給与のうち報酬割合', calculated.officerPay ? latest.officerCompensation / calculated.officerPay * 100 : 90, 0, 'fixed'),
       linear('nonOperatingRate', '営業外損益の売上高比率', latest.sales ? latest.nonOperating / latest.sales * 100 : 0, 0, 'fixed'),

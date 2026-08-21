@@ -4,26 +4,32 @@ import { forecastPlRows } from '../src/domain/rows';
 import { baseHistoricalPl } from '../src/domain/sample-data';
 
 describe('将来P/L表の参考行', () => {
-  it('従業員人件費の内訳直後に1人当たり給与と前年比成長率を表示する', () => {
+  it('従業員・役員の1人当たり指標を人数行の後へまとめる', () => {
     const labels = forecastPlRows.map((row) => row.label);
     const bonusIndex = labels.indexOf('うち従業員の賞与');
+    const officerCountIndex = labels.indexOf('役員数');
 
-    expect(labels.slice(bonusIndex, bonusIndex + 3)).toEqual([
-      'うち従業員の賞与',
-      '1人当たり給与',
-      '1人当たり給与成長率',
+    expect(labels[bonusIndex + 1]).not.toContain('1人当たり');
+    expect(labels.slice(officerCountIndex + 1, officerCountIndex + 5)).toEqual([
+      '従業員1人当たり給与支給総額',
+      '従業員1人当たり給与支給総額成長率',
+      '役員1人当たり給与支給総額',
+      '役員1人当たり給与支給総額成長率',
     ]);
-    expect(labels.filter((label) => label === '1人当たり給与')).toHaveLength(1);
   });
 
   it('給与総額とFTEから1人当たり給与とその前年比を算出する', () => {
     const records = calculatePlSeries(baseHistoricalPl);
-    const pay = forecastPlRows.find((row) => row.label === '1人当たり給与')!;
-    const growth = forecastPlRows.find((row) => row.label === '1人当たり給与成長率')!;
+    const pay = forecastPlRows.find((row) => row.label === '従業員1人当たり給与支給総額')!;
+    const growth = forecastPlRows.find((row) => row.label === '従業員1人当たり給与支給総額成長率')!;
+    const officerPay = forecastPlRows.find((row) => row.label === '役員1人当たり給与支給総額')!;
+    const officerGrowth = forecastPlRows.find((row) => row.label === '役員1人当たり給与支給総額成長率')!;
 
     expect(pay.valueKind).toBe('moneyPerPerson');
     expect(growth.valueKind).toBe('percent');
     expect(pay.value?.(records[2], 2, records)).toBeCloseTo(records[2].employeePayPerPerson);
     expect(growth.value?.(records[2], 2, records)).toBeCloseTo(records[2].employeePayPerPersonGrowthRate!);
+    expect(officerPay.value?.(records[2], 2, records)).toBeCloseTo(records[2].officerPayPerPerson);
+    expect(officerGrowth.value?.(records[2], 2, records)).toBeCloseTo(records[2].officerPayPerPersonGrowthRate!);
   });
 });

@@ -14,6 +14,7 @@ export function calculatePl(input: HistoricalPlInput, previous?: HistoricalPlInp
   const people = input.headcount + input.officerCount;
   const ebitda = operatingProfit + depreciation;
   const employeePayPerPerson = input.headcount ? employeePay / input.headcount : 0;
+  const officerPayPerPerson = input.officerCount ? officerPay / input.officerCount : 0;
   return {
     ...input,
     employeePay,
@@ -30,11 +31,13 @@ export function calculatePl(input: HistoricalPlInput, previous?: HistoricalPlInp
     salesGrowthRate: previous?.sales ? (input.sales / previous.sales - 1) * 100 : null,
     headcountGrowthRate: previous?.headcount ? (input.headcount / previous.headcount - 1) * 100 : null,
     employeePayPerPersonGrowthRate: previousCalculated?.employeePayPerPerson ? (employeePayPerPerson / previousCalculated.employeePayPerPerson - 1) * 100 : null,
+    officerPayPerPersonGrowthRate: previousCalculated?.officerPayPerPerson ? (officerPayPerPerson / previousCalculated.officerPayPerPerson - 1) * 100 : null,
     employeePayGrowthRate: previousCalculated?.employeePay ? (employeePay / previousCalculated.employeePay - 1) * 100 : null,
     valueAddedGrowthRate: previousCalculated?.valueAdded ? (valueAdded / previousCalculated.valueAdded - 1) * 100 : null,
     cogsRate: input.sales ? input.cogs / input.sales * 100 : 0,
     otherSgaRate: input.sales ? input.otherSga / input.sales * 100 : 0,
     employeePayPerPerson,
+    officerPayPerPerson,
     laborProductivity: people ? valueAdded / people : 0,
     ebitda,
     ebitdaMargin: input.sales ? ebitda / input.sales * 100 : 0,

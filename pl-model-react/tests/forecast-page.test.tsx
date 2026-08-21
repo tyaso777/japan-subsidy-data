@@ -212,7 +212,7 @@ describe('将来予測・PL画面', () => {
       '売上高',
       '原価率',
       '原価内減価償却費率',
-      '役員人件費',
+      '役員1人当たり給与支給総額',
       '役員給与のうち報酬割合',
       '従業員給与のうち給与割合',
       '販管費内減価償却費率',
@@ -613,7 +613,7 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByLabelText('ベース事業 P/L 2028年 売上高')).toHaveValue(1259.7);
   });
 
-  it('従業員給与・賞与の直後に1人当たり給与と成長率を表示する', async () => {
+  it('人数行の後に従業員・役員の1人当たり給与と成長率を表示する', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
@@ -622,10 +622,12 @@ describe('将来予測・PL画面', () => {
     const table = screen.getByTestId('forecast-pl-table');
     const labels = within(table).getAllByRole('row').map((row) => row.textContent ?? '');
     const bonusIndex = labels.findIndex((label) => label.includes('うち従業員の賞与'));
-    expect(labels[bonusIndex + 1]).toContain('1人当たり給与');
-    expect(labels[bonusIndex + 2]).toContain('1人当たり給与成長率');
-    expect(within(table).getByLabelText('ベース事業 P/L 2026年 1人当たり給与')).toBeVisible();
-    expect(within(table).getByLabelText('ベース事業 P/L 2026年 1人当たり給与成長率')).toBeVisible();
+    const officerCountIndex = labels.findIndex((label) => label.includes('役員数'));
+    expect(labels[bonusIndex + 1]).not.toContain('1人当たり');
+    expect(labels[officerCountIndex + 1]).toContain('従業員1人当たり給与支給総額');
+    expect(labels[officerCountIndex + 2]).toContain('従業員1人当たり給与支給総額成長率');
+    expect(labels[officerCountIndex + 3]).toContain('役員1人当たり給与支給総額');
+    expect(labels[officerCountIndex + 4]).toContain('役員1人当たり給与支給総額成長率');
   });
 
   it('将来PLでS番号の補足指標を独立して表示・非表示にできる', async () => {

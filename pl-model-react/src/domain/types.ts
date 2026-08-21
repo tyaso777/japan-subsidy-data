@@ -99,11 +99,13 @@ export type HistoricalPlCalculated = HistoricalPlInput & {
   salesGrowthRate: number | null;
   headcountGrowthRate: number | null;
   employeePayPerPersonGrowthRate: number | null;
+  officerPayPerPersonGrowthRate: number | null;
   employeePayGrowthRate: number | null;
   valueAddedGrowthRate: number | null;
   cogsRate: number;
   otherSgaRate: number;
   employeePayPerPerson: number;
+  officerPayPerPerson: number;
   laborProductivity: number;
   ebitda: number;
   ebitdaMargin: number;

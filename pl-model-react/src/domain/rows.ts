@@ -87,14 +87,14 @@ export const historicalPlRows: FinancialRow<HistoricalPlCalculated>[] = [
 ];
 
 const forecastPayPerPersonRows: FinancialRow<HistoricalPlCalculated>[] = [
-  { code: '29', label: '1人当たり給与', valueKind: 'moneyPerPerson', indent: 1, calculated: true, value: (row) => row.employeePayPerPerson },
-  { code: '30', label: '1人当たり給与成長率', valueKind: 'percent', indent: 1, calculated: true, value: (row) => row.employeePayPerPersonGrowthRate },
+  { code: '30', label: '従業員1人当たり給与支給総額成長率', valueKind: 'percent', indent: 1, calculated: true, value: (row) => row.employeePayPerPersonGrowthRate },
+  { code: '31', label: '役員1人当たり給与支給総額', valueKind: 'moneyPerPerson', indent: 1, calculated: true, value: (row) => row.officerPayPerPerson },
+  { code: '32', label: '役員1人当たり給与支給総額成長率', valueKind: 'percent', indent: 1, calculated: true, value: (row) => row.officerPayPerPersonGrowthRate },
 ];
 
-/** 将来P/Lでは人件費の単価と前年比を、給与・賞与の直後で確認できるようにする。 */
+/** 将来P/Lでは従業員・役員の人数に続けて、1人当たり単価と前年比をまとめる。 */
 export const forecastPlRows: FinancialRow<HistoricalPlCalculated>[] = historicalPlRows.flatMap((row) => {
-  if (row.code === '29') return [];
-  return row.code === '13' ? [row, ...forecastPayPerPersonRows] : [row];
+  return row.code === '29' ? [row, ...forecastPayPerPersonRows] : [row];
 });
 
 export type HistoricalPlEditableField = keyof HistoricalPlInput;

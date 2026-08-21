@@ -806,13 +806,13 @@
           ]
         },
         {
-          "id": "base-officerPay",
-          "label": "役員人件費",
+          "id": "base-officerPayPerPerson",
+          "label": "役員1人当たり給与支給総額",
           "scope": "base",
-          "valueKind": "money",
+          "valueKind": "moneyPerPerson",
           "projectionMode": "compound",
           "baseYear": 2025,
-          "baseValue": 18000000,
+          "baseValue": 4500000,
           "periods": [
             {
               "id": "subsidy",
@@ -1341,10 +1341,10 @@
           ]
         },
         {
-          "id": "subsidy-officerPay",
-          "label": "役員人件費",
+          "id": "subsidy-officerPayPerPerson",
+          "label": "役員1人当たり給与支給総額",
           "scope": "subsidy",
-          "valueKind": "money",
+          "valueKind": "moneyPerPerson",
           "projectionMode": "compound",
           "baseYear": 2025,
           "baseValue": 2500000,

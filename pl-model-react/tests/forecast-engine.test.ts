@@ -87,7 +87,7 @@ describe('将来予測計算サービス', () => {
       { ...make('headcount', latest.headcount, 0), valueKind: 'fte' },
       { ...make('payPerPerson', calculatePl(latest).employeePayPerPerson, 5), valueKind: 'moneyPerPerson' },
       make('cogsRate', 60, -1, 'linear'), make('cogsDepRate', 4, 0, 'linear'), make('sgaDepRate', 2, 0, 'linear'),
-      make('researchDevelopmentRate', 2, 0, 'linear'), make('otherSgaRate', 7, -.5, 'linear'), make('officerPay', 18_000_000, 2),
+      make('researchDevelopmentRate', 2, 0, 'linear'), make('otherSgaRate', 7, -.5, 'linear'), make('officerPayPerPerson', 4_500_000, 2),
       make('employeeSalaryShare', 95, 0, 'linear'), make('officerCompensationShare', 90, 0, 'linear'),
       make('nonOperatingRate', -.6, 0, 'linear'), make('extraordinaryRate', 0, 0, 'linear'), make('taxRate', 30, 0, 'linear'),
       { ...make('officerCount', 4, 0), valueKind: 'count' },
@@ -97,6 +97,7 @@ describe('将来予測計算サービス', () => {
     expect(result).toHaveLength(2);
     expect(result[0].input.sales).toBeCloseTo(1_100_000_000);
     expect(result[0].input.cogs).toBeCloseTo(649_000_000);
+    expect(result[0].calculated.officerPay).toBeCloseTo(18_360_000);
     expect(result[0].calculated.operatingProfit).toBeGreaterThan(0);
     expect(result[1].calculated.salesGrowthRate).toBeCloseTo(10);
     expect(result[0].input.netIncome).toBeCloseTo(result[0].calculated.preTaxIncome * .7);
