@@ -31,7 +31,7 @@ export function ActualsPage({ onNext }: { onNext: () => void }) {
   }), [balanceSheets, calculatedBase, calculatedSubsidy]);
   const yearLabels = buildTimelineYearLabels(program);
 
-  return <main className="mt-3 grid gap-3">
+  return <main data-testid="actuals-page" className="mx-auto mt-3 grid w-full max-w-[1360px] gap-3">
     <PeriodEditor program={program} onEndYearChange={updatePeriodEnd} onHistoricalBoundaryChange={updateHistoricalBoundary} />
     <section className="border border-line bg-surface px-4.5 py-3.5"><h2 className="m-0 text-lg font-bold">過去実績</h2><p className="mt-0.5 text-[11px] text-muted-foreground">B/Sと2つの事業P/Lを同じ3期表示で入力します。</p></section>
     <FinancialTable testId="historical-bs" title="全社 B/S（1-1～1-25）" years={years} yearLabels={yearLabels} records={balanceSheetsWithMetrics} rows={balanceSheetRows} moneyUnit={moneyUnit} onEditStart={beginTransaction} onEditEnd={commitTransaction} onChange={(index, field, value) => updateBalanceSheet(index, String(field), value)} />

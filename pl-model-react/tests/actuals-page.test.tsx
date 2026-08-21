@@ -4,6 +4,12 @@ import { describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
 
 describe('期間・過去実績', () => {
+  it('広い画面でも入力領域を引き伸ばしすぎず中央配置する', () => {
+    render(<App />);
+
+    expect(screen.getByTestId('actuals-page')).toHaveClass('mx-auto', 'w-full', 'max-w-[1360px]');
+  });
+
   it('ベース事業と補助事業をタブなしで同時表示する', () => {
     render(<App />);
     expect(screen.getByRole('heading', { name: 'ベース事業 P/L' })).toBeVisible();
