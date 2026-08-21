@@ -25,6 +25,7 @@ type Props<T extends object> = {
   onValuesChange?: (updates: FinancialTableValueUpdate<T>[]) => void;
   yearLabels?: Record<number, TimelineYearLabel>;
   onRowSelect?: (row: FinancialRow<T>) => void;
+  isRecordEmpty?: (record: T, index: number) => boolean;
 };
 
 export type FinancialTableValueUpdate<T extends object> = { yearIndex: number; row: FinancialRow<T>; value: number };
@@ -53,7 +54,7 @@ function EditableValueCell({ label, value, step, maximumFractionDigits, onEditSt
   return <Input className="ml-auto h-6 w-[min(120px,100%)] rounded px-0.5 py-0 text-right text-[10px]" aria-label={label} type="number" step={step} value={draft} onFocus={() => { setEditing(true); setDirty(false); onEditStart?.(); }} onChange={(event) => { setDirty(true); setDraft(event.target.value); }} onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); }} onBlur={() => { const next = Number(draft); setEditing(false); if (dirty && Number.isFinite(next)) onCommit(next); setDirty(false); onEditEnd?.(); }} />;
 }
 
-export function FinancialTable<T extends object>({ testId, title, prefix = '', years, records, rows, onChange, moneyUnit, onEditStart, onEditEnd, editableFromIndex, onValueChange, onValuesChange, yearLabels, onRowSelect }: Props<T>) {
+export function FinancialTable<T extends object>({ testId, title, prefix = '', years, records, rows, onChange, moneyUnit, onEditStart, onEditEnd, editableFromIndex, onValueChange, onValuesChange, yearLabels, onRowSelect, isRecordEmpty }: Props<T>) {
   const [omitCalculated, setOmitCalculated] = useState(false);
   const [selection, setSelection] = useState<GridSelection>();
   const [clipboardStatus, setClipboardStatus] = useState('');
@@ -81,7 +82,8 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
     const row = visibleRows[rowIndex];
     const record = records[column];
     if (!row || !record) return null;
-    const value = row.calculated ? row.value?.(record, column, records) : row.field ? Number(record[row.field]) : null;
+    const hasInput = !(isRecordEmpty?.(record, column) ?? Object.values(record).every((value) => value === null || value === undefined));
+    const value = row.calculated ? (hasInput ? row.value?.(record, column, records) : null) : row.field ? record[row.field] : null;
     if (value === null || value === undefined || !Number.isFinite(Number(value))) return null;
     return toDisplayFinancialValue(Number(value), row.valueKind ?? 'money', moneyUnit);
   };
@@ -156,16 +158,18 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
           <th className="h-8 border-t border-line px-2 py-1 text-left font-bold">{onRowSelect ? <button type="button" className="w-full text-left" onClick={() => onRowSelect(row)}><span className="inline-block w-13 text-[9px] font-medium text-muted-foreground">{prefix}{row.code}</span><span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span></button> : <><span className="inline-block w-13 text-[9px] font-medium text-muted-foreground">{prefix}{row.code}</span><span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span></>}</th>
           {records.map((record, index) => {
             const kind = row.valueKind ?? 'money';
-            const displayedValue = row.calculated ? row.value?.(record, index, records) : row.field ? Number(record[row.field]) : 0;
+            const hasInput = !(isRecordEmpty?.(record, index) ?? Object.values(record).every((value) => value === null || value === undefined));
+            const rawValue = row.field ? record[row.field] : null;
+            const displayedValue = row.calculated ? (hasInput ? row.value?.(record, index, records) : null) : rawValue;
             const selectionClass = selectedCell(rowIndex, index) && 'bg-teal/10 ring-1 ring-inset ring-teal';
             if (onValueChange && index >= (editableFromIndex ?? 0)) return <td {...cellInteraction(rowIndex, index)} className={cn('h-8 border-t border-line px-0.5 py-1 text-right tabular-nums', selectionClass)} key={years[index]}><EditableValueCell label={`${title} ${years[index]}年 ${row.label}`} step={financialInputStep(kind, moneyUnit)} maximumFractionDigits={financialInputFractionDigits(kind, moneyUnit)} value={toDisplayFinancialValue(Number(displayedValue ?? 0), kind, moneyUnit)} onEditStart={onEditStart} onEditEnd={onEditEnd} onCommit={(value) => onValueChange(index, row, fromDisplayFinancialValue(value, kind, moneyUnit))} /></td>;
             if (row.calculated) {
-              return <td {...cellInteraction(rowIndex, index)} className={cn('h-8 border-t border-line px-0.5 py-1 text-right tabular-nums', selectionClass)} key={years[index]}><output className="font-extrabold text-[#234d3c]">{displayedValue === null || displayedValue === undefined ? '—' : formatFinancialValue(displayedValue, kind, moneyUnit)}</output></td>;
+              return <td {...cellInteraction(rowIndex, index)} className={cn('h-8 border-t border-line px-0.5 py-1 text-right tabular-nums', selectionClass)} key={years[index]}><output className="font-extrabold text-[#234d3c]">{displayedValue === null || displayedValue === undefined ? '—' : formatFinancialValue(Number(displayedValue), kind, moneyUnit)}</output></td>;
             }
             const field = row.field;
             return <td {...cellInteraction(rowIndex, index)} className={cn('h-8 border-t border-line px-0.5 py-1 text-right tabular-nums', selectionClass)} key={years[index]}>{field && onChange
-              ? <NumberInput className="ml-auto h-6 w-[min(120px,100%)] rounded px-0.5 py-0 text-right text-[10px]" aria-label={`${title} ${years[index]}年 ${row.label}`} step={financialInputStep(kind, moneyUnit)} value={toDisplayFinancialValue(Number(record[field]), kind, moneyUnit)} onEditingStart={onEditStart} onEditingEnd={onEditEnd} onValueChange={(value) => onChange(index, field, fromDisplayFinancialValue(value, kind, moneyUnit))} />
-              : formatFinancialValue(field ? Number(record[field]) : 0, kind, moneyUnit)}</td>;
+              ? <NumberInput className="ml-auto h-6 w-[min(120px,100%)] rounded px-0.5 py-0 text-right text-[10px]" aria-label={`${title} ${years[index]}年 ${row.label}`} step={financialInputStep(kind, moneyUnit)} value={rawValue === null || rawValue === undefined ? null : toDisplayFinancialValue(Number(rawValue), kind, moneyUnit)} emptyValue={rawValue === null || rawValue === undefined ? null : 0} onEditingStart={onEditStart} onEditingEnd={onEditEnd} onValueChange={(value) => onChange(index, field, fromDisplayFinancialValue(value, kind, moneyUnit))} />
+              : rawValue === null || rawValue === undefined ? '—' : formatFinancialValue(Number(rawValue), kind, moneyUnit)}</td>;
           })}
         </tr>)}</tbody>
       </table>

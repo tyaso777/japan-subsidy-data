@@ -12,6 +12,7 @@ import { ModelFileMenu } from '../features/model-file/ModelFileMenu';
 import { ForecastPage } from '../features/forecast/ForecastPage';
 import { LogicMapPage } from '../features/logic/LogicMapPage';
 import { DefinitionPage as ProgramDefinitionPage } from '../features/definition/DefinitionPage';
+import type { InitialActualsMode } from '../store/model-store';
 
 type Page = 'definition' | 'actuals' | 'forecast' | 'logic';
 type PageLink = { id: Page; label: string; icon: ComponentType<{ className?: string }> };
@@ -60,6 +61,6 @@ function AppContent() {
   </div></TooltipProvider>;
 }
 
-export function App() {
-  return <ModelStoreProvider><AppContent /></ModelStoreProvider>;
+export function App({ initialActuals = import.meta.env.MODE === 'test' ? 'sample' : 'empty' }: { initialActuals?: InitialActualsMode }) {
+  return <ModelStoreProvider initialActuals={initialActuals}><AppContent /></ModelStoreProvider>;
 }

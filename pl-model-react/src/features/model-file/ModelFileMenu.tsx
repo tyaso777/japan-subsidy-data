@@ -1,5 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react';
-import { FileJson, FolderOpen, Save, SaveAll } from 'lucide-react';
+import { ChevronDown, FileJson, Save, SaveAll } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
@@ -21,6 +21,7 @@ type PickerWindow = Window & {
 };
 
 const pickerOptions = {
+  id: 'pl-model-case-files',
   types: [{ description: 'PLモデル案件JSON', accept: { 'application/json': ['.json'] } }],
 };
 
@@ -95,15 +96,14 @@ export function ModelFileMenu() {
       if (file) void loadFile(file);
       event.target.value = '';
     }} />
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild><Button variant="outline" size="sm" className="max-w-38"><FileJson /><span className="truncate">{fileName ?? '案件JSON'}</span></Button></DropdownMenuTrigger>
+    <div className="flex items-stretch"><Button variant="outline" size="sm" className="max-w-38 rounded-r-none" onClick={() => void open()}><FileJson /><span className="truncate">{fileName ?? '案件JSON'}</span></Button><DropdownMenu>
+      <DropdownMenuTrigger asChild><Button variant="outline" size="icon" className="h-8 w-7 rounded-l-none border-l-0" aria-label="案件JSONの保存メニュー"><ChevronDown /></Button></DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onSelect={() => void open()}><FolderOpen />読み込み</DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem disabled={!handleRef.current} onSelect={() => void overwrite()}><Save />上書き保存</DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => void saveAs()}><SaveAll />名前を付けて保存</DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenu>
+    </DropdownMenu></div>
     <Dialog open={Boolean(error)} onOpenChange={(openState) => { if (!openState) setError(undefined); }}>
       <DialogContent><DialogHeader><DialogTitle>案件JSONのエラー</DialogTitle><DialogDescription className="break-all">{error}</DialogDescription></DialogHeader></DialogContent>
     </Dialog>

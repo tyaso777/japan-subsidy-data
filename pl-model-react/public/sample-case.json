@@ -1,0 +1,1539 @@
+{
+  "fileVersion": "1",
+  "model": {
+    "program": {
+      "schemaVersion": "3.0",
+      "program": {
+        "id": "generic-growth-subsidy",
+        "name": "成長投資向け標準定義",
+        "version": "1.0"
+      },
+      "definitions": {
+        "historical": {
+          "id": "historical",
+          "label": "過去実績",
+          "fixed": true
+        },
+        "periods": [
+          {
+            "id": "subsidy",
+            "label": "補助事業期間",
+            "modelPhase": "toBase"
+          },
+          {
+            "id": "report",
+            "label": "事業化報告期間",
+            "modelPhase": "postBase"
+          }
+        ],
+        "specialYears": [
+          {
+            "id": "latest",
+            "label": "最新決算期",
+            "anchor": {
+              "type": "historicalEnd"
+            },
+            "offset": 0
+          },
+          {
+            "id": "base",
+            "label": "基準年",
+            "anchor": {
+              "type": "periodEnd",
+              "periodId": "subsidy"
+            },
+            "offset": 0
+          }
+        ],
+        "commonNumericDefinitions": [
+          {
+            "id": "人件費",
+            "label": "人件費",
+            "formula": "[従業員給与総額][t] + [役員人件費][t]",
+            "outputPoint": "t"
+          },
+          {
+            "id": "付加価値額",
+            "label": "付加価値額",
+            "formula": "[営業利益][t] + [人件費][t] + [減価償却費][t]",
+            "outputPoint": "t"
+          },
+          {
+            "id": "労働生産性",
+            "label": "労働生産性",
+            "formula": "[付加価値額][t] / ([従業員数（就業時間換算）][t] + [役員数][t])",
+            "outputPoint": "t"
+          },
+          {
+            "id": "EBITDA",
+            "label": "EBITDA",
+            "formula": "[営業利益][t] + [減価償却費][t]",
+            "outputPoint": "t"
+          }
+        ],
+        "managementMetrics": [
+          {
+            "id": "company-sales-growth",
+            "label": "全社売上高成長率",
+            "enabled": true,
+            "scope": "company",
+            "timePoints": [
+              {
+                "id": "A",
+                "anchor": {
+                  "type": "specialYear",
+                  "specialYearId": "base"
+                },
+                "offset": 0
+              },
+              {
+                "id": "B",
+                "anchor": {
+                  "type": "periodEnd",
+                  "periodId": "report"
+                },
+                "offset": 0
+              }
+            ],
+            "formula": "(([売上高][B] / [売上高][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
+            "outputUnit": "% / 年",
+            "target": 30.5,
+            "direction": "min",
+            "targetPolicy": "reference",
+            "optimization": "adjustable"
+          },
+          {
+            "id": "company-value-added-growth",
+            "label": "全社付加価値増加率",
+            "enabled": true,
+            "scope": "company",
+            "timePoints": [
+              {
+                "id": "A",
+                "anchor": {
+                  "type": "specialYear",
+                  "specialYearId": "base"
+                },
+                "offset": 0
+              },
+              {
+                "id": "B",
+                "anchor": {
+                  "type": "periodEnd",
+                  "periodId": "report"
+                },
+                "offset": 0
+              }
+            ],
+            "formula": "(([付加価値額][B] / [付加価値額][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
+            "outputUnit": "% / 年",
+            "target": 34.9,
+            "direction": "min",
+            "targetPolicy": "reference",
+            "optimization": "adjustable"
+          },
+          {
+            "id": "company-productivity-growth",
+            "label": "労働生産性成長率",
+            "enabled": true,
+            "scope": "company",
+            "timePoints": [
+              {
+                "id": "A",
+                "anchor": {
+                  "type": "specialYear",
+                  "specialYearId": "base"
+                },
+                "offset": 0
+              },
+              {
+                "id": "B",
+                "anchor": {
+                  "type": "periodEnd",
+                  "periodId": "report"
+                },
+                "offset": 0
+              }
+            ],
+            "formula": "(([労働生産性][B] / [労働生産性][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
+            "outputUnit": "% / 年",
+            "target": 23.6,
+            "direction": "min",
+            "targetPolicy": "reference",
+            "optimization": "adjustable"
+          },
+          {
+            "id": "latest-ebitda-margin",
+            "label": "最新決算期 EBITDAマージン",
+            "enabled": true,
+            "scope": "company",
+            "timePoints": [
+              {
+                "id": "A",
+                "anchor": {
+                  "type": "historicalEnd"
+                },
+                "offset": 0
+              }
+            ],
+            "formula": "[EBITDA][A] / [売上高][A] * 100",
+            "outputUnit": "%",
+            "target": 9.5,
+            "direction": "min",
+            "targetPolicy": "reference",
+            "optimization": "fixed"
+          },
+          {
+            "id": "latest-sales-investment-ratio",
+            "label": "最新決算期 売上高投資比率",
+            "enabled": true,
+            "scope": "company",
+            "timePoints": [
+              {
+                "id": "A",
+                "anchor": {
+                  "type": "historicalEnd"
+                },
+                "offset": 0
+              }
+            ],
+            "formula": "0",
+            "outputUnit": "%",
+            "target": 54.6,
+            "direction": "min",
+            "targetPolicy": "reference",
+            "optimization": "fixed",
+            "requiresActualInput": true
+          },
+          {
+            "id": "latest-equity-ratio",
+            "label": "最新決算期 自己資本比率",
+            "enabled": true,
+            "scope": "company",
+            "timePoints": [
+              {
+                "id": "A",
+                "anchor": {
+                  "type": "historicalEnd"
+                },
+                "offset": 0
+              }
+            ],
+            "formula": "0",
+            "outputUnit": "%",
+            "target": 43.8,
+            "direction": "min",
+            "targetPolicy": "reference",
+            "optimization": "fixed",
+            "requiresActualInput": true
+          },
+          {
+            "id": "latest-roa",
+            "label": "最新決算期 ROA",
+            "enabled": true,
+            "scope": "company",
+            "timePoints": [
+              {
+                "id": "A",
+                "anchor": {
+                  "type": "historicalEnd"
+                },
+                "offset": 0
+              }
+            ],
+            "formula": "0",
+            "outputUnit": "%",
+            "target": 5.1,
+            "direction": "min",
+            "targetPolicy": "reference",
+            "optimization": "fixed",
+            "requiresActualInput": true
+          },
+          {
+            "id": "employee-pay-growth",
+            "label": "従業員1人当たり給与成長率",
+            "enabled": true,
+            "scope": "company",
+            "timePoints": [
+              {
+                "id": "A",
+                "anchor": {
+                  "type": "specialYear",
+                  "specialYearId": "base"
+                },
+                "offset": 0
+              },
+              {
+                "id": "B",
+                "anchor": {
+                  "type": "periodEnd",
+                  "periodId": "report"
+                },
+                "offset": 0
+              }
+            ],
+            "formula": "(([従業員1人当たり給与支給総額][B] / [従業員1人当たり給与支給総額][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
+            "outputUnit": "% / 年",
+            "target": 6.5,
+            "direction": "min",
+            "targetPolicy": "reference",
+            "optimization": "adjustable"
+          },
+          {
+            "id": "employee-payroll-growth",
+            "label": "従業員給与総額成長率",
+            "enabled": true,
+            "scope": "company",
+            "timePoints": [
+              {
+                "id": "A",
+                "anchor": {
+                  "type": "specialYear",
+                  "specialYearId": "base"
+                },
+                "offset": 0
+              },
+              {
+                "id": "B",
+                "anchor": {
+                  "type": "periodEnd",
+                  "periodId": "report"
+                },
+                "offset": 0
+              }
+            ],
+            "formula": "(([従業員給与総額][B] / [従業員給与総額][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
+            "outputUnit": "% / 年",
+            "target": 17.4,
+            "direction": "min",
+            "targetPolicy": "reference",
+            "optimization": "adjustable"
+          }
+        ]
+      },
+      "timeline": {
+        "historical": {
+          "startYear": 2023,
+          "endYear": 2025
+        },
+        "periods": [
+          {
+            "definitionId": "subsidy",
+            "startYear": 2026,
+            "endYear": 2028
+          },
+          {
+            "definitionId": "report",
+            "startYear": 2029,
+            "endYear": 2031
+          }
+        ]
+      }
+    },
+    "actuals": {
+      "balanceSheets": [
+        {
+          "assets": 1050000000,
+          "currentAssets": 555000000,
+          "cash": 180000000,
+          "fixedAssets": 460000000,
+          "tangibleAssets": 400000000,
+          "buildings": 180000000,
+          "machinery": 140000000,
+          "land": 80000000,
+          "intangibleAssets": 60000000,
+          "software": 40000000,
+          "liabilities": 630000000,
+          "currentLiabilities": 250000000,
+          "shortTermDebt": 95000000,
+          "fixedLiabilities": 380000000,
+          "longTermDebt": 285000000,
+          "netAssets": 420000000,
+          "shareholderEquity": 400000000,
+          "capital": 100000000,
+          "capex": 75000000
+        },
+        {
+          "assets": 1115000000,
+          "currentAssets": 599000000,
+          "cash": 195000000,
+          "fixedAssets": 480000000,
+          "tangibleAssets": 416000000,
+          "buildings": 188000000,
+          "machinery": 148000000,
+          "land": 80000000,
+          "intangibleAssets": 64000000,
+          "software": 43000000,
+          "liabilities": 640000000,
+          "currentLiabilities": 260000000,
+          "shortTermDebt": 90000000,
+          "fixedLiabilities": 380000000,
+          "longTermDebt": 282000000,
+          "netAssets": 475000000,
+          "shareholderEquity": 450000000,
+          "capital": 100000000,
+          "capex": 82000000
+        },
+        {
+          "assets": 1208000000,
+          "currentAssets": 640000000,
+          "cash": 220000000,
+          "fixedAssets": 530000000,
+          "tangibleAssets": 460000000,
+          "buildings": 205000000,
+          "machinery": 175000000,
+          "land": 80000000,
+          "intangibleAssets": 70000000,
+          "software": 48000000,
+          "liabilities": 663000000,
+          "currentLiabilities": 278000000,
+          "shortTermDebt": 85000000,
+          "fixedLiabilities": 385000000,
+          "longTermDebt": 275000000,
+          "netAssets": 545000000,
+          "shareholderEquity": 520000000,
+          "capital": 100000000,
+          "capex": 96000000
+        }
+      ],
+      "basePl": [
+        {
+          "sales": 900000000,
+          "cogs": 570000000,
+          "cogsDepreciation": 21000000,
+          "employeeSalary": 112000000,
+          "employeeBonus": 6000000,
+          "officerCompensation": 14400000,
+          "officerBonus": 1600000,
+          "sgaDepreciation": 15000000,
+          "researchDevelopment": 16000000,
+          "otherSga": 68000000,
+          "nonOperating": -5000000,
+          "extraordinary": 0,
+          "netIncome": 64000000,
+          "headcount": 110,
+          "officerCount": 4
+        },
+        {
+          "sales": 950000000,
+          "cogs": 600000000,
+          "cogsDepreciation": 23000000,
+          "employeeSalary": 118000000,
+          "employeeBonus": 6000000,
+          "officerCompensation": 15300000,
+          "officerBonus": 1700000,
+          "sgaDepreciation": 16000000,
+          "researchDevelopment": 17000000,
+          "otherSga": 72000000,
+          "nonOperating": -5500000,
+          "extraordinary": 0,
+          "netIncome": 69000000,
+          "headcount": 114,
+          "officerCount": 4
+        },
+        {
+          "sales": 1000000000,
+          "cogs": 620000000,
+          "cogsDepreciation": 25000000,
+          "employeeSalary": 125500000,
+          "employeeBonus": 6500000,
+          "officerCompensation": 16200000,
+          "officerBonus": 1800000,
+          "sgaDepreciation": 17000000,
+          "researchDevelopment": 18000000,
+          "otherSga": 76000000,
+          "nonOperating": -6000000,
+          "extraordinary": 0,
+          "netIncome": 79000000,
+          "headcount": 118,
+          "officerCount": 4
+        }
+      ],
+      "subsidyPl": [
+        {
+          "sales": 50000000,
+          "cogs": 38000000,
+          "cogsDepreciation": 2000000,
+          "employeeSalary": 11500000,
+          "employeeBonus": 500000,
+          "officerCompensation": 1800000,
+          "officerBonus": 200000,
+          "sgaDepreciation": 1000000,
+          "researchDevelopment": 2000000,
+          "otherSga": 5000000,
+          "nonOperating": -1000000,
+          "extraordinary": 0,
+          "netIncome": -8000000,
+          "headcount": 12,
+          "officerCount": 1
+        },
+        {
+          "sales": 70000000,
+          "cogs": 51000000,
+          "cogsDepreciation": 3000000,
+          "employeeSalary": 14300000,
+          "employeeBonus": 700000,
+          "officerCompensation": 2000000,
+          "officerBonus": 200000,
+          "sgaDepreciation": 1500000,
+          "researchDevelopment": 3000000,
+          "otherSga": 6000000,
+          "nonOperating": -1000000,
+          "extraordinary": 0,
+          "netIncome": -5000000,
+          "headcount": 15,
+          "officerCount": 1
+        },
+        {
+          "sales": 100000000,
+          "cogs": 70000000,
+          "cogsDepreciation": 4000000,
+          "employeeSalary": 17000000,
+          "employeeBonus": 1000000,
+          "officerCompensation": 2200000,
+          "officerBonus": 300000,
+          "sgaDepreciation": 2000000,
+          "researchDevelopment": 4000000,
+          "otherSga": 8000000,
+          "nonOperating": -1000000,
+          "extraordinary": 0,
+          "netIncome": 0,
+          "headcount": 18,
+          "officerCount": 1
+        }
+      ],
+      "metricInputs": {}
+    },
+    "forecast": {
+      "segments": [
+        {
+          "id": "subsidy",
+          "definitionId": "subsidy",
+          "startYear": 2026,
+          "endYear": 2028
+        },
+        {
+          "id": "report",
+          "definitionId": "report",
+          "startYear": 2029,
+          "endYear": 2031
+        }
+      ],
+      "series": [
+        {
+          "id": "base-sales",
+          "label": "売上高",
+          "scope": "base",
+          "valueKind": "money",
+          "projectionMode": "compound",
+          "baseYear": 2025,
+          "baseValue": 1000000000,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 8,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 8,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            }
+          ]
+        },
+        {
+          "id": "base-headcount",
+          "label": "従業員数（就業時間換算）",
+          "scope": "base",
+          "valueKind": "fte",
+          "projectionMode": "compound",
+          "baseYear": 2025,
+          "baseValue": 118,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 3,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 3,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            }
+          ]
+        },
+        {
+          "id": "base-payPerPerson",
+          "label": "1人当たり給与",
+          "scope": "base",
+          "valueKind": "moneyPerPerson",
+          "projectionMode": "compound",
+          "baseYear": 2025,
+          "baseValue": 1118644.06779661,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 4,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 4,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            }
+          ]
+        },
+        {
+          "id": "base-cogsRate",
+          "label": "原価率",
+          "scope": "base",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 62,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": -1,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": -1,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "base-cogsDepRate",
+          "label": "原価内減価償却費率",
+          "scope": "base",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 2.5,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "base-sgaDepRate",
+          "label": "販管費内減価償却費率",
+          "scope": "base",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 1.7000000000000002,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "base-researchDevelopmentRate",
+          "label": "研究開発費の売上高比率",
+          "scope": "base",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 1.7999999999999998,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "base-otherSgaRate",
+          "label": "その他販管費率",
+          "scope": "base",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 7.6,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": -0.5,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": -0.5,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "base-officerPay",
+          "label": "役員人件費",
+          "scope": "base",
+          "valueKind": "money",
+          "projectionMode": "compound",
+          "baseYear": 2025,
+          "baseValue": 18000000,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 2,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 2,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            }
+          ]
+        },
+        {
+          "id": "base-employeeSalaryShare",
+          "label": "従業員給与のうち給与割合",
+          "scope": "base",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 95.07575757575758,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "base-officerCompensationShare",
+          "label": "役員給与のうち報酬割合",
+          "scope": "base",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 90,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "base-nonOperatingRate",
+          "label": "営業外損益の売上高比率",
+          "scope": "base",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": -0.6,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "base-extraordinaryRate",
+          "label": "特別損益の売上高比率",
+          "scope": "base",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 0,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "base-taxRate",
+          "label": "実効税率",
+          "scope": "base",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "fixed",
+          "baseYear": 2025,
+          "baseValue": 30.08849557522124,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": 0,
+                "max": 0
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": 0,
+                "max": 0
+              }
+            }
+          ]
+        },
+        {
+          "id": "base-officerCount",
+          "label": "役員数",
+          "scope": "base",
+          "valueKind": "count",
+          "projectionMode": "compound",
+          "baseYear": 2025,
+          "baseValue": 4,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-sales",
+          "label": "売上高",
+          "scope": "subsidy",
+          "valueKind": "money",
+          "projectionMode": "compound",
+          "baseYear": 2025,
+          "baseValue": 100000000,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 12,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 12,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-headcount",
+          "label": "従業員数（就業時間換算）",
+          "scope": "subsidy",
+          "valueKind": "fte",
+          "projectionMode": "compound",
+          "baseYear": 2025,
+          "baseValue": 18,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 5,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 5,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-payPerPerson",
+          "label": "1人当たり給与",
+          "scope": "subsidy",
+          "valueKind": "moneyPerPerson",
+          "projectionMode": "compound",
+          "baseYear": 2025,
+          "baseValue": 1000000,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 5,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 5,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-cogsRate",
+          "label": "原価率",
+          "scope": "subsidy",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 70,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": -1,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": -1,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-cogsDepRate",
+          "label": "原価内減価償却費率",
+          "scope": "subsidy",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 4,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-sgaDepRate",
+          "label": "販管費内減価償却費率",
+          "scope": "subsidy",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 2,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-researchDevelopmentRate",
+          "label": "研究開発費の売上高比率",
+          "scope": "subsidy",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 4,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-otherSgaRate",
+          "label": "その他販管費率",
+          "scope": "subsidy",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 8,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": -0.5,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": -0.5,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-officerPay",
+          "label": "役員人件費",
+          "scope": "subsidy",
+          "valueKind": "money",
+          "projectionMode": "compound",
+          "baseYear": 2025,
+          "baseValue": 2500000,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 2,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 2,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-employeeSalaryShare",
+          "label": "従業員給与のうち給与割合",
+          "scope": "subsidy",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 94.44444444444444,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-officerCompensationShare",
+          "label": "役員給与のうち報酬割合",
+          "scope": "subsidy",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 88,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-nonOperatingRate",
+          "label": "営業外損益の売上高比率",
+          "scope": "subsidy",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": -1,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-extraordinaryRate",
+          "label": "特別損益の売上高比率",
+          "scope": "subsidy",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "adjustable",
+          "baseYear": 2025,
+          "baseValue": 0,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -20,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-taxRate",
+          "label": "実効税率",
+          "scope": "subsidy",
+          "valueKind": "percent",
+          "projectionMode": "linear",
+          "changePolicy": "fixed",
+          "baseYear": 2025,
+          "baseValue": 30,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": 0,
+                "max": 0
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": 0,
+                "max": 0
+              }
+            }
+          ]
+        },
+        {
+          "id": "subsidy-officerCount",
+          "label": "役員数",
+          "scope": "subsidy",
+          "valueKind": "count",
+          "projectionMode": "compound",
+          "baseYear": 2025,
+          "baseValue": 1,
+          "periods": [
+            {
+              "id": "subsidy",
+              "startYear": 2026,
+              "endYear": 2028,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            },
+            {
+              "id": "report",
+              "startYear": 2029,
+              "endYear": 2031,
+              "annualGrowthRate": 0,
+              "startAdjustment": 0,
+              "range": {
+                "min": -10,
+                "max": 50
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "caseSettings": {
+      "metricTargets": {}
+    }
+  }
+}
