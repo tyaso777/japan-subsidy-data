@@ -76,6 +76,22 @@ describe('将来予測画面のワイドレイアウト', () => {
     expect(availableSettingsPanelHeight(900, 20)).toBe(776);
   });
 
+  it('期間分割と解除を年度の時系列順に同じ位置へ表示する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    const controls = within(screen.getByTestId('forecast-chart-display-controls')).getByLabelText('期間分割操作');
+    await user.click(within(controls).getByRole('button', { name: '2028年から期間を分割' }));
+
+    expect(within(controls).getAllByRole('button').map((button) => button.getAttribute('aria-label'))).toEqual([
+      '2027年から期間を分割',
+      '2028年の期間分割を解除',
+      '2030年から期間を分割',
+      '2031年から期間を分割',
+    ]);
+  });
+
   it('狭い水準設定では変動設定を自動収納し、必要なら手動で再表示できる', async () => {
     class NarrowResizeObserver {
       constructor(private readonly callback: ResizeObserverCallback) {}

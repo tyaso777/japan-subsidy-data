@@ -301,6 +301,12 @@ export function ForecastPage() {
     { length: Math.max(0, segment.endYear - segment.startYear) },
     (_, index) => segment.startYear + index + 1,
   ));
+  const periodOperations = [
+    ...splitYears.map((year) => ({ year, action: 'split' as const })),
+    ...segments.slice(1)
+      .filter((segment, index) => segments[index].definitionId === segment.definitionId)
+      .map((segment) => ({ year: segment.startYear, action: 'merge' as const, segmentId: segment.id })),
+  ].sort((left, right) => left.year - right.year);
   const comparison = (field: keyof HistoricalPlCalculated) => [
     { label: '全社合算', values: company.records.map((row) => Number(row[field])), color: colors[0] },
     { label: 'ベース事業', values: base.records.map((row) => Number(row[field])), color: colors[1] },
@@ -385,7 +391,9 @@ export function ForecastPage() {
               <div className="flex flex-wrap items-center justify-end gap-1"><div aria-label="チャート表示区分" className="flex flex-wrap justify-end gap-1">{chartDisplayOrder.map((item) => {
                 const enabled = chartDisplays[item];
                 return <Button key={item} variant={enabled ? 'default' : 'outline'} size="sm" className="h-7 gap-1.5 px-2 text-[10px]" aria-pressed={enabled} aria-label={`${chartDisplayLabels[item]}を${enabled ? '非表示' : '表示'}`} disabled={enabled && activeChartDisplays.length === 1} onClick={() => toggleChartDisplay(item)}><span>{chartDisplayLabels[item]}</span><small className="text-[8px] opacity-70">{enabled ? 'ON' : 'OFF'}</small></Button>;
-              })}</div><span className="mx-1 h-6 w-px shrink-0 bg-line" aria-hidden="true" /><div className="flex shrink-0 items-center gap-1" aria-label="期間分割操作">{splitYears.map((year) => <Button key={year} variant="outline" size="sm" className="h-7 px-2 text-[9px]" aria-label={`${year}年から期間を分割`} onClick={() => splitForecastAtYear(year)}>＋ '{String(year).slice(-2)}</Button>)}{segments.slice(1).filter((segment, index) => segments[index].definitionId === segment.definitionId).map((segment) => <Button key={segment.id} variant="ghost" size="sm" className="h-7 px-2 text-[9px] text-orange" aria-label={`${segment.startYear}年の期間分割を解除`} onClick={() => mergeForecastPeriod(segment.id)}>− '{String(segment.startYear).slice(-2)}</Button>)}</div></div>
+              })}</div><span className="mx-1 h-6 w-px shrink-0 bg-line" aria-hidden="true" /><div className="flex shrink-0 items-center gap-1" aria-label="期間分割操作">{periodOperations.map((operation) => operation.action === 'split'
+                ? <Button key={operation.year} variant="outline" size="sm" className="h-7 w-10 px-1 text-[9px]" aria-label={`${operation.year}年から期間を分割`} onClick={() => splitForecastAtYear(operation.year)}>＋ '{String(operation.year).slice(-2)}</Button>
+                : <Button key={operation.year} variant="outline" size="sm" className="h-7 w-10 px-1 text-[9px] text-orange" aria-label={`${operation.year}年の期間分割を解除`} onClick={() => mergeForecastPeriod(operation.segmentId)}>− '{String(operation.year).slice(-2)}</Button>)}</div></div>
             </div>
             <div data-testid="forecast-chart-sections" data-layout={chartDisplayLayout} className="grid items-start gap-3">
               {comparisonVisible && <section data-testid="forecast-chart-section" data-scope="comparison" className="min-w-0">
