@@ -4,28 +4,61 @@ import { describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
 
 describe('将来予測・PL画面', () => {
-  it('最終年度の全社売上高と事業別配分を設定して固定・解除できる', async () => {
+  it('最終年度の事業別配分率だけを設定し、売上高は最適化対象に保つ', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
 
     const allocation = screen.getByTestId('final-year-sales-allocation');
+    const operationBar = screen.getByTestId('forecast-operation-bar');
+    expect(operationBar).toContainElement(allocation);
+    expect(within(operationBar).getByTestId('forecast-scope-shortcuts')).toHaveClass('flex-col');
+    expect(within(operationBar).getByTestId('forecast-scope-shortcuts')).toHaveTextContent('Ctrl+1 / 2 / 3');
+    expect(within(operationBar).getByTestId('forecast-view-shortcuts')).toHaveClass('flex-col');
+    expect(within(operationBar).getByTestId('forecast-view-shortcuts')).toHaveTextContent('Ctrl+4 / 5');
+    expect(within(allocation).getByTestId('final-year-allocation-title')).toHaveClass('flex-col');
+    const optimizationToolbar = within(operationBar).getByTestId('forecast-optimization-toolbar');
+    expect(optimizationToolbar).toHaveAttribute('data-layout', 'compact');
+    expect(optimizationToolbar).toHaveClass('flex', 'shrink-0');
+    expect(within(optimizationToolbar).getByRole('combobox', { name: '最適化方法' })).toBeVisible();
+    expect(within(optimizationToolbar).getByRole('combobox', { name: '探索範囲' })).toBeVisible();
+    expect(within(optimizationToolbar).getByRole('button', { name: '目標を満たす水準案を作成' })).toHaveClass('min-w-0', 'whitespace-nowrap');
+    expect(within(screen.getByTestId('forecast-metrics-panel')).queryByRole('combobox', { name: '最適化方法' })).not.toBeInTheDocument();
     expect(within(allocation).getByText('2031年')).toBeVisible();
-    const companySales = within(allocation).getByLabelText('最終年度 全社売上高目標');
+    expect(within(allocation).getByText(`（現在 ${88.94.toFixed(2)}%）`)).toBeVisible();
+    expect(allocation).toHaveClass('w-[236px]');
+    expect(within(allocation).getByTestId('current-base-share')).toHaveClass('w-[86px]', 'tabular-nums');
+    expect(within(allocation).queryByText(/^B /)).not.toBeInTheDocument();
+    await user.click(screen.getByRole('tab', { name: 'PL表' }));
+    const finalSales = screen.getByLabelText('ベース事業 P/L 2031年 売上高');
+    const salesBeforeAllocation = (finalSales as HTMLInputElement).value;
     const baseShare = within(allocation).getByLabelText('ベース事業 配分率');
-    await user.clear(companySales);
-    await user.type(companySales, '2000');
+    expect(baseShare).toHaveValue(null);
+    expect(baseShare).toHaveAttribute('placeholder', '任意');
+    expect(within(allocation).queryByLabelText('最終年度 全社売上高目標')).not.toBeInTheDocument();
     await user.clear(baseShare);
+    await user.tab();
+    expect(baseShare).toHaveValue(null);
     await user.type(baseShare, '65');
-    expect(within(allocation).getByText('補助事業 35.00%')).toBeVisible();
-    await user.click(within(allocation).getByRole('button', { name: '配分を売上高へ反映して固定' }));
-    expect(within(allocation).getByText('売上高配分を固定中')).toBeVisible();
-    expect(screen.getByLabelText('補助事業期間 売上高 水準')).toBeDisabled();
-
-    await user.click(within(allocation).getByRole('button', { name: '売上高配分の固定を解除' }));
+    expect(baseShare).toHaveValue(65);
+    expect(finalSales).toHaveValue(Number(salesBeforeAllocation));
+    expect(within(allocation).queryByRole('button', { name: /配分率を(設定|更新)/ })).not.toBeInTheDocument();
     expect(screen.getByLabelText('補助事業期間 売上高 水準')).toBeEnabled();
-  });
-  it('全水準とチャート・PL表・事業比較を同じ画面で切り替える', async () => {
+
+    await user.clear(baseShare);
+    await user.tab();
+    expect(baseShare).toHaveValue(null);
+    expect(finalSales).toHaveValue(Number(salesBeforeAllocation));
+
+    await user.type(baseShare, '70');
+    expect(within(allocation).getByText(`（現在 ${88.94.toFixed(2)}%）`)).toBeVisible();
+
+    await user.clear(baseShare);
+    await user.tab();
+    expect(baseShare).toHaveValue(null);
+    expect(screen.getByLabelText('補助事業期間 売上高 水準')).toBeEnabled();
+  }, 10_000);
+  it('全水準とチャート・PL表を同じ画面で切り替え、事業比較はチャート内に表示する', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
@@ -54,8 +87,7 @@ describe('将来予測・PL画面', () => {
     expect(profitChart.querySelector('[data-line-phase="forecast"]')).toBeInTheDocument();
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
     expect(screen.getByTestId('forecast-pl-table')).toBeVisible();
-    await user.click(screen.getByRole('tab', { name: '事業比較' }));
-    expect(screen.getAllByRole('img', { name: /推移チャート/ })).toHaveLength(6);
+    expect(screen.queryByRole('tab', { name: '事業比較' })).not.toBeInTheDocument();
   });
 
   it('全社・ベース・補助・事業比較を個別に表示し、1区分だけなら一覧表示にする', async () => {
@@ -64,9 +96,13 @@ describe('将来予測・PL画面', () => {
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
 
     const display = screen.getByTestId('forecast-chart-sections');
+    expect(screen.getByTestId('forecast-layout')).toHaveClass(
+      '[&>aside]:top-[var(--forecast-content-sticky-top)]',
+      '[&>aside]:max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)]',
+    );
     expect(screen.getByTestId('forecast-chart-display-controls')).toHaveClass(
       'sticky',
-      'top-28',
+      'top-[var(--forecast-content-sticky-top)]',
       'z-30',
       'bg-surface',
       'before:h-3',
@@ -143,7 +179,7 @@ describe('将来予測・PL画面', () => {
     const card = chart.closest('article');
     expect(card).toHaveClass('p-2', 'self-start');
     expect(chart).toHaveClass('h-38');
-    expect(chart.querySelector('text')).toHaveAttribute('font-size', '10');
+    expect(chart.querySelector('text')).toHaveAttribute('font-size', '11');
     expect(card?.querySelector('[data-testid="forecast-chart-heading"]')).toHaveClass('flex');
   });
 
@@ -255,24 +291,24 @@ describe('将来予測・PL画面', () => {
     expect(screen.queryByRole('slider', { name: '売上高・利益額 2026年 売上高' })).not.toBeInTheDocument();
   });
 
-  it('Ctrl+4・5・6でチャート・PL表・事業比較を切り替える', async () => {
+  it('Ctrl+4・5でチャート・PL表を切り替え、Ctrl+6は割り当てない', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
 
     const chartTab = screen.getByRole('tab', { name: 'チャート' });
     const tableTab = screen.getByRole('tab', { name: 'PL表' });
-    const comparisonTab = screen.getByRole('tab', { name: '事業比較' });
     expect(chartTab).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByText('Ctrl+4 / 5 / 6')).toBeVisible();
+    expect(screen.getByText('Ctrl+4 / 5')).toBeVisible();
+    expect(screen.queryByRole('tab', { name: '事業比較' })).not.toBeInTheDocument();
 
     await user.keyboard('{Control>}5{/Control}');
     expect(tableTab).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByTestId('forecast-pl-table')).toBeVisible();
 
     await user.keyboard('{Control>}6{/Control}');
-    expect(comparisonTab).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getAllByRole('img', { name: /推移チャート/ })).toHaveLength(6);
+    expect(tableTab).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('forecast-pl-table')).toBeVisible();
 
     await user.keyboard('{Control>}4{/Control}');
     expect(chartTab).toHaveAttribute('aria-selected', 'true');
@@ -299,6 +335,9 @@ describe('将来予測・PL画面', () => {
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
     expect(screen.getByRole('heading', { name: '経営指標・目標' })).toBeVisible();
     expect(screen.getByTestId('metric-bullet-company-sales-growth')).toHaveTextContent('全社売上高成長率');
+    const salesMetric = screen.getByTestId('metric-bullet-company-sales-growth');
+    expect(within(within(salesMetric).getByTestId('metric-title-row')).queryByTestId('metric-scope-badge')).not.toBeInTheDocument();
+    expect(within(within(salesMetric).getByTestId('metric-meta-row')).getByTestId('metric-scope-badge')).toHaveTextContent('全社');
     expect(screen.getByTestId('metric-bullet-latest-ebitda-margin')).toHaveAttribute('data-reference', 'fixed');
     const variableBar = screen.getByTestId('metric-bullet-bar-company-sales-growth');
     const fixedBar = screen.getByTestId('metric-bullet-bar-latest-ebitda-margin');
@@ -309,9 +348,20 @@ describe('将来予測・PL画面', () => {
     expect(screen.queryByTestId('metric-bullet-bar-latest-sales-investment-ratio')).not.toBeInTheDocument();
     expect(screen.queryByTestId('metric-bullet-bar-latest-equity-ratio')).not.toBeInTheDocument();
     expect(screen.queryByTestId('metric-bullet-bar-latest-roa')).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('全社売上高成長率 目標値')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('全社売上高成長率 個社目標')).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'すべて編集' }));
-    expect(screen.getByLabelText('全社売上高成長率 目標値')).toHaveValue(30.5);
+    const companyTarget = screen.getByLabelText('全社売上高成長率 個社目標');
+    expect(companyTarget).toHaveValue(null);
+    await user.type(companyTarget, '35');
+    await user.tab();
+    expect(screen.getByTestId('metric-bullet-company-sales-growth')).toHaveTextContent('制度 30.5');
+    expect(screen.getByTestId('metric-bullet-company-sales-growth')).toHaveTextContent('個社 35');
+    expect(screen.getByTestId('metric-program-target-company-sales-growth')).toBeVisible();
+    expect(screen.getByTestId('metric-company-target-company-sales-growth')).toBeVisible();
+    await user.clear(companyTarget);
+    await user.tab();
+    expect(screen.queryByTestId('metric-company-target-company-sales-growth')).not.toBeInTheDocument();
+    expect(screen.getByTestId('metric-bullet-company-sales-growth')).toHaveTextContent('制度≥ 30.5');
     expect((screen.getByLabelText('全社売上高成長率 計算式') as HTMLTextAreaElement).value).toContain('YEARS');
     expect(screen.getByLabelText('全社売上高成長率 対象範囲')).toHaveValue('company');
   });
@@ -368,7 +418,7 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByTestId('optimization-spinner')).toHaveClass('animate-spin', 'will-change-transform');
 
     const proposal = await screen.findByTestId('optimization-proposal', {}, { timeout: 15_000 });
-    const strength = within(proposal).getByRole('slider', { name: '最適化方向の適用率' });
+    const strength = within(screen.getByTestId('forecast-optimization-toolbar')).getByRole('slider', { name: '最適化方向の適用率' });
     const direction = within(proposal).getByText(/最適化方向・/);
     expect(strength.compareDocumentPosition(direction) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   }, 20_000);
@@ -378,7 +428,7 @@ describe('将来予測・PL画面', () => {
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
     await user.click(screen.getByRole('button', { name: 'すべて編集' }));
-    const target = screen.getByRole('spinbutton', { name: '全社売上高成長率 目標値' });
+    const target = screen.getByRole('spinbutton', { name: '全社売上高成長率 個社目標' });
     await user.clear(target);
     await user.type(target, '100');
     await user.selectOptions(screen.getByRole('combobox', { name: '探索範囲' }), 'outside-levels');
@@ -397,9 +447,9 @@ describe('将来予測・PL画面', () => {
 
     const proposal = screen.getByTestId('optimization-proposal');
     const summary = within(proposal).getByTestId('optimization-status-summary');
-    const strength = within(proposal).getByTestId('optimization-strength-control');
-    expect(summary.compareDocumentPosition(strength) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(strength.compareDocumentPosition(report) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const strength = within(screen.getByTestId('forecast-optimization-toolbar')).getByTestId('optimization-strength-control');
+    expect(strength.compareDocumentPosition(summary) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(summary.compareDocumentPosition(report) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     const expansionPlan = await screen.findByTestId('optimization-expansion-plan', {}, { timeout: 30_000 });
     expect(within(expansionPlan).queryByRole('checkbox')).not.toBeInTheDocument();
@@ -426,7 +476,7 @@ describe('将来予測・PL画面', () => {
     await screen.findByTestId('optimization-proposal', {}, { timeout: 30_000 });
     const control = screen.getByTestId('optimization-strength-control');
     const thumb = screen.getByRole('slider', { name: '最適化方向の適用率' });
-    expect(control).toHaveClass('h-8');
+    expect(control).toHaveClass('h-7');
     expect(thumb).toHaveAttribute('data-slot', 'slider-thumb');
   }, 35_000);
 
@@ -512,17 +562,55 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByLabelText('ベース事業 P/L 2028年 売上高')).toHaveValue(1259.7);
   });
 
-  it('将来チャート点を操作するとドラッグ途中から水準と線を更新し、Undoは1回にまとめる', async () => {
+  it('将来チャートは閲覧専用で、点をドラッグまたはキー操作できない', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
-    const rate = screen.getByLabelText('補助事業期間 売上高 年間変化');
-    const before = Number((rate as HTMLInputElement).value);
-    const point = screen.getByRole('slider', { name: '売上高・利益額 2026年 売上高' });
-    point.focus();
-    await user.keyboard('{ArrowUp}');
-    expect(rate).not.toHaveValue(before);
-    await user.keyboard('{Control>}z{/Control}');
-    expect(rate).toHaveValue(before);
+    const chart = screen.getByRole('img', { name: '売上高・利益額 推移チャート' });
+    expect(chart.closest('[data-testid="forecast-chart-card"]')).toHaveClass('bg-white');
+    expect(within(chart).queryByRole('slider')).not.toBeInTheDocument();
+    expect(screen.queryByRole('slider', { name: '売上高・利益額 2026年 売上高' })).not.toBeInTheDocument();
+    const actualPoints = chart.querySelectorAll('[data-point-phase="actual"]');
+    const forecastPoints = chart.querySelectorAll('[data-point-phase="forecast"]');
+    expect(actualPoints.length).toBeGreaterThan(0);
+    expect(forecastPoints.length).toBeGreaterThan(0);
+    expect(actualPoints[0]).toHaveAttribute('fill', '#183b56');
+    expect(forecastPoints[0]).toHaveAttribute('fill', '#fff');
+    expect(forecastPoints[0]).toHaveAttribute('stroke', '#183b56');
+    expect(within(chart).getByTestId('forecast-area')).toHaveAttribute('fill', '#eef6ef');
+    expect(within(chart).getByTestId('forecast-start-boundary')).toHaveAttribute('stroke-dasharray', '3 3');
+    expect(within(chart).getByText("'28")).toBeInTheDocument();
+    expect(within(chart).getByText('基準年')).toBeInTheDocument();
+    expect(within(chart).getByText('最新決算期')).toBeInTheDocument();
+    const year2028X = Number(within(chart).getByText("'28").getAttribute('x'));
+    const year2029X = Number(within(chart).getByText("'29").getAttribute('x'));
+    const periodBoundaryX = Number(within(chart).getByTestId('forecast-boundary-2029').getAttribute('x1'));
+    expect(periodBoundaryX).toBe((year2028X + year2029X) / 2);
+  });
+
+  it('縦軸を4区間で表示し、年度ホバーで全系列の値を確認・クリック固定できる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    const chart = screen.getByRole('img', { name: '売上高・利益額 推移チャート' });
+    expect(chart.querySelectorAll('[data-axis-tick="y"]')).toHaveLength(5);
+    expect(chart.querySelector('[data-axis-tick="y"]')).toHaveAttribute('font-size', '11');
+    expect(within(chart).getByText("'23")).toHaveAttribute('font-size', '11');
+
+    const yearTarget = within(chart).getByTestId('chart-year-target-2028');
+    await user.hover(yearTarget);
+    const tooltip = within(chart).getByTestId('chart-tooltip');
+    expect(tooltip).toHaveTextContent('2028年');
+    expect(tooltip).toHaveTextContent('売上高');
+    expect(tooltip).toHaveTextContent('売上総利益');
+    expect(tooltip).toHaveTextContent('営業利益');
+
+    await user.click(yearTarget);
+    await user.unhover(yearTarget);
+    expect(within(chart).getByTestId('chart-tooltip')).toHaveTextContent('2028年');
+    await user.click(yearTarget);
+    await user.unhover(yearTarget);
+    expect(within(chart).queryByTestId('chart-tooltip')).not.toBeInTheDocument();
   });
 });

@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #fffdf8;
+  --color-background: #f8fafb;
   --color-foreground: #17243b;
-  --color-card: #fffdf8;
+  --color-card: #ffffff;
   --color-card-foreground: #17243b;
   --color-popover: #ffffff;
   --color-popover-foreground: #17243b;
@@ -13,7 +13,7 @@
   --color-secondary-foreground: #17243b;
   --color-muted: #edf2f4;
   --color-muted-foreground: #667085;
-  --color-accent: #e8e6df;
+  --color-accent: #eef1f3;
   --color-accent-foreground: #17243b;
   --color-destructive: #b42318;
   --color-border: #d2dbe2;
@@ -22,11 +22,11 @@
   --color-ink: #17243b;
   --color-navy: #183b56;
   --color-line: #d2dbe2;
-  --color-surface: #fffdf8;
+  --color-surface: #ffffff;
   --color-teal: #167d78;
   --color-orange: #c75b24;
   --color-soft: #edf2f4;
-  --color-canvas: #f4f2ec;
+  --color-canvas: #f3f5f6;
   --font-sans: "Yu Gothic UI", "Hiragino Sans", Meiryo, system-ui, sans-serif;
 }
 
@@ -42,5 +42,33 @@
   input[type="number"]::-webkit-outer-spin-button {
     margin: 0;
     -webkit-appearance: none;
+  }
+}
+
+@container (max-width: 245px) {
+  .forecast-setting-controls--with-adjustment {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.25rem;
+  }
+
+  .forecast-start-adjustment-group {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 64px;
+    align-items: center;
+    gap: 0.5rem;
+    border-top: 1px dashed var(--color-line);
+    border-left-width: 0;
+    padding-top: 0.25rem;
+    padding-left: 0;
+  }
+
+  .forecast-start-adjustment-group small {
+    text-align: left;
+    font-size: 8px;
+  }
+
+  .forecast-start-adjustment-group input {
+    width: 100%;
+    margin-top: 0;
   }
 }
