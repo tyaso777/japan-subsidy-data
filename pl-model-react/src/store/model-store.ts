@@ -107,7 +107,7 @@ function emptyRecordLike<T extends object>(record: T): T {
   return Object.fromEntries(Object.keys(record).map((field) => [field, null])) as T;
 }
 
-function initialSnapshot(programInput?: unknown, initialActuals: InitialActualsMode = 'sample'): ModelSnapshot {
+export function createInitialModelSnapshot(programInput?: unknown, initialActuals: InitialActualsMode = 'sample'): ModelSnapshot {
   const program = normalizeProgram(programInput ?? createDefaultProgram());
   const actuals = initialActuals === 'sample' ? {
     balanceSheets: structuredClone(balanceSheets),
@@ -140,7 +140,7 @@ export function createModelStore(program?: unknown, options?: { initialActuals?:
       set({ ...next, canUndo: true, canRedo: false });
     };
     return {
-      ...initialSnapshot(program, options?.initialActuals),
+      ...createInitialModelSnapshot(program, options?.initialActuals),
       preferences: { moneyUnit: 'millionYen' },
       canUndo: false,
       canRedo: false,

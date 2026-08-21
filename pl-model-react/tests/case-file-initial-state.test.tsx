@@ -46,4 +46,20 @@ describe('案件JSONを読み込む前後の過去実績', () => {
     expect(click).toHaveBeenCalledOnce();
     fireEvent.change(fileInput, { target: { files: [] } });
   });
+
+  it('ファイルを選択せず同梱サンプルデータを読み込める', async () => {
+    const user = userEvent.setup();
+    render(<App initialActuals="empty" />);
+    const assets = screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額');
+    const sales = screen.getByLabelText('ベース事業 P/L 2023年 売上高');
+    expect(assets).toHaveValue(null);
+    expect(sales).toHaveValue(null);
+
+    await user.click(screen.getByRole('button', { name: '案件JSONメニュー' }));
+    await user.click(screen.getByRole('menuitem', { name: 'サンプルデータを読み込む' }));
+
+    expect(assets).toHaveValue(1050);
+    expect(sales).toHaveValue(900);
+    expect(screen.getByRole('button', { name: 'sample-case.json' })).toBeVisible();
+  });
 });

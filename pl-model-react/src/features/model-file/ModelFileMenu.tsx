@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
 import { parseModelFile, serializeModelFile } from '../../domain/model-file';
+import { createInitialModelSnapshot } from '../../store/model-store';
 import { useModelStore } from '../../store/model-store-context';
 
 type WritableFile = {
@@ -90,6 +91,12 @@ export function ModelFileMenu() {
     try { await writeTo(handleRef.current); } catch { setError('案件ファイルを上書きできませんでした'); }
   };
 
+  const loadSample = () => {
+    replaceSnapshot(createInitialModelSnapshot(window.PL_SUBSIDY_PROGRAM, 'sample'));
+    handleRef.current = null;
+    setFileName('sample-case.json');
+  };
+
   return <>
     <input ref={inputRef} aria-label="案件JSONファイル" className="hidden" type="file" accept="application/json,.json" onChange={(event: ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
@@ -97,8 +104,10 @@ export function ModelFileMenu() {
       event.target.value = '';
     }} />
     <div className="flex items-stretch"><Button variant="outline" size="sm" className="max-w-38 rounded-r-none" onClick={() => void open()}><FileJson /><span className="truncate">{fileName ?? '案件JSON'}</span></Button><DropdownMenu>
-      <DropdownMenuTrigger asChild><Button variant="outline" size="icon" className="h-8 w-7 rounded-l-none border-l-0" aria-label="案件JSONの保存メニュー"><ChevronDown /></Button></DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild><Button variant="outline" size="icon" className="h-8 w-7 rounded-l-none border-l-0" aria-label="案件JSONメニュー"><ChevronDown /></Button></DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem onSelect={loadSample}><FileJson />サンプルデータを読み込む</DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem disabled={!handleRef.current} onSelect={() => void overwrite()}><Save />上書き保存</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => void saveAs()}><SaveAll />名前を付けて保存</DropdownMenuItem>
