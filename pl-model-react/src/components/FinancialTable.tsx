@@ -52,7 +52,7 @@ function EditableValueCell({ label, value, step, maximumFractionDigits, onEditSt
   const [editing, setEditing] = useState(false);
   const [dirty, setDirty] = useState(false);
   useEffect(() => { if (!editing) setDraft(String(normalized)); }, [editing, normalized]);
-  return <Input className="ml-auto h-6 w-[min(120px,100%)] rounded px-0.5 py-0 text-right text-[10px]" aria-label={label} type="number" step={step} value={draft} onFocus={() => { setEditing(true); setDirty(false); onEditStart?.(); }} onChange={(event) => { setDirty(true); setDraft(event.target.value); }} onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); }} onBlur={() => { const next = Number(draft); setEditing(false); if (dirty && Number.isFinite(next)) onCommit(next); setDirty(false); onEditEnd?.(); }} />;
+  return <Input className="ml-auto h-6 w-[min(120px,100%)] select-text rounded px-0.5 py-0 text-right text-[10px]" aria-label={label} type="number" step={step} value={draft} onFocus={() => { setEditing(true); setDirty(false); onEditStart?.(); }} onChange={(event) => { setDirty(true); setDraft(event.target.value); }} onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); }} onBlur={() => { const next = Number(draft); setEditing(false); if (dirty && Number.isFinite(next)) onCommit(next); setDirty(false); onEditEnd?.(); }} />;
 }
 
 export function FinancialTable<T extends object>({ testId, title, prefix = '', years, records, rows, onChange, moneyUnit, onEditStart, onEditEnd, editableFromIndex, onValueChange, onValuesChange, yearLabels, onRowSelect, isRecordEmpty, separateSubjectColumns = false }: Props<T>) {
@@ -154,16 +154,20 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
     'data-column-index': column,
     onMouseDown: (event: MouseEvent<HTMLElement>) => {
       if (event.button !== 0) return;
+      window.getSelection()?.removeAllRanges();
       const cell = { row, column };
       const anchor = event.shiftKey && selection ? selection.anchor : cell;
       dragAnchor.current = anchor;
       setSelection({ anchor, focus: cell });
-      if (!(event.target instanceof HTMLInputElement) && !(event.target instanceof HTMLButtonElement)) {
+      if (!(event.target instanceof HTMLInputElement)) {
+        event.preventDefault();
         event.currentTarget.focus({ preventScroll: true });
       }
     },
     onMouseEnter: (event: MouseEvent<HTMLElement>) => {
       if (!dragAnchor.current || (event.buttons & 1) !== 1) return;
+      event.preventDefault();
+      window.getSelection()?.removeAllRanges();
       setSelection({ anchor: dragAnchor.current, focus: { row, column } });
     },
     onClick: (event: MouseEvent<HTMLElement>) => selectCell({ row, column }, event.shiftKey),
@@ -180,7 +184,7 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
       <div className="grid min-h-8 items-center border-t border-line bg-[#f3f1eb] text-[10px]" style={{ gridTemplateColumns: separateSubjectColumns ? `8% 22% repeat(${years.length}, minmax(0, 1fr))` : `26% repeat(${years.length}, minmax(0, 1fr))` }}>{separateSubjectColumns ? <><strong className="px-2 py-1 text-left text-muted-foreground">科目番号</strong><strong className="px-2 py-1 text-left text-muted-foreground">科目名</strong></> : <strong className="px-2 py-1 text-left text-muted-foreground">科目</strong>}{years.map((year, index) => <YearHeading key={year} year={year} index={index} count={years.length} role={yearLabels?.[year]} />)}</div>
     </div>
     <div className="overflow-x-auto">
-      <table className="w-full table-fixed border-collapse text-[10px]">
+      <table className="w-full table-fixed border-collapse text-[10px] select-none">
         <colgroup>{separateSubjectColumns ? <><col style={{ width: '8%' }} /><col data-testid={`${testId}-subject-column`} style={{ width: '22%' }} /></> : <col data-testid={`${testId}-subject-column`} style={{ width: '26%' }} />}<col span={years.length} /></colgroup>
         <thead className="sr-only"><tr>{separateSubjectColumns ? <><th scope="col">科目番号</th><th scope="col">科目名</th></> : <th scope="col" aria-label="科目" />}{years.map((year, index) => <th scope="col" aria-label={`${yearLabels?.[year]?.primary ?? closingLabel(index, years.length)} ${year}年`} key={year} />)}</tr></thead>
         <tbody>{visibleRows.map((row, rowIndex) => <tr key={row.code} className={cn(row.calculated && 'bg-teal/5', row.supplementary && 'bg-orange/5')}>
@@ -197,7 +201,7 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
             }
             const field = row.field;
             return <td {...cellInteraction(rowIndex, index + yearColumnOffset)} className={cn('h-8 border-t border-line px-0.5 py-1 text-right tabular-nums', selectionClass)} key={years[index]}>{field && onChange
-              ? <NumberInput className="ml-auto h-6 w-[min(120px,100%)] rounded px-0.5 py-0 text-right text-[10px]" aria-label={`${title} ${years[index]}年 ${row.label}`} step={financialInputStep(kind, moneyUnit)} value={rawValue === null || rawValue === undefined ? null : toDisplayFinancialValue(Number(rawValue), kind, moneyUnit)} emptyValue={rawValue === null || rawValue === undefined ? null : 0} onEditingStart={onEditStart} onEditingEnd={onEditEnd} onValueChange={(value) => onChange(index, field, fromDisplayFinancialValue(value, kind, moneyUnit))} />
+              ? <NumberInput className="ml-auto h-6 w-[min(120px,100%)] select-text rounded px-0.5 py-0 text-right text-[10px]" aria-label={`${title} ${years[index]}年 ${row.label}`} step={financialInputStep(kind, moneyUnit)} value={rawValue === null || rawValue === undefined ? null : toDisplayFinancialValue(Number(rawValue), kind, moneyUnit)} emptyValue={rawValue === null || rawValue === undefined ? null : 0} onEditingStart={onEditStart} onEditingEnd={onEditEnd} onValueChange={(value) => onChange(index, field, fromDisplayFinancialValue(value, kind, moneyUnit))} />
               : rawValue === null || rawValue === undefined ? '—' : formatFinancialValue(Number(rawValue), kind, moneyUnit)}</td>;
           })}
         </tr>)}</tbody>

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { createEvent, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
@@ -184,12 +184,22 @@ describe('期間・過去実績', () => {
     render(<App />);
     const table = screen.getByTestId('historical-bs');
     const codeCell = within(table).getByText('1-1').closest<HTMLElement>('[data-grid-cell="true"]');
+    const label = within(table).getByText('資産総額');
     const finalValue = screen.getByLabelText('全社 B/S（1-1～1-25） 2025年 資産総額');
     const finalCell = finalValue.closest<HTMLElement>('[data-grid-cell="true"]');
     expect(codeCell).not.toBeNull();
     expect(finalCell).not.toBeNull();
 
-    fireEvent.mouseDown(codeCell!, { button: 0, buttons: 1 });
+    const nativeSelection = window.getSelection();
+    const nativeRange = document.createRange();
+    nativeRange.selectNodeContents(label);
+    nativeSelection?.addRange(nativeRange);
+    expect(nativeSelection?.toString()).toBe('資産総額');
+
+    const mouseDown = createEvent.mouseDown(codeCell!, { button: 0, buttons: 1 });
+    fireEvent(codeCell!, mouseDown);
+    expect(mouseDown.defaultPrevented).toBe(true);
+    expect(nativeSelection?.toString()).toBe('');
     fireEvent.mouseEnter(finalCell!, { buttons: 1 });
     fireEvent.mouseUp(window);
     let copied = '';
