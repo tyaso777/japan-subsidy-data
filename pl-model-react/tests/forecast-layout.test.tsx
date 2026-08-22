@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
-import { availableSettingsPanelHeight, settingsPeriodMinWidth, shouldAutoCollapseSettings } from '../src/features/forecast/forecast-layout';
+import { settingsPeriodMinWidth, shouldAutoCollapseSettings } from '../src/features/forecast/forecast-layout';
 import { stickyStackOffset, stickyStackOffsetCss } from '../src/lib/sticky-stack';
 
 const nativeResizeObserver = globalThis.ResizeObserver;
@@ -23,11 +23,28 @@ describe('将来予測画面のワイドレイアウト', () => {
     expect(screen.getByTestId('forecast-layout')).toHaveClass(
       'grid-cols-[clamp(320px,20vw,380px)_minmax(0,1fr)_clamp(250px,15vw,290px)]',
     );
-    expect(screen.getByTestId('forecast-settings-panel')).toHaveClass('overflow-x-hidden', 'overflow-y-auto', 'p-2.5');
+    expect(screen.getByTestId('forecast-settings-panel')).toHaveClass(
+      'sticky',
+      'top-[var(--forecast-content-sticky-top)]',
+      'max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)]',
+      'overflow-x-hidden',
+      'overflow-y-auto',
+      'p-2.5',
+    );
+    expect(screen.getByTestId('forecast-settings-panel')).not.toHaveClass('top-3');
     expect(screen.getByTestId('forecast-period-grid')).toHaveClass('min-w-0');
     expect(screen.getByTestId('forecast-period-grid')).not.toHaveClass('overflow-x-auto');
     const metricsPanel = screen.getByTestId('forecast-metrics-panel');
-    expect(metricsPanel).toHaveClass('min-w-0', 'overflow-x-hidden', 'overflow-y-scroll', 'p-2');
+    expect(metricsPanel).toHaveClass(
+      'sticky',
+      'top-[var(--forecast-content-sticky-top)]',
+      'max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)]',
+      'min-w-0',
+      'overflow-x-hidden',
+      'overflow-y-scroll',
+      'p-2',
+    );
+    expect(metricsPanel).not.toHaveClass('top-3', 'max-h-[calc(100vh-24px)]');
     expect(metricsPanel).toHaveStyle({ scrollbarGutter: 'stable' });
     expect(within(screen.getByTestId('metric-bullet-company-sales-growth')).getByTestId('metric-bullet-layout')).toHaveClass(
       'grid-cols-[minmax(92px,0.88fr)_minmax(84px,0.72fr)]',
@@ -36,10 +53,7 @@ describe('将来予測画面のワイドレイアウト', () => {
     expect(within(salesGrowthMetric).getByText('2028→2031 · %/年')).toBeVisible();
     expect(within(salesGrowthMetric).queryByText(/A:2028|B:2031/)).not.toBeInTheDocument();
     expect(within(salesGrowthMetric).queryByText(/目標まで/)).not.toBeInTheDocument();
-    expect(screen.getByTestId('forecast-layout')).toHaveClass(
-      '[&>aside]:top-[var(--forecast-content-sticky-top)]',
-      '[&>aside]:max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)]',
-    );
+    expect(screen.getByTestId('forecast-layout').className).not.toMatch(/\[&>aside\]/);
 
     const stickyLayer = screen.getByTestId('forecast-operation-sticky-layer');
     expect(stickyLayer).toHaveClass('sticky', 'top-[var(--app-toolbar-sticky-bottom)]', 'z-40', 'bg-surface');
@@ -69,8 +83,6 @@ describe('将来予測画面のワイドレイアウト', () => {
     expect(shouldAutoCollapseSettings(0, 2)).toBe(false);
     expect(settingsPeriodMinWidth(3, true)).toBe('150px');
     expect(settingsPeriodMinWidth(3, false)).toBe('150px');
-    expect(availableSettingsPanelHeight(900, 180)).toBe(708);
-    expect(availableSettingsPanelHeight(900, 20)).toBe(776);
   });
 
   it('固定面の境界は計測値を1px重ねて小数ピクセルの隙間を防ぐ', () => {

@@ -102,9 +102,13 @@ describe('将来予測・PL画面', () => {
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
 
     const display = screen.getByTestId('forecast-chart-sections');
-    expect(screen.getByTestId('forecast-layout')).toHaveClass(
-      '[&>aside]:top-[var(--forecast-content-sticky-top)]',
-      '[&>aside]:max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)]',
+    expect(screen.getByTestId('forecast-settings-panel')).toHaveClass(
+      'top-[var(--forecast-content-sticky-top)]',
+      'max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)]',
+    );
+    expect(screen.getByTestId('forecast-metrics-panel')).toHaveClass(
+      'top-[var(--forecast-content-sticky-top)]',
+      'max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)]',
     );
     expect(screen.getByTestId('forecast-chart-display-controls')).toHaveClass(
       'sticky',

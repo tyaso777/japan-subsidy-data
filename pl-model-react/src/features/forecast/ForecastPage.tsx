@@ -19,7 +19,7 @@ import { chartAxisTicks, nextChartExtent, type ChartExtent } from '../../domain/
 import { buildTimelineYearLabels, resolveTimeline } from '../../domain/timeline';
 import { downstreamCodes, plLogicNodes } from '../../domain/pl-logic';
 import { defaultForecastRange } from '../../domain/forecast-range';
-import { availableSettingsPanelHeight, settingsPeriodMinWidth, shouldAutoCollapseSettings } from './forecast-layout';
+import { settingsPeriodMinWidth, shouldAutoCollapseSettings } from './forecast-layout';
 import { stickyStackOffsetCss, useObservedHeight } from '../../lib/sticky-stack';
 
 type Scope = 'company' | 'base' | 'subsidy';
@@ -40,22 +40,14 @@ function useCompactSettingsPanel(periodCount: number) {
     const panel = ref.current;
     if (!panel) return;
     const update = (width: number) => setCompact(shouldAutoCollapseSettings(width, periodCount));
-    const updateViewportHeight = () => {
-      panel.style.maxHeight = `${availableSettingsPanelHeight(window.innerHeight, panel.getBoundingClientRect().top)}px`;
-    };
     update(panel.getBoundingClientRect().width || panel.clientWidth);
-    updateViewportHeight();
     const observer = new ResizeObserver((entries) => {
       const entry = entries[0];
       if (entry) update(entry.contentRect.width);
     });
     observer.observe(panel);
-    window.addEventListener('resize', updateViewportHeight);
-    window.addEventListener('scroll', updateViewportHeight, { passive: true });
     return () => {
       observer.disconnect();
-      window.removeEventListener('resize', updateViewportHeight);
-      window.removeEventListener('scroll', updateViewportHeight);
     };
   }, [periodCount]);
   return { ref, compact };
@@ -379,8 +371,8 @@ export function ForecastPage() {
       </section>
       <div data-testid="forecast-sticky-spacer" className="h-3 bg-canvas" aria-hidden="true" />
       </div>
-    <div data-testid="forecast-layout" className="grid grid-cols-[clamp(320px,20vw,380px)_minmax(0,1fr)_clamp(250px,15vw,290px)] items-start gap-3 [&>aside]:top-[var(--forecast-content-sticky-top)] [&>aside]:max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)]">
-      <aside ref={settingsPanel.ref} data-testid="forecast-settings-panel" className="sticky top-3 overflow-x-hidden overflow-y-auto border border-line bg-surface p-2.5">
+    <div data-testid="forecast-layout" className="grid grid-cols-[clamp(320px,20vw,380px)_minmax(0,1fr)_clamp(250px,15vw,290px)] items-start gap-3">
+      <aside ref={settingsPanel.ref} data-testid="forecast-settings-panel" className="sticky top-[var(--forecast-content-sticky-top)] max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)] overflow-x-hidden overflow-y-auto border border-line bg-surface p-2.5">
         <div className="mb-2 flex items-center justify-between gap-2"><div><h3 className="m-0 text-base font-bold">水準設定</h3><p className="m-0 text-[10px] text-muted-foreground">{scope === 'company' ? '全社合算ではベース事業の水準を表示' : scopeLabels[scope]}・右端は開始時増減</p></div><span className="flex shrink-0 items-center gap-1"><Button variant="outline" size="sm" className="h-7 gap-1 px-2 text-[9px]" aria-label={variationOpen ? '変動設定を隠す' : '変動設定を表示'} aria-expanded={variationOpen} onClick={() => setVariationOverride(!variationOpen)}><ChevronDown className={cn('transition-transform', !variationOpen && '-rotate-90')} />変動設定</Button><Badge variant="outline">金額単位：{moneyUnitLabel(unit)}</Badge></span></div>
         {scope === 'company' && <p className="mb-2 rounded bg-soft p-2 text-[10px] text-muted-foreground">全社合算はベース事業と補助事業から自動計算します。水準を変更する場合は各事業へ切り替えてください。</p>}
         <div data-testid="forecast-period-grid" className="grid min-w-0 gap-2" style={{ gridTemplateColumns: `repeat(${segments.length}, minmax(${settingsPeriodMinWidth(segments.length, variationOpen)}, 1fr))` }}>{segments.map((period, segmentIndex) => { const definitionLabel = program.definitions.periods.find((definition) => definition.id === period.definitionId)?.label ?? period.definitionId; const siblings = segments.filter((candidate) => candidate.definitionId === period.definitionId); const label = siblings.length > 1 ? `${definitionLabel}${siblings.indexOf(period) + 1}` : definitionLabel; return <section data-testid="forecast-period-column" key={period.id} className="min-w-0 border-t-[3px] border-navy bg-background"><header data-testid="forecast-period-header" className="flex min-h-10 items-center justify-between gap-2 px-1.5 py-1"><span className="flex min-w-0 items-center gap-2"><strong className="min-w-0 text-sm leading-tight">{label}</strong><span data-testid="forecast-period-years" className="shrink-0 whitespace-nowrap text-[10px] tabular-nums text-muted-foreground">{period.startYear}–{period.endYear}</span></span>{segmentIndex > 0 && segments[segmentIndex - 1].definitionId === period.definitionId && <Button variant="ghost" size="sm" className="h-6 shrink-0 px-1.5 text-[9px]" aria-label={`${period.startYear}年の期間分割を解除`} onClick={() => mergeForecastPeriod(period.id)}>解除</Button>}</header>{settings.map((series) => <SettingRow key={series.id} series={series} periodId={period.id} periodLabel={label} unit={unit} variationOpen={variationOpen} readOnly={scope === 'company'} />)}</section>; })}</div>

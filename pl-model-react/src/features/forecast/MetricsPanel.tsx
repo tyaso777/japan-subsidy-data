@@ -186,7 +186,7 @@ export function MetricsPanel({ company, base, subsidy, optimization }: { company
   const { proposal, rangeMode, isExpansionSearching, applicationResult } = optimization;
   const metrics = useModelStore((state) => state.program.definitions.managementMetrics);
   const program = useModelStore((state) => state.program);
-  return <aside data-testid="forecast-metrics-panel" style={{ scrollbarGutter: 'stable' }} className="sticky top-3 min-w-0 max-h-[calc(100vh-24px)] overflow-x-hidden overflow-y-scroll border border-line bg-surface p-2 pr-3">
+  return <aside data-testid="forecast-metrics-panel" style={{ scrollbarGutter: 'stable' }} className="sticky top-[var(--forecast-content-sticky-top)] min-w-0 max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)] overflow-x-hidden overflow-y-scroll border border-line bg-surface p-2 pr-3">
     <div className="mb-1 flex items-center justify-between gap-2"><div><h3 className="m-0 text-base font-bold">経営指標・目標</h3><p className="m-0 text-[10px] text-muted-foreground">制度式で全社・事業別を同時評価</p></div><Button variant={editing ? 'default' : 'outline'} size="sm" onClick={() => setEditing((value) => !value)}>{editing ? '編集完了' : 'すべて編集'}</Button></div>
     <div>{metrics.map((metric) => <MetricBullet key={metric.id} metric={metric} editing={editing} timeline={metric.scope === 'company' ? company : metric.scope === 'base' ? base : subsidy} />)}</div>
     {proposal && <section data-testid="optimization-proposal" className="mt-3 border-t-[3px] border-orange bg-background p-3">

@@ -11,9 +11,3 @@ export function settingsPeriodMinWidth(periodCount: number, _variationOpen: bool
   if (periodCount <= 2) return '0px';
   return '150px';
 }
-
-export function availableSettingsPanelHeight(viewportHeight: number, panelTop: number) {
-  const stickyTop = 112;
-  const bottomGap = 12;
-  return Math.max(240, viewportHeight - Math.max(panelTop, stickyTop) - bottomGap);
-}
