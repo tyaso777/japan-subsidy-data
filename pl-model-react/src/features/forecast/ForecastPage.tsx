@@ -7,6 +7,7 @@ import { Button } from '../../components/ui/button';
 import { NumberInput } from '../../components/ui/number-input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { StickyPanel } from '../../components/ui/sticky-panel';
+import { StickySurface } from '../../components/ui/sticky-surface';
 import { buildForecastPl, fitForecastPlCell, type ForecastSeries } from '../../domain/forecast-engine';
 import { orderForecastSeriesByPl } from '../../domain/forecast-series-order';
 import { calculatePlSeries, combinePlInputs } from '../../domain/financials';
@@ -358,7 +359,7 @@ export function ForecastPage() {
       <div><p className="mb-1 flex items-center gap-1 text-[10px] font-extrabold tracking-[.08em] text-orange"><SlidersHorizontal className="size-3" />FORECAST &amp; PL</p><h2 className="m-0 text-xl font-bold">将来予測・調整水準</h2></div>
     </section>
     <Tabs data-testid="forecast-workspace-tabs" value={view} onValueChange={(value) => setView(value as ForecastView)} className="gap-0" style={{ '--forecast-content-sticky-top': stickyStackOffsetCss('var(--app-toolbar-sticky-bottom)', operationLayer.height) } as CSSProperties}>
-      <div ref={operationLayer.ref} data-testid="forecast-operation-sticky-layer" className="sticky top-[var(--app-toolbar-sticky-bottom)] z-40 grid bg-surface">
+      <StickySurface ref={operationLayer.ref} data-testid="forecast-operation-sticky-layer" stickyTop="var(--app-toolbar-sticky-bottom)" className="z-40 grid">
       <section data-testid="forecast-operation-bar" className="flex min-w-0 items-center gap-2 overflow-x-auto border border-line bg-surface px-2 py-1.5 shadow-sm">
         <div data-testid="forecast-scope-shortcuts" className="flex shrink-0 flex-col items-center gap-0.5"><div className="flex rounded-lg bg-[#e8e6df] p-1" aria-label="対象事業">{(['company', 'base', 'subsidy'] as Scope[]).map((item) => <Button key={item} variant="ghost" size="sm" className={cn('h-7 px-2 text-[10px]', scope === item && 'bg-navy text-white hover:bg-navy/90 hover:text-white')} onClick={() => setScope(item)}>{scopeLabels[item]}</Button>)}</div><span className="text-[7px] leading-none text-muted-foreground">Ctrl+1 / 2 / 3</span></div>
         <span className="h-6 w-px shrink-0 bg-line" aria-hidden="true" />
@@ -371,7 +372,7 @@ export function ForecastPage() {
         <OptimizationToolbar controller={optimization} compact />
       </section>
       <div data-testid="forecast-sticky-spacer" className="h-3 bg-canvas" aria-hidden="true" />
-      </div>
+      </StickySurface>
     <div data-testid="forecast-layout" className="grid grid-cols-[clamp(320px,20vw,380px)_minmax(0,1fr)_clamp(250px,15vw,290px)] items-start gap-3">
       <StickyPanel
         ref={settingsPanel.ref}
@@ -386,7 +387,7 @@ export function ForecastPage() {
       </StickyPanel>
       <section className="min-w-0 border border-line bg-surface p-3">
           <TabsContent value="chart" className="mt-0">
-            <div ref={chartDisplayLayer.ref} data-testid="forecast-chart-display-controls" className="sticky top-[var(--forecast-content-sticky-top)] z-30 -mx-3 flex items-center justify-between gap-2 border-b border-line bg-surface px-3 py-2 shadow-sm">
+            <StickySurface ref={chartDisplayLayer.ref} data-testid="forecast-chart-display-controls" stickyTop="var(--forecast-content-sticky-top)" className="z-30 -mx-3 flex items-center justify-between gap-2 border-b border-line px-3 py-2 shadow-sm">
               <strong className="text-xs">表示区分</strong>
               <div className="flex flex-wrap items-center justify-end gap-1"><div aria-label="チャート表示区分" className="flex flex-wrap justify-end gap-1">{chartDisplayOrder.map((item) => {
                 const enabled = chartDisplays[item];
@@ -394,20 +395,20 @@ export function ForecastPage() {
               })}</div><span className="mx-1 h-6 w-px shrink-0 bg-line" aria-hidden="true" /><div className="flex shrink-0 items-center gap-1" aria-label="期間分割操作">{periodOperations.map((operation) => operation.action === 'split'
                 ? <Button key={operation.year} variant="outline" size="sm" className="h-7 w-10 px-1 text-[9px]" aria-label={`${operation.year}年から期間を分割`} onClick={() => splitForecastAtYear(operation.year)}>＋ '{String(operation.year).slice(-2)}</Button>
                 : <Button key={operation.year} variant="outline" size="sm" className="h-7 w-10 px-1 text-[9px] text-orange" aria-label={`${operation.year}年の期間分割を解除`} onClick={() => mergeForecastPeriod(operation.segmentId)}>− '{String(operation.year).slice(-2)}</Button>)}</div></div>
-            </div>
+            </StickySurface>
             <div data-testid="forecast-chart-sections" data-layout={chartDisplayLayout} className="grid items-start gap-3" style={{ '--forecast-section-sticky-top': stickyStackOffsetCss('var(--forecast-content-sticky-top)', chartDisplayLayer.height) } as CSSProperties}>
               {comparisonVisible && <section data-testid="forecast-chart-section" data-scope="comparison" className="min-w-0">
                 <div data-testid="forecast-comparison-section" data-placement="full-width" className="bg-surface">
-                  <header data-testid="forecast-comparison-sticky-header" className="sticky top-[var(--forecast-section-sticky-top)] z-20 flex items-center justify-between gap-2 border-t-2 border-orange bg-surface py-1.5 shadow-sm"><h3 className="m-0 text-sm font-bold">事業比較</h3><span className="text-[9px] text-muted-foreground">{comparisonCharts.length}チャート・全社合算／ベース事業／補助事業</span></header>
+                  <StickySurface data-testid="forecast-comparison-sticky-header" stickyTop="var(--forecast-section-sticky-top)" className="z-20 flex items-center justify-between gap-2 border-t-2 border-orange py-1.5 shadow-sm"><h3 className="m-0 text-sm font-bold">事業比較</h3><span className="text-[9px] text-muted-foreground">{comparisonCharts.length}チャート・全社合算／ベース事業／補助事業</span></StickySurface>
                   <div data-testid="forecast-comparison-chart-list" data-layout="overview" className="grid grid-cols-3 items-start gap-2">{renderComparisonCharts()}</div>
                 </div>
               </section>}
               {activeBusinessDisplays.length > 0 && <>
-                <div ref={businessHeaderScrollRef} data-testid="forecast-business-sticky-headers" className="sticky top-[var(--forecast-section-sticky-top)] z-20 overflow-hidden bg-surface shadow-sm">
+                <StickySurface ref={businessHeaderScrollRef} data-testid="forecast-business-sticky-headers" stickyTop="var(--forecast-section-sticky-top)" className="z-20 overflow-hidden shadow-sm">
                   <div className="grid items-start gap-2" style={{ gridTemplateColumns: businessOverview ? 'minmax(0, 1fr)' : `repeat(${activeBusinessDisplays.length}, minmax(220px, 1fr))`, minWidth: businessOverview ? undefined : `${activeBusinessDisplays.length * 220}px` }}>
                     {activeBusinessDisplays.map((item) => <header key={item} data-testid="forecast-business-sticky-header" className="flex items-center justify-between gap-2 border-t-2 border-navy px-0.5 py-1"><h3 className="m-0 text-sm font-bold">{chartDisplayLabels[item]}</h3><span className="text-[9px] text-muted-foreground">{charts.length}チャート</span></header>)}
                   </div>
-                </div>
+                </StickySurface>
                 <SyncedHorizontalScrollbar contentRef={chartScrollContentRef} contentKey={activeBusinessDisplays.join(':')} />
                 <div ref={chartScrollContentRef} data-testid="forecast-chart-scroll-content" className="overflow-x-auto pb-5">
                   <div data-testid="forecast-business-columns" data-orientation="horizontal" className="grid items-start gap-2 pb-1" style={{ gridTemplateColumns: businessOverview ? 'minmax(0, 1fr)' : `repeat(${activeBusinessDisplays.length}, minmax(220px, 1fr))` }}>
@@ -419,7 +420,7 @@ export function ForecastPage() {
               </>}
             </div>
           </TabsContent>
-          <TabsContent value="table"><FinancialTable testId="forecast-pl-table" title={`${scopeLabels[scope]} P/L`} years={selected.years} yearLabels={yearLabels} records={selected.records} rows={forecastPlRows} moneyUnit={unit} editableFromIndex={baseActuals.length} stickyHeaderPositionClassName="top-[var(--forecast-content-sticky-top)] z-30" onRowSelect={(row) => setSelectedLogicCode(row.code)} onEditStart={beginTransaction} onEditEnd={commitTransaction} onValueChange={scope === 'company' ? undefined : (yearIndex, row, value) => applyForecastPlValues([{ yearIndex, row, value }])} onValuesChange={scope === 'company' ? undefined : applyForecastPlValues} /></TabsContent>
+          <TabsContent value="table"><FinancialTable testId="forecast-pl-table" title={`${scopeLabels[scope]} P/L`} years={selected.years} yearLabels={yearLabels} records={selected.records} rows={forecastPlRows} moneyUnit={unit} editableFromIndex={baseActuals.length} stickyHeaderTop="var(--forecast-content-sticky-top)" stickyHeaderClassName="z-30" onRowSelect={(row) => setSelectedLogicCode(row.code)} onEditStart={beginTransaction} onEditEnd={commitTransaction} onValueChange={scope === 'company' ? undefined : (yearIndex, row, value) => applyForecastPlValues([{ yearIndex, row, value }])} onValuesChange={scope === 'company' ? undefined : applyForecastPlValues} /></TabsContent>
       </section>
       <MetricsPanel company={company} base={base} subsidy={subsidy} optimization={optimization} />
     </div>

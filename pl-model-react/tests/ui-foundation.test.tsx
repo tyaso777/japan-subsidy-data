@@ -25,7 +25,8 @@ describe('共通UI基盤', () => {
     render(<App />);
 
     const toolbar = screen.getByTestId('app-toolbar');
-    expect(toolbar).toHaveClass('sticky', 'top-0', 'z-50');
+    expect(toolbar).toHaveClass('sticky', 'isolate', 'z-50');
+    expect(toolbar).toHaveStyle({ top: '0px' });
     expect(toolbar).toHaveClass('bg-surface');
     expect(toolbar).not.toHaveClass('bg-surface/95', 'backdrop-blur');
     expect(within(toolbar).getByRole('navigation', { name: '主要画面' })).toBeVisible();

@@ -37,7 +37,8 @@ describe('期間・過去実績', () => {
       const section = screen.getByTestId(testId);
       const stickyHeader = within(section).getByTestId(`${testId}-sticky-header`);
       expect(section).toHaveClass('relative', 'isolate');
-      expect(stickyHeader).toHaveClass('sticky', 'top-12', 'z-40');
+      expect(stickyHeader).toHaveClass('sticky', 'isolate', 'z-40');
+      expect(stickyHeader).toHaveStyle({ top: 'var(--app-toolbar-sticky-bottom)' });
       expect(within(stickyHeader).getByText('科目番号')).toBeVisible();
       expect(within(stickyHeader).getByText('科目名')).toBeVisible();
       expect(within(stickyHeader).getByText('最新決算期')).toBeVisible();

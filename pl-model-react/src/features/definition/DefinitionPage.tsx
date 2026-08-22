@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { NumberInput } from '../../components/ui/number-input';
 import { Textarea } from '../../components/ui/textarea';
+import { StickySurface } from '../../components/ui/sticky-surface';
 import { inferMetricPeriodKind, validateMetricDefinition } from '../../domain/metrics';
 import { resolveTimeline } from '../../domain/timeline';
 import type { ManagementMetricDefinition, MetricTimeAnchor, ProgramConfiguration } from '../../domain/types';
@@ -32,7 +33,7 @@ function decodeAnchor(value: string): MetricTimeAnchor {
 }
 
 function DefinitionSectionHeader({ id, title, description, addLabel, onAdd }: { id: string; title: string; description?: ReactNode; addLabel: string; onAdd: () => void }) {
-  return <div data-testid={`definition-section-header-${id}`} className="sticky top-12 z-30 flex min-h-12 items-center justify-between gap-4 border-b border-line bg-surface py-2 shadow-sm"><div><h3 className="m-0 text-base font-bold">{title}</h3>{description && <p className="mt-1 mb-0 text-xs text-muted-foreground">{description}</p>}</div><Button variant="outline" size="sm" aria-label={addLabel} onClick={onAdd}><Plus />追加</Button></div>;
+  return <StickySurface data-testid={`definition-section-header-${id}`} stickyTop="var(--app-toolbar-sticky-bottom)" className="z-30 flex min-h-12 items-center justify-between gap-4 border-b border-line py-2 shadow-sm"><div><h3 className="m-0 text-base font-bold">{title}</h3>{description && <p className="mt-1 mb-0 text-xs text-muted-foreground">{description}</p>}</div><Button variant="outline" size="sm" aria-label={addLabel} onClick={onAdd}><Plus />追加</Button></StickySurface>;
 }
 
 function MetricCard({ metric, program, update, remove }: { metric: ManagementMetricDefinition; program: ProgramConfiguration; update: (metric: ManagementMetricDefinition) => void; remove: () => void }) {

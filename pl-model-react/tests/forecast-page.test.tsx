@@ -87,10 +87,8 @@ describe('将来予測・PL画面', () => {
     expect(profitChart.querySelector('[data-line-phase="forecast"]')).toBeInTheDocument();
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
     expect(screen.getByTestId('forecast-pl-table')).toBeVisible();
-    expect(screen.getByTestId('forecast-pl-table-sticky-header')).toHaveClass(
-      'top-[var(--forecast-content-sticky-top)]',
-      'z-30',
-    );
+    expect(screen.getByTestId('forecast-pl-table-sticky-header')).toHaveClass('sticky', 'isolate', 'z-30');
+    expect(screen.getByTestId('forecast-pl-table-sticky-header')).toHaveStyle({ top: 'var(--forecast-content-sticky-top)' });
     expect(screen.getByTestId('forecast-pl-table-sticky-header').className).not.toMatch(/before:/);
     expect(screen.getByTestId('forecast-pl-table-sticky-header')).not.toHaveClass('top-12');
     expect(screen.queryByRole('tab', { name: '事業比較' })).not.toBeInTheDocument();
@@ -104,25 +102,16 @@ describe('将来予測・PL画面', () => {
     const display = screen.getByTestId('forecast-chart-sections');
     expect(screen.getByTestId('forecast-settings-panel')).toHaveStyle({ top: 'var(--forecast-content-sticky-top)' });
     expect(screen.getByTestId('forecast-metrics-panel')).toHaveStyle({ top: 'var(--forecast-content-sticky-top)' });
-    expect(screen.getByTestId('forecast-chart-display-controls')).toHaveClass(
-      'sticky',
-      'top-[var(--forecast-content-sticky-top)]',
-      'z-30',
-      'bg-surface',
-    );
+    expect(screen.getByTestId('forecast-chart-display-controls')).toHaveClass('sticky', 'isolate', 'z-30', 'bg-surface');
+    expect(screen.getByTestId('forecast-chart-display-controls')).toHaveStyle({ top: 'var(--forecast-content-sticky-top)' });
     expect(screen.getByTestId('forecast-chart-display-controls').className).not.toMatch(/before:/);
     expect(screen.getByTestId('forecast-chart-display-controls')).not.toHaveClass('mb-2');
     expect(display).toHaveAttribute('data-layout', 'comparison-with-businesses');
     expect(display.getAttribute('style')).toContain('calc(var(--forecast-content-sticky-top) + 44px)');
     expect(screen.getAllByTestId('forecast-chart-section')).toHaveLength(4);
     expect(screen.getByTestId('forecast-comparison-section')).toHaveAttribute('data-placement', 'full-width');
-    expect(screen.getByTestId('forecast-comparison-sticky-header')).toHaveClass(
-      'sticky',
-      'top-[var(--forecast-section-sticky-top)]',
-      'bg-surface',
-      'border-t-2',
-      'border-orange',
-    );
+    expect(screen.getByTestId('forecast-comparison-sticky-header')).toHaveClass('sticky', 'isolate', 'bg-surface', 'border-t-2', 'border-orange');
+    expect(screen.getByTestId('forecast-comparison-sticky-header')).toHaveStyle({ top: 'var(--forecast-section-sticky-top)' });
     expect(screen.getByTestId('forecast-comparison-sticky-header')).not.toHaveClass('mb-1');
     expect(screen.getByTestId('forecast-comparison-section')).not.toHaveClass('pt-1.5');
     expect(screen.getByTestId('forecast-comparison-chart-list')).toHaveClass('grid-cols-3');
@@ -132,7 +121,8 @@ describe('将来予測・PL画面', () => {
       expect(list).toHaveClass('grid-cols-1');
     }
     const businessHeaders = screen.getByTestId('forecast-business-sticky-headers');
-    expect(businessHeaders).toHaveClass('sticky', 'top-[var(--forecast-section-sticky-top)]', 'bg-surface', 'overflow-hidden');
+    expect(businessHeaders).toHaveClass('sticky', 'isolate', 'bg-surface', 'overflow-hidden');
+    expect(businessHeaders).toHaveStyle({ top: 'var(--forecast-section-sticky-top)' });
     expect(screen.getByTestId('forecast-chart-scroll-content')).not.toContainElement(businessHeaders);
     expect(within(businessHeaders).getByRole('heading', { name: '全社合算' })).toBeVisible();
     expect(within(businessHeaders).getByRole('heading', { name: 'ベース事業' })).toBeVisible();

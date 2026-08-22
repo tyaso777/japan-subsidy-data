@@ -64,7 +64,8 @@ describe('将来予測画面のワイドレイアウト', () => {
     expect(screen.getByTestId('forecast-layout').className).not.toMatch(/\[&>aside\]/);
 
     const stickyLayer = screen.getByTestId('forecast-operation-sticky-layer');
-    expect(stickyLayer).toHaveClass('sticky', 'top-[var(--app-toolbar-sticky-bottom)]', 'z-40', 'bg-surface');
+    expect(stickyLayer).toHaveClass('sticky', 'isolate', 'z-40', 'bg-surface');
+    expect(stickyLayer).toHaveStyle({ top: 'var(--app-toolbar-sticky-bottom)' });
     expect(stickyLayer.className).not.toMatch(/(?:before|after):/);
     expect(screen.getByTestId('app-shell')).toHaveStyle({ '--app-toolbar-sticky-bottom': '56px' });
     expect(screen.getByTestId('forecast-workspace-tabs')).toHaveClass('gap-0');

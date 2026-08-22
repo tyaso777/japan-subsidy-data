@@ -1,5 +1,6 @@
 import type { CSSProperties, ComponentPropsWithRef, ReactNode } from 'react';
 import { cn } from '../../lib/utils';
+import { stickySurfaceBaseClassName, stickySurfaceStyle } from './sticky-surface';
 
 type StickyPanelProps = Omit<ComponentPropsWithRef<'aside'>, 'children'> & {
   testIdPrefix: string;
@@ -30,8 +31,8 @@ export function StickyPanel({
   return (
     <aside
       data-testid={`${testIdPrefix}-panel`}
-      className={cn('sticky flex min-w-0 flex-col overflow-hidden border border-line bg-surface', className)}
-      style={{ ...style, top: stickyTop, maxHeight: `calc(100vh - (${stickyTop} + ${bottomGap}px))` }}
+      className={cn(stickySurfaceBaseClassName, 'flex min-w-0 flex-col overflow-hidden border border-line', className)}
+      style={{ ...stickySurfaceStyle(stickyTop, style), maxHeight: `calc(100vh - (${stickyTop} + ${bottomGap}px))` }}
       {...props}
     >
       <div
