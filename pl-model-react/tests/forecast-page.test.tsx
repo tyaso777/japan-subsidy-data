@@ -246,6 +246,24 @@ describe('将来予測・PL画面', () => {
     expect(rate).toHaveValue(-3);
   });
 
+  it('年間変化を消した瞬間に0として再計算し、空欄表示はフォーカス中だけ維持する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    await user.click(screen.getByRole('tab', { name: 'PL表' }));
+    const rate = screen.getByLabelText('補助事業期間 売上高 年間変化');
+    const firstYearGrowth = screen.getByLabelText('ベース事業 P/L 2026年 売上高成長率');
+
+    expect(rate).toHaveValue(8);
+    expect(firstYearGrowth).toHaveValue(8);
+    await user.clear(rate);
+    expect(rate).toHaveValue(null);
+    expect(firstYearGrowth).toHaveValue(0);
+    await user.tab();
+    expect(rate).toHaveValue(0);
+    expect(firstYearGrowth).toHaveValue(0);
+  });
+
   it('開始時増減を消した瞬間に0として再計算し、空欄表示はフォーカス中だけ維持する', async () => {
     const user = userEvent.setup();
     render(<App />);
