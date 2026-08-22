@@ -12,6 +12,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './tests/setup.ts',
     css: true,
+    exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
     // DOM量の多い03画面を全スイート並列実行しても、個別テストの正常完了を待てるようにする。
     testTimeout: 20_000,
   },

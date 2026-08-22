@@ -52,7 +52,7 @@ function AppContent() {
     <header className="border border-line bg-surface px-5.5 pt-4.5 pb-3.5">
       <div><p className="mb-1 text-[10px] font-extrabold tracking-[.12em] text-orange">PL MODEL / REACT MIGRATION</p><h1 className="m-0 text-2xl leading-tight font-bold">成長投資計画シミュレーター</h1><Badge variant="outline" className="mt-1 border-line text-[10px] text-muted-foreground">{program.program.name}</Badge></div>
     </header>
-    <StickySurface ref={appToolbar.ref} data-testid="app-toolbar" stickyTop="0px" className="z-50 flex items-center justify-end gap-2 border-x border-b border-line px-3 py-2 shadow-sm max-[1100px]:overflow-x-auto"><nav aria-label="主要画面" className="flex gap-0.5 rounded-lg bg-[#e8e6df] p-1">{pages.map((item) => {
+    <StickySurface ref={appToolbar.ref} data-testid="app-toolbar" stickyTop="0px" layer="navigation" className="flex items-center justify-end gap-2 border-x border-b border-line px-3 py-2 shadow-sm max-[1100px]:overflow-x-auto"><nav aria-label="主要画面" className="flex gap-0.5 rounded-lg bg-[#e8e6df] p-1">{pages.map((item) => {
         const Icon = item.icon;
         const active = page === item.id;
         return <Button key={item.id} variant="ghost" size="sm" aria-current={active ? 'page' : undefined} className={cn('max-[1100px]:flex-1', active && 'bg-navy text-white hover:bg-navy/90 hover:text-white')} onClick={() => navigateToPage(item.id)}><Icon aria-hidden="true" />{item.label}</Button>;

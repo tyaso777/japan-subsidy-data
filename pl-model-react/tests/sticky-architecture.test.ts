@@ -29,4 +29,24 @@ describe('sticky実装のアーキテクチャ', () => {
 
     expect(violations).toEqual([]);
   });
+
+  it('固定面のz-indexを画面側へ直接書かず共通レイヤーを利用する', () => {
+    const violations = sourceFiles(sourceRoot).flatMap((path) => {
+      const name = relative(sourceRoot, path).replaceAll('\\', '/');
+      if (name.startsWith('components/ui/sticky-')) return [];
+      return readFileSync(path, 'utf8').split(/\r?\n/).flatMap((line, index) =>
+        /<Sticky(?:Surface|Panel)\b/.test(line) && /\bz-(?:10|20|30|40|50)\b/.test(line)
+          ? [`${name}:${index + 1}`]
+          : [],
+      );
+    });
+
+    expect(violations).toEqual([]);
+  });
+
+  it('固定位置の初回計測を描画前に完了する', () => {
+    const source = readFileSync(join(sourceRoot, 'lib/sticky-stack.ts'), 'utf8');
+    expect(source).toContain('useLayoutEffect');
+    expect(source).not.toMatch(/import\s*\{[^}]*\buseEffect\b/);
+  });
 });

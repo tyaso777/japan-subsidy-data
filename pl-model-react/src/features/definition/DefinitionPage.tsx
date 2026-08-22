@@ -33,7 +33,7 @@ function decodeAnchor(value: string): MetricTimeAnchor {
 }
 
 function DefinitionSectionHeader({ id, title, description, addLabel, onAdd }: { id: string; title: string; description?: ReactNode; addLabel: string; onAdd: () => void }) {
-  return <StickySurface data-testid={`definition-section-header-${id}`} stickyTop="var(--app-toolbar-sticky-bottom)" className="z-30 flex min-h-12 items-center justify-between gap-4 border-b border-line py-2 shadow-sm"><div><h3 className="m-0 text-base font-bold">{title}</h3>{description && <p className="mt-1 mb-0 text-xs text-muted-foreground">{description}</p>}</div><Button variant="outline" size="sm" aria-label={addLabel} onClick={onAdd}><Plus />追加</Button></StickySurface>;
+  return <StickySurface data-testid={`definition-section-header-${id}`} stickyTop="var(--app-toolbar-sticky-bottom)" layer="content" className="flex min-h-12 items-center justify-between gap-4 border-b border-line py-2 shadow-sm"><div><h3 className="m-0 text-base font-bold">{title}</h3>{description && <p className="mt-1 mb-0 text-xs text-muted-foreground">{description}</p>}</div><Button variant="outline" size="sm" aria-label={addLabel} onClick={onAdd}><Plus />追加</Button></StickySurface>;
 }
 
 function MetricCard({ metric, program, update, remove }: { metric: ManagementMetricDefinition; program: ProgramConfiguration; update: (metric: ManagementMetricDefinition) => void; remove: () => void }) {

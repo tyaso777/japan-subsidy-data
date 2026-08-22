@@ -19,7 +19,9 @@ describe('StickyPanel', () => {
     const body = screen.getByTestId('sample-body');
 
     expect(panel).toHaveClass('sticky', 'flex', 'flex-col', 'overflow-hidden');
+    expect(panel).toHaveClass('bg-surface', 'z-10');
     expect(panel).toHaveStyle({ top: '126px' });
+    expect(panel).toHaveStyle({ backgroundColor: 'var(--color-surface)' });
     expect(panel.style.maxHeight).toBe('calc(100vh - (126px + 12px))');
     expect(header).toHaveClass('shrink-0', 'bg-surface');
     expect(header.parentElement).toBe(panel);

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 const STICKY_SEAM_OVERLAP_PX = 1;
 
@@ -15,13 +15,14 @@ export function stickyStackOffsetCss(base: string, measuredHeight: number) {
 export function useObservedHeight<T extends HTMLElement>(fallbackHeight = 0) {
   const ref = useRef<T>(null);
   const [height, setHeight] = useState(fallbackHeight);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const element = ref.current;
     if (!element) return;
     const update = (measuredHeight: number) => {
       if (measuredHeight > 0) setHeight(Math.ceil(measuredHeight));
     };
     update(element.getBoundingClientRect().height);
+    if (typeof ResizeObserver === 'undefined') return;
     const observer = new ResizeObserver((entries) => {
       const entry = entries[0];
       if (!entry) return;
