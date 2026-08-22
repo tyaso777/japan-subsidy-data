@@ -250,10 +250,12 @@ export function ForecastPage() {
   const [view, setView] = useState<ForecastView>('chart');
   const [chartDisplays, setChartDisplays] = useState<Record<ChartDisplay, boolean>>({ company: true, base: true, subsidy: true, comparison: true });
   const chartScrollContentRef = useRef<HTMLDivElement>(null);
+  const businessHeaderScrollRef = useRef<HTMLDivElement>(null);
   const [selectedLogicCode, setSelectedLogicCode] = useState('16');
   const model = useForecastModel();
   const optimization = useForecastOptimization();
   const operationLayer = useObservedHeight<HTMLDivElement>();
+  const chartDisplayLayer = useObservedHeight<HTMLDivElement>();
   const program = useModelStore((state) => state.program);
   const baseActuals = useModelStore((state) => state.actuals.basePl);
   const subsidyActuals = useModelStore((state) => state.actuals.subsidyPl);
@@ -350,6 +352,7 @@ export function ForecastPage() {
   ] as const;
   const activeChartDisplays = chartDisplayOrder.filter((item) => chartDisplays[item]);
   const activeBusinessDisplays = activeChartDisplays.filter((item): item is Scope => item !== 'comparison');
+  const activeBusinessDisplayKey = activeBusinessDisplays.join(':');
   const comparisonVisible = chartDisplays.comparison;
   const chartDisplayLayout = activeChartDisplays.length === 1 ? 'single' : comparisonVisible && activeBusinessDisplays.length > 0 ? 'comparison-with-businesses' : 'multiple-businesses';
   const businessOverview = activeBusinessDisplays.length === 1;
@@ -367,6 +370,15 @@ export function ForecastPage() {
     });
   };
   const renderComparisonCharts = () => comparisonCharts.map(([title, field, kind]) => <MultiLineChart key={title} title={title} subtitle="全社合算・ベース事業・補助事業" contextLabel="事業比較" years={company.years} lines={comparison(field)} boundaries={boundaryYears} kind={kind} unit={unit} editableFromYear={model.series[0].baseYear + 1} specialYearLabels={specialYearLabels} />);
+  useEffect(() => {
+    const content = chartScrollContentRef.current;
+    const header = businessHeaderScrollRef.current;
+    if (!content || !header) return;
+    const syncHeader = () => { header.scrollLeft = content.scrollLeft; };
+    syncHeader();
+    content.addEventListener('scroll', syncHeader, { passive: true });
+    return () => content.removeEventListener('scroll', syncHeader);
+  }, [activeBusinessDisplayKey, view]);
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if (!event.ctrlKey) return;
@@ -407,7 +419,7 @@ export function ForecastPage() {
       </aside>
       <section className="min-w-0 border border-line bg-surface p-3">
           <TabsContent value="chart" className="mt-0">
-            <div data-testid="forecast-chart-display-controls" className="sticky top-[var(--forecast-content-sticky-top)] z-30 -mx-3 mb-2 flex items-center justify-between gap-2 border-b border-line bg-surface px-3 py-2 shadow-sm before:pointer-events-none before:absolute before:inset-x-0 before:bottom-full before:h-3 before:bg-canvas before:content-['']">
+            <div ref={chartDisplayLayer.ref} data-testid="forecast-chart-display-controls" className="sticky top-[var(--forecast-content-sticky-top)] z-30 -mx-3 mb-2 flex items-center justify-between gap-2 border-b border-line bg-surface px-3 py-2 shadow-sm before:pointer-events-none before:absolute before:inset-x-0 before:bottom-full before:h-3 before:bg-canvas before:content-['']">
               <strong className="text-xs">表示区分</strong>
               <div className="flex flex-wrap items-center justify-end gap-1"><div aria-label="チャート表示区分" className="flex flex-wrap justify-end gap-1">{chartDisplayOrder.map((item) => {
                 const enabled = chartDisplays[item];
@@ -416,19 +428,23 @@ export function ForecastPage() {
                 ? <Button key={operation.year} variant="outline" size="sm" className="h-7 w-10 px-1 text-[9px]" aria-label={`${operation.year}年から期間を分割`} onClick={() => splitForecastAtYear(operation.year)}>＋ '{String(operation.year).slice(-2)}</Button>
                 : <Button key={operation.year} variant="outline" size="sm" className="h-7 w-10 px-1 text-[9px] text-orange" aria-label={`${operation.year}年の期間分割を解除`} onClick={() => mergeForecastPeriod(operation.segmentId)}>− '{String(operation.year).slice(-2)}</Button>)}</div></div>
             </div>
-            <div data-testid="forecast-chart-sections" data-layout={chartDisplayLayout} className="grid items-start gap-3">
+            <div data-testid="forecast-chart-sections" data-layout={chartDisplayLayout} className="grid items-start gap-3" style={{ '--forecast-section-sticky-top': `calc(var(--forecast-content-sticky-top) + ${chartDisplayLayer.height}px)` } as CSSProperties}>
               {comparisonVisible && <section data-testid="forecast-chart-section" data-scope="comparison" className="min-w-0">
                 <div data-testid="forecast-comparison-section" data-placement="full-width" className="border-t-2 border-orange pt-1.5">
-                  <header className="mb-1 flex items-center justify-between gap-2"><h3 className="m-0 text-sm font-bold">事業比較</h3><span className="text-[9px] text-muted-foreground">{comparisonCharts.length}チャート・全社合算／ベース事業／補助事業</span></header>
+                  <header data-testid="forecast-comparison-sticky-header" className="sticky top-[var(--forecast-section-sticky-top)] z-20 mb-1 flex items-center justify-between gap-2 bg-surface py-1 shadow-sm"><h3 className="m-0 text-sm font-bold">事業比較</h3><span className="text-[9px] text-muted-foreground">{comparisonCharts.length}チャート・全社合算／ベース事業／補助事業</span></header>
                   <div data-testid="forecast-comparison-chart-list" data-layout="overview" className="grid grid-cols-3 items-start gap-2">{renderComparisonCharts()}</div>
                 </div>
               </section>}
               {activeBusinessDisplays.length > 0 && <>
+                <div ref={businessHeaderScrollRef} data-testid="forecast-business-sticky-headers" className="sticky top-[var(--forecast-section-sticky-top)] z-20 overflow-hidden bg-surface shadow-sm">
+                  <div className="grid items-start gap-2" style={{ gridTemplateColumns: businessOverview ? 'minmax(0, 1fr)' : `repeat(${activeBusinessDisplays.length}, minmax(220px, 1fr))`, minWidth: businessOverview ? undefined : `${activeBusinessDisplays.length * 220}px` }}>
+                    {activeBusinessDisplays.map((item) => <header key={item} data-testid="forecast-business-sticky-header" className="flex items-center justify-between gap-2 border-t-2 border-navy px-0.5 py-1"><h3 className="m-0 text-sm font-bold">{chartDisplayLabels[item]}</h3><span className="text-[9px] text-muted-foreground">{charts.length}チャート</span></header>)}
+                  </div>
+                </div>
                 <SyncedHorizontalScrollbar contentRef={chartScrollContentRef} contentKey={activeBusinessDisplays.join(':')} />
                 <div ref={chartScrollContentRef} data-testid="forecast-chart-scroll-content" className="overflow-x-auto pb-5">
                   <div data-testid="forecast-business-columns" data-orientation="horizontal" className="grid items-start gap-2 pb-1" style={{ gridTemplateColumns: businessOverview ? 'minmax(0, 1fr)' : `repeat(${activeBusinessDisplays.length}, minmax(220px, 1fr))` }}>
-                    {activeBusinessDisplays.map((item) => <section key={item} data-testid="forecast-chart-section" data-scope={item} className="min-w-0 border-t-2 border-navy pt-1.5">
-                      <header className="mb-1 flex items-center justify-between gap-2"><h3 className="m-0 text-sm font-bold">{chartDisplayLabels[item]}</h3><span className="text-[9px] text-muted-foreground">{charts.length}チャート</span></header>
+                    {activeBusinessDisplays.map((item) => <section key={item} data-testid="forecast-chart-section" data-scope={item} className="min-w-0 pt-1.5">
                       <div data-testid="forecast-business-chart-list" data-layout={businessOverview ? 'overview' : 'column'} className={cn('grid items-start gap-2', businessOverview ? 'grid-cols-3' : 'grid-cols-1')}>{renderDetailCharts(item)}</div>
                     </section>)}
                   </div>

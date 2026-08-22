@@ -116,12 +116,23 @@ describe('将来予測・PL画面', () => {
     expect(display).toHaveAttribute('data-layout', 'comparison-with-businesses');
     expect(screen.getAllByTestId('forecast-chart-section')).toHaveLength(4);
     expect(screen.getByTestId('forecast-comparison-section')).toHaveAttribute('data-placement', 'full-width');
+    expect(screen.getByTestId('forecast-comparison-sticky-header')).toHaveClass(
+      'sticky',
+      'top-[var(--forecast-section-sticky-top)]',
+      'bg-surface',
+    );
     expect(screen.getByTestId('forecast-comparison-chart-list')).toHaveClass('grid-cols-3');
     expect(screen.getByTestId('forecast-business-columns')).toHaveStyle({ gridTemplateColumns: 'repeat(3, minmax(220px, 1fr))' });
     for (const list of screen.getAllByTestId('forecast-business-chart-list')) {
       expect(list).toHaveAttribute('data-layout', 'column');
       expect(list).toHaveClass('grid-cols-1');
     }
+    const businessHeaders = screen.getByTestId('forecast-business-sticky-headers');
+    expect(businessHeaders).toHaveClass('sticky', 'top-[var(--forecast-section-sticky-top)]', 'bg-surface', 'overflow-hidden');
+    expect(screen.getByTestId('forecast-chart-scroll-content')).not.toContainElement(businessHeaders);
+    expect(within(businessHeaders).getByRole('heading', { name: '全社合算' })).toBeVisible();
+    expect(within(businessHeaders).getByRole('heading', { name: 'ベース事業' })).toBeVisible();
+    expect(within(businessHeaders).getByRole('heading', { name: '補助事業' })).toBeVisible();
     for (const label of ['全社合算', 'ベース事業', '補助事業', '事業比較']) {
       expect(screen.getByRole('button', { name: `${label}を非表示` })).toHaveAttribute('aria-pressed', 'true');
     }
@@ -152,6 +163,7 @@ describe('将来予測・PL画面', () => {
 
     const scrollbar = screen.getByTestId('forecast-chart-horizontal-scrollbar');
     const content = screen.getByTestId('forecast-chart-scroll-content');
+    const businessHeaders = screen.getByTestId('forecast-business-sticky-headers');
     let scrollWidth = 1200;
     Object.defineProperty(content, 'clientWidth', { configurable: true, value: 600 });
     Object.defineProperty(content, 'scrollWidth', { configurable: true, get: () => scrollWidth });
@@ -164,6 +176,7 @@ describe('将来予測・PL画面', () => {
     content.scrollLeft = 140;
     fireEvent.scroll(content);
     expect(scrollbar.scrollLeft).toBe(140);
+    expect(businessHeaders.scrollLeft).toBe(140);
 
     scrollbar.scrollLeft = 260;
     fireEvent.scroll(scrollbar);
