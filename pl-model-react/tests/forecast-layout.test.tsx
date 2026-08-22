@@ -20,7 +20,7 @@ describe('将来予測画面のワイドレイアウト', () => {
 
     expect(screen.getByTestId('app-shell')).toHaveClass('max-w-[1900px]');
     expect(screen.getByTestId('forecast-layout')).toHaveClass(
-      'grid-cols-[clamp(360px,26vw,500px)_minmax(0,1fr)_clamp(250px,15vw,290px)]',
+      'grid-cols-[clamp(320px,20vw,380px)_minmax(0,1fr)_clamp(250px,15vw,290px)]',
     );
     expect(screen.getByTestId('forecast-settings-panel')).toHaveClass('overflow-x-hidden', 'overflow-y-auto', 'p-2.5');
     expect(screen.getByTestId('forecast-period-grid')).toHaveClass('min-w-0');
@@ -118,7 +118,7 @@ describe('将来予測画面のワイドレイアウト', () => {
     await user.click(toggle);
     expect(toggle).toHaveAccessibleName('変動設定を隠す');
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    expect(layout).toHaveClass('grid-cols-[clamp(360px,26vw,500px)_minmax(0,1fr)_clamp(250px,15vw,290px)]');
+    expect(layout).toHaveClass('grid-cols-[clamp(320px,20vw,380px)_minmax(0,1fr)_clamp(250px,15vw,290px)]');
     expect(within(row).getByTestId('forecast-start-adjustment-group')).toBeVisible();
 
     await user.click(within(row).getByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' }));
