@@ -285,12 +285,14 @@ describe('将来予測・PL画面', () => {
     expect(adjustment).toHaveValue(0);
   });
 
-  it('変動設定内で開始時固定値と開始時増減を併用できる', async () => {
+  it('開始時固定値を消した瞬間に0として再計算し、空欄表示はフォーカス中だけ維持する', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    await user.click(screen.getByRole('tab', { name: 'PL表' }));
     const fixed = screen.getByLabelText('補助事業期間 売上高 開始時固定値');
     const adjustment = screen.getByLabelText('補助事業期間 売上高 開始時増減');
+    const firstYearSales = screen.getByLabelText('ベース事業 P/L 2026年 売上高');
 
     expect(fixed).toHaveValue(null);
     await user.type(fixed, '1200');
@@ -302,8 +304,32 @@ describe('将来予測・PL画面', () => {
     expect(adjustment).toHaveValue(50);
 
     await user.clear(fixed);
-    await user.tab();
     expect(fixed).toHaveValue(null);
+    expect(firstYearSales).toHaveValue(50);
+    await user.tab();
+    expect(fixed).toHaveValue(0);
+    expect(firstYearSales).toHaveValue(50);
+  });
+
+  it('水準設定の最小値・最大値を消した瞬間に0として設定する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    const min = screen.getByLabelText('補助事業期間 売上高 最小値');
+    const max = screen.getByLabelText('補助事業期間 売上高 最大値');
+    const slider = screen.getByRole('slider', { name: '補助事業期間 売上高 水準' });
+
+    await user.clear(min);
+    expect(min).toHaveValue(null);
+    expect(slider).toHaveAttribute('min', '0');
+    await user.tab();
+    expect(min).toHaveValue(0);
+
+    await user.clear(max);
+    expect(max).toHaveValue(null);
+    expect(slider).toHaveAttribute('max', '0');
+    await user.tab();
+    expect(max).toHaveValue(0);
   });
 
   it('水準設定の率と範囲は内部精度を保ったまま小数点以下2桁で表示する', async () => {
@@ -582,6 +608,15 @@ describe('将来予測・PL画面', () => {
     expect(fixed).toHaveValue(10);
     expect(screen.getByLabelText('補助事業期間 売上高 成長加速度')).toBeVisible();
     expect(screen.getByLabelText('補助事業期間 売上高 単年増減')).toBeVisible();
+
+    await user.click(screen.getByRole('tab', { name: 'PL表' }));
+    const firstYearSales = screen.getByLabelText('ベース事業 P/L 2026年 売上高');
+    expect(firstYearSales).toHaveValue(1090);
+    await user.clear(fixed);
+    expect(fixed).toHaveValue(null);
+    expect(firstYearSales).toHaveValue(1080);
+    await user.tab();
+    expect(fixed).toHaveValue(0);
   });
 
   it('将来PLの入力行・計算行を直接編集すると対応水準へ即時逆算する', async () => {
