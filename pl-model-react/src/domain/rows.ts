@@ -88,13 +88,23 @@ export const historicalPlRows: FinancialRow<HistoricalPlCalculated>[] = [
 
 const forecastPayPerPersonRows: FinancialRow<HistoricalPlCalculated>[] = [
   { code: '30', label: '従業員1人当たり給与支給総額成長率', valueKind: 'percent', indent: 1, calculated: true, value: (row) => row.employeePayPerPersonGrowthRate },
-  { code: '31', label: '役員1人当たり給与支給総額', valueKind: 'moneyPerPerson', indent: 1, calculated: true, value: (row) => row.officerPayPerPerson },
+  { code: '31', label: '役員1人当たり給与支給総額', valueKind: 'moneyPerPerson', calculated: true, value: (row) => row.officerPayPerPerson },
   { code: '32', label: '役員1人当たり給与支給総額成長率', valueKind: 'percent', indent: 1, calculated: true, value: (row) => row.officerPayPerPersonGrowthRate },
 ];
 
-/** 将来P/Lでは従業員・役員の人数に続けて、1人当たり単価と前年比をまとめる。 */
+const forecastPeopleCodes = new Set(['27', '28', '29']);
+const forecastPeopleRows: FinancialRow<HistoricalPlCalculated>[] = [
+  historicalPlRows.find((row) => row.code === '27')!,
+  historicalPlRows.find((row) => row.code === '29')!,
+  forecastPayPerPersonRows[0],
+  historicalPlRows.find((row) => row.code === '28')!,
+  ...forecastPayPerPersonRows.slice(1),
+];
+
+/** 将来P/Lでは従業員・役員ごとに「人数→1人当たり単価→前年比」をまとめる。 */
 export const forecastPlRows: FinancialRow<HistoricalPlCalculated>[] = historicalPlRows.flatMap((row) => {
-  return row.code === '29' ? [row, ...forecastPayPerPersonRows] : [row];
+  if (row.code === '27') return forecastPeopleRows;
+  return forecastPeopleCodes.has(row.code) ? [] : [row];
 });
 
 export type HistoricalPlEditableField = keyof HistoricalPlInput;

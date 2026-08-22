@@ -82,7 +82,7 @@ function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInpu
     return [
       compound('sales', '売上高', 'money', latest.sales, growth.sales),
       compound('headcount', '従業員数（就業時間換算）', 'fte', latest.headcount, growth.headcount),
-      compound('payPerPerson', '1人当たり給与', 'moneyPerPerson', calculated.employeePayPerPerson, growth.pay),
+      compound('payPerPerson', '従業員1人当たり給与支給総額', 'moneyPerPerson', calculated.employeePayPerPerson, growth.pay),
       linear('cogsRate', '原価率', latest.sales ? latest.cogs / latest.sales * 100 : 0, 0, 'adjustable', true),
       linear('cogsDepRate', '原価内減価償却費率', latest.sales ? latest.cogsDepreciation / latest.sales * 100 : 0, 0, 'fixed'),
       linear('sgaDepRate', '販管費内減価償却費率', latest.sales ? latest.sgaDepreciation / latest.sales * 100 : 0, 0, 'fixed'),

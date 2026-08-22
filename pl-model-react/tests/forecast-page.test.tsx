@@ -212,7 +212,6 @@ describe('将来予測・PL画面', () => {
       '売上高',
       '原価率',
       '原価内減価償却費率',
-      '役員1人当たり給与支給総額',
       '役員給与のうち報酬割合',
       '従業員給与のうち給与割合',
       '販管費内減価償却費率',
@@ -222,8 +221,9 @@ describe('将来予測・PL画面', () => {
       '特別損益の売上高比率',
       '実効税率',
       '従業員数（就業時間換算）',
+      '従業員1人当たり給与支給総額',
       '役員数',
-      '1人当たり給与',
+      '役員1人当たり給与支給総額',
     ]);
   });
 
@@ -626,12 +626,13 @@ describe('将来予測・PL画面', () => {
     const table = screen.getByTestId('forecast-pl-table');
     const labels = within(table).getAllByRole('row').map((row) => row.textContent ?? '');
     const bonusIndex = labels.findIndex((label) => label.includes('うち従業員の賞与'));
-    const officerCountIndex = labels.findIndex((label) => label.includes('役員数'));
+    const employeeCountIndex = labels.findIndex((label) => label.includes('従業員数（就業時間換算）'));
     expect(labels[bonusIndex + 1]).not.toContain('1人当たり');
-    expect(labels[officerCountIndex + 1]).toContain('従業員1人当たり給与支給総額');
-    expect(labels[officerCountIndex + 2]).toContain('従業員1人当たり給与支給総額成長率');
-    expect(labels[officerCountIndex + 3]).toContain('役員1人当たり給与支給総額');
-    expect(labels[officerCountIndex + 4]).toContain('役員1人当たり給与支給総額成長率');
+    expect(labels[employeeCountIndex + 1]).toContain('従業員1人当たり給与支給総額');
+    expect(labels[employeeCountIndex + 2]).toContain('従業員1人当たり給与支給総額成長率');
+    expect(labels[employeeCountIndex + 3]).toContain('役員数');
+    expect(labels[employeeCountIndex + 4]).toContain('役員1人当たり給与支給総額');
+    expect(labels[employeeCountIndex + 5]).toContain('役員1人当たり給与支給総額成長率');
   });
 
   it('将来PLでS番号の補足指標を独立して表示・非表示にできる', async () => {

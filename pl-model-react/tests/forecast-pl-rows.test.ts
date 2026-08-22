@@ -7,12 +7,14 @@ describe('将来P/L表の参考行', () => {
   it('従業員・役員の1人当たり指標を人数行の後へまとめる', () => {
     const labels = forecastPlRows.map((row) => row.label);
     const bonusIndex = labels.indexOf('うち従業員の賞与');
-    const officerCountIndex = labels.indexOf('役員数');
+    const employeeCountIndex = labels.indexOf('従業員数（就業時間換算）');
 
     expect(labels[bonusIndex + 1]).not.toContain('1人当たり');
-    expect(labels.slice(officerCountIndex + 1, officerCountIndex + 5)).toEqual([
+    expect(labels.slice(employeeCountIndex, employeeCountIndex + 6)).toEqual([
+      '従業員数（就業時間換算）',
       '従業員1人当たり給与支給総額',
       '従業員1人当たり給与支給総額成長率',
+      '役員数',
       '役員1人当たり給与支給総額',
       '役員1人当たり給与支給総額成長率',
     ]);

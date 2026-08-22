@@ -8,7 +8,6 @@ const plDriverOrder = [
   'sales',
   'cogsRate',
   'cogsDepRate',
-  'officerPayPerPerson',
   'officerCompensationShare',
   'employeeSalaryShare',
   'sgaDepRate',
@@ -18,8 +17,9 @@ const plDriverOrder = [
   'extraordinaryRate',
   'taxRate',
   'headcount',
-  'officerCount',
   'payPerPerson',
+  'officerCount',
+  'officerPayPerPerson',
 ] as const;
 
 const orderByDriver = new Map<string, number>(plDriverOrder.map((driver, index) => [driver, index]));
