@@ -27,16 +27,17 @@ describe('将来予測画面のワイドレイアウト', () => {
       'sticky',
       'top-[var(--forecast-content-sticky-top)]',
       'max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)]',
+      'flex',
+      'flex-col',
+      'overflow-hidden',
+    );
+    expect(screen.getByTestId('forecast-settings-panel')).not.toHaveClass('top-3');
+    expect(screen.getByTestId('forecast-settings-sticky-header')).toHaveClass('shrink-0', 'bg-surface');
+    expect(screen.getByTestId('forecast-settings-scroll-body')).toHaveClass(
+      'min-h-0',
       'overflow-x-hidden',
       'overflow-y-auto',
       'p-2.5',
-    );
-    expect(screen.getByTestId('forecast-settings-panel')).not.toHaveClass('top-3');
-    expect(screen.getByTestId('forecast-settings-sticky-header')).toHaveClass(
-      'sticky',
-      'top-0',
-      'z-20',
-      'bg-surface',
     );
     expect(screen.getByTestId('forecast-period-grid')).toHaveClass('min-w-0');
     expect(screen.getByTestId('forecast-period-grid')).not.toHaveClass('overflow-x-auto');
@@ -46,18 +47,15 @@ describe('将来予測画面のワイドレイアウト', () => {
       'top-[var(--forecast-content-sticky-top)]',
       'max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)]',
       'min-w-0',
-      'overflow-x-hidden',
-      'overflow-y-scroll',
-      'p-2',
+      'flex',
+      'flex-col',
+      'overflow-hidden',
     );
     expect(metricsPanel).not.toHaveClass('top-3', 'max-h-[calc(100vh-24px)]');
-    expect(screen.getByTestId('forecast-metrics-sticky-header')).toHaveClass(
-      'sticky',
-      'top-0',
-      'z-20',
-      'bg-surface',
-    );
-    expect(metricsPanel).toHaveStyle({ scrollbarGutter: 'stable' });
+    expect(screen.getByTestId('forecast-metrics-sticky-header')).toHaveClass('shrink-0', 'bg-surface');
+    const metricsBody = screen.getByTestId('forecast-metrics-scroll-body');
+    expect(metricsBody).toHaveClass('min-h-0', 'overflow-x-hidden', 'overflow-y-scroll', 'p-2');
+    expect(metricsBody).toHaveStyle({ scrollbarGutter: 'stable' });
     expect(within(screen.getByTestId('metric-bullet-company-sales-growth')).getByTestId('metric-bullet-layout')).toHaveClass(
       'grid-cols-[minmax(92px,0.88fr)_minmax(84px,0.72fr)]',
     );
