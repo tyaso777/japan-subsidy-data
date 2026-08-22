@@ -419,7 +419,7 @@ export function ForecastPage() {
       </aside>
       <section className="min-w-0 border border-line bg-surface p-3">
           <TabsContent value="chart" className="mt-0">
-            <div ref={chartDisplayLayer.ref} data-testid="forecast-chart-display-controls" className="sticky top-[var(--forecast-content-sticky-top)] z-30 -mx-3 mb-2 flex items-center justify-between gap-2 border-b border-line bg-surface px-3 py-2 shadow-sm before:pointer-events-none before:absolute before:inset-x-0 before:bottom-full before:h-3 before:bg-canvas before:content-['']">
+            <div ref={chartDisplayLayer.ref} data-testid="forecast-chart-display-controls" className="sticky top-[var(--forecast-content-sticky-top)] z-30 -mx-3 flex items-center justify-between gap-2 border-b border-line bg-surface px-3 py-2 shadow-sm before:pointer-events-none before:absolute before:inset-x-0 before:bottom-full before:h-3 before:bg-canvas before:content-['']">
               <strong className="text-xs">表示区分</strong>
               <div className="flex flex-wrap items-center justify-end gap-1"><div aria-label="チャート表示区分" className="flex flex-wrap justify-end gap-1">{chartDisplayOrder.map((item) => {
                 const enabled = chartDisplays[item];
@@ -428,10 +428,10 @@ export function ForecastPage() {
                 ? <Button key={operation.year} variant="outline" size="sm" className="h-7 w-10 px-1 text-[9px]" aria-label={`${operation.year}年から期間を分割`} onClick={() => splitForecastAtYear(operation.year)}>＋ '{String(operation.year).slice(-2)}</Button>
                 : <Button key={operation.year} variant="outline" size="sm" className="h-7 w-10 px-1 text-[9px] text-orange" aria-label={`${operation.year}年の期間分割を解除`} onClick={() => mergeForecastPeriod(operation.segmentId)}>− '{String(operation.year).slice(-2)}</Button>)}</div></div>
             </div>
-            <div data-testid="forecast-chart-sections" data-layout={chartDisplayLayout} className="grid items-start gap-3" style={{ '--forecast-section-sticky-top': `calc(var(--forecast-content-sticky-top) + ${chartDisplayLayer.height}px)` } as CSSProperties}>
+            <div data-testid="forecast-chart-sections" data-layout={chartDisplayLayout} className="grid items-start gap-3" style={{ '--forecast-section-sticky-top': `calc(var(--forecast-content-sticky-top) + ${chartDisplayLayer.height}px - 1px)` } as CSSProperties}>
               {comparisonVisible && <section data-testid="forecast-chart-section" data-scope="comparison" className="min-w-0">
-                <div data-testid="forecast-comparison-section" data-placement="full-width" className="border-t-2 border-orange pt-1.5">
-                  <header data-testid="forecast-comparison-sticky-header" className="sticky top-[var(--forecast-section-sticky-top)] z-20 mb-1 flex items-center justify-between gap-2 bg-surface py-1 shadow-sm"><h3 className="m-0 text-sm font-bold">事業比較</h3><span className="text-[9px] text-muted-foreground">{comparisonCharts.length}チャート・全社合算／ベース事業／補助事業</span></header>
+                <div data-testid="forecast-comparison-section" data-placement="full-width" className="bg-surface">
+                  <header data-testid="forecast-comparison-sticky-header" className="sticky top-[var(--forecast-section-sticky-top)] z-20 flex items-center justify-between gap-2 border-t-2 border-orange bg-surface py-1.5 shadow-sm"><h3 className="m-0 text-sm font-bold">事業比較</h3><span className="text-[9px] text-muted-foreground">{comparisonCharts.length}チャート・全社合算／ベース事業／補助事業</span></header>
                   <div data-testid="forecast-comparison-chart-list" data-layout="overview" className="grid grid-cols-3 items-start gap-2">{renderComparisonCharts()}</div>
                 </div>
               </section>}

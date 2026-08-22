@@ -115,14 +115,20 @@ describe('将来予測・PL画面', () => {
       'before:h-3',
       'before:bg-canvas',
     );
+    expect(screen.getByTestId('forecast-chart-display-controls')).not.toHaveClass('mb-2');
     expect(display).toHaveAttribute('data-layout', 'comparison-with-businesses');
+    expect(display.getAttribute('style')).toContain('- 1px');
     expect(screen.getAllByTestId('forecast-chart-section')).toHaveLength(4);
     expect(screen.getByTestId('forecast-comparison-section')).toHaveAttribute('data-placement', 'full-width');
     expect(screen.getByTestId('forecast-comparison-sticky-header')).toHaveClass(
       'sticky',
       'top-[var(--forecast-section-sticky-top)]',
       'bg-surface',
+      'border-t-2',
+      'border-orange',
     );
+    expect(screen.getByTestId('forecast-comparison-sticky-header')).not.toHaveClass('mb-1');
+    expect(screen.getByTestId('forecast-comparison-section')).not.toHaveClass('pt-1.5');
     expect(screen.getByTestId('forecast-comparison-chart-list')).toHaveClass('grid-cols-3');
     expect(screen.getByTestId('forecast-business-columns')).toHaveStyle({ gridTemplateColumns: 'repeat(3, minmax(220px, 1fr))' });
     for (const list of screen.getAllByTestId('forecast-business-chart-list')) {
