@@ -27,6 +27,7 @@ type Props<T extends object> = {
   onRowSelect?: (row: FinancialRow<T>) => void;
   isRecordEmpty?: (record: T, index: number) => boolean;
   separateSubjectColumns?: boolean;
+  stickyHeaderPositionClassName?: string;
 };
 
 export type FinancialTableValueUpdate<T extends object> = { yearIndex: number; row: FinancialRow<T>; value: number };
@@ -55,7 +56,7 @@ function EditableValueCell({ label, value, step, maximumFractionDigits, onEditSt
   return <Input className="ml-auto h-6 w-[min(120px,100%)] select-text rounded px-0.5 py-0 text-right text-[10px]" aria-label={label} type="number" step={step} value={draft} onFocus={() => { setEditing(true); setDirty(false); onEditStart?.(); }} onChange={(event) => { setDirty(true); setDraft(event.target.value); }} onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); }} onBlur={() => { const next = Number(draft); setEditing(false); if (dirty && Number.isFinite(next)) onCommit(next); setDirty(false); onEditEnd?.(); }} />;
 }
 
-export function FinancialTable<T extends object>({ testId, title, prefix = '', years, records, rows, onChange, moneyUnit, onEditStart, onEditEnd, editableFromIndex, onValueChange, onValuesChange, yearLabels, onRowSelect, isRecordEmpty, separateSubjectColumns = false }: Props<T>) {
+export function FinancialTable<T extends object>({ testId, title, prefix = '', years, records, rows, onChange, moneyUnit, onEditStart, onEditEnd, editableFromIndex, onValueChange, onValuesChange, yearLabels, onRowSelect, isRecordEmpty, separateSubjectColumns = false, stickyHeaderPositionClassName = 'top-12 z-40' }: Props<T>) {
   const [omitCalculated, setOmitCalculated] = useState(false);
   const [showSupplementary, setShowSupplementary] = useState(true);
   const [selection, setSelection] = useState<GridSelection>();
@@ -173,7 +174,7 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
     onClick: (event: MouseEvent<HTMLElement>) => selectCell({ row, column }, event.shiftKey),
   });
   return <section className="relative isolate border border-line bg-surface" data-testid={testId} onCopy={handleCopy} onPaste={handlePaste}>
-    <div data-testid={`${testId}-sticky-header`} className="sticky top-12 z-40 bg-surface shadow-sm">
+    <div data-testid={`${testId}-sticky-header`} className={cn('sticky bg-surface shadow-sm', stickyHeaderPositionClassName)}>
       <header className="flex items-center justify-between gap-3.5 border-t-[3px] border-navy px-3.5 pt-2.5 pb-2">
         <div><h3 className="m-0 text-[15px] font-bold">{title}</h3><p className="mt-0.5 text-[9px] text-muted-foreground">入力項目と自動計算項目・金額表示：{moneyUnitLabel(moneyUnit)}・ドラッグで範囲選択、Ctrl+C/VでExcel連携</p></div>
         <div className="flex items-center gap-2">{clipboardStatus && <span role="status" className="text-[9px] font-bold text-teal">{clipboardStatus}</span>}{hasSupplementary && <Button variant="subtle" size="xs" onClick={() => setShowSupplementary((value) => !value)}>{showSupplementary ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}{showSupplementary ? '補足指標を隠す' : '補足指標を表示'}</Button>}<Button variant="subtle" size="xs" onClick={() => setOmitCalculated((value) => !value)}>

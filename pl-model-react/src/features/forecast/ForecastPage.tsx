@@ -416,7 +416,7 @@ export function ForecastPage() {
               </>}
             </div>
           </TabsContent>
-          <TabsContent value="table"><FinancialTable testId="forecast-pl-table" title={`${scopeLabels[scope]} P/L`} years={selected.years} yearLabels={yearLabels} records={selected.records} rows={forecastPlRows} moneyUnit={unit} editableFromIndex={baseActuals.length} onRowSelect={(row) => setSelectedLogicCode(row.code)} onEditStart={beginTransaction} onEditEnd={commitTransaction} onValueChange={scope === 'company' ? undefined : (yearIndex, row, value) => applyForecastPlValues([{ yearIndex, row, value }])} onValuesChange={scope === 'company' ? undefined : applyForecastPlValues} /></TabsContent>
+          <TabsContent value="table"><FinancialTable testId="forecast-pl-table" title={`${scopeLabels[scope]} P/L`} years={selected.years} yearLabels={yearLabels} records={selected.records} rows={forecastPlRows} moneyUnit={unit} editableFromIndex={baseActuals.length} stickyHeaderPositionClassName="top-[var(--forecast-content-sticky-top)] z-30" onRowSelect={(row) => setSelectedLogicCode(row.code)} onEditStart={beginTransaction} onEditEnd={commitTransaction} onValueChange={scope === 'company' ? undefined : (yearIndex, row, value) => applyForecastPlValues([{ yearIndex, row, value }])} onValuesChange={scope === 'company' ? undefined : applyForecastPlValues} /></TabsContent>
       </section>
       <MetricsPanel company={company} base={base} subsidy={subsidy} optimization={optimization} />
     </div>

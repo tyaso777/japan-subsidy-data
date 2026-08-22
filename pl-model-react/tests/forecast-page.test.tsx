@@ -87,6 +87,11 @@ describe('将来予測・PL画面', () => {
     expect(profitChart.querySelector('[data-line-phase="forecast"]')).toBeInTheDocument();
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
     expect(screen.getByTestId('forecast-pl-table')).toBeVisible();
+    expect(screen.getByTestId('forecast-pl-table-sticky-header')).toHaveClass(
+      'top-[var(--forecast-content-sticky-top)]',
+      'z-30',
+    );
+    expect(screen.getByTestId('forecast-pl-table-sticky-header')).not.toHaveClass('top-12');
     expect(screen.queryByRole('tab', { name: '事業比較' })).not.toBeInTheDocument();
   });
 
