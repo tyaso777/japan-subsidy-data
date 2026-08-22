@@ -32,6 +32,12 @@ describe('将来予測画面のワイドレイアウト', () => {
       'p-2.5',
     );
     expect(screen.getByTestId('forecast-settings-panel')).not.toHaveClass('top-3');
+    expect(screen.getByTestId('forecast-settings-sticky-header')).toHaveClass(
+      'sticky',
+      'top-0',
+      'z-20',
+      'bg-surface',
+    );
     expect(screen.getByTestId('forecast-period-grid')).toHaveClass('min-w-0');
     expect(screen.getByTestId('forecast-period-grid')).not.toHaveClass('overflow-x-auto');
     const metricsPanel = screen.getByTestId('forecast-metrics-panel');
@@ -45,6 +51,12 @@ describe('将来予測画面のワイドレイアウト', () => {
       'p-2',
     );
     expect(metricsPanel).not.toHaveClass('top-3', 'max-h-[calc(100vh-24px)]');
+    expect(screen.getByTestId('forecast-metrics-sticky-header')).toHaveClass(
+      'sticky',
+      'top-0',
+      'z-20',
+      'bg-surface',
+    );
     expect(metricsPanel).toHaveStyle({ scrollbarGutter: 'stable' });
     expect(within(screen.getByTestId('metric-bullet-company-sales-growth')).getByTestId('metric-bullet-layout')).toHaveClass(
       'grid-cols-[minmax(92px,0.88fr)_minmax(84px,0.72fr)]',
