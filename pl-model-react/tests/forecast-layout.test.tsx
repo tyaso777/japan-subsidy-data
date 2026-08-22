@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
-import { availableSettingsPanelHeight, settingsPeriodMinWidth, shouldAutoCollapseSettings } from '../src/features/forecast/ForecastPage';
+import { availableSettingsPanelHeight, settingsPeriodMinWidth, shouldAutoCollapseSettings, stickyStackOffset } from '../src/features/forecast/ForecastPage';
 
 const nativeResizeObserver = globalThis.ResizeObserver;
 
@@ -41,22 +41,10 @@ describe('将来予測画面のワイドレイアウト', () => {
     );
 
     const stickyLayer = screen.getByTestId('forecast-operation-sticky-layer');
-    expect(stickyLayer).toHaveClass('sticky', 'top-[57px]', 'z-40', 'bg-surface');
-    expect(stickyLayer).toHaveClass(
-      "before:content-['']",
-      'before:absolute',
-      'before:inset-x-0',
-      'before:bottom-full',
-      'before:h-3',
-      'before:bg-surface',
-      "after:content-['']",
-      'after:pointer-events-none',
-      'after:absolute',
-      'after:inset-x-0',
-      'after:top-full',
-      'after:h-4',
-      'after:bg-canvas',
-    );
+    expect(stickyLayer).toHaveClass('sticky', 'top-[56px]', 'z-40', 'bg-surface');
+    expect(stickyLayer.className).not.toMatch(/(?:before|after):/);
+    expect(screen.getByTestId('forecast-workspace-tabs')).toHaveClass('gap-0');
+    expect(screen.getByTestId('forecast-sticky-spacer')).toHaveClass('h-3', 'bg-canvas');
     const operationBar = screen.getByTestId('forecast-operation-bar');
     expect(operationBar).not.toHaveClass('sticky');
     expect(within(operationBar).getByRole('button', { name: 'ベース事業' })).toBeVisible();
@@ -81,6 +69,11 @@ describe('将来予測画面のワイドレイアウト', () => {
     expect(settingsPeriodMinWidth(3, false)).toBe('150px');
     expect(availableSettingsPanelHeight(900, 180)).toBe(708);
     expect(availableSettingsPanelHeight(900, 20)).toBe(776);
+  });
+
+  it('固定面の境界は計測値を1px重ねて小数ピクセルの隙間を防ぐ', () => {
+    expect(stickyStackOffset(56, 71)).toBe(126);
+    expect(stickyStackOffset(0, 0)).toBe(0);
   });
 
   it('期間分割と解除を年度の時系列順に同じ位置へ表示する', async () => {

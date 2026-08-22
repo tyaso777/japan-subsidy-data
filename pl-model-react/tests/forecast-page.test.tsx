@@ -90,9 +90,8 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByTestId('forecast-pl-table-sticky-header')).toHaveClass(
       'top-[var(--forecast-content-sticky-top)]',
       'z-30',
-      'before:h-8',
-      'before:bg-canvas',
     );
+    expect(screen.getByTestId('forecast-pl-table-sticky-header').className).not.toMatch(/before:/);
     expect(screen.getByTestId('forecast-pl-table-sticky-header')).not.toHaveClass('top-12');
     expect(screen.queryByRole('tab', { name: '事業比較' })).not.toBeInTheDocument();
   });
@@ -112,9 +111,8 @@ describe('将来予測・PL画面', () => {
       'top-[var(--forecast-content-sticky-top)]',
       'z-30',
       'bg-surface',
-      'before:h-3',
-      'before:bg-canvas',
     );
+    expect(screen.getByTestId('forecast-chart-display-controls').className).not.toMatch(/before:/);
     expect(screen.getByTestId('forecast-chart-display-controls')).not.toHaveClass('mb-2');
     expect(display).toHaveAttribute('data-layout', 'comparison-with-businesses');
     expect(display.getAttribute('style')).toContain('- 1px');
