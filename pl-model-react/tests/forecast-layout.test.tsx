@@ -2,7 +2,8 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
-import { availableSettingsPanelHeight, settingsPeriodMinWidth, shouldAutoCollapseSettings, stickyStackOffset } from '../src/features/forecast/ForecastPage';
+import { availableSettingsPanelHeight, settingsPeriodMinWidth, shouldAutoCollapseSettings } from '../src/features/forecast/forecast-layout';
+import { stickyStackOffset, stickyStackOffsetCss } from '../src/lib/sticky-stack';
 
 const nativeResizeObserver = globalThis.ResizeObserver;
 
@@ -41,8 +42,9 @@ describe('将来予測画面のワイドレイアウト', () => {
     );
 
     const stickyLayer = screen.getByTestId('forecast-operation-sticky-layer');
-    expect(stickyLayer).toHaveClass('sticky', 'top-[56px]', 'z-40', 'bg-surface');
+    expect(stickyLayer).toHaveClass('sticky', 'top-[var(--app-toolbar-sticky-bottom)]', 'z-40', 'bg-surface');
     expect(stickyLayer.className).not.toMatch(/(?:before|after):/);
+    expect(screen.getByTestId('app-shell')).toHaveStyle({ '--app-toolbar-sticky-bottom': '56px' });
     expect(screen.getByTestId('forecast-workspace-tabs')).toHaveClass('gap-0');
     expect(screen.getByTestId('forecast-sticky-spacer')).toHaveClass('h-3', 'bg-canvas');
     const operationBar = screen.getByTestId('forecast-operation-bar');
@@ -74,6 +76,28 @@ describe('将来予測画面のワイドレイアウト', () => {
   it('固定面の境界は計測値を1px重ねて小数ピクセルの隙間を防ぐ', () => {
     expect(stickyStackOffset(56, 71)).toBe(126);
     expect(stickyStackOffset(0, 0)).toBe(0);
+    expect(stickyStackOffsetCss('var(--toolbar-bottom)', 71)).toBe('calc(var(--toolbar-bottom) + 70px)');
+    expect(stickyStackOffsetCss('var(--toolbar-bottom)', 0)).toBe('var(--toolbar-bottom)');
+  });
+
+  it('共通ツールバーの実測高さが変わると03画面の固定起点も追従する', async () => {
+    class MeasuredResizeObserver {
+      constructor(private readonly callback: ResizeObserverCallback) {}
+      observe(target: Element) {
+        const testId = target.getAttribute('data-testid');
+        const height = testId === 'app-toolbar' ? 83 : testId === 'forecast-operation-sticky-layer' ? 71 : 45;
+        this.callback([{ target, contentRect: { width: 900, height: 40 }, borderBoxSize: [{ blockSize: height, inlineSize: 900 }] } as unknown as ResizeObserverEntry], this as unknown as ResizeObserver);
+      }
+      unobserve() {}
+      disconnect() {}
+    }
+    globalThis.ResizeObserver = MeasuredResizeObserver as unknown as typeof ResizeObserver;
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    expect(screen.getByTestId('app-shell')).toHaveStyle({ '--app-toolbar-sticky-bottom': '82px' });
+    expect(screen.getByTestId('forecast-workspace-tabs')).toHaveStyle({ '--forecast-content-sticky-top': 'calc(var(--app-toolbar-sticky-bottom) + 70px)' });
   });
 
   it('期間分割と解除を年度の時系列順に同じ位置へ表示する', async () => {

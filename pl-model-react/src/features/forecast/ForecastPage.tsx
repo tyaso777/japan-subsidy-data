@@ -19,6 +19,8 @@ import { chartAxisTicks, nextChartExtent, type ChartExtent } from '../../domain/
 import { buildTimelineYearLabels, resolveTimeline } from '../../domain/timeline';
 import { downstreamCodes, plLogicNodes } from '../../domain/pl-logic';
 import { defaultForecastRange } from '../../domain/forecast-range';
+import { availableSettingsPanelHeight, settingsPeriodMinWidth, shouldAutoCollapseSettings } from './forecast-layout';
+import { stickyStackOffsetCss, useObservedHeight } from '../../lib/sticky-stack';
 
 type Scope = 'company' | 'base' | 'subsidy';
 type ForecastView = 'chart' | 'table';
@@ -30,32 +32,6 @@ const chartDisplayLabels: Record<ChartDisplay, string> = { ...scopeLabels, compa
 const chartDisplayOrder: ChartDisplay[] = ['company', 'base', 'subsidy', 'comparison'];
 const colors = ['#183b56', '#167d78', '#c75b24', '#7c5c8e', '#9a7222'];
 const calculatedPlFields: Record<string, keyof HistoricalPlCalculated> = { '2': 'salesGrowthRate', '5': 'grossProfit', '6': 'grossProfitMargin', '7': 'sga', '8': 'officerPay', '11': 'employeePay', '16': 'operatingProfit', '17': 'operatingProfitMargin', '18': 'ordinaryIncome', '19': 'preTaxIncome', '23': 'depreciation', '24': 'valueAdded', '25': 'valueAddedGrowthRate', '29': 'employeePayPerPerson', '30': 'employeePayPerPersonGrowthRate', '31': 'officerPayPerPerson', '32': 'officerPayPerPersonGrowthRate', '33': 'laborProductivity', '34': 'ebitda', '35': 'ebitdaMargin' };
-
-const MIN_SETTINGS_PERIOD_WIDTH = 220;
-const APP_TOOLBAR_STACK_TOP = 56;
-
-export function shouldAutoCollapseSettings(panelWidth: number, periodCount: number) {
-  if (panelWidth <= 0 || periodCount <= 0) return false;
-  const panelPadding = 20;
-  const periodGap = Math.max(0, periodCount - 1) * 8;
-  return (panelWidth - panelPadding - periodGap) / periodCount < MIN_SETTINGS_PERIOD_WIDTH;
-}
-
-export function settingsPeriodMinWidth(periodCount: number, variationOpen: boolean) {
-  if (periodCount <= 2) return '0px';
-  return '150px';
-}
-
-export function availableSettingsPanelHeight(viewportHeight: number, panelTop: number) {
-  const stickyTop = 112;
-  const bottomGap = 12;
-  return Math.max(240, viewportHeight - Math.max(panelTop, stickyTop) - bottomGap);
-}
-
-export function stickyStackOffset(top: number, measuredHeight: number) {
-  if (measuredHeight <= 0) return Math.max(0, top);
-  return Math.max(0, top + measuredHeight - 1);
-}
 
 function useCompactSettingsPanel(periodCount: number) {
   const ref = useRef<HTMLElement>(null);
@@ -83,21 +59,6 @@ function useCompactSettingsPanel(periodCount: number) {
     };
   }, [periodCount]);
   return { ref, compact };
-}
-
-function useObservedHeight<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
-  const [height, setHeight] = useState(0);
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-    const update = () => setHeight(Math.ceil(element.getBoundingClientRect().height));
-    update();
-    const observer = new ResizeObserver(update);
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-  return { ref, height };
 }
 
 function SyncedHorizontalScrollbar({ contentRef, contentKey }: { contentRef: RefObject<HTMLDivElement | null>; contentKey: string }) {
@@ -260,8 +221,8 @@ export function ForecastPage() {
   const [selectedLogicCode, setSelectedLogicCode] = useState('16');
   const model = useForecastModel();
   const optimization = useForecastOptimization();
-  const operationLayer = useObservedHeight<HTMLDivElement>();
-  const chartDisplayLayer = useObservedHeight<HTMLDivElement>();
+  const operationLayer = useObservedHeight<HTMLDivElement>(71);
+  const chartDisplayLayer = useObservedHeight<HTMLDivElement>(45);
   const program = useModelStore((state) => state.program);
   const baseActuals = useModelStore((state) => state.actuals.basePl);
   const subsidyActuals = useModelStore((state) => state.actuals.subsidyPl);
@@ -403,8 +364,8 @@ export function ForecastPage() {
     <section data-testid="forecast-heading" className="border border-line bg-surface px-5 py-3">
       <div><p className="mb-1 flex items-center gap-1 text-[10px] font-extrabold tracking-[.08em] text-orange"><SlidersHorizontal className="size-3" />FORECAST &amp; PL</p><h2 className="m-0 text-xl font-bold">将来予測・調整水準</h2></div>
     </section>
-    <Tabs data-testid="forecast-workspace-tabs" value={view} onValueChange={(value) => setView(value as ForecastView)} className="gap-0" style={{ '--forecast-content-sticky-top': `${stickyStackOffset(APP_TOOLBAR_STACK_TOP, operationLayer.height)}px` } as CSSProperties}>
-      <div ref={operationLayer.ref} data-testid="forecast-operation-sticky-layer" className="sticky top-[56px] z-40 grid bg-surface">
+    <Tabs data-testid="forecast-workspace-tabs" value={view} onValueChange={(value) => setView(value as ForecastView)} className="gap-0" style={{ '--forecast-content-sticky-top': stickyStackOffsetCss('var(--app-toolbar-sticky-bottom)', operationLayer.height) } as CSSProperties}>
+      <div ref={operationLayer.ref} data-testid="forecast-operation-sticky-layer" className="sticky top-[var(--app-toolbar-sticky-bottom)] z-40 grid bg-surface">
       <section data-testid="forecast-operation-bar" className="flex min-w-0 items-center gap-2 overflow-x-auto border border-line bg-surface px-2 py-1.5 shadow-sm">
         <div data-testid="forecast-scope-shortcuts" className="flex shrink-0 flex-col items-center gap-0.5"><div className="flex rounded-lg bg-[#e8e6df] p-1" aria-label="対象事業">{(['company', 'base', 'subsidy'] as Scope[]).map((item) => <Button key={item} variant="ghost" size="sm" className={cn('h-7 px-2 text-[10px]', scope === item && 'bg-navy text-white hover:bg-navy/90 hover:text-white')} onClick={() => setScope(item)}>{scopeLabels[item]}</Button>)}</div><span className="text-[7px] leading-none text-muted-foreground">Ctrl+1 / 2 / 3</span></div>
         <span className="h-6 w-px shrink-0 bg-line" aria-hidden="true" />
@@ -435,7 +396,7 @@ export function ForecastPage() {
                 ? <Button key={operation.year} variant="outline" size="sm" className="h-7 w-10 px-1 text-[9px]" aria-label={`${operation.year}年から期間を分割`} onClick={() => splitForecastAtYear(operation.year)}>＋ '{String(operation.year).slice(-2)}</Button>
                 : <Button key={operation.year} variant="outline" size="sm" className="h-7 w-10 px-1 text-[9px] text-orange" aria-label={`${operation.year}年の期間分割を解除`} onClick={() => mergeForecastPeriod(operation.segmentId)}>− '{String(operation.year).slice(-2)}</Button>)}</div></div>
             </div>
-            <div data-testid="forecast-chart-sections" data-layout={chartDisplayLayout} className="grid items-start gap-3" style={{ '--forecast-section-sticky-top': `calc(var(--forecast-content-sticky-top) + ${chartDisplayLayer.height}px - 1px)` } as CSSProperties}>
+            <div data-testid="forecast-chart-sections" data-layout={chartDisplayLayout} className="grid items-start gap-3" style={{ '--forecast-section-sticky-top': stickyStackOffsetCss('var(--forecast-content-sticky-top)', chartDisplayLayer.height) } as CSSProperties}>
               {comparisonVisible && <section data-testid="forecast-chart-section" data-scope="comparison" className="min-w-0">
                 <div data-testid="forecast-comparison-section" data-placement="full-width" className="bg-surface">
                   <header data-testid="forecast-comparison-sticky-header" className="sticky top-[var(--forecast-section-sticky-top)] z-20 flex items-center justify-between gap-2 border-t-2 border-orange bg-surface py-1.5 shadow-sm"><h3 className="m-0 text-sm font-bold">事業比較</h3><span className="text-[9px] text-muted-foreground">{comparisonCharts.length}チャート・全社合算／ベース事業／補助事業</span></header>

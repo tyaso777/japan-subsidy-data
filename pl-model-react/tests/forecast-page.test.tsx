@@ -115,7 +115,7 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByTestId('forecast-chart-display-controls').className).not.toMatch(/before:/);
     expect(screen.getByTestId('forecast-chart-display-controls')).not.toHaveClass('mb-2');
     expect(display).toHaveAttribute('data-layout', 'comparison-with-businesses');
-    expect(display.getAttribute('style')).toContain('- 1px');
+    expect(display.getAttribute('style')).toContain('calc(var(--forecast-content-sticky-top) + 44px)');
     expect(screen.getAllByTestId('forecast-chart-section')).toHaveLength(4);
     expect(screen.getByTestId('forecast-comparison-section')).toHaveAttribute('data-placement', 'full-width');
     expect(screen.getByTestId('forecast-comparison-sticky-header')).toHaveClass(
