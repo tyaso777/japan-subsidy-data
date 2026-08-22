@@ -92,7 +92,7 @@ describe('将来予測画面のワイドレイアウト', () => {
     ]);
   });
 
-  it('狭い水準設定では変動設定を自動収納し、必要なら手動で再表示できる', async () => {
+  it('狭い水準設定でも変動設定をデフォルト表示し、手動で収納できる', async () => {
     class NarrowResizeObserver {
       constructor(private readonly callback: ResizeObserverCallback) {}
       observe(target: Element) {
@@ -109,21 +109,17 @@ describe('将来予測画面のワイドレイアウト', () => {
     const panel = screen.getByTestId('forecast-settings-panel');
     const layout = screen.getByTestId('forecast-layout');
     const row = screen.getByTestId('forecast-setting-row-base-sales-subsidy');
-    const toggle = within(panel).getByRole('button', { name: '変動設定を表示' });
+    const toggle = within(panel).getByRole('button', { name: '変動設定を隠す' });
     expect(layout).toHaveClass('grid-cols-[clamp(320px,20vw,380px)_minmax(0,1fr)_clamp(250px,15vw,290px)]');
-    expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    expect(within(row).queryByTestId('forecast-start-adjustment-group')).not.toBeInTheDocument();
-    expect(within(row).queryByRole('button', { name: '補助事業期間 売上高 変動設定' })).not.toBeInTheDocument();
-
-    await user.click(toggle);
-    expect(toggle).toHaveAccessibleName('変動設定を隠す');
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
     expect(layout).toHaveClass('grid-cols-[clamp(320px,20vw,380px)_minmax(0,1fr)_clamp(250px,15vw,290px)]');
     expect(within(row).getByTestId('forecast-start-adjustment-group')).toBeVisible();
 
     await user.click(within(row).getByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' }));
     expect(within(row).getByLabelText('補助事業期間 売上高 毎年固定増減')).toBeVisible();
-    await user.click(within(panel).getByRole('button', { name: '変動設定を隠す' }));
+    await user.click(toggle);
+    expect(toggle).toHaveAccessibleName('変動設定を表示');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
     expect(within(row).queryByLabelText('補助事業期間 売上高 毎年固定増減')).not.toBeInTheDocument();
   });
 

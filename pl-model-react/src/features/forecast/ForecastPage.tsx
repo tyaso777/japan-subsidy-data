@@ -290,7 +290,7 @@ export function ForecastPage() {
   const settings = orderForecastSeriesByPl(model.series.filter((series) => series.scope === settingsScope));
   const segments = model.segments ?? program.timeline.periods.map((period) => ({ id: period.definitionId, definitionId: period.definitionId, startYear: period.startYear, endYear: period.endYear }));
   const settingsPanel = useCompactSettingsPanel(segments.length);
-  const [variationOverride, setVariationOverride] = useState<boolean>();
+  const [variationOverride, setVariationOverride] = useState(true);
   const variationOpen = variationOverride ?? !settingsPanel.compact;
   const boundaryYears = segments.slice(1).map((period) => period.startYear);
   const yearLabels = buildTimelineYearLabels(program);
