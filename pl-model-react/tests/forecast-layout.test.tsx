@@ -49,6 +49,13 @@ describe('将来予測画面のワイドレイアウト', () => {
       'before:bottom-full',
       'before:h-3',
       'before:bg-surface',
+      "after:content-['']",
+      'after:pointer-events-none',
+      'after:absolute',
+      'after:inset-x-0',
+      'after:top-full',
+      'after:h-4',
+      'after:bg-canvas',
     );
     const operationBar = screen.getByTestId('forecast-operation-bar');
     expect(operationBar).not.toHaveClass('sticky');
