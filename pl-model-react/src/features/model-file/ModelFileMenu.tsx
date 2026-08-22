@@ -46,10 +46,13 @@ export function ModelFileMenu() {
   const [fileName, setFileName] = useState<string>();
   const [error, setError] = useState<string>();
   const json = () => serializeModelFile({ program, actuals, forecast, caseSettings });
+  const lastPersistedJsonRef = useRef(json());
 
   const loadFile = async (file: File, handle?: ModelFileHandle) => {
     try {
-      replaceSnapshot(parseModelFile(await file.text()));
+      const snapshot = parseModelFile(await file.text());
+      replaceSnapshot(snapshot);
+      lastPersistedJsonRef.current = serializeModelFile(snapshot);
       handleRef.current = handle ?? null;
       setFileName(file.name);
     } catch (cause) {
@@ -69,16 +72,23 @@ export function ModelFileMenu() {
   };
 
   const writeTo = async (handle: ModelFileHandle) => {
+    const content = json();
     const writable = await handle.createWritable();
-    await writable.write(json());
+    await writable.write(content);
     await writable.close();
+    lastPersistedJsonRef.current = content;
     handleRef.current = handle;
     setFileName(handle.name);
   };
 
   const saveAs = async () => {
     const picker = window as PickerWindow;
-    if (!picker.showSaveFilePicker) { fallbackDownload(json()); return; }
+    if (!picker.showSaveFilePicker) {
+      const content = json();
+      fallbackDownload(content);
+      lastPersistedJsonRef.current = content;
+      return;
+    }
     try {
       await writeTo(await picker.showSaveFilePicker({ ...pickerOptions, suggestedName: fileName ?? 'pl-model.json' }));
     } catch (cause) {
@@ -92,7 +102,10 @@ export function ModelFileMenu() {
   };
 
   const loadSample = () => {
-    replaceSnapshot(createInitialModelSnapshot(window.PL_SUBSIDY_PROGRAM, 'sample'));
+    if (json() !== lastPersistedJsonRef.current && !window.confirm('既存のデータが消えますが、よろしいでしょうか。')) return;
+    const snapshot = createInitialModelSnapshot(window.PL_SUBSIDY_PROGRAM, 'sample');
+    replaceSnapshot(snapshot);
+    lastPersistedJsonRef.current = serializeModelFile(snapshot);
     handleRef.current = null;
     setFileName('sample-case.json');
   };
@@ -106,11 +119,10 @@ export function ModelFileMenu() {
     <div className="flex items-stretch"><Button variant="outline" size="sm" className="max-w-38 rounded-r-none" onClick={() => void open()}><FileJson /><span className="truncate">{fileName ?? '案件JSON'}</span></Button><DropdownMenu>
       <DropdownMenuTrigger asChild><Button variant="outline" size="icon" className="h-8 w-7 rounded-l-none border-l-0" aria-label="案件JSONメニュー"><ChevronDown /></Button></DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onSelect={loadSample}><FileJson />サンプルデータを読み込む</DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem disabled={!handleRef.current} onSelect={() => void overwrite()}><Save />上書き保存</DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => void saveAs()}><SaveAll />名前を付けて保存</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={loadSample}><FileJson />サンプルデータを読み込み</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu></div>
     <Dialog open={Boolean(error)} onOpenChange={(openState) => { if (!openState) setError(undefined); }}>
