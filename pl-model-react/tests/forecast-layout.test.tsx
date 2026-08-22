@@ -25,15 +25,14 @@ describe('将来予測画面のワイドレイアウト', () => {
     );
     expect(screen.getByTestId('forecast-settings-panel')).toHaveClass(
       'sticky',
-      'top-[var(--forecast-content-sticky-top)]',
-      'max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)]',
       'flex',
       'flex-col',
       'overflow-hidden',
     );
+    expect(screen.getByTestId('forecast-settings-panel')).toHaveStyle({ top: 'var(--forecast-content-sticky-top)' });
     expect(screen.getByTestId('forecast-settings-panel')).not.toHaveClass('top-3');
-    expect(screen.getByTestId('forecast-settings-sticky-header')).toHaveClass('shrink-0', 'bg-surface');
-    expect(screen.getByTestId('forecast-settings-scroll-body')).toHaveClass(
+    expect(screen.getByTestId('forecast-settings-header')).toHaveClass('shrink-0', 'bg-surface');
+    expect(screen.getByTestId('forecast-settings-body')).toHaveClass(
       'min-h-0',
       'overflow-x-hidden',
       'overflow-y-auto',
@@ -44,16 +43,15 @@ describe('将来予測画面のワイドレイアウト', () => {
     const metricsPanel = screen.getByTestId('forecast-metrics-panel');
     expect(metricsPanel).toHaveClass(
       'sticky',
-      'top-[var(--forecast-content-sticky-top)]',
-      'max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)]',
       'min-w-0',
       'flex',
       'flex-col',
       'overflow-hidden',
     );
+    expect(metricsPanel).toHaveStyle({ top: 'var(--forecast-content-sticky-top)' });
     expect(metricsPanel).not.toHaveClass('top-3', 'max-h-[calc(100vh-24px)]');
-    expect(screen.getByTestId('forecast-metrics-sticky-header')).toHaveClass('shrink-0', 'bg-surface');
-    const metricsBody = screen.getByTestId('forecast-metrics-scroll-body');
+    expect(screen.getByTestId('forecast-metrics-header')).toHaveClass('shrink-0', 'bg-surface');
+    const metricsBody = screen.getByTestId('forecast-metrics-body');
     expect(metricsBody).toHaveClass('min-h-0', 'overflow-x-hidden', 'overflow-y-scroll', 'p-2');
     expect(metricsBody).toHaveStyle({ scrollbarGutter: 'stable' });
     expect(within(screen.getByTestId('metric-bullet-company-sales-growth')).getByTestId('metric-bullet-layout')).toHaveClass(

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { LoaderCircle } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { StickyPanel } from '../../components/ui/sticky-panel';
 import { Input } from '../../components/ui/input';
 import { NumberInput } from '../../components/ui/number-input';
 import { Slider } from '../../components/ui/slider';
@@ -186,9 +187,15 @@ export function MetricsPanel({ company, base, subsidy, optimization }: { company
   const { proposal, rangeMode, isExpansionSearching, applicationResult } = optimization;
   const metrics = useModelStore((state) => state.program.definitions.managementMetrics);
   const program = useModelStore((state) => state.program);
-  return <aside data-testid="forecast-metrics-panel" className="sticky top-[var(--forecast-content-sticky-top)] flex min-w-0 max-h-[calc(100vh-var(--forecast-content-sticky-top)-12px)] flex-col overflow-hidden border border-line bg-surface">
-    <div data-testid="forecast-metrics-sticky-header" className="flex shrink-0 items-center justify-between gap-2 border-b border-line bg-surface px-2 py-2 pr-3 shadow-sm"><div><h3 className="m-0 text-base font-bold">経営指標・目標</h3><p className="m-0 text-[10px] text-muted-foreground">制度式で全社・事業別を同時評価</p></div><Button variant={editing ? 'default' : 'outline'} size="sm" onClick={() => setEditing((value) => !value)}>{editing ? '編集完了' : 'すべて編集'}</Button></div>
-    <div data-testid="forecast-metrics-scroll-body" style={{ scrollbarGutter: 'stable' }} className="min-h-0 overflow-x-hidden overflow-y-scroll p-2 pr-3">
+  return <StickyPanel
+    testIdPrefix="forecast-metrics"
+    stickyTop="var(--forecast-content-sticky-top)"
+    scrollMode="always"
+    headerClassName="px-2 py-2 pr-3"
+    bodyClassName="p-2 pr-3"
+    bodyStyle={{ scrollbarGutter: 'stable' }}
+    header={<div className="flex items-center justify-between gap-2"><div><h3 className="m-0 text-base font-bold">経営指標・目標</h3><p className="m-0 text-[10px] text-muted-foreground">制度式で全社・事業別を同時評価</p></div><Button variant={editing ? 'default' : 'outline'} size="sm" onClick={() => setEditing((value) => !value)}>{editing ? '編集完了' : 'すべて編集'}</Button></div>}
+  >
       <div>{metrics.map((metric) => <MetricBullet key={metric.id} metric={metric} editing={editing} timeline={metric.scope === 'company' ? company : metric.scope === 'base' ? base : subsidy} />)}</div>
       {proposal && <section data-testid="optimization-proposal" className="mt-3 border-t-[3px] border-orange bg-background p-3">
       <div data-testid="optimization-status-summary" aria-live="polite" className={`mb-2 flex items-center justify-between rounded px-2 py-1.5 text-[11px] font-bold ${proposal.feasibility === 'feasible' ? 'bg-teal/10 text-teal' : 'bg-orange/10 text-orange'}`}><span>{proposal.feasibility === 'feasible' ? '目標達成' : proposal.feasibility === 'infeasible' ? '目標未達' : '評価不能'}</span><span className="text-[9px] font-normal">{proposal.feasibility === 'feasible' ? '選択した探索範囲で達成できます' : proposal.feasibility === 'infeasible' ? rangeMode === 'within-levels' ? '現在のMin・Max内の最良案' : '水準外の候補も探索中／探索済み' : '必要な実績値を確認してください'}</span></div>
@@ -197,6 +204,5 @@ export function MetricsPanel({ company, base, subsidy, optimization }: { company
       <div className="mt-3 flex items-center justify-between border-t border-line pt-3"><strong className="text-sm">最適化方向・{strategyLabels[proposal.strategy]}</strong><span className="text-[10px] text-muted-foreground">PLは適用率で段階反映</span></div>
       <div className="mt-2 max-h-32 overflow-y-auto">{proposal.changes.map((change) => <div key={`${change.seriesId}-${change.periodId}`} className="grid grid-cols-[1fr_48px] items-center border-t border-line py-1 text-[9px]"><span>{change.seriesId} / {change.periodId}</span><strong className={change.direction === 'up' ? 'text-teal' : 'text-orange'}>{change.direction === 'up' ? '↗' : '↘'} {Math.abs(change.delta).toFixed(1)}</strong></div>)}</div>
       </section>}
-    </div>
-  </aside>;
+  </StickyPanel>;
 }
