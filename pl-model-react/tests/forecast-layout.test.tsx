@@ -82,7 +82,10 @@ describe('将来予測画面のワイドレイアウト', () => {
 
     const headers = screen.getAllByTestId('forecast-period-header');
     expect(headers).toHaveLength(2);
-    headers.forEach((header) => expect(header).toHaveClass('min-h-10', 'items-center'));
+    headers.forEach((header) => {
+      expect(header).toHaveClass('sticky', 'z-10', 'min-h-10', 'items-center', 'bg-surface');
+      expect(header).toHaveStyle({ top: '0px' });
+    });
     screen.getAllByTestId('forecast-period-years').forEach((years) => {
       expect(years).toHaveClass('whitespace-nowrap');
     });

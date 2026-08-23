@@ -67,6 +67,18 @@ test('sticky layers remain opaque, ordered and joined while scrolling', async ({
   expectJoined(operation, settings);
   expectJoined(operation, metrics);
 
+  const settingsBody = page.getByTestId('forecast-settings-body');
+  const periodHeaders = page.getByTestId('forecast-period-header');
+  await settingsBody.evaluate((element) => { element.scrollTop = Math.max(1, element.scrollHeight - element.clientHeight); });
+  const settingsBodyGeometry = await geometry(settingsBody);
+  for (const periodHeader of await periodHeaders.all()) {
+    const periodHeaderGeometry = await geometry(periodHeader);
+    expectOpaque(periodHeaderGeometry);
+    expect(periodHeaderGeometry.position).toBe('sticky');
+    expect(periodHeaderGeometry.top).toBeGreaterThanOrEqual(settingsBodyGeometry.top);
+    expect(periodHeaderGeometry.top - settingsBodyGeometry.top).toBeLessThanOrEqual(10.5);
+  }
+
   await page.getByRole('tab', { name: 'PL表' }).click();
   await expect(page.getByTestId('forecast-logic-detail')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /04ロジックマップで確認/ })).toBeVisible();
