@@ -66,4 +66,10 @@ test('sticky layers remain opaque, ordered and joined while scrolling', async ({
   expectJoined(displayControls, comparison);
   expectJoined(operation, settings);
   expectJoined(operation, metrics);
+
+  const logicDetail = page.getByTestId('forecast-logic-detail');
+  await logicDetail.evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.7));
+  const operationAtLayoutEnd = await geometry(page.getByTestId('forecast-operation-sticky-layer'));
+  expectJoined(operationAtLayoutEnd, await geometry(page.getByTestId('forecast-settings-panel')));
+  expectJoined(operationAtLayoutEnd, await geometry(page.getByTestId('forecast-metrics-panel')));
 });
