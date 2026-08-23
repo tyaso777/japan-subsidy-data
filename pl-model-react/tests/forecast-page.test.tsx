@@ -447,12 +447,18 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByLabelText('全社売上高成長率 対象範囲')).toHaveValue('company');
   });
 
-  it('BLUEPRINT同様に選択したPLロジックを将来予測画面内で確認する', async () => {
+  it('PL表で選択した科目をコンパクトな導線から04ロジックマップで確認する', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
-    expect(screen.getByRole('heading', { name: '選択したロジック' })).toBeVisible();
-    expect(screen.getByTestId('forecast-logic-detail')).toHaveTextContent('営業利益');
+    await user.click(screen.getByRole('tab', { name: 'PL表' }));
+    await user.click(within(screen.getByTestId('forecast-pl-table')).getByRole('button', { name: /うち減価償却費（原価）/ }));
+    expect(screen.queryByTestId('forecast-logic-detail')).not.toBeInTheDocument();
+    const openLogicMap = screen.getByRole('button', { name: 'うち減価償却費（原価）を04ロジックマップで確認' });
+    expect(openLogicMap).toBeVisible();
+    await user.click(openLogicMap);
+    expect(screen.getByRole('button', { name: '04 ロジックマップ' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByTestId('logic-detail')).toHaveTextContent('うち減価償却費（原価）');
   });
 
   it('最適化案の作成だけでは水準を変えず、適用率で段階反映する', async () => {

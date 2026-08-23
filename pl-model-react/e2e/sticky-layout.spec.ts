@@ -67,12 +67,7 @@ test('sticky layers remain opaque, ordered and joined while scrolling', async ({
   expectJoined(operation, settings);
   expectJoined(operation, metrics);
 
-  const logicDetail = page.getByTestId('forecast-logic-detail');
-  await logicDetail.evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.45));
-  const operationAtLayoutEnd = await geometry(page.getByTestId('forecast-operation-sticky-layer'));
-  const settingsAtLayoutEnd = await geometry(page.getByTestId('forecast-settings-panel'));
-  const settingsHeaderAtLayoutEnd = await geometry(page.getByTestId('forecast-settings-header'));
-  expect(settingsAtLayoutEnd.top).toBeLessThan(operationAtLayoutEnd.bottom);
-  expectJoined(operationAtLayoutEnd, settingsHeaderAtLayoutEnd);
-  expectJoined(operationAtLayoutEnd, await geometry(page.getByTestId('forecast-metrics-header')));
+  await page.getByRole('tab', { name: 'PL表' }).click();
+  await expect(page.getByTestId('forecast-logic-detail')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /04ロジックマップで確認/ })).toBeVisible();
 });

@@ -1,5 +1,5 @@
 ﻿import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { BarChart3, ChevronDown, SlidersHorizontal, Table2 } from 'lucide-react';
+import { BarChart3, ChevronDown, SlidersHorizontal, Table2, Workflow } from 'lucide-react';
 import type { CSSProperties, RefObject } from 'react';
 import { FinancialTable, type FinancialTableValueUpdate } from '../../components/FinancialTable';
 import { Badge } from '../../components/ui/badge';
@@ -19,7 +19,7 @@ import { useModelStore } from '../../store/model-store-context';
 import { MetricsPanel, OptimizationToolbar, useForecastOptimization } from './MetricsPanel';
 import { chartAxisTicks, nextChartExtent, type ChartExtent } from '../../domain/chart-scale';
 import { buildTimelineYearLabels, resolveTimeline } from '../../domain/timeline';
-import { downstreamCodes, plLogicNodes } from '../../domain/pl-logic';
+import { plLogicNodes } from '../../domain/pl-logic';
 import { defaultForecastRange } from '../../domain/forecast-range';
 import { settingsPeriodMinWidth, shouldAutoCollapseSettings } from './forecast-layout';
 import { stickyStackOffsetCss, useObservedHeight } from '../../lib/sticky-stack';
@@ -206,13 +206,14 @@ function buildTimeline(actuals: HistoricalPlInput[], model: ReturnType<typeof us
 }
 function useForecastModel() { return useModelStore((state) => state.forecast); }
 
-export function ForecastPage() {
+export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: string) => void }) {
   const [scope, setScope] = useState<Scope>('base');
   const [view, setView] = useState<ForecastView>('chart');
   const [chartDisplays, setChartDisplays] = useState<Record<ChartDisplay, boolean>>({ company: true, base: true, subsidy: true, comparison: true });
   const chartScrollContentRef = useRef<HTMLDivElement>(null);
   const businessHeaderScrollRef = useRef<HTMLDivElement>(null);
   const [selectedLogicCode, setSelectedLogicCode] = useState('16');
+  const selectedLogic = plLogicNodes.find((node) => node.code === selectedLogicCode) ?? plLogicNodes[0];
   const model = useForecastModel();
   const optimization = useForecastOptimization();
   const operationLayer = useObservedHeight<HTMLDivElement>(71);
@@ -377,7 +378,6 @@ export function ForecastPage() {
       <StickyPanel
         ref={settingsPanel.ref}
         testIdPrefix="forecast-settings"
-        className="row-span-2"
         stickyTop="var(--forecast-content-sticky-top)"
         headerClassName="px-2.5 py-2.5"
         bodyClassName="p-2.5"
@@ -421,10 +421,9 @@ export function ForecastPage() {
               </>}
             </div>
           </TabsContent>
-          <TabsContent value="table"><FinancialTable testId="forecast-pl-table" title={`${scopeLabels[scope]} P/L`} years={selected.years} yearLabels={yearLabels} records={selected.records} rows={forecastPlRows} moneyUnit={unit} editableFromIndex={baseActuals.length} stickyHeaderTop="var(--forecast-content-sticky-top)" stickyHeaderLayer="content" onRowSelect={(row) => setSelectedLogicCode(row.code)} onEditStart={beginTransaction} onEditEnd={commitTransaction} onValueChange={scope === 'company' ? undefined : (yearIndex, row, value) => applyForecastPlValues([{ yearIndex, row, value }])} onValuesChange={scope === 'company' ? undefined : applyForecastPlValues} /></TabsContent>
+          <TabsContent value="table" className="mt-0"><FinancialTable testId="forecast-pl-table" title={`${scopeLabels[scope]} P/L`} years={selected.years} yearLabels={yearLabels} records={selected.records} rows={forecastPlRows} moneyUnit={unit} editableFromIndex={baseActuals.length} stickyHeaderTop="var(--forecast-content-sticky-top)" stickyHeaderLayer="content" onRowSelect={(row) => setSelectedLogicCode(row.code)} onEditStart={beginTransaction} onEditEnd={commitTransaction} onValueChange={scope === 'company' ? undefined : (yearIndex, row, value) => applyForecastPlValues([{ yearIndex, row, value }])} onValuesChange={scope === 'company' ? undefined : applyForecastPlValues} /><div data-testid="forecast-logic-link" className="mt-2 flex min-w-0 items-center justify-between gap-2 rounded border border-line bg-soft px-3 py-2"><span className="min-w-0 truncate text-[10px] text-muted-foreground"><strong className="text-navy">{selectedLogic.code} {selectedLogic.label}</strong> の計算式・参照元・影響先</span><Button variant="outline" size="sm" className="h-7 shrink-0 gap-1.5 text-[10px]" aria-label={`${selectedLogic.label}を04ロジックマップで確認`} onClick={() => onOpenLogicMap?.(selectedLogic.code)}><Workflow className="size-3.5" />04ロジックマップで確認</Button></div></TabsContent>
       </section>
       <MetricsPanel company={company} base={base} subsidy={subsidy} optimization={optimization} />
-      {(() => { const logic = plLogicNodes.find((node) => node.code === selectedLogicCode) ?? plLogicNodes[0]; const labels = new Map(plLogicNodes.map((node) => [node.code, node.label])); const downstream = downstreamCodes(plLogicNodes, logic.code); return <section data-testid="forecast-logic-detail" className="col-start-2 grid grid-cols-[minmax(0,1fr)_360px] gap-3 border border-line bg-surface p-4"><div><h3 className="m-0 text-base font-bold">選択したロジック</h3><p className="mt-1 text-[10px] text-muted-foreground">P/L項目を選択して計算式・参照元・影響先を確認</p><div className="mt-2 flex flex-wrap gap-1">{plLogicNodes.map((node) => <Button key={node.code} variant={node.code === logic.code ? 'default' : 'outline'} size="sm" className="h-7" onClick={() => setSelectedLogicCode(node.code)}>{node.code} {node.label}</Button>)}</div></div><aside className="border-t-[3px] border-orange bg-background p-3"><strong className="text-sm">{logic.label}</strong><code className="mt-2 block rounded bg-soft p-2 text-[10px]">{logic.formula}</code><p className="mb-1 text-[9px] text-muted-foreground">参照：{logic.dependsOn.map((code) => labels.get(code)).join('・') || '外部入力・前年値'}</p><p className="m-0 text-[9px] text-muted-foreground">影響先：{downstream.map((code) => labels.get(code)).join('・') || '最終出力'}</p></aside></section>; })()}
     </div>
     </Tabs>
   </main>;

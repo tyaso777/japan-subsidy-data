@@ -21,6 +21,7 @@ type PageLink = { id: Page; label: string; icon: ComponentType<{ className?: str
 
 function AppContent() {
   const [page, setPage] = useState<Page>('actuals');
+  const [selectedLogicCode, setSelectedLogicCode] = useState('16');
   const appToolbar = useObservedHeight<HTMLDivElement>(57);
   const program = useModelStore((state) => state.program);
   const undo = useModelStore((state) => state.undo);
@@ -38,6 +39,10 @@ function AppContent() {
   const navigateToPage = (nextPage: Page) => {
     setPage(nextPage);
     requestAnimationFrame(() => document.querySelector<HTMLElement>('[data-testid="app-toolbar"]')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' }));
+  };
+  const openLogicMap = (code: string) => {
+    setSelectedLogicCode(code);
+    navigateToPage('logic');
   };
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -59,8 +64,8 @@ function AppContent() {
       })}</nav><Select value={moneyUnit} onValueChange={setMoneyUnit}><SelectTrigger aria-label="金額表示単位" size="sm" className="w-28 bg-surface"><SelectValue /></SelectTrigger><SelectContent>{moneyDisplayUnits.map((unit) => <SelectItem key={unit.id} value={unit.id}>{unit.label}</SelectItem>)}</SelectContent></Select><ModelFileMenu /><div className="flex gap-1"><Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" aria-label="元に戻す Ctrl+Z" disabled={!canUndo} onClick={undo}><Undo2 /></Button></TooltipTrigger><TooltipContent>元に戻す Ctrl+Z</TooltipContent></Tooltip><Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" aria-label="やり直す Ctrl+Y" disabled={!canRedo} onClick={redo}><Redo2 /></Button></TooltipTrigger><TooltipContent>やり直す Ctrl+Y</TooltipContent></Tooltip></div></StickySurface>
     {page === 'definition' && <ProgramDefinitionPage />}
     {page === 'actuals' && <ActualsPage onNext={() => navigateToPage('forecast')} />}
-    {page === 'forecast' && <ForecastPage />}
-    {page === 'logic' && <LogicMapPage />}
+    {page === 'forecast' && <ForecastPage onOpenLogicMap={openLogicMap} />}
+    {page === 'logic' && <LogicMapPage initialSelectedCode={selectedLogicCode} />}
   </div></TooltipProvider>;
 }
 

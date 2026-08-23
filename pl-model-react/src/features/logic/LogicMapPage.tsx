@@ -6,8 +6,8 @@ import { commonPlFormulaInputs, extractFormulaReferences, sortNumericDefinitions
 import { useModelStore } from '../../store/model-store-context';
 import { downstreamCodes, plLogicNodes } from '../../domain/pl-logic';
 
-export function LogicMapPage() {
-  const [selectedCode, setSelectedCode] = useState('16');
+export function LogicMapPage({ initialSelectedCode = '16' }: { initialSelectedCode?: string }) {
+  const [selectedCode, setSelectedCode] = useState(initialSelectedCode);
   const definitions = useModelStore((state) => state.program.definitions.commonNumericDefinitions);
   let graphError = '';
   let ordered = definitions;

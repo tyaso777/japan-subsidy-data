@@ -189,7 +189,6 @@ export function MetricsPanel({ company, base, subsidy, optimization }: { company
   const program = useModelStore((state) => state.program);
   return <StickyPanel
     testIdPrefix="forecast-metrics"
-    className="row-span-2"
     stickyTop="var(--forecast-content-sticky-top)"
     scrollMode="always"
     headerClassName="px-2 py-2 pr-3"
