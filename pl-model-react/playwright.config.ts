@@ -6,7 +6,7 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:5181',
     channel: process.platform === 'win32' ? 'msedge' : 'chrome',
-    viewport: { width: 1440, height: 900 },
+    viewport: { width: 1440, height: 1200 },
   },
   webServer: {
     command: 'npm run dev -- --host 127.0.0.1 --port 5181 --strictPort',

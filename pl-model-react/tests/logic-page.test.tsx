@@ -29,9 +29,9 @@ describe('ロジックマップ画面', () => {
     await user.click(within(plMap).getByRole('button', { name: /^16営業利益$/ }));
     const detail = screen.getByTestId('logic-detail');
     expect(screen.getByTestId('pl-logic-section')).not.toHaveClass('[&>aside]:top-16');
-    expect(detail).toHaveClass('sticky', 'isolate', 'overflow-hidden', 'bg-surface');
+    expect(detail).toHaveClass('sticky', 'isolate', 'overflow-visible', 'bg-surface');
     expect(detail).toHaveStyle({ top: 'calc(var(--app-toolbar-sticky-bottom) + 12px)' });
-    expect(screen.getByTestId('logic-detail-header')).toHaveClass('shrink-0', 'bg-surface');
+    expect(screen.getByTestId('logic-detail-header')).toHaveClass('sticky', 'shrink-0', 'bg-surface');
     expect(screen.getByTestId('logic-detail-body')).toHaveClass('min-h-0', 'overflow-y-auto');
     expect(detail).toHaveTextContent('参照するPL項目');
     expect(detail).toHaveTextContent('販売費及び一般管理費');

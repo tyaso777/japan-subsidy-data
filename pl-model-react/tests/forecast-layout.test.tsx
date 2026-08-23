@@ -27,11 +27,12 @@ describe('将来予測画面のワイドレイアウト', () => {
       'sticky',
       'flex',
       'flex-col',
-      'overflow-hidden',
+      'overflow-visible',
+      'row-span-2',
     );
     expect(screen.getByTestId('forecast-settings-panel')).toHaveStyle({ top: 'var(--forecast-content-sticky-top)' });
     expect(screen.getByTestId('forecast-settings-panel')).not.toHaveClass('top-3');
-    expect(screen.getByTestId('forecast-settings-header')).toHaveClass('shrink-0', 'bg-surface');
+    expect(screen.getByTestId('forecast-settings-header')).toHaveClass('sticky', 'shrink-0', 'bg-surface');
     expect(screen.getByTestId('forecast-settings-body')).toHaveClass(
       'min-h-0',
       'overflow-x-hidden',
@@ -46,11 +47,12 @@ describe('将来予測画面のワイドレイアウト', () => {
       'min-w-0',
       'flex',
       'flex-col',
-      'overflow-hidden',
+      'overflow-visible',
+      'row-span-2',
     );
     expect(metricsPanel).toHaveStyle({ top: 'var(--forecast-content-sticky-top)' });
     expect(metricsPanel).not.toHaveClass('top-3', 'max-h-[calc(100vh-24px)]');
-    expect(screen.getByTestId('forecast-metrics-header')).toHaveClass('shrink-0', 'bg-surface');
+    expect(screen.getByTestId('forecast-metrics-header')).toHaveClass('sticky', 'shrink-0', 'bg-surface');
     const metricsBody = screen.getByTestId('forecast-metrics-body');
     expect(metricsBody).toHaveClass('min-h-0', 'overflow-x-hidden', 'overflow-y-scroll', 'p-2');
     expect(metricsBody).toHaveStyle({ scrollbarGutter: 'stable' });

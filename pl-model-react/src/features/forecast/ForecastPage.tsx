@@ -377,6 +377,7 @@ export function ForecastPage() {
       <StickyPanel
         ref={settingsPanel.ref}
         testIdPrefix="forecast-settings"
+        className="row-span-2"
         stickyTop="var(--forecast-content-sticky-top)"
         headerClassName="px-2.5 py-2.5"
         bodyClassName="p-2.5"
