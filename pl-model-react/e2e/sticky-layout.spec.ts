@@ -76,7 +76,7 @@ test('sticky layers remain opaque, ordered and joined while scrolling', async ({
     expectOpaque(periodHeaderGeometry);
     expect(periodHeaderGeometry.position).toBe('sticky');
     expect(periodHeaderGeometry.top).toBeGreaterThanOrEqual(settingsBodyGeometry.top);
-    expect(periodHeaderGeometry.top - settingsBodyGeometry.top).toBeLessThanOrEqual(10.5);
+    expect(periodHeaderGeometry.top - settingsBodyGeometry.top).toBeLessThanOrEqual(1.5);
   }
 
   await page.getByRole('tab', { name: 'PL表' }).click();

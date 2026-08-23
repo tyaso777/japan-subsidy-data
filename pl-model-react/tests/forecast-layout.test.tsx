@@ -37,8 +37,10 @@ describe('将来予測画面のワイドレイアウト', () => {
       'min-h-0',
       'overflow-x-hidden',
       'overflow-y-auto',
-      'p-2.5',
+      'px-2.5',
+      'pb-2.5',
     );
+    expect(screen.getByTestId('forecast-settings-body')).not.toHaveClass('pt-2.5', 'p-2.5');
     expect(screen.getByTestId('forecast-period-grid')).toHaveClass('min-w-0');
     expect(screen.getByTestId('forecast-period-grid')).not.toHaveClass('overflow-x-auto');
     const metricsPanel = screen.getByTestId('forecast-metrics-panel');
