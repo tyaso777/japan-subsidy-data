@@ -102,7 +102,7 @@ function baseRange(series: ForecastSeries, rows: HistoricalPlCalculated[]): { ra
   const range = observed ?? fallback;
   const upperHeadroom = driver === 'sales'
     ? (series.scope === 'subsidy' ? 30 : 20)
-    : driver === 'payPerPerson' ? 5 : null;
+    : driver === 'payPerPerson' || driver === 'officerPayPerPerson' ? 5 : null;
   return {
     range: upperHeadroom !== null
       ? { min: range.min, max: initialValue + upperHeadroom }

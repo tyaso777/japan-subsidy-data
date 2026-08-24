@@ -50,17 +50,23 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(period.annualGrowthRate).toBeCloseTo((period.range!.min + period.range!.max) / 2);
   });
 
-  it('従業員1人当たり給与支給総額は初期値＋5ptを上限とし、事業化報告期間でも同じ余裕幅を保つ', () => {
+  it('従業員・役員の1人当たり給与支給総額は初期値＋5ptを上限とし、事業化報告期間でも同じ余裕幅を保つ', () => {
     const state = createModelStore().getState();
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
 
-    for (const seriesId of ['base-payPerPerson', 'subsidy-payPerPerson']) {
+    for (const seriesId of [
+      'base-payPerPerson',
+      'subsidy-payPerPerson',
+      'base-officerPayPerPerson',
+      'subsidy-officerPayPerPerson',
+    ]) {
       const series = result.forecast.series.find((item) => item.id === seriesId)!;
       const toBase = series.periods.find((item) => item.id === 'subsidy')!;
       const postBase = series.periods.find((item) => item.id === 'report')!;
       expect(toBase.range?.max).toBeCloseTo(toBase.annualGrowthRate + 5);
       expect(postBase.range?.max).toBeCloseTo(postBase.annualGrowthRate + 5);
-      expect(postBase.annualGrowthRate).toBeCloseTo(toBase.annualGrowthRate + .5);
+      const expectedPostBaseAdjustment = seriesId.endsWith('-payPerPerson') ? .5 : 0;
+      expect(postBase.annualGrowthRate).toBeCloseTo(toBase.annualGrowthRate + expectedPostBaseAdjustment);
     }
   });
 
