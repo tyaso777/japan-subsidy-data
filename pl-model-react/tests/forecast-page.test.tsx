@@ -592,14 +592,26 @@ describe('将来予測・PL画面', () => {
     expect(max).toHaveValue(10);
   });
 
-  it('実効税率は年間変化を固定しつつ開始時固定値と開始時増減を編集できる', async () => {
+  it('実効税率もMin=Max=0の間だけロックし、範囲を広げると変動できる', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
-    expect(screen.getByLabelText('補助事業期間 実効税率 年間変化')).toBeDisabled();
-    expect(screen.getByLabelText('補助事業期間 実効税率 水準')).toBeDisabled();
+    const min = screen.getByLabelText('補助事業期間 実効税率 最小値');
+    const max = screen.getByLabelText('補助事業期間 実効税率 最大値');
+    const slider = screen.getByLabelText('補助事業期間 実効税率 水準');
+    expect(screen.getByLabelText('補助事業期間 実効税率 年間変化')).toBeEnabled();
+    expect(min).toBeEnabled();
+    expect(max).toBeEnabled();
+    expect(min).toHaveValue(0);
+    expect(max).toHaveValue(0);
+    expect(slider).toBeDisabled();
     expect(screen.getByLabelText('補助事業期間 実効税率 開始時固定値')).toBeEnabled();
     expect(screen.getByLabelText('補助事業期間 実効税率 開始時増減')).toBeEnabled();
+
+    await user.clear(max);
+    await user.type(max, '5');
+    await user.tab();
+    expect(slider).toBeEnabled();
   });
 
   it('原価率は初期状態でMin=Max=0となり、範囲を広げるまで水準をロックする', async () => {

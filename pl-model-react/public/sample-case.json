@@ -990,7 +990,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 30.08849557522124,
           "periods": [
@@ -1525,7 +1525,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 30,
           "periods": [

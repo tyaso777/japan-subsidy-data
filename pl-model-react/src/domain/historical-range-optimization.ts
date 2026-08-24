@@ -33,6 +33,7 @@ const initiallyLockedDrivers = new Set([
   'officerCompensationShare',
   'nonOperatingRate',
   'extraordinaryRate',
+  'taxRate',
 ]);
 
 function driverId(series: ForecastSeries): string {
@@ -147,12 +148,9 @@ export function optimizeForecastRangesFromActuals(
   forecast.series.filter((series) => series.scope !== 'company').forEach((series) => {
     const source = actuals[series.scope as Scope];
     const driver = driverId(series);
-    if (series.changePolicy === 'fixed' || driver === 'taxRate') {
+    if (series.changePolicy === 'fixed') {
       const latestLevel = valuesForDriver(driverId(series), source).at(-1);
-      const fixedLevel = Number.isFinite(latestLevel) ? latestLevel! : driver === 'taxRate' ? 30 : series.baseValue;
-      if (driver === 'taxRate') {
-        series.changePolicy = 'fixed';
-      }
+      const fixedLevel = Number.isFinite(latestLevel) ? latestLevel! : series.baseValue;
       series.baseValue = fixedLevel;
       series.periods.forEach((period, index) => {
         period.annualGrowthRate = 0;

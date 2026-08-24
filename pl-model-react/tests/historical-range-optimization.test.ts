@@ -115,14 +115,15 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(cogs.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);
   });
 
-  it('実効税率は赤字実績から変化率を作らず、固定値として保持する', () => {
+  it('実効税率は赤字実績から変化率を作らず、他の補足比率と同じく初期範囲をロックする', () => {
     const state = createModelStore().getState();
     const subsidyTax = state.forecast.series.find((series) => series.id === 'subsidy-taxRate')!;
     expect(subsidyTax.baseValue).toBe(30);
-    expect(subsidyTax.changePolicy).toBe('fixed');
+    expect(subsidyTax.changePolicy).toBe('adjustable');
 
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
     const optimizedTax = result.forecast.series.find((series) => series.id === 'subsidy-taxRate')!;
+    expect(optimizedTax.changePolicy).toBe('adjustable');
     expect(optimizedTax.baseValue).toBe(30);
     expect(optimizedTax.periods[0].startValue).toBe(30);
     expect(optimizedTax.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);

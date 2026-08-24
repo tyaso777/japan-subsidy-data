@@ -91,7 +91,7 @@ function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInpu
       linear('officerCompensationShare', '役員給与のうち報酬割合', calculated.officerPay ? latest.officerCompensation / calculated.officerPay * 100 : 90, 0, 'adjustable', true),
       linear('nonOperatingRate', '営業外損益の売上高比率', latest.sales ? latest.nonOperating / latest.sales * 100 : 0, 0, 'adjustable', true),
       linear('extraordinaryRate', '特別損益の売上高比率', latest.sales ? latest.extraordinary / latest.sales * 100 : 0, 0, 'adjustable', true),
-      linear('taxRate', '実効税率', calculated.preTaxIncome > 0 ? Math.max(0, Math.min(100, (1 - latest.netIncome / calculated.preTaxIncome) * 100)) : 30, 0, 'fixed'),
+      linear('taxRate', '実効税率', calculated.preTaxIncome > 0 ? Math.max(0, Math.min(100, (1 - latest.netIncome / calculated.preTaxIncome) * 100)) : 30, 0, 'adjustable', true),
       compound('officerCount', '役員数', 'count', latest.officerCount, 0),
     ];
   };
