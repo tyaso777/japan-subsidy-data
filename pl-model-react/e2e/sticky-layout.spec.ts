@@ -188,3 +188,19 @@ test('水準設定は固定項目を一括で隠して変動可能項目へ集�
   await expect(panel.getByLabel('補助事業期間 売上高 年間変化')).toBeVisible();
   await expect(panel.getByRole('button', { name: '固定項目を表示' })).toBeVisible();
 });
+
+test('全社合算は編集タブから外しPL表の閲覧対象として残す', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('app-toolbar').getByRole('button', { name: '03 将来予測・PL' }).click();
+
+  const editScopes = page.getByLabel('編集対象事業');
+  await expect(editScopes.getByRole('button', { name: '全社合算' })).toHaveCount(0);
+  await expect(editScopes.getByRole('button', { name: 'ベース事業' })).toBeVisible();
+  await expect(editScopes.getByRole('button', { name: '補助事業' })).toBeVisible();
+
+  await page.getByRole('tab', { name: 'PL表' }).click();
+  const tableScopes = page.getByLabel('P/L表示対象');
+  await tableScopes.getByRole('button', { name: '全社合算' }).click();
+  await expect(page.getByRole('heading', { name: '全社合算 P/L' })).toBeVisible();
+  await expect(page.getByLabel('補助事業期間 売上高 年間変化')).toBeEnabled();
+});

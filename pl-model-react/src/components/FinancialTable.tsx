@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ClipboardEvent, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type ClipboardEvent, type MouseEvent, type ReactNode } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import type { FinancialRow } from '../domain/rows';
 import { financialInputFractionDigits, financialInputStep, formatFinancialValue, fromDisplayFinancialValue, moneyUnitLabel, toDisplayFinancialValue, type MoneyDisplayUnit } from '../domain/value-units';
@@ -31,6 +31,7 @@ type Props<T extends object> = {
   stickyHeaderTop?: string;
   stickyHeaderLayer?: StickyLayer;
   compact?: boolean;
+  headerActions?: ReactNode;
 };
 
 export type FinancialTableValueUpdate<T extends object> = { yearIndex: number; row: FinancialRow<T>; value: number };
@@ -59,7 +60,7 @@ function EditableValueCell({ label, value, step, maximumFractionDigits, compact 
   return <Input className={cn('ml-auto select-text rounded px-0.5 py-0 text-right text-[10px]', compact ? 'h-5 w-[min(86px,100%)]' : 'h-6 w-[min(120px,100%)]')} aria-label={label} type="number" step={step} value={draft} onFocus={() => { setEditing(true); setDirty(false); onEditStart?.(); }} onChange={(event) => { setDirty(true); setDraft(event.target.value); }} onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); }} onBlur={() => { const next = Number(draft); setEditing(false); if (dirty && Number.isFinite(next)) onCommit(next); setDirty(false); onEditEnd?.(); }} />;
 }
 
-export function FinancialTable<T extends object>({ testId, title, prefix = '', years, records, rows, onChange, moneyUnit, onEditStart, onEditEnd, editableFromIndex, onValueChange, onValuesChange, yearLabels, onRowSelect, isRecordEmpty, separateSubjectColumns = false, stickyHeaderTop = 'var(--app-toolbar-sticky-bottom)', stickyHeaderLayer = 'operation', compact = false }: Props<T>) {
+export function FinancialTable<T extends object>({ testId, title, prefix = '', years, records, rows, onChange, moneyUnit, onEditStart, onEditEnd, editableFromIndex, onValueChange, onValuesChange, yearLabels, onRowSelect, isRecordEmpty, separateSubjectColumns = false, stickyHeaderTop = 'var(--app-toolbar-sticky-bottom)', stickyHeaderLayer = 'operation', compact = false, headerActions }: Props<T>) {
   const [omitCalculated, setOmitCalculated] = useState(false);
   const [showSupplementary, setShowSupplementary] = useState(true);
   const [selection, setSelection] = useState<GridSelection>();
@@ -188,7 +189,7 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
     <StickySurface data-testid={`${testId}-sticky-header`} stickyTop={stickyHeaderTop} layer={stickyHeaderLayer} className="shadow-sm">
       <header className={cn('flex items-center justify-between gap-3.5 border-t-[3px] border-navy', compact ? 'px-3 py-1.5' : 'px-3.5 pt-2.5 pb-2')}>
         <div><h3 className="m-0 text-[15px] font-bold">{title}</h3><p className="mt-0.5 text-[9px] text-muted-foreground">入力項目と自動計算項目・金額表示：{moneyUnitLabel(moneyUnit)}・ドラッグで範囲選択、Ctrl+C/VでExcel連携</p></div>
-        <div className="flex items-center gap-2">{clipboardStatus && <span role="status" className="text-[9px] font-bold text-teal">{clipboardStatus}</span>}{hasSupplementary && <Button variant="subtle" size="xs" onClick={() => setShowSupplementary((value) => !value)}>{showSupplementary ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}{showSupplementary ? '補足指標を隠す' : '補足指標を表示'}</Button>}<Button variant="subtle" size="xs" onClick={() => setOmitCalculated((value) => !value)}>
+        <div className="flex items-center gap-2">{headerActions}{clipboardStatus && <span role="status" className="text-[9px] font-bold text-teal">{clipboardStatus}</span>}{hasSupplementary && <Button variant="subtle" size="xs" onClick={() => setShowSupplementary((value) => !value)}>{showSupplementary ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}{showSupplementary ? '補足指標を隠す' : '補足指標を表示'}</Button>}<Button variant="subtle" size="xs" onClick={() => setOmitCalculated((value) => !value)}>
           {omitCalculated ? <Eye aria-hidden="true" /> : <EyeOff aria-hidden="true" />}
           {omitCalculated ? '自動計算項目を表示' : '自動計算項目を省略'}
         </Button></div>

@@ -36,7 +36,8 @@ describe('将来予測・PL画面', () => {
     const operationBar = screen.getByTestId('forecast-operation-bar');
     expect(operationBar).toContainElement(allocation);
     expect(within(operationBar).getByTestId('forecast-scope-shortcuts')).toHaveClass('flex-col');
-    expect(within(operationBar).getByTestId('forecast-scope-shortcuts')).toHaveTextContent('Ctrl+1 / 2 / 3');
+    expect(within(operationBar).getByTestId('forecast-scope-shortcuts')).toHaveTextContent('Ctrl+1 / 2');
+    expect(within(operationBar).getByLabelText('編集対象事業')).not.toHaveTextContent('全社合算');
     expect(within(operationBar).getByTestId('forecast-view-shortcuts')).toHaveClass('flex-col');
     expect(within(operationBar).getByTestId('forecast-view-shortcuts')).toHaveTextContent('Ctrl+4 / 5');
     expect(within(allocation).getByTestId('final-year-allocation-title')).toHaveClass('flex-col');
@@ -387,16 +388,36 @@ describe('将来予測・PL画面', () => {
     expect((Number(slider.getAttribute('max')) - Number(slider.getAttribute('min'))) / Number(slider.getAttribute('step'))).toBeCloseTo(58);
   });
 
-  it('Ctrl+1・2・3で全社・ベース・補助事業を切り替える', async () => {
+  it('Ctrl+1・2でベース・補助事業を切り替え、全社合算は編集対象にしない', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
-    await user.keyboard('{Control>}3{/Control}');
+    const scopeShortcuts = screen.getByTestId('forecast-scope-shortcuts');
+    expect(within(scopeShortcuts).queryByRole('button', { name: '全社合算' })).not.toBeInTheDocument();
+    expect(scopeShortcuts).toHaveTextContent('Ctrl+1 / 2');
+    await user.keyboard('{Control>}2{/Control}');
     expect(screen.getByText('補助事業・右端は開始時増減')).toBeVisible();
     await user.keyboard('{Control>}1{/Control}');
-    expect(screen.getByText('全社合算ではベース事業の水準を表示・右端は開始時増減')).toBeVisible();
-    expect(screen.getByLabelText('補助事業期間 売上高 年間変化')).toBeDisabled();
+    expect(screen.getByText('ベース事業・右端は開始時増減')).toBeVisible();
+    expect(screen.getByLabelText('補助事業期間 売上高 年間変化')).toBeEnabled();
     expect(screen.queryByRole('slider', { name: '売上高・利益額 2026年 売上高' })).not.toBeInTheDocument();
+  });
+
+  it('全社合算P/LはPL表の表示対象としてだけ選択できる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    await user.click(screen.getByRole('tab', { name: 'PL表' }));
+
+    const tableScope = screen.getByLabelText('P/L表示対象');
+    expect(within(tableScope).getByRole('button', { name: '全社合算' })).toBeVisible();
+    expect(within(tableScope).getByRole('button', { name: 'ベース事業' })).toHaveAttribute('aria-pressed', 'true');
+    await user.click(within(tableScope).getByRole('button', { name: '全社合算' }));
+
+    expect(screen.getByRole('heading', { name: '全社合算 P/L' })).toBeVisible();
+    expect(screen.queryByLabelText('全社合算 P/L 2031年 売上高')).not.toBeInTheDocument();
+    expect(screen.getByText('ベース事業・右端は開始時増減')).toBeVisible();
+    expect(screen.getByLabelText('補助事業期間 売上高 年間変化')).toBeEnabled();
   });
 
   it('Ctrl+4・5でチャート・PL表を切り替え、Ctrl+6は割り当てない', async () => {
