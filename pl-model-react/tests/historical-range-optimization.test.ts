@@ -29,15 +29,16 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(period.annualGrowthRate).toBeCloseTo(mean);
   });
 
-  it('基準年後の補助事業は旧planning_modelの成長ベンチマークを使う', () => {
+  it('基準年後の補助事業は過去実績から求めた範囲を10pt上方へ移動する', () => {
     const state = createModelStore().getState();
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
-    const sales = result.forecast.series.find((series) => series.id === 'subsidy-sales')!.periods.find((item) => item.id === 'report')!;
-    const pay = result.forecast.series.find((series) => series.id === 'subsidy-payPerPerson')!.periods.find((item) => item.id === 'report')!;
+    const sales = result.forecast.series.find((series) => series.id === 'subsidy-sales')!;
+    const toBase = sales.periods.find((item) => item.id === 'subsidy')!;
+    const postBase = sales.periods.find((item) => item.id === 'report')!;
 
-    expect(sales.range).toEqual({ min: 15, max: 30 });
-    expect(sales.annualGrowthRate).toBe(22.5);
-    expect(pay.range).toEqual({ min: 5, max: 10 });
+    expect(postBase.range?.min).toBeCloseTo(toBase.range!.min + 10);
+    expect(postBase.range?.max).toBeCloseTo(toBase.range!.max + 10);
+    expect(postBase.annualGrowthRate).toBeCloseTo(toBase.annualGrowthRate + 10);
   });
 
   it('基準年後のベース事業は設備導入期間の範囲へシナジー補正する', () => {
@@ -50,6 +51,20 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(postBase.range?.min).toBeCloseTo(toBase.range!.min + 2);
     expect(postBase.range?.max).toBeCloseTo(toBase.range!.max + 2);
     expect(postBase.annualGrowthRate).toBeCloseTo((postBase.range!.min + postBase.range!.max) / 2);
+  });
+
+  it('過去実績から求めた売上高成長率の範囲を固定のハード上限・下限で切らない', () => {
+    const state = createModelStore().getState();
+    const fastGrowth = state.actuals.basePl.map((row, index) => ({
+      ...row,
+      sales: [100, 160, 320][index],
+    }));
+
+    const result = optimizeForecastRangesFromActuals(state.forecast, state.program, fastGrowth, state.actuals.subsidyPl);
+    const period = result.forecast.series.find((series) => series.id === 'base-sales')!.periods.find((item) => item.id === 'subsidy')!;
+
+    expect(period.range!.max).toBeGreaterThan(20);
+    expect(period.annualGrowthRate).toBeGreaterThan(20);
   });
 
   it('原価率は直近値を開始時固定値とし、Min=Max=0の間は年間変化をロックする', () => {

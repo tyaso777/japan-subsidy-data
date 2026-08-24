@@ -28,21 +28,6 @@ function driverId(series: ForecastSeries): string {
   return series.id.replace(`${series.scope}-`, '');
 }
 
-function hardRange(driver: string, scope: Scope, projectionMode: ForecastSeries['projectionMode']): Range {
-  if (driver === 'sales') return scope === 'subsidy' ? { min: -5, max: 40 } : { min: -10, max: 20 };
-  if (driver === 'headcount') return scope === 'subsidy' ? { min: -3, max: 20 } : { min: -5, max: 10 };
-  if (driver === 'payPerPerson' || driver === 'officerPayPerPerson') return scope === 'subsidy' ? { min: 0, max: 10 } : { min: 0, max: 8 };
-  if (driver === 'cogsRate' || driver === 'otherSgaRate') return { min: -3, max: 0 };
-  if (driver === 'officerCount') return { min: -10, max: 20 };
-  return projectionMode === 'linear' ? { min: -20, max: 20 } : { min: -10, max: 50 };
-}
-
-function clampRange(range: Range, hard: Range): Range {
-  const min = Math.max(hard.min, Math.min(hard.max, range.min));
-  const max = Math.max(min, Math.max(hard.min, Math.min(hard.max, range.max)));
-  return { min, max };
-}
-
 function midpoint(range: Range): number {
   return (range.min + range.max) / 2;
 }
@@ -102,30 +87,23 @@ function baseRange(series: ForecastSeries, rows: HistoricalPlCalculated[]): { ra
   const fallback = fallbackRanges[driver]?.[series.scope as Scope]
     ?? (series.projectionMode === 'linear' ? generalLinearFallback : { min: -5, max: 10 });
   return {
-    range: clampRange(observed ?? fallback, hardRange(driver, series.scope as Scope, series.projectionMode)),
+    range: observed ?? fallback,
     fallback: observed === null,
   };
 }
 
-function shifted(range: Range, amount: number, hard: Range): Range {
-  return clampRange({ min: range.min + amount, max: range.max + amount }, hard);
+function shifted(range: Range, amount: number): Range {
+  return { min: range.min + amount, max: range.max + amount };
 }
 
 function postBaseRange(series: ForecastSeries, toBase: Range): Range {
   const driver = driverId(series);
   const scope = series.scope as Scope;
-  const hard = hardRange(driver, scope, series.projectionMode);
-  if (scope === 'subsidy') {
-    if (driver === 'sales') return { min: 15, max: 30 };
-    if (driver === 'payPerPerson') return { min: 5, max: 10 };
-    if (driver === 'cogsRate') return { min: -3, max: 0 };
-    return toBase;
-  }
-  const synergy = driver === 'sales' ? 2
+  const synergy = driver === 'sales' ? (scope === 'subsidy' ? 10 : 2)
     : driver === 'headcount' || driver === 'payPerPerson' ? .5
       : driver === 'cogsRate' || driver === 'otherSgaRate' ? -.5
         : 0;
-  return shifted(toBase, synergy, hard);
+  return shifted(toBase, synergy);
 }
 
 function phaseForPeriod(model: ForecastModel, program: ProgramConfiguration, periodId: string): Phase {
