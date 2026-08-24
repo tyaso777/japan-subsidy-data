@@ -133,3 +133,20 @@ test('狭い画面でも事業比較の長いタイトルがカード外へは�
   const overflow = await card.evaluate((element) => ({ clientWidth: element.clientWidth, scrollWidth: element.scrollWidth }));
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
 });
+
+test('制度定義カードの見出しは枠端に密着せず、狭い画面でも操作が収まる', async ({ page }) => {
+  await page.setViewportSize({ width: 1100, height: 900 });
+  await page.goto('/');
+  await page.getByTestId('app-toolbar').getByRole('button', { name: '01 制度定義' }).click();
+
+  const card = page.getByTestId('definition-section-periods');
+  const header = page.getByTestId('definition-section-header-periods');
+  const title = header.getByRole('heading', { name: '区間名の定義' });
+  const cardBox = await card.boundingBox();
+  const titleBox = await title.boundingBox();
+  const overflow = await card.evaluate((element) => ({ clientWidth: element.clientWidth, scrollWidth: element.scrollWidth }));
+
+  expect((titleBox?.x ?? 0) - (cardBox?.x ?? 0)).toBeGreaterThanOrEqual(15);
+  expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
+  await expect(header.getByRole('button', { name: '区間を追加' })).toBeVisible();
+});

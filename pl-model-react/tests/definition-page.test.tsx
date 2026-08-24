@@ -41,6 +41,26 @@ describe('制度定義画面', () => {
     }
   });
 
+  it('各定義ブロックを共通カードとして表示し、見出しと本文に十分な内側余白を持たせる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+
+    for (const id of ['periods', 'special-years', 'numeric-definitions', 'management-metrics']) {
+      const card = screen.getByTestId(`definition-section-${id}`);
+      const header = screen.getByTestId(`definition-section-header-${id}`);
+      const body = screen.getByTestId(`definition-section-body-${id}`);
+      expect(card).toHaveClass('border', 'bg-surface');
+      expect(header).toHaveClass('px-4', 'py-3');
+      expect(body).toHaveClass('px-4', 'pb-4');
+    }
+
+    const periods = screen.getByTestId('definition-section-periods');
+    const specialYears = screen.getByTestId('definition-section-special-years');
+    expect(periods.parentElement).toHaveClass('grid-cols-2');
+    expect(periods).not.toContainElement(specialYears);
+  });
+
   it('削除不可の過去実績も制度上の区間名として編集できる', async () => {
     const user = userEvent.setup();
     render(<App />);
