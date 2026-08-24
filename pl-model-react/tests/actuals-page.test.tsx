@@ -11,8 +11,9 @@ describe('期間・過去実績', () => {
     for (const testId of ['historical-bs', 'historical-pl-base', 'historical-pl-subsidy']) {
       expect(screen.getByTestId(testId)).toHaveAttribute('data-density', 'compact');
       expect(screen.getByTestId(testId)).toHaveClass('mx-auto', 'w-full');
-      expect(screen.getByTestId(testId)).toHaveStyle({ maxWidth: '580px' });
+      expect(screen.getByTestId(testId)).toHaveStyle({ maxWidth: '592px' });
       expect(within(screen.getByTestId(testId)).getByTestId(`${testId}-subject-column`)).toHaveStyle({ width: '32%' });
+      expect(within(screen.getByTestId(testId)).getByTestId(`${testId}-end-gutter`)).toHaveClass('w-3');
     }
     expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額')).toHaveClass('h-5', 'w-[min(72px,100%)]');
   });
@@ -111,7 +112,7 @@ describe('期間・過去実績', () => {
     expect(screen.getByLabelText('補助事業期間 開始年')).toHaveValue(2027);
     expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2021年 資産総額')).toHaveValue(null);
     expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額')).toHaveValue(1050);
-    expect(screen.getByTestId('historical-bs')).toHaveStyle({ maxWidth: '850px' });
+    expect(screen.getByTestId('historical-bs')).toHaveStyle({ maxWidth: '862px' });
   });
 
   it('モデル変更をCtrl+ZとCtrl+Yで戻して進める', async () => {

@@ -115,7 +115,7 @@ test('期間・過去実績の財務表はワイド画面でも会計表の密�
   const inputBox = await input.boundingBox();
   const rowBox = await input.locator('xpath=ancestor::tr').boundingBox();
 
-  expect(tableWidth).toBeLessThanOrEqual(582);
+  expect(tableWidth).toBeLessThanOrEqual(594);
   expect(inputBox?.width).toBeLessThanOrEqual(74);
   expect(inputBox?.height).toBeLessThanOrEqual(22);
   expect(rowBox?.height).toBeLessThanOrEqual(28);
