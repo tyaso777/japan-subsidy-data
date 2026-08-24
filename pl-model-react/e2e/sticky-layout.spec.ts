@@ -94,3 +94,13 @@ test('次へで画面を切り替えるとページ先頭へ戻る', async ({ pa
   await expect(page.getByTestId('forecast-heading')).toBeVisible();
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 });
+
+test('水準設定には通常操作だけを表示し、行別の詳細変動設定を表示しない', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('app-toolbar').getByRole('button', { name: '将来予測・PL' }).click();
+
+  await expect(page.getByLabel('補助事業期間 売上高 開始時固定値')).toBeVisible();
+  await expect(page.getByLabel('補助事業期間 売上高 開始時増減')).toBeVisible();
+  await expect(page.getByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' })).toHaveCount(0);
+  await expect(page.getByLabel('補助事業期間 売上高 毎年固定増減')).toHaveCount(0);
+});

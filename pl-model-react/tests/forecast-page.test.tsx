@@ -611,25 +611,14 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByLabelText('補助事業期間 原価率 水準')).toBeDisabled();
   });
 
-  it('期間水準ごとに固定額・単年・加速度の効果レイヤーを編集する', async () => {
+  it('固定額・単年・加速度の詳細編集UIを水準設定に表示しない', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
-    await user.click(screen.getByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' }));
-    const fixed = screen.getByLabelText('補助事業期間 売上高 毎年固定増減');
-    await user.clear(fixed); await user.type(fixed, '10');
-    expect(fixed).toHaveValue(10);
-    expect(screen.getByLabelText('補助事業期間 売上高 成長加速度')).toBeVisible();
-    expect(screen.getByLabelText('補助事業期間 売上高 単年増減')).toBeVisible();
-
-    await user.click(screen.getByRole('tab', { name: 'PL表' }));
-    const firstYearSales = screen.getByLabelText('ベース事業 P/L 2026年 売上高');
-    expect(firstYearSales).toHaveValue(1090);
-    await user.clear(fixed);
-    expect(fixed).toHaveValue(null);
-    expect(firstYearSales).toHaveValue(1080);
-    await user.tab();
-    expect(fixed).toHaveValue(0);
+    expect(screen.queryByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('補助事業期間 売上高 毎年固定増減')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('補助事業期間 売上高 成長加速度')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('補助事業期間 売上高 単年増減')).not.toBeInTheDocument();
   });
 
   it('将来PLの入力行・計算行を直接編集すると対応水準へ即時逆算する', async () => {

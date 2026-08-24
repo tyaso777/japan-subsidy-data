@@ -167,8 +167,8 @@ describe('将来予測画面のワイドレイアウト', () => {
     expect(layout).toHaveClass('grid-cols-[clamp(320px,20vw,380px)_minmax(0,1fr)_clamp(250px,15vw,290px)]');
     expect(within(row).getByTestId('forecast-start-adjustment-group')).toBeVisible();
 
-    await user.click(within(row).getByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' }));
-    expect(within(row).getByLabelText('補助事業期間 売上高 毎年固定増減')).toBeVisible();
+    expect(within(row).queryByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' })).not.toBeInTheDocument();
+    expect(within(row).queryByLabelText('補助事業期間 売上高 毎年固定増減')).not.toBeInTheDocument();
     await user.click(toggle);
     expect(toggle).toHaveAccessibleName('変動設定を表示');
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
@@ -195,7 +195,7 @@ describe('将来予測画面のワイドレイアウト', () => {
     expect(within(row).getByTestId('forecast-start-adjustment-group')).toHaveClass('grid-cols-2', 'border-dashed');
     expect(screen.getByRole('button', { name: '変動設定を隠す' })).toHaveAttribute('aria-expanded', 'true');
     expect(within(row).queryByRole('button', { name: '補助事業期間 売上高 変動設定' })).not.toBeInTheDocument();
-    expect(within(row).getByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' })).toHaveAttribute('title', '固定増減などの詳細設定');
+    expect(within(row).queryByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' })).not.toBeInTheDocument();
     expect(within(row).queryByText('効果')).not.toBeInTheDocument();
   });
 });
