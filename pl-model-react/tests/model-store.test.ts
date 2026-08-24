@@ -102,14 +102,6 @@ describe('モデルストア', () => {
     expect(store.getState().forecast.segments).toHaveLength(2);
   });
 
-  it('効果レイヤーを他の水準と独立して更新する', () => {
-    const store = createModelStore();
-    store.getState().updateForecastLayer('base-sales', 'subsidy', { fixedAnnualIncrement: 10_000_000, spots: { 2027: 30_000_000 } });
-    const period = store.getState().forecast.series.find((series) => series.id === 'base-sales')!.periods[0];
-    expect(period.layers?.fixedAnnualIncrement).toBe(10_000_000);
-    expect(period.layers?.spots[2027]).toBe(30_000_000);
-  });
-
   it('制度定義の編集を1操作として履歴管理する', () => {
     const store = createModelStore();
     const next = structuredClone(store.getState().program);

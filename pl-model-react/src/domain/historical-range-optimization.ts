@@ -159,7 +159,6 @@ export function optimizeForecastRangesFromActuals(
         period.startValue = index === 0 ? fixedLevel : null;
         period.startAdjustment = 0;
         period.range = { min: 0, max: 0 };
-        period.layers = { fixedAnnualIncrement: 0, steps: {}, spots: {}, acceleration: 0 };
         period.lineageId = undefined;
         updatedPeriods += 1;
       });
@@ -174,7 +173,6 @@ export function optimizeForecastRangesFromActuals(
         period.startValue = index === 0 ? fixedLevel : null;
         period.startAdjustment = 0;
         period.range = { min: 0, max: 0 };
-        period.layers = { fixedAnnualIncrement: 0, steps: {}, spots: {}, acceleration: 0 };
         period.lineageId = undefined;
         updatedPeriods += 1;
       });

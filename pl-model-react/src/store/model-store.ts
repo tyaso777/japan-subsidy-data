@@ -7,7 +7,6 @@ import {
   mergeForecastSegment,
   splitForecastSegment,
   synchronizeForecastTimeline,
-  type ForecastEffectLayers,
   type ForecastModel,
   type ForecastPeriod,
 } from '../domain/forecast-engine';
@@ -48,7 +47,6 @@ type ModelActions = {
   updateMetricTarget: (metricId: string, value: number | null) => void;
   optimizeForecastRangesFromActuals: () => HistoricalRangeOptimizationResult;
   updateForecastPeriod: (seriesId: string, periodId: string, patch: Partial<Pick<ForecastPeriod, 'annualGrowthRate' | 'startValue' | 'startAdjustment' | 'range'>>) => void;
-  updateForecastLayer: (seriesId: string, periodId: string, patch: Partial<ForecastEffectLayers>) => void;
   updateFinalYearSalesAllocation: (baseSharePercent: number) => void;
   clearFinalYearSalesAllocation: () => void;
   splitForecastAtYear: (year: number) => void;
@@ -220,34 +218,6 @@ export function createModelStore(program?: unknown, options?: { initialActuals?:
           series: snapshot.forecast.series.map((series) => series.id === seriesId ? {
             ...series,
             periods: series.periods.map((period) => period.id === periodId ? { ...period, ...patch, lineageId: undefined } : period),
-          } : series),
-        },
-      })),
-      updateForecastLayer: (seriesId, periodId, patch) => applyMutation((snapshot) => ({
-        ...snapshot,
-        forecast: {
-          ...snapshot.forecast,
-          series: snapshot.forecast.series.map((series) => series.id === seriesId ? {
-            ...series,
-            periods: series.periods.map((period) => {
-              if (period.id !== periodId) return period;
-              const current = period.layers ?? {
-                fixedAnnualIncrement: 0,
-                steps: {},
-                spots: {},
-                acceleration: 0,
-              };
-              return {
-                ...period,
-                lineageId: undefined,
-                layers: {
-                  ...current,
-                  ...patch,
-                  steps: patch.steps ? { ...current.steps, ...patch.steps } : current.steps,
-                  spots: patch.spots ? { ...current.spots, ...patch.spots } : current.spots,
-                },
-              };
-            }),
           } : series),
         },
       })),

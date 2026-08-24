@@ -9,14 +9,6 @@ export type ForecastPeriod = {
   startValue?: number | null;
   startAdjustment: number;
   range?: { min: number; max: number };
-  layers?: ForecastEffectLayers;
-};
-
-export type ForecastEffectLayers = {
-  fixedAnnualIncrement: number;
-  steps: Record<number, number>;
-  spots: Record<number, number>;
-  acceleration: number;
 };
 
 export type ForecastSegment = { id: string; definitionId: string; startYear: number; endYear: number };
@@ -74,26 +66,19 @@ export function projectForecastSeries(series: ForecastSeries): ForecastPoint[] {
     const lineage = lineages.get(lineageKey) ?? { origin: value, startYear: period.startYear, startValue: period.startValue ?? null, startAdjustment: period.startAdjustment };
     lineages.set(lineageKey, lineage);
     const origin = lineage.origin;
-    const layers = period.layers ?? { fixedAnnualIncrement: 0, steps: {}, spots: {}, acceleration: 0 };
     for (let year = period.startYear; year <= period.endYear; year += 1) {
       const elapsed = year - lineage.startYear + 1;
-      const step = Object.entries(layers.steps).reduce((sum, [stepYear, amount]) => Number(stepYear) <= year ? sum + amount : sum, 0);
-      const spot = layers.spots[year] ?? 0;
       if (series.projectionMode === 'linear') {
         const start = lineage.startValue ?? origin + period.annualGrowthRate;
-        value = start + lineage.startAdjustment + period.annualGrowthRate * (elapsed - 1) + layers.acceleration * elapsed * (elapsed + 1) / 2 + layers.fixedAnnualIncrement * elapsed + step + spot;
+        value = start + lineage.startAdjustment + period.annualGrowthRate * (elapsed - 1);
       } else {
         const baseRate = period.annualGrowthRate / 100;
         if (lineage.startValue === null) {
           const baseline = origin * (1 + baseRate) ** elapsed;
-          let accelerated = origin;
-          for (let cursor = 1; cursor <= elapsed; cursor += 1) accelerated *= 1 + baseRate + layers.acceleration * cursor / 100;
           const compoundedStartAdjustment = lineage.startAdjustment * (1 + baseRate) ** Math.max(0, elapsed - 1);
-          value = baseline + (accelerated - baseline) + compoundedStartAdjustment + layers.fixedAnnualIncrement * elapsed + step + spot;
+          value = baseline + compoundedStartAdjustment;
         } else {
-          let compounded = lineage.startValue + lineage.startAdjustment;
-          for (let cursor = 2; cursor <= elapsed; cursor += 1) compounded *= 1 + baseRate + layers.acceleration * cursor / 100;
-          value = compounded + layers.fixedAnnualIncrement * elapsed + step + spot;
+          value = (lineage.startValue + lineage.startAdjustment) * (1 + baseRate) ** Math.max(0, elapsed - 1);
         }
       }
       points.push({ year, value, periodId: period.id });

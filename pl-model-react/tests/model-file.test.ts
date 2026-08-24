@@ -27,4 +27,18 @@ describe('案件データ保存境界', () => {
   it('不正な案件データを拒否する', () => {
     expect(() => parseModelFile('{"actuals":{}}')).toThrow();
   });
+
+  it('廃止した詳細予測レイヤーを案件データとして受け付けない', () => {
+    const store = createModelStore();
+    const state = store.getState();
+    const file = JSON.parse(serializeModelFile({ program: state.program, actuals: state.actuals, forecast: state.forecast, caseSettings: state.caseSettings }));
+    file.model.forecast.series[0].periods[0].layers = {
+      fixedAnnualIncrement: 1,
+      steps: {},
+      spots: {},
+      acceleration: 0,
+    };
+
+    expect(() => parseModelFile(JSON.stringify(file))).toThrow();
+  });
 });

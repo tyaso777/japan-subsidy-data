@@ -12,8 +12,7 @@ const forecastPeriodSchema = z.object({
   id: z.string(), startYear: z.number().int(), endYear: z.number().int(), annualGrowthRate: z.number(), startValue: z.number().nullable().optional().default(null), startAdjustment: z.number(),
   lineageId: z.string().optional(),
   range: z.object({ min: z.number(), max: z.number() }).refine((range) => range.min <= range.max, '最小値は最大値以下にしてください').optional(),
-  layers: z.object({ fixedAnnualIncrement: z.number(), steps: z.record(z.string(), z.number()), spots: z.record(z.string(), z.number()), acceleration: z.number() }).optional(),
-});
+}).strict();
 
 const forecastSeriesSchema = z.object({
   id: z.string(), label: z.string(), scope: z.enum(['company', 'base', 'subsidy']),

@@ -127,43 +127,6 @@ describe('将来予測計算サービス', () => {
     expect(mergeForecastSegment(split, split.segments![1].id).segments).toHaveLength(1);
   });
 
-  it('固定額・単年ステップ・単年スポット・成長加速度を独立レイヤーとして合成する', () => {
-    const series: ForecastSeries = {
-      id: 'base-sales', label: '売上高', scope: 'base' as const, valueKind: 'money' as const, baseYear: 2025, baseValue: 100,
-      periods: [{
-        id: 'A', startYear: 2026, endYear: 2028, annualGrowthRate: 10, startAdjustment: 0,
-        layers: { fixedAnnualIncrement: 5, steps: { 2027: 20 }, spots: { 2027: 30 }, acceleration: 1 },
-      }],
-    };
-    const values = projectForecastSeries(series).map((point) => point.value);
-    expect(values[1]).toBeCloseTo(116);
-    expect(values[2]).toBeGreaterThan(176);
-    expect(values[3]).toBeLessThan(values[2] * 1.5);
-
-    const withoutSpot = structuredClone(series);
-    withoutSpot.periods[0].layers!.spots = {};
-    const noSpotValues = projectForecastSeries(withoutSpot).map((point) => point.value);
-    expect(values[2] - noSpotValues[2]).toBeCloseTo(30);
-    expect(values[3] - noSpotValues[3]).toBeCloseTo(0);
-  });
-
-  it('効果レイヤーを持つ期間も、分割だけなら各年の値が完全に変わらない', () => {
-    const model: ForecastModel = {
-      segments: [{ id: 'A', definitionId: 'subsidy', startYear: 2026, endYear: 2029 }],
-      series: [{
-        id: 'base-sales', label: '売上高', scope: 'base', valueKind: 'money', projectionMode: 'compound',
-        baseYear: 2025, baseValue: 100,
-        periods: [{
-          id: 'A', startYear: 2026, endYear: 2029, annualGrowthRate: 10, startAdjustment: 20,
-          layers: { fixedAnnualIncrement: 5, steps: { 2027: 20 }, spots: { 2028: 30 }, acceleration: 1 },
-        }],
-      }],
-    };
-    const before = projectForecastSeries(model.series[0]).map((point) => point.value);
-    const split = splitForecastSegment(model, 2028);
-    expect(projectForecastSeries(split.series[0]).map((point) => point.value)).toEqual(before);
-  });
-
   it('表入力と点ドラッグで共有する逆算により指定年の値へ連続的に収束する', () => {
     const series: ForecastSeries = { id: 'base-sales', label: '売上高', scope: 'base', valueKind: 'money', projectionMode: 'compound', baseYear: 2025, baseValue: 100, periods: [{ id: 'A', startYear: 2026, endYear: 2028, annualGrowthRate: 5, startAdjustment: 0 }] };
     const fitted = fitForecastSeriesPoint(series, 2027, 150);
