@@ -1,6 +1,6 @@
-import { createEvent, fireEvent, render, screen, within } from '@testing-library/react';
+import { createEvent, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
 
 describe('期間・過去実績', () => {
@@ -239,11 +239,14 @@ describe('期間・過去実績', () => {
 
   it('最下部の次へボタンから将来予測・PLへ移動する', async () => {
     const user = userEvent.setup();
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
     render(<App />);
 
     await user.click(screen.getByRole('button', { name: '次へ：03 将来予測・PL' }));
 
     expect(screen.getByRole('button', { name: '03 将来予測・PL' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByText('将来予測・調整水準')).toBeVisible();
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' }));
+    scrollTo.mockRestore();
   });
 });

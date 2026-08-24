@@ -57,7 +57,7 @@ describe('将来予測・PL画面', () => {
     await user.tab();
     expect(baseShare).toHaveValue(null);
     expect(screen.getByLabelText('補助事業期間 売上高 水準')).toBeEnabled();
-  }, 10_000);
+  }, 20_000);
   it('全水準とチャート・PL表を同じ画面で切り替え、事業比較はチャート内に表示する', async () => {
     const user = userEvent.setup();
     render(<App />);

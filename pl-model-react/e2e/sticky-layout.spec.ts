@@ -83,3 +83,14 @@ test('sticky layers remain opaque, ordered and joined while scrolling', async ({
   await expect(page.getByTestId('forecast-logic-detail')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /04ロジックマップで確認/ })).toBeVisible();
 });
+
+test('次へで画面を切り替えるとページ先頭へ戻る', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+
+  await page.getByRole('button', { name: '次へ：03 将来予測・PL' }).click();
+
+  await expect(page.getByTestId('forecast-heading')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+});

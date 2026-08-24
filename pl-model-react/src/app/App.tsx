@@ -38,7 +38,7 @@ function AppContent() {
   ], []);
   const navigateToPage = (nextPage: Page) => {
     setPage(nextPage);
-    requestAnimationFrame(() => document.querySelector<HTMLElement>('[data-testid="app-toolbar"]')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' }));
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
   };
   const openLogicMap = (code: string) => {
     setSelectedLogicCode(code);
