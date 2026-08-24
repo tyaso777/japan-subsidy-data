@@ -179,11 +179,11 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
   const subjectNumberWidth = compact ? '9%' : '8%';
   const subjectNameWidth = compact ? '32%' : '22%';
   const subjectWidth = compact ? '38%' : '26%';
-  const hasEndGutter = compact && separateSubjectColumns;
-  const endGutterWidth = 12;
-  const columnTemplate = `${separateSubjectColumns ? `${subjectNumberWidth} ${subjectNameWidth}` : subjectWidth} repeat(${years.length}, minmax(0, 1fr))${hasEndGutter ? ` ${endGutterWidth}px` : ''}`;
+  const hasHorizontalGutters = compact && separateSubjectColumns;
+  const horizontalGutterWidth = 12;
+  const columnTemplate = `${hasHorizontalGutters ? `${horizontalGutterWidth}px ` : ''}${separateSubjectColumns ? `${subjectNumberWidth} ${subjectNameWidth}` : subjectWidth} repeat(${years.length}, minmax(0, 1fr))${hasHorizontalGutters ? ` ${horizontalGutterWidth}px` : ''}`;
   const cellClass = compact ? 'h-7 py-0.5' : 'h-8 py-1';
-  const compactMaxWidth = Math.min(1360, 310 + years.length * 90 + (hasEndGutter ? endGutterWidth : 0));
+  const compactMaxWidth = Math.min(1360, 310 + years.length * 90 + (hasHorizontalGutters ? horizontalGutterWidth * 2 : 0));
   return <section className={cn('relative isolate border border-line bg-surface', compact && 'mx-auto w-full')} style={compact ? { maxWidth: `${compactMaxWidth}px` } : undefined} data-density={compact ? 'compact' : 'default'} data-testid={testId} onCopy={handleCopy} onPaste={handlePaste}>
     <StickySurface data-testid={`${testId}-sticky-header`} stickyTop={stickyHeaderTop} layer={stickyHeaderLayer} className="shadow-sm">
       <header className={cn('flex items-center justify-between gap-3.5 border-t-[3px] border-navy', compact ? 'px-3 py-1.5' : 'px-3.5 pt-2.5 pb-2')}>
@@ -193,13 +193,14 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
           {omitCalculated ? '自動計算項目を表示' : '自動計算項目を省略'}
         </Button></div>
       </header>
-      <div className={cn('grid items-center border-t border-line bg-[#f3f1eb] text-[10px]', compact ? 'min-h-7' : 'min-h-8')} style={{ gridTemplateColumns: columnTemplate }}>{separateSubjectColumns ? <><strong className="px-2 py-1 text-left text-muted-foreground">科目番号</strong><strong className="px-2 py-1 text-left text-muted-foreground">科目名</strong></> : <strong className="px-2 py-1 text-left text-muted-foreground">科目</strong>}{years.map((year, index) => <YearHeading key={year} year={year} index={index} count={years.length} role={yearLabels?.[year]} />)}{hasEndGutter && <span aria-hidden="true" />}</div>
+      <div className={cn('grid items-center border-t border-line bg-[#f3f1eb] text-[10px]', compact ? 'min-h-7' : 'min-h-8')} style={{ gridTemplateColumns: columnTemplate }}>{hasHorizontalGutters && <span aria-hidden="true" />}{separateSubjectColumns ? <><strong className="px-2 py-1 text-left text-muted-foreground">科目番号</strong><strong className="px-2 py-1 text-left text-muted-foreground">科目名</strong></> : <strong className="px-2 py-1 text-left text-muted-foreground">科目</strong>}{years.map((year, index) => <YearHeading key={year} year={year} index={index} count={years.length} role={yearLabels?.[year]} />)}{hasHorizontalGutters && <span aria-hidden="true" />}</div>
     </StickySurface>
     <div className="overflow-x-auto">
       <table className="w-full table-fixed border-collapse text-[10px] select-none">
-        <colgroup>{separateSubjectColumns ? <><col style={{ width: subjectNumberWidth }} /><col data-testid={`${testId}-subject-column`} style={{ width: subjectNameWidth }} /></> : <col data-testid={`${testId}-subject-column`} style={{ width: subjectWidth }} />}<col span={years.length} />{hasEndGutter && <col className="w-3" data-testid={`${testId}-end-gutter`} />}</colgroup>
-        <thead className="sr-only"><tr>{separateSubjectColumns ? <><th scope="col">科目番号</th><th scope="col">科目名</th></> : <th scope="col" aria-label="科目" />}{years.map((year, index) => <th scope="col" aria-label={`${yearLabels?.[year]?.primary ?? closingLabel(index, years.length)} ${year}年`} key={year} />)}{hasEndGutter && <th aria-hidden="true" />}</tr></thead>
+        <colgroup>{hasHorizontalGutters && <col className="w-3" data-testid={`${testId}-start-gutter`} />}{separateSubjectColumns ? <><col style={{ width: subjectNumberWidth }} /><col data-testid={`${testId}-subject-column`} style={{ width: subjectNameWidth }} /></> : <col data-testid={`${testId}-subject-column`} style={{ width: subjectWidth }} />}<col span={years.length} />{hasHorizontalGutters && <col className="w-3" data-testid={`${testId}-end-gutter`} />}</colgroup>
+        <thead className="sr-only"><tr>{hasHorizontalGutters && <th aria-hidden="true" />}{separateSubjectColumns ? <><th scope="col">科目番号</th><th scope="col">科目名</th></> : <th scope="col" aria-label="科目" />}{years.map((year, index) => <th scope="col" aria-label={`${yearLabels?.[year]?.primary ?? closingLabel(index, years.length)} ${year}年`} key={year} />)}{hasHorizontalGutters && <th aria-hidden="true" />}</tr></thead>
         <tbody>{visibleRows.map((row, rowIndex) => <tr key={row.code} className={cn(row.calculated && 'bg-teal/5', row.supplementary && 'bg-orange/5')}>
+          {hasHorizontalGutters && <td aria-hidden="true" className="border-t border-line" />}
           {separateSubjectColumns ? <><td {...cellInteraction(rowIndex, 0)} className={cn(cellClass, 'border-t border-line px-2 text-left text-[9px] font-medium text-muted-foreground', selectedCell(rowIndex, 0) && 'bg-teal/10 ring-1 ring-inset ring-teal')}>{prefix}{row.code}</td><th {...cellInteraction(rowIndex, 1)} scope="row" className={cn(cellClass, 'border-t border-line px-2 text-left font-bold', selectedCell(rowIndex, 1) && 'bg-teal/10 ring-1 ring-inset ring-teal')}>{onRowSelect ? <button type="button" className={cn('w-full text-left', row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')} onClick={() => onRowSelect(row)}>{row.label}</button> : <span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span>}</th></> : <th className={cn(cellClass, 'border-t border-line px-2 text-left font-bold')}>{onRowSelect ? <button type="button" className="w-full text-left" onClick={() => onRowSelect(row)}><span className="inline-block w-13 text-[9px] font-medium text-muted-foreground">{prefix}{row.code}</span><span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span></button> : <><span className="inline-block w-13 text-[9px] font-medium text-muted-foreground">{prefix}{row.code}</span><span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span></>}</th>}
           {records.map((record, index) => {
             const kind = row.valueKind ?? 'money';
@@ -215,7 +216,7 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
             return <td {...cellInteraction(rowIndex, index + yearColumnOffset)} className={cn(cellClass, 'border-t border-line px-0.5 text-right tabular-nums', selectionClass)} key={years[index]}>{field && onChange
               ? <NumberInput className={cn('ml-auto select-text rounded px-0.5 py-0 text-right text-[10px]', compact ? 'h-5 w-[min(72px,100%)]' : 'h-6 w-[min(120px,100%)]')} aria-label={`${title} ${years[index]}年 ${row.label}`} step={financialInputStep(kind, moneyUnit)} value={rawValue === null || rawValue === undefined ? null : toDisplayFinancialValue(Number(rawValue), kind, moneyUnit)} emptyValue={rawValue === null || rawValue === undefined ? null : 0} onEditingStart={onEditStart} onEditingEnd={onEditEnd} onValueChange={(value) => onChange(index, field, fromDisplayFinancialValue(value, kind, moneyUnit))} />
               : rawValue === null || rawValue === undefined ? '—' : formatFinancialValue(Number(rawValue), kind, moneyUnit)}</td>;
-          })}{hasEndGutter && <td aria-hidden="true" className="border-t border-line" />}
+          })}{hasHorizontalGutters && <td aria-hidden="true" className="border-t border-line" />}
         </tr>)}</tbody>
       </table>
     </div>

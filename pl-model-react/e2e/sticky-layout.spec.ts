@@ -112,10 +112,12 @@ test('期間・過去実績の財務表はワイド画面でも会計表の密�
   const balanceSheet = page.getByTestId('historical-bs');
   const input = page.getByLabel('全社 B/S（1-1～1-25） 2023年 資産総額');
   const tableWidth = await balanceSheet.evaluate((element) => element.getBoundingClientRect().width);
+  const headerOverflow = await balanceSheet.locator('header').evaluate((element) => ({ clientWidth: element.clientWidth, scrollWidth: element.scrollWidth }));
   const inputBox = await input.boundingBox();
   const rowBox = await input.locator('xpath=ancestor::tr').boundingBox();
 
-  expect(tableWidth).toBeLessThanOrEqual(594);
+  expect(tableWidth).toBeLessThanOrEqual(606);
+  expect(headerOverflow.scrollWidth).toBeLessThanOrEqual(headerOverflow.clientWidth);
   expect(inputBox?.width).toBeLessThanOrEqual(74);
   expect(inputBox?.height).toBeLessThanOrEqual(22);
   expect(rowBox?.height).toBeLessThanOrEqual(28);
