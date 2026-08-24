@@ -104,3 +104,19 @@ test('水準設定には通常操作だけを表示し、行別の詳細変動�
   await expect(page.getByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' })).toHaveCount(0);
   await expect(page.getByLabel('補助事業期間 売上高 毎年固定増減')).toHaveCount(0);
 });
+
+test('期間・過去実績の財務表はワイド画面でも会計表の密度を保つ', async ({ page }) => {
+  await page.setViewportSize({ width: 1600, height: 1000 });
+  await page.goto('/');
+
+  const balanceSheet = page.getByTestId('historical-bs');
+  const input = page.getByLabel('全社 B/S（1-1～1-25） 2023年 資産総額');
+  const tableWidth = await balanceSheet.evaluate((element) => element.getBoundingClientRect().width);
+  const inputBox = await input.boundingBox();
+  const rowBox = await input.locator('xpath=ancestor::tr').boundingBox();
+
+  expect(tableWidth).toBeLessThanOrEqual(922);
+  expect(inputBox?.width).toBeLessThanOrEqual(88);
+  expect(inputBox?.height).toBeLessThanOrEqual(22);
+  expect(rowBox?.height).toBeLessThanOrEqual(28);
+});
