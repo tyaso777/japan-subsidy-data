@@ -15,7 +15,7 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(values.every((value) => Number(value.toFixed(2)) === value)).toBe(true);
   });
 
-  it('設備導入期間は過去2年の変化率の平均±2標準偏差を範囲とし、中点を水準にする', () => {
+  it('ベース事業の売上高は過去平均を初期値、平均−2標準偏差を下限、初期値＋20ptを上限にする', () => {
     const state = createModelStore().getState();
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
     const period = result.forecast.series.find((series) => series.id === 'base-sales')!.periods.find((item) => item.id === 'subsidy')!;
@@ -25,8 +25,29 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     const mean = (first + second) / 2;
     const deviation = Math.sqrt(((first - mean) ** 2 + (second - mean) ** 2) / 2);
     expect(period.range?.min).toBeCloseTo(mean - 2 * deviation);
-    expect(period.range?.max).toBeCloseTo(mean + 2 * deviation);
+    expect(period.range?.max).toBeCloseTo(mean + 20);
     expect(period.annualGrowthRate).toBeCloseTo(mean);
+  });
+
+  it('補助事業の売上高は過去平均を初期値、初期値＋30ptを上限にする', () => {
+    const state = createModelStore().getState();
+    const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
+    const period = result.forecast.series.find((series) => series.id === 'subsidy-sales')!.periods.find((item) => item.id === 'subsidy')!;
+    const [firstYear, secondYear, thirdYear] = state.actuals.subsidyPl.map((row) => row.sales!);
+    const first = (secondYear / firstYear - 1) * 100;
+    const second = (thirdYear / secondYear - 1) * 100;
+    const mean = (first + second) / 2;
+
+    expect(period.annualGrowthRate).toBeCloseTo(mean);
+    expect(period.range?.max).toBeCloseTo(mean + 30);
+  });
+
+  it('売上高以外は過去平均±2標準偏差の対称範囲と中点を維持する', () => {
+    const state = createModelStore().getState();
+    const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
+    const period = result.forecast.series.find((series) => series.id === 'base-headcount')!.periods.find((item) => item.id === 'subsidy')!;
+
+    expect(period.annualGrowthRate).toBeCloseTo((period.range!.min + period.range!.max) / 2);
   });
 
   it('基準年後の補助事業は過去実績から求めた範囲を10pt上方へ移動する', () => {
@@ -50,7 +71,7 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
 
     expect(postBase.range?.min).toBeCloseTo(toBase.range!.min + 2);
     expect(postBase.range?.max).toBeCloseTo(toBase.range!.max + 2);
-    expect(postBase.annualGrowthRate).toBeCloseTo((postBase.range!.min + postBase.range!.max) / 2);
+    expect(postBase.annualGrowthRate).toBeCloseTo(toBase.annualGrowthRate + 2);
   });
 
   it('過去実績から求めた売上高成長率の範囲を固定のハード上限・下限で切らない', () => {

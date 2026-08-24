@@ -74,20 +74,25 @@ function historicalChanges(series: ForecastSeries, rows: HistoricalPlCalculated[
   }).filter(Number.isFinite);
 }
 
-function statisticalRange(values: number[]): Range | null {
+function statisticalRange(values: number[]): (Range & { center: number }) | null {
   if (!values.length) return null;
   const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
   const deviation = Math.sqrt(values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length);
-  return { min: mean - 2 * deviation, max: mean + 2 * deviation };
+  return { min: mean - 2 * deviation, max: mean + 2 * deviation, center: mean };
 }
 
-function baseRange(series: ForecastSeries, rows: HistoricalPlCalculated[]): { range: Range; fallback: boolean } {
+function baseRange(series: ForecastSeries, rows: HistoricalPlCalculated[]): { range: Range; initialValue: number; fallback: boolean } {
   const driver = driverId(series);
   const observed = statisticalRange(historicalChanges(series, rows));
   const fallback = fallbackRanges[driver]?.[series.scope as Scope]
     ?? (series.projectionMode === 'linear' ? generalLinearFallback : { min: -5, max: 10 });
+  const initialValue = observed?.center ?? midpoint(fallback);
+  const range = observed ?? fallback;
   return {
-    range: observed ?? fallback,
+    range: driver === 'sales'
+      ? { min: range.min, max: initialValue + (series.scope === 'subsidy' ? 30 : 20) }
+      : range,
+    initialValue,
     fallback: observed === null,
   };
 }
@@ -96,14 +101,17 @@ function shifted(range: Range, amount: number): Range {
   return { min: range.min + amount, max: range.max + amount };
 }
 
-function postBaseRange(series: ForecastSeries, toBase: Range): Range {
+function postBaseAdjustment(series: ForecastSeries): number {
   const driver = driverId(series);
   const scope = series.scope as Scope;
-  const synergy = driver === 'sales' ? (scope === 'subsidy' ? 10 : 2)
+  return driver === 'sales' ? (scope === 'subsidy' ? 10 : 2)
     : driver === 'headcount' || driver === 'payPerPerson' ? .5
       : driver === 'cogsRate' || driver === 'otherSgaRate' ? -.5
         : 0;
-  return shifted(toBase, synergy);
+}
+
+function postBaseRange(series: ForecastSeries, toBase: Range): Range {
+  return shifted(toBase, postBaseAdjustment(series));
 }
 
 function phaseForPeriod(model: ForecastModel, program: ProgramConfiguration, periodId: string): Phase {
@@ -161,7 +169,7 @@ export function optimizeForecastRangesFromActuals(
       const phase = phaseForPeriod(forecast, program, period.id);
       const range = roundRange(phase === 'postBase' ? postBaseRange(series, derived.range) : derived.range);
       period.range = range;
-      period.annualGrowthRate = roundSetting(midpoint(range));
+      period.annualGrowthRate = roundSetting(derived.initialValue + (phase === 'postBase' ? postBaseAdjustment(series) : 0));
       period.lineageId = undefined;
       updatedPeriods += 1;
       if (derived.fallback) fallbackPeriods += 1;
