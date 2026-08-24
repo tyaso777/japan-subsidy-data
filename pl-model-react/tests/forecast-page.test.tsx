@@ -611,6 +611,25 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByLabelText('補助事業期間 原価率 水準')).toBeDisabled();
   });
 
+  it('補足比率も初期状態はMin=Max=0で固定し、範囲を入力するとスライダーを使える', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    const min = screen.getByLabelText('補助事業期間 特別損益の売上高比率 最小値');
+    const max = screen.getByLabelText('補助事業期間 特別損益の売上高比率 最大値');
+    const slider = screen.getByLabelText('補助事業期間 特別損益の売上高比率 水準');
+    expect(min).toBeEnabled();
+    expect(max).toBeEnabled();
+    expect(min).toHaveValue(0);
+    expect(max).toHaveValue(0);
+    expect(slider).toBeDisabled();
+
+    await user.clear(max);
+    await user.type(max, '5');
+    await user.tab();
+    expect(slider).toBeEnabled();
+  });
+
   it('固定額・単年・加速度の詳細編集UIを水準設定に表示しない', async () => {
     const user = userEvent.setup();
     render(<App />);

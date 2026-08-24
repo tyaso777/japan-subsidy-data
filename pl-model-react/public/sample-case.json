@@ -667,7 +667,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 2.5,
           "periods": [
@@ -703,7 +703,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 1.7000000000000002,
           "periods": [
@@ -739,7 +739,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 1.7999999999999998,
           "periods": [
@@ -775,7 +775,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 7.6,
           "periods": [
@@ -846,7 +846,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 95.07575757575758,
           "periods": [
@@ -882,7 +882,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 90,
           "periods": [
@@ -918,7 +918,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": -0.6,
           "periods": [
@@ -954,7 +954,7 @@
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 0,
           "periods": [
@@ -1202,7 +1202,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 4,
           "periods": [
@@ -1238,7 +1238,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 2,
           "periods": [
@@ -1274,7 +1274,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 4,
           "periods": [
@@ -1310,7 +1310,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 8,
           "periods": [
@@ -1381,7 +1381,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 94.44444444444444,
           "periods": [
@@ -1417,7 +1417,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 88,
           "periods": [
@@ -1453,7 +1453,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": -1,
           "periods": [
@@ -1489,7 +1489,7 @@
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
-          "changePolicy": "fixed",
+          "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 0,
           "periods": [

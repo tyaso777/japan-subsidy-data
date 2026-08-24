@@ -23,6 +23,17 @@ const fallbackRanges: Record<string, Record<Scope, Range>> = {
 };
 
 const generalLinearFallback: Range = { min: -1, max: 1 };
+const initiallyLockedDrivers = new Set([
+  'cogsRate',
+  'cogsDepRate',
+  'sgaDepRate',
+  'researchDevelopmentRate',
+  'otherSgaRate',
+  'employeeSalaryShare',
+  'officerCompensationShare',
+  'nonOperatingRate',
+  'extraordinaryRate',
+]);
 
 function driverId(series: ForecastSeries): string {
   return series.id.replace(`${series.scope}-`, '');
@@ -153,7 +164,7 @@ export function optimizeForecastRangesFromActuals(
       });
       return;
     }
-    if (driver === 'cogsRate') {
+    if (initiallyLockedDrivers.has(driver)) {
       const latestLevel = valuesForDriver(driver, source).at(-1);
       const fixedLevel = Number.isFinite(latestLevel) ? latestLevel! : series.baseValue;
       series.baseValue = fixedLevel;
