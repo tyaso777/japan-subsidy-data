@@ -177,11 +177,11 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
     onClick: (event: MouseEvent<HTMLElement>) => selectCell({ row, column }, event.shiftKey),
   });
   const subjectNumberWidth = compact ? '9%' : '8%';
-  const subjectNameWidth = compact ? '37%' : '22%';
+  const subjectNameWidth = compact ? '32%' : '22%';
   const subjectWidth = compact ? '38%' : '26%';
   const columnTemplate = separateSubjectColumns ? `${subjectNumberWidth} ${subjectNameWidth} repeat(${years.length}, minmax(0, 1fr))` : `${subjectWidth} repeat(${years.length}, minmax(0, 1fr))`;
   const cellClass = compact ? 'h-7 py-0.5' : 'h-8 py-1';
-  return <section className={cn('relative isolate border border-line bg-surface', compact && 'mx-auto w-full max-w-[920px]')} data-density={compact ? 'compact' : 'default'} data-testid={testId} onCopy={handleCopy} onPaste={handlePaste}>
+  return <section className={cn('relative isolate border border-line bg-surface', compact && 'mx-auto w-full max-w-[580px]')} data-density={compact ? 'compact' : 'default'} data-testid={testId} onCopy={handleCopy} onPaste={handlePaste}>
     <StickySurface data-testid={`${testId}-sticky-header`} stickyTop={stickyHeaderTop} layer={stickyHeaderLayer} className="shadow-sm">
       <header className={cn('flex items-center justify-between gap-3.5 border-t-[3px] border-navy', compact ? 'px-3 py-1.5' : 'px-3.5 pt-2.5 pb-2')}>
         <div><h3 className="m-0 text-[15px] font-bold">{title}</h3><p className="mt-0.5 text-[9px] text-muted-foreground">入力項目と自動計算項目・金額表示：{moneyUnitLabel(moneyUnit)}・ドラッグで範囲選択、Ctrl+C/VでExcel連携</p></div>
@@ -210,7 +210,7 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
             }
             const field = row.field;
             return <td {...cellInteraction(rowIndex, index + yearColumnOffset)} className={cn(cellClass, 'border-t border-line px-0.5 text-right tabular-nums', selectionClass)} key={years[index]}>{field && onChange
-              ? <NumberInput className={cn('ml-auto select-text rounded px-0.5 py-0 text-right text-[10px]', compact ? 'h-5 w-[min(86px,100%)]' : 'h-6 w-[min(120px,100%)]')} aria-label={`${title} ${years[index]}年 ${row.label}`} step={financialInputStep(kind, moneyUnit)} value={rawValue === null || rawValue === undefined ? null : toDisplayFinancialValue(Number(rawValue), kind, moneyUnit)} emptyValue={rawValue === null || rawValue === undefined ? null : 0} onEditingStart={onEditStart} onEditingEnd={onEditEnd} onValueChange={(value) => onChange(index, field, fromDisplayFinancialValue(value, kind, moneyUnit))} />
+              ? <NumberInput className={cn('ml-auto select-text rounded px-0.5 py-0 text-right text-[10px]', compact ? 'h-5 w-[min(72px,100%)]' : 'h-6 w-[min(120px,100%)]')} aria-label={`${title} ${years[index]}年 ${row.label}`} step={financialInputStep(kind, moneyUnit)} value={rawValue === null || rawValue === undefined ? null : toDisplayFinancialValue(Number(rawValue), kind, moneyUnit)} emptyValue={rawValue === null || rawValue === undefined ? null : 0} onEditingStart={onEditStart} onEditingEnd={onEditEnd} onValueChange={(value) => onChange(index, field, fromDisplayFinancialValue(value, kind, moneyUnit))} />
               : rawValue === null || rawValue === undefined ? '—' : formatFinancialValue(Number(rawValue), kind, moneyUnit)}</td>;
           })}
         </tr>)}</tbody>

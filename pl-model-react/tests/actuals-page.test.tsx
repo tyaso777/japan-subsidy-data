@@ -10,9 +10,10 @@ describe('期間・過去実績', () => {
     expect(screen.getByTestId('actuals-page')).toHaveClass('mx-auto', 'w-full', 'max-w-[1360px]');
     for (const testId of ['historical-bs', 'historical-pl-base', 'historical-pl-subsidy']) {
       expect(screen.getByTestId(testId)).toHaveAttribute('data-density', 'compact');
-      expect(screen.getByTestId(testId)).toHaveClass('mx-auto', 'w-full', 'max-w-[920px]');
+      expect(screen.getByTestId(testId)).toHaveClass('mx-auto', 'w-full', 'max-w-[580px]');
+      expect(within(screen.getByTestId(testId)).getByTestId(`${testId}-subject-column`)).toHaveStyle({ width: '32%' });
     }
-    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額')).toHaveClass('h-5', 'w-[min(86px,100%)]');
+    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額')).toHaveClass('h-5', 'w-[min(72px,100%)]');
   });
 
   it('ベース事業と補助事業をタブなしで同時表示する', () => {
