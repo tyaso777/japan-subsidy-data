@@ -253,18 +253,22 @@ describe('目標最適化提案', () => {
     expect(proposal.metricDiagnostics.find((metric) => metric.id === 'company-sales-growth')?.target).toBe(42);
   });
 
-  it('デフォルト案件は過去実績で範囲適正化後も、拡張範囲から目標達成案を作れる', () => {
+  it('明示的に狭い給与上限で未達となる案件も、拡張範囲から目標達成案を作れる', () => {
     const store = createModelStore();
     store.getState().optimizeForecastRangesFromActuals();
     const state = store.getState();
-    const initial = createMetricOptimizationProposal(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl, state.actuals.metricInputs, 'minimum-change', { includeExpansionPlan: false });
+    const constrained = structuredClone(state.forecast);
+    constrained.series.filter((series) => series.id.endsWith('-payPerPerson')).forEach((series) => {
+      series.periods.forEach((period) => { period.range = { min: period.range!.min, max: period.annualGrowthRate }; });
+    });
+    const initial = createMetricOptimizationProposal(constrained, state.program, state.actuals.basePl, state.actuals.subsidyPl, state.actuals.metricInputs, 'minimum-change', { includeExpansionPlan: false });
     expect(initial.feasibility).toBe('infeasible');
 
-    const expansion = createMetricOptimizationExpansionPlan(state.forecast, initial, state.program, state.actuals.basePl, state.actuals.subsidyPl, state.actuals.metricInputs, 'minimum-change');
+    const expansion = createMetricOptimizationExpansionPlan(constrained, initial, state.program, state.actuals.basePl, state.actuals.subsidyPl, state.actuals.metricInputs, 'minimum-change');
     expect(expansion?.status).toBe('feasible');
     const rangesOnly = applyOptimizationExpansionPlan({ ...initial, expansionPlan: expansion });
     expect(rangesOnly.series.map((series) => series.periods.map((period) => period.annualGrowthRate))).toEqual(
-      state.forecast.series.map((series) => series.periods.map((period) => period.annualGrowthRate)),
+      constrained.series.map((series) => series.periods.map((period) => period.annualGrowthRate)),
     );
 
     const final = createMetricOptimizationProposal(rangesOnly, state.program, state.actuals.basePl, state.actuals.subsidyPl, state.actuals.metricInputs, 'minimum-change', { includeExpansionPlan: false });

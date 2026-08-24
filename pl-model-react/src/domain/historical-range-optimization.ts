@@ -88,9 +88,12 @@ function baseRange(series: ForecastSeries, rows: HistoricalPlCalculated[]): { ra
     ?? (series.projectionMode === 'linear' ? generalLinearFallback : { min: -5, max: 10 });
   const initialValue = observed?.center ?? midpoint(fallback);
   const range = observed ?? fallback;
+  const upperHeadroom = driver === 'sales'
+    ? (series.scope === 'subsidy' ? 30 : 20)
+    : driver === 'payPerPerson' ? 5 : null;
   return {
-    range: driver === 'sales'
-      ? { min: range.min, max: initialValue + (series.scope === 'subsidy' ? 30 : 20) }
+    range: upperHeadroom !== null
+      ? { min: range.min, max: initialValue + upperHeadroom }
       : range,
     initialValue,
     fallback: observed === null,
