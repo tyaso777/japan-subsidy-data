@@ -122,3 +122,14 @@ test('期間・過去実績の財務表はワイド画面でも会計表の密�
   expect(inputBox?.height).toBeLessThanOrEqual(22);
   expect(rowBox?.height).toBeLessThanOrEqual(28);
 });
+
+test('狭い画面でも事業比較の長いタイトルがカード外へはみ出さない', async ({ page }) => {
+  await page.setViewportSize({ width: 980, height: 900 });
+  await page.goto('/');
+  await page.getByTestId('app-toolbar').getByRole('button', { name: '03 将来予測・PL' }).click();
+
+  const chart = page.getByRole('img', { name: '事業比較 従業員数（就業時間換算） 推移チャート' });
+  const card = chart.locator('xpath=ancestor::article');
+  const overflow = await card.evaluate((element) => ({ clientWidth: element.clientWidth, scrollWidth: element.scrollWidth }));
+  expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
+});

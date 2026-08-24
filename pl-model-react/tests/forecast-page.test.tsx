@@ -4,6 +4,29 @@ import { describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
 
 describe('将来予測・PL画面', () => {
+  it('左右パネルを個別に隠して中央表示を拡張する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    const layout = screen.getByTestId('forecast-layout');
+    const operationBar = screen.getByTestId('forecast-operation-bar');
+    expect(layout).toHaveAttribute('data-settings-visible', 'true');
+    expect(layout).toHaveAttribute('data-metrics-visible', 'true');
+    expect(within(operationBar).getByRole('button', { name: '水準設定を非表示' })).toBeVisible();
+    expect(within(operationBar).getByRole('button', { name: '経営指標・目標を非表示' })).toBeVisible();
+
+    await user.click(within(operationBar).getByRole('button', { name: '水準設定を非表示' }));
+    expect(screen.queryByTestId('forecast-settings-panel')).not.toBeInTheDocument();
+    expect(layout).toHaveAttribute('data-settings-visible', 'false');
+    expect(within(operationBar).getByRole('button', { name: '水準設定を表示' })).toBeVisible();
+
+    await user.click(within(operationBar).getByRole('button', { name: '経営指標・目標を非表示' }));
+    expect(screen.queryByTestId('forecast-metrics-panel')).not.toBeInTheDocument();
+    expect(layout).toHaveAttribute('data-metrics-visible', 'false');
+    expect(layout).toHaveClass('grid-cols-[minmax(0,1fr)]');
+  });
+
   it('最終年度の事業別配分率だけを設定し、売上高は最適化対象に保つ', async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -115,6 +138,10 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByTestId('forecast-comparison-sticky-header')).not.toHaveClass('mb-1');
     expect(screen.getByTestId('forecast-comparison-section')).not.toHaveClass('pt-1.5');
     expect(screen.getByTestId('forecast-comparison-chart-list')).toHaveClass('grid-cols-3');
+    const comparisonHeadcount = screen.getByRole('img', { name: '事業比較 従業員数（就業時間換算） 推移チャート' }).closest('article')!;
+    expect(comparisonHeadcount).toHaveClass('min-w-0', 'overflow-hidden');
+    expect(within(comparisonHeadcount).getByTestId('forecast-chart-heading')).not.toHaveTextContent('全社合算・ベース事業・補助事業');
+    expect(within(comparisonHeadcount).getByRole('heading', { name: '従業員数（就業時間換算）' })).toHaveClass('break-words');
     expect(screen.getByTestId('forecast-business-columns')).toHaveStyle({ gridTemplateColumns: 'repeat(3, minmax(220px, 1fr))' });
     for (const list of screen.getAllByTestId('forecast-business-chart-list')) {
       expect(list).toHaveAttribute('data-layout', 'column');

@@ -1,5 +1,5 @@
 ﻿import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { BarChart3, ChevronDown, SlidersHorizontal, Table2, Workflow } from 'lucide-react';
+import { BarChart3, ChevronDown, Eye, EyeOff, SlidersHorizontal, Table2, Workflow } from 'lucide-react';
 import type { CSSProperties, RefObject } from 'react';
 import { FinancialTable, type FinancialTableValueUpdate } from '../../components/FinancialTable';
 import { Badge } from '../../components/ui/badge';
@@ -118,8 +118,8 @@ const MultiLineChart = memo(function MultiLineChart({ title, subtitle, contextLa
   const tooltipHeight = 22 + lines.length * 12;
   const tooltipX = activeYearIndex == null ? 0 : Math.min(width - margin.right - tooltipWidth, Math.max(margin.left, x(activeYearIndex) + (x(activeYearIndex) > width / 2 ? -tooltipWidth - 7 : 7)));
   const togglePinnedYear = (index: number) => setPinnedYearIndex((current) => current === index ? null : index);
-  return <article data-testid="forecast-chart-card" className="self-start border border-line bg-white p-2">
-    <div data-testid="forecast-chart-heading" className="flex min-w-0 items-baseline justify-between gap-2"><h4 className="m-0 shrink-0 text-sm font-bold">{title}</h4><p className="m-0 truncate text-[9px] text-muted-foreground" title={subtitle}>{subtitle}</p></div>
+  return <article data-testid="forecast-chart-card" className="min-w-0 self-start overflow-hidden border border-line bg-white p-2">
+    <div data-testid="forecast-chart-heading" className="flex min-w-0 items-start justify-between gap-2"><h4 className="m-0 min-w-0 break-words text-sm font-bold leading-tight">{title}</h4>{subtitle && <p className="m-0 min-w-0 truncate text-[9px] text-muted-foreground" title={subtitle}>{subtitle}</p>}</div>
     <svg role="img" aria-label={`${contextLabel ? `${contextLabel} ` : ''}${title} 推移チャート`} viewBox={`0 0 ${width} ${height}`} className="h-38 w-full">
       {forecastStartIndex >= 0 && <rect data-testid="forecast-area" x={forecastBoundaryX} y={margin.top} width={width - margin.right - forecastBoundaryX} height={height - margin.top - margin.bottom} fill="#eef6ef" />}
       {chartAxisTicks(extent).map((value) => { const py = y(value); return <g key={value}><line x1={margin.left} x2={width - margin.right} y1={py} y2={py} stroke="#d2dbe2" /><text data-axis-tick="y" x={margin.left - 4} y={py + 3.5} textAnchor="end" fontSize="11" fill="#667085">{formatAxis(value)}</text></g>; })}
@@ -201,6 +201,8 @@ function useForecastModel() { return useModelStore((state) => state.forecast); }
 export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: string) => void }) {
   const [scope, setScope] = useState<Scope>('base');
   const [view, setView] = useState<ForecastView>('chart');
+  const [settingsVisible, setSettingsVisible] = useState(true);
+  const [metricsVisible, setMetricsVisible] = useState(true);
   const [chartDisplays, setChartDisplays] = useState<Record<ChartDisplay, boolean>>({ company: true, base: true, subsidy: true, comparison: true });
   const chartScrollContentRef = useRef<HTMLDivElement>(null);
   const businessHeaderScrollRef = useRef<HTMLDivElement>(null);
@@ -323,7 +325,10 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
       return <MultiLineChart key={`${chartScope}-${chart.title}`} title={chart.title} subtitle={chart.subtitle} contextLabel={chartScope === 'base' ? undefined : scopeLabels[chartScope]} years={timeline.years} lines={lines} boundaries={boundaryYears} kind={chart.kind} unit={unit} editableFromYear={model.series[0].baseYear + 1} specialYearLabels={specialYearLabels} />;
     });
   };
-  const renderComparisonCharts = () => comparisonCharts.map(([title, field, kind]) => <MultiLineChart key={title} title={title} subtitle="全社合算・ベース事業・補助事業" contextLabel="事業比較" years={company.years} lines={comparison(field)} boundaries={boundaryYears} kind={kind} unit={unit} editableFromYear={model.series[0].baseYear + 1} specialYearLabels={specialYearLabels} />);
+  const renderComparisonCharts = () => comparisonCharts.map(([title, field, kind]) => <MultiLineChart key={title} title={title} subtitle="" contextLabel="事業比較" years={company.years} lines={comparison(field)} boundaries={boundaryYears} kind={kind} unit={unit} editableFromYear={model.series[0].baseYear + 1} specialYearLabels={specialYearLabels} />);
+  const forecastLayoutColumns = settingsVisible
+    ? metricsVisible ? 'grid-cols-[clamp(320px,20vw,380px)_minmax(0,1fr)_clamp(250px,15vw,290px)]' : 'grid-cols-[clamp(320px,20vw,380px)_minmax(0,1fr)]'
+    : metricsVisible ? 'grid-cols-[minmax(0,1fr)_clamp(250px,15vw,290px)]' : 'grid-cols-[minmax(0,1fr)]';
   useEffect(() => {
     const content = chartScrollContentRef.current;
     const header = businessHeaderScrollRef.current;
@@ -358,6 +363,11 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
         <span className="h-6 w-px shrink-0 bg-line" aria-hidden="true" />
         <div data-testid="forecast-view-shortcuts" className="flex shrink-0 flex-col items-center gap-0.5"><TabsList className="h-8"><TabsTrigger value="chart" className="text-[10px]"><BarChart3 />チャート</TabsTrigger><TabsTrigger value="table" className="text-[10px]"><Table2 />PL表</TabsTrigger></TabsList><span className="text-[7px] leading-none text-muted-foreground">Ctrl+4 / 5</span></div>
         <span className="h-6 w-px shrink-0 bg-line" aria-hidden="true" />
+        <div aria-label="サイドパネル表示" className="flex shrink-0 items-center gap-1">
+          <Button variant="outline" size="sm" className="h-7 gap-1 px-2 text-[9px]" aria-pressed={settingsVisible} aria-label={`水準設定を${settingsVisible ? '非表示' : '表示'}`} onClick={() => setSettingsVisible((value) => !value)}>{settingsVisible ? <Eye aria-hidden="true" /> : <EyeOff aria-hidden="true" />}水準設定</Button>
+          <Button variant="outline" size="sm" className="h-7 gap-1 px-2 text-[9px]" aria-pressed={metricsVisible} aria-label={`経営指標・目標を${metricsVisible ? '非表示' : '表示'}`} onClick={() => setMetricsVisible((value) => !value)}>{metricsVisible ? <Eye aria-hidden="true" /> : <EyeOff aria-hidden="true" />}指標・目標</Button>
+        </div>
+        <span className="h-6 w-px shrink-0 bg-line" aria-hidden="true" />
         <section data-testid="final-year-sales-allocation" className="flex w-[236px] shrink-0 items-center gap-1.5" title="入力した配分率は次回の最適化結果にのみ適用し、現在のPLは変更しません。">
           <span data-testid="final-year-allocation-title" className="flex shrink-0 flex-col items-center leading-none"><strong className="text-[9px]">最終年度配分</strong><small className="mt-1 text-[8px] text-muted-foreground">{finalYear}年</small></span>
           <label className="flex min-w-0 items-center gap-1 whitespace-nowrap text-[8px] font-bold text-muted-foreground">ベース<NumberInput aria-label="ベース事業 配分率" className="h-7 w-[64px] shrink-0 text-right text-[10px] tabular-nums" min={0} max={100} step={0.01} value={baseShareDraft} emptyValue={null} onEmpty={clearBaseShare} placeholder="任意" onEditingStart={beginTransaction} onEditingEnd={commitTransaction} onValueChange={applyBaseShare} />% <span data-testid="current-base-share" className="inline-block w-[86px] shrink-0 font-normal tabular-nums">（現在 {currentBaseShareRounded.toFixed(2)}%）</span></label>
@@ -366,8 +376,8 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
       </section>
       <div data-testid="forecast-sticky-spacer" className="h-3 bg-canvas" aria-hidden="true" />
       </StickySurface>
-    <div data-testid="forecast-layout" className="grid grid-cols-[clamp(320px,20vw,380px)_minmax(0,1fr)_clamp(250px,15vw,290px)] items-start gap-3">
-      <StickyPanel
+    <div data-testid="forecast-layout" data-settings-visible={settingsVisible} data-metrics-visible={metricsVisible} className={cn('grid items-start gap-3', forecastLayoutColumns)}>
+      {settingsVisible && <StickyPanel
         ref={settingsPanel.ref}
         testIdPrefix="forecast-settings"
         stickyTop="var(--forecast-content-sticky-top)"
@@ -377,7 +387,7 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
       >
         {scope === 'company' && <p className="mb-2 rounded bg-soft p-2 text-[10px] text-muted-foreground">全社合算はベース事業と補助事業から自動計算します。水準を変更する場合は各事業へ切り替えてください。</p>}
         <div data-testid="forecast-period-grid" className="grid min-w-0 gap-2" style={{ gridTemplateColumns: `repeat(${segments.length}, minmax(${settingsPeriodMinWidth(segments.length, variationOpen)}, 1fr))` }}>{segments.map((period, segmentIndex) => { const definitionLabel = program.definitions.periods.find((definition) => definition.id === period.definitionId)?.label ?? period.definitionId; const siblings = segments.filter((candidate) => candidate.definitionId === period.definitionId); const label = siblings.length > 1 ? `${definitionLabel}${siblings.indexOf(period) + 1}` : definitionLabel; return <section data-testid="forecast-period-column" key={period.id} className="min-w-0 bg-background"><StickySurface data-testid="forecast-period-header" stickyTop="0px" layer="panel" className="flex min-h-10 items-center justify-between gap-2 border-t-[3px] border-navy px-1.5 py-1 shadow-sm"><span className="flex min-w-0 items-center gap-2"><strong className="min-w-0 text-sm leading-tight">{label}</strong><span data-testid="forecast-period-years" className="shrink-0 whitespace-nowrap text-[10px] tabular-nums text-muted-foreground">{period.startYear}–{period.endYear}</span></span>{segmentIndex > 0 && segments[segmentIndex - 1].definitionId === period.definitionId && <Button variant="ghost" size="sm" className="h-6 shrink-0 px-1.5 text-[9px]" aria-label={`${period.startYear}年の期間分割を解除`} onClick={() => mergeForecastPeriod(period.id)}>解除</Button>}</StickySurface>{settings.map((series) => <SettingRow key={series.id} series={series} periodId={period.id} periodLabel={label} unit={unit} variationOpen={variationOpen} readOnly={scope === 'company'} />)}</section>; })}</div>
-      </StickyPanel>
+      </StickyPanel>}
       <section className="min-w-0 border border-line bg-surface p-3">
           <TabsContent value="chart" className="mt-0">
             <StickySurface ref={chartDisplayLayer.ref} data-testid="forecast-chart-display-controls" stickyTop="var(--forecast-content-sticky-top)" layer="content" className="-mx-3 flex items-center justify-between gap-2 border-b border-line px-3 py-2 shadow-sm">
@@ -392,7 +402,7 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
             <div data-testid="forecast-chart-sections" data-layout={chartDisplayLayout} className="grid items-start gap-3" style={{ '--forecast-section-sticky-top': stickyStackOffsetCss('var(--forecast-content-sticky-top)', chartDisplayLayer.height) } as CSSProperties}>
               {comparisonVisible && <section data-testid="forecast-chart-section" data-scope="comparison" className="min-w-0">
                 <div data-testid="forecast-comparison-section" data-placement="full-width" className="bg-surface">
-                  <StickySurface data-testid="forecast-comparison-sticky-header" stickyTop="var(--forecast-section-sticky-top)" layer="section" className="flex items-center justify-between gap-2 border-t-2 border-orange py-1.5 shadow-sm"><h3 className="m-0 text-sm font-bold">事業比較</h3><span className="text-[9px] text-muted-foreground">{comparisonCharts.length}チャート・全社合算／ベース事業／補助事業</span></StickySurface>
+                  <StickySurface data-testid="forecast-comparison-sticky-header" stickyTop="var(--forecast-section-sticky-top)" layer="section" className="flex items-center justify-between gap-2 border-t-2 border-orange py-1.5 shadow-sm"><h3 className="m-0 text-sm font-bold">事業比較</h3><span className="text-[9px] text-muted-foreground">{comparisonCharts.length}チャート</span></StickySurface>
                   <div data-testid="forecast-comparison-chart-list" data-layout="overview" className="grid grid-cols-3 items-start gap-2">{renderComparisonCharts()}</div>
                 </div>
               </section>}
@@ -415,7 +425,7 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
           </TabsContent>
           <TabsContent value="table" className="mt-0"><FinancialTable testId="forecast-pl-table" title={`${scopeLabels[scope]} P/L`} years={selected.years} yearLabels={yearLabels} records={selected.records} rows={forecastPlRows} moneyUnit={unit} editableFromIndex={baseActuals.length} stickyHeaderTop="var(--forecast-content-sticky-top)" stickyHeaderLayer="content" onRowSelect={(row) => setSelectedLogicCode(row.code)} onEditStart={beginTransaction} onEditEnd={commitTransaction} onValueChange={scope === 'company' ? undefined : (yearIndex, row, value) => applyForecastPlValues([{ yearIndex, row, value }])} onValuesChange={scope === 'company' ? undefined : applyForecastPlValues} /><div data-testid="forecast-logic-link" className="mt-2 flex min-w-0 items-center justify-between gap-2 rounded border border-line bg-soft px-3 py-2"><span className="min-w-0 truncate text-[10px] text-muted-foreground"><strong className="text-navy">{selectedLogic.code} {selectedLogic.label}</strong> の計算式・参照元・影響先</span><Button variant="outline" size="sm" className="h-7 shrink-0 gap-1.5 text-[10px]" aria-label={`${selectedLogic.label}を04ロジックマップで確認`} onClick={() => onOpenLogicMap?.(selectedLogic.code)}><Workflow className="size-3.5" />04ロジックマップで確認</Button></div></TabsContent>
       </section>
-      <MetricsPanel company={company} base={base} subsidy={subsidy} optimization={optimization} />
+      {metricsVisible && <MetricsPanel company={company} base={base} subsidy={subsidy} optimization={optimization} />}
     </div>
     </Tabs>
   </main>;
