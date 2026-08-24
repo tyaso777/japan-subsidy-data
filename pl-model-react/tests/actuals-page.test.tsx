@@ -10,7 +10,8 @@ describe('期間・過去実績', () => {
     expect(screen.getByTestId('actuals-page')).toHaveClass('mx-auto', 'w-full', 'max-w-[1360px]');
     for (const testId of ['historical-bs', 'historical-pl-base', 'historical-pl-subsidy']) {
       expect(screen.getByTestId(testId)).toHaveAttribute('data-density', 'compact');
-      expect(screen.getByTestId(testId)).toHaveClass('mx-auto', 'w-full', 'max-w-[580px]');
+      expect(screen.getByTestId(testId)).toHaveClass('mx-auto', 'w-full');
+      expect(screen.getByTestId(testId)).toHaveStyle({ maxWidth: '580px' });
       expect(within(screen.getByTestId(testId)).getByTestId(`${testId}-subject-column`)).toHaveStyle({ width: '32%' });
     }
     expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額')).toHaveClass('h-5', 'w-[min(72px,100%)]');
@@ -94,16 +95,23 @@ describe('期間・過去実績', () => {
     expect(within(table).getByText('事業化報告期間3年目')).toBeVisible();
   });
 
-  it('削除不可の過去実績区間も開始・終了年を入力でき、3期幅と次期間を連動する', async () => {
+  it('過去実績の開始・終了年を独立して変更し、任意の期数へ拡張して既存値を暦年で保持する', async () => {
     const user = userEvent.setup();
     render(<App />);
     const historicalEnd = screen.getByLabelText('過去実績 終了年');
     await user.clear(historicalEnd); await user.type(historicalEnd, '2026');
-    expect(screen.getByLabelText('過去実績 開始年')).toHaveValue(2024);
+    expect(screen.getByLabelText('過去実績 開始年')).toHaveValue(2023);
     expect(screen.getByLabelText('補助事業期間 開始年')).toHaveValue(2027);
-    expect(within(screen.getByTestId('historical-bs')).getByText('2026年')).toBeVisible();
-    expect(within(screen.getByTestId('historical-pl-base')).getByText('2026年')).toBeVisible();
-    expect(within(screen.getByTestId('historical-pl-subsidy')).getByText('2026年')).toBeVisible();
+    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額')).toHaveValue(1050);
+    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2026年 資産総額')).toHaveValue(null);
+
+    const historicalStart = screen.getByLabelText('過去実績 開始年');
+    await user.clear(historicalStart); await user.type(historicalStart, '2021');
+    expect(screen.getByLabelText('過去実績 終了年')).toHaveValue(2026);
+    expect(screen.getByLabelText('補助事業期間 開始年')).toHaveValue(2027);
+    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2021年 資産総額')).toHaveValue(null);
+    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額')).toHaveValue(1050);
+    expect(screen.getByTestId('historical-bs')).toHaveStyle({ maxWidth: '850px' });
   });
 
   it('モデル変更をCtrl+ZとCtrl+Yで戻して進める', async () => {

@@ -53,18 +53,19 @@ function roundRange(range: Range): Range {
 }
 
 function valuesForDriver(driver: string, rows: HistoricalPlCalculated[]): number[] {
-  const ratio = (numerator: number, denominator: number) => denominator ? numerator / denominator * 100 : Number.NaN;
+  const finite = (...values: number[]) => values.every((value) => Number.isFinite(value));
+  const ratio = (numerator: number, denominator: number) => finite(numerator, denominator) && denominator ? numerator / denominator * 100 : Number.NaN;
   return rows.map((row) => {
     switch (driver) {
       case 'sales': return row.sales;
       case 'headcount': return row.headcount;
-      case 'payPerPerson': return row.employeePayPerPerson;
-      case 'cogsRate': return row.cogsRate;
+      case 'payPerPerson': return finite(row.employeeSalary, row.employeeBonus, row.headcount) && row.headcount ? (row.employeeSalary + row.employeeBonus) / row.headcount : Number.NaN;
+      case 'cogsRate': return ratio(row.cogs, row.sales);
       case 'cogsDepRate': return ratio(row.cogsDepreciation, row.sales);
       case 'sgaDepRate': return ratio(row.sgaDepreciation, row.sales);
       case 'researchDevelopmentRate': return ratio(row.researchDevelopment, row.sales);
-      case 'otherSgaRate': return row.otherSgaRate;
-      case 'officerPayPerPerson': return row.officerPayPerPerson;
+      case 'otherSgaRate': return ratio(row.otherSga, row.sales);
+      case 'officerPayPerPerson': return finite(row.officerCompensation, row.officerBonus, row.officerCount) && row.officerCount ? (row.officerCompensation + row.officerBonus) / row.officerCount : Number.NaN;
       case 'employeeSalaryShare': return ratio(row.employeeSalary, row.employeePay);
       case 'officerCompensationShare': return ratio(row.officerCompensation, row.officerPay);
       case 'nonOperatingRate': return ratio(row.nonOperating, row.sales);

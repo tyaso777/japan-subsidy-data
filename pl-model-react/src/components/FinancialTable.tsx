@@ -181,7 +181,8 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
   const subjectWidth = compact ? '38%' : '26%';
   const columnTemplate = separateSubjectColumns ? `${subjectNumberWidth} ${subjectNameWidth} repeat(${years.length}, minmax(0, 1fr))` : `${subjectWidth} repeat(${years.length}, minmax(0, 1fr))`;
   const cellClass = compact ? 'h-7 py-0.5' : 'h-8 py-1';
-  return <section className={cn('relative isolate border border-line bg-surface', compact && 'mx-auto w-full max-w-[580px]')} data-density={compact ? 'compact' : 'default'} data-testid={testId} onCopy={handleCopy} onPaste={handlePaste}>
+  const compactMaxWidth = Math.min(1360, 310 + years.length * 90);
+  return <section className={cn('relative isolate border border-line bg-surface', compact && 'mx-auto w-full')} style={compact ? { maxWidth: `${compactMaxWidth}px` } : undefined} data-density={compact ? 'compact' : 'default'} data-testid={testId} onCopy={handleCopy} onPaste={handlePaste}>
     <StickySurface data-testid={`${testId}-sticky-header`} stickyTop={stickyHeaderTop} layer={stickyHeaderLayer} className="shadow-sm">
       <header className={cn('flex items-center justify-between gap-3.5 border-t-[3px] border-navy', compact ? 'px-3 py-1.5' : 'px-3.5 pt-2.5 pb-2')}>
         <div><h3 className="m-0 text-[15px] font-bold">{title}</h3><p className="mt-0.5 text-[9px] text-muted-foreground">入力項目と自動計算項目・金額表示：{moneyUnitLabel(moneyUnit)}・ドラッグで範囲選択、Ctrl+C/VでExcel連携</p></div>

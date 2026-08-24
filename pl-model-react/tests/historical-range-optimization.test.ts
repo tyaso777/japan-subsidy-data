@@ -29,6 +29,36 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(period.annualGrowthRate).toBeCloseTo(mean);
   });
 
+  it('任意の過去実績期間に含まれる全前年差から平均と母分散を求める', () => {
+    const state = createModelStore().getState();
+    const sales = [100, 110, 132, 171.6, 257.4].map((value) => value * 1_000_000);
+    const fiveYearActuals = sales.map((value, index) => ({ ...state.actuals.basePl[Math.min(index, state.actuals.basePl.length - 1)], sales: value }));
+    const result = optimizeForecastRangesFromActuals(state.forecast, state.program, fiveYearActuals, state.actuals.subsidyPl);
+    const period = result.forecast.series.find((series) => series.id === 'base-sales')!.periods.find((item) => item.id === 'subsidy')!;
+    const changes = [10, 20, 30, 50];
+    const mean = changes.reduce((sum, value) => sum + value, 0) / changes.length;
+    const variance = changes.reduce((sum, value) => sum + (value - mean) ** 2, 0) / changes.length;
+
+    expect(period.annualGrowthRate).toBeCloseTo(mean);
+    expect(period.range?.min).toBeCloseTo(mean - 2 * Math.sqrt(variance));
+    expect(period.range?.max).toBeCloseTo(mean + 20);
+  });
+
+  it('期間を延長して増えた未入力年度は平均・分散の対象から除外する', () => {
+    const state = createModelStore().getState();
+    const baseline = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
+    const emptyYear = Object.fromEntries(Object.keys(state.actuals.basePl[0]).map((field) => [field, null])) as unknown as typeof state.actuals.basePl[number];
+    const extended = optimizeForecastRangesFromActuals(state.forecast, state.program, [...state.actuals.basePl, emptyYear], state.actuals.subsidyPl);
+
+    for (const seriesId of ['base-sales', 'base-payPerPerson', 'base-officerPayPerPerson']) {
+      const expected = baseline.forecast.series.find((series) => series.id === seriesId)!.periods.find((period) => period.id === 'subsidy')!;
+      const actual = extended.forecast.series.find((series) => series.id === seriesId)!.periods.find((period) => period.id === 'subsidy')!;
+      expect(actual.annualGrowthRate).toBeCloseTo(expected.annualGrowthRate);
+      expect(actual.range?.min).toBeCloseTo(expected.range!.min);
+      expect(actual.range?.max).toBeCloseTo(expected.range!.max);
+    }
+  });
+
   it('補助事業の売上高は過去平均を初期値、初期値＋30ptを上限にする', () => {
     const state = createModelStore().getState();
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);

@@ -105,6 +105,17 @@ function emptyRecordLike<T extends object>(record: T): T {
   return Object.fromEntries(Object.keys(record).map((field) => [field, null])) as T;
 }
 
+type HistoricalBoundary = { startYear: number; endYear: number };
+
+function resizeHistoricalRecords<T extends object>(records: T[], previous: HistoricalBoundary, next: HistoricalBoundary): T[] {
+  const recordsByYear = new Map(records.map((record, index) => [previous.startYear + index, record]));
+  const emptyTemplate = emptyRecordLike(records[0] ?? {} as T);
+  return Array.from({ length: next.endYear - next.startYear + 1 }, (_, index) => {
+    const year = next.startYear + index;
+    return structuredClone(recordsByYear.get(year) ?? emptyTemplate);
+  });
+}
+
 export function createInitialModelSnapshot(programInput?: unknown, initialActuals: InitialActualsMode = 'sample'): ModelSnapshot {
   const program = normalizeProgram(programInput ?? createDefaultProgram());
   const actuals = initialActuals === 'sample' ? {
@@ -160,10 +171,10 @@ export function createModelStore(program?: unknown, options?: { initialActuals?:
       },
       updateHistoricalBoundary: (boundary, year) => applyMutation((snapshot) => {
         const historical = snapshot.program.timeline.historical;
-        const duration = historical.endYear - historical.startYear;
+        const requestedYear = Math.trunc(year);
         const nextHistorical = boundary === 'startYear'
-          ? { startYear: Math.trunc(year), endYear: Math.trunc(year) + duration }
-          : { startYear: Math.trunc(year) - duration, endYear: Math.trunc(year) };
+          ? { startYear: Math.min(requestedYear, historical.endYear), endYear: historical.endYear }
+          : { startYear: historical.startYear, endYear: Math.max(requestedYear, historical.startYear) };
         let cursor = nextHistorical.endYear + 1;
         const periods = snapshot.program.timeline.periods.map((period) => {
           const periodDuration = period.endYear - period.startYear;
@@ -174,7 +185,17 @@ export function createModelStore(program?: unknown, options?: { initialActuals?:
         const program = { ...snapshot.program, timeline: { historical: nextHistorical, periods } };
         const synchronized = synchronizeForecastTimeline(snapshot.forecast, periods);
         const forecast = { ...synchronized, series: synchronized.series.map((series) => ({ ...series, baseYear: nextHistorical.endYear })) };
-        return { ...snapshot, program, forecast };
+        return {
+          ...snapshot,
+          program,
+          actuals: {
+            ...snapshot.actuals,
+            balanceSheets: resizeHistoricalRecords(snapshot.actuals.balanceSheets, historical, nextHistorical),
+            basePl: resizeHistoricalRecords(snapshot.actuals.basePl, historical, nextHistorical),
+            subsidyPl: resizeHistoricalRecords(snapshot.actuals.subsidyPl, historical, nextHistorical),
+          },
+          forecast,
+        };
       }),
       updateBalanceSheet: (yearIndex, field, value) => {
         if (get().actuals.balanceSheets[yearIndex]?.[field] === value) return;
