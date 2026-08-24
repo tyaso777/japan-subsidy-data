@@ -1,6 +1,6 @@
 import type { CSSProperties, ComponentPropsWithRef, ReactNode } from 'react';
 import { cn } from '../../lib/utils';
-import { StickySurface, stickyLayerClassNames, stickySurfaceBaseClassName, stickySurfaceStyle, type StickyLayer } from './sticky-surface';
+import { stickyLayerClassNames, stickySurfaceBaseClassName, stickySurfaceStyle, type StickyLayer } from './sticky-surface';
 
 type StickyPanelProps = Omit<ComponentPropsWithRef<'aside'>, 'children'> & {
   testIdPrefix: string;
@@ -33,18 +33,17 @@ export function StickyPanel({
   return (
     <aside
       data-testid={`${testIdPrefix}-panel`}
-      className={cn(className, 'flex min-w-0 flex-col overflow-visible border border-line', stickySurfaceBaseClassName, stickyLayerClassNames[layer])}
+      className={cn(className, 'flex min-w-0 flex-col overflow-hidden border border-line', stickySurfaceBaseClassName, stickyLayerClassNames[layer])}
       style={{ ...stickySurfaceStyle(stickyTop, style), maxHeight: `calc(100vh - (${stickyTop} + ${bottomGap}px))` }}
       {...props}
     >
-      <StickySurface
+      <div
         data-testid={`${testIdPrefix}-header`}
-        stickyTop={stickyTop}
-        layer={layer}
-        className={cn('shrink-0 border-b border-line bg-surface shadow-sm', headerClassName)}
+        className={cn('relative isolate shrink-0 border-b border-line bg-surface shadow-sm', stickyLayerClassNames[layer], headerClassName)}
+        style={{ backgroundColor: 'var(--color-surface)' }}
       >
         {header}
-      </StickySurface>
+      </div>
       <div
         data-testid={`${testIdPrefix}-body`}
         className={cn(

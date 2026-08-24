@@ -84,6 +84,32 @@ test('sticky layers remain opaque, ordered and joined while scrolling', async ({
   await expect(page.getByRole('button', { name: /04ロジックマップで確認/ })).toBeVisible();
 });
 
+test('中央を最下部までスクロールしても水準設定の期間見出しがパネル見出しへ重ならない', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('app-toolbar').getByRole('button', { name: '03 将来予測・PL' }).click();
+
+  const panel = page.getByTestId('forecast-settings-panel');
+  const panelHeader = page.getByTestId('forecast-settings-header');
+  const panelBody = page.getByTestId('forecast-settings-body');
+  const periodHeaders = page.getByTestId('forecast-period-header');
+
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await panelBody.evaluate((element) => { element.scrollTop = element.scrollHeight; });
+
+  const panelGeometry = await geometry(panel);
+  const headerGeometry = await geometry(panelHeader);
+  const bodyGeometry = await geometry(panelBody);
+  expect(panelGeometry.position).toBe('sticky');
+  expect(headerGeometry.position).toBe('relative');
+  expectOpaque(headerGeometry);
+  expect(bodyGeometry.top).toBeGreaterThanOrEqual(headerGeometry.bottom - 1.5);
+  for (const periodHeader of await periodHeaders.all()) {
+    const periodGeometry = await geometry(periodHeader);
+    expect(periodGeometry.top).toBeGreaterThanOrEqual(headerGeometry.bottom - 1.5);
+    expect(periodGeometry.top).toBeGreaterThanOrEqual(bodyGeometry.top - 1.5);
+  }
+});
+
 test('次へで画面を切り替えるとページ先頭へ戻る', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
