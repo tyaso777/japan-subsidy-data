@@ -150,3 +150,15 @@ test('制度定義カードの見出しは枠端に密着せず、狭い画面�
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
   await expect(header.getByRole('button', { name: '区間を追加' })).toBeVisible();
 });
+
+test('水準設定は固定項目を一括で隠して変動可能項目へ集中できる', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('app-toolbar').getByRole('button', { name: '03 将来予測・PL' }).click();
+
+  const panel = page.getByTestId('forecast-settings-panel');
+  await expect(panel.getByLabel('補助事業期間 原価率 年間変化')).toBeVisible();
+  await panel.getByRole('button', { name: '固定項目を隠す' }).click();
+  await expect(panel.getByLabel('補助事業期間 原価率 年間変化')).toHaveCount(0);
+  await expect(panel.getByLabel('補助事業期間 売上高 年間変化')).toBeVisible();
+  await expect(panel.getByRole('button', { name: '固定項目を表示' })).toBeVisible();
+});

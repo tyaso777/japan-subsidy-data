@@ -20,7 +20,7 @@ import { MetricsPanel, OptimizationToolbar, useForecastOptimization } from './Me
 import { chartAxisTicks, nextChartExtent, type ChartExtent } from '../../domain/chart-scale';
 import { buildTimelineYearLabels, resolveTimeline } from '../../domain/timeline';
 import { plLogicNodes } from '../../domain/pl-logic';
-import { defaultForecastRange } from '../../domain/forecast-range';
+import { defaultForecastRange, isForecastRangeLocked } from '../../domain/forecast-range';
 import { settingsPeriodMinWidth, shouldAutoCollapseSettings } from './forecast-layout';
 import { stickyStackOffsetCss, useObservedHeight } from '../../lib/sticky-stack';
 
@@ -203,6 +203,7 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
   const [view, setView] = useState<ForecastView>('chart');
   const [settingsVisible, setSettingsVisible] = useState(true);
   const [metricsVisible, setMetricsVisible] = useState(true);
+  const [showFixedSettings, setShowFixedSettings] = useState(true);
   const [chartDisplays, setChartDisplays] = useState<Record<ChartDisplay, boolean>>({ company: true, base: true, subsidy: true, comparison: true });
   const chartScrollContentRef = useRef<HTMLDivElement>(null);
   const businessHeaderScrollRef = useRef<HTMLDivElement>(null);
@@ -270,6 +271,11 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
   const settingsPanel = useCompactSettingsPanel(segments.length);
   const [variationOverride, setVariationOverride] = useState(true);
   const variationOpen = variationOverride ?? !settingsPanel.compact;
+  const fixedSettingIds = new Set(settings.filter((series) => series.changePolicy === 'fixed' || segments.every((segment) => {
+    const period = series.periods.find((candidate) => candidate.id === segment.id);
+    return Boolean(period && isForecastRangeLocked(period.range ?? defaultForecastRange(series.projectionMode)));
+  })).map((series) => series.id));
+  const visibleSettings = showFixedSettings ? settings : settings.filter((series) => !fixedSettingIds.has(series.id));
   const boundaryYears = segments.slice(1).map((period) => period.startYear);
   const yearLabels = buildTimelineYearLabels(program);
   const specialYearLabels = useMemo(() => resolveTimeline(program).specialYears.reduce<Record<number, string[]>>((labels, specialYear) => {
@@ -383,10 +389,10 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
         stickyTop="var(--forecast-content-sticky-top)"
         headerClassName="px-2.5 py-2.5"
         bodyClassName="px-2.5 pb-2.5"
-        header={<div className="flex items-center justify-between gap-2"><div><h3 className="m-0 text-base font-bold">水準設定</h3><p className="m-0 text-[10px] text-muted-foreground">{scope === 'company' ? '全社合算ではベース事業の水準を表示' : scopeLabels[scope]}・右端は開始時増減</p></div><span className="flex shrink-0 items-center gap-1"><Button variant="outline" size="sm" className="h-7 gap-1 px-2 text-[9px]" aria-label={variationOpen ? '変動設定を隠す' : '変動設定を表示'} aria-expanded={variationOpen} onClick={() => setVariationOverride(!variationOpen)}><ChevronDown className={cn('transition-transform', !variationOpen && '-rotate-90')} />変動設定</Button><Badge variant="outline">金額単位：{moneyUnitLabel(unit)}</Badge></span></div>}
+        header={<div className="flex items-center justify-between gap-2"><div><h3 className="m-0 text-base font-bold">水準設定</h3><p className="m-0 text-[10px] text-muted-foreground">{scope === 'company' ? '全社合算ではベース事業の水準を表示' : scopeLabels[scope]}・右端は開始時増減</p></div><span className="flex shrink-0 flex-col items-end gap-1"><span className="flex items-center gap-1"><Button variant="outline" size="sm" className="h-7 gap-1 px-2 text-[9px]" aria-label={variationOpen ? '変動設定を隠す' : '変動設定を表示'} aria-expanded={variationOpen} onClick={() => setVariationOverride(!variationOpen)}><ChevronDown className={cn('transition-transform', !variationOpen && '-rotate-90')} />変動設定</Button><Badge variant="outline">金額単位：{moneyUnitLabel(unit)}</Badge></span><Button variant="ghost" size="sm" className="h-6 gap-1 px-1.5 text-[9px] text-muted-foreground" aria-label={showFixedSettings ? '固定項目を隠す' : '固定項目を表示'} aria-pressed={!showFixedSettings} onClick={() => setShowFixedSettings((value) => !value)}>{showFixedSettings ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}{showFixedSettings ? '固定項目を隠す' : `固定項目を表示（${fixedSettingIds.size}件）`}</Button></span></div>}
       >
         {scope === 'company' && <p className="mb-2 rounded bg-soft p-2 text-[10px] text-muted-foreground">全社合算はベース事業と補助事業から自動計算します。水準を変更する場合は各事業へ切り替えてください。</p>}
-        <div data-testid="forecast-period-grid" className="grid min-w-0 gap-2" style={{ gridTemplateColumns: `repeat(${segments.length}, minmax(${settingsPeriodMinWidth(segments.length, variationOpen)}, 1fr))` }}>{segments.map((period, segmentIndex) => { const definitionLabel = program.definitions.periods.find((definition) => definition.id === period.definitionId)?.label ?? period.definitionId; const siblings = segments.filter((candidate) => candidate.definitionId === period.definitionId); const label = siblings.length > 1 ? `${definitionLabel}${siblings.indexOf(period) + 1}` : definitionLabel; return <section data-testid="forecast-period-column" key={period.id} className="min-w-0 bg-background"><StickySurface data-testid="forecast-period-header" stickyTop="0px" layer="panel" className="flex min-h-10 items-center justify-between gap-2 border-t-[3px] border-navy px-1.5 py-1 shadow-sm"><span className="flex min-w-0 items-center gap-2"><strong className="min-w-0 text-sm leading-tight">{label}</strong><span data-testid="forecast-period-years" className="shrink-0 whitespace-nowrap text-[10px] tabular-nums text-muted-foreground">{period.startYear}–{period.endYear}</span></span>{segmentIndex > 0 && segments[segmentIndex - 1].definitionId === period.definitionId && <Button variant="ghost" size="sm" className="h-6 shrink-0 px-1.5 text-[9px]" aria-label={`${period.startYear}年の期間分割を解除`} onClick={() => mergeForecastPeriod(period.id)}>解除</Button>}</StickySurface>{settings.map((series) => <SettingRow key={series.id} series={series} periodId={period.id} periodLabel={label} unit={unit} variationOpen={variationOpen} readOnly={scope === 'company'} />)}</section>; })}</div>
+        <div data-testid="forecast-period-grid" className="grid min-w-0 gap-2" style={{ gridTemplateColumns: `repeat(${segments.length}, minmax(${settingsPeriodMinWidth(segments.length, variationOpen)}, 1fr))` }}>{segments.map((period, segmentIndex) => { const definitionLabel = program.definitions.periods.find((definition) => definition.id === period.definitionId)?.label ?? period.definitionId; const siblings = segments.filter((candidate) => candidate.definitionId === period.definitionId); const label = siblings.length > 1 ? `${definitionLabel}${siblings.indexOf(period) + 1}` : definitionLabel; return <section data-testid="forecast-period-column" key={period.id} className="min-w-0 bg-background"><StickySurface data-testid="forecast-period-header" stickyTop="0px" layer="panel" className="flex min-h-10 items-center justify-between gap-2 border-t-[3px] border-navy px-1.5 py-1 shadow-sm"><span className="flex min-w-0 items-center gap-2"><strong className="min-w-0 text-sm leading-tight">{label}</strong><span data-testid="forecast-period-years" className="shrink-0 whitespace-nowrap text-[10px] tabular-nums text-muted-foreground">{period.startYear}–{period.endYear}</span></span>{segmentIndex > 0 && segments[segmentIndex - 1].definitionId === period.definitionId && <Button variant="ghost" size="sm" className="h-6 shrink-0 px-1.5 text-[9px]" aria-label={`${period.startYear}年の期間分割を解除`} onClick={() => mergeForecastPeriod(period.id)}>解除</Button>}</StickySurface>{visibleSettings.map((series) => <SettingRow key={series.id} series={series} periodId={period.id} periodLabel={label} unit={unit} variationOpen={variationOpen} readOnly={scope === 'company'} />)}</section>; })}</div>
       </StickyPanel>}
       <section className="min-w-0 border border-line bg-surface p-3">
           <TabsContent value="chart" className="mt-0">

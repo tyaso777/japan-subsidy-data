@@ -650,6 +650,21 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByLabelText('補助事業期間 原価率 水準')).toBeDisabled();
   });
 
+  it('固定項目をまとめて隠し、変動可能な水準だけに絞り込める', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    expect(screen.getByLabelText('補助事業期間 原価率 年間変化')).toBeVisible();
+    expect(screen.getByLabelText('補助事業期間 売上高 年間変化')).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: '固定項目を隠す' }));
+
+    expect(screen.queryByLabelText('補助事業期間 原価率 年間変化')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('補助事業期間 売上高 年間変化')).toBeVisible();
+    expect(screen.getByRole('button', { name: '固定項目を表示' })).toBeVisible();
+  });
+
   it('補足比率も初期状態はMin=Max=0で固定し、範囲を入力するとスライダーを使える', async () => {
     const user = userEvent.setup();
     render(<App />);
