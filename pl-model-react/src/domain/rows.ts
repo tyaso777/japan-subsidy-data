@@ -3,12 +3,14 @@ import type { ValueKind } from './value-units';
 
 export type FinancialRow<T> = {
   code: string;
+  /** 制度定義から生成された行を、表示用A番号に依存せず識別する。 */
+  definitionId?: string;
   label: string;
   field?: keyof T;
   indent?: 1 | 2;
   valueKind?: ValueKind;
   calculated?: boolean;
-  /** P/L本表を補う水準・比率。S番号で表示し、本表とは独立して表示切替する。 */
+  /** P/L本表を補う水準・比率。既定補足はS番号、制度追加はA番号で表示切替する。 */
   supplementary?: boolean;
   value?: (record: T, index: number, records: T[]) => number | null;
 };
@@ -118,27 +120,47 @@ export function buildProgramPlRows(baseRows: FinancialRow<HistoricalPlCalculated
   const rows = baseRows.filter((row) => !configuredLabels.has(row.label));
   const displayed = definitions
     .map((definition, index) => ({ definition, index }))
-    .filter(({ definition }) => definition.plDisplay?.enabled)
-    .sort((left, right) => left.definition.plDisplay!.order - right.definition.plDisplay!.order || left.index - right.index);
+    .filter(({ definition }) => definition.plDisplay?.enabled);
 
-  for (const { definition } of displayed) {
-    const display = definition.plDisplay!;
-    const row: FinancialRow<HistoricalPlCalculated> = {
-      code: display.code,
-      label: definition.label,
-      valueKind: display.valueKind,
-      indent: display.indent === 0 ? undefined : display.indent,
-      calculated: true,
-      supplementary: true,
-      value: (record) => record.programValues?.[definition.id] ?? null,
-    };
-    const insertionIndex = rows.findIndex((candidate) => {
-      const order = numericRowOrder(candidate.code);
-      return order !== null && order > display.order;
-    });
-    rows.splice(insertionIndex < 0 ? rows.length : insertionIndex, 0, row);
+  const additionsByIndex = new Map<number, typeof displayed>();
+  for (const item of displayed) {
+    const anchor = item.definition.plDisplay!.insertAfter;
+    let anchorIndex = rows.findIndex((row) => row.code === anchor);
+    if (anchorIndex < 0) {
+      const targetOrder = numericRowOrder(anchor);
+      const nextIndex = targetOrder === null ? -1 : rows.findIndex((row) => {
+        const order = numericRowOrder(row.code);
+        return order !== null && order > targetOrder;
+      });
+      anchorIndex = nextIndex < 0 ? rows.length - 1 : nextIndex - 1;
+    }
+    const group = additionsByIndex.get(anchorIndex) ?? [];
+    group.push(item);
+    additionsByIndex.set(anchorIndex, group);
   }
-  return rows;
+
+  const result: FinancialRow<HistoricalPlCalculated>[] = [];
+  let additionalNumber = 0;
+  rows.forEach((row, rowIndex) => {
+    result.push(row);
+    const group = (additionsByIndex.get(rowIndex) ?? []).sort((left, right) =>
+      left.definition.plDisplay!.insertOrder - right.definition.plDisplay!.insertOrder || left.index - right.index);
+    for (const { definition } of group) {
+      const display = definition.plDisplay!;
+      additionalNumber += 1;
+      result.push({
+        code: `A-${additionalNumber}`,
+        definitionId: definition.id,
+        label: definition.label,
+        valueKind: display.valueKind,
+        indent: display.indent === 0 ? undefined : display.indent,
+        calculated: true,
+        supplementary: true,
+        value: (record) => record.programValues?.[definition.id] ?? null,
+      });
+    }
+  });
+  return result;
 }
 
 export type HistoricalPlEditableField = keyof HistoricalPlInput;

@@ -8,15 +8,15 @@ const anchorSchema = z.object({
 
 export const defaultCommonNumericDefinitions = [
   { id: '人件費', label: '人件費', formula: '[従業員給与総額][t]', outputPoint: 't' },
-  { id: '付加価値額', label: '付加価値額', formula: '[営業利益][t] + [人件費][t] + [減価償却費][t]', outputPoint: 't', plDisplay: { enabled: true, code: '24', order: 24, valueKind: 'money' } },
-  { id: '労働生産性', label: '労働生産性', formula: '[付加価値額][t] / [従業員数（就業時間換算）][t]', outputPoint: 't', plDisplay: { enabled: true, code: '33', order: 33, valueKind: 'moneyPerPerson' } },
-  { id: 'EBITDA', label: 'EBITDA', formula: '[営業利益][t] + [減価償却費][t]', outputPoint: 't', plDisplay: { enabled: true, code: '34', order: 34, valueKind: 'money' } },
+  { id: '付加価値額', label: '付加価値額', formula: '[営業利益][t] + [人件費][t] + [減価償却費][t]', outputPoint: 't', plDisplay: { enabled: true, insertAfter: '23', insertOrder: 1, valueKind: 'money' } },
+  { id: '労働生産性', label: '労働生産性', formula: '[付加価値額][t] / [従業員数（就業時間換算）][t]', outputPoint: 't', plDisplay: { enabled: true, insertAfter: '32', insertOrder: 1, valueKind: 'moneyPerPerson' } },
+  { id: 'EBITDA', label: 'EBITDA', formula: '[営業利益][t] + [減価償却費][t]', outputPoint: 't', plDisplay: { enabled: true, insertAfter: '32', insertOrder: 2, valueKind: 'money' } },
 ] as const;
 
 const commonNumericDefinitionSchema = z.object({
   id: z.string(), label: z.string(), formula: z.string(), outputPoint: z.string(),
   plDisplay: z.object({
-    enabled: z.boolean(), code: z.string(), order: z.number(),
+    enabled: z.boolean(), insertAfter: z.string(), insertOrder: z.number().int().min(1),
     valueKind: z.enum(['money', 'percent', 'point', 'fte', 'count', 'moneyPerPerson', 'multiple', 'index']),
     indent: z.union([z.literal(0), z.literal(1), z.literal(2)]).optional(),
   }).optional(),

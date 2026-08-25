@@ -27,9 +27,10 @@ export type CommonNumericDefinition = {
   outputPoint: string;
   plDisplay?: {
     enabled: boolean;
-    code: string;
-    /** P/L本表の科目番号に対応する表示順。小さいほど上へ表示する。 */
-    order: number;
+    /** この基準科目の直後へ挿入する。画面上のA番号とは分離した安定した位置指定。 */
+    insertAfter: string;
+    /** 同じ基準科目の後へ複数追加するときの順番。 */
+    insertOrder: number;
     valueKind: ValueKind;
     indent?: 0 | 1 | 2;
   };

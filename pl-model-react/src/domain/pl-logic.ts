@@ -52,9 +52,12 @@ const logicByCode: Record<string, Omit<PlLogicNode, 'code' | 'label'>> = {
 export function buildPlLogicNodes(definitions: CommonNumericDefinition[]): PlLogicNode[] {
   const rows = buildProgramPlRows(forecastPlRows, definitions);
   const codeByLabel = new Map(rows.map((row) => [row.label, row.code]));
-  const displayedDefinitionByCode = new Map(definitions.filter((definition) => definition.plDisplay?.enabled).map((definition) => [definition.plDisplay!.code, definition]));
+  const baseLabelByCode = new Map(forecastPlRows.map((row) => [row.code, row.label]));
+  const currentCodes = new Set(rows.map((row) => row.code));
+  const resolveCurrentCode = (code: string) => currentCodes.has(code) ? code : codeByLabel.get(baseLabelByCode.get(code) ?? '') ?? code;
+  const definitionById = new Map(definitions.map((definition) => [definition.id, definition]));
   return rows.map((row) => {
-    const definition = displayedDefinitionByCode.get(row.code);
+    const definition = row.definitionId ? definitionById.get(row.definitionId) : undefined;
     if (definition) return {
       code: row.code,
       label: row.label,
@@ -62,7 +65,8 @@ export function buildPlLogicNodes(definitions: CommonNumericDefinition[]): PlLog
       dependsOn: extractFormulaReferences(definition.formula).flatMap((label) => codeByLabel.get(label) ?? []),
       settings: [],
     };
-    return { code: row.code, label: row.label, ...(logicByCode[row.code] ?? { formula: '入力値', dependsOn: [], settings: [] }) };
+    const logic = logicByCode[row.code] ?? { formula: '入力値', dependsOn: [], settings: [] };
+    return { code: row.code, label: row.label, ...logic, dependsOn: logic.dependsOn.map(resolveCurrentCode) };
   });
 }
 

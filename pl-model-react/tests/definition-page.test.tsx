@@ -19,19 +19,21 @@ describe('制度定義画面', () => {
     expect(screen.getByLabelText('特別年3 調整年数')).toHaveValue(0);
   });
 
-  it('共通数値定義ごとにPL表示・科目番号・表示順・単位を設定できる', async () => {
+  it('共通数値定義ごとにPL表示・挿入位置・同位置順・単位を設定できる', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '01 制度定義' }));
 
     expect(screen.getByLabelText('付加価値額をPL表に表示')).toBeChecked();
-    expect(screen.getByLabelText('付加価値額 PL科目番号')).toHaveValue('24');
-    expect(screen.getByLabelText('付加価値額 PL表示順')).toHaveValue(24);
+    expect(screen.getByLabelText('付加価値額 挿入位置')).toHaveValue('23');
+    expect(screen.getByLabelText('付加価値額 同位置での順番')).toHaveValue(1);
+    expect(screen.queryByLabelText('付加価値額 PL科目番号')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('付加価値額 PL表示順')).not.toBeInTheDocument();
     expect(screen.getByLabelText('付加価値額 PL表示単位')).toHaveValue('money');
-    expect(screen.getAllByText(/16.5は16と17の間/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/追加科目番号はPL全体の表示順でA-1、A-2/).length).toBeGreaterThan(0);
 
     await user.click(screen.getByLabelText('付加価値額をPL表に表示'));
-    expect(screen.queryByLabelText('付加価値額 PL表示順')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('付加価値額 挿入位置')).not.toBeInTheDocument();
   });
 
   it('共通数値定義の式変更を03のPL表へそのまま反映する', async () => {
