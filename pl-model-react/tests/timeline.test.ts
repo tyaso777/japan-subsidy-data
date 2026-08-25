@@ -22,12 +22,31 @@ describe('制度期間', () => {
     expect(resolved.specialYears.find((year) => year.id === 'base')?.year).toBe(2028);
   });
 
-  it('補助金審査で使う成長・給与・最新期固定指標を既定搭載する', () => {
-    expect(createDefaultProgram().definitions.managementMetrics.map((metric) => metric.id)).toEqual([
+  it('2次公募の採択者中央値14指標を既定目標として搭載する', () => {
+    const metrics = createDefaultProgram().definitions.managementMetrics;
+    expect(metrics.map((metric) => metric.id)).toEqual([
       'company-sales-growth', 'company-value-added-growth', 'company-productivity-growth',
-      'latest-ebitda-margin', 'latest-sales-investment-ratio', 'latest-equity-ratio', 'latest-roa',
-      'employee-pay-growth', 'employee-payroll-growth',
+      'latest-sales-investment-ratio', 'latest-sales', 'total-subsidy-project-cost',
+      'latest-ebitda-margin', 'employee-pay-growth', 'employee-payroll-growth',
+      'latest-employee-pay-per-person', 'current-wage-growth', 'latest-equity-ratio',
+      'local-benchmark-score', 'latest-roa',
     ]);
+    expect(Object.fromEntries(metrics.map((metric) => [metric.id, metric.target]))).toEqual({
+      'company-sales-growth': 30.5,
+      'company-value-added-growth': 35,
+      'company-productivity-growth': 23.7,
+      'latest-sales-investment-ratio': 54.7,
+      'latest-sales': 20.5,
+      'total-subsidy-project-cost': 11.3,
+      'latest-ebitda-margin': 9.4,
+      'employee-pay-growth': 6.5,
+      'employee-payroll-growth': 17.4,
+      'latest-employee-pay-per-person': 436.9,
+      'current-wage-growth': 3,
+      'latest-equity-ratio': 43.8,
+      'local-benchmark-score': 22.3,
+      'latest-roa': 5.1,
+    });
   });
 
   it('循環参照を含む制度定義は読み込まず安全な既定値へ戻す', () => {

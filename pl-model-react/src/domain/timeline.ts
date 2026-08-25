@@ -1,4 +1,5 @@
 import { defaultCommonNumericDefinitions, programConfigurationSchema } from './program-schema';
+import { createDefaultManagementMetrics } from './default-management-metrics';
 import type { ProgramConfiguration } from './types';
 
 export type TimelineYearLabel = { primary: string; secondary?: string };
@@ -18,17 +19,7 @@ export function createDefaultProgram(): ProgramConfiguration {
         { id: 'base', label: '基準年', anchor: { type: 'periodEnd', periodId: 'subsidy' }, offset: 0 },
       ],
       commonNumericDefinitions: defaultCommonNumericDefinitions.map((definition) => ({ ...definition })),
-      managementMetrics: [
-        { id: 'company-sales-growth', label: '全社売上高成長率', enabled: true, scope: 'company', timePoints: [{ id: 'A', anchor: { type: 'specialYear', specialYearId: 'base' }, offset: 0 }, { id: 'B', anchor: { type: 'periodEnd', periodId: 'report' }, offset: 0 }], formula: '(([売上高][B] / [売上高][A]) ^ (1 / YEARS(A, B)) - 1) * 100', outputUnit: '% / 年', target: 30.5, targetPolicy: 'reference', direction: 'min', optimization: 'adjustable' },
-        { id: 'company-value-added-growth', label: '全社付加価値増加率', enabled: true, scope: 'company', timePoints: [{ id: 'A', anchor: { type: 'specialYear', specialYearId: 'base' }, offset: 0 }, { id: 'B', anchor: { type: 'periodEnd', periodId: 'report' }, offset: 0 }], formula: '(([付加価値額][B] / [付加価値額][A]) ^ (1 / YEARS(A, B)) - 1) * 100', outputUnit: '% / 年', target: 34.9, targetPolicy: 'reference', direction: 'min', optimization: 'adjustable' },
-        { id: 'company-productivity-growth', label: '労働生産性成長率', enabled: true, scope: 'company', timePoints: [{ id: 'A', anchor: { type: 'specialYear', specialYearId: 'base' }, offset: 0 }, { id: 'B', anchor: { type: 'periodEnd', periodId: 'report' }, offset: 0 }], formula: '(([労働生産性][B] / [労働生産性][A]) ^ (1 / YEARS(A, B)) - 1) * 100', outputUnit: '% / 年', target: 23.6, targetPolicy: 'reference', direction: 'min', optimization: 'adjustable' },
-        { id: 'latest-ebitda-margin', label: '最新決算期 EBITDAマージン', enabled: true, scope: 'company', timePoints: [{ id: 'A', anchor: { type: 'historicalEnd' }, offset: 0 }], formula: '[EBITDA][A] / [売上高][A] * 100', outputUnit: '%', target: 9.5, targetPolicy: 'reference', direction: 'min', optimization: 'fixed' },
-        { id: 'latest-sales-investment-ratio', label: '最新決算期 売上高投資比率', enabled: true, scope: 'company', timePoints: [{ id: 'A', anchor: { type: 'historicalEnd' }, offset: 0 }], formula: '0', outputUnit: '%', target: 54.6, targetPolicy: 'reference', direction: 'min', optimization: 'fixed', requiresActualInput: true },
-        { id: 'latest-equity-ratio', label: '最新決算期 自己資本比率', enabled: true, scope: 'company', timePoints: [{ id: 'A', anchor: { type: 'historicalEnd' }, offset: 0 }], formula: '0', outputUnit: '%', target: 43.8, targetPolicy: 'reference', direction: 'min', optimization: 'fixed', requiresActualInput: true },
-        { id: 'latest-roa', label: '最新決算期 ROA', enabled: true, scope: 'company', timePoints: [{ id: 'A', anchor: { type: 'historicalEnd' }, offset: 0 }], formula: '0', outputUnit: '%', target: 5.1, targetPolicy: 'reference', direction: 'min', optimization: 'fixed', requiresActualInput: true },
-        { id: 'employee-pay-growth', label: '従業員1人当たり給与成長率', enabled: true, scope: 'company', timePoints: [{ id: 'A', anchor: { type: 'specialYear', specialYearId: 'base' }, offset: 0 }, { id: 'B', anchor: { type: 'periodEnd', periodId: 'report' }, offset: 0 }], formula: '(([従業員1人当たり給与支給総額][B] / [従業員1人当たり給与支給総額][A]) ^ (1 / YEARS(A, B)) - 1) * 100', outputUnit: '% / 年', target: 6.5, targetPolicy: 'reference', direction: 'min', optimization: 'adjustable' },
-        { id: 'employee-payroll-growth', label: '従業員給与総額成長率', enabled: true, scope: 'company', timePoints: [{ id: 'A', anchor: { type: 'specialYear', specialYearId: 'base' }, offset: 0 }, { id: 'B', anchor: { type: 'periodEnd', periodId: 'report' }, offset: 0 }], formula: '(([従業員給与総額][B] / [従業員給与総額][A]) ^ (1 / YEARS(A, B)) - 1) * 100', outputUnit: '% / 年', target: 17.4, targetPolicy: 'reference', direction: 'min', optimization: 'adjustable' },
-      ],
+      managementMetrics: createDefaultManagementMetrics(),
     },
     timeline: {
       historical: { startYear: 2023, endYear: 2025 },

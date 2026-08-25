@@ -73,4 +73,22 @@ describe('制度共通の経営指標定義', () => {
     expect(evaluateManagementMetric(definition, program, { records: new Map() }).status).toBe('missing-actual');
     expect(evaluateManagementMetric(definition, program, { records: new Map(), actualInputs: { [definition.id]: 12.5 } }).value).toBe(12.5);
   });
+
+  it('最新期の金額中央値を億円・万円へ換算して評価する', () => {
+    const program = createDefaultProgram();
+    const records = new Map(calculatePlSeries(baseHistoricalPl).map((record, index) => [2023 + index, record]));
+    const latestSales = program.definitions.managementMetrics.find((candidate) => candidate.id === 'latest-sales')!;
+    const latestPay = program.definitions.managementMetrics.find((candidate) => candidate.id === 'latest-employee-pay-per-person')!;
+
+    expect(evaluateManagementMetric(latestSales, program, { records }).value).toBeCloseTo(records.get(2025)!.sales / 100_000_000);
+    expect(evaluateManagementMetric(latestPay, program, { records }).value).toBeCloseTo(records.get(2025)!.employeePayPerPerson / 10_000);
+  });
+
+  it('足下の賃上げを最新決算期から基準年までのCAGRとして定義する', () => {
+    const program = createDefaultProgram();
+    const definition = program.definitions.managementMetrics.find((candidate) => candidate.id === 'current-wage-growth')!;
+    expect(resolveMetricTimePoints(definition, program)).toEqual({ A: 2025, B: 2028 });
+    expect(definition.formula).toContain('YEARS(A, B)');
+    expect(definition.optimization).toBe('adjustable');
+  });
 });

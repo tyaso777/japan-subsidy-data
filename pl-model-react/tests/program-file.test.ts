@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { parseProgramScript, serializeProgramScript } from '../src/domain/program-file';
 import { createDefaultProgram } from '../src/domain/timeline';
 
@@ -18,6 +20,12 @@ describe('制度定義ファイル', () => {
   it('同梱ファイルで使う静的JSオブジェクト記法も実行せず読み込む', () => {
     const json = serializeProgramScript(createDefaultProgram()).replace(/"([A-Za-z][A-Za-z0-9]*)":/g, '$1:').replace(/"([^"\\]*)"/g, "'$1'");
     expect(parseProgramScript(json).program.id).toBe('generic-growth-subsidy');
+  });
+
+  it('同梱の制度定義JSと内蔵既定値で経営指標が一致する', () => {
+    const source = readFileSync(resolve(process.cwd(), 'public/subsidy-program.js'), 'utf8');
+    const bundled = parseProgramScript(source);
+    expect(bundled.definitions.managementMetrics).toEqual(createDefaultProgram().definitions.managementMetrics);
   });
 
   it('0区間・重複ID・存在しない区間や特別年への参照を拒否する', () => {

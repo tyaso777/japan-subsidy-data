@@ -100,7 +100,7 @@ describe('制度定義画面', () => {
     render(<App />);
     await user.click(screen.getByRole('button', { name: '01 制度定義' }));
     expect(screen.getByTestId('metric-latest-roa')).toBeVisible();
-    await user.click(screen.getByRole('button', { name: '最新決算期 ROAを削除' }));
+    await user.click(screen.getByRole('button', { name: '最新決算期のROAを削除' }));
     expect(screen.queryByTestId('metric-latest-roa')).not.toBeInTheDocument();
   });
 
