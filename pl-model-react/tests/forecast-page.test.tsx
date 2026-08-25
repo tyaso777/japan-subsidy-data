@@ -502,6 +502,7 @@ describe('将来予測・PL画面', () => {
     expect(screen.queryByTestId('metric-bullet-bar-latest-sales-investment-ratio')).not.toBeInTheDocument();
     expect(screen.queryByTestId('metric-bullet-bar-latest-equity-ratio')).not.toBeInTheDocument();
     expect(screen.queryByTestId('metric-bullet-bar-latest-roa')).not.toBeInTheDocument();
+    expect(screen.getByTestId('metric-bullet-local-benchmark-score')).toHaveTextContent('計算不可');
     expect(screen.queryByLabelText('全社売上高成長率 個社目標')).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'すべて編集' }));
     const companyTarget = screen.getByLabelText('全社売上高成長率 個社目標');
@@ -518,6 +519,7 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByTestId('metric-bullet-company-sales-growth')).toHaveTextContent('制度≥ 30.5');
     expect((screen.getByLabelText('全社売上高成長率 計算式') as HTMLTextAreaElement).value).toContain('YEARS');
     expect(screen.getByLabelText('全社売上高成長率 対象範囲')).toHaveValue('company');
+    expect(screen.queryByLabelText('ローカルベンチマークの得点 実績値')).not.toBeInTheDocument();
   });
 
   it('PL表で選択した科目をコンパクトな導線から04ロジックマップで確認する', async () => {

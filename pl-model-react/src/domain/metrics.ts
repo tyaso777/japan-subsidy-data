@@ -77,7 +77,7 @@ export type MetricDataSource = {
 export type MetricEvaluation = {
   value?: number;
   years: Record<string, number>;
-  status: 'ok' | 'missing-record' | 'missing-actual' | 'error';
+  status: 'ok' | 'missing-record' | 'missing-actual' | 'unavailable' | 'error';
   message?: string;
 };
 
@@ -107,6 +107,7 @@ function pointValues(year: number, source: MetricDataSource): Record<string, Rec
 
 export function evaluateManagementMetric(metric: ManagementMetricDefinition, program: ProgramConfiguration, source: MetricDataSource): MetricEvaluation {
   const years = resolveMetricTimePoints(metric, program);
+  if (metric.calculationUnavailable) return { years, status: 'unavailable', message: 'PL・B/Sから計算できない指標です' };
   if (metric.requiresActualInput) {
     const actual = source.actualInputs?.[metric.id];
     return Number.isFinite(actual) ? { value: actual, years, status: 'ok' } : { years, status: 'missing-actual' };

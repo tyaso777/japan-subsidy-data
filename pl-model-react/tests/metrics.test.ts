@@ -91,4 +91,12 @@ describe('制度共通の経営指標定義', () => {
     expect(definition.formula).toContain('YEARS(A, B)');
     expect(definition.optimization).toBe('adjustable');
   });
+
+  it('PL・B/S外のローカルベンチマークは実績入力を求めず計算不可とする', () => {
+    const program = createDefaultProgram();
+    const definition = program.definitions.managementMetrics.find((candidate) => candidate.id === 'local-benchmark-score')!;
+    expect(definition.requiresActualInput).not.toBe(true);
+    expect(definition.calculationUnavailable).toBe(true);
+    expect(evaluateManagementMetric(definition, program, { records: new Map(), actualInputs: { [definition.id]: 25 } }).status).toBe('unavailable');
+  });
 });

@@ -30,6 +30,26 @@ const fixedActual = (
   requiresActualInput: true,
 });
 
+const unavailable = (
+  id: string,
+  label: string,
+  outputUnit: string,
+  target: number,
+): ManagementMetricDefinition => ({
+  id,
+  label,
+  enabled: true,
+  scope: 'company',
+  timePoints: [historicalEnd],
+  formula: '0',
+  outputUnit,
+  target,
+  targetPolicy: 'reference',
+  direction: 'min',
+  optimization: 'fixed',
+  calculationUnavailable: true,
+});
+
 export function createDefaultManagementMetrics(): ManagementMetricDefinition[] {
   const metrics: ManagementMetricDefinition[] = [
     { id: 'company-sales-growth', label: '全社売上高成長率', enabled: true, scope: 'company', timePoints: baseToReport, formula: '(([売上高][B] / [売上高][A]) ^ (1 / YEARS(A, B)) - 1) * 100', outputUnit: '% / 年', target: 30.5, targetPolicy: 'reference', direction: 'min', optimization: 'adjustable' },
@@ -44,7 +64,7 @@ export function createDefaultManagementMetrics(): ManagementMetricDefinition[] {
     { id: 'latest-employee-pay-per-person', label: '最新決算期の従業員の1人当たり給与支給総額', enabled: true, scope: 'company', timePoints: [historicalEnd], formula: '[従業員1人当たり給与支給総額][A] / 10000', outputUnit: '万円', target: 436.9, targetPolicy: 'reference', direction: 'min', optimization: 'fixed' },
     { id: 'current-wage-growth', label: '足下の賃上げ', enabled: true, scope: 'company', timePoints: latestToBase, formula: '(([従業員1人当たり給与支給総額][B] / [従業員1人当たり給与支給総額][A]) ^ (1 / YEARS(A, B)) - 1) * 100', outputUnit: '% / 年', target: 3, targetPolicy: 'reference', direction: 'min', optimization: 'adjustable' },
     fixedActual('latest-equity-ratio', '最新決算期の自己資本比率', '%', 43.8),
-    fixedActual('local-benchmark-score', 'ローカルベンチマークの得点', '点', 22.3),
+    unavailable('local-benchmark-score', 'ローカルベンチマークの得点', '点', 22.3),
     fixedActual('latest-roa', '最新決算期のROA', '%', 5.1),
   ];
   return metrics.map((metric) => structuredClone(metric));

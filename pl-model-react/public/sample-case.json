@@ -387,7 +387,7 @@
             "target": 22.3,
             "direction": "min",
             "optimization": "fixed",
-            "requiresActualInput": true
+            "calculationUnavailable": true
           },
           {
             "id": "latest-roa",

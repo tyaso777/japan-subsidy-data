@@ -48,6 +48,7 @@ export type ManagementMetricDefinition = {
   direction: 'min' | 'max';
   optimization: 'adjustable' | 'fixed';
   requiresActualInput?: boolean;
+  calculationUnavailable?: boolean;
 };
 
 export type ProgramConfiguration = {
