@@ -204,3 +204,13 @@ test('全社合算は編集タブから外しPL表の閲覧対象として残す
   await expect(page.getByRole('heading', { name: '全社合算 P/L' })).toBeVisible();
   await expect(page.getByLabel('補助事業期間 売上高 年間変化')).toBeEnabled();
 });
+
+test('03画面で水準範囲の未適正化を確認してその場で適正化できる', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('app-toolbar').getByRole('button', { name: '03 将来予測・PL' }).click();
+
+  const settings = page.getByTestId('forecast-settings-panel');
+  await expect(settings.getByRole('alert')).toContainText('水準範囲は未適正化です');
+  await page.getByRole('button', { name: '過去実績から水準範囲を適正化' }).click();
+  await expect(settings.getByText('過去実績に適正化済み')).toBeVisible();
+});

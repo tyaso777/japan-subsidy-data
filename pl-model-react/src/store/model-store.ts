@@ -15,6 +15,7 @@ import type { MoneyDisplayUnit } from '../domain/value-units';
 import { calculatePl } from '../domain/financials';
 import { defaultForecastRange, normalizeForecastRanges } from '../domain/forecast-range';
 import { optimizeForecastRangesFromActuals, type HistoricalRangeOptimizationResult } from '../domain/historical-range-optimization';
+import { forecastRangeCalibrationFingerprint, type ForecastRangeCalibration } from '../domain/forecast-range-calibration';
 
 export type BusinessScope = 'base' | 'subsidy';
 export type ModelSnapshot = {
@@ -26,7 +27,7 @@ export type ModelSnapshot = {
     metricInputs: Record<string, number>;
   };
   forecast: ForecastModel;
-  caseSettings: { metricTargets: Record<string, number> };
+  caseSettings: { metricTargets: Record<string, number>; forecastRangeCalibration?: ForecastRangeCalibration };
 };
 
 type ModelPreferences = { moneyUnit: MoneyDisplayUnit };
@@ -229,7 +230,14 @@ export function createModelStore(program?: unknown, options?: { initialActuals?:
       optimizeForecastRangesFromActuals: () => {
         const snapshot = currentSnapshot();
         const result = optimizeForecastRangesFromActuals(snapshot.forecast, snapshot.program, snapshot.actuals.basePl, snapshot.actuals.subsidyPl);
-        applyMutation((current) => ({ ...current, forecast: result.forecast }));
+        applyMutation((current) => ({
+          ...current,
+          forecast: result.forecast,
+          caseSettings: {
+            ...current.caseSettings,
+            forecastRangeCalibration: { sourceFingerprint: forecastRangeCalibrationFingerprint(snapshot) },
+          },
+        }));
         return result;
       },
       updateForecastPeriod: (seriesId, periodId, patch) => applyMutation((snapshot) => ({

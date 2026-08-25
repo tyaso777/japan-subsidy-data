@@ -37,7 +37,10 @@ const snapshotSchema = z.object({
       finalYear: z.number().int(), baseSharePercent: z.number().min(0).max(100),
     }).optional(),
   }),
-  caseSettings: z.object({ metricTargets: z.record(z.string(), z.number()).default({}) }).default({ metricTargets: {} }),
+  caseSettings: z.object({
+    metricTargets: z.record(z.string(), z.number()).default({}),
+    forecastRangeCalibration: z.object({ sourceFingerprint: z.string() }).optional(),
+  }).default({ metricTargets: {} }),
 });
 
 const modelFileSchema = z.object({ fileVersion: z.literal('1'), model: snapshotSchema });

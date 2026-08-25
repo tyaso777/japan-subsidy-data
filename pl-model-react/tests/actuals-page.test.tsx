@@ -247,6 +247,7 @@ describe('期間・過去実績', () => {
 
     await user.click(screen.getByRole('button', { name: '過去実績から水準範囲を適正化' }));
     expect(screen.getByText(/水準範囲を更新しました/)).toBeVisible();
+    expect(screen.getByText('過去実績に適正化済み')).toBeVisible();
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
 
     expect(screen.getByLabelText('補助事業期間 売上高 最小値')).not.toHaveValue(-10);

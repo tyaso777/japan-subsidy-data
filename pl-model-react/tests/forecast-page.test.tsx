@@ -4,6 +4,31 @@ import { describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
 
 describe('将来予測・PL画面', () => {
+  it('水準範囲の未適正化を警告し、03画面から適正化できる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    expect(screen.getByRole('alert')).toHaveTextContent('水準範囲は未適正化です');
+    const optimize = screen.getByRole('button', { name: '過去実績から水準範囲を適正化' });
+    expect(optimize).toBeVisible();
+    await user.click(optimize);
+    expect(screen.getByText('過去実績に適正化済み')).toBeVisible();
+  });
+
+  it('適正化後に過去P/Lを変更すると再適正化の警告を出す', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '過去実績から水準範囲を適正化' }));
+    const sales = screen.getByLabelText('ベース事業 P/L 2025年 売上高');
+    await user.clear(sales);
+    await user.type(sales, '1100');
+    await user.tab();
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    expect(screen.getByRole('alert')).toHaveTextContent('過去実績の変更後、再適正化されていません');
+  });
+
   it('左右パネルを個別に隠して中央表示を拡張する', async () => {
     const user = userEvent.setup();
     render(<App />);
