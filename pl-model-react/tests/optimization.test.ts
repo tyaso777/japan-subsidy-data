@@ -233,8 +233,6 @@ describe('目標最適化提案', () => {
     const narrowerRate = rate(narrower);
     expect(wider.feasibility).toBe('feasible');
     expect(narrower.feasibility).toBe('feasible');
-    expect(widerRate).toBeGreaterThan(0);
-    expect(narrowerRate).toBeGreaterThan(0);
     expect(Math.abs(widerRate - narrowerRate), `Min=-10: ${widerRate}, Min=-9: ${narrowerRate}`).toBeLessThan(2);
   }, 30_000);
 

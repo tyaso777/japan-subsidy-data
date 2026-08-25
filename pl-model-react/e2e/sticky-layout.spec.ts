@@ -205,6 +205,24 @@ test('全社合算は編集タブから外しPL表の閲覧対象として残す
   await expect(page.getByLabel('補助事業期間 売上高 年間変化')).toBeEnabled();
 });
 
+test('PL表ヘッダーの事業切替と表示ボタンが重ならない', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('app-toolbar').getByRole('button', { name: '03 将来予測・PL' }).click();
+  await page.getByRole('tab', { name: 'PL表' }).click();
+  await page.getByTestId('forecast-pl-table').evaluate((element) => { (element as HTMLElement).style.width = '900px'; });
+
+  const scopes = page.getByLabel('P/L表示対象');
+  const controls = page.getByTestId('forecast-pl-table-header-controls');
+  const supplementary = page.getByTestId('forecast-pl-table').getByRole('button', { name: '補足指標を隠す' });
+  await expect(controls).toHaveCSS('flex-wrap', 'wrap');
+  await expect(scopes).toHaveCSS('flex-shrink', '0');
+  const scopeBox = await scopes.getByRole('button', { name: '補助事業' }).boundingBox();
+  const supplementaryBox = await supplementary.boundingBox();
+  expect(scopeBox).not.toBeNull();
+  expect(supplementaryBox).not.toBeNull();
+  expect(supplementaryBox!.x - (scopeBox!.x + scopeBox!.width)).toBeGreaterThanOrEqual(8);
+});
+
 test('03画面で水準範囲の未適正化を確認してその場で適正化できる', async ({ page }) => {
   await page.goto('/');
   await page.getByTestId('app-toolbar').getByRole('button', { name: '03 将来予測・PL' }).click();

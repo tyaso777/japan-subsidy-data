@@ -107,6 +107,14 @@ describe('制度共通の経営指標定義', () => {
     expect(formula).toBe('[付加価値額][t] / [従業員数（就業時間換算）][t]');
   });
 
+  it('2次公募の付加価値額は役員人件費を含めない', () => {
+    const program = createDefaultProgram();
+    const humanCost = program.definitions.commonNumericDefinitions.find((definition) => definition.id === '人件費')!.formula;
+    const valueAdded = program.definitions.commonNumericDefinitions.find((definition) => definition.id === '付加価値額')!.formula;
+    expect(humanCost).toBe('[従業員給与総額][t]');
+    expect(valueAdded).toBe('[営業利益][t] + [人件費][t] + [減価償却費][t]');
+  });
+
   it('売上高投資比率は補助事業全体経費を最新決算期の全社売上高で割る', () => {
     const program = createDefaultProgram();
     const records = new Map(calculatePlSeries(baseHistoricalPl).map((record, index) => [2023 + index, record]));
