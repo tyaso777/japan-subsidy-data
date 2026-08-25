@@ -14,7 +14,7 @@ describe('ロジックマップ画面', () => {
     expect(within(map).getByRole('heading', { name: '人件費' })).toBeVisible();
     expect(within(map).getByRole('heading', { name: '付加価値額' })).toBeVisible();
     expect(within(map).getByRole('heading', { name: '労働生産性' })).toBeVisible();
-    expect(within(map).getByText('[付加価値額][t] / ([従業員数（就業時間換算）][t] + [役員数][t])')).toBeVisible();
+    expect(within(map).getByText('[付加価値額][t] / [従業員数（就業時間換算）][t]')).toBeVisible();
     expect(within(map).getAllByText(/計算順/)).toHaveLength(4);
   });
 

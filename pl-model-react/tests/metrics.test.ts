@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createDefaultProgram, setPeriodEndYear } from '../src/domain/timeline';
 import { evaluateManagementMetric, inferMetricPeriodKind, resolveMetricTarget, resolveMetricTimePoints, validateMetricDefinition } from '../src/domain/metrics';
 import { calculatePlSeries } from '../src/domain/financials';
-import { baseHistoricalPl } from '../src/domain/sample-data';
+import { balanceSheets, baseHistoricalPl } from '../src/domain/sample-data';
 import type { ManagementMetricDefinition } from '../src/domain/types';
 
 const metric = (points: ManagementMetricDefinition['timePoints']): ManagementMetricDefinition => ({
@@ -90,6 +90,41 @@ describe('制度共通の経営指標定義', () => {
     expect(resolveMetricTimePoints(definition, program)).toEqual({ A: 2025, B: 2028 });
     expect(definition.formula).toContain('YEARS(A, B)');
     expect(definition.optimization).toBe('adjustable');
+  });
+
+  it('成長率指標は基準年と事業化報告3年目を比較する', () => {
+    const program = createDefaultProgram();
+    const definition = program.definitions.managementMetrics.find((candidate) => candidate.id === 'company-sales-growth')!;
+    expect(resolveMetricTimePoints(definition, program)).toEqual({ A: 2028, B: 2031 });
+
+    const extended = structuredClone(program);
+    extended.timeline.periods.find((period) => period.definitionId === 'report')!.endYear = 2034;
+    expect(resolveMetricTimePoints(definition, extended)).toEqual({ A: 2028, B: 2031 });
+  });
+
+  it('労働生産性は役員数を加えずFTE従業員数で割る', () => {
+    const formula = createDefaultProgram().definitions.commonNumericDefinitions.find((definition) => definition.id === '労働生産性')!.formula;
+    expect(formula).toBe('[付加価値額][t] / [従業員数（就業時間換算）][t]');
+  });
+
+  it('売上高投資比率は補助事業全体経費を最新決算期の全社売上高で割る', () => {
+    const program = createDefaultProgram();
+    const records = new Map(calculatePlSeries(baseHistoricalPl).map((record, index) => [2023 + index, record]));
+    const definition = program.definitions.managementMetrics.find((candidate) => candidate.id === 'latest-sales-investment-ratio')!;
+    const missing = evaluateManagementMetric(definition, program, { records });
+    const result = evaluateManagementMetric(definition, program, { records, actualInputs: { 'total-subsidy-project-cost': 11.3 } });
+    expect(missing.status).toBe('missing-actual');
+    expect(result.value).toBeCloseTo(11.3 * 100_000_000 / records.get(2025)!.sales * 100);
+  });
+
+  it('自己資本比率とROAは最新決算期のB/S・P/Lから計算する', () => {
+    const program = createDefaultProgram();
+    const records = new Map(calculatePlSeries(baseHistoricalPl).map((record, index) => [2023 + index, record]));
+    const bs = new Map(balanceSheets.map((record, index) => [2023 + index, record]));
+    const equity = program.definitions.managementMetrics.find((candidate) => candidate.id === 'latest-equity-ratio')!;
+    const roa = program.definitions.managementMetrics.find((candidate) => candidate.id === 'latest-roa')!;
+    expect(evaluateManagementMetric(equity, program, { records, balanceSheets: bs }).value).toBeCloseTo(balanceSheets[2].shareholderEquity / balanceSheets[2].assets * 100);
+    expect(evaluateManagementMetric(roa, program, { records, balanceSheets: bs }).value).toBeCloseTo(records.get(2025)!.netIncome / balanceSheets[2].assets * 100);
   });
 
   it('PL・B/S外のローカルベンチマークは実績入力を求めず計算不可とする', () => {

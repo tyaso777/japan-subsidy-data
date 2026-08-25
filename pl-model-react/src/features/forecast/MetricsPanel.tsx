@@ -28,11 +28,12 @@ function position(value: number, min: number, max: number) { return Math.max(0, 
 function MetricBullet({ metric, timeline, editing }: { metric: ManagementMetricDefinition; timeline: Timeline; editing: boolean }) {
   const program = useModelStore((state) => state.program);
   const metricInputs = useModelStore((state) => state.actuals.metricInputs);
+  const balanceSheets = useModelStore((state) => state.actuals.balanceSheets);
   const updateMetricActual = useModelStore((state) => state.updateMetricActual);
   const companyTargets = useModelStore((state) => state.caseSettings.metricTargets);
   const updateMetricTarget = useModelStore((state) => state.updateMetricTarget);
   const replaceProgram = useModelStore((state) => state.replaceProgram);
-  const source = useMemo(() => ({ records: new Map(timeline.years.map((year, index) => [year, timeline.records[index]])), actualInputs: metricInputs }), [metricInputs, timeline]);
+  const source = useMemo(() => ({ records: new Map(timeline.years.map((year, index) => [year, timeline.records[index]])), balanceSheets: new Map(balanceSheets.map((record, index) => [program.timeline.historical.startYear + index, record])), actualInputs: metricInputs }), [balanceSheets, metricInputs, program.timeline.historical.startYear, timeline]);
   const result = evaluateManagementMetric(metric, program, source);
   const current = result.value;
   const target = resolveMetricTarget(metric, companyTargets[metric.id]);

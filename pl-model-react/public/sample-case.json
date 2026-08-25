@@ -61,7 +61,7 @@
           {
             "id": "労働生産性",
             "label": "労働生産性",
-            "formula": "[付加価値額][t] / ([従業員数（就業時間換算）][t] + [役員数][t])",
+            "formula": "[付加価値額][t] / [従業員数（就業時間換算）][t]",
             "outputPoint": "t"
           },
           {
@@ -89,10 +89,10 @@
               {
                 "id": "B",
                 "anchor": {
-                  "type": "periodEnd",
+                  "type": "periodStart",
                   "periodId": "report"
                 },
-                "offset": 0
+                "offset": 2
               }
             ],
             "formula": "(([売上高][B] / [売上高][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
@@ -118,10 +118,10 @@
               {
                 "id": "B",
                 "anchor": {
-                  "type": "periodEnd",
+                  "type": "periodStart",
                   "periodId": "report"
                 },
-                "offset": 0
+                "offset": 2
               }
             ],
             "formula": "(([付加価値額][B] / [付加価値額][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
@@ -147,10 +147,10 @@
               {
                 "id": "B",
                 "anchor": {
-                  "type": "periodEnd",
+                  "type": "periodStart",
                   "periodId": "report"
                 },
-                "offset": 0
+                "offset": 2
               }
             ],
             "formula": "(([労働生産性][B] / [労働生産性][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
@@ -173,12 +173,11 @@
                 "offset": 0
               }
             ],
-            "formula": "0",
+            "formula": "[補助事業全体に要する経費（税抜）][A] * 100000000 / [売上高][A] * 100",
             "outputUnit": "%",
             "target": 54.7,
             "direction": "min",
-            "optimization": "fixed",
-            "requiresActualInput": true
+            "optimization": "fixed"
           },
           {
             "id": "latest-sales",
@@ -258,10 +257,10 @@
               {
                 "id": "B",
                 "anchor": {
-                  "type": "periodEnd",
+                  "type": "periodStart",
                   "periodId": "report"
                 },
-                "offset": 0
+                "offset": 2
               }
             ],
             "formula": "(([従業員1人当たり給与支給総額][B] / [従業員1人当たり給与支給総額][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
@@ -287,10 +286,10 @@
               {
                 "id": "B",
                 "anchor": {
-                  "type": "periodEnd",
+                  "type": "periodStart",
                   "periodId": "report"
                 },
-                "offset": 0
+                "offset": 2
               }
             ],
             "formula": "(([従業員給与総額][B] / [従業員給与総額][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
@@ -361,12 +360,11 @@
                 "offset": 0
               }
             ],
-            "formula": "0",
+            "formula": "[株主資本][A] / [資産総額][A] * 100",
             "outputUnit": "%",
             "target": 43.8,
             "direction": "min",
-            "optimization": "fixed",
-            "requiresActualInput": true
+            "optimization": "fixed"
           },
           {
             "id": "local-benchmark-score",
@@ -403,12 +401,11 @@
                 "offset": 0
               }
             ],
-            "formula": "0",
+            "formula": "[当期純利益][A] / [資産総額][A] * 100",
             "outputUnit": "%",
             "target": 5.1,
             "direction": "min",
-            "optimization": "fixed",
-            "requiresActualInput": true
+            "optimization": "fixed"
           }
         ]
       },

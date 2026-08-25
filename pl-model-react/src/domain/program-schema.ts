@@ -9,7 +9,7 @@ const anchorSchema = z.object({
 export const defaultCommonNumericDefinitions = [
   { id: '人件費', label: '人件費', formula: '[従業員給与総額][t] + [役員人件費][t]', outputPoint: 't' },
   { id: '付加価値額', label: '付加価値額', formula: '[営業利益][t] + [人件費][t] + [減価償却費][t]', outputPoint: 't' },
-  { id: '労働生産性', label: '労働生産性', formula: '[付加価値額][t] / ([従業員数（就業時間換算）][t] + [役員数][t])', outputPoint: 't' },
+  { id: '労働生産性', label: '労働生産性', formula: '[付加価値額][t] / [従業員数（就業時間換算）][t]', outputPoint: 't' },
   { id: 'EBITDA', label: 'EBITDA', formula: '[営業利益][t] + [減価償却費][t]', outputPoint: 't' },
 ] as const;
 

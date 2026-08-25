@@ -19,7 +19,7 @@ export function resolveMetricTarget(metric: ManagementMetricDefinition, companyT
       : individual;
   return { programTarget: metric.target, companyTarget: individual, effectiveTarget, source: 'company', policy };
 }
-import type { HistoricalPlCalculated } from './types';
+import type { BalanceSheetRecord, HistoricalPlCalculated } from './types';
 import { evaluateNumericDefinitions } from './definition-graph';
 import { evaluateFormula } from './formula-engine';
 
@@ -71,6 +71,7 @@ export function validateMetricDefinition(metric: ManagementMetricDefinition): Ma
 
 export type MetricDataSource = {
   records: Map<number, HistoricalPlCalculated>;
+  balanceSheets?: Map<number, BalanceSheetRecord>;
   actualInputs?: Record<string, number>;
 };
 
@@ -102,6 +103,11 @@ function pointValues(year: number, source: MetricDataSource): Record<string, Rec
     }
     result[label] = values;
   }
+  const balanceSheet = source.balanceSheets?.get(year);
+  if (balanceSheet) {
+    result['資産総額'] = { t: Number(balanceSheet.assets) };
+    result['株主資本'] = { t: Number(balanceSheet.shareholderEquity) };
+  }
   return result;
 }
 
@@ -114,6 +120,9 @@ export function evaluateManagementMetric(metric: ManagementMetricDefinition, pro
   }
   try {
     validateMetricDefinition(metric);
+    const referencedActuals = program.definitions.managementMetrics.filter((candidate) => candidate.requiresActualInput && metric.formula.includes(`[${candidate.label}]`));
+    const missingActual = referencedActuals.find((candidate) => !Number.isFinite(source.actualInputs?.[candidate.id]));
+    if (missingActual) return { years, status: 'missing-actual', message: `${missingActual.label}が未入力です` };
     const values: Record<string, Record<string, number>> = {};
     for (const [point, year] of Object.entries(years)) {
       if (!source.records.has(year)) return { years, status: 'missing-record', message: `${year}年のデータがありません` };
@@ -121,6 +130,7 @@ export function evaluateManagementMetric(metric: ManagementMetricDefinition, pro
       const common = evaluateNumericDefinitions(program.definitions.commonNumericDefinitions, { values: raw, years: { t: year } });
       for (const [label, pointMap] of Object.entries(raw)) values[label] = { ...(values[label] ?? {}), [point]: pointMap.t };
       for (const [label, value] of Object.entries(common)) values[label] = { ...(values[label] ?? {}), [point]: value };
+      for (const actual of referencedActuals) values[actual.label] = { ...(values[actual.label] ?? {}), [point]: source.actualInputs![actual.id] };
     }
     return { value: evaluateFormula(metric.formula, { values, years }), years, status: 'ok' };
   } catch (cause) {
