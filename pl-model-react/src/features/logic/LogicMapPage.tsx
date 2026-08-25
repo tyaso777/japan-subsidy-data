@@ -4,7 +4,7 @@ import { Badge } from '../../components/ui/badge';
 import { StickyPanel } from '../../components/ui/sticky-panel';
 import { commonPlFormulaInputs, extractFormulaReferences, sortNumericDefinitions } from '../../domain/definition-graph';
 import { useModelStore } from '../../store/model-store-context';
-import { downstreamCodes, plLogicNodes } from '../../domain/pl-logic';
+import { buildPlLogicNodes, downstreamCodes } from '../../domain/pl-logic';
 
 export function LogicMapPage({ initialSelectedCode = '16' }: { initialSelectedCode?: string }) {
   const [selectedCode, setSelectedCode] = useState(initialSelectedCode);
@@ -13,6 +13,7 @@ export function LogicMapPage({ initialSelectedCode = '16' }: { initialSelectedCo
   let ordered = definitions;
   try { ordered = sortNumericDefinitions(definitions, commonPlFormulaInputs); } catch (cause) { graphError = cause instanceof Error ? cause.message : '数値定義を検証できません'; }
   const definitionNames = new Set(definitions.map((definition) => definition.label));
+  const plLogicNodes = buildPlLogicNodes(definitions);
   const selected = plLogicNodes.find((node) => node.code === selectedCode) ?? plLogicNodes[0];
   const labels = new Map(plLogicNodes.map((node) => [node.code, node.label]));
   const downstream = downstreamCodes(plLogicNodes, selected.code);

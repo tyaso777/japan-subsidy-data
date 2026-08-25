@@ -1,4 +1,7 @@
-import { forecastPlRows } from './rows';
+import { extractFormulaReferences } from './definition-graph';
+import { defaultCommonNumericDefinitions } from './program-schema';
+import { buildProgramPlRows, forecastPlRows } from './rows';
+import type { CommonNumericDefinition } from './types';
 
 export type PlLogicNode = {
   code: string;
@@ -46,11 +49,24 @@ const logicByCode: Record<string, Omit<PlLogicNode, 'code' | 'label'>> = {
   '35': { formula: 'EBITDA ÷ 売上高', dependsOn: ['34', '1'], settings: [] },
 };
 
-export const plLogicNodes: PlLogicNode[] = forecastPlRows.map((row) => ({
-  code: row.code,
-  label: row.label,
-  ...(logicByCode[row.code] ?? { formula: '入力値', dependsOn: [], settings: [] }),
-}));
+export function buildPlLogicNodes(definitions: CommonNumericDefinition[]): PlLogicNode[] {
+  const rows = buildProgramPlRows(forecastPlRows, definitions);
+  const codeByLabel = new Map(rows.map((row) => [row.label, row.code]));
+  const displayedDefinitionByCode = new Map(definitions.filter((definition) => definition.plDisplay?.enabled).map((definition) => [definition.plDisplay!.code, definition]));
+  return rows.map((row) => {
+    const definition = displayedDefinitionByCode.get(row.code);
+    if (definition) return {
+      code: row.code,
+      label: row.label,
+      formula: definition.formula,
+      dependsOn: extractFormulaReferences(definition.formula).flatMap((label) => codeByLabel.get(label) ?? []),
+      settings: [],
+    };
+    return { code: row.code, label: row.label, ...(logicByCode[row.code] ?? { formula: '入力値', dependsOn: [], settings: [] }) };
+  });
+}
+
+export const plLogicNodes: PlLogicNode[] = buildPlLogicNodes(defaultCommonNumericDefinitions.map((definition) => structuredClone(definition)));
 
 export function downstreamCodes(nodes: PlLogicNode[], sourceCode: string): string[] {
   const found = new Set<string>();

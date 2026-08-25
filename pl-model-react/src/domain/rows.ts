@@ -1,4 +1,4 @@
-import type { BalanceSheetRecord, HistoricalPlCalculated, HistoricalPlInput } from './types';
+import type { BalanceSheetRecord, CommonNumericDefinition, HistoricalPlCalculated, HistoricalPlInput } from './types';
 import type { ValueKind } from './value-units';
 
 export type FinancialRow<T> = {
@@ -106,5 +106,39 @@ export const forecastPlRows: FinancialRow<HistoricalPlCalculated>[] = historical
   if (row.code === '27') return forecastPeopleRows;
   return forecastPeopleCodes.has(row.code) ? [] : [row];
 });
+
+function numericRowOrder(code: string): number | null {
+  const match = code.match(/^(\d+)(A)?$/);
+  return match ? Number(match[1]) + (match[2] ? 0.5 : 0) : null;
+}
+
+/** 共通数値定義のPL表示設定を、既存の会計科目順へ差し込む。 */
+export function buildProgramPlRows(baseRows: FinancialRow<HistoricalPlCalculated>[], definitions: CommonNumericDefinition[]): FinancialRow<HistoricalPlCalculated>[] {
+  const configuredLabels = new Set(definitions.filter((definition) => definition.plDisplay).map((definition) => definition.label));
+  const rows = baseRows.filter((row) => !configuredLabels.has(row.label));
+  const displayed = definitions
+    .map((definition, index) => ({ definition, index }))
+    .filter(({ definition }) => definition.plDisplay?.enabled)
+    .sort((left, right) => left.definition.plDisplay!.order - right.definition.plDisplay!.order || left.index - right.index);
+
+  for (const { definition } of displayed) {
+    const display = definition.plDisplay!;
+    const row: FinancialRow<HistoricalPlCalculated> = {
+      code: display.code,
+      label: definition.label,
+      valueKind: display.valueKind,
+      indent: display.indent === 0 ? undefined : display.indent,
+      calculated: true,
+      supplementary: true,
+      value: (record) => record.programValues?.[definition.id] ?? null,
+    };
+    const insertionIndex = rows.findIndex((candidate) => {
+      const order = numericRowOrder(candidate.code);
+      return order !== null && order > display.order;
+    });
+    rows.splice(insertionIndex < 0 ? rows.length : insertionIndex, 0, row);
+  }
+  return rows;
+}
 
 export type HistoricalPlEditableField = keyof HistoricalPlInput;

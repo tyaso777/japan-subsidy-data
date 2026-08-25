@@ -7,7 +7,8 @@ import { Textarea } from '../../components/ui/textarea';
 import { StickySurface } from '../../components/ui/sticky-surface';
 import { inferMetricPeriodKind, validateMetricDefinition } from '../../domain/metrics';
 import { resolveTimeline } from '../../domain/timeline';
-import type { ManagementMetricDefinition, MetricTimeAnchor, ProgramConfiguration } from '../../domain/types';
+import type { CommonNumericDefinition, ManagementMetricDefinition, MetricTimeAnchor, ProgramConfiguration } from '../../domain/types';
+import { valueKindMetadata, type ValueKind } from '../../domain/value-units';
 import { useModelStore } from '../../store/model-store-context';
 import { ProgramFileMenu } from './ProgramFileMenu';
 import { addPeriodDefinition, removePeriodDefinition, removeSpecialYearDefinition, renameNumericDefinition } from '../../domain/program-editor';
@@ -41,6 +42,30 @@ function DefinitionCard({ id, title, description, addLabel, onAdd, children }: {
     <DefinitionSectionHeader id={id} title={title} description={description} addLabel={addLabel} onAdd={onAdd} />
     <div data-testid={`definition-section-body-${id}`} className="px-4 pt-3 pb-4">{children}</div>
   </section>;
+}
+
+const plValueKinds = Object.keys(valueKindMetadata) as ValueKind[];
+
+function NumericDefinitionCard({ definition, index, update, rename, remove }: { definition: CommonNumericDefinition; index: number; update: (definition: CommonNumericDefinition) => void; rename: (label: string) => void; remove: () => void }) {
+  const display = definition.plDisplay;
+  const setDisplayEnabled = (enabled: boolean) => update({
+    ...definition,
+    plDisplay: { ...(display ?? { code: `S${index + 11}`, order: 100 + index, valueKind: 'money' as const }), enabled },
+  });
+  return <article data-testid={`numeric-definition-${definition.id}`} className="grid gap-2 border-t-[3px] border-teal bg-background p-3">
+    <div className="grid grid-cols-[minmax(0,1fr)_36px] gap-2"><Input aria-label={`数値定義${index + 1} 名称`} value={definition.label} onChange={(event) => rename(event.target.value)} /><Button variant="ghost" size="icon" aria-label={`${definition.label}を削除`} onClick={remove}><Trash2 /></Button></div>
+    <Textarea aria-label={`${definition.label} 計算式`} value={definition.formula} onChange={(event) => update({ ...definition, formula: event.target.value })} />
+    <div className="border-t border-dashed border-line pt-2">
+      <label className="flex items-center gap-2 text-xs font-bold"><input aria-label={`${definition.label}をPL表に表示`} type="checkbox" checked={display?.enabled ?? false} onChange={(event) => setDisplayEnabled(event.target.checked)} />PL表の補足指標として表示</label>
+      {display?.enabled && <div className="mt-2 grid grid-cols-[90px_100px_minmax(120px,1fr)_100px] gap-2">
+        <label className={fieldClass}>科目番号<Input aria-label={`${definition.label} PL科目番号`} value={display.code} onChange={(event) => update({ ...definition, plDisplay: { ...display, code: event.target.value } })} /></label>
+        <label className={fieldClass}>PL表示順<NumberInput aria-label={`${definition.label} PL表示順`} value={display.order} step="0.1" onValueChange={(value) => update({ ...definition, plDisplay: { ...display, order: value } })} /></label>
+        <label className={fieldClass}>表示単位<select aria-label={`${definition.label} PL表示単位`} className={selectClass} value={display.valueKind} onChange={(event) => update({ ...definition, plDisplay: { ...display, valueKind: event.target.value as ValueKind } })}>{plValueKinds.map((kind) => <option key={kind} value={kind}>{valueKindMetadata[kind].label}</option>)}</select></label>
+        <label className={fieldClass}>字下げ<select aria-label={`${definition.label} PL字下げ`} className={selectClass} value={display.indent ?? 0} onChange={(event) => update({ ...definition, plDisplay: { ...display, indent: Number(event.target.value) as 0 | 1 | 2 } })}><option value={0}>なし</option><option value={1}>1段</option><option value={2}>2段</option></select></label>
+      </div>}
+      <p className="mt-1 mb-0 text-[9px] text-muted-foreground">表示順は本表の科目番号に対応し、小さい数値ほど上に表示します（例：16.5は16と17の間）。</p>
+    </div>
+  </article>;
 }
 
 function MetricCard({ metric, program, update, remove }: { metric: ManagementMetricDefinition; program: ProgramConfiguration; update: (metric: ManagementMetricDefinition) => void; remove: () => void }) {
@@ -88,8 +113,8 @@ export function DefinitionPage() {
       </DefinitionCard>
     </div>
 
-    <DefinitionCard id="numeric-definitions" title="共通数値定義" description="複数の経営指標から再利用する値を先に定義します。t・t-1等も式に直接記述できます。" addLabel="共通数値定義を追加" onAdd={() => change((draft) => draft.definitions.commonNumericDefinitions.push({ id: nextId('value', draft.definitions.commonNumericDefinitions.length), label: '新しい数値', formula: '0', outputPoint: 't' }))}>
-      <div className="grid grid-cols-2 gap-3 max-[1100px]:grid-cols-1">{program.definitions.commonNumericDefinitions.map((definition, index) => <article key={definition.id} className="grid gap-2 border-t-[3px] border-teal bg-background p-3"><div className="grid grid-cols-[minmax(0,1fr)_36px] gap-2"><Input aria-label={`数値定義${index + 1} 名称`} value={definition.label} onChange={(event) => replaceProgram(renameNumericDefinition(program, definition.id, event.target.value))} /><Button variant="ghost" size="icon" aria-label={`${definition.label}を削除`} onClick={() => change((draft) => { draft.definitions.commonNumericDefinitions.splice(index, 1); })}><Trash2 /></Button></div><Textarea aria-label={`${definition.label} 計算式`} value={definition.formula} onChange={(event) => change((draft) => { draft.definitions.commonNumericDefinitions[index].formula = event.target.value; })} /></article>)}</div>
+    <DefinitionCard id="numeric-definitions" title="共通数値定義" description="複数の経営指標から再利用する値を先に定義します。t・t-1等も式に直接記述でき、必要な定義はP/L補足指標として同じ計算結果を表示できます。" addLabel="共通数値定義を追加" onAdd={() => change((draft) => draft.definitions.commonNumericDefinitions.push({ id: nextId('value', draft.definitions.commonNumericDefinitions.length), label: '新しい数値', formula: '0', outputPoint: 't' }))}>
+      <div className="grid grid-cols-2 gap-3 max-[1100px]:grid-cols-1">{program.definitions.commonNumericDefinitions.map((definition, index) => <NumericDefinitionCard key={definition.id} definition={definition} index={index} rename={(label) => replaceProgram(renameNumericDefinition(program, definition.id, label))} update={(next) => change((draft) => { draft.definitions.commonNumericDefinitions[index] = next; })} remove={() => change((draft) => { draft.definitions.commonNumericDefinitions.splice(index, 1); })} />)}</div>
     </DefinitionCard>
 
     <DefinitionCard id="management-metrics" title="経営指標・目標" description="制度目標と、個社目標を優先・下限・上限のどれとして扱うかを定義します。個社値そのものは案件JSONへ保存します。" addLabel="経営指標を追加" onAdd={() => change((draft) => draft.definitions.managementMetrics.push({ id: nextId('metric', draft.definitions.managementMetrics.length), label: '新しい経営指標', enabled: true, scope: 'company', timePoints: [{ id: 'A', anchor: { type: 'historicalEnd' }, offset: 0 }], formula: '0', outputUnit: '', target: 0, targetPolicy: 'reference', direction: 'min', optimization: 'fixed' }))}>

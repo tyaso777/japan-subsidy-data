@@ -11,15 +11,16 @@ import { StickySurface } from '../../components/ui/sticky-surface';
 import { buildForecastPl, fitForecastPlCell, type ForecastSeries } from '../../domain/forecast-engine';
 import { orderForecastSeriesByPl } from '../../domain/forecast-series-order';
 import { calculatePlSeries, combinePlInputs } from '../../domain/financials';
-import { forecastPlRows } from '../../domain/rows';
-import type { HistoricalPlCalculated, HistoricalPlInput } from '../../domain/types';
+import { applyProgramNumericDefinitions } from '../../domain/program-pl-definitions';
+import { buildProgramPlRows, forecastPlRows as baseForecastPlRows } from '../../domain/rows';
+import type { HistoricalPlCalculated, HistoricalPlInput, ProgramConfiguration } from '../../domain/types';
 import { formatFinancialValue, fromDisplayFinancialValue, moneyUnitLabel, roundFinancialInputValue, toDisplayFinancialValue, type MoneyDisplayUnit, type ValueKind } from '../../domain/value-units';
 import { cn } from '../../lib/utils';
 import { useModelStore } from '../../store/model-store-context';
 import { MetricsPanel, OptimizationToolbar, useForecastOptimization } from './MetricsPanel';
 import { chartAxisTicks, nextChartExtent, type ChartExtent } from '../../domain/chart-scale';
 import { buildTimelineYearLabels, resolveTimeline } from '../../domain/timeline';
-import { plLogicNodes } from '../../domain/pl-logic';
+import { buildPlLogicNodes } from '../../domain/pl-logic';
 import { defaultForecastRange, isForecastRangeLocked } from '../../domain/forecast-range';
 import { forecastRangeCalibrationStatus } from '../../domain/forecast-range-calibration';
 import { settingsPeriodMinWidth, shouldAutoCollapseSettings } from './forecast-layout';
@@ -194,9 +195,11 @@ function SettingRow({ series, periodId, periodLabel, unit, variationOpen, readOn
     </div>
   </fieldset>;
 }
-function buildTimeline(actuals: HistoricalPlInput[], model: ReturnType<typeof useForecastModel>, scope: 'base' | 'subsidy') {
+function buildTimeline(actuals: HistoricalPlInput[], model: ReturnType<typeof useForecastModel>, scope: 'base' | 'subsidy', program: ProgramConfiguration) {
   const future = buildForecastPl(model, scope, actuals.at(-1)!);
-  return { years: [...actuals.map((_, index) => model.series[0].baseYear - actuals.length + index + 1), ...future.map((row) => row.year)], records: [...calculatePlSeries(actuals), ...future.map((row) => row.calculated)] };
+  const years = [...actuals.map((_, index) => model.series[0].baseYear - actuals.length + index + 1), ...future.map((row) => row.year)];
+  const records = [...calculatePlSeries(actuals), ...future.map((row) => row.calculated)];
+  return { years, records: applyProgramNumericDefinitions(records, years, program.definitions.commonNumericDefinitions) };
 }
 function useForecastModel() { return useModelStore((state) => state.forecast); }
 
@@ -211,12 +214,13 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
   const chartScrollContentRef = useRef<HTMLDivElement>(null);
   const businessHeaderScrollRef = useRef<HTMLDivElement>(null);
   const [selectedLogicCode, setSelectedLogicCode] = useState('16');
-  const selectedLogic = plLogicNodes.find((node) => node.code === selectedLogicCode) ?? plLogicNodes[0];
   const model = useForecastModel();
   const optimization = useForecastOptimization();
   const operationLayer = useObservedHeight<HTMLDivElement>(71);
   const chartDisplayLayer = useObservedHeight<HTMLDivElement>(45);
   const program = useModelStore((state) => state.program);
+  const plLogicNodes = useMemo(() => buildPlLogicNodes(program.definitions.commonNumericDefinitions), [program.definitions.commonNumericDefinitions]);
+  const selectedLogic = plLogicNodes.find((node) => node.code === selectedLogicCode) ?? plLogicNodes[0];
   const baseActuals = useModelStore((state) => state.actuals.basePl);
   const subsidyActuals = useModelStore((state) => state.actuals.subsidyPl);
   const calibration = useModelStore((state) => state.caseSettings.forecastRangeCalibration);
@@ -230,12 +234,13 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
   const clearFinalYearSalesAllocation = useModelStore((state) => state.clearFinalYearSalesAllocation);
   const beginTransaction = useModelStore((state) => state.beginTransaction);
   const commitTransaction = useModelStore((state) => state.commitTransaction);
-  const base = useMemo(() => buildTimeline(baseActuals, model, 'base'), [baseActuals, model]);
-  const subsidy = useMemo(() => buildTimeline(subsidyActuals, model, 'subsidy'), [subsidyActuals, model]);
+  const base = useMemo(() => buildTimeline(baseActuals, model, 'base', program), [baseActuals, model, program]);
+  const subsidy = useMemo(() => buildTimeline(subsidyActuals, model, 'subsidy', program), [subsidyActuals, model, program]);
   const company = useMemo(() => {
     const inputs = base.records.map((row, index) => combinePlInputs(row, subsidy.records[index]));
-    return { years: base.years, records: calculatePlSeries(inputs) };
-  }, [base, subsidy]);
+    return { years: base.years, records: applyProgramNumericDefinitions(calculatePlSeries(inputs), base.years, program.definitions.commonNumericDefinitions) };
+  }, [base, subsidy, program.definitions.commonNumericDefinitions]);
+  const forecastPlRows = useMemo(() => buildProgramPlRows(baseForecastPlRows, program.definitions.commonNumericDefinitions), [program.definitions.commonNumericDefinitions]);
   const finalYear = Math.max(...(model.segments ?? program.timeline.periods).map((period) => period.endYear));
   const currentCompanyFinalSales = company.records.at(-1)?.sales ?? 0;
   const currentBaseFinalSales = base.records.at(-1)?.sales ?? 0;

@@ -19,6 +19,34 @@ describe('制度定義画面', () => {
     expect(screen.getByLabelText('特別年3 調整年数')).toHaveValue(0);
   });
 
+  it('共通数値定義ごとにPL表示・科目番号・表示順・単位を設定できる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+
+    expect(screen.getByLabelText('付加価値額をPL表に表示')).toBeChecked();
+    expect(screen.getByLabelText('付加価値額 PL科目番号')).toHaveValue('24');
+    expect(screen.getByLabelText('付加価値額 PL表示順')).toHaveValue(24);
+    expect(screen.getByLabelText('付加価値額 PL表示単位')).toHaveValue('money');
+    expect(screen.getAllByText(/16.5は16と17の間/).length).toBeGreaterThan(0);
+
+    await user.click(screen.getByLabelText('付加価値額をPL表に表示'));
+    expect(screen.queryByLabelText('付加価値額 PL表示順')).not.toBeInTheDocument();
+  });
+
+  it('共通数値定義の式変更を03のPL表へそのまま反映する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+    fireEvent.change(screen.getByLabelText('付加価値額 計算式'), { target: { value: '[営業利益][t]' } });
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    await user.click(screen.getByRole('tab', { name: 'PL表' }));
+
+    const table = screen.getByTestId('forecast-pl-table');
+    const valueAddedRow = within(table).getByRole('button', { name: /付加価値額/ }).closest('tr');
+    expect(valueAddedRow).toHaveTextContent('119');
+  });
+
   it('各定義ブロックのタイトルと追加操作を表示中は上部へ固定する', async () => {
     const user = userEvent.setup();
     render(<App />);

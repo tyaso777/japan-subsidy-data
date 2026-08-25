@@ -25,6 +25,14 @@ export type CommonNumericDefinition = {
   label: string;
   formula: string;
   outputPoint: string;
+  plDisplay?: {
+    enabled: boolean;
+    code: string;
+    /** P/L本表の科目番号に対応する表示順。小さいほど上へ表示する。 */
+    order: number;
+    valueKind: ValueKind;
+    indent?: 0 | 1 | 2;
+  };
 };
 
 export type MetricTimeAnchor =
@@ -110,6 +118,9 @@ export type HistoricalPlCalculated = HistoricalPlInput & {
   laborProductivity: number;
   ebitda: number;
   ebitdaMargin: number;
+  /** 制度定義から年度ごとに算出した補足指標。キーは共通数値定義ID。 */
+  programValues?: Record<string, number | null>;
 };
 
 export type BalanceSheetRecord = Record<string, number>;
+import type { ValueKind } from './value-units';
