@@ -18,7 +18,7 @@ describe('案件JSONを読み込む前後の過去実績', () => {
   it('初期表示は過去実績を空欄とし、案件JSON読込後に数値を表示する', async () => {
     const user = userEvent.setup();
     render(<App initialActuals="empty" />);
-    const assets = screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額');
+    const assets = screen.getByLabelText('全社 B/S 2023年 資産総額');
     const sales = screen.getByLabelText('ベース事業 P/L 2023年 売上高');
     expect(assets).toHaveValue(null);
     expect(sales).toHaveValue(null);
@@ -50,7 +50,7 @@ describe('案件JSONを読み込む前後の過去実績', () => {
   it('ファイルを選択せず同梱サンプルデータを読み込める', async () => {
     const user = userEvent.setup();
     render(<App initialActuals="empty" />);
-    const assets = screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額');
+    const assets = screen.getByLabelText('全社 B/S 2023年 資産総額');
     const sales = screen.getByLabelText('ベース事業 P/L 2023年 売上高');
     expect(assets).toHaveValue(null);
     expect(sales).toHaveValue(null);
@@ -67,7 +67,7 @@ describe('案件JSONを読み込む前後の過去実績', () => {
     const user = userEvent.setup();
     const confirm = vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true);
     render(<App initialActuals="empty" />);
-    const assets = screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額');
+    const assets = screen.getByLabelText('全社 B/S 2023年 資産総額');
     await user.type(assets, '123');
     await user.tab();
 

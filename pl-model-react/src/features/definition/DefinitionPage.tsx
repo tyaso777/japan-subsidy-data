@@ -47,7 +47,7 @@ function DefinitionCard({ id, title, description, addLabel, onAdd, children }: {
 
 const plValueKinds = Object.keys(valueKindMetadata) as ValueKind[];
 
-type PlInsertionAnchor = { code: string; label: string };
+type PlInsertionAnchor = { code: string; displayCode: string; label: string };
 
 function NumericDefinitionCard({ definition, index, anchors, update, rename, remove }: { definition: CommonNumericDefinition; index: number; anchors: PlInsertionAnchor[]; update: (definition: CommonNumericDefinition) => void; rename: (label: string) => void; remove: () => void }) {
   const display = definition.plDisplay;
@@ -61,7 +61,7 @@ function NumericDefinitionCard({ definition, index, anchors, update, rename, rem
     <div className="border-t border-dashed border-line pt-2">
       <label className="flex items-center gap-2 text-xs font-bold"><input aria-label={`${definition.label}をPL表に表示`} type="checkbox" checked={display?.enabled ?? false} onChange={(event) => setDisplayEnabled(event.target.checked)} />PL表の補足指標として表示</label>
       {display?.enabled && <div className="mt-2 grid grid-cols-[minmax(180px,1.4fr)_110px_minmax(120px,1fr)_100px] gap-2">
-        <label className={fieldClass}>挿入位置<select aria-label={`${definition.label} 挿入位置`} className={selectClass} value={display.insertAfter} onChange={(event) => update({ ...definition, plDisplay: { ...display, insertAfter: event.target.value } })}>{anchors.map((anchor) => <option key={anchor.code} value={anchor.code}>{anchor.code} {anchor.label}の後</option>)}</select></label>
+        <label className={fieldClass}>挿入位置<select aria-label={`${definition.label} 挿入位置`} className={selectClass} value={display.insertAfter} onChange={(event) => update({ ...definition, plDisplay: { ...display, insertAfter: event.target.value } })}>{anchors.map((anchor) => <option key={anchor.code} value={anchor.code}>{anchor.displayCode} {anchor.label}の後</option>)}</select></label>
         <label className={fieldClass}>同位置での順番<NumberInput aria-label={`${definition.label} 同位置での順番`} value={display.insertOrder} min={1} step="1" onValueChange={(value) => update({ ...definition, plDisplay: { ...display, insertOrder: Math.max(1, Math.round(value)) } })} /></label>
         <label className={fieldClass}>表示単位<select aria-label={`${definition.label} PL表示単位`} className={selectClass} value={display.valueKind} onChange={(event) => update({ ...definition, plDisplay: { ...display, valueKind: event.target.value as ValueKind } })}>{plValueKinds.map((kind) => <option key={kind} value={kind}>{valueKindMetadata[kind].label}</option>)}</select></label>
         <label className={fieldClass}>字下げ<select aria-label={`${definition.label} PL字下げ`} className={selectClass} value={display.indent ?? 0} onChange={(event) => update({ ...definition, plDisplay: { ...display, indent: Number(event.target.value) as 0 | 1 | 2 } })}><option value={0}>なし</option><option value={1}>1段</option><option value={2}>2段</option></select></label>
@@ -95,7 +95,7 @@ export function DefinitionPage() {
   const replaceProgram = useModelStore((state) => state.replaceProgram);
   const timeline = resolveTimeline(program);
   const configuredLabels = new Set(program.definitions.commonNumericDefinitions.filter((definition) => definition.plDisplay).map((definition) => definition.label));
-  const plInsertionAnchors = forecastPlRows.filter((row) => !row.supplementary && !configuredLabels.has(row.label)).map((row) => ({ code: row.code, label: row.label }));
+  const plInsertionAnchors = forecastPlRows.filter((row) => !row.supplementary && !configuredLabels.has(row.label)).map((row) => ({ code: row.code, displayCode: row.displayCode ?? row.code, label: row.label }));
   const change = (mutate: (draft: ProgramConfiguration) => void) => { const draft = structuredClone(program); mutate(draft); replaceProgram(draft); };
   const addPeriod = () => replaceProgram(addPeriodDefinition(program));
   const addSpecialYear = () => change((draft) => draft.definitions.specialYears.push({ id: nextId('special', draft.definitions.specialYears.length), label: `特別年${draft.definitions.specialYears.length + 1}`, anchor: { type: 'historicalEnd' }, offset: 0 }));

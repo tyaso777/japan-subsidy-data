@@ -16,7 +16,7 @@ describe('期間・過去実績', () => {
       expect(within(screen.getByTestId(testId)).getByTestId(`${testId}-start-gutter`)).toHaveClass('w-3');
       expect(within(screen.getByTestId(testId)).getByTestId(`${testId}-end-gutter`)).toHaveClass('w-3');
     }
-    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額')).toHaveClass('h-5', 'w-[min(72px,100%)]');
+    expect(screen.getByLabelText('全社 B/S 2023年 資産総額')).toHaveClass('h-5', 'w-[min(72px,100%)]');
   });
 
   it('ベース事業と補助事業をタブなしで同時表示する', () => {
@@ -104,15 +104,15 @@ describe('期間・過去実績', () => {
     await user.clear(historicalEnd); await user.type(historicalEnd, '2026');
     expect(screen.getByLabelText('過去実績 開始年')).toHaveValue(2023);
     expect(screen.getByLabelText('補助事業期間 開始年')).toHaveValue(2027);
-    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額')).toHaveValue(1050);
-    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2026年 資産総額')).toHaveValue(null);
+    expect(screen.getByLabelText('全社 B/S 2023年 資産総額')).toHaveValue(1050);
+    expect(screen.getByLabelText('全社 B/S 2026年 資産総額')).toHaveValue(null);
 
     const historicalStart = screen.getByLabelText('過去実績 開始年');
     await user.clear(historicalStart); await user.type(historicalStart, '2021');
     expect(screen.getByLabelText('過去実績 終了年')).toHaveValue(2026);
     expect(screen.getByLabelText('補助事業期間 開始年')).toHaveValue(2027);
-    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2021年 資産総額')).toHaveValue(null);
-    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額')).toHaveValue(1050);
+    expect(screen.getByLabelText('全社 B/S 2021年 資産総額')).toHaveValue(null);
+    expect(screen.getByLabelText('全社 B/S 2023年 資産総額')).toHaveValue(1050);
     expect(screen.getByTestId('historical-bs')).toHaveStyle({ maxWidth: '874px' });
   });
 
@@ -166,28 +166,28 @@ describe('期間・過去実績', () => {
   it('Excelの複数セルを一括貼り付けし、一度のUndoで全件を戻す', async () => {
     const user = userEvent.setup();
     render(<App />);
-    const cash2023 = screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額');
+    const cash2023 = screen.getByLabelText('全社 B/S 2023年 資産総額');
 
     await user.click(cash2023);
     fireEvent.paste(cash2023, { clipboardData: { getData: () => '111\t222\n333\t444' } });
 
     expect(cash2023).toHaveValue(111);
-    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2024年 資産総額')).toHaveValue(222);
-    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 うち流動資産')).toHaveValue(333);
-    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2024年 うち流動資産')).toHaveValue(444);
+    expect(screen.getByLabelText('全社 B/S 2024年 資産総額')).toHaveValue(222);
+    expect(screen.getByLabelText('全社 B/S 2023年 うち流動資産')).toHaveValue(333);
+    expect(screen.getByLabelText('全社 B/S 2024年 うち流動資産')).toHaveValue(444);
     expect(within(screen.getByTestId('historical-bs')).getByText('4件を貼り付けました')).toBeInTheDocument();
 
     await user.keyboard('{Control>}z{/Control}');
     expect(cash2023).toHaveValue(1050);
-    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2024年 資産総額')).toHaveValue(1115);
-    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 うち流動資産')).toHaveValue(555);
-    expect(screen.getByLabelText('全社 B/S（1-1～1-25） 2024年 うち流動資産')).toHaveValue(599);
+    expect(screen.getByLabelText('全社 B/S 2024年 資産総額')).toHaveValue(1115);
+    expect(screen.getByLabelText('全社 B/S 2023年 うち流動資産')).toHaveValue(555);
+    expect(screen.getByLabelText('全社 B/S 2024年 うち流動資産')).toHaveValue(599);
   });
 
   it('Shiftで選択した範囲をExcel向けTSVとしてコピーする', () => {
     render(<App />);
-    const cash2023 = screen.getByLabelText('全社 B/S（1-1～1-25） 2023年 資産総額');
-    const receivable2024 = screen.getByLabelText('全社 B/S（1-1～1-25） 2024年 うち流動資産');
+    const cash2023 = screen.getByLabelText('全社 B/S 2023年 資産総額');
+    const receivable2024 = screen.getByLabelText('全社 B/S 2024年 うち流動資産');
     fireEvent.click(cash2023);
     fireEvent.click(receivable2024, { shiftKey: true });
     let copied = '';
@@ -200,9 +200,9 @@ describe('期間・過去実績', () => {
   it('科目番号から3期目までドラッグするだけで5列をExcel向けTSVとしてコピーする', () => {
     render(<App />);
     const table = screen.getByTestId('historical-bs');
-    const codeCell = within(table).getByText('1-1').closest<HTMLElement>('[data-grid-cell="true"]');
+    const codeCell = within(table).getByText('1').closest<HTMLElement>('[data-grid-cell="true"]');
     const label = within(table).getByText('資産総額');
-    const finalValue = screen.getByLabelText('全社 B/S（1-1～1-25） 2025年 資産総額');
+    const finalValue = screen.getByLabelText('全社 B/S 2025年 資産総額');
     const finalCell = finalValue.closest<HTMLElement>('[data-grid-cell="true"]');
     expect(codeCell).not.toBeNull();
     expect(finalCell).not.toBeNull();
@@ -223,7 +223,7 @@ describe('期間・過去実績', () => {
     expect(document.activeElement).toBe(codeCell);
     fireEvent.copy(document.activeElement!, { clipboardData: { setData: (_type: string, value: string) => { copied = value; } } });
 
-    expect(copied).toBe('1-1\t資産総額\t1050\t1115\t1208');
+    expect(copied).toBe('1\t資産総額\t1050\t1115\t1208');
   });
 
   it('過去P/Lでは空欄を維持し、自動計算行を飛ばして入力行だけ更新する', async () => {

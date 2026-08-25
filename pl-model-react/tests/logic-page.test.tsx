@@ -25,8 +25,8 @@ describe('ロジックマップ画面', () => {
 
     const plMap = screen.getByTestId('pl-logic-map');
     expect(within(plMap).getByRole('button', { name: /^1売上高$/ })).toBeVisible();
-    expect(within(plMap).getByRole('button', { name: /^16営業利益$/ })).toBeVisible();
-    await user.click(within(plMap).getByRole('button', { name: /^16営業利益$/ }));
+    expect(within(plMap).getByRole('button', { name: /^17営業利益$/ })).toBeVisible();
+    await user.click(within(plMap).getByRole('button', { name: /^17営業利益$/ }));
     const detail = screen.getByTestId('logic-detail');
     expect(screen.getByTestId('pl-logic-section')).not.toHaveClass('[&>aside]:top-16');
     expect(detail).toHaveClass('sticky', 'isolate', 'overflow-hidden', 'bg-surface');

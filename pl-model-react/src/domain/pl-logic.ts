@@ -5,13 +5,14 @@ import type { CommonNumericDefinition } from './types';
 
 export type PlLogicNode = {
   code: string;
+  displayCode: string;
   label: string;
   formula: string;
   dependsOn: string[];
   settings: string[];
 };
 
-const logicByCode: Record<string, Omit<PlLogicNode, 'code' | 'label'>> = {
+const logicByCode: Record<string, Omit<PlLogicNode, 'code' | 'displayCode' | 'label'>> = {
   '1': { formula: '前年売上高 × (1 + 売上成長率) + 開始時増減', dependsOn: [], settings: ['売上高'] },
   '2': { formula: '当年売上高 ÷ 前年売上高 − 1', dependsOn: ['1'], settings: [] },
   '3': { formula: '売上高 × 原価率', dependsOn: ['1'], settings: ['原価率'] },
@@ -60,13 +61,14 @@ export function buildPlLogicNodes(definitions: CommonNumericDefinition[]): PlLog
     const definition = row.definitionId ? definitionById.get(row.definitionId) : undefined;
     if (definition) return {
       code: row.code,
+      displayCode: row.displayCode ?? row.code,
       label: row.label,
       formula: definition.formula,
       dependsOn: extractFormulaReferences(definition.formula).flatMap((label) => codeByLabel.get(label) ?? []),
       settings: [],
     };
     const logic = logicByCode[row.code] ?? { formula: '入力値', dependsOn: [], settings: [] };
-    return { code: row.code, label: row.label, ...logic, dependsOn: logic.dependsOn.map(resolveCurrentCode) };
+    return { code: row.code, displayCode: row.displayCode ?? row.code, label: row.label, ...logic, dependsOn: logic.dependsOn.map(resolveCurrentCode) };
   });
 }
 

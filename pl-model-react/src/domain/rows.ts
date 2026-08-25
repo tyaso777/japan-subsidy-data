@@ -2,7 +2,10 @@ import type { BalanceSheetRecord, CommonNumericDefinition, HistoricalPlCalculate
 import type { ValueKind } from './value-units';
 
 export type FinancialRow<T> = {
+  /** 計算・保存・参照に使う安定ID。画面上の採番変更には追従させない。 */
   code: string;
+  /** 財務諸表内だけで使う表示番号（1… / S-… / A-…）。 */
+  displayCode?: string;
   /** 制度定義から生成された行を、表示用A番号に依存せず識別する。 */
   definitionId?: string;
   label: string;
@@ -15,7 +18,18 @@ export type FinancialRow<T> = {
   value?: (record: T, index: number, records: T[]) => number | null;
 };
 
-export const balanceSheetRows: FinancialRow<BalanceSheetRecord>[] = [
+function assignStatementDisplayCodes<T>(rows: FinancialRow<T>[]): FinancialRow<T>[] {
+  let ordinaryNumber = 0;
+  let supplementaryNumber = 0;
+  return rows.map((row) => ({
+    ...row,
+    displayCode: row.supplementary
+      ? `S-${++supplementaryNumber}`
+      : String(++ordinaryNumber),
+  }));
+}
+
+const baseBalanceSheetRows: FinancialRow<BalanceSheetRecord>[] = [
   { code: '1-1', label: '資産総額', field: 'assets' },
   { code: '1-2', label: 'うち流動資産', field: 'currentAssets', indent: 1 },
   { code: '1-3', label: 'うち現金及び預金', field: 'cash', indent: 2 },
@@ -43,7 +57,9 @@ export const balanceSheetRows: FinancialRow<BalanceSheetRecord>[] = [
   { code: '1-25', label: 'EBITDA有利子負債倍率', valueKind: 'multiple', calculated: true, value: (row) => row.ebitdaDebtMultiple ?? 0 },
 ];
 
-export const historicalPlRows: FinancialRow<HistoricalPlCalculated>[] = [
+export const balanceSheetRows = assignStatementDisplayCodes(baseBalanceSheetRows);
+
+const baseHistoricalPlRows: FinancialRow<HistoricalPlCalculated>[] = [
   { code: '1', label: '売上高', field: 'sales' },
   { code: '2', label: '売上高成長率', valueKind: 'percent', indent: 1, calculated: true, value: (row) => row.salesGrowthRate },
   { code: '3', label: '売上原価', field: 'cogs' },
@@ -88,6 +104,8 @@ export const historicalPlRows: FinancialRow<HistoricalPlCalculated>[] = [
   { code: '35', label: 'EBITDAマージン', valueKind: 'percent', calculated: true, value: (row) => row.ebitdaMargin },
 ];
 
+export const historicalPlRows = assignStatementDisplayCodes(baseHistoricalPlRows);
+
 const forecastPayPerPersonRows: FinancialRow<HistoricalPlCalculated>[] = [
   { code: '30', label: '従業員1人当たり給与支給総額成長率', valueKind: 'percent', indent: 1, calculated: true, value: (row) => row.employeePayPerPersonGrowthRate },
   { code: '31', label: '役員1人当たり給与支給総額', valueKind: 'moneyPerPerson', calculated: true, value: (row) => row.officerPayPerPerson },
@@ -104,10 +122,10 @@ const forecastPeopleRows: FinancialRow<HistoricalPlCalculated>[] = [
 ];
 
 /** 将来P/Lでは従業員・役員ごとに「人数→1人当たり単価→前年比」をまとめる。 */
-export const forecastPlRows: FinancialRow<HistoricalPlCalculated>[] = historicalPlRows.flatMap((row) => {
+export const forecastPlRows: FinancialRow<HistoricalPlCalculated>[] = assignStatementDisplayCodes(historicalPlRows.flatMap((row) => {
   if (row.code === '27') return forecastPeopleRows;
   return forecastPeopleCodes.has(row.code) ? [] : [row];
-});
+}));
 
 function numericRowOrder(code: string): number | null {
   const match = code.match(/^(\d+)(A)?$/);
@@ -117,7 +135,7 @@ function numericRowOrder(code: string): number | null {
 /** 共通数値定義のPL表示設定を、既存の会計科目順へ差し込む。 */
 export function buildProgramPlRows(baseRows: FinancialRow<HistoricalPlCalculated>[], definitions: CommonNumericDefinition[]): FinancialRow<HistoricalPlCalculated>[] {
   const configuredLabels = new Set(definitions.filter((definition) => definition.plDisplay).map((definition) => definition.label));
-  const rows = baseRows.filter((row) => !configuredLabels.has(row.label));
+  const rows = assignStatementDisplayCodes(baseRows.filter((row) => !configuredLabels.has(row.label)));
   const displayed = definitions
     .map((definition, index) => ({ definition, index }))
     .filter(({ definition }) => definition.plDisplay?.enabled);
@@ -149,7 +167,8 @@ export function buildProgramPlRows(baseRows: FinancialRow<HistoricalPlCalculated
       const display = definition.plDisplay!;
       additionalNumber += 1;
       result.push({
-        code: `A-${additionalNumber}`,
+        code: `program:${definition.id}`,
+        displayCode: `A-${additionalNumber}`,
         definitionId: definition.id,
         label: definition.label,
         valueKind: display.valueKind,

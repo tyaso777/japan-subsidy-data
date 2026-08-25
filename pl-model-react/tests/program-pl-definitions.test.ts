@@ -27,7 +27,14 @@ describe('制度定義から生成するP/L補足指標', () => {
     const cogsIndex = rows.findIndex((row) => row.code === '3');
     const customIndex = rows.findIndex((row) => row.code === 'S20');
 
-    expect(rows[cogsIndex + 1]).toMatchObject({ code: 'A-1', label: '独自利益率', supplementary: true, calculated: true, valueKind: 'percent' });
+    expect(rows[cogsIndex + 1]).toMatchObject({
+      code: 'program:custom-margin',
+      displayCode: 'A-1',
+      label: '独自利益率',
+      supplementary: true,
+      calculated: true,
+      valueKind: 'percent',
+    });
     expect(customIndex).toBe(-1);
   });
 
@@ -42,7 +49,7 @@ describe('制度定義から生成するP/L補足指標', () => {
 
     const rows = buildProgramPlRows(historicalPlRows, program.definitions.commonNumericDefinitions);
     const cogsIndex = rows.findIndex((row) => row.code === '3');
-    expect(rows.slice(cogsIndex + 1, cogsIndex + 3).map((row) => [row.code, row.label])).toEqual([
+    expect(rows.slice(cogsIndex + 1, cogsIndex + 3).map((row) => [row.displayCode, row.label])).toEqual([
       ['A-1', '独自利益率'],
       ['A-2', '付加価値額'],
     ]);
@@ -64,7 +71,8 @@ describe('制度定義から生成するP/L補足指標', () => {
     const ebitda = nodes.find((node) => node.label === 'EBITDA')!;
     const ebitdaMargin = nodes.find((node) => node.label === 'EBITDAマージン')!;
 
-    expect(valueAdded.code).toMatch(/^A-/);
+    expect(valueAdded.code).toBe('program:付加価値額');
+    expect(valueAdded.displayCode).toMatch(/^A-/);
     expect(valueAddedGrowth.dependsOn).toContain(valueAdded.code);
     expect(ebitdaMargin.dependsOn).toContain(ebitda.code);
   });

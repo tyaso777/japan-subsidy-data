@@ -13,7 +13,6 @@ import type { TimelineYearLabel } from '../domain/timeline';
 type Props<T extends object> = {
   testId: string;
   title: string;
-  prefix?: string;
   years: number[];
   records: T[];
   rows: FinancialRow<T>[];
@@ -60,7 +59,7 @@ function EditableValueCell({ label, value, step, maximumFractionDigits, compact 
   return <Input className={cn('ml-auto select-text rounded px-0.5 py-0 text-right text-[10px]', compact ? 'h-5 w-[min(86px,100%)]' : 'h-6 w-[min(120px,100%)]')} aria-label={label} type="number" step={step} value={draft} onFocus={() => { setEditing(true); setDirty(false); onEditStart?.(); }} onChange={(event) => { setDirty(true); setDraft(event.target.value); }} onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); }} onBlur={() => { const next = Number(draft); setEditing(false); if (dirty && Number.isFinite(next)) onCommit(next); setDirty(false); onEditEnd?.(); }} />;
 }
 
-export function FinancialTable<T extends object>({ testId, title, prefix = '', years, records, rows, onChange, moneyUnit, onEditStart, onEditEnd, editableFromIndex, onValueChange, onValuesChange, yearLabels, onRowSelect, isRecordEmpty, separateSubjectColumns = false, stickyHeaderTop = 'var(--app-toolbar-sticky-bottom)', stickyHeaderLayer = 'operation', compact = false, headerActions }: Props<T>) {
+export function FinancialTable<T extends object>({ testId, title, years, records, rows, onChange, moneyUnit, onEditStart, onEditEnd, editableFromIndex, onValueChange, onValuesChange, yearLabels, onRowSelect, isRecordEmpty, separateSubjectColumns = false, stickyHeaderTop = 'var(--app-toolbar-sticky-bottom)', stickyHeaderLayer = 'operation', compact = false, headerActions }: Props<T>) {
   const [omitCalculated, setOmitCalculated] = useState(false);
   const [showSupplementary, setShowSupplementary] = useState(true);
   const [selection, setSelection] = useState<GridSelection>();
@@ -96,7 +95,7 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
   const displayedCellValue = (rowIndex: number, column: number): TabularClipboardValue => {
     const row = visibleRows[rowIndex];
     if (!row) return null;
-    if (separateSubjectColumns && column === 0) return `${prefix}${row.code}`;
+    if (separateSubjectColumns && column === 0) return row.displayCode ?? row.code;
     if (separateSubjectColumns && column === 1) return row.label;
     const yearIndex = column - yearColumnOffset;
     const record = records[yearIndex];
@@ -202,7 +201,7 @@ export function FinancialTable<T extends object>({ testId, title, prefix = '', y
         <thead className="sr-only"><tr>{hasHorizontalGutters && <th aria-hidden="true" />}{separateSubjectColumns ? <><th scope="col">科目番号</th><th scope="col">科目名</th></> : <th scope="col" aria-label="科目" />}{years.map((year, index) => <th scope="col" aria-label={`${yearLabels?.[year]?.primary ?? closingLabel(index, years.length)} ${year}年`} key={year} />)}{hasHorizontalGutters && <th aria-hidden="true" />}</tr></thead>
         <tbody>{visibleRows.map((row, rowIndex) => <tr key={row.code} className={cn(row.calculated && 'bg-teal/5', row.supplementary && 'bg-orange/5')}>
           {hasHorizontalGutters && <td aria-hidden="true" className="border-t border-line" />}
-          {separateSubjectColumns ? <><td {...cellInteraction(rowIndex, 0)} className={cn(cellClass, 'border-t border-line px-2 text-left text-[9px] font-medium text-muted-foreground', selectedCell(rowIndex, 0) && 'bg-teal/10 ring-1 ring-inset ring-teal')}>{prefix}{row.code}</td><th {...cellInteraction(rowIndex, 1)} scope="row" className={cn(cellClass, 'border-t border-line px-2 text-left font-bold', selectedCell(rowIndex, 1) && 'bg-teal/10 ring-1 ring-inset ring-teal')}>{onRowSelect ? <button type="button" className={cn('w-full text-left', row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')} onClick={() => onRowSelect(row)}>{row.label}</button> : <span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span>}</th></> : <th className={cn(cellClass, 'border-t border-line px-2 text-left font-bold')}>{onRowSelect ? <button type="button" className="w-full text-left" onClick={() => onRowSelect(row)}><span className="inline-block w-13 text-[9px] font-medium text-muted-foreground">{prefix}{row.code}</span><span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span></button> : <><span className="inline-block w-13 text-[9px] font-medium text-muted-foreground">{prefix}{row.code}</span><span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span></>}</th>}
+          {separateSubjectColumns ? <><td {...cellInteraction(rowIndex, 0)} className={cn(cellClass, 'border-t border-line px-2 text-left text-[9px] font-medium text-muted-foreground', selectedCell(rowIndex, 0) && 'bg-teal/10 ring-1 ring-inset ring-teal')}>{row.displayCode ?? row.code}</td><th {...cellInteraction(rowIndex, 1)} scope="row" className={cn(cellClass, 'border-t border-line px-2 text-left font-bold', selectedCell(rowIndex, 1) && 'bg-teal/10 ring-1 ring-inset ring-teal')}>{onRowSelect ? <button type="button" className={cn('w-full text-left', row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')} onClick={() => onRowSelect(row)}>{row.label}</button> : <span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span>}</th></> : <th className={cn(cellClass, 'border-t border-line px-2 text-left font-bold')}>{onRowSelect ? <button type="button" className="w-full text-left" onClick={() => onRowSelect(row)}><span className="inline-block w-13 text-[9px] font-medium text-muted-foreground">{row.displayCode ?? row.code}</span><span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span></button> : <><span className="inline-block w-13 text-[9px] font-medium text-muted-foreground">{row.displayCode ?? row.code}</span><span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span></>}</th>}
           {records.map((record, index) => {
             const kind = row.valueKind ?? 'money';
             const hasInput = !(isRecordEmpty?.(record, index) ?? Object.values(record).every((value) => value === null || value === undefined));
