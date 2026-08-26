@@ -66,7 +66,7 @@ export function FinancialTable<T extends object>({ testId, title, years, records
   const [clipboardStatus, setClipboardStatus] = useState('');
   const dragAnchor = useRef<GridCell | undefined>(undefined);
   const hasSupplementary = useMemo(() => rows.some((row) => row.supplementary), [rows]);
-  const yearColumnOffset = separateSubjectColumns ? 2 : 0;
+  const yearColumnOffset = separateSubjectColumns ? 2 : 1;
   const visibleRows = useMemo(() => rows.filter((row) => row.supplementary ? showSupplementary : !(omitCalculated && row.calculated)), [omitCalculated, rows, showSupplementary]);
   const bounds = (selected: GridSelection) => ({
     firstRow: Math.min(selected.anchor.row, selected.focus.row),
@@ -97,6 +97,7 @@ export function FinancialTable<T extends object>({ testId, title, years, records
     if (!row) return null;
     if (separateSubjectColumns && column === 0) return row.displayCode ?? row.code;
     if (separateSubjectColumns && column === 1) return row.label;
+    if (!separateSubjectColumns && column === 0) return `${row.displayCode ?? row.code} ${row.label}`;
     const yearIndex = column - yearColumnOffset;
     const record = records[yearIndex];
     if (!record) return null;
@@ -201,7 +202,7 @@ export function FinancialTable<T extends object>({ testId, title, years, records
         <thead className="sr-only"><tr>{hasHorizontalGutters && <th aria-hidden="true" />}{separateSubjectColumns ? <><th scope="col">科目番号</th><th scope="col">科目名</th></> : <th scope="col" aria-label="科目" />}{years.map((year, index) => <th scope="col" aria-label={`${yearLabels?.[year]?.primary ?? closingLabel(index, years.length)} ${year}年`} key={year} />)}{hasHorizontalGutters && <th aria-hidden="true" />}</tr></thead>
         <tbody>{visibleRows.map((row, rowIndex) => <tr key={row.code} className={cn(row.calculated && 'bg-teal/5', row.supplementary && 'bg-orange/5')}>
           {hasHorizontalGutters && <td aria-hidden="true" className="border-t border-line" />}
-          {separateSubjectColumns ? <><td {...cellInteraction(rowIndex, 0)} className={cn(cellClass, 'border-t border-line px-2 text-left text-[9px] font-medium text-muted-foreground', selectedCell(rowIndex, 0) && 'bg-teal/10 ring-1 ring-inset ring-teal')}>{row.displayCode ?? row.code}</td><th {...cellInteraction(rowIndex, 1)} scope="row" className={cn(cellClass, 'border-t border-line px-2 text-left font-bold', selectedCell(rowIndex, 1) && 'bg-teal/10 ring-1 ring-inset ring-teal')}>{onRowSelect ? <button type="button" className={cn('w-full text-left', row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')} onClick={() => onRowSelect(row)}>{row.label}</button> : <span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span>}</th></> : <th className={cn(cellClass, 'border-t border-line px-2 text-left font-bold')}>{onRowSelect ? <button type="button" className="w-full text-left" onClick={() => onRowSelect(row)}><span className="inline-block w-13 text-[9px] font-medium text-muted-foreground">{row.displayCode ?? row.code}</span><span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span></button> : <><span className="inline-block w-13 text-[9px] font-medium text-muted-foreground">{row.displayCode ?? row.code}</span><span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span></>}</th>}
+          {separateSubjectColumns ? <><td {...cellInteraction(rowIndex, 0)} className={cn(cellClass, 'border-t border-line px-2 text-left text-[9px] font-medium text-muted-foreground', selectedCell(rowIndex, 0) && 'bg-teal/10 ring-1 ring-inset ring-teal')}>{row.displayCode ?? row.code}</td><th {...cellInteraction(rowIndex, 1)} scope="row" className={cn(cellClass, 'border-t border-line px-2 text-left font-bold', selectedCell(rowIndex, 1) && 'bg-teal/10 ring-1 ring-inset ring-teal')}>{onRowSelect ? <button type="button" className={cn('w-full text-left', row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')} onClick={() => onRowSelect(row)}>{row.label}</button> : <span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span>}</th></> : <th {...cellInteraction(rowIndex, 0)} scope="row" className={cn(cellClass, 'border-t border-line px-2 text-left font-bold', selectedCell(rowIndex, 0) && 'bg-teal/10 ring-1 ring-inset ring-teal')}>{onRowSelect ? <button type="button" className="w-full text-left" onClick={() => onRowSelect(row)}><span className="inline-block w-13 text-[9px] font-medium text-muted-foreground">{row.displayCode ?? row.code}</span><span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span></button> : <><span className="inline-block w-13 text-[9px] font-medium text-muted-foreground">{row.displayCode ?? row.code}</span><span className={cn(row.indent === 1 && 'pl-3.5', row.indent === 2 && 'pl-7')}>{row.label}</span></>}</th>}
           {records.map((record, index) => {
             const kind = row.valueKind ?? 'money';
             const hasInput = !(isRecordEmpty?.(record, index) ?? Object.values(record).every((value) => value === null || value === undefined));

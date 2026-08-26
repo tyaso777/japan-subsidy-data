@@ -782,6 +782,28 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByLabelText('ベース事業 P/L 2027年 売上高')).toHaveValue(1166.4);
   });
 
+  it('将来PLの科目列から数値列までドラッグしてExcel向けTSVへコピーできる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    await user.click(screen.getByRole('tab', { name: 'PL表' }));
+
+    const table = screen.getByTestId('forecast-pl-table');
+    const subjectCell = within(table).getByText('売上高').closest<HTMLElement>('[data-grid-cell="true"]');
+    const sales2026 = screen.getByLabelText('ベース事業 P/L 2026年 売上高');
+    const sales2026Cell = sales2026.closest<HTMLElement>('[data-grid-cell="true"]');
+    expect(subjectCell).not.toBeNull();
+    expect(sales2026Cell).not.toBeNull();
+
+    fireEvent.mouseDown(subjectCell!, { button: 0, buttons: 1 });
+    fireEvent.mouseEnter(sales2026Cell!, { buttons: 1 });
+    fireEvent.mouseUp(window);
+    let copied = '';
+    fireEvent.copy(subjectCell!, { clipboardData: { setData: (_type: string, value: string) => { copied = value; } } });
+
+    expect(copied).toBe('1 売上高\t900\t950\t1000\t1080');
+  });
+
   it('科目列を抑えて決算数値列へ表示幅を配分する', async () => {
     const user = userEvent.setup();
     render(<App />);
