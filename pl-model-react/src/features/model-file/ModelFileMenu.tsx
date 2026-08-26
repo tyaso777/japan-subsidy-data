@@ -1,8 +1,9 @@
 import { useRef, useState, type ChangeEvent } from 'react';
-import { ChevronDown, FileJson, Save, SaveAll } from 'lucide-react';
+import { ChevronDown, FileJson, FileSpreadsheet, FileText, Save, SaveAll } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../components/ui/dialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
+import { buildCaseResultReport, createCaseResultHtml, createCaseResultXlsx } from '../../domain/case-results-export';
 import { parseModelFile, serializeModelFile } from '../../domain/model-file';
 import { createInitialModelSnapshot } from '../../store/model-store';
 import { useModelStore } from '../../store/model-store-context';
@@ -35,17 +36,28 @@ function fallbackDownload(json: string) {
   URL.revokeObjectURL(url);
 }
 
+function downloadResult(fileName: string, content: BlobPart, type: string) {
+  const url = URL.createObjectURL(new Blob([content], { type }));
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = fileName;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
 export function ModelFileMenu() {
   const program = useModelStore((state) => state.program);
   const actuals = useModelStore((state) => state.actuals);
   const forecast = useModelStore((state) => state.forecast);
   const caseSettings = useModelStore((state) => state.caseSettings);
+  const moneyUnit = useModelStore((state) => state.preferences.moneyUnit);
   const replaceSnapshot = useModelStore((state) => state.replaceSnapshot);
   const inputRef = useRef<HTMLInputElement>(null);
   const handleRef = useRef<ModelFileHandle | null>(null);
   const [fileName, setFileName] = useState<string>();
   const [error, setError] = useState<string>();
   const json = () => serializeModelFile({ program, actuals, forecast, caseSettings });
+  const snapshot = () => ({ program, actuals, forecast, caseSettings });
   const lastPersistedJsonRef = useRef(json());
 
   const loadFile = async (file: File, handle?: ModelFileHandle) => {
@@ -110,6 +122,23 @@ export function ModelFileMenu() {
     setFileName('sample-case.json');
   };
 
+  const exportExcel = () => {
+    try {
+      const bytes = createCaseResultXlsx(buildCaseResultReport(snapshot(), moneyUnit));
+      downloadResult(`pl-model-results-${new Date().toISOString().slice(0, 10)}.xlsx`, bytes.buffer as ArrayBuffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Excelファイルを出力できませんでした');
+    }
+  };
+
+  const exportHtml = () => {
+    try {
+      downloadResult(`pl-model-results-${new Date().toISOString().slice(0, 10)}.html`, createCaseResultHtml(buildCaseResultReport(snapshot(), moneyUnit)), 'text/html;charset=utf-8');
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'HTMLファイルを出力できませんでした');
+    }
+  };
+
   return <>
     <input ref={inputRef} aria-label="案件JSONファイル" className="hidden" type="file" accept="application/json,.json" onChange={(event: ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
@@ -119,10 +148,14 @@ export function ModelFileMenu() {
     <div className="flex items-stretch"><Button variant="outline" size="sm" className="max-w-38 rounded-r-none" onClick={() => void open()}><FileJson /><span className="truncate">{fileName ?? '案件JSON'}</span></Button><DropdownMenu>
       <DropdownMenuTrigger asChild><Button variant="outline" size="icon" className="h-8 w-7 rounded-l-none border-l-0" aria-label="案件JSONメニュー"><ChevronDown /></Button></DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuLabel>案件データ</DropdownMenuLabel>
         <DropdownMenuItem disabled={!handleRef.current} onSelect={() => void overwrite()}><Save />上書き保存</DropdownMenuItem>
         <DropdownMenuItem onSelect={() => void saveAs()}><SaveAll />名前を付けて保存</DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={loadSample}><FileJson />サンプルデータを読み込み</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel>結果出力</DropdownMenuLabel>
+        <DropdownMenuItem onSelect={exportExcel}><FileSpreadsheet />Excelで出力</DropdownMenuItem>
+        <DropdownMenuItem onSelect={exportHtml}><FileText />HTMLで出力</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu></div>
     <Dialog open={Boolean(error)} onOpenChange={(openState) => { if (!openState) setError(undefined); }}>

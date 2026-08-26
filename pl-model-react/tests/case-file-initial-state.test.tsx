@@ -74,6 +74,10 @@ describe('案件JSONを読み込む前後の過去実績', () => {
     await user.click(screen.getByRole('button', { name: '案件JSONメニュー' }));
     expect(screen.getByRole('menuitem', { name: '上書き保存' })).toBeVisible();
     expect(screen.getByRole('menuitem', { name: '名前を付けて保存' })).toBeVisible();
+    expect(screen.getByText('案件データ')).toBeVisible();
+    expect(screen.getByText('結果出力')).toBeVisible();
+    expect(screen.getByRole('menuitem', { name: 'Excelで出力' })).toBeVisible();
+    expect(screen.getByRole('menuitem', { name: 'HTMLで出力' })).toBeVisible();
     await user.click(screen.getByRole('menuitem', { name: 'サンプルデータを読み込み' }));
 
     expect(confirm).toHaveBeenLastCalledWith('既存のデータが消えますが、よろしいでしょうか。');
@@ -83,5 +87,24 @@ describe('案件JSONを読み込む前後の過去実績', () => {
     await user.click(screen.getByRole('menuitem', { name: 'サンプルデータを読み込み' }));
 
     expect(assets).toHaveValue(1050);
+  });
+
+  it('案件メニューから計算済みP/LをExcelとHTMLで出力する', async () => {
+    const user = userEvent.setup();
+    const downloads: string[] = [];
+    Object.defineProperty(URL, 'createObjectURL', { configurable: true, value: vi.fn(() => 'blob:case-result') });
+    Object.defineProperty(URL, 'revokeObjectURL', { configurable: true, value: vi.fn() });
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) { downloads.push(this.download); });
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: '案件JSONメニュー' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Excelで出力' }));
+    await user.click(screen.getByRole('button', { name: '案件JSONメニュー' }));
+    await user.click(screen.getByRole('menuitem', { name: 'HTMLで出力' }));
+
+    expect(downloads).toEqual([
+      expect.stringMatching(/^pl-model-results-\d{4}-\d{2}-\d{2}\.xlsx$/),
+      expect.stringMatching(/^pl-model-results-\d{4}-\d{2}-\d{2}\.html$/),
+    ]);
   });
 });
