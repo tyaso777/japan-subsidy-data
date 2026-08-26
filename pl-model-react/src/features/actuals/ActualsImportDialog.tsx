@@ -2,7 +2,6 @@ import { useRef, useState, type ChangeEvent } from 'react';
 import { Bot, Copy, Download, FileJson2, Upload } from 'lucide-react';
 import actualsImportPrompt from '../../assets/ai-actuals-import-prompt.md?raw';
 import actualsImportSchema from '../../assets/actuals-import.schema.json?raw';
-import actualsImportTemplate from '../../assets/actuals-import-template.json?raw';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { parseActualsImportFile, type ActualsImportResult } from '../../domain/actuals-import';
@@ -68,10 +67,6 @@ export function ActualsImportDialog() {
               downloadTextFile('actuals-import.schema.json', actualsImportSchema, 'application/schema+json;charset=utf-8');
               setResourceMessage('JSON Schemaをダウンロードしました');
             }}><Download />JSON Schema</Button>
-            <Button variant="outline" size="sm" aria-label="入力テンプレートをダウンロード" onClick={() => {
-              downloadTextFile('actuals-import-template.json', actualsImportTemplate, 'application/json;charset=utf-8');
-              setResourceMessage('入力テンプレートをダウンロードしました');
-            }}><Download />入力テンプレート</Button>
           </div>
           {resourceMessage && <p role="status" className="m-0 text-[11px] font-bold text-teal">{resourceMessage}</p>}
           <p className="m-0 text-[11px] leading-relaxed text-muted-foreground">資料にない値は推測せずnull、自動計算項目は出力せず、対応できない科目はunmappedItemsへ残す仕様です。</p>

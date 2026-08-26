@@ -2,6 +2,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
+import actualsImportPrompt from '../src/assets/ai-actuals-import-prompt.md?raw';
 
 const importJson = JSON.stringify({
   format: 'pl-model-actuals',
@@ -30,6 +31,8 @@ describe('AIで過去実績を取り込む', () => {
     await user.click(screen.getByRole('button', { name: 'AIで過去実績を取り込む' }));
     await user.click(screen.getByRole('button', { name: 'AI変換用プロンプトをコピー' }));
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('# 過去実績JSON変換プロンプト'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('## 具体例'));
+    expect(writeText).not.toHaveBeenCalledWith(expect.stringContaining('actuals-import-template.json'));
     expect(await screen.findByText('プロンプトをコピーしました')).toBeVisible();
 
     await user.click(screen.getByRole('button', { name: 'JSON Schemaをダウンロード' }));
@@ -37,6 +40,7 @@ describe('AIで過去実績を取り込む', () => {
     expect(anchorClick).toHaveBeenCalled();
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:actuals-import');
     expect(screen.queryByRole('link', { name: /JSON Schema/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '入力テンプレートをダウンロード' })).not.toBeInTheDocument();
 
     const file = new File([importJson], 'actuals.json', { type: 'application/json' });
     Object.defineProperty(file, 'text', { value: async () => importJson });
@@ -55,6 +59,13 @@ describe('AIで過去実績を取り込む', () => {
     await waitFor(() => expect(screen.getByLabelText('全社 B/S 2023年 資産総額')).toHaveValue(1050));
     expect(screen.getByLabelText('ベース事業 P/L 2023年 売上高')).toHaveValue(900);
     expect(screen.queryByRole('dialog', { name: 'AIで過去実績を取り込む' })).not.toBeInTheDocument();
+  });
+
+  it('プロンプト内の具体例は読み込み可能な過去実績JSONである', async () => {
+    const example = actualsImportPrompt.match(/```json\s*([\s\S]*?)\s*```/)?.[1];
+    expect(example).toBeDefined();
+    const { parseActualsImportFile } = await import('../src/domain/actuals-import');
+    expect(() => parseActualsImportFile(example!)).not.toThrow();
   });
 
   it('不正なJSONは反映せずエラーを表示する', async () => {

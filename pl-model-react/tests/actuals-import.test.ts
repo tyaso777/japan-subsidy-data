@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { parseActualsImportFile } from '../src/domain/actuals-import';
 import { createModelStore } from '../src/store/model-store';
@@ -25,12 +23,6 @@ const validFile = {
 };
 
 describe('AI向け過去実績インポート形式', () => {
-  it('配布する入力テンプレートをそのまま検証できる', () => {
-    const template = readFileSync(resolve(process.cwd(), 'src/assets/actuals-import-template.json'), 'utf8');
-
-    expect(() => parseActualsImportFile(template)).not.toThrow();
-  });
-
   it('年度をキーに不足項目をnullで補い、金額だけを円へ変換する', () => {
     const imported = parseActualsImportFile(JSON.stringify(validFile));
 

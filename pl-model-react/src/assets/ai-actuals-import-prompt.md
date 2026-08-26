@@ -66,3 +66,83 @@
 3. 同じ区分・同じ年度のレコードが重複していないか確認してください。
 4. 合計値と内訳値を混同していないか確認してください。
 5. 自動計算項目を推測生成していないか確認してください。
+
+## 具体例
+
+次は構造と記法を示す例です。年度、金額単位、値、資料名はコピーせず、必ず添付資料の内容に置き換えてください。資料に存在しない値は、例から補わず `null` にしてください。
+
+```json
+{
+  "format": "pl-model-actuals",
+  "version": "1",
+  "amountUnit": "million-yen",
+  "years": [2023, 2024, 2025],
+  "balanceSheets": [
+    {
+      "year": 2023,
+      "values": {
+        "assets": 1000,
+        "cash": 180,
+        "capex": null
+      }
+    },
+    {
+      "year": 2024,
+      "values": {
+        "assets": 1100,
+        "cash": 195,
+        "capex": null
+      }
+    },
+    {
+      "year": 2025,
+      "values": {
+        "assets": 1200,
+        "cash": 210,
+        "capex": 80
+      }
+    }
+  ],
+  "profitAndLoss": {
+    "base": [
+      {
+        "year": 2023,
+        "values": {
+          "sales": 900,
+          "cogs": 570,
+          "employeeSalary": 112,
+          "employeeBonus": 6,
+          "headcount": 110,
+          "officerCount": 4
+        }
+      },
+      {
+        "year": 2024,
+        "values": {
+          "sales": 950,
+          "cogs": 600,
+          "employeeSalary": 118,
+          "employeeBonus": 6,
+          "headcount": 114,
+          "officerCount": 4
+        }
+      },
+      {
+        "year": 2025,
+        "values": {
+          "sales": 1000,
+          "cogs": 620,
+          "employeeSalary": 125.5,
+          "employeeBonus": 6.5,
+          "headcount": 118,
+          "officerCount": 4
+        }
+      }
+    ],
+    "subsidy": []
+  },
+  "sourceFiles": ["決算資料.pdf"],
+  "unmappedItems": ["支払利息：対応する入力項目がないため未反映"],
+  "notes": ["資料に事業区分がないため、P/Lはベース事業として記録"]
+}
+```
