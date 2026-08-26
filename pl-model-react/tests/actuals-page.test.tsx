@@ -241,10 +241,10 @@ describe('期間・過去実績', () => {
     expect(within(screen.getByTestId('historical-pl-base')).getByText('3件を貼り付けました（2件は入力対象外）')).toBeInTheDocument();
   });
 
-  it('水準範囲の適正化は03画面へ一本化し、02画面には重複表示しない', () => {
+  it('水準範囲の適正化は02将来予測画面へ一本化し、01期間・過去実績には重複表示しない', () => {
     render(<App />);
     expect(screen.queryByRole('button', { name: '過去実績から水準範囲を適正化' })).not.toBeInTheDocument();
-    expect(screen.getByText('水準範囲の適正化は、次の03画面の水準設定欄で実行できます。')).toBeVisible();
+    expect(screen.getByText('水準範囲の適正化は、次の02画面の水準設定欄で実行できます。')).toBeVisible();
   });
 
   it('最下部の次へボタンから将来予測・PLへ移動する', async () => {

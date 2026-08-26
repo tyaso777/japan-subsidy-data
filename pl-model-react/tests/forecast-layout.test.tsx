@@ -15,9 +15,7 @@ describe('将来予測画面のワイドレイアウト', () => {
   it('広い画面を活用し、左右パネルと期間見出しを横方向に揃える', async () => {
     const user = userEvent.setup();
     render(<App />);
-    const forecastButton = screen.getAllByRole('button').find((button) => button.textContent?.startsWith('03 '));
-    expect(forecastButton).toBeDefined();
-    await user.click(forecastButton!);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
 
     expect(screen.getByTestId('app-shell')).toHaveClass('max-w-[1900px]');
     expect(screen.getByTestId('forecast-layout')).toHaveClass(
@@ -180,8 +178,7 @@ describe('将来予測画面のワイドレイアウト', () => {
   it('水準値を項目名の横へ置き、開始時増減を点線で分離する', async () => {
     const user = userEvent.setup();
     render(<App />);
-    const forecastButton = screen.getAllByRole('button').find((button) => button.textContent?.startsWith('03 '));
-    await user.click(forecastButton!);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
 
     const row = screen.getByTestId('forecast-setting-row-base-sales-subsidy');
     expect(row).toBeVisible();

@@ -48,6 +48,6 @@ describe('ロジックマップ画面', () => {
     fireEvent.change(formula, { target: { value: '[未定義][t]' } });
     await user.click(screen.getByRole('button', { name: '04 ロジックマップ' }));
     expect(screen.getByRole('alert')).toHaveTextContent('未定義');
-    expect(screen.getByRole('heading', { name: '共通数値定義・ロジックマップ' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: '共通数値定義・計算ロジック' })).toBeVisible();
   });
 });

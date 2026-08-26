@@ -20,7 +20,7 @@ export function LogicMapPage({ initialSelectedCode = '16' }: { initialSelectedCo
 
   return <main className="mt-3 grid gap-3">
     <section className="flex items-center justify-between border border-line bg-surface px-5 py-4">
-      <div><p className="mb-1 flex items-center gap-1 text-[10px] font-extrabold tracking-[.08em] text-orange"><Braces className="size-3" />FORMULA DEPENDENCY GRAPH</p><h2 className="m-0 text-xl font-bold">共通数値定義・ロジックマップ</h2><p className="mt-1 mb-0 text-xs text-muted-foreground">制度定義ファイルで定義した数式を依存順に並べます。循環参照と未定義参照は読み込み時に検出します。</p></div>
+      <div><p className="mb-1 flex items-center gap-1 text-[10px] font-extrabold tracking-[.08em] text-orange"><Braces className="size-3" />REFERENCE / FORMULA DEPENDENCY GRAPH</p><h2 className="m-0 text-xl font-bold">共通数値定義・計算ロジック</h2><p className="mt-1 mb-0 text-xs text-muted-foreground">参考画面として、制度定義ファイルで定義した数式を依存順に表示します。循環参照と未定義参照は読み込み時に検出します。</p></div>
       {graphError ? <Badge role="alert" variant="outline" className="border-orange/50 text-orange">{graphError}</Badge> : <Badge variant="outline" className="gap-1 border-teal/40 text-teal"><CheckCircle2 className="size-3" />依存関係に問題なし</Badge>}
     </section>
     <section data-testid="definition-logic-map" className="grid grid-cols-4 gap-3 border border-line bg-surface p-4">

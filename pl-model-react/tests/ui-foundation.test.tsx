@@ -21,6 +21,22 @@ describe('共通UI基盤', () => {
     expect(definition).toHaveAttribute('aria-current', 'page');
   });
 
+  it('制度共通・個社案件・参考の導線を別グループとして表示する', () => {
+    render(<App />);
+
+    const toolbar = screen.getByTestId('app-toolbar');
+    const programNavigation = within(toolbar).getByRole('navigation', { name: '制度設定' });
+    const caseNavigation = within(toolbar).getByRole('navigation', { name: '個社案件' });
+    const referenceNavigation = within(toolbar).getByRole('navigation', { name: '参考' });
+
+    expect(within(programNavigation).getByText('制度テンプレート')).toBeVisible();
+    expect(within(programNavigation).getByText('制度共通')).toBeVisible();
+    expect(within(caseNavigation).getByText('01 期間・過去実績')).toBeVisible();
+    expect(within(caseNavigation).getByText('02 将来予測・PL')).toBeVisible();
+    expect(within(referenceNavigation).getByText('計算ロジック')).toBeVisible();
+    expect(within(referenceNavigation).getByText('参考')).toBeVisible();
+  });
+
   it('画面タブと共通操作をスクロール中も上端に固定する', () => {
     render(<App />);
 
@@ -29,7 +45,9 @@ describe('共通UI基盤', () => {
     expect(toolbar).toHaveStyle({ top: '0px' });
     expect(toolbar).toHaveClass('bg-surface');
     expect(toolbar).not.toHaveClass('bg-surface/95', 'backdrop-blur');
-    expect(within(toolbar).getByRole('navigation', { name: '主要画面' })).toBeVisible();
+    expect(within(toolbar).getByRole('navigation', { name: '制度設定' })).toBeVisible();
+    expect(within(toolbar).getByRole('navigation', { name: '個社案件' })).toBeVisible();
+    expect(within(toolbar).getByRole('navigation', { name: '参考' })).toBeVisible();
     expect(within(toolbar).getByLabelText('金額表示単位')).toBeVisible();
     expect(within(toolbar).getByRole('button', { name: '案件JSON' })).toBeVisible();
     expect(within(toolbar).getByRole('button', { name: '元に戻す Ctrl+Z' })).toBeVisible();
