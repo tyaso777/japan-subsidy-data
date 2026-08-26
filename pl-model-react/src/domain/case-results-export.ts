@@ -101,12 +101,14 @@ function numericStyle(kind: ValueKind) {
   return 3;
 }
 
-function worksheetXml(table: CaseResultTable) {
+function worksheetXml(table: CaseResultTable, unit: MoneyDisplayUnit) {
   const header = ['科目番号', '科目名', ...table.years.map((year) => `${year}年`)];
+  const lastColumn = columnName(header.length - 1);
   const rows = [
-    `<row r="1" ht="24" customHeight="1">${header.map((value, index) => inlineCell(`${columnName(index)}1`, value, 1)).join('')}</row>`,
+    `<row r="1">${inlineCell(`${lastColumn}1`, `金額単位：${moneyUnitLabel(unit)}`)}</row>`,
+    `<row r="2" ht="24" customHeight="1">${header.map((value, index) => inlineCell(`${columnName(index)}2`, value, 1)).join('')}</row>`,
     ...table.rows.map((row, rowIndex) => {
-      const excelRow = rowIndex + 2;
+      const excelRow = rowIndex + 3;
       const values = [inlineCell(`A${excelRow}`, row.code, 2), inlineCell(`B${excelRow}`, row.label, 2)];
       row.values.forEach((value, index) => {
         const ref = `${columnName(index + 2)}${excelRow}`;
@@ -115,14 +117,17 @@ function worksheetXml(table: CaseResultTable) {
       return `<row r="${excelRow}">${values.join('')}</row>`;
     }),
   ];
-  const lastColumn = columnName(header.length - 1);
-  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><dimension ref="A1:${lastColumn}${table.rows.length + 1}"/><sheetViews><sheetView workbookViewId="0"><pane xSplit="2" ySplit="1" topLeftCell="C2" activePane="bottomRight" state="frozen"/></sheetView></sheetViews><cols><col min="1" max="1" width="11" customWidth="1"/><col min="2" max="2" width="36" customWidth="1"/><col min="3" max="${header.length}" width="14" customWidth="1"/></cols><sheetData>${rows.join('')}</sheetData><autoFilter ref="A1:${lastColumn}${table.rows.length + 1}"/></worksheet>`;
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><dimension ref="A1:${lastColumn}${table.rows.length + 2}"/><sheetViews><sheetView workbookViewId="0"><pane xSplit="2" ySplit="2" topLeftCell="C3" activePane="bottomRight" state="frozen"/></sheetView></sheetViews><cols><col min="1" max="1" width="11" customWidth="1"/><col min="2" max="2" width="36" customWidth="1"/><col min="3" max="${header.length}" width="14" customWidth="1"/></cols><sheetData>${rows.join('')}</sheetData><autoFilter ref="A2:${lastColumn}${table.rows.length + 2}"/></worksheet>`;
 }
 
 const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="5"><numFmt numFmtId="164" formatCode="#,##0.00"/><numFmt numFmtId="165" formatCode="0.00&quot;%&quot;"/><numFmt numFmtId="166" formatCode="0.00&quot;pt&quot;"/><numFmt numFmtId="167" formatCode="0.00&quot;人&quot;"/><numFmt numFmtId="168" formatCode="0.00&quot;倍&quot;"/></numFmts><fonts count="2"><font><sz val="11"/><name val="Yu Gothic"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Yu Gothic"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF183B56"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border/><border><left style="thin"><color rgb="FFD2DBE2"/></left><right style="thin"><color rgb="FFD2DBE2"/></right><top style="thin"><color rgb="FFD2DBE2"/></top><bottom style="thin"><color rgb="FFD2DBE2"/></bottom></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="8"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFill="1" applyFont="1" applyBorder="1"/><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/><xf numFmtId="165" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/><xf numFmtId="166" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/><xf numFmtId="167" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/><xf numFmtId="168" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
 
 export function createCaseResultXlsx(report: CaseResultReport): Uint8Array {
-  const sheetEntries = report.tables.map((table, index) => `<sheet name="${escapeXml(table.name.slice(0, 31))}" sheetId="${index + 1}" r:id="rId${index + 1}"/>`).join('');
+  const sheetNames = report.tables.map((table, index) => {
+    const normalized = table.name.replace(/[\\/?*:[\]]/g, '').replace(/\s+/g, '').replace(/^'+|'+$/g, '').slice(0, 31);
+    return normalized || `Sheet${index + 1}`;
+  });
+  const sheetEntries = sheetNames.map((name, index) => `<sheet name="${escapeXml(name)}" sheetId="${index + 1}" r:id="rId${index + 1}"/>`).join('');
   const relationshipEntries = report.tables.map((_table, index) => `<Relationship Id="rId${index + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${index + 1}.xml"/>`).join('');
   const files: Record<string, Uint8Array> = {
     '[Content_Types].xml': strToU8(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${report.tables.map((_table, index) => `<Override PartName="/xl/worksheets/sheet${index + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`),
@@ -131,7 +136,7 @@ export function createCaseResultXlsx(report: CaseResultReport): Uint8Array {
     'xl/_rels/workbook.xml.rels': strToU8(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${relationshipEntries}<Relationship Id="rId${report.tables.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`),
     'xl/styles.xml': strToU8(stylesXml),
   };
-  report.tables.forEach((table, index) => { files[`xl/worksheets/sheet${index + 1}.xml`] = strToU8(worksheetXml(table)); });
+  report.tables.forEach((table, index) => { files[`xl/worksheets/sheet${index + 1}.xml`] = strToU8(worksheetXml(table, report.unit)); });
   return zipSync(files, { level: 6 });
 }
 

@@ -20,8 +20,14 @@ describe('案件結果の出力', () => {
     expect(Object.keys(archive)).toContain('xl/worksheets/sheet3.xml');
     const workbook = strFromU8(archive['xl/workbook.xml']);
     const baseSheet = strFromU8(archive['xl/worksheets/sheet2.xml']);
-    expect(workbook).toContain('name="全社合算 P/L"');
-    expect(workbook).toContain('name="ベース事業 P/L"');
+    expect(workbook).toContain('name="全社合算PL"');
+    expect(workbook).toContain('name="ベース事業PL"');
+    expect(workbook).not.toMatch(/<sheet name="[^"]*[\\/?*:[\]][^"]*"/);
+    expect(baseSheet).toContain('<row r="1"');
+    expect(baseSheet).toContain('金額単位：百万円');
+    expect(baseSheet).toContain('<row r="2" ht="24" customHeight="1">');
+    expect(baseSheet).toContain('ySplit="2" topLeftCell="C3"');
+    expect(baseSheet).toContain('<autoFilter ref="A2:');
     expect(baseSheet).toContain('2026');
     expect(baseSheet).toContain('1080');
   });
