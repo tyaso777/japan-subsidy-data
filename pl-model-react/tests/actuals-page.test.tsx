@@ -8,6 +8,8 @@ describe('期間・過去実績', () => {
     render(<App />);
 
     expect(screen.getByTestId('actuals-page')).toHaveClass('mx-auto', 'w-full', 'max-w-[1360px]');
+    expect(screen.getByTestId('period-editor')).toHaveClass('mx-auto', 'w-full', 'max-w-[760px]');
+    expect(screen.getByTestId('special-year-summary')).toHaveClass('grid-cols-2');
     for (const testId of ['historical-bs', 'historical-pl-base', 'historical-pl-subsidy']) {
       expect(screen.getByTestId(testId)).toHaveAttribute('data-density', 'compact');
       expect(screen.getByTestId(testId)).toHaveClass('mx-auto', 'w-full');
