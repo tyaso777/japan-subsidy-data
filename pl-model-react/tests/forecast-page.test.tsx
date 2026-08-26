@@ -562,6 +562,23 @@ describe('将来予測・PL画面', () => {
     expect(strengthSlider).toHaveAttribute('aria-valuenow', '100');
   }, 35_000);
 
+  it('水準案の作成後に水準設定を直接変更すると作成済み案と適用率を破棄する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    await user.click(screen.getByRole('button', { name: '目標を満たす水準案を作成' }));
+
+    expect(await screen.findByTestId('optimization-proposal', {}, { timeout: 30_000 })).toBeVisible();
+    expect(screen.getByRole('slider', { name: '最適化方向の適用率' })).toBeVisible();
+
+    const rate = screen.getAllByLabelText(/年間変化$/)[0] as HTMLInputElement;
+    await user.clear(rate);
+    await user.type(rate, '9');
+
+    expect(screen.queryByTestId('optimization-proposal')).not.toBeInTheDocument();
+    expect(screen.queryByRole('slider', { name: '最適化方向の適用率' })).not.toBeInTheDocument();
+  }, 35_000);
+
   it('最適化方法を最小変更・バランス・最少項目・優先順位から選択し、提案へ使用方式を表示する', async () => {
     const user = userEvent.setup();
     render(<App />);

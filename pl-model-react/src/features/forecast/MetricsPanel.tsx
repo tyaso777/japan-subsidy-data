@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { LoaderCircle } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { StickyPanel } from '../../components/ui/sticky-panel';
@@ -101,6 +101,7 @@ export function useForecastOptimization() {
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [isExpansionSearching, setIsExpansionSearching] = useState(false);
   const [applicationResult, setApplicationResult] = useState<string[]>();
+  const calculationGeneration = useRef(0);
   const program = useModelStore((state) => state.program);
   const forecast = useModelStore((state) => state.forecast);
   const actuals = useModelStore((state) => state.actuals);
@@ -113,7 +114,16 @@ export function useForecastOptimization() {
     const restoredStrength = inferOptimizationStrength(proposal, forecast);
     setStrength((current) => current === restoredStrength ? current : restoredStrength);
   }, [forecast, proposal]);
+  const invalidateProposal = () => {
+    calculationGeneration.current += 1;
+    setProposal(undefined);
+    setStrength(0);
+    setApplicationResult(undefined);
+    setIsOptimizing(false);
+    setIsExpansionSearching(false);
+  };
   const calculateProposal = (sourceForecast: typeof forecast) => {
+    const generation = ++calculationGeneration.current;
     setIsOptimizing(true);
     setIsExpansionSearching(false);
     setProposal(undefined);
@@ -122,6 +132,7 @@ export function useForecastOptimization() {
       try {
         const input = { model: sourceForecast, program, baseActuals: actuals.basePl, subsidyActuals: actuals.subsidyPl, actualInputs: actuals.metricInputs, metricTargets, strategy, rangeMode };
         const initial = await calculateMetricOptimization(input);
+        if (generation !== calculationGeneration.current) return;
         setProposal(initial);
         if (initial.feasibility === 'infeasible' && rangeMode === 'outside-levels') {
           setIsExpansionSearching(true);
@@ -130,6 +141,7 @@ export function useForecastOptimization() {
           window.setTimeout(async () => {
             try {
               const expansionPlan = await calculateMetricOptimizationExpansion(input, initial);
+              if (generation !== calculationGeneration.current) return;
               if (!expansionPlan) return;
               const proposalWithExpansion = { ...initial, expansionPlan };
               const expanded = applyOptimizationExpansionPlan(proposalWithExpansion);
@@ -138,6 +150,7 @@ export function useForecastOptimization() {
                 return `${entry.seriesLabel}／${period} ${entry.boundary === 'max' ? '上限' : '下限'} ${entry.before.toFixed(2)} → ${entry.after.toFixed(2)}`;
               });
               const optimizedInExpandedRange = await calculateMetricOptimization({ ...input, model: expanded });
+              if (generation !== calculationGeneration.current) return;
               const completedProposal = { ...optimizedInExpandedRange, expansionPlan };
               begin();
               replaceForecast(applyOptimizationStrength(completedProposal, 100));
@@ -146,12 +159,12 @@ export function useForecastOptimization() {
               setProposal(completedProposal);
               setStrength(100);
             } finally {
-              setIsExpansionSearching(false);
+              if (generation === calculationGeneration.current) setIsExpansionSearching(false);
             }
           }, 500);
         }
       } finally {
-        setIsOptimizing(false);
+        if (generation === calculationGeneration.current) setIsOptimizing(false);
       }
     }, 0);
   };
@@ -164,25 +177,24 @@ export function useForecastOptimization() {
     setStrength(nextStrength);
     if (proposal) replaceForecast(applyOptimizationStrength(proposal, nextStrength));
   };
-  return { strategy, setStrategy, rangeMode, setRangeMode, proposal, strength, isOptimizing, isExpansionSearching, applicationResult, createProposal, apply, commit, setProposal, setStrength, setApplicationResult };
+  return { strategy, setStrategy, rangeMode, setRangeMode, proposal, strength, isOptimizing, isExpansionSearching, applicationResult, createProposal, apply, commit, invalidateProposal };
 }
 
 export type ForecastOptimizationController = ReturnType<typeof useForecastOptimization>;
 
 export function OptimizationToolbar({ controller, compact = false }: { controller: ForecastOptimizationController; compact?: boolean }) {
-  const { strategy, setStrategy, rangeMode, setRangeMode, proposal, strength, isOptimizing, isExpansionSearching, createProposal, apply, commit, setProposal, setStrength, setApplicationResult } = controller;
-  const resetProposal = () => { setProposal(undefined); setStrength(0); setApplicationResult(undefined); };
+  const { strategy, setStrategy, rangeMode, setRangeMode, proposal, strength, isOptimizing, isExpansionSearching, createProposal, apply, commit, invalidateProposal } = controller;
   const createButtonContent = isOptimizing ? <><LoaderCircle data-testid="optimization-spinner" className="animate-spin will-change-transform [animation-duration:850ms]" aria-hidden="true" /><span role="status">水準案を計算中…</span></> : isExpansionSearching ? <><LoaderCircle className="animate-spin will-change-transform [animation-duration:850ms]" aria-hidden="true" />水準外を探索中…</> : compact ? '水準案を作成' : '目標を満たす水準案を作成';
   if (compact) return <section data-testid="forecast-optimization-toolbar" data-layout="compact" className="flex shrink-0 items-center gap-1.5 border-l border-line pl-2">
-    <label className="flex shrink-0 items-center gap-1 text-[8px] font-bold text-muted-foreground">方法<select aria-label="最適化方法" className="h-7 w-[82px] rounded border border-input bg-surface px-1.5 text-[9px]" value={strategy} onChange={(event) => { setStrategy(event.target.value as OptimizationStrategy); resetProposal(); }}><option value="minimum-change">最小変更</option><option value="balanced">バランス</option><option value="sparse">最少項目</option><option value="priority">優先順位</option></select></label>
-    <label className="flex shrink-0 items-center gap-1 text-[8px] font-bold text-muted-foreground">範囲<select aria-label="探索範囲" className="h-7 w-[98px] rounded border border-input bg-surface px-1.5 text-[9px]" value={rangeMode} onChange={(event) => { setRangeMode(event.target.value as OptimizationRangeMode); resetProposal(); }}><option value="within-levels">水準内最適化</option><option value="outside-levels">水準外最適化</option></select></label>
+    <label className="flex shrink-0 items-center gap-1 text-[8px] font-bold text-muted-foreground">方法<select aria-label="最適化方法" className="h-7 w-[82px] rounded border border-input bg-surface px-1.5 text-[9px]" value={strategy} onChange={(event) => { setStrategy(event.target.value as OptimizationStrategy); invalidateProposal(); }}><option value="minimum-change">最小変更</option><option value="balanced">バランス</option><option value="sparse">最少項目</option><option value="priority">優先順位</option></select></label>
+    <label className="flex shrink-0 items-center gap-1 text-[8px] font-bold text-muted-foreground">範囲<select aria-label="探索範囲" className="h-7 w-[98px] rounded border border-input bg-surface px-1.5 text-[9px]" value={rangeMode} onChange={(event) => { setRangeMode(event.target.value as OptimizationRangeMode); invalidateProposal(); }}><option value="within-levels">水準内最適化</option><option value="outside-levels">水準外最適化</option></select></label>
     <Button className="h-7 min-w-0 whitespace-nowrap px-2 text-[9px]" aria-label="目標を満たす水準案を作成" disabled={isOptimizing || isExpansionSearching} aria-busy={isOptimizing || isExpansionSearching} onClick={createProposal}>{createButtonContent}</Button>
     {proposal && <label className="grid w-[170px] shrink-0 grid-cols-[auto_minmax(70px,1fr)_28px] items-center gap-1 text-[8px] font-bold">適用率<Slider aria-label="最適化方向の適用率" data-testid="optimization-strength-control" className="h-7 cursor-pointer [&_[data-slot=slider-thumb]]:size-5" min={0} max={100} step={1} value={[strength]} onPointerCancel={commit} onLostPointerCapture={commit} onValueChange={(values) => apply(values[0] ?? 0)} onValueCommit={commit} onBlur={commit} /><b className="text-right text-orange">{strength}%</b></label>}
     <a aria-label="最適化方法の詳しい説明" className="shrink-0 text-[9px] font-bold text-teal underline underline-offset-2" href="./docs/optimization-methods.html" target="_blank" rel="noreferrer">説明</a>
   </section>;
   return <section data-testid="forecast-optimization-toolbar" className="grid w-full min-w-0 grid-cols-[repeat(auto-fit,minmax(105px,1fr))] items-end gap-2 overflow-hidden rounded border border-line bg-background p-2">
-    <label className="min-w-0 text-[9px] font-bold text-muted-foreground">最適化方法<select aria-label="最適化方法" className="mt-0.5 h-7 w-full min-w-0 rounded border border-input bg-surface px-2 text-[10px]" value={strategy} onChange={(event) => { setStrategy(event.target.value as OptimizationStrategy); resetProposal(); }}><option value="minimum-change">最小変更</option><option value="balanced">バランス</option><option value="sparse">最少項目</option><option value="priority">優先順位</option></select></label>
-    <label className="min-w-0 text-[9px] font-bold text-muted-foreground">探索範囲<select aria-label="探索範囲" className="mt-0.5 h-7 w-full min-w-0 rounded border border-input bg-surface px-2 text-[10px]" value={rangeMode} onChange={(event) => { setRangeMode(event.target.value as OptimizationRangeMode); resetProposal(); }}><option value="within-levels">水準内最適化</option><option value="outside-levels">水準外最適化</option></select></label>
+    <label className="min-w-0 text-[9px] font-bold text-muted-foreground">最適化方法<select aria-label="最適化方法" className="mt-0.5 h-7 w-full min-w-0 rounded border border-input bg-surface px-2 text-[10px]" value={strategy} onChange={(event) => { setStrategy(event.target.value as OptimizationStrategy); invalidateProposal(); }}><option value="minimum-change">最小変更</option><option value="balanced">バランス</option><option value="sparse">最少項目</option><option value="priority">優先順位</option></select></label>
+    <label className="min-w-0 text-[9px] font-bold text-muted-foreground">探索範囲<select aria-label="探索範囲" className="mt-0.5 h-7 w-full min-w-0 rounded border border-input bg-surface px-2 text-[10px]" value={rangeMode} onChange={(event) => { setRangeMode(event.target.value as OptimizationRangeMode); invalidateProposal(); }}><option value="within-levels">水準内最適化</option><option value="outside-levels">水準外最適化</option></select></label>
     <Button className="h-7 w-full min-w-0 overflow-hidden whitespace-nowrap px-2 text-[10px]" disabled={isOptimizing || isExpansionSearching} aria-busy={isOptimizing || isExpansionSearching} onClick={createProposal}>{createButtonContent}</Button>
     <div className="col-span-full flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 border-t border-line pt-1.5"><span className="min-w-0 text-[9px] text-muted-foreground">{rangeMode === 'within-levels' ? 'Min・Max内' : 'Min・Max外も探索'}・{strategyDescriptions[strategy]}</span><a className="shrink-0 text-[9px] font-bold text-teal underline underline-offset-2" href="./docs/optimization-methods.html" target="_blank" rel="noreferrer">最適化方法の詳しい説明</a>{proposal && <label className="ml-auto grid min-w-[210px] flex-1 grid-cols-[auto_minmax(100px,1fr)_32px] items-center gap-2 text-[9px] font-bold">適用率<Slider aria-label="最適化方向の適用率" data-testid="optimization-strength-control" className="h-7 cursor-pointer [&_[data-slot=slider-thumb]]:size-5" min={0} max={100} step={1} value={[strength]} onPointerCancel={commit} onLostPointerCapture={commit} onValueChange={(values) => apply(values[0] ?? 0)} onValueCommit={commit} onBlur={commit} /><b className="text-right text-orange">{strength}%</b></label>}</div>
   </section>;
