@@ -35,8 +35,9 @@ describe('GitHub Actions build workflow', () => {
     expect(workflow).toMatch(/release:[\s\S]+permissions:\s+contents: write/)
     expect(workflow).toMatch(/uses: actions\/download-artifact@v\d+/)
     expect(workflow).toContain(
-      'zip -j pl-model-react-dist.zip release-assets/index.html release-assets/subsidy-program.js',
+      'cd release-assets && zip -r ../pl-model-react-dist.zip .',
     )
+    expect(workflow).not.toContain('zip -j')
     expect(workflow).toContain('GH_TOKEN: ${{ github.token }}')
     expect(workflow).toContain('GH_REPO: ${{ github.repository }}')
     expect(workflow).toContain('tag="pl-model-react-${short_sha}"')

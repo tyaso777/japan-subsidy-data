@@ -71,7 +71,7 @@ jobs:
           path: release-assets
 
       - name: Package public release
-        run: zip -j pl-model-react-dist.zip release-assets/index.html release-assets/subsidy-program.js
+        run: cd release-assets && zip -r ../pl-model-react-dist.zip .
 
       - name: Publish GitHub Release
         env:
@@ -81,7 +81,7 @@ jobs:
           short_sha="${GITHUB_SHA::7}"
           tag="pl-model-react-${short_sha}"
           title="PL Model React ${short_sha}"
-          notes="Automated build from commit ${GITHUB_SHA}. The ZIP contains index.html and subsidy-program.js. Keep both files in the same folder."
+          notes="Automated build from commit ${GITHUB_SHA}. The ZIP contains the complete built distribution, including documentation and sample data. Extract the complete ZIP before opening index.html."
 
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" pl-model-react-dist.zip --clobber
