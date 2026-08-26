@@ -24,3 +24,13 @@ export function parseProgramScript(source: string): ProgramConfiguration {
   }
   return programConfigurationSchema.parse(value);
 }
+
+export function parseProgramTemplateJson(source: string): ProgramConfiguration {
+  let value: unknown;
+  try {
+    value = JSON.parse(source);
+  } catch {
+    throw new Error('JSONとして解析できません');
+  }
+  return programConfigurationSchema.parse(value);
+}

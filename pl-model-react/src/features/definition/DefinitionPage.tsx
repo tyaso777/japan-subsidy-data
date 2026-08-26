@@ -11,6 +11,7 @@ import type { CommonNumericDefinition, ManagementMetricDefinition, MetricTimeAnc
 import { valueKindMetadata, type ValueKind } from '../../domain/value-units';
 import { useModelStore } from '../../store/model-store-context';
 import { ProgramFileMenu } from './ProgramFileMenu';
+import { ProgramTemplateAiDialog } from './ProgramTemplateAiDialog';
 import { addPeriodDefinition, removePeriodDefinition, removeSpecialYearDefinition, renameNumericDefinition } from '../../domain/program-editor';
 import { forecastPlRows } from '../../domain/rows';
 
@@ -101,7 +102,7 @@ export function DefinitionPage() {
   const addSpecialYear = () => change((draft) => draft.definitions.specialYears.push({ id: nextId('special', draft.definitions.specialYears.length), label: `特別年${draft.definitions.specialYears.length + 1}`, anchor: { type: 'historicalEnd' }, offset: 0 }));
   return <main className="mt-3 grid gap-3">
     <section className="flex items-start justify-between gap-5 border border-line border-t-[3px] border-t-orange bg-surface px-5 py-4">
-      <div className="min-w-0 flex-1"><span className="text-[10px] font-extrabold tracking-[.08em] text-orange">制度・プロジェクト共通</span><Input aria-label="制度名" className="mt-2 max-w-xl text-lg font-bold" value={program.program.name} onChange={(event) => change((draft) => { draft.program.name = event.target.value; })} /><p className="mb-0 text-sm text-muted-foreground">区間・特別年・数値・経営指標を制度定義ファイルとして定義します。個社ごとに変わる実年は次画面で設定します。</p></div><ProgramFileMenu />
+      <div className="min-w-0 flex-1"><span className="text-[10px] font-extrabold tracking-[.08em] text-orange">制度・プロジェクト共通</span><Input aria-label="制度名" className="mt-2 max-w-xl text-lg font-bold" value={program.program.name} onChange={(event) => change((draft) => { draft.program.name = event.target.value; })} /><p className="mb-0 text-sm text-muted-foreground">区間・特別年・数値・経営指標を制度定義ファイルとして定義します。個社ごとに変わる実年は次画面で設定します。</p></div><div className="flex max-w-md shrink-0 flex-col items-end gap-1.5"><div className="flex flex-wrap justify-end gap-2"><ProgramTemplateAiDialog /><ProgramFileMenu /></div><p className="m-0 max-w-sm text-right text-[10px] leading-relaxed text-muted-foreground"><code className="font-bold text-ink">subsidy-program.js</code> としてHTMLと同じ階層へ置くと、次回起動時から自動で読み込みます。</p></div>
     </section>
 
     <div className="grid grid-cols-2 items-start gap-3 max-[1100px]:grid-cols-1">

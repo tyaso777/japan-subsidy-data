@@ -6,31 +6,10 @@ import actualsImportTemplate from '../../assets/actuals-import-template.json?raw
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { parseActualsImportFile, type ActualsImportResult } from '../../domain/actuals-import';
+import { copyText, downloadTextFile } from '../../lib/text-resource-actions';
 import { useModelStore } from '../../store/model-store-context';
 
 const amountUnitLabels = { yen: '円', 'thousand-yen': '千円', 'million-yen': '百万円' } as const;
-
-async function copyText(text: string) {
-  if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  textarea.style.position = 'fixed';
-  textarea.style.opacity = '0';
-  document.body.append(textarea);
-  textarea.select();
-  const copied = document.execCommand?.('copy');
-  textarea.remove();
-  if (!copied) throw new Error('clipboard unavailable');
-}
-
-function downloadTextFile(fileName: string, content: string, type: string) {
-  const url = URL.createObjectURL(new Blob([content], { type }));
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = fileName;
-  anchor.click();
-  URL.revokeObjectURL(url);
-}
 
 function countValues(records: object[]) {
   return records.reduce((count, record) => count + Object.values(record).filter((value) => typeof value === 'number').length, 0);
