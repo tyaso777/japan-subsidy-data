@@ -8,7 +8,7 @@ describe('ロジックマップ画面', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '04 ロジックマップ' }));
-    expect(screen.getByText(/制度定義ファイルで定義した数式/)).toBeVisible();
+    expect(screen.getByText(/制度テンプレートで定義され、すべての個別案件に共通して使用/)).toBeVisible();
 
     const map = screen.getByTestId('definition-logic-map');
     expect(within(map).getByRole('heading', { name: '人件費' })).toBeVisible();
@@ -50,6 +50,6 @@ describe('ロジックマップ画面', () => {
     fireEvent.change(formula, { target: { value: '[未定義][t]' } });
     await user.click(screen.getByRole('button', { name: '04 ロジックマップ' }));
     expect(screen.getByRole('alert')).toHaveTextContent('未定義');
-    expect(screen.getByRole('heading', { name: '共通数値定義・計算ロジック' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: '制度テンプレートの共通数値定義' })).toBeVisible();
   });
 });
