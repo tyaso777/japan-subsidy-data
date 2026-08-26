@@ -2,9 +2,17 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
+import programTemplatePrompt from '../src/assets/ai-program-template-prompt.md?raw';
+import { parseProgramTemplateJson } from '../src/domain/program-file';
 import { createDefaultProgram } from '../src/domain/timeline';
 
 describe('AIで制度テンプレートを作成する', () => {
+  it('プロンプト内の具体例は読み込み可能な制度テンプレートである', () => {
+    const example = programTemplatePrompt.match(/```json\s*([\s\S]*?)\s*```/)?.[1];
+    expect(example).toBeDefined();
+    expect(() => parseProgramTemplateJson(example!)).not.toThrow();
+  });
+
   it('プロンプトと検証資料を提供し、生成JSONを確認して制度へ反映する', async () => {
     const user = userEvent.setup();
     const writeText = vi.fn().mockResolvedValue(undefined);
@@ -19,11 +27,14 @@ describe('AIで制度テンプレートを作成する', () => {
     await user.click(screen.getByRole('button', { name: 'AIで制度テンプレートを作る' }));
     await user.click(screen.getByRole('button', { name: 'AI作成用プロンプトをコピー' }));
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('# 制度テンプレートJSON作成プロンプト'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('## 具体例'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('"commonNumericDefinitions"'));
+    expect(writeText).not.toHaveBeenCalledWith(expect.stringContaining('program-template-example.json'));
     expect(await screen.findByText('プロンプトをコピーしました')).toBeVisible();
 
     await user.click(screen.getByRole('button', { name: '制度テンプレートSchemaをダウンロード' }));
-    await user.click(screen.getByRole('button', { name: '現在のテンプレート例をダウンロード' }));
-    expect(createObjectURL).toHaveBeenCalledTimes(2);
+    expect(screen.queryByRole('button', { name: '現在のテンプレート例をダウンロード' })).not.toBeInTheDocument();
+    expect(createObjectURL).toHaveBeenCalledTimes(1);
 
     const generated = createDefaultProgram();
     generated.program.name = 'AI生成テスト制度';

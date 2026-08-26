@@ -1,6 +1,6 @@
 # 制度テンプレートJSON作成プロンプト
 
-添付した補助金・支援制度の公募要領、指標資料、`program-template.schema.json`、および `program-template-example.json` を読み取り、このシミュレーター用の制度テンプレートJSONを1件作成してください。
+添付した補助金・支援制度の公募要領、指標資料、`program-template.schema.json`、および後記の具体例を読み取り、このシミュレーター用の制度テンプレートJSONを1件作成してください。
 
 ## 絶対条件
 
@@ -23,5 +23,101 @@
 3. 経営指標の式で使う時点IDが `timePoints` に存在するか確認してください。
 4. 制度資料の期間定義、基準年、比較期間、目標値、以上・以下の方向が注意書きまで含めて一致するか確認してください。
 5. 個社固有データを混入させていないか確認してください。
+
+## 具体例
+
+次は構造と記法を示す最小例です。名称、期間、計算式、目標値をコピーするのではなく、必ず添付資料の定義に置き換えてください。配列には、資料から確認できた区間・特別年・共通数値定義・経営指標を必要な件数だけ追加してください。
+
+```json
+{
+  "schemaVersion": "3.0",
+  "program": {
+    "id": "example-program",
+    "name": "制度名の例",
+    "version": "1.0"
+  },
+  "definitions": {
+    "historical": {
+      "id": "historical",
+      "label": "過去実績",
+      "fixed": true
+    },
+    "periods": [
+      {
+        "id": "investment",
+        "label": "設備導入期間",
+        "modelPhase": "toBase"
+      },
+      {
+        "id": "report",
+        "label": "事業化報告期間",
+        "modelPhase": "postBase"
+      }
+    ],
+    "specialYears": [
+      {
+        "id": "latest",
+        "label": "最新決算期",
+        "anchor": { "type": "historicalEnd" },
+        "offset": 0
+      },
+      {
+        "id": "base",
+        "label": "基準年",
+        "anchor": { "type": "periodEnd", "periodId": "investment" },
+        "offset": 0
+      }
+    ],
+    "commonNumericDefinitions": [
+      {
+        "id": "example-ebitda",
+        "label": "EBITDA（例）",
+        "formula": "[営業利益][t] + [減価償却費][t]",
+        "outputPoint": "t",
+        "plDisplay": {
+          "enabled": true,
+          "insertAfter": "23",
+          "insertOrder": 1,
+          "valueKind": "money",
+          "indent": 0
+        }
+      }
+    ],
+    "managementMetrics": [
+      {
+        "id": "example-sales-growth",
+        "label": "売上高成長率（例）",
+        "enabled": true,
+        "scope": "company",
+        "timePoints": [
+          {
+            "id": "A",
+            "anchor": { "type": "specialYear", "specialYearId": "base" },
+            "offset": 0
+          },
+          {
+            "id": "B",
+            "anchor": { "type": "periodEnd", "periodId": "report" },
+            "offset": 0
+          }
+        ],
+        "formula": "(([売上高][B] / [売上高][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
+        "outputUnit": "% / 年",
+        "target": 10,
+        "direction": "min",
+        "targetPolicy": "minimum",
+        "optimization": "adjustable"
+      }
+    ]
+  },
+  "timeline": {
+    "historical": { "startYear": 2023, "endYear": 2025 },
+    "periods": [
+      { "definitionId": "investment", "startYear": 2026, "endYear": 2028 },
+      { "definitionId": "report", "startYear": 2029, "endYear": 2031 }
+    ]
+  }
+}
+```
 
 生成JSONは、この画面の「生成されたJSONを選択」で検証します。検証後に画面へ反映し、「制度定義ファイル」から `subsidy-program.js` として保存してください。

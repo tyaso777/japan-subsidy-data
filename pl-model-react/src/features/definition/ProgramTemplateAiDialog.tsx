@@ -10,7 +10,6 @@ import { copyText, downloadTextFile } from '../../lib/text-resource-actions';
 import { useModelStore } from '../../store/model-store-context';
 
 export function ProgramTemplateAiDialog() {
-  const program = useModelStore((state) => state.program);
   const replaceProgram = useModelStore((state) => state.replaceProgram);
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
@@ -55,10 +54,6 @@ export function ProgramTemplateAiDialog() {
               downloadTextFile('program-template.schema.json', programTemplateSchema, 'application/schema+json;charset=utf-8');
               setResourceMessage('JSON Schemaをダウンロードしました');
             }}><Download />JSON Schema</Button>
-            <Button variant="outline" size="sm" aria-label="現在のテンプレート例をダウンロード" onClick={() => {
-              downloadTextFile('program-template-example.json', `${JSON.stringify(program, null, 2)}\n`, 'application/json;charset=utf-8');
-              setResourceMessage('現在のテンプレート例をダウンロードしました');
-            }}><Download />現在のテンプレート例</Button>
           </div>
           {resourceMessage && <p role="status" className="m-0 text-[11px] font-bold text-teal">{resourceMessage}</p>}
           <p className="m-0 text-[11px] leading-relaxed text-muted-foreground">AIにはJSONだけを生成させます。画面側で参照ID・数式依存・期間整合を検証し、生成コードは実行しません。</p>
