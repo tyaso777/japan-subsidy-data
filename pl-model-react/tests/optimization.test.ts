@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyOptimizationExpansionPlan, applyOptimizationStrength, buildOptimizationTimelines, createConstrainedOptimizationProposal, createMetricOptimizationExpansionPlan, createMetricOptimizationProposal, createOptimizationExpansionPlan, createOptimizationProposal } from '../src/domain/optimization';
+import { applyOptimizationExpansionPlan, applyOptimizationStrength, buildOptimizationTimelines, createConstrainedOptimizationProposal, createMetricOptimizationExpansionPlan, createMetricOptimizationProposal, createOptimizationExpansionPlan, createOptimizationProposal, inferOptimizationStrength } from '../src/domain/optimization';
 import { projectForecastSeries, type ForecastModel } from '../src/domain/forecast-engine';
 import { baseHistoricalPl, subsidyHistoricalPl } from '../src/domain/sample-data';
 import { createModelStore } from '../src/store/model-store';
@@ -315,6 +315,9 @@ describe('目標最適化提案', () => {
     expect(applyOptimizationStrength(proposal, 0).series[0].periods[0].annualGrowthRate).toBe(baseRate);
     expect(applyOptimizationStrength(proposal, 50).series[0].periods[0].annualGrowthRate).toBeCloseTo((baseRate + targetRate) / 2);
     expect(applyOptimizationStrength(proposal, 100)).toEqual(proposal.optimized);
+    expect(inferOptimizationStrength(proposal, applyOptimizationStrength(proposal, 0))).toBe(0);
+    expect(inferOptimizationStrength(proposal, applyOptimizationStrength(proposal, 50))).toBe(50);
+    expect(inferOptimizationStrength(proposal, applyOptimizationStrength(proposal, 100))).toBe(100);
   });
 
   it('配分率は現在PLを変えず、最適化結果と適用率に応じて段階反映する', () => {

@@ -691,6 +691,21 @@ export function applyOptimizationStrength(proposal: OptimizationProposal, streng
   return result;
 }
 
+export function inferOptimizationStrength(proposal: OptimizationProposal, model: ForecastModel): number {
+  let weightedDifference = 0;
+  let totalWeight = 0;
+  for (const change of proposal.changes) {
+    if (Math.abs(change.delta) < 1e-9) continue;
+    const series = model.series.find((candidate) => candidate.id === change.seriesId);
+    const period = series?.periods.find((candidate) => candidate.id === change.periodId);
+    if (!period) continue;
+    weightedDifference += change.delta * (period.annualGrowthRate - change.before);
+    totalWeight += change.delta ** 2;
+  }
+  if (totalWeight === 0) return 0;
+  return Math.round(Math.max(0, Math.min(100, weightedDifference / totalWeight * 100)));
+}
+
 type Timeline = { years: number[]; records: HistoricalPlCalculated[] };
 
 function timeline(actuals: HistoricalPlInput[], model: ForecastModel, scope: 'base' | 'subsidy'): Timeline {

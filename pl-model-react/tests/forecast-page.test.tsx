@@ -553,6 +553,13 @@ describe('将来予測・PL画面', () => {
     strengthSlider.focus();
     await user.keyboard('{End}');
     expect(rates.some((rate, index) => rate.value !== before[index])).toBe(true);
+    expect(strengthSlider).toHaveAttribute('aria-valuenow', '100');
+    await user.click(screen.getByRole('button', { name: '元に戻す Ctrl+Z' }));
+    expect(rates.map((rate) => rate.value)).toEqual(before);
+    expect(strengthSlider).toHaveAttribute('aria-valuenow', '0');
+    await user.click(screen.getByRole('button', { name: 'やり直す Ctrl+Y' }));
+    expect(rates.some((rate, index) => rate.value !== before[index])).toBe(true);
+    expect(strengthSlider).toHaveAttribute('aria-valuenow', '100');
   }, 35_000);
 
   it('最適化方法を最小変更・バランス・最少項目・優先順位から選択し、提案へ使用方式を表示する', async () => {

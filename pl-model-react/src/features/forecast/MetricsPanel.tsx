@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { LoaderCircle } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { StickyPanel } from '../../components/ui/sticky-panel';
@@ -8,7 +8,7 @@ import { Slider } from '../../components/ui/slider';
 import { Textarea } from '../../components/ui/textarea';
 import { evaluateManagementMetric, resolveMetricTarget } from '../../domain/metrics';
 import { metricAttainmentColor, metricAttainmentScore } from '../../domain/metric-attainment';
-import { applyOptimizationExpansionPlan, applyOptimizationStrength, type OptimizationProposal, type OptimizationRangeMode, type OptimizationStrategy } from '../../domain/optimization';
+import { applyOptimizationExpansionPlan, applyOptimizationStrength, inferOptimizationStrength, type OptimizationProposal, type OptimizationRangeMode, type OptimizationStrategy } from '../../domain/optimization';
 import type { HistoricalPlCalculated, ManagementMetricDefinition, ProgramConfiguration } from '../../domain/types';
 import { useModelStore } from '../../store/model-store-context';
 import { calculateMetricOptimization, calculateMetricOptimizationExpansion } from './optimization-worker-client';
@@ -108,6 +108,11 @@ export function useForecastOptimization() {
   const replaceForecast = useModelStore((state) => state.replaceForecast);
   const begin = useModelStore((state) => state.beginTransaction);
   const commit = useModelStore((state) => state.commitTransaction);
+  useEffect(() => {
+    if (!proposal) return;
+    const restoredStrength = inferOptimizationStrength(proposal, forecast);
+    setStrength((current) => current === restoredStrength ? current : restoredStrength);
+  }, [forecast, proposal]);
   const calculateProposal = (sourceForecast: typeof forecast) => {
     setIsOptimizing(true);
     setIsExpansionSearching(false);
