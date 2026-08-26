@@ -18,6 +18,33 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByText('過去実績に適正化済み')).toBeVisible();
   });
 
+  it('補助事業に有効な過去実績がない場合は新規事業設定を確認し、初年度固定値を要求する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '02 期間・過去実績' }));
+    for (const year of [2023, 2024, 2025]) {
+      const sales = screen.getByLabelText(`補助事業 P/L ${year}年 売上高`);
+      await user.clear(sales);
+      await user.type(sales, '0');
+      await user.tab();
+    }
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    await user.click(screen.getByRole('button', { name: '過去実績から水準範囲を適正化' }));
+
+    const dialog = screen.getByRole('dialog', { name: '補助事業を新規事業として設定' });
+    expect(within(dialog).getByText(/売上高と従業員数は、補助事業期間の開始時固定値を設定してください/)).toBeVisible();
+    await user.click(within(dialog).getByRole('button', { name: '新規事業として設定' }));
+
+    expect(screen.getByRole('alert')).toHaveTextContent('新規事業・要初期値');
+    expect(screen.getByLabelText('補助事業期間 売上高 開始時固定値')).toHaveValue(null);
+    expect(screen.getByLabelText('補助事業期間 従業員数（就業時間換算） 開始時固定値')).toHaveValue(null);
+    expect(screen.getByLabelText('補助事業期間 原価率 開始時固定値')).toHaveValue(62);
+
+    await user.type(screen.getByLabelText('補助事業期間 売上高 開始時固定値'), '100');
+    await user.type(screen.getByLabelText('補助事業期間 従業員数（就業時間換算） 開始時固定値'), '10');
+    expect(screen.getByText('新規事業として適正化済み')).toBeVisible();
+  });
+
   it('適正化後に過去P/Lを変更すると再適正化の警告を出す', async () => {
     const user = userEvent.setup();
     render(<App />);

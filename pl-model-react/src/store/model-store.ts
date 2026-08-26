@@ -14,7 +14,7 @@ import type { BalanceSheetRecord, HistoricalPlInput, ProgramConfiguration } from
 import type { MoneyDisplayUnit } from '../domain/value-units';
 import { calculatePl } from '../domain/financials';
 import { defaultForecastRange, normalizeForecastRanges } from '../domain/forecast-range';
-import { optimizeForecastRangesFromActuals, type HistoricalRangeOptimizationResult } from '../domain/historical-range-optimization';
+import { optimizeForecastRangesFromActuals, type HistoricalRangeOptimizationOptions, type HistoricalRangeOptimizationResult } from '../domain/historical-range-optimization';
 import { forecastRangeCalibrationFingerprint, type ForecastRangeCalibration } from '../domain/forecast-range-calibration';
 import type { ActualsImportResult } from '../domain/actuals-import';
 
@@ -28,7 +28,7 @@ export type ModelSnapshot = {
     metricInputs: Record<string, number>;
   };
   forecast: ForecastModel;
-  caseSettings: { metricTargets: Record<string, number>; forecastRangeCalibration?: ForecastRangeCalibration };
+  caseSettings: { metricTargets: Record<string, number>; forecastRangeCalibration?: ForecastRangeCalibration; subsidyNewBusiness?: boolean };
 };
 
 type ModelPreferences = { moneyUnit: MoneyDisplayUnit };
@@ -48,7 +48,7 @@ type ModelActions = {
   updateMetricActual: (metricId: string, value: number) => void;
   updateMetricTarget: (metricId: string, value: number | null) => void;
   importHistoricalActuals: (imported: ActualsImportResult) => void;
-  optimizeForecastRangesFromActuals: () => HistoricalRangeOptimizationResult;
+  optimizeForecastRangesFromActuals: (options?: HistoricalRangeOptimizationOptions) => HistoricalRangeOptimizationResult;
   updateForecastPeriod: (seriesId: string, periodId: string, patch: Partial<Pick<ForecastPeriod, 'annualGrowthRate' | 'startValue' | 'startAdjustment' | 'range'>>) => void;
   updateFinalYearSalesAllocation: (baseSharePercent: number) => void;
   clearFinalYearSalesAllocation: () => void;
@@ -63,7 +63,7 @@ type ModelActions = {
 };
 
 export type ModelStore = ModelSnapshot & ModelActions;
-export type InitialActualsMode = 'empty' | 'sample';
+export type InitialActualsMode = 'empty' | 'sample' | 'sample-no-subsidy-history';
 
 function cloneSnapshot(snapshot: ModelSnapshot): ModelSnapshot {
   return structuredClone(snapshot);
@@ -108,6 +108,10 @@ function emptyRecordLike<T extends object>(record: T): T {
   return Object.fromEntries(Object.keys(record).map((field) => [field, null])) as T;
 }
 
+function zeroRecordLike<T extends object>(record: T): T {
+  return Object.fromEntries(Object.keys(record).map((field) => [field, 0])) as T;
+}
+
 type HistoricalBoundary = { startYear: number; endYear: number };
 
 function resizeHistoricalRecords<T extends object>(records: T[], previous: HistoricalBoundary, next: HistoricalBoundary): T[] {
@@ -121,10 +125,12 @@ function resizeHistoricalRecords<T extends object>(records: T[], previous: Histo
 
 export function createInitialModelSnapshot(programInput?: unknown, initialActuals: InitialActualsMode = 'sample'): ModelSnapshot {
   const program = normalizeProgram(programInput ?? createDefaultProgram());
-  const actuals = initialActuals === 'sample' ? {
+  const actuals = initialActuals !== 'empty' ? {
     balanceSheets: structuredClone(balanceSheets),
     basePl: structuredClone(baseHistoricalPl),
-    subsidyPl: structuredClone(subsidyHistoricalPl),
+    subsidyPl: initialActuals === 'sample-no-subsidy-history'
+      ? subsidyHistoricalPl.map(zeroRecordLike)
+      : structuredClone(subsidyHistoricalPl),
     metricInputs: {},
   } : {
     balanceSheets: balanceSheets.map(emptyRecordLike),
@@ -229,15 +235,16 @@ export function createModelStore(program?: unknown, options?: { initialActuals?:
         ...snapshot,
         actuals: { ...snapshot.actuals, metricInputs: { ...snapshot.actuals.metricInputs, [metricId]: value } },
       })),
-      optimizeForecastRangesFromActuals: () => {
+      optimizeForecastRangesFromActuals: (options) => {
         const snapshot = currentSnapshot();
-        const result = optimizeForecastRangesFromActuals(snapshot.forecast, snapshot.program, snapshot.actuals.basePl, snapshot.actuals.subsidyPl);
+        const result = optimizeForecastRangesFromActuals(snapshot.forecast, snapshot.program, snapshot.actuals.basePl, snapshot.actuals.subsidyPl, options);
         applyMutation((current) => ({
           ...current,
           forecast: result.forecast,
           caseSettings: {
             ...current.caseSettings,
             forecastRangeCalibration: { sourceFingerprint: forecastRangeCalibrationFingerprint(snapshot) },
+            subsidyNewBusiness: Boolean(options?.subsidyAsNewBusiness),
           },
         }));
         return result;

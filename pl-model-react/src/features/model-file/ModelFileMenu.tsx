@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
 import { buildCaseResultReport, createCaseResultHtml, createCaseResultXlsx } from '../../domain/case-results-export';
 import { parseModelFile, serializeModelFile } from '../../domain/model-file';
-import { createInitialModelSnapshot } from '../../store/model-store';
+import { createInitialModelSnapshot, type InitialActualsMode } from '../../store/model-store';
 import { useModelStore } from '../../store/model-store-context';
 
 type WritableFile = {
@@ -113,13 +113,13 @@ export function ModelFileMenu() {
     try { await writeTo(handleRef.current); } catch { setError('案件ファイルを上書きできませんでした'); }
   };
 
-  const loadSample = () => {
+  const loadSample = (mode: Extract<InitialActualsMode, 'sample' | 'sample-no-subsidy-history'>) => {
     if (json() !== lastPersistedJsonRef.current && !window.confirm('既存のデータが消えますが、よろしいでしょうか。')) return;
-    const snapshot = createInitialModelSnapshot(window.PL_SUBSIDY_PROGRAM, 'sample');
+    const snapshot = createInitialModelSnapshot(window.PL_SUBSIDY_PROGRAM, mode);
     replaceSnapshot(snapshot);
     lastPersistedJsonRef.current = serializeModelFile(snapshot);
     handleRef.current = null;
-    setFileName('sample-case.json');
+    setFileName(mode === 'sample' ? 'sample-case.json' : 'sample-case-no-subsidy-history.json');
   };
 
   const exportExcel = () => {
@@ -151,7 +151,9 @@ export function ModelFileMenu() {
         <DropdownMenuLabel>案件データ</DropdownMenuLabel>
         <DropdownMenuItem disabled={!handleRef.current} onSelect={() => void overwrite()}><Save />上書き保存</DropdownMenuItem>
         <DropdownMenuItem onSelect={() => void saveAs()}><SaveAll />名前を付けて保存</DropdownMenuItem>
-        <DropdownMenuItem onSelect={loadSample}><FileJson />サンプルデータを読み込み</DropdownMenuItem>
+        <DropdownMenuLabel>サンプルデータ</DropdownMenuLabel>
+        <DropdownMenuItem onSelect={() => loadSample('sample')}><FileJson />サンプルデータを読み込み（補助事業実績あり）</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => loadSample('sample-no-subsidy-history')}><FileJson />サンプルデータを読み込み（補助事業実績なし）</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuLabel>結果出力</DropdownMenuLabel>
         <DropdownMenuItem onSelect={exportExcel}><FileSpreadsheet />Excelで出力</DropdownMenuItem>

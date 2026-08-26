@@ -15,6 +15,13 @@ describe('案件JSONを読み込む前後の過去実績', () => {
     expect(parseModelFile(json)).toEqual(expected);
   });
 
+  it('補助事業実績なしのサンプル案件JSONも同梱する', () => {
+    const json = readFileSync(resolve(process.cwd(), 'public/sample-case-no-subsidy-history.json'), 'utf8');
+    const snapshot = parseModelFile(json);
+    expect(snapshot.actuals.basePl.at(-1)?.sales).toBe(1_000_000_000);
+    expect(snapshot.actuals.subsidyPl.every((row) => row.sales === 0)).toBe(true);
+  });
+
   it('初期表示は過去実績を空欄とし、案件JSON読込後に数値を表示する', async () => {
     const user = userEvent.setup();
     render(<App initialActuals="empty" />);
@@ -56,7 +63,7 @@ describe('案件JSONを読み込む前後の過去実績', () => {
     expect(sales).toHaveValue(null);
 
     await user.click(screen.getByRole('button', { name: '案件JSONメニュー' }));
-    await user.click(screen.getByRole('menuitem', { name: 'サンプルデータを読み込み' }));
+    await user.click(screen.getByRole('menuitem', { name: 'サンプルデータを読み込み（補助事業実績あり）' }));
 
     expect(assets).toHaveValue(1050);
     expect(sales).toHaveValue(900);
@@ -78,15 +85,27 @@ describe('案件JSONを読み込む前後の過去実績', () => {
     expect(screen.getByText('結果出力')).toBeVisible();
     expect(screen.getByRole('menuitem', { name: 'Excelで出力' })).toBeVisible();
     expect(screen.getByRole('menuitem', { name: 'HTMLで出力' })).toBeVisible();
-    await user.click(screen.getByRole('menuitem', { name: 'サンプルデータを読み込み' }));
+    await user.click(screen.getByRole('menuitem', { name: 'サンプルデータを読み込み（補助事業実績あり）' }));
 
     expect(confirm).toHaveBeenLastCalledWith('既存のデータが消えますが、よろしいでしょうか。');
     expect(assets).toHaveValue(123);
 
     await user.click(screen.getByRole('button', { name: '案件JSONメニュー' }));
-    await user.click(screen.getByRole('menuitem', { name: 'サンプルデータを読み込み' }));
+    await user.click(screen.getByRole('menuitem', { name: 'サンプルデータを読み込み（補助事業実績あり）' }));
 
     expect(assets).toHaveValue(1050);
+  });
+
+  it('補助事業の過去実績がないサンプルを読み込める', async () => {
+    const user = userEvent.setup();
+    render(<App initialActuals="empty" />);
+
+    await user.click(screen.getByRole('button', { name: '案件JSONメニュー' }));
+    await user.click(screen.getByRole('menuitem', { name: 'サンプルデータを読み込み（補助事業実績なし）' }));
+
+    expect(screen.getByLabelText('ベース事業 P/L 2025年 売上高')).toHaveValue(1000);
+    expect(screen.getByLabelText('補助事業 P/L 2025年 売上高')).toHaveValue(0);
+    expect(screen.getByRole('button', { name: 'sample-case-no-subsidy-history.json' })).toBeVisible();
   });
 
   it('案件メニューから計算済みP/LをExcelとHTMLで出力する', async () => {

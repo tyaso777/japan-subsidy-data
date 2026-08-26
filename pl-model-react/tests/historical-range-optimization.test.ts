@@ -1,8 +1,41 @@
 import { describe, expect, it } from 'vitest';
-import { optimizeForecastRangesFromActuals } from '../src/domain/historical-range-optimization';
+import { hasUsableSubsidyHistory, optimizeForecastRangesFromActuals } from '../src/domain/historical-range-optimization';
 import { createModelStore } from '../src/store/model-store';
 
 describe('過去実績による将来予測水準範囲の適正化', () => {
+  it('補助事業の売上高が全期間0または未入力なら新規事業候補と判定する', () => {
+    const state = createModelStore().getState();
+    const zeroActuals = state.actuals.subsidyPl.map((row) => ({ ...row, sales: 0 }));
+    const emptyActuals = state.actuals.subsidyPl.map((row) => ({ ...row, sales: null })) as unknown as typeof state.actuals.subsidyPl;
+
+    expect(hasUsableSubsidyHistory(zeroActuals)).toBe(false);
+    expect(hasUsableSubsidyHistory(emptyActuals)).toBe(false);
+    expect(hasUsableSubsidyHistory(state.actuals.subsidyPl)).toBe(true);
+  });
+
+  it('新規事業設定ではベース事業の基準値を参照し、売上高と従業員数の開始時固定値は入力待ちにする', () => {
+    const state = createModelStore().getState();
+    const zeroActuals = state.actuals.subsidyPl.map((row) => Object.fromEntries(Object.keys(row).map((field) => [field, 0]))) as typeof state.actuals.subsidyPl;
+    const result = optimizeForecastRangesFromActuals(
+      state.forecast,
+      state.program,
+      state.actuals.basePl,
+      zeroActuals,
+      { subsidyAsNewBusiness: true },
+    );
+    const firstPeriod = state.program.timeline.periods[0].definitionId;
+    const series = (id: string) => result.forecast.series.find((item) => item.id === `subsidy-${id}`)!;
+    const first = (id: string) => series(id).periods.find((period) => period.id === firstPeriod)!;
+    const latestBase = state.actuals.basePl.at(-1)!;
+
+    expect(result.newBusinessSetupRequired).toBe(true);
+    expect(first('sales').startValue).toBeNull();
+    expect(first('headcount').startValue).toBeNull();
+    expect(first('cogsRate').startValue).toBeCloseTo(latestBase.cogs / latestBase.sales * 100);
+    expect(first('payPerPerson').startValue).toBeCloseTo((latestBase.employeeSalary + latestBase.employeeBonus) / latestBase.headcount);
+    expect(first('officerPayPerPerson').startValue).toBeCloseTo((latestBase.officerCompensation + latestBase.officerBonus) / latestBase.officerCount);
+  });
+
   it('適正化後の正式な水準・最小値・最大値は小数点以下2桁へ揃える', () => {
     const state = createModelStore().getState();
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);

@@ -241,10 +241,26 @@ test('PL表ヘッダーの事業切替と表示ボタンが重ならない', asy
 
 test('03画面で水準範囲の未適正化を確認してその場で適正化できる', async ({ page }) => {
   await page.goto('/');
+  await page.getByRole('button', { name: '案件JSONメニュー' }).click();
+  await page.getByRole('menuitem', { name: 'サンプルデータを読み込み（補助事業実績あり）' }).click();
   await page.getByTestId('app-toolbar').getByRole('button', { name: '03 将来予測・PL' }).click();
 
   const settings = page.getByTestId('forecast-settings-panel');
   await expect(settings.getByRole('alert')).toContainText('水準範囲は未適正化です');
   await page.getByRole('button', { name: '過去実績から水準範囲を適正化' }).click();
   await expect(settings.getByText('過去実績に適正化済み')).toBeVisible();
+});
+
+test('補助事業実績なしのサンプルは新規事業設定を確認する', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: '案件JSONメニュー' }).click();
+  await page.getByRole('menuitem', { name: 'サンプルデータを読み込み（補助事業実績なし）' }).click();
+  await page.getByTestId('app-toolbar').getByRole('button', { name: '03 将来予測・PL' }).click();
+  await page.getByRole('button', { name: '過去実績から水準範囲を適正化' }).click();
+
+  const dialog = page.getByRole('dialog', { name: '補助事業を新規事業として設定' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText('売上高と従業員数');
+  await dialog.getByRole('button', { name: '新規事業として設定' }).click();
+  await expect(page.getByTestId('forecast-settings-panel').getByRole('alert')).toContainText('新規事業・要初期値');
 });

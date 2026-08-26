@@ -4,6 +4,7 @@ import type { CSSProperties, RefObject } from 'react';
 import { FinancialTable, type FinancialTableValueUpdate } from '../../components/FinancialTable';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { NumberInput } from '../../components/ui/number-input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { StickyPanel } from '../../components/ui/sticky-panel';
@@ -23,6 +24,7 @@ import { buildTimelineYearLabels, resolveTimeline } from '../../domain/timeline'
 import { buildPlLogicNodes } from '../../domain/pl-logic';
 import { defaultForecastRange, isForecastRangeLocked } from '../../domain/forecast-range';
 import { forecastRangeCalibrationStatus } from '../../domain/forecast-range-calibration';
+import { hasUsableSubsidyHistory, newBusinessInitialValuesMissing } from '../../domain/historical-range-optimization';
 import { settingsPeriodMinWidth, shouldAutoCollapseSettings } from './forecast-layout';
 import { stickyStackOffsetCss, useObservedHeight } from '../../lib/sticky-stack';
 
@@ -214,6 +216,7 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
   const [settingsVisible, setSettingsVisible] = useState(true);
   const [metricsVisible, setMetricsVisible] = useState(true);
   const [showFixedSettings, setShowFixedSettings] = useState(true);
+  const [newBusinessDialogOpen, setNewBusinessDialogOpen] = useState(false);
   const [chartDisplays, setChartDisplays] = useState<Record<ChartDisplay, boolean>>({ company: true, base: true, subsidy: true, comparison: true });
   const chartScrollContentRef = useRef<HTMLDivElement>(null);
   const businessHeaderScrollRef = useRef<HTMLDivElement>(null);
@@ -228,9 +231,11 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
   const baseActuals = useModelStore((state) => state.actuals.basePl);
   const subsidyActuals = useModelStore((state) => state.actuals.subsidyPl);
   const calibration = useModelStore((state) => state.caseSettings.forecastRangeCalibration);
+  const subsidyNewBusiness = useModelStore((state) => state.caseSettings.subsidyNewBusiness);
   const optimizeForecastRanges = useModelStore((state) => state.optimizeForecastRangesFromActuals);
   const unit = useModelStore((state) => state.preferences.moneyUnit);
   const calibrationStatus = forecastRangeCalibrationStatus({ program, actuals: { basePl: baseActuals, subsidyPl: subsidyActuals }, caseSettings: { forecastRangeCalibration: calibration } });
+  const newBusinessNeedsInitialValues = Boolean(subsidyNewBusiness) && newBusinessInitialValuesMissing(model);
   const splitForecastAtYear = useModelStore((state) => state.splitForecastAtYear);
   const mergeForecastPeriod = useModelStore((state) => state.mergeForecastPeriod);
   const replaceForecast = useModelStore((state) => state.replaceForecast);
@@ -238,6 +243,20 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
   const clearFinalYearSalesAllocation = useModelStore((state) => state.clearFinalYearSalesAllocation);
   const beginTransaction = useModelStore((state) => state.beginTransaction);
   const commitTransaction = useModelStore((state) => state.commitTransaction);
+  const requestRangeOptimization = () => {
+    if (!hasUsableSubsidyHistory(subsidyActuals)) {
+      setNewBusinessDialogOpen(true);
+      return;
+    }
+    optimizeForecastRanges({ subsidyAsNewBusiness: false });
+  };
+  const configureNewBusiness = () => {
+    optimizeForecastRanges({ subsidyAsNewBusiness: true });
+    setScope('subsidy');
+    setTableScope('subsidy');
+    setVariationOverride(true);
+    setNewBusinessDialogOpen(false);
+  };
   const base = useMemo(() => buildTimeline(baseActuals, model, 'base', program), [baseActuals, model, program]);
   const subsidy = useMemo(() => buildTimeline(subsidyActuals, model, 'subsidy', program), [subsidyActuals, model, program]);
   const company = useMemo(() => {
@@ -403,7 +422,7 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
         stickyTop="var(--forecast-content-sticky-top)"
         headerClassName="px-2.5 py-2.5"
         bodyClassName="px-2.5 pb-2.5"
-        header={<div className="grid gap-1.5"><div className="flex items-start justify-between gap-2"><div><h3 className="m-0 text-base font-bold">水準設定</h3><p className="m-0 text-[10px] text-muted-foreground">{scopeLabels[scope]}・右端は開始時増減</p></div><span className="flex shrink-0 flex-col items-end gap-1"><span className="flex items-center gap-1"><Button variant="outline" size="sm" className="h-7 gap-1 px-2 text-[9px]" aria-label={variationOpen ? '変動設定を隠す' : '変動設定を表示'} aria-expanded={variationOpen} onClick={() => setVariationOverride(!variationOpen)}><ChevronDown className={cn('transition-transform', !variationOpen && '-rotate-90')} />変動設定</Button><Badge variant="outline">金額単位：{moneyUnitLabel(unit)}</Badge></span><Button variant="ghost" size="sm" className="h-6 gap-1 px-1.5 text-[9px] text-muted-foreground" aria-label={showFixedSettings ? '固定項目を隠す' : '固定項目を表示'} aria-pressed={!showFixedSettings} onClick={() => setShowFixedSettings((value) => !value)}>{showFixedSettings ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}{showFixedSettings ? '固定項目を隠す' : `固定項目を表示（${fixedSettingIds.size}件）`}</Button></span></div><div className="flex flex-wrap items-center justify-between gap-1">{calibrationStatus === 'current' ? <p className="m-0 flex items-center gap-1 text-[9px] font-bold text-teal"><CheckCircle2 className="size-3" aria-hidden="true" />過去実績に適正化済み</p> : <p role="alert" className="m-0 flex items-center gap-1 text-[9px] font-bold text-orange"><TriangleAlert className="size-3" aria-hidden="true" />{calibrationStatus === 'stale' ? '過去実績の変更後、再適正化されていません' : '水準範囲は未適正化です'}</p>}<Button variant="outline" size="sm" className="h-7 gap-1 px-2 text-[9px]" onClick={optimizeForecastRanges}><Sparkles aria-hidden="true" />過去実績から水準範囲を適正化</Button></div></div>}
+        header={<div className="grid gap-1.5"><div className="flex items-start justify-between gap-2"><div><h3 className="m-0 text-base font-bold">水準設定</h3><p className="m-0 text-[10px] text-muted-foreground">{scopeLabels[scope]}・右端は開始時増減</p></div><span className="flex shrink-0 flex-col items-end gap-1"><span className="flex items-center gap-1"><Button variant="outline" size="sm" className="h-7 gap-1 px-2 text-[9px]" aria-label={variationOpen ? '変動設定を隠す' : '変動設定を表示'} aria-expanded={variationOpen} onClick={() => setVariationOverride(!variationOpen)}><ChevronDown className={cn('transition-transform', !variationOpen && '-rotate-90')} />変動設定</Button><Badge variant="outline">金額単位：{moneyUnitLabel(unit)}</Badge></span><Button variant="ghost" size="sm" className="h-6 gap-1 px-1.5 text-[9px] text-muted-foreground" aria-label={showFixedSettings ? '固定項目を隠す' : '固定項目を表示'} aria-pressed={!showFixedSettings} onClick={() => setShowFixedSettings((value) => !value)}>{showFixedSettings ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}{showFixedSettings ? '固定項目を隠す' : `固定項目を表示（${fixedSettingIds.size}件）`}</Button></span></div><div className="flex flex-wrap items-center justify-between gap-1">{calibrationStatus === 'current' ? newBusinessNeedsInitialValues ? <p role="alert" className="m-0 flex items-center gap-1 text-[9px] font-bold text-orange"><TriangleAlert className="size-3" aria-hidden="true" />新規事業・要初期値（売上高・従業員数）</p> : <p className="m-0 flex items-center gap-1 text-[9px] font-bold text-teal"><CheckCircle2 className="size-3" aria-hidden="true" />{subsidyNewBusiness ? '新規事業として適正化済み' : '過去実績に適正化済み'}</p> : <p role="alert" className="m-0 flex items-center gap-1 text-[9px] font-bold text-orange"><TriangleAlert className="size-3" aria-hidden="true" />{calibrationStatus === 'stale' ? '過去実績の変更後、再適正化されていません' : '水準範囲は未適正化です'}</p>}<Button variant="outline" size="sm" className="h-7 gap-1 px-2 text-[9px]" onClick={requestRangeOptimization}><Sparkles aria-hidden="true" />過去実績から水準範囲を適正化</Button></div></div>}
       >
         <div data-testid="forecast-period-grid" className="grid min-w-0 gap-2" style={{ gridTemplateColumns: `repeat(${segments.length}, minmax(${settingsPeriodMinWidth(segments.length, variationOpen)}, 1fr))` }}>{segments.map((period, segmentIndex) => { const definitionLabel = program.definitions.periods.find((definition) => definition.id === period.definitionId)?.label ?? period.definitionId; const siblings = segments.filter((candidate) => candidate.definitionId === period.definitionId); const label = siblings.length > 1 ? `${definitionLabel}${siblings.indexOf(period) + 1}` : definitionLabel; return <section data-testid="forecast-period-column" key={period.id} className="min-w-0 bg-background"><StickySurface data-testid="forecast-period-header" stickyTop="0px" layer="panel" className="flex min-h-10 items-center justify-between gap-2 border-t-[3px] border-navy px-1.5 py-1 shadow-sm"><span className="flex min-w-0 items-center gap-2"><strong className="min-w-0 text-sm leading-tight">{label}</strong><span data-testid="forecast-period-years" className="shrink-0 whitespace-nowrap text-[10px] tabular-nums text-muted-foreground">{period.startYear}–{period.endYear}</span></span>{segmentIndex > 0 && segments[segmentIndex - 1].definitionId === period.definitionId && <Button variant="ghost" size="sm" className="h-6 shrink-0 px-1.5 text-[9px]" aria-label={`${period.startYear}年の期間分割を解除`} onClick={() => mergeForecastPeriod(period.id)}>解除</Button>}</StickySurface>{visibleSettings.map((series) => <SettingRow key={series.id} series={series} periodId={period.id} periodLabel={label} unit={unit} variationOpen={variationOpen} onForecastInputChange={optimization.invalidateProposal} readOnly={false} />)}</section>; })}</div>
       </StickyPanel>}
@@ -447,5 +466,18 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
       {metricsVisible && <MetricsPanel company={company} base={base} subsidy={subsidy} optimization={optimization} />}
     </div>
     </Tabs>
+    <Dialog open={newBusinessDialogOpen} onOpenChange={setNewBusinessDialogOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>補助事業を新規事業として設定</DialogTitle>
+          <DialogDescription>補助事業には予測基準にできる過去売上高がありません。新規事業として、ベース事業の最新実績を参考に原価率・費用率・給与水準などを初期設定しますか？</DialogDescription>
+        </DialogHeader>
+        <div className="rounded-md border border-orange/35 bg-orange/5 px-3 py-2 text-sm text-ink">売上高と従業員数は、補助事業期間の開始時固定値を設定してください。0からは成長率だけで将来値を増やせません。</div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setNewBusinessDialogOpen(false)}>今回は設定しない</Button>
+          <Button onClick={configureNewBusiness}>新規事業として設定</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </main>;
 }

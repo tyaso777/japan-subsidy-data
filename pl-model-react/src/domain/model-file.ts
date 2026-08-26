@@ -40,6 +40,7 @@ const snapshotSchema = z.object({
   caseSettings: z.object({
     metricTargets: z.record(z.string(), z.number()).default({}),
     forecastRangeCalibration: z.object({ sourceFingerprint: z.string() }).optional(),
+    subsidyNewBusiness: z.boolean().optional(),
   }).default({ metricTargets: {} }),
 });
 

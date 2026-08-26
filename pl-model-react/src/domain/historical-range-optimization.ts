@@ -6,6 +6,11 @@ export type HistoricalRangeOptimizationResult = {
   forecast: ForecastModel;
   updatedPeriods: number;
   fallbackPeriods: number;
+  newBusinessSetupRequired: boolean;
+};
+
+export type HistoricalRangeOptimizationOptions = {
+  subsidyAsNewBusiness?: boolean;
 };
 
 type Scope = 'base' | 'subsidy';
@@ -94,6 +99,21 @@ function statisticalRange(values: number[]): (Range & { center: number }) | null
   return { min: mean - 2 * deviation, max: mean + 2 * deviation, center: mean };
 }
 
+export function hasUsableSubsidyHistory(rows: HistoricalPlInput[]): boolean {
+  return rows.some((row) => Number.isFinite(Number(row.sales)) && Number(row.sales) > 0);
+}
+
+export function newBusinessInitialValuesMissing(model: ForecastModel): boolean {
+  return ['subsidy-sales', 'subsidy-headcount'].some((seriesId) => {
+    const series = model.series.find((item) => item.id === seriesId);
+    const firstPeriod = series?.periods.reduce(
+      (earliest, period) => !earliest || period.startYear < earliest.startYear ? period : earliest,
+      undefined as typeof series.periods[number] | undefined,
+    );
+    return !firstPeriod || firstPeriod.startValue === null || firstPeriod.startValue === undefined || firstPeriod.startValue <= 0;
+  });
+}
+
 function baseRange(series: ForecastSeries, rows: HistoricalPlCalculated[]): { range: Range; initialValue: number; fallback: boolean } {
   const driver = driverId(series);
   const observed = statisticalRange(historicalChanges(series, rows));
@@ -140,6 +160,7 @@ export function optimizeForecastRangesFromActuals(
   program: ProgramConfiguration,
   basePl: HistoricalPlInput[],
   subsidyPl: HistoricalPlInput[],
+  options: HistoricalRangeOptimizationOptions = {},
 ): HistoricalRangeOptimizationResult {
   const forecast = structuredClone(model);
   const actuals = { base: calculatePlSeries(basePl), subsidy: calculatePlSeries(subsidyPl) };
@@ -147,8 +168,10 @@ export function optimizeForecastRangesFromActuals(
   let fallbackPeriods = 0;
 
   forecast.series.filter((series) => series.scope !== 'company').forEach((series) => {
-    const source = actuals[series.scope as Scope];
     const driver = driverId(series);
+    const newBusinessSeries = options.subsidyAsNewBusiness && series.scope === 'subsidy';
+    const requiresOwnInitialValue = newBusinessSeries && (driver === 'sales' || driver === 'headcount');
+    const source = newBusinessSeries && !requiresOwnInitialValue ? actuals.base : actuals[series.scope as Scope];
     if (series.changePolicy === 'fixed') {
       const latestLevel = valuesForDriver(driverId(series), source).at(-1);
       const fixedLevel = Number.isFinite(latestLevel) ? latestLevel! : series.baseValue;
@@ -178,16 +201,23 @@ export function optimizeForecastRangesFromActuals(
       return;
     }
     const derived = baseRange(series, source);
-    series.periods.forEach((period) => {
+    const referenceLevel = newBusinessSeries && !requiresOwnInitialValue ? valuesForDriver(driver, source).at(-1) : Number.NaN;
+    if (Number.isFinite(referenceLevel)) series.baseValue = referenceLevel!;
+    if (requiresOwnInitialValue) series.baseValue = 0;
+    series.periods.forEach((period, index) => {
       const phase = phaseForPeriod(forecast, program, period.id);
       const range = roundRange(phase === 'postBase' ? postBaseRange(series, derived.range) : derived.range);
       period.range = range;
       period.annualGrowthRate = roundSetting(derived.initialValue + (phase === 'postBase' ? postBaseAdjustment(series) : 0));
+      if (newBusinessSeries) {
+        period.startValue = index === 0 && Number.isFinite(referenceLevel) ? referenceLevel! : null;
+        period.startAdjustment = 0;
+      }
       period.lineageId = undefined;
       updatedPeriods += 1;
       if (derived.fallback) fallbackPeriods += 1;
     });
   });
 
-  return { forecast, updatedPeriods, fallbackPeriods };
+  return { forecast, updatedPeriods, fallbackPeriods, newBusinessSetupRequired: Boolean(options.subsidyAsNewBusiness) };
 }
