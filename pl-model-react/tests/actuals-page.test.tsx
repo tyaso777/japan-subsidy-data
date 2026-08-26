@@ -88,6 +88,25 @@ describe('期間・過去実績', () => {
     expect(within(balanceSheet).getAllByText(/倍$/)).toHaveLength(3);
   });
 
+  it('全社B/Sの申請向け指標を補足指標としてまとめて表示切替する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const balanceSheet = screen.getByTestId('historical-bs');
+
+    expect(within(balanceSheet).getByText('S-1')).toBeVisible();
+    expect(within(balanceSheet).getByText('自己資本比率')).toBeVisible();
+    expect(within(balanceSheet).getByText('S-2')).toBeVisible();
+    expect(within(balanceSheet).getByText('新規設備投資による支出')).toBeVisible();
+    expect(within(balanceSheet).getByText('S-3')).toBeVisible();
+    expect(within(balanceSheet).getByText('EBITDA有利子負債倍率')).toBeVisible();
+
+    await user.click(within(balanceSheet).getByRole('button', { name: '補足指標を隠す' }));
+    expect(within(balanceSheet).queryByText('自己資本比率')).not.toBeInTheDocument();
+    expect(within(balanceSheet).queryByText('新規設備投資による支出')).not.toBeInTheDocument();
+    expect(within(balanceSheet).queryByText('EBITDA有利子負債倍率')).not.toBeInTheDocument();
+    expect(within(balanceSheet).getByRole('button', { name: '補足指標を表示' })).toBeVisible();
+  });
+
   it('特別年の呼称をP/L年見出しへ注入する', async () => {
     const user = userEvent.setup();
     render(<App />);

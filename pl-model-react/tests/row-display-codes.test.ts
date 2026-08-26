@@ -5,9 +5,15 @@ const visibleCodes = (rows: Array<{ displayCode?: string; code: string }>) =>
   rows.map((row) => row.displayCode ?? row.code);
 
 describe('tool-local financial statement display codes', () => {
-  it('numbers B/S rows sequentially without subsidy-form prefixes', () => {
-    expect(visibleCodes(balanceSheetRows)).toEqual(
-      Array.from({ length: balanceSheetRows.length }, (_, index) => String(index + 1)),
+  it('numbers ordinary B/S rows sequentially and supplementary rows as S-n', () => {
+    const ordinary = balanceSheetRows.filter((row) => !row.supplementary);
+    const supplementary = balanceSheetRows.filter((row) => row.supplementary);
+
+    expect(visibleCodes(ordinary)).toEqual(
+      Array.from({ length: ordinary.length }, (_, index) => String(index + 1)),
+    );
+    expect(visibleCodes(supplementary)).toEqual(
+      Array.from({ length: supplementary.length }, (_, index) => `S-${index + 1}`),
     );
   });
 

@@ -52,9 +52,9 @@ const baseBalanceSheetRows: FinancialRow<BalanceSheetRecord>[] = [
   { code: '1-20', label: 'うち株主資本', field: 'shareholderEquity', indent: 1 },
   { code: '1-21', label: 'うち資本金', field: 'capital', indent: 2 },
   { code: '1-22', label: 'その他（上記を除く純資産）', indent: 1, calculated: true, value: (row) => row.netAssets - row.shareholderEquity },
-  { code: '1-23', label: '自己資本比率', valueKind: 'percent', calculated: true, value: (row) => row.assets ? row.shareholderEquity / row.assets * 100 : 0 },
-  { code: '1-24', label: '新規設備投資による支出', field: 'capex' },
-  { code: '1-25', label: 'EBITDA有利子負債倍率', valueKind: 'multiple', calculated: true, value: (row) => row.ebitdaDebtMultiple ?? 0 },
+  { code: '1-23', label: '自己資本比率', valueKind: 'percent', calculated: true, supplementary: true, value: (row) => row.assets ? row.shareholderEquity / row.assets * 100 : 0 },
+  { code: '1-24', label: '新規設備投資による支出', field: 'capex', supplementary: true },
+  { code: '1-25', label: 'EBITDA有利子負債倍率', valueKind: 'multiple', calculated: true, supplementary: true, value: (row) => row.ebitdaDebtMultiple ?? 0 },
 ];
 
 export const balanceSheetRows = assignStatementDisplayCodes(baseBalanceSheetRows);
