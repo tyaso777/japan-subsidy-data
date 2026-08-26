@@ -30,11 +30,11 @@ describe('共通UI基盤', () => {
     const referenceNavigation = within(toolbar).getByRole('navigation', { name: '参考' });
 
     expect(within(programNavigation).getByText('制度テンプレート')).toBeVisible();
-    expect(within(programNavigation).getByText('制度共通')).toBeVisible();
+    expect(within(programNavigation).queryByText('制度共通')).not.toBeInTheDocument();
     expect(within(caseNavigation).getByText('01 期間・過去実績')).toBeVisible();
     expect(within(caseNavigation).getByText('02 将来予測・PL')).toBeVisible();
     expect(within(referenceNavigation).getByText('計算ロジック')).toBeVisible();
-    expect(within(referenceNavigation).getByText('参考')).toBeVisible();
+    expect(within(referenceNavigation).queryByText('参考')).not.toBeInTheDocument();
   });
 
   it('画面タブと共通操作をスクロール中も上端に固定する', () => {

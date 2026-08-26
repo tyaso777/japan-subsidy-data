@@ -18,7 +18,7 @@ import { stickyStackOffset, useObservedHeight } from '../lib/sticky-stack';
 
 type Page = 'definition' | 'actuals' | 'forecast' | 'logic';
 type PageLink = { id: Page; label: string; legacyLabel: string; icon: ComponentType<{ className?: string }> };
-type PageGroup = { label: string; badge?: string; items: PageLink[] };
+type PageGroup = { label: string; items: PageLink[] };
 
 function AppContent() {
   const [page, setPage] = useState<Page>('actuals');
@@ -32,14 +32,14 @@ function AppContent() {
   const moneyUnit = useModelStore((state) => state.preferences.moneyUnit);
   const setMoneyUnit = useModelStore((state) => state.setMoneyUnit);
   const pageGroups = useMemo<PageGroup[]>(() => [
-    { label: '制度設定', badge: '制度共通', items: [
+    { label: '制度設定', items: [
       { id: 'definition', label: '制度テンプレート', legacyLabel: '01 制度定義', icon: Settings2 },
     ] },
     { label: '個社案件', items: [
       { id: 'actuals', label: '01 期間・過去実績', legacyLabel: '02 期間・過去実績', icon: ClipboardList },
       { id: 'forecast', label: '02 将来予測・PL', legacyLabel: '03 将来予測・PL', icon: ChartNoAxesCombined },
     ] },
-    { label: '参考', badge: '参考', items: [
+    { label: '参考', items: [
       { id: 'logic', label: '計算ロジック', legacyLabel: '04 ロジックマップ', icon: Workflow },
     ] },
   ], []);
@@ -64,7 +64,7 @@ function AppContent() {
     <header className="border border-line bg-surface px-5.5 pt-4.5 pb-3.5">
       <div><p className="mb-1 text-[10px] font-extrabold tracking-[.12em] text-orange">PL MODEL / REACT MIGRATION</p><h1 className="m-0 text-2xl leading-tight font-bold">成長投資計画シミュレーター</h1><Badge variant="outline" className="mt-1 border-line text-[10px] text-muted-foreground">{program.program.name}</Badge></div>
     </header>
-    <StickySurface ref={appToolbar.ref} data-testid="app-toolbar" stickyTop="0px" layer="navigation" className="flex items-center justify-end gap-2 border-x border-b border-line px-3 py-2 shadow-sm max-[1100px]:overflow-x-auto"><div className="flex items-stretch gap-1.5">{pageGroups.map((group, groupIndex) => <div key={group.label} className={cn('flex items-center gap-1.5', groupIndex > 0 && 'border-l border-line pl-1.5')}><small className="shrink-0 text-[8px] font-bold text-muted-foreground">{group.label}</small><nav aria-label={group.label} className="flex items-center gap-0.5 rounded-lg bg-[#e8e6df] p-1">{group.badge && <Badge variant="outline" className="h-5 border-orange/40 bg-surface px-1.5 text-[7px] font-bold text-orange">{group.badge}</Badge>}{group.items.map((item) => {
+    <StickySurface ref={appToolbar.ref} data-testid="app-toolbar" stickyTop="0px" layer="navigation" className="flex items-center justify-end gap-2 border-x border-b border-line px-3 py-2 shadow-sm max-[1100px]:overflow-x-auto"><div className="flex items-stretch gap-1.5">{pageGroups.map((group, groupIndex) => <div key={group.label} className={cn('flex items-center gap-1.5', groupIndex > 0 && 'border-l border-line pl-1.5')}><small className="shrink-0 text-[8px] font-bold text-muted-foreground">{group.label}</small><nav aria-label={group.label} className="flex items-center gap-0.5 rounded-lg bg-[#e8e6df] p-1">{group.items.map((item) => {
         const Icon = item.icon;
         const active = page === item.id;
         return <Button key={item.id} variant="ghost" size="sm" aria-label={item.legacyLabel} aria-current={active ? 'page' : undefined} className={cn('max-[1100px]:flex-1', active && 'bg-navy text-white hover:bg-navy/90 hover:text-white')} onClick={() => navigateToPage(item.id)}><Icon aria-hidden="true" /><span aria-hidden="true">{item.label}</span></Button>;
