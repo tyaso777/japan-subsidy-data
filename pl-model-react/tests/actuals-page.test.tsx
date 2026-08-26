@@ -241,17 +241,10 @@ describe('期間・過去実績', () => {
     expect(within(screen.getByTestId('historical-pl-base')).getByText('3件を貼り付けました（2件は入力対象外）')).toBeInTheDocument();
   });
 
-  it('過去B/S・P/L入力後に水準範囲を適正化し、将来予測へ反映する', async () => {
-    const user = userEvent.setup();
+  it('水準範囲の適正化は03画面へ一本化し、02画面には重複表示しない', () => {
     render(<App />);
-
-    await user.click(screen.getByRole('button', { name: '過去実績から水準範囲を適正化' }));
-    expect(screen.getByText(/水準範囲を更新しました/)).toBeVisible();
-    expect(screen.getByText('過去実績に適正化済み')).toBeVisible();
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
-
-    expect(screen.getByLabelText('補助事業期間 売上高 最小値')).not.toHaveValue(-10);
-    expect(screen.getByLabelText('補助事業期間 売上高 最大値')).not.toHaveValue(50);
+    expect(screen.queryByRole('button', { name: '過去実績から水準範囲を適正化' })).not.toBeInTheDocument();
+    expect(screen.getByText('水準範囲の適正化は、次の03画面の水準設定欄で実行できます。')).toBeVisible();
   });
 
   it('最下部の次へボタンから将来予測・PLへ移動する', async () => {
