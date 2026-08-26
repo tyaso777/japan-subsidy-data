@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
 
 describe('ロジックマップ画面', () => {
-  it('共通数値定義を依存順で数式とともに表示する', async () => {
+  it('内部の計算順を見せずに共通数値定義と参照関係を表示する', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: '04 ロジックマップ' }));
@@ -15,7 +15,9 @@ describe('ロジックマップ画面', () => {
     expect(within(map).getByRole('heading', { name: '付加価値額' })).toBeVisible();
     expect(within(map).getByRole('heading', { name: '労働生産性' })).toBeVisible();
     expect(within(map).getByText('[付加価値額][t] / [従業員数（就業時間換算）][t]')).toBeVisible();
-    expect(within(map).getAllByText(/計算順/)).toHaveLength(4);
+    expect(within(map).queryByText(/計算順/)).not.toBeInTheDocument();
+    expect(within(map).getAllByText('参照する共通数値定義')).toHaveLength(2);
+    expect(map.querySelector('.lucide-arrow-right')).not.toBeInTheDocument();
   });
 
   it('PL項目を並べ、参照項目・設定値・影響先を選択して確認できる', async () => {
