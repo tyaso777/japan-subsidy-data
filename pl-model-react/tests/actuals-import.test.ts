@@ -26,7 +26,7 @@ const validFile = {
 
 describe('AI向け過去実績インポート形式', () => {
   it('配布する入力テンプレートをそのまま検証できる', () => {
-    const template = readFileSync(resolve(process.cwd(), 'public/actuals-import-template.json'), 'utf8');
+    const template = readFileSync(resolve(process.cwd(), 'src/assets/actuals-import-template.json'), 'utf8');
 
     expect(() => parseActualsImportFile(template)).not.toThrow();
   });

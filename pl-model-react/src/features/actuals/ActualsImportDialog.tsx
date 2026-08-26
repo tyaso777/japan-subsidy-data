@@ -1,12 +1,36 @@
 import { useRef, useState, type ChangeEvent } from 'react';
-import { Bot, Download, FileJson2, Upload } from 'lucide-react';
+import { Bot, Copy, Download, FileJson2, Upload } from 'lucide-react';
+import actualsImportPrompt from '../../assets/ai-actuals-import-prompt.md?raw';
+import actualsImportSchema from '../../assets/actuals-import.schema.json?raw';
+import actualsImportTemplate from '../../assets/actuals-import-template.json?raw';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { parseActualsImportFile, type ActualsImportResult } from '../../domain/actuals-import';
 import { useModelStore } from '../../store/model-store-context';
 
 const amountUnitLabels = { yen: '円', 'thousand-yen': '千円', 'million-yen': '百万円' } as const;
-const downloadClass = 'inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-3 text-[11px] font-bold text-ink hover:bg-soft [&_svg]:size-3.5';
+
+async function copyText(text: string) {
+  if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.append(textarea);
+  textarea.select();
+  const copied = document.execCommand?.('copy');
+  textarea.remove();
+  if (!copied) throw new Error('clipboard unavailable');
+}
+
+function downloadTextFile(fileName: string, content: string, type: string) {
+  const url = URL.createObjectURL(new Blob([content], { type }));
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = fileName;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
 
 function countValues(records: object[]) {
   return records.reduce((count, record) => count + Object.values(record).filter((value) => typeof value === 'number').length, 0);
@@ -19,8 +43,9 @@ export function ActualsImportDialog() {
   const [preview, setPreview] = useState<ActualsImportResult>();
   const [fileName, setFileName] = useState<string>();
   const [error, setError] = useState<string>();
+  const [resourceMessage, setResourceMessage] = useState<string>();
 
-  const reset = () => { setPreview(undefined); setFileName(undefined); setError(undefined); };
+  const reset = () => { setPreview(undefined); setFileName(undefined); setError(undefined); setResourceMessage(undefined); };
   const read = async (file: File) => {
     try {
       setPreview(parseActualsImportFile(await file.text()));
@@ -48,10 +73,24 @@ export function ActualsImportDialog() {
         }} />
         <div className="grid gap-3 rounded-md border border-line bg-soft/50 p-3">
           <div className="flex flex-wrap items-center gap-2">
-            <a className={downloadClass} href="./ai-actuals-import-prompt.md" download><Download />AI変換用プロンプト</a>
-            <a className={downloadClass} href="./actuals-import.schema.json" download><Download />JSON Schema</a>
-            <a className={downloadClass} href="./actuals-import-template.json" download><Download />入力テンプレート</a>
+            <Button variant="outline" size="sm" aria-label="AI変換用プロンプトをコピー" onClick={async () => {
+              try {
+                await copyText(actualsImportPrompt);
+                setResourceMessage('プロンプトをコピーしました');
+              } catch {
+                setResourceMessage('プロンプトをコピーできませんでした');
+              }
+            }}><Copy />AI変換用プロンプトをコピー</Button>
+            <Button variant="outline" size="sm" aria-label="JSON Schemaをダウンロード" onClick={() => {
+              downloadTextFile('actuals-import.schema.json', actualsImportSchema, 'application/schema+json;charset=utf-8');
+              setResourceMessage('JSON Schemaをダウンロードしました');
+            }}><Download />JSON Schema</Button>
+            <Button variant="outline" size="sm" aria-label="入力テンプレートをダウンロード" onClick={() => {
+              downloadTextFile('actuals-import-template.json', actualsImportTemplate, 'application/json;charset=utf-8');
+              setResourceMessage('入力テンプレートをダウンロードしました');
+            }}><Download />入力テンプレート</Button>
           </div>
+          {resourceMessage && <p role="status" className="m-0 text-[11px] font-bold text-teal">{resourceMessage}</p>}
           <p className="m-0 text-[11px] leading-relaxed text-muted-foreground">資料にない値は推測せずnull、自動計算項目は出力せず、対応できない科目はunmappedItemsへ残す仕様です。</p>
           <Button className="w-fit" onClick={() => inputRef.current?.click()}><Upload />生成されたJSONを選択</Button>
         </div>

@@ -1,6 +1,6 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
 
 const importJson = JSON.stringify({
@@ -20,11 +20,23 @@ const importJson = JSON.stringify({
 describe('AIで過去実績を取り込む', () => {
   it('プロンプトとSchemaを提供し、検証結果を確認してからB/S・P/Lへ反映する', async () => {
     const user = userEvent.setup();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } });
+    const createObjectURL = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:actuals-import');
+    const revokeObjectURL = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
+    const anchorClick = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined);
     render(<App initialActuals="empty" />);
 
     await user.click(screen.getByRole('button', { name: 'AIで過去実績を取り込む' }));
-    expect(screen.getByRole('link', { name: 'AI変換用プロンプト' })).toHaveAttribute('href', './ai-actuals-import-prompt.md');
-    expect(screen.getByRole('link', { name: 'JSON Schema' })).toHaveAttribute('href', './actuals-import.schema.json');
+    await user.click(screen.getByRole('button', { name: 'AI変換用プロンプトをコピー' }));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('# 過去実績JSON変換プロンプト'));
+    expect(await screen.findByText('プロンプトをコピーしました')).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'JSON Schemaをダウンロード' }));
+    expect(createObjectURL).toHaveBeenCalledWith(expect.any(Blob));
+    expect(anchorClick).toHaveBeenCalled();
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:actuals-import');
+    expect(screen.queryByRole('link', { name: /JSON Schema/ })).not.toBeInTheDocument();
 
     const file = new File([importJson], 'actuals.json', { type: 'application/json' });
     Object.defineProperty(file, 'text', { value: async () => importJson });
