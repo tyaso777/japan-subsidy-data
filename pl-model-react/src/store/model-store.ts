@@ -259,27 +259,21 @@ export function createModelStore(program?: unknown, options?: { initialActuals?:
         return { ...snapshot, caseSettings: { ...snapshot.caseSettings, metricTargets } };
       }),
       importHistoricalActuals: (imported) => applyMutation((snapshot) => {
-        const startYear = imported.years[0];
-        const endYear = imported.years.at(-1)!;
-        let cursor = endYear + 1;
-        const periods = snapshot.program.timeline.periods.map((period) => {
-          const duration = period.endYear - period.startYear;
-          const next = { ...period, startYear: cursor, endYear: cursor + duration };
-          cursor = next.endYear + 1;
-          return next;
-        });
-        const program = {
-          ...snapshot.program,
-          timeline: { historical: { startYear, endYear }, periods },
+        const historical = snapshot.program.timeline.historical;
+        const targetYears = Array.from({ length: historical.endYear - historical.startYear + 1 }, (_, index) => historical.startYear + index);
+        const selectYears = <T extends object>(records: T[]) => {
+          const byYear = new Map(imported.years.map((year, index) => [year, records[index]]));
+          const emptyTemplate = emptyRecordLike(records[0]);
+          return targetYears.map((year) => structuredClone(byYear.get(year) ?? emptyTemplate));
         };
         const actuals = {
-          balanceSheets: structuredClone(imported.actuals.balanceSheets),
-          basePl: structuredClone(imported.actuals.basePl),
-          subsidyPl: structuredClone(imported.actuals.subsidyPl),
+          balanceSheets: selectYears(imported.actuals.balanceSheets),
+          basePl: selectYears(imported.actuals.basePl),
+          subsidyPl: selectYears(imported.actuals.subsidyPl),
           metricInputs: snapshot.actuals.metricInputs,
         };
         const { forecastRangeCalibration: _calibration, ...caseSettings } = snapshot.caseSettings;
-        return { ...snapshot, program, actuals, forecast: defaultForecast(program, actuals.basePl, actuals.subsidyPl), caseSettings };
+        return { ...snapshot, actuals, forecast: defaultForecast(snapshot.program, actuals.basePl, actuals.subsidyPl), caseSettings };
       }),
       updateFinalYearSalesAllocation: (baseSharePercent) => applyMutation((snapshot) => {
         const finalYear = Math.max(...(snapshot.forecast.segments ?? snapshot.program.timeline.periods).map((period) => period.endYear));

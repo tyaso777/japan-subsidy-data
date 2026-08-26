@@ -73,18 +73,22 @@ describe('AI向け過去実績インポート形式', () => {
     expect(() => parseActualsImportFile(JSON.stringify(unknown))).toThrow();
   });
 
-  it('取込年度へ個社期間を合わせ、最新実績を将来予測の基準値へ反映して一度で戻せる', () => {
+  it('個社の過去実績期間に一致する年度だけを取り込み、期間設定を変えず一度で戻せる', () => {
     const store = createModelStore(undefined, { initialActuals: 'empty' });
     const extended = structuredClone(validFile);
     extended.years = [2022, 2023, 2024, 2025];
+    extended.balanceSheets.unshift({ year: 2022, values: { assets: 999_999, cash: 0 } });
+    extended.profitAndLoss.base.unshift({ year: 2022, values: { sales: 999_999, cogs: 0, headcount: 0 } });
     const imported = parseActualsImportFile(JSON.stringify(extended));
 
     store.getState().importHistoricalActuals(imported);
 
     const state = store.getState();
-    expect(state.program.timeline.historical).toEqual({ startYear: 2022, endYear: 2025 });
+    expect(state.program.timeline.historical).toEqual({ startYear: 2023, endYear: 2025 });
     expect(state.program.timeline.periods[0]).toMatchObject({ startYear: 2026, endYear: 2028 });
-    expect(state.actuals.basePl[3].sales).toBe(1_000_000_000);
+    expect(state.actuals.balanceSheets).toHaveLength(3);
+    expect(state.actuals.balanceSheets[0].assets).toBe(1_000_000_000);
+    expect(state.actuals.basePl[2].sales).toBe(1_000_000_000);
     expect(state.forecast.series.find((series) => series.id === 'base-sales')).toMatchObject({ baseYear: 2025, baseValue: 1_000_000_000 });
     expect(state.canUndo).toBe(true);
 

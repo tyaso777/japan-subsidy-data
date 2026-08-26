@@ -38,12 +38,16 @@ function countValues(records: object[]) {
 
 export function ActualsImportDialog() {
   const importHistoricalActuals = useModelStore((state) => state.importHistoricalActuals);
+  const historical = useModelStore((state) => state.program.timeline.historical);
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState<ActualsImportResult>();
   const [fileName, setFileName] = useState<string>();
   const [error, setError] = useState<string>();
   const [resourceMessage, setResourceMessage] = useState<string>();
+  const targetYears = Array.from({ length: historical.endYear - historical.startYear + 1 }, (_, index) => historical.startYear + index);
+  const targetIndexes = preview ? targetYears.map((year) => preview.years.indexOf(year)).filter((index) => index >= 0) : [];
+  const missingYears = preview ? targetYears.filter((year) => !preview.years.includes(year)) : [];
 
   const reset = () => { setPreview(undefined); setFileName(undefined); setError(undefined); setResourceMessage(undefined); };
   const read = async (file: File) => {
@@ -98,13 +102,15 @@ export function ActualsImportDialog() {
         {preview && <div className="grid gap-2 rounded-md border border-teal/35 bg-teal/5 p-3 text-xs">
           <div className="flex flex-wrap items-center justify-between gap-2"><strong className="text-sm">取込内容の確認</strong><span className="text-muted-foreground">{fileName}</span></div>
           <dl className="grid grid-cols-[140px_1fr] gap-x-3 gap-y-1">
-            <dt className="text-muted-foreground">対象期間</dt><dd className="m-0 font-bold">{preview.years[0]}年〜{preview.years.at(-1)}年（{preview.years.length}期）</dd>
+            <dt className="text-muted-foreground">資料に含まれる期間</dt><dd className="m-0">{preview.years[0]}年〜{preview.years.at(-1)}年（{preview.years.length}期）</dd>
+            <dt className="text-muted-foreground">今回の取込対象</dt><dd className="m-0 font-bold">{historical.startYear}年〜{historical.endYear}年（{targetYears.length}期）</dd>
             <dt className="text-muted-foreground">資料の金額単位</dt><dd className="m-0 font-bold">{amountUnitLabels[preview.amountUnit]}</dd>
-            <dt className="text-muted-foreground">認識した入力値</dt><dd className="m-0">B/S {countValues(preview.actuals.balanceSheets)}件・ベースP/L {countValues(preview.actuals.basePl)}件・補助事業P/L {countValues(preview.actuals.subsidyPl)}件</dd>
+            <dt className="text-muted-foreground">反映する入力値</dt><dd className="m-0">B/S {countValues(targetIndexes.map((index) => preview.actuals.balanceSheets[index]))}件・ベースP/L {countValues(targetIndexes.map((index) => preview.actuals.basePl[index]))}件・補助事業P/L {countValues(targetIndexes.map((index) => preview.actuals.subsidyPl[index]))}件</dd>
           </dl>
+          {missingYears.length > 0 && <p className="m-0 text-[11px] font-bold text-orange">資料にない{missingYears.join('年・')}年は、未入力として取り込みます。</p>}
           {preview.unmappedItems.length > 0 && <div><strong>未対応科目</strong><ul className="mt-1 mb-0 pl-5">{preview.unmappedItems.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul></div>}
           {preview.notes.length > 0 && <div><strong>AIからの注記</strong><ul className="mt-1 mb-0 pl-5">{preview.notes.map((note, index) => <li key={`${note}-${index}`}>{note}</li>)}</ul></div>}
-          <p className="m-0 border-t border-teal/20 pt-2 text-[10px] text-muted-foreground">反映すると現在の過去実績を置き換え、最新実績を基準に将来予測を初期化します。制度定義と個社目標は維持されます。</p>
+          <p className="m-0 border-t border-teal/20 pt-2 text-[10px] text-muted-foreground">画面で設定した過去実績期間に一致する年度だけを反映します。期間設定は変更せず、最新実績を基準に将来予測を初期化します。制度定義と個社目標は維持されます。</p>
         </div>}
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>キャンセル</Button>
