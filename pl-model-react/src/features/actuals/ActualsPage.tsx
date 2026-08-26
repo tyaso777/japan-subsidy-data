@@ -33,7 +33,7 @@ export function ActualsPage({ onNext }: { onNext: () => void }) {
   const yearLabels = buildTimelineYearLabels(program);
   const emptyActual = (record: object) => Object.values(record).every((value) => value === null || value === undefined);
 
-  return <main data-testid="actuals-page" className="mx-auto mt-3 grid w-full max-w-[1360px] gap-3">
+  return <main data-testid="actuals-page" className="mx-auto mt-3 grid w-full max-w-[760px] gap-3">
     <PeriodEditor program={program} onEndYearChange={updatePeriodEnd} onHistoricalBoundaryChange={updateHistoricalBoundary} />
     <section className="border border-line bg-surface px-4.5 py-3.5"><h2 className="m-0 text-lg font-bold">過去実績</h2><p className="mt-0.5 text-[11px] text-muted-foreground">B/Sと2つの事業P/Lを、指定した過去実績期間（{years.length}期）で入力します。</p></section>
     <FinancialTable compact separateSubjectColumns testId="historical-bs" title="全社 B/S" years={years} yearLabels={yearLabels} records={balanceSheetsWithMetrics} rows={balanceSheetRows} moneyUnit={moneyUnit} onEditStart={beginTransaction} onEditEnd={commitTransaction} onChange={(index, field, value) => updateBalanceSheet(index, String(field), value)} />

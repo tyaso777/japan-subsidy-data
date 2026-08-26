@@ -7,7 +7,7 @@ describe('期間・過去実績', () => {
   it('広い画面でも入力領域を引き伸ばしすぎず中央配置する', () => {
     render(<App />);
 
-    expect(screen.getByTestId('actuals-page')).toHaveClass('mx-auto', 'w-full', 'max-w-[1360px]');
+    expect(screen.getByTestId('actuals-page')).toHaveClass('mx-auto', 'w-full', 'max-w-[760px]');
     expect(screen.getByTestId('period-editor')).toHaveClass('mx-auto', 'w-full', 'max-w-[760px]');
     expect(screen.getByTestId('special-year-summary')).toHaveClass('grid-cols-2');
     for (const testId of ['historical-bs', 'historical-pl-base', 'historical-pl-subsidy']) {
