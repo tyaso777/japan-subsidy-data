@@ -8,6 +8,7 @@ import { balanceSheetRows, buildProgramPlRows, historicalPlRows, type Historical
 import { buildTimelineYearLabels, resolveTimeline } from '../../domain/timeline';
 import { useModelStore } from '../../store/model-store-context';
 import { PeriodEditor } from './PeriodEditor';
+import { ActualsImportDialog } from './ActualsImportDialog';
 
 export function ActualsPage({ onNext }: { onNext: () => void }) {
   const program = useModelStore((state) => state.program);
@@ -35,7 +36,7 @@ export function ActualsPage({ onNext }: { onNext: () => void }) {
 
   return <main data-testid="actuals-page" className="mx-auto mt-3 grid w-full max-w-[760px] gap-3">
     <PeriodEditor program={program} onEndYearChange={updatePeriodEnd} onHistoricalBoundaryChange={updateHistoricalBoundary} />
-    <section className="border border-line bg-surface px-4.5 py-3.5"><h2 className="m-0 text-lg font-bold">過去実績</h2><p className="mt-0.5 text-[11px] text-muted-foreground">B/Sと2つの事業P/Lを、指定した過去実績期間（{years.length}期）で入力します。</p></section>
+    <section className="flex flex-wrap items-center justify-between gap-3 border border-line bg-surface px-4.5 py-3.5"><div><h2 className="m-0 text-lg font-bold">過去実績</h2><p className="mt-0.5 text-[11px] text-muted-foreground">B/Sと2つの事業P/Lを、指定した過去実績期間（{years.length}期）で入力します。</p></div><ActualsImportDialog /></section>
     <FinancialTable compact separateSubjectColumns testId="historical-bs" title="全社 B/S" years={years} yearLabels={yearLabels} records={balanceSheetsWithMetrics} rows={balanceSheetRows} moneyUnit={moneyUnit} onEditStart={beginTransaction} onEditEnd={commitTransaction} onChange={(index, field, value) => updateBalanceSheet(index, String(field), value)} />
     <FinancialTable compact separateSubjectColumns testId="historical-pl-base" title="ベース事業 P/L" years={years} yearLabels={yearLabels} records={calculatedBase} rows={programPlRows} moneyUnit={moneyUnit} isRecordEmpty={(_record, index) => emptyActual(base[index])} onEditStart={beginTransaction} onEditEnd={commitTransaction} onChange={(index, field, value) => updateHistoricalPl('base', index, field as HistoricalPlEditableField, value)} />
     <FinancialTable compact separateSubjectColumns testId="historical-pl-subsidy" title="補助事業 P/L" years={years} yearLabels={yearLabels} records={calculatedSubsidy} rows={programPlRows} moneyUnit={moneyUnit} isRecordEmpty={(_record, index) => emptyActual(subsidy[index])} onEditStart={beginTransaction} onEditEnd={commitTransaction} onChange={(index, field, value) => updateHistoricalPl('subsidy', index, field as HistoricalPlEditableField, value)} />

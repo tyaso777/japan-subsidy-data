@@ -16,6 +16,7 @@ import { calculatePl } from '../domain/financials';
 import { defaultForecastRange, normalizeForecastRanges } from '../domain/forecast-range';
 import { optimizeForecastRangesFromActuals, type HistoricalRangeOptimizationResult } from '../domain/historical-range-optimization';
 import { forecastRangeCalibrationFingerprint, type ForecastRangeCalibration } from '../domain/forecast-range-calibration';
+import type { ActualsImportResult } from '../domain/actuals-import';
 
 export type BusinessScope = 'base' | 'subsidy';
 export type ModelSnapshot = {
@@ -46,6 +47,7 @@ type ModelActions = {
   updateHistoricalPl: (scope: BusinessScope, yearIndex: number, field: keyof HistoricalPlInput, value: number) => void;
   updateMetricActual: (metricId: string, value: number) => void;
   updateMetricTarget: (metricId: string, value: number | null) => void;
+  importHistoricalActuals: (imported: ActualsImportResult) => void;
   optimizeForecastRangesFromActuals: () => HistoricalRangeOptimizationResult;
   updateForecastPeriod: (seriesId: string, periodId: string, patch: Partial<Pick<ForecastPeriod, 'annualGrowthRate' | 'startValue' | 'startAdjustment' | 'range'>>) => void;
   updateFinalYearSalesAllocation: (baseSharePercent: number) => void;
@@ -255,6 +257,29 @@ export function createModelStore(program?: unknown, options?: { initialActuals?:
         if (value === null || !Number.isFinite(value)) delete metricTargets[metricId];
         else metricTargets[metricId] = value;
         return { ...snapshot, caseSettings: { ...snapshot.caseSettings, metricTargets } };
+      }),
+      importHistoricalActuals: (imported) => applyMutation((snapshot) => {
+        const startYear = imported.years[0];
+        const endYear = imported.years.at(-1)!;
+        let cursor = endYear + 1;
+        const periods = snapshot.program.timeline.periods.map((period) => {
+          const duration = period.endYear - period.startYear;
+          const next = { ...period, startYear: cursor, endYear: cursor + duration };
+          cursor = next.endYear + 1;
+          return next;
+        });
+        const program = {
+          ...snapshot.program,
+          timeline: { historical: { startYear, endYear }, periods },
+        };
+        const actuals = {
+          balanceSheets: structuredClone(imported.actuals.balanceSheets),
+          basePl: structuredClone(imported.actuals.basePl),
+          subsidyPl: structuredClone(imported.actuals.subsidyPl),
+          metricInputs: snapshot.actuals.metricInputs,
+        };
+        const { forecastRangeCalibration: _calibration, ...caseSettings } = snapshot.caseSettings;
+        return { ...snapshot, program, actuals, forecast: defaultForecast(program, actuals.basePl, actuals.subsidyPl), caseSettings };
       }),
       updateFinalYearSalesAllocation: (baseSharePercent) => applyMutation((snapshot) => {
         const finalYear = Math.max(...(snapshot.forecast.segments ?? snapshot.program.timeline.periods).map((period) => period.endYear));

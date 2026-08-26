@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/pl-model/actuals-import.schema.json",
+  "title": "PL Model Historical Actuals Import",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "version", "amountUnit", "years", "balanceSheets", "profitAndLoss"],
+  "properties": {
+    "format": { "const": "pl-model-actuals" },
+    "version": { "const": "1" },
+    "amountUnit": { "enum": ["yen", "thousand-yen", "million-yen"] },
+    "years": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "integer" } },
+    "balanceSheets": { "type": "array", "items": { "$ref": "#/$defs/balanceSheetRecord" } },
+    "profitAndLoss": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base", "subsidy"],
+      "properties": {
+        "base": { "type": "array", "items": { "$ref": "#/$defs/plRecord" } },
+        "subsidy": { "type": "array", "items": { "$ref": "#/$defs/plRecord" } }
+      }
+    },
+    "sourceFiles": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "unmappedItems": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "notes": { "type": "array", "items": { "type": "string" }, "default": [] }
+  },
+  "$defs": {
+    "nullableNumber": { "type": ["number", "null"] },
+    "balanceSheetValues": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "assets": { "$ref": "#/$defs/nullableNumber" },
+        "currentAssets": { "$ref": "#/$defs/nullableNumber" },
+        "cash": { "$ref": "#/$defs/nullableNumber" },
+        "fixedAssets": { "$ref": "#/$defs/nullableNumber" },
+        "tangibleAssets": { "$ref": "#/$defs/nullableNumber" },
+        "buildings": { "$ref": "#/$defs/nullableNumber" },
+        "machinery": { "$ref": "#/$defs/nullableNumber" },
+        "land": { "$ref": "#/$defs/nullableNumber" },
+        "intangibleAssets": { "$ref": "#/$defs/nullableNumber" },
+        "software": { "$ref": "#/$defs/nullableNumber" },
+        "liabilities": { "$ref": "#/$defs/nullableNumber" },
+        "currentLiabilities": { "$ref": "#/$defs/nullableNumber" },
+        "shortTermDebt": { "$ref": "#/$defs/nullableNumber" },
+        "fixedLiabilities": { "$ref": "#/$defs/nullableNumber" },
+        "longTermDebt": { "$ref": "#/$defs/nullableNumber" },
+        "netAssets": { "$ref": "#/$defs/nullableNumber" },
+        "shareholderEquity": { "$ref": "#/$defs/nullableNumber" },
+        "capital": { "$ref": "#/$defs/nullableNumber" },
+        "capex": { "$ref": "#/$defs/nullableNumber" }
+      }
+    },
+    "plValues": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sales": { "$ref": "#/$defs/nullableNumber" },
+        "cogs": { "$ref": "#/$defs/nullableNumber" },
+        "cogsDepreciation": { "$ref": "#/$defs/nullableNumber" },
+        "employeeSalary": { "$ref": "#/$defs/nullableNumber" },
+        "employeeBonus": { "$ref": "#/$defs/nullableNumber" },
+        "officerCompensation": { "$ref": "#/$defs/nullableNumber" },
+        "officerBonus": { "$ref": "#/$defs/nullableNumber" },
+        "sgaDepreciation": { "$ref": "#/$defs/nullableNumber" },
+        "researchDevelopment": { "$ref": "#/$defs/nullableNumber" },
+        "otherSga": { "$ref": "#/$defs/nullableNumber" },
+        "nonOperating": { "$ref": "#/$defs/nullableNumber" },
+        "extraordinary": { "$ref": "#/$defs/nullableNumber" },
+        "netIncome": { "$ref": "#/$defs/nullableNumber" },
+        "headcount": { "$ref": "#/$defs/nullableNumber" },
+        "officerCount": { "$ref": "#/$defs/nullableNumber" }
+      }
+    },
+    "balanceSheetRecord": {
+      "type": "object", "additionalProperties": false, "required": ["year", "values"],
+      "properties": { "year": { "type": "integer" }, "values": { "$ref": "#/$defs/balanceSheetValues" } }
+    },
+    "plRecord": {
+      "type": "object", "additionalProperties": false, "required": ["year", "values"],
+      "properties": { "year": { "type": "integer" }, "values": { "$ref": "#/$defs/plValues" } }
+    }
+  }
+}

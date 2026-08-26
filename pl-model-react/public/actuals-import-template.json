@@ -1,0 +1,22 @@
+{
+  "format": "pl-model-actuals",
+  "version": "1",
+  "amountUnit": "million-yen",
+  "years": [2023, 2024, 2025],
+  "balanceSheets": [
+    { "year": 2023, "values": {} },
+    { "year": 2024, "values": {} },
+    { "year": 2025, "values": {} }
+  ],
+  "profitAndLoss": {
+    "base": [
+      { "year": 2023, "values": {} },
+      { "year": 2024, "values": {} },
+      { "year": 2025, "values": {} }
+    ],
+    "subsidy": []
+  },
+  "sourceFiles": [],
+  "unmappedItems": [],
+  "notes": []
+}
