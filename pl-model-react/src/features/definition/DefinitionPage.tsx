@@ -14,8 +14,8 @@ import { ProgramFileMenu } from './ProgramFileMenu';
 import { addPeriodDefinition, removePeriodDefinition, removeSpecialYearDefinition, renameNumericDefinition } from '../../domain/program-editor';
 import { forecastPlRows } from '../../domain/rows';
 
-const fieldClass = 'grid gap-1 text-[10px] font-bold text-muted-foreground';
-const selectClass = 'h-9 rounded-md border border-input bg-surface px-2 text-sm text-ink';
+const fieldClass = 'grid min-w-0 gap-1 text-[10px] font-bold text-muted-foreground';
+const selectClass = 'h-9 w-full min-w-0 rounded-md border border-input bg-surface px-2 text-sm text-ink';
 
 function nextId(prefix: string, count: number) { return `${prefix}-${count + 1}-${Date.now().toString(36)}`; }
 function nextPointId(points: ManagementMetricDefinition['timePoints']) {
@@ -60,7 +60,7 @@ function NumericDefinitionCard({ definition, index, anchors, update, rename, rem
     <Textarea aria-label={`${definition.label} 計算式`} value={definition.formula} onChange={(event) => update({ ...definition, formula: event.target.value })} />
     <div className="border-t border-dashed border-line pt-2">
       <label className="flex items-center gap-2 text-xs font-bold"><input aria-label={`${definition.label}をPL表に表示`} type="checkbox" checked={display?.enabled ?? false} onChange={(event) => setDisplayEnabled(event.target.checked)} />PL表の補足指標として表示</label>
-      {display?.enabled && <div className="mt-2 grid grid-cols-[minmax(180px,1.4fr)_110px_minmax(120px,1fr)_100px] gap-2">
+      {display?.enabled && <div className="mt-2 grid min-w-0 grid-cols-2 gap-2">
         <label className={fieldClass}>挿入位置<select aria-label={`${definition.label} 挿入位置`} className={selectClass} value={display.insertAfter} onChange={(event) => update({ ...definition, plDisplay: { ...display, insertAfter: event.target.value } })}>{anchors.map((anchor) => <option key={anchor.code} value={anchor.code}>{anchor.displayCode} {anchor.label}の後</option>)}</select></label>
         <label className={fieldClass}>同位置での順番<NumberInput aria-label={`${definition.label} 同位置での順番`} value={display.insertOrder} min={1} step="1" onValueChange={(value) => update({ ...definition, plDisplay: { ...display, insertOrder: Math.max(1, Math.round(value)) } })} /></label>
         <label className={fieldClass}>表示単位<select aria-label={`${definition.label} PL表示単位`} className={selectClass} value={display.valueKind} onChange={(event) => update({ ...definition, plDisplay: { ...display, valueKind: event.target.value as ValueKind } })}>{plValueKinds.map((kind) => <option key={kind} value={kind}>{valueKindMetadata[kind].label}</option>)}</select></label>

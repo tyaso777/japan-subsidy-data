@@ -136,7 +136,7 @@ test('期間・過去実績の財務表はワイド画面でも会計表の密�
   await page.goto('/');
 
   const balanceSheet = page.getByTestId('historical-bs');
-  const input = page.getByLabel('全社 B/S（1-1～1-25） 2023年 資産総額');
+  const input = page.getByLabel('全社 B/S 2023年 資産総額');
   const tableWidth = await balanceSheet.evaluate((element) => element.getBoundingClientRect().width);
   const headerOverflow = await balanceSheet.locator('header').evaluate((element) => ({ clientWidth: element.clientWidth, scrollWidth: element.scrollWidth }));
   const inputBox = await input.boundingBox();
@@ -175,6 +175,22 @@ test('制度定義カードの見出しは枠端に密着せず、狭い画面�
   expect((titleBox?.x ?? 0) - (cardBox?.x ?? 0)).toBeGreaterThanOrEqual(15);
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
   await expect(header.getByRole('button', { name: '区間を追加' })).toBeVisible();
+});
+
+test('狭い画面でも共通数値定義のPL挿入設定が重ならずカード内へ収まる', async ({ page }) => {
+  await page.setViewportSize({ width: 1101, height: 900 });
+  await page.goto('/');
+  await page.getByTestId('app-toolbar').getByRole('button', { name: '01 制度定義' }).click();
+
+  const card = page.getByTestId('numeric-definition-付加価値額');
+  const insertion = page.getByLabel('付加価値額 挿入位置');
+  const order = page.getByLabel('付加価値額 同位置での順番');
+  const overflow = await card.evaluate((element) => ({ clientWidth: element.clientWidth, scrollWidth: element.scrollWidth }));
+  const insertionBox = await insertion.boundingBox();
+  const orderBox = await order.boundingBox();
+
+  expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
+  expect((insertionBox?.x ?? 0) + (insertionBox?.width ?? 0)).toBeLessThanOrEqual(orderBox?.x ?? 0);
 });
 
 test('水準設定は固定項目を一括で隠して変動可能項目へ集中できる', async ({ page }) => {
