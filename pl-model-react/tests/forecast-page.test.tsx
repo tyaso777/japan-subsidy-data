@@ -12,6 +12,8 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('水準範囲は未適正化です');
     const optimize = screen.getByRole('button', { name: '過去実績から水準範囲を適正化' });
     expect(optimize).toBeVisible();
+    expect(screen.getByTestId('forecast-settings-panel')).toContainElement(optimize);
+    expect(screen.getByTestId('forecast-operation-bar')).not.toContainElement(optimize);
     await user.click(optimize);
     expect(screen.getByText('過去実績に適正化済み')).toBeVisible();
   });
