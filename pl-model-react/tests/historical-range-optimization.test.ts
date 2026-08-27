@@ -13,7 +13,7 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(hasUsableSubsidyHistory(state.actuals.subsidyPl)).toBe(true);
   });
 
-  it('新規事業設定ではベース事業の基準値を参照し、売上高と従業員数の開始時固定値は入力待ちにする', () => {
+  it('新規事業設定ではベース事業の基準値を参照し、売上高・従業員数・役員数の開始時固定値は入力待ちにする', () => {
     const state = createModelStore().getState();
     const zeroActuals = state.actuals.subsidyPl.map((row) => Object.fromEntries(Object.keys(row).map((field) => [field, 0]))) as typeof state.actuals.subsidyPl;
     const result = optimizeForecastRangesFromActuals(
@@ -31,6 +31,8 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(result.newBusinessSetupRequired).toBe(true);
     expect(first('sales').startValue).toBeNull();
     expect(first('headcount').startValue).toBeNull();
+    expect(first('officerCount').startValue).toBeNull();
+    expect(series('officerCount').baseValue).toBe(0);
     expect(first('cogsRate').startValue).toBeCloseTo(latestBase.cogs / latestBase.sales * 100);
     expect(first('payPerPerson').startValue).toBeCloseTo((latestBase.employeeSalary + latestBase.employeeBonus) / latestBase.headcount);
     expect(first('officerPayPerPerson').startValue).toBeCloseTo((latestBase.officerCompensation + latestBase.officerBonus) / latestBase.officerCount);

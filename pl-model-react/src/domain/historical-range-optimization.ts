@@ -41,6 +41,9 @@ const initiallyLockedDrivers = new Set([
   'taxRate',
 ]);
 
+// 新規の補助事業では、事業固有の絶対量をベース事業から転記しない。
+const newBusinessOwnInitialValueDrivers = new Set(['sales', 'headcount', 'officerCount']);
+
 function driverId(series: ForecastSeries): string {
   return series.id.replace(`${series.scope}-`, '');
 }
@@ -170,7 +173,7 @@ export function optimizeForecastRangesFromActuals(
   forecast.series.filter((series) => series.scope !== 'company').forEach((series) => {
     const driver = driverId(series);
     const newBusinessSeries = options.subsidyAsNewBusiness && series.scope === 'subsidy';
-    const requiresOwnInitialValue = newBusinessSeries && (driver === 'sales' || driver === 'headcount');
+    const requiresOwnInitialValue = newBusinessSeries && newBusinessOwnInitialValueDrivers.has(driver);
     const source = newBusinessSeries && !requiresOwnInitialValue ? actuals.base : actuals[series.scope as Scope];
     if (series.changePolicy === 'fixed') {
       const latestLevel = valuesForDriver(driverId(series), source).at(-1);
