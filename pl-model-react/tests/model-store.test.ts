@@ -11,7 +11,7 @@ describe('モデルストア', () => {
     expect(state.actuals.basePl[2].sales).toBe(1_000_000_000);
     expect(state.preferences.moneyUnit).toBe('millionYen');
     expect(state.program.timeline.periods[0].endYear).toBe(2028);
-    expect(state.forecast.series[0].periods.find((period) => period.id === 'report')?.boundaryYear).toBe(2029);
+    expect(state.forecast.series[0].periods.find((period) => period.id === 'report')).not.toHaveProperty('boundaryYear');
   });
 
   it('変更をUndo・Redoできる', () => {
@@ -73,7 +73,7 @@ describe('モデルストア', () => {
     snapshot.program.timeline.periods[1] = { definitionId: 'report', startYear: 2028, endYear: 2031 };
     snapshot.forecast.series.forEach((series) => {
       const report = series.periods.find((period) => period.id === 'report');
-      if (report) Object.assign(report, { startYear: 2028, endYear: 2031, boundaryYear: 2028 });
+      if (report) Object.assign(report, { startYear: 2028, endYear: 2031 });
     });
 
     store.getState().replaceSnapshot(snapshot);
@@ -81,7 +81,8 @@ describe('モデルストア', () => {
     expect(store.getState().program.timeline.periods[1]).toEqual({ definitionId: 'report', startYear: 2029, endYear: 2032 });
     expect(store.getState().program.definitions.specialYears.find((year) => year.id === 'base')?.anchor).toEqual({ type: 'periodStart', periodId: 'report' });
     for (const series of store.getState().forecast.series) {
-      expect(series.periods.find((period) => period.id === 'report')).toMatchObject({ startYear: 2029, endYear: 2032, boundaryYear: 2029 });
+      expect(series.periods.find((period) => period.id === 'report')).toMatchObject({ startYear: 2029, endYear: 2032 });
+      expect(series.periods.find((period) => period.id === 'report')).not.toHaveProperty('boundaryYear');
     }
   });
 

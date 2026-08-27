@@ -11,6 +11,7 @@ describe('案件データ保存境界', () => {
     state.optimizeForecastRangesFromActuals();
     const updated = store.getState();
     const json = serializeModelFile({ program: updated.program, actuals: updated.actuals, forecast: updated.forecast, caseSettings: updated.caseSettings });
+    expect(json).not.toContain('"boundaryYear"');
     const restored = parseModelFile(json);
     expect(restored.actuals.basePl[2].sales).toBe(1_000_000_000);
     expect(restored.forecast.series.length).toBeGreaterThan(0);

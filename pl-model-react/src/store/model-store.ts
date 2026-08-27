@@ -75,11 +75,9 @@ function sameSnapshot(left: ModelSnapshot, right: ModelSnapshot): boolean {
 
 function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInput[], subsidyPl: HistoricalPlInput[]): ForecastModel {
   const baseYear = program.timeline.historical.endYear;
-  const periods = (change: number, projectionMode: 'compound' | 'linear'): ForecastPeriod[] => program.timeline.periods.map((period, index) => {
-    const definition = program.definitions.periods.find((candidate) => candidate.id === period.definitionId);
-    const boundaryYear = definition?.modelPhase === 'postBase' ? period.startYear : undefined;
-    return { id: period.definitionId, startYear: period.startYear, endYear: period.endYear, boundaryYear, annualGrowthRate: change, startValue: null, startAdjustment: 0, range: defaultForecastRange(projectionMode) };
-  });
+  const periods = (change: number, projectionMode: 'compound' | 'linear'): ForecastPeriod[] => program.timeline.periods.map((period) => ({
+    id: period.definitionId, startYear: period.startYear, endYear: period.endYear, annualGrowthRate: change, startValue: null, startAdjustment: 0, range: defaultForecastRange(projectionMode),
+  }));
   const forScope = (scope: BusinessScope, latest: HistoricalPlInput, growth: { sales: number; headcount: number; pay: number }) => {
     const calculated = calculatePl(latest);
     const compound = (id: string, label: string, valueKind: import('../domain/value-units').ValueKind, baseValue: number, rate: number) => ({ id: `${scope}-${id}`, label, scope, valueKind, projectionMode: 'compound' as const, baseYear, baseValue, periods: periods(rate, 'compound') });

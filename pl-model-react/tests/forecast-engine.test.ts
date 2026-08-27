@@ -59,13 +59,13 @@ describe('将来予測計算サービス', () => {
     expect(linear.map((point) => point.value)).toEqual([50, 83, 85]);
   });
 
-  it('事業化報告期間の初年を基準年度とし、翌年の報告1年目から成長率を適用する', () => {
+  it('事業化報告期間の初年で開始時固定値を優先し、翌年から成長させる', () => {
     const points = projectForecastSeries({
       id: 'subsidy-sales', label: '売上高', scope: 'subsidy', valueKind: 'money', projectionMode: 'compound',
       baseYear: 2025, baseValue: 100,
       periods: [
         { id: 'subsidy', startYear: 2026, endYear: 2028, annualGrowthRate: 0, startAdjustment: 0 },
-        { id: 'report', startYear: 2029, endYear: 2032, boundaryYear: 2029, annualGrowthRate: 10, startValue: 200, startAdjustment: 20 },
+        { id: 'report', startYear: 2029, endYear: 2032, annualGrowthRate: 10, startValue: 200, startAdjustment: 20 },
       ],
     });
 
@@ -79,7 +79,7 @@ describe('将来予測計算サービス', () => {
       baseYear: 2025, baseValue: 100,
       periods: [
         { id: 'subsidy', startYear: 2026, endYear: 2028, annualGrowthRate: 5, startAdjustment: 0 },
-        { id: 'report', startYear: 2029, endYear: 2032, boundaryYear: 2029, annualGrowthRate: 10, startValue: null, startAdjustment: 0 },
+        { id: 'report', startYear: 2029, endYear: 2032, annualGrowthRate: 10, startValue: null, startAdjustment: 0 },
       ],
     });
 
