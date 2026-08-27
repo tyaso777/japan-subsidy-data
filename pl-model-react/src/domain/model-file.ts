@@ -58,7 +58,7 @@ export function parseModelFile(json: string): ModelSnapshot {
       const segment = model.forecast.segments?.find((candidate) => candidate.id === period.id);
       const definitionId = segment?.definitionId ?? period.id.split('~')[0];
       if (!postBaseIds.has(definitionId) || period.id.includes('~')) return;
-      period.boundaryYear ??= period.startYear - 1;
+      period.boundaryYear ??= period.startYear;
     });
   });
   return model;

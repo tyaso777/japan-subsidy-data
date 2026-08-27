@@ -39,8 +39,8 @@
             "id": "base",
             "label": "基準年度",
             "anchor": {
-              "type": "periodEnd",
-              "periodId": "subsidy"
+              "type": "periodStart",
+              "periodId": "report"
             },
             "offset": 0
           }
@@ -95,7 +95,7 @@
                   "type": "periodStart",
                   "periodId": "report"
                 },
-                "offset": 2
+                "offset": 3
               }
             ],
             "formula": "(([売上高][B] / [売上高][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
@@ -124,7 +124,7 @@
                   "type": "periodStart",
                   "periodId": "report"
                 },
-                "offset": 2
+                "offset": 3
               }
             ],
             "formula": "(([付加価値額][B] / [付加価値額][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
@@ -153,7 +153,7 @@
                   "type": "periodStart",
                   "periodId": "report"
                 },
-                "offset": 2
+                "offset": 3
               }
             ],
             "formula": "(([労働生産性][B] / [労働生産性][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
@@ -263,7 +263,7 @@
                   "type": "periodStart",
                   "periodId": "report"
                 },
-                "offset": 2
+                "offset": 3
               }
             ],
             "formula": "(([従業員1人当たり給与支給総額][B] / [従業員1人当たり給与支給総額][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
@@ -292,7 +292,7 @@
                   "type": "periodStart",
                   "periodId": "report"
                 },
-                "offset": 2
+                "offset": 3
               }
             ],
             "formula": "(([従業員給与総額][B] / [従業員給与総額][A]) ^ (1 / YEARS(A, B)) - 1) * 100",
@@ -426,7 +426,7 @@
           {
             "definitionId": "report",
             "startYear": 2029,
-            "endYear": 2031
+            "endYear": 2032
           }
         ]
       }
@@ -617,7 +617,7 @@
           "id": "report",
           "definitionId": "report",
           "startYear": 2029,
-          "endYear": 2031
+          "endYear": 2032
         }
       ],
       "series": [
@@ -645,7 +645,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 8,
               "startAdjustment": 0,
               "range": {
@@ -680,7 +680,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 3,
               "startAdjustment": 0,
               "range": {
@@ -715,7 +715,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 4,
               "startAdjustment": 0,
               "range": {
@@ -751,7 +751,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -787,7 +787,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -823,7 +823,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -859,7 +859,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -895,7 +895,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -930,7 +930,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 2,
               "startAdjustment": 0,
               "range": {
@@ -966,7 +966,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1002,7 +1002,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1038,7 +1038,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1074,7 +1074,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1110,7 +1110,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1145,7 +1145,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1180,7 +1180,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 12,
               "startAdjustment": 0,
               "range": {
@@ -1215,7 +1215,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 5,
               "startAdjustment": 0,
               "range": {
@@ -1250,7 +1250,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 5,
               "startAdjustment": 0,
               "range": {
@@ -1286,7 +1286,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1322,7 +1322,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1358,7 +1358,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1394,7 +1394,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1430,7 +1430,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1465,7 +1465,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 2,
               "startAdjustment": 0,
               "range": {
@@ -1501,7 +1501,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1537,7 +1537,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1573,7 +1573,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1609,7 +1609,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1645,7 +1645,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
@@ -1680,7 +1680,7 @@
             {
               "id": "report",
               "startYear": 2029,
-              "endYear": 2031,
+              "endYear": 2032,
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {

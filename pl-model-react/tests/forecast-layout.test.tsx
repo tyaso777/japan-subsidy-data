@@ -62,8 +62,8 @@ describe('将来予測画面のワイドレイアウト', () => {
       'grid-cols-[minmax(92px,0.88fr)_minmax(84px,0.72fr)]',
     );
     const salesGrowthMetric = screen.getByTestId('metric-bullet-company-sales-growth');
-    expect(within(salesGrowthMetric).getByText('2028→2031 · %/年')).toBeVisible();
-    expect(within(salesGrowthMetric).queryByText(/A:2028|B:2031/)).not.toBeInTheDocument();
+    expect(within(salesGrowthMetric).getByText('2029→2032 · %/年')).toBeVisible();
+    expect(within(salesGrowthMetric).queryByText(/A:2029|B:2032/)).not.toBeInTheDocument();
     expect(within(salesGrowthMetric).queryByText(/目標まで/)).not.toBeInTheDocument();
     expect(screen.getByTestId('forecast-layout').className).not.toMatch(/\[&>aside\]/);
 
@@ -141,6 +141,7 @@ describe('将来予測画面のワイドレイアウト', () => {
       '2028年の期間分割を解除',
       '2030年から期間を分割',
       '2031年から期間を分割',
+      '2032年から期間を分割',
     ]);
   });
 

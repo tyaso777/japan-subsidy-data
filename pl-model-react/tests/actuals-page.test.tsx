@@ -72,13 +72,13 @@ describe('期間・過去実績', () => {
     expect(within(summary).getByText('最新決算期')).toBeVisible();
     expect(within(summary).getByText('2025年')).toBeVisible();
     expect(within(summary).getByText('基準年度')).toBeVisible();
-    expect(within(summary).getByText('2028年')).toBeVisible();
-    expect(within(summary).getByText('補助事業期間・終了年 ±0年')).toBeVisible();
+    expect(within(summary).getByText('2029年')).toBeVisible();
+    expect(within(summary).getByText('事業化報告期間・開始年 ±0年')).toBeVisible();
 
     const subsidyEnd = screen.getByLabelText('補助事業期間 終了年');
     await user.clear(subsidyEnd);
     await user.type(subsidyEnd, '2029');
-    expect(within(summary).getByText('2029年')).toBeVisible();
+    expect(within(summary).getByText('2030年')).toBeVisible();
   });
 
   it('旧BLUEPRINTと同じB/S 1-25 EBITDA有利子負債倍率を自動計算する', () => {

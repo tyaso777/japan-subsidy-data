@@ -5,15 +5,15 @@ import { createDefaultProgram } from '../src/domain/timeline';
 describe('制度定義の構造編集', () => {
   it('区間追加時は直前区間の長さを引き継ぎ、翌年から連続させる', () => {
     const program = addPeriodDefinition(createDefaultProgram());
-    expect(program.timeline.periods.at(-1)).toMatchObject({ startYear: 2032, endYear: 2034 });
+    expect(program.timeline.periods.at(-1)).toMatchObject({ startYear: 2033, endYear: 2036 });
     expect(program.definitions.periods.at(-1)?.modelPhase).toBe('postBase');
   });
 
   it('区間削除時は後続期間を詰め、特別年と指標時点を残存区間へ付け替える', () => {
     const result = removePeriodDefinition(createDefaultProgram(), 'subsidy');
     expect(result.definitions.periods).toHaveLength(1);
-    expect(result.timeline.periods).toEqual([{ definitionId: 'report', startYear: 2026, endYear: 2028 }]);
-    expect(result.definitions.specialYears.find((year) => year.id === 'base')?.anchor).toEqual({ type: 'periodEnd', periodId: 'report' });
+    expect(result.timeline.periods).toEqual([{ definitionId: 'report', startYear: 2026, endYear: 2029 }]);
+    expect(result.definitions.specialYears.find((year) => year.id === 'base')?.anchor).toEqual({ type: 'periodStart', periodId: 'report' });
     expect(result.definitions.managementMetrics.flatMap((metric) => metric.timePoints).every((point) => !(['periodStart', 'periodEnd'].includes(point.anchor.type) && 'periodId' in point.anchor && point.anchor.periodId === 'subsidy'))).toBe(true);
   });
 

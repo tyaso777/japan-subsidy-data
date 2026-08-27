@@ -5,14 +5,15 @@ describe('制度期間', () => {
   it('通常年の区間内呼称へ特別年の呼称を重ねる', () => {
     const labels = buildTimelineYearLabels(createDefaultProgram());
     expect(labels[2025]).toEqual({ primary: '最新決算期' });
-    expect(labels[2028]).toEqual({ primary: '基準年度', secondary: '補助事業期間3年目' });
-    expect(labels[2031]).toEqual({ primary: '事業化報告期間3年目' });
+    expect(labels[2028]).toEqual({ primary: '補助事業期間3年目' });
+    expect(labels[2029]).toEqual({ primary: '基準年度' });
+    expect(labels[2032]).toEqual({ primary: '事業化報告期間3年目' });
   });
   it('既定の補助事業期間は3年で、基準年度の後に報告1～3年目が続く', () => {
     const resolved = resolveTimeline(createDefaultProgram());
     expect(resolved.periodYears.find((period) => period.definitionId === 'subsidy')?.years).toEqual([2026, 2027, 2028]);
-    expect(resolved.specialYears.find((year) => year.id === 'base')?.year).toBe(2028);
-    expect(resolved.periodYears.find((period) => period.definitionId === 'report')?.years).toEqual([2029, 2030, 2031]);
+    expect(resolved.specialYears.find((year) => year.id === 'base')?.year).toBe(2029);
+    expect(resolved.periodYears.find((period) => period.definitionId === 'report')?.years).toEqual([2029, 2030, 2031, 2032]);
   });
   it('過去実績の翌年から事業期間を連続させる', () => {
     const program = createDefaultProgram();
@@ -20,12 +21,12 @@ describe('制度期間', () => {
 
     expect(changed.timeline.periods[0].endYear).toBe(2029);
     expect(changed.timeline.periods[1].startYear).toBe(2030);
-    expect(resolveTimeline(changed).years).toEqual([2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032]);
+    expect(resolveTimeline(changed).years).toEqual([2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033]);
   });
 
   it('期間終了年に紐づく特別年を解決する', () => {
     const resolved = resolveTimeline(createDefaultProgram());
-    expect(resolved.specialYears.find((year) => year.id === 'base')?.year).toBe(2028);
+    expect(resolved.specialYears.find((year) => year.id === 'base')?.year).toBe(2029);
   });
 
   it('2次公募の採択者中央値14指標を既定目標として搭載する', () => {

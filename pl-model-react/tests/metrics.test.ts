@@ -39,8 +39,8 @@ describe('制度共通の経営指標定義', () => {
       { id: 'B', anchor: { type: 'specialYear', specialYearId: 'base' }, offset: -1 },
       { id: 'C', anchor: { type: 'periodEnd', periodId: 'report' }, offset: 0 },
     ]);
-    expect(resolveMetricTimePoints(definition, program)).toEqual({ A: 2025, B: 2027, C: 2031 });
-    expect(resolveMetricTimePoints(definition, setPeriodEndYear(program, 0, 2030))).toEqual({ A: 2025, B: 2029, C: 2033 });
+    expect(resolveMetricTimePoints(definition, program)).toEqual({ A: 2025, B: 2028, C: 2032 });
+    expect(resolveMetricTimePoints(definition, setPeriodEndYear(program, 0, 2030))).toEqual({ A: 2025, B: 2030, C: 2034 });
   });
 
   it('削除した時点や未定義時点を式が参照していれば明示的に拒否する', () => {
@@ -87,7 +87,7 @@ describe('制度共通の経営指標定義', () => {
   it('足下の賃上げを最新決算期から基準年までのCAGRとして定義する', () => {
     const program = createDefaultProgram();
     const definition = program.definitions.managementMetrics.find((candidate) => candidate.id === 'current-wage-growth')!;
-    expect(resolveMetricTimePoints(definition, program)).toEqual({ A: 2025, B: 2028 });
+    expect(resolveMetricTimePoints(definition, program)).toEqual({ A: 2025, B: 2029 });
     expect(definition.formula).toContain('YEARS(A, B)');
     expect(definition.optimization).toBe('adjustable');
   });
@@ -95,11 +95,11 @@ describe('制度共通の経営指標定義', () => {
   it('成長率指標は基準年と事業化報告3年目を比較する', () => {
     const program = createDefaultProgram();
     const definition = program.definitions.managementMetrics.find((candidate) => candidate.id === 'company-sales-growth')!;
-    expect(resolveMetricTimePoints(definition, program)).toEqual({ A: 2028, B: 2031 });
+    expect(resolveMetricTimePoints(definition, program)).toEqual({ A: 2029, B: 2032 });
 
     const extended = structuredClone(program);
     extended.timeline.periods.find((period) => period.definitionId === 'report')!.endYear = 2034;
-    expect(resolveMetricTimePoints(definition, extended)).toEqual({ A: 2028, B: 2031 });
+    expect(resolveMetricTimePoints(definition, extended)).toEqual({ A: 2029, B: 2032 });
   });
 
   it('労働生産性は役員数を加えずFTE従業員数で割る', () => {

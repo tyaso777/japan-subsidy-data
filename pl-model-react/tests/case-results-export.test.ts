@@ -8,7 +8,7 @@ describe('案件結果の出力', () => {
     const report = buildCaseResultReport(createInitialModelSnapshot(), 'millionYen');
 
     expect(report.tables.map((table) => table.name)).toEqual(['全社合算 P/L', 'ベース事業 P/L', '補助事業 P/L']);
-    expect(report.tables[1].years).toEqual([2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031]);
+    expect(report.tables[1].years).toEqual([2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032]);
     expect(report.tables[1].rows.find((row) => row.label === '売上高')?.values.slice(0, 4)).toEqual([900, 950, 1000, 1080]);
   });
 

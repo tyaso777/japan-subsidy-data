@@ -14,7 +14,7 @@ describe('将来予測・PL画面', () => {
     expect(headers[0]).toHaveTextContent('補助事業期間');
     expect(headers[0]).toHaveTextContent('2026–2028');
     expect(headers[1]).toHaveTextContent('事業化報告期間');
-    expect(headers[1]).toHaveTextContent('2028–2031');
+    expect(headers[1]).toHaveTextContent('2029–2032');
   });
 
   it('水準範囲の未適正化を警告し、03画面から適正化できる', async () => {
@@ -117,13 +117,13 @@ describe('将来予測・PL画面', () => {
     expect(within(optimizationToolbar).getByRole('combobox', { name: '探索範囲' })).toBeVisible();
     expect(within(optimizationToolbar).getByRole('button', { name: '目標を満たす水準案を作成' })).toHaveClass('min-w-0', 'whitespace-nowrap');
     expect(within(screen.getByTestId('forecast-metrics-panel')).queryByRole('combobox', { name: '最適化方法' })).not.toBeInTheDocument();
-    expect(within(allocation).getByText('2031年')).toBeVisible();
+    expect(within(allocation).getByText('2032年')).toBeVisible();
     expect(within(allocation).getByText(`（現在 ${88.94.toFixed(2)}%）`)).toBeVisible();
     expect(allocation).toHaveClass('w-[236px]');
     expect(within(allocation).getByTestId('current-base-share')).toHaveClass('w-[86px]', 'tabular-nums');
     expect(within(allocation).queryByText(/^B /)).not.toBeInTheDocument();
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
-    const finalSales = screen.getByLabelText('ベース事業 P/L 2031年 売上高');
+    const finalSales = screen.getByLabelText('ベース事業 P/L 2032年 売上高');
     const salesBeforeAllocation = (finalSales as HTMLInputElement).value;
     const baseShare = within(allocation).getByLabelText('ベース事業 配分率');
     expect(baseShare).toHaveValue(null);

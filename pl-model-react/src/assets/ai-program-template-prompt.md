@@ -64,7 +64,7 @@
       {
         "id": "base",
         "label": "基準年度",
-        "anchor": { "type": "periodEnd", "periodId": "investment" },
+        "anchor": { "type": "periodStart", "periodId": "report" },
         "offset": 0
       }
     ],
@@ -114,7 +114,7 @@
     "historical": { "startYear": 2023, "endYear": 2025 },
     "periods": [
       { "definitionId": "investment", "startYear": 2026, "endYear": 2028 },
-      { "definitionId": "report", "startYear": 2029, "endYear": 2031 }
+      { "definitionId": "report", "startYear": 2029, "endYear": 2032 }
     ]
   }
 }

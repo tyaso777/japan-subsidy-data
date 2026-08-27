@@ -14,7 +14,7 @@ describe('案件データ保存境界', () => {
     const restored = parseModelFile(json);
     expect(restored.actuals.basePl[2].sales).toBe(1_000_000_000);
     expect(restored.forecast.series.length).toBeGreaterThan(0);
-    expect(restored.forecast.finalYearSalesAllocation).toEqual({ finalYear: 2031, baseSharePercent: 65 });
+    expect(restored.forecast.finalYearSalesAllocation).toEqual({ finalYear: 2032, baseSharePercent: 65 });
     expect(restored.caseSettings.metricTargets).toEqual({ 'company-sales-growth': 35 });
     expect(restored.caseSettings.forecastRangeCalibration?.sourceFingerprint).toMatch(/^v1-/);
   });

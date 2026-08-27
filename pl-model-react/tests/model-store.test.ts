@@ -11,7 +11,7 @@ describe('モデルストア', () => {
     expect(state.actuals.basePl[2].sales).toBe(1_000_000_000);
     expect(state.preferences.moneyUnit).toBe('millionYen');
     expect(state.program.timeline.periods[0].endYear).toBe(2028);
-    expect(state.forecast.series[0].periods.find((period) => period.id === 'report')?.boundaryYear).toBe(2028);
+    expect(state.forecast.series[0].periods.find((period) => period.id === 'report')?.boundaryYear).toBe(2029);
   });
 
   it('変更をUndo・Redoできる', () => {
@@ -51,9 +51,9 @@ describe('モデルストア', () => {
   it('期間変更も履歴に含める', () => {
     const store = createModelStore();
     store.getState().updatePeriodEnd(0, 2029);
-    expect(store.getState().program.timeline.periods[1]).toMatchObject({ startYear: 2030, endYear: 2032 });
+    expect(store.getState().program.timeline.periods[1]).toMatchObject({ startYear: 2030, endYear: 2033 });
     store.getState().undo();
-    expect(store.getState().program.timeline.periods[1]).toMatchObject({ startYear: 2029, endYear: 2031 });
+    expect(store.getState().program.timeline.periods[1]).toMatchObject({ startYear: 2029, endYear: 2032 });
   });
 
   it('個社期間の変更を全予測系列の期間境界へ同期する', () => {
@@ -61,7 +61,7 @@ describe('モデルストア', () => {
     store.getState().updatePeriodEnd(0, 2029);
     for (const series of store.getState().forecast.series) {
       expect(series.periods[0]).toMatchObject({ startYear: 2026, endYear: 2029 });
-      expect(series.periods[1]).toMatchObject({ startYear: 2030, endYear: 2032 });
+      expect(series.periods[1]).toMatchObject({ startYear: 2030, endYear: 2033 });
     }
   });
 
@@ -118,18 +118,18 @@ describe('モデルストア', () => {
     store.getState().splitForecastAtYear(2027);
     store.getState().updatePeriodEnd(0, 2030);
     expect(store.getState().forecast.segments?.map((segment) => [segment.id, segment.startYear, segment.endYear])).toEqual([
-      ['subsidy', 2026, 2026], ['subsidy~2027', 2027, 2030], ['report', 2031, 2033],
+      ['subsidy', 2026, 2026], ['subsidy~2027', 2027, 2030], ['report', 2031, 2034],
     ]);
-    expect(store.getState().forecast.series.every((series) => series.periods.at(-1)?.endYear === 2033)).toBe(true);
+    expect(store.getState().forecast.series.every((series) => series.periods.at(-1)?.endYear === 2034)).toBe(true);
   });
 
   it('制度区間の追加・削除を全予測系列へ反映する', () => {
     const store = createModelStore();
     const next = structuredClone(store.getState().program);
     next.definitions.periods.push({ id: 'followup', label: '追跡期間', modelPhase: 'postBase' });
-    next.timeline.periods.push({ definitionId: 'followup', startYear: 2032, endYear: 2034 });
+    next.timeline.periods.push({ definitionId: 'followup', startYear: 2033, endYear: 2035 });
     store.getState().replaceProgram(next);
-    expect(store.getState().forecast.segments?.at(-1)).toEqual({ id: 'followup', definitionId: 'followup', startYear: 2032, endYear: 2034 });
+    expect(store.getState().forecast.segments?.at(-1)).toEqual({ id: 'followup', definitionId: 'followup', startYear: 2033, endYear: 2035 });
     expect(store.getState().forecast.series.every((series) => series.periods.at(-1)?.id === 'followup')).toBe(true);
   });
 });

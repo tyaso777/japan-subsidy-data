@@ -16,7 +16,7 @@ export function createDefaultProgram(): ProgramConfiguration {
       ],
       specialYears: [
         { id: 'latest', label: '最新決算期', anchor: { type: 'historicalEnd' }, offset: 0 },
-        { id: 'base', label: '基準年度', anchor: { type: 'periodEnd', periodId: 'subsidy' }, offset: 0 },
+        { id: 'base', label: '基準年度', anchor: { type: 'periodStart', periodId: 'report' }, offset: 0 },
       ],
       commonNumericDefinitions: defaultCommonNumericDefinitions.map((definition) => structuredClone(definition)),
       managementMetrics: createDefaultManagementMetrics(),
@@ -25,7 +25,7 @@ export function createDefaultProgram(): ProgramConfiguration {
       historical: { startYear: 2023, endYear: 2025 },
       periods: [
         { definitionId: 'subsidy', startYear: 2026, endYear: 2028 },
-        { definitionId: 'report', startYear: 2029, endYear: 2031 },
+        { definitionId: 'report', startYear: 2029, endYear: 2032 },
       ],
     },
   };
@@ -70,7 +70,12 @@ export function buildTimelineYearLabels(program: ProgramConfiguration): Record<n
   resolved.historicalYears.forEach((year, index) => { labels[year] = { primary: historicalClosingLabel(index, resolved.historicalYears.length) }; });
   resolved.periodYears.forEach((period) => {
     const definition = program.definitions.periods.find((candidate) => candidate.id === period.definitionId);
-    period.years.forEach((year, index) => { labels[year] = { primary: `${definition?.label ?? period.definitionId}${index + 1}年目` }; });
+    const startingSpecial = resolved.specialYears.find((special) => special.year === period.startYear);
+    period.years.forEach((year, index) => {
+      labels[year] = startingSpecial
+        ? { primary: index === 0 ? startingSpecial.label : `${definition?.label ?? period.definitionId}${index}年目` }
+        : { primary: `${definition?.label ?? period.definitionId}${index + 1}年目` };
+    });
   });
   resolved.specialYears.forEach((special) => {
     const existing = labels[special.year];

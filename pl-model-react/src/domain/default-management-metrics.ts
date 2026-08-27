@@ -3,7 +3,7 @@ import type { ManagementMetricDefinition } from './types';
 const historicalEnd = { id: 'A', anchor: { type: 'historicalEnd' as const }, offset: 0 };
 const baseToReport = [
   { id: 'A', anchor: { type: 'specialYear' as const, specialYearId: 'base' }, offset: 0 },
-  { id: 'B', anchor: { type: 'periodStart' as const, periodId: 'report' }, offset: 2 },
+  { id: 'B', anchor: { type: 'periodStart' as const, periodId: 'report' }, offset: 3 },
 ];
 const latestToBase = [
   { id: 'A', anchor: { type: 'historicalEnd' as const }, offset: 0 },
