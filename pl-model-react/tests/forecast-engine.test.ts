@@ -73,6 +73,21 @@ describe('将来予測計算サービス', () => {
     [100, 100, 100, 100, 220, 242, 266.2, 292.82].forEach((value, index) => expect(points[index].value).toBeCloseTo(value));
   });
 
+  it('開始時固定値がない基準年度には事業化報告期間の成長率を適用する', () => {
+    const points = projectForecastSeries({
+      id: 'base-sales', label: '売上高', scope: 'base', valueKind: 'money', projectionMode: 'compound',
+      baseYear: 2025, baseValue: 100,
+      periods: [
+        { id: 'subsidy', startYear: 2026, endYear: 2028, annualGrowthRate: 5, startAdjustment: 0 },
+        { id: 'report', startYear: 2029, endYear: 2032, boundaryYear: 2029, annualGrowthRate: 10, startValue: null, startAdjustment: 0 },
+      ],
+    });
+
+    const baseYear = points.find((point) => point.year === 2029)!;
+    const previousYear = points.find((point) => point.year === 2028)!;
+    expect(baseYear.value / previousYear.value - 1).toBeCloseTo(0.1, 8);
+  });
+
   it('売上高の開始時増減額は初年度の成長計算後に加算し、翌年度から合計額を成長させる', () => {
     const series: ForecastSeries = {
       id: 'base-sales', label: '売上高', scope: 'base', valueKind: 'money', projectionMode: 'compound',

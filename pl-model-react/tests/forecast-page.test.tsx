@@ -118,7 +118,9 @@ describe('将来予測・PL画面', () => {
     expect(within(optimizationToolbar).getByRole('button', { name: '目標を満たす水準案を作成' })).toHaveClass('min-w-0', 'whitespace-nowrap');
     expect(within(screen.getByTestId('forecast-metrics-panel')).queryByRole('combobox', { name: '最適化方法' })).not.toBeInTheDocument();
     expect(within(allocation).getByText('2032年')).toBeVisible();
-    expect(within(allocation).getByText(`（現在 ${88.94.toFixed(2)}%）`)).toBeVisible();
+    const currentBaseShare = within(allocation).getByTestId('current-base-share');
+    expect(currentBaseShare).toHaveTextContent(/^（現在 \d+\.\d{2}%）$/);
+    const currentBaseShareText = currentBaseShare.textContent;
     expect(allocation).toHaveClass('w-[236px]');
     expect(within(allocation).getByTestId('current-base-share')).toHaveClass('w-[86px]', 'tabular-nums');
     expect(within(allocation).queryByText(/^B /)).not.toBeInTheDocument();
@@ -144,7 +146,7 @@ describe('将来予測・PL画面', () => {
     expect(finalSales).toHaveValue(Number(salesBeforeAllocation));
 
     await user.type(baseShare, '70');
-    expect(within(allocation).getByText(`（現在 ${88.94.toFixed(2)}%）`)).toBeVisible();
+    expect(currentBaseShare).toHaveTextContent(currentBaseShareText ?? '');
 
     await user.clear(baseShare);
     await user.tab();

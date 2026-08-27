@@ -4,7 +4,7 @@ export type ForecastPeriod = {
   lineageId?: string;
   startYear: number;
   endYear: number;
-  /** 事業化報告期間など、年次変化を始める前に開始時設定だけを適用する基準年度。 */
+  /** 事業化報告期間などの基準年度。開始時固定値がある場合だけ、その年の通常成長より固定値を優先する。 */
   boundaryYear?: number;
   annualGrowthRate: number;
   /** null/省略時は前年から通常計算し、指定時は期間初年度の計算起点をこの値へ置換する。 */
@@ -66,17 +66,18 @@ export function projectForecastSeries(series: ForecastSeries): ForecastPoint[] {
     if (period.endYear < period.startYear) throw new Error(`期間 ${period.id} の終了年が開始年より前です`);
     const boundaryIsPeriodStart = period.boundaryYear === period.startYear;
     const boundaryAppliedToPreviousPoint = period.boundaryYear !== undefined && points.at(-1)?.year === period.boundaryYear;
-    if (boundaryAppliedToPreviousPoint) {
+    const hasStartValue = period.startValue !== null && period.startValue !== undefined;
+    if (boundaryAppliedToPreviousPoint && hasStartValue) {
       value = (period.startValue ?? value) + period.startAdjustment;
       points[points.length - 1] = { ...points[points.length - 1], value, periodId: period.id };
     }
-    if (boundaryIsPeriodStart) {
+    if (boundaryIsPeriodStart && hasStartValue) {
       value = (period.startValue ?? value) + period.startAdjustment;
       points.push({ year: period.startYear, value, periodId: period.id });
     }
     const lineageKey = period.lineageId ?? period.id;
-    const boundaryApplied = boundaryIsPeriodStart || boundaryAppliedToPreviousPoint;
-    const firstGrowthYear = boundaryIsPeriodStart ? period.startYear + 1 : period.startYear;
+    const boundaryApplied = hasStartValue && (boundaryIsPeriodStart || boundaryAppliedToPreviousPoint);
+    const firstGrowthYear = boundaryApplied ? period.startYear + 1 : period.startYear;
     const lineage = lineages.get(lineageKey) ?? { origin: value, startYear: firstGrowthYear, startValue: boundaryApplied ? null : period.startValue ?? null, startAdjustment: boundaryApplied ? 0 : period.startAdjustment };
     lineages.set(lineageKey, lineage);
     const origin = lineage.origin;
