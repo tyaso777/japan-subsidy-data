@@ -107,7 +107,7 @@ export function hasUsableSubsidyHistory(rows: HistoricalPlInput[]): boolean {
 }
 
 export function newBusinessInitialValuesMissing(model: ForecastModel): boolean {
-  return ['subsidy-sales', 'subsidy-headcount'].some((seriesId) => {
+  return ['subsidy-sales', 'subsidy-headcount', 'subsidy-officerCount'].some((seriesId) => {
     const series = model.series.find((item) => item.id === seriesId);
     const firstPeriod = series?.periods.reduce(
       (earliest, period) => !earliest || period.startYear < earliest.startYear ? period : earliest,
