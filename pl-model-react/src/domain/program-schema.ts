@@ -62,6 +62,23 @@ export const programConfigurationSchema = z.object({
   const timelineIds = program.timeline.periods.map((period) => period.definitionId);
   for (const [index, definitionId] of timelineIds.entries()) if (!periodIds.includes(definitionId)) context.addIssue({ code: 'custom', path: ['timeline', 'periods', index, 'definitionId'], message: `区間定義が見つかりません: ${definitionId}` });
   for (const definitionId of periodIds) if (!timelineIds.includes(definitionId)) context.addIssue({ code: 'custom', path: ['timeline', 'periods'], message: `個社期間が見つかりません: ${definitionId}` });
+  if (program.timeline.historical.startYear > program.timeline.historical.endYear) {
+    context.addIssue({ code: 'custom', path: ['timeline', 'historical'], message: '過去実績の開始年は終了年以下にしてください' });
+  }
+  program.timeline.periods.forEach((period, index) => {
+    if (period.startYear > period.endYear) context.addIssue({ code: 'custom', path: ['timeline', 'periods', index], message: '区間の開始年は終了年以下にしてください' });
+    const previousEndYear = index === 0 ? program.timeline.historical.endYear : program.timeline.periods[index - 1].endYear;
+    if (period.startYear !== previousEndYear + 1) context.addIssue({ code: 'custom', path: ['timeline', 'periods', index, 'startYear'], message: '各区間は前区間の翌年から開始してください' });
+  });
+  const firstPostBasePeriod = program.definitions.periods.find((period) => period.modelPhase === 'postBase');
+  const baseYear = program.definitions.specialYears.find((special) => special.id === 'base');
+  if (firstPostBasePeriod && baseYear && (
+    baseYear.anchor.type !== 'periodStart'
+    || baseYear.anchor.periodId !== firstPostBasePeriod.id
+    || baseYear.offset !== 0
+  )) {
+    context.addIssue({ code: 'custom', path: ['definitions', 'specialYears', specialYearIds.indexOf('base')], message: '基準年度は最初の事業化報告期間の開始年として定義してください' });
+  }
   program.definitions.specialYears.forEach((special, index) => {
     if (special.anchor.type !== 'historicalEnd' && !periodIds.includes(special.anchor.periodId ?? '')) context.addIssue({ code: 'custom', path: ['definitions', 'specialYears', index, 'anchor'], message: `特別年の基準区間が見つかりません: ${special.anchor.periodId}` });
   });

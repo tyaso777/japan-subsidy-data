@@ -19,6 +19,20 @@ describe('制度定義画面', () => {
     expect(screen.getByLabelText('特別年3 調整年数')).toHaveValue(0);
   });
 
+  it('基準年度の境界は事業化報告期間の開始年に固定する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+
+    expect(screen.getByLabelText('特別年2 呼称')).toHaveValue('基準年度');
+    expect(screen.getByLabelText('特別年2 調整年数')).toBeDisabled();
+    expect(screen.getByLabelText('特別年2 調整年数')).toHaveValue(0);
+    expect(screen.getByRole('button', { name: '基準年度を削除' })).toBeDisabled();
+    const baseYearCard = screen.getByLabelText('特別年2 呼称').closest('article')!;
+    expect(within(baseYearCard).getByRole('combobox', { name: '基準期間' })).toBeDisabled();
+    expect(within(baseYearCard).getByRole('combobox', { name: '基準期間' })).toHaveValue('periodStart:report');
+  });
+
   it('共通数値定義ごとにPL表示・挿入位置・同位置順・単位を設定できる', async () => {
     const user = userEvent.setup();
     render(<App />);

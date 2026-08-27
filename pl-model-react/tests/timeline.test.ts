@@ -69,4 +69,26 @@ describe('制度期間', () => {
     expect(normalized.program.name).not.toBe('循環する制度');
     expect(normalized.definitions.commonNumericDefinitions.map((definition) => definition.id)).toContain('付加価値額');
   });
+
+  it('基準年度と事業化報告期間が矛盾する古い制度定義は既定の連続した期間へ戻す', () => {
+    const inconsistent = createDefaultProgram();
+    inconsistent.definitions.specialYears.find((year) => year.id === 'base')!.anchor = {
+      type: 'periodEnd',
+      periodId: 'subsidy',
+    };
+    inconsistent.timeline.periods[1].startYear = 2028;
+    inconsistent.timeline.periods[1].endYear = 2031;
+
+    const normalized = normalizeProgram(inconsistent);
+
+    expect(normalized.definitions.specialYears.find((year) => year.id === 'base')).toMatchObject({
+      anchor: { type: 'periodStart', periodId: 'report' },
+      offset: 0,
+    });
+    expect(normalized.timeline.periods).toEqual([
+      { definitionId: 'subsidy', startYear: 2026, endYear: 2028 },
+      { definitionId: 'report', startYear: 2029, endYear: 2032 },
+    ]);
+    expect(resolveTimeline(normalized).specialYears.find((year) => year.id === 'base')?.year).toBe(2029);
+  });
 });

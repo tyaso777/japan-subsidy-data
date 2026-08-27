@@ -65,6 +65,26 @@ describe('モデルストア', () => {
     }
   });
 
+  it('案件反映時に制度期間を正規化し全予測系列を同じ境界へ同期する', () => {
+    const store = createModelStore();
+    const state = store.getState();
+    const snapshot = structuredClone({ program: state.program, actuals: state.actuals, forecast: state.forecast, caseSettings: state.caseSettings });
+    snapshot.program.definitions.specialYears.find((year) => year.id === 'base')!.anchor = { type: 'periodEnd', periodId: 'subsidy' };
+    snapshot.program.timeline.periods[1] = { definitionId: 'report', startYear: 2028, endYear: 2031 };
+    snapshot.forecast.series.forEach((series) => {
+      const report = series.periods.find((period) => period.id === 'report');
+      if (report) Object.assign(report, { startYear: 2028, endYear: 2031, boundaryYear: 2028 });
+    });
+
+    store.getState().replaceSnapshot(snapshot);
+
+    expect(store.getState().program.timeline.periods[1]).toEqual({ definitionId: 'report', startYear: 2029, endYear: 2032 });
+    expect(store.getState().program.definitions.specialYears.find((year) => year.id === 'base')?.anchor).toEqual({ type: 'periodStart', periodId: 'report' });
+    for (const series of store.getState().forecast.series) {
+      expect(series.periods.find((period) => period.id === 'report')).toMatchObject({ startYear: 2029, endYear: 2032, boundaryYear: 2029 });
+    }
+  });
+
   it('予測系列の編集で他系列と過去実績の参照を維持する', () => {
     const store = createModelStore();
     const before = store.getState();

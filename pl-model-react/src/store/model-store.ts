@@ -329,7 +329,8 @@ export function createModelStore(program?: unknown, options?: { initialActuals?:
         past.length = 0;
         future.length = 0;
         const normalized = cloneSnapshot(snapshot);
-        normalized.forecast = normalizeForecastRanges(normalized.forecast);
+        normalized.program = normalizeProgram(normalized.program);
+        normalized.forecast = normalizeForecastRanges(synchronizeForecastTimeline(normalized.forecast, normalized.program.timeline.periods));
         set({ ...normalized, isTransactionActive: false, canUndo: false, canRedo: false });
       },
       undo: () => {
