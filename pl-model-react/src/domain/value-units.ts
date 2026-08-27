@@ -42,6 +42,8 @@ export function fromDisplayFinancialValue(value: number, kind: ValueKind, unit: 
 }
 
 export function formatFinancialValue(value: number, kind: ValueKind, unit: MoneyDisplayUnit, maximumFractionDigits = valueKindMetadata[kind].defaultFractionDigits): string {
+  if (!Number.isFinite(value)) return '—';
+
   const displayed = toDisplayFinancialValue(value, kind, unit);
   const formatted = new Intl.NumberFormat('ja-JP', { maximumFractionDigits }).format(displayed);
   if (kind === 'percent') return `${formatted}%`;

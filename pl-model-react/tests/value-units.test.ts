@@ -18,6 +18,10 @@ describe('金額単位と表示精度', () => {
     expect(formatFinancialValue(132_000_000 / 118, 'moneyPerPerson', 'yen')).toBe('1,118,644.07 円/人');
   });
 
+  it('算定不能な数値は0ではなくダッシュで表示する', () => {
+    expect(formatFinancialValue(Number.NaN, 'percent', 'millionYen')).toBe('—');
+  });
+
   it('表示単位の日本語名称を返す', () => {
     expect(moneyUnitLabel('yen')).toBe('円');
     expect(moneyUnitLabel('thousandYen')).toBe('千円');

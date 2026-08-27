@@ -23,7 +23,7 @@ export function calculatePl(input: HistoricalPlInput, previous?: HistoricalPlInp
     grossProfitMargin: input.sales ? grossProfit / input.sales * 100 : 0,
     sga,
     operatingProfit,
-    operatingProfitMargin: input.sales ? operatingProfit / input.sales * 100 : 0,
+    operatingProfitMargin: input.sales ? operatingProfit / input.sales * 100 : Number.NaN,
     ordinaryIncome,
     preTaxIncome,
     depreciation,

@@ -28,4 +28,18 @@ describe('過去P/L自動計算', () => {
     expect(company.sales).toBe(1_100_000_000);
     expect(company.headcount).toBe(136);
   });
+
+  it('売上高0で営業赤字の場合は営業利益率を0%とせず算定不能にする', () => {
+    const result = calculateHistoricalPl({ ...subsidyHistoricalPl[0], sales: 0, cogs: 0 });
+
+    expect(result.operatingProfit).toBeLessThan(0);
+    expect(result.operatingProfitMargin).toBeNaN();
+  });
+
+  it('売上高が正で営業赤字なら営業利益率を負値で返す', () => {
+    const result = calculateHistoricalPl({ ...subsidyHistoricalPl[0], sales: 10_000_000, cogs: 9_000_000 });
+
+    expect(result.operatingProfit).toBeLessThan(0);
+    expect(result.operatingProfitMargin).toBeLessThan(0);
+  });
 });
