@@ -63,7 +63,7 @@
       },
       {
         "id": "base",
-        "label": "基準年",
+        "label": "基準年度",
         "anchor": { "type": "periodEnd", "periodId": "investment" },
         "offset": 0
       }

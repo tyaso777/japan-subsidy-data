@@ -4,6 +4,8 @@ export type ForecastPeriod = {
   lineageId?: string;
   startYear: number;
   endYear: number;
+  /** 事業化報告期間など、期間開始年の前年を計算起点として開始時設定を適用する場合の境界年度。 */
+  boundaryYear?: number;
   annualGrowthRate: number;
   /** null/省略時は前年から通常計算し、指定時は期間初年度の計算起点をこの値へ置換する。 */
   startValue?: number | null;
@@ -62,8 +64,13 @@ export function projectForecastSeries(series: ForecastSeries): ForecastPoint[] {
   const lineages = new Map<string, { origin: number; startYear: number; startValue: number | null; startAdjustment: number }>();
   for (const period of series.periods) {
     if (period.endYear < period.startYear) throw new Error(`期間 ${period.id} の終了年が開始年より前です`);
+    const boundaryApplied = period.boundaryYear !== undefined && points.at(-1)?.year === period.boundaryYear;
+    if (boundaryApplied) {
+      value = (period.startValue ?? value) + period.startAdjustment;
+      points[points.length - 1] = { ...points[points.length - 1], value, periodId: period.id };
+    }
     const lineageKey = period.lineageId ?? period.id;
-    const lineage = lineages.get(lineageKey) ?? { origin: value, startYear: period.startYear, startValue: period.startValue ?? null, startAdjustment: period.startAdjustment };
+    const lineage = lineages.get(lineageKey) ?? { origin: value, startYear: period.startYear, startValue: boundaryApplied ? null : period.startValue ?? null, startAdjustment: boundaryApplied ? 0 : period.startAdjustment };
     lineages.set(lineageKey, lineage);
     const origin = lineage.origin;
     for (let year = period.startYear; year <= period.endYear; year += 1) {
@@ -214,7 +221,7 @@ export function splitForecastSegment(model: ForecastModel, splitYear: number): F
         const lineageId = period.lineageId ?? period.id;
         return [
           { ...period, lineageId, endYear: splitYear - 1 },
-          { ...period, id: nextId, lineageId, startYear: splitYear, startValue: null, startAdjustment: 0 },
+          { ...period, id: nextId, lineageId, startYear: splitYear, boundaryYear: undefined, startValue: null, startAdjustment: 0 },
         ];
       }),
     })),
@@ -262,7 +269,7 @@ export function synchronizeForecastTimeline(model: ForecastModel, timeline: Time
         const containingSegment = oldSegments.find((old) => old.definitionId === segment.definitionId && segment.startYear >= old.startYear && segment.startYear <= old.endYear);
         const inherited = exact ?? series.periods.find((period) => period.id === containingSegment?.id) ?? series.periods[index - 1] ?? series.periods.at(-1);
         return inherited
-          ? { ...inherited, id: segment.id, startYear: segment.startYear, endYear: segment.endYear, startValue: exact ? inherited.startValue ?? null : null, startAdjustment: exact ? inherited.startAdjustment : 0 }
+          ? { ...inherited, id: segment.id, startYear: segment.startYear, endYear: segment.endYear, boundaryYear: inherited.boundaryYear === undefined ? undefined : segment.startYear - 1, startValue: exact ? inherited.startValue ?? null : null, startAdjustment: exact ? inherited.startAdjustment : 0 }
           : { id: segment.id, startYear: segment.startYear, endYear: segment.endYear, annualGrowthRate: 0, startValue: null, startAdjustment: 0 };
       }),
     })),

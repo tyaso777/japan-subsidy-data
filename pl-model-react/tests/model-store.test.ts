@@ -11,6 +11,7 @@ describe('モデルストア', () => {
     expect(state.actuals.basePl[2].sales).toBe(1_000_000_000);
     expect(state.preferences.moneyUnit).toBe('millionYen');
     expect(state.program.timeline.periods[0].endYear).toBe(2028);
+    expect(state.forecast.series[0].periods.find((period) => period.id === 'report')?.boundaryYear).toBe(2028);
   });
 
   it('変更をUndo・Redoできる', () => {

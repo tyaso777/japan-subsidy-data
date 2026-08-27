@@ -16,7 +16,7 @@ export function createDefaultProgram(): ProgramConfiguration {
       ],
       specialYears: [
         { id: 'latest', label: '最新決算期', anchor: { type: 'historicalEnd' }, offset: 0 },
-        { id: 'base', label: '基準年', anchor: { type: 'periodEnd', periodId: 'subsidy' }, offset: 0 },
+        { id: 'base', label: '基準年度', anchor: { type: 'periodEnd', periodId: 'subsidy' }, offset: 0 },
       ],
       commonNumericDefinitions: defaultCommonNumericDefinitions.map((definition) => structuredClone(definition)),
       managementMetrics: createDefaultManagementMetrics(),

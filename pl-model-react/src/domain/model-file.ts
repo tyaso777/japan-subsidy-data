@@ -9,7 +9,7 @@ const historicalPlSchema = z.object({
 });
 
 const forecastPeriodSchema = z.object({
-  id: z.string(), startYear: z.number().int(), endYear: z.number().int(), annualGrowthRate: z.number(), startValue: z.number().nullable().optional().default(null), startAdjustment: z.number(),
+  id: z.string(), startYear: z.number().int(), endYear: z.number().int(), boundaryYear: z.number().int().optional(), annualGrowthRate: z.number(), startValue: z.number().nullable().optional().default(null), startAdjustment: z.number(),
   lineageId: z.string().optional(),
   range: z.object({ min: z.number(), max: z.number() }).refine((range) => range.min <= range.max, '最小値は最大値以下にしてください').optional(),
 }).strict();
@@ -51,5 +51,15 @@ export function serializeModelFile(model: ModelSnapshot): string {
 }
 
 export function parseModelFile(json: string): ModelSnapshot {
-  return modelFileSchema.parse(JSON.parse(json)).model;
+  const model = modelFileSchema.parse(JSON.parse(json)).model;
+  const postBaseIds = new Set(model.program.definitions.periods.filter((period) => period.modelPhase === 'postBase').map((period) => period.id));
+  model.forecast.series.forEach((series) => {
+    series.periods.forEach((period) => {
+      const segment = model.forecast.segments?.find((candidate) => candidate.id === period.id);
+      const definitionId = segment?.definitionId ?? period.id.split('~')[0];
+      if (!postBaseIds.has(definitionId) || period.id.includes('~')) return;
+      period.boundaryYear ??= period.startYear - 1;
+    });
+  });
+  return model;
 }

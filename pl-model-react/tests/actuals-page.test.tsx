@@ -71,7 +71,7 @@ describe('期間・過去実績', () => {
     const summary = screen.getByTestId('special-year-summary');
     expect(within(summary).getByText('最新決算期')).toBeVisible();
     expect(within(summary).getByText('2025年')).toBeVisible();
-    expect(within(summary).getByText('基準年')).toBeVisible();
+    expect(within(summary).getByText('基準年度')).toBeVisible();
     expect(within(summary).getByText('2028年')).toBeVisible();
     expect(within(summary).getByText('補助事業期間・終了年 ±0年')).toBeVisible();
 
@@ -114,7 +114,7 @@ describe('期間・過去実績', () => {
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
     const table = screen.getByTestId('forecast-pl-table');
     expect(within(table).getByText('最新決算期')).toBeVisible();
-    expect(within(table).getByText('基準年')).toBeVisible();
+    expect(within(table).getByText('基準年度')).toBeVisible();
     expect(within(table).getByText('事業化報告期間3年目')).toBeVisible();
   });
 

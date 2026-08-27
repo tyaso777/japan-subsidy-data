@@ -9,7 +9,7 @@ window.PL_SUBSIDY_PROGRAM = {
     ],
     specialYears: [
       { id: 'latest', label: '最新決算期', anchor: { type: 'historicalEnd' }, offset: 0 },
-      { id: 'base', label: '基準年', anchor: { type: 'periodEnd', periodId: 'subsidy' }, offset: 0 }
+      { id: 'base', label: '基準年度', anchor: { type: 'periodEnd', periodId: 'subsidy' }, offset: 0 }
     ],
     commonNumericDefinitions: [
       { id: '人件費', label: '人件費', formula: '[従業員給与総額][t]', outputPoint: 't' },

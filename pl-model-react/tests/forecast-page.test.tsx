@@ -4,6 +4,19 @@ import { describe, expect, it } from 'vitest';
 import { App } from '../src/app/App';
 
 describe('将来予測・PL画面', () => {
+  it('事業化報告期間は基準年度から報告3年目までを表示する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+
+    const headers = screen.getAllByTestId('forecast-period-header');
+    expect(headers).toHaveLength(2);
+    expect(headers[0]).toHaveTextContent('補助事業期間');
+    expect(headers[0]).toHaveTextContent('2026–2028');
+    expect(headers[1]).toHaveTextContent('事業化報告期間');
+    expect(headers[1]).toHaveTextContent('2028–2031');
+  });
+
   it('水準範囲の未適正化を警告し、03画面から適正化できる', async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -926,7 +939,7 @@ describe('将来予測・PL画面', () => {
     expect(within(chart).getByTestId('forecast-area')).toHaveAttribute('fill', '#eef6ef');
     expect(within(chart).getByTestId('forecast-start-boundary')).toHaveAttribute('stroke-dasharray', '3 3');
     expect(within(chart).getByText("'28")).toBeInTheDocument();
-    expect(within(chart).getByText('基準年')).toBeInTheDocument();
+    expect(within(chart).getByText('基準年度')).toBeInTheDocument();
     expect(within(chart).getByText('最新決算期')).toBeInTheDocument();
     const year2028X = Number(within(chart).getByText("'28").getAttribute('x'));
     const year2029X = Number(within(chart).getByText("'29").getAttribute('x'));
