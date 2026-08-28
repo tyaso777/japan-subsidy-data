@@ -1,4 +1,4 @@
-import type { ForecastModel } from './forecast-engine';
+import type { ForecastModel, ForecastPeriod } from './forecast-engine';
 import { buildForecastPl, projectForecastSeries } from './forecast-engine';
 import { calculatePlSeries, combinePlInputs } from './financials';
 import { evaluateManagementMetric, resolveMetricTarget } from './metrics';
@@ -85,7 +85,7 @@ export type OptimizationBoundDiagnostic = {
 
 type Options = { strategy?: OptimizationStrategy; iterations?: number; initialStep?: number; minimumStep?: number; movementWeight?: number; expansionIterations?: number; includeExpansionPlan?: boolean; preferredModel?: ForecastModel };
 
-type SearchParameter = { seriesId: string; periodId: string; baseline: number; min: number; max: number; preferredMin?: number; preferredMax?: number };
+type SearchParameter = { seriesId: string; periodId: string; period: ForecastPeriod; baseline: number; min: number; max: number; preferredMin?: number; preferredMax?: number };
 type SearchContext = {
   model: ForecastModel;
   parameters: SearchParameter[];
@@ -97,8 +97,7 @@ type SearchContext = {
 };
 
 function improveParameter(context: SearchContext, parameter: SearchParameter, step: number, currentScore: number) {
-  const series = context.model.series.find((candidate) => candidate.id === parameter.seriesId)!;
-  const period = series.periods.find((candidate) => candidate.id === parameter.periodId)!;
+  const period = parameter.period;
   const original = period.annualGrowthRate;
   let value = original;
   let score = currentScore;
@@ -145,23 +144,23 @@ function parameterPeriod(model: ForecastModel, parameter: SearchParameter) {
   return model.series.find((series) => series.id === parameter.seriesId)!.periods.find((period) => period.id === parameter.periodId)!;
 }
 
-function normalizedMovement(model: ForecastModel, parameter: SearchParameter) {
-  return Math.abs(parameterPeriod(model, parameter).annualGrowthRate - parameter.baseline) / Math.max((parameter.preferredMax ?? parameter.max) - (parameter.preferredMin ?? parameter.min), .01);
+function normalizedMovement(parameter: SearchParameter) {
+  return Math.abs(parameter.period.annualGrowthRate - parameter.baseline) / Math.max((parameter.preferredMax ?? parameter.max) - (parameter.preferredMin ?? parameter.min), .01);
 }
 
 function searchBalanced(context: SearchContext) {
   let score = searchMinimumChange(context);
   let step = context.initialStep;
   for (let iteration = 0; iteration < context.iterations; iteration += 1) {
-    const source = [...context.parameters].sort((left, right) => normalizedMovement(context.model, right) - normalizedMovement(context.model, left))[0];
-    if (!source || normalizedMovement(context.model, source) === 0) break;
-    const sourcePeriod = parameterPeriod(context.model, source);
+    const source = [...context.parameters].sort((left, right) => normalizedMovement(right) - normalizedMovement(left))[0];
+    if (!source || normalizedMovement(source) === 0) break;
+    const sourcePeriod = source.period;
     const sourceOriginal = sourcePeriod.annualGrowthRate;
     const sourceDirection = Math.sign(sourceOriginal - source.baseline);
     let best: { target: SearchParameter; sourceValue: number; targetValue: number; score: number } | undefined;
     for (const target of context.parameters) {
       if (target === source) continue;
-      const targetPeriod = parameterPeriod(context.model, target);
+      const targetPeriod = target.period;
       const targetOriginal = targetPeriod.annualGrowthRate;
       const existingDirection = Math.sign(targetOriginal - target.baseline);
       const targetDirections = existingDirection === 0 ? [1, -1] : [existingDirection];
@@ -180,7 +179,7 @@ function searchBalanced(context: SearchContext) {
     }
     if (best) {
       sourcePeriod.annualGrowthRate = best.sourceValue;
-      parameterPeriod(context.model, best.target).annualGrowthRate = best.targetValue;
+      best.target.period.annualGrowthRate = best.targetValue;
       score = best.score;
     } else step /= 2;
     if (step < context.minimumStep) break;
@@ -190,7 +189,7 @@ function searchBalanced(context: SearchContext) {
 
 function searchSparse(context: SearchContext) {
   const rankedParameters = context.parameters.map((parameter, index) => {
-    const period = parameterPeriod(context.model, parameter);
+    const period = parameter.period;
     const original = period.annualGrowthRate;
     let bestScore = context.initialScore;
     for (const direction of [1, -1]) {
@@ -222,13 +221,14 @@ export function createOptimizationProposal(model: ForecastModel, objective: (can
     return isForecastRangeLocked(configured) ? [] : [{
       seriesId: series.id,
       periodId: period.id,
+      period,
       baseline: period.annualGrowthRate,
       min: configured.min,
       max: configured.max,
     }];
   }));
   const movementScores = (candidate: ForecastModel) => parameters.map((parameter) => {
-    const value = candidate.series.find((series) => series.id === parameter.seriesId)?.periods.find((period) => period.id === parameter.periodId)?.annualGrowthRate;
+    const value = parameter.period.annualGrowthRate;
     if (!Number.isFinite(value)) return 0;
     return ((value! - parameter.baseline) / Math.max(parameter.max - parameter.min, .01)) ** 2;
   });
@@ -320,6 +320,12 @@ function finalYearSalesAllocationConstraints(model: ForecastModel): Optimization
   ];
 }
 
+function optimizationVectorKey(model: ForecastModel) {
+  return model.series
+    .flatMap((series) => series.periods.map((period) => `${series.id}\u001f${period.id}\u001f${period.annualGrowthRate}`))
+    .join('\u001e');
+}
+
 function isBetterConstraintScore(candidate: ConstraintScore, current: ConstraintScore) {
   const epsilon = 1e-12;
   if (candidate.unavailableCount !== current.unavailableCount) return candidate.unavailableCount < current.unavailableCount;
@@ -331,16 +337,16 @@ function isBetterConstraintScore(candidate: ConstraintScore, current: Constraint
   return candidate.cost < current.cost - epsilon;
 }
 
-function constrainedCost(model: ForecastModel, parameters: SearchParameter[], strategy: OptimizationStrategy) {
+function constrainedCost(parameters: SearchParameter[], strategy: OptimizationStrategy) {
   const movements = parameters.map((parameter) => {
-    const value = parameterPeriod(model, parameter).annualGrowthRate;
+    const value = parameter.period.annualGrowthRate;
     const preferredMin = parameter.preferredMin ?? parameter.min;
     const preferredMax = parameter.preferredMax ?? parameter.max;
     const preferredSpan = Math.max(preferredMax - preferredMin, .01);
     return ((value - parameter.baseline) / preferredSpan) ** 2;
   });
   const outsidePenalty = parameters.reduce((sum, parameter) => {
-    const value = parameterPeriod(model, parameter).annualGrowthRate;
+    const value = parameter.period.annualGrowthRate;
     const preferredMin = parameter.preferredMin ?? parameter.min;
     const preferredMax = parameter.preferredMax ?? parameter.max;
     const preferredSpan = Math.max(preferredMax - preferredMin, .01);
@@ -363,7 +369,7 @@ function satisfiesForecastDomain(model: ForecastModel): boolean {
 }
 
 function improveConstrainedParameter(context: ConstraintSearchContext, parameter: SearchParameter, step: number) {
-  const period = parameterPeriod(context.model, parameter);
+  const period = parameter.period;
   const original = period.annualGrowthRate;
   let value = original;
   let score = context.score;
@@ -408,7 +414,7 @@ function searchConstrainedPriority(context: ConstraintSearchContext) {
 
 function searchConstrainedSparse(context: ConstraintSearchContext) {
   const ranked = context.parameters.map((parameter, index) => {
-    const period = parameterPeriod(context.model, parameter);
+    const period = parameter.period;
     const original = period.annualGrowthRate;
     let best = context.score;
     for (const direction of [1, -1]) {
@@ -429,7 +435,7 @@ function searchConstrainedSparse(context: ConstraintSearchContext) {
 
 function rankConstrainedParameters(context: ConstraintSearchContext) {
   return context.parameters.map((parameter, index) => {
-    const period = parameterPeriod(context.model, parameter);
+    const period = parameter.period;
     const original = period.annualGrowthRate;
     let best = context.score;
     for (const direction of [1, -1]) {
@@ -452,15 +458,15 @@ function searchConstrainedBalanced(context: ConstraintSearchContext) {
   if (!context.score.feasible) return context.score;
   let step = context.initialStep;
   for (let iteration = 0; iteration < context.iterations; iteration += 1) {
-    const source = [...context.parameters].sort((left, right) => normalizedMovement(context.model, right) - normalizedMovement(context.model, left))[0];
-    if (!source || normalizedMovement(context.model, source) === 0) break;
-    const sourcePeriod = parameterPeriod(context.model, source);
+    const source = [...context.parameters].sort((left, right) => normalizedMovement(right) - normalizedMovement(left))[0];
+    if (!source || normalizedMovement(source) === 0) break;
+    const sourcePeriod = source.period;
     const sourceOriginal = sourcePeriod.annualGrowthRate;
     const sourceDirection = Math.sign(sourceOriginal - source.baseline);
     let best: { target: SearchParameter; sourceValue: number; targetValue: number; score: ConstraintScore } | undefined;
     for (const target of context.parameters) {
       if (target === source) continue;
-      const targetPeriod = parameterPeriod(context.model, target);
+      const targetPeriod = target.period;
       const targetOriginal = targetPeriod.annualGrowthRate;
       const existingDirection = Math.sign(targetOriginal - target.baseline);
       for (const targetDirection of existingDirection === 0 ? [1, -1] : [existingDirection]) {
@@ -476,7 +482,7 @@ function searchConstrainedBalanced(context: ConstraintSearchContext) {
     }
     if (best) {
       sourcePeriod.annualGrowthRate = best.sourceValue;
-      parameterPeriod(context.model, best.target).annualGrowthRate = best.targetValue;
+      best.target.period.annualGrowthRate = best.targetValue;
       context.score = best.score;
     } else step /= 2;
     if (step < context.minimumStep) break;
@@ -628,30 +634,48 @@ export function createConstrainedOptimizationProposal(model: ForecastModel, eval
   const strategy = options.strategy ?? 'minimum-change';
   const baseline = normalizeForecastRanges(model);
   const optimized = structuredClone(baseline);
-  const evaluateAllConstraints = (candidate: ForecastModel) => [
-    ...evaluateConstraints(candidate),
-    ...finalYearSalesAllocationConstraints(candidate),
-  ];
+  const constraintCache = new Map<string, OptimizationConstraintMeasurement[]>();
+  const evaluateAllConstraints = (candidate: ForecastModel) => {
+    const key = optimizationVectorKey(candidate);
+    const cached = constraintCache.get(key);
+    if (cached) return cached;
+    const measurements = [
+      ...evaluateConstraints(candidate),
+      ...finalYearSalesAllocationConstraints(candidate),
+    ];
+    constraintCache.set(key, measurements);
+    return measurements;
+  };
   const parameters = orderForecastSeriesByPl(optimized.series).filter((series) => series.scope !== 'company' && series.changePolicy !== 'fixed').flatMap((series) => series.periods.flatMap((period) => {
     const configured = period.range ?? defaultForecastRange(series.projectionMode);
     if (isForecastRangeLocked(configured)) return [];
     const preferredSeries = options.preferredModel?.series.find((candidate) => candidate.id === series.id);
     const preferredPeriod = preferredSeries?.periods.find((candidate) => candidate.id === period.id);
     const preferred = preferredPeriod?.range ?? configured;
-    return [{ seriesId: series.id, periodId: period.id, baseline: period.annualGrowthRate, min: configured.min, max: configured.max, preferredMin: preferred.min, preferredMax: preferred.max }];
+    return [{ seriesId: series.id, periodId: period.id, period, baseline: period.annualGrowthRate, min: configured.min, max: configured.max, preferredMin: preferred.min, preferredMax: preferred.max }];
   }));
+  const scoreCache = new Map<string, ConstraintScore>();
   const score = (candidate: ForecastModel): ConstraintScore => {
-    if (!satisfiesForecastDomain(candidate)) return { unavailableCount: Number.MAX_SAFE_INTEGER, feasible: false, maxViolation: Number.POSITIVE_INFINITY, totalViolation: Number.POSITIVE_INFINITY, cost: Number.POSITIVE_INFINITY };
+    const key = optimizationVectorKey(candidate);
+    const cached = scoreCache.get(key);
+    if (cached) return cached;
+    if (!satisfiesForecastDomain(candidate)) {
+      const unavailable = { unavailableCount: Number.MAX_SAFE_INTEGER, feasible: false, maxViolation: Number.POSITIVE_INFINITY, totalViolation: Number.POSITIVE_INFINITY, cost: Number.POSITIVE_INFINITY };
+      scoreCache.set(key, unavailable);
+      return unavailable;
+    }
     const diagnostics = constraintDiagnostics(evaluateAllConstraints(candidate));
     const unavailableCount = diagnostics.filter((metric) => metric.status === 'unavailable').length;
     const violations = diagnostics.filter((metric) => metric.status === 'unmet').map((metric) => metric.gap! / Math.max(1, Math.abs(metric.target)));
-    return {
+    const result = {
       unavailableCount,
       feasible: unavailableCount === 0 && violations.length === 0,
       maxViolation: Math.max(0, ...violations),
       totalViolation: violations.reduce((sum, violation) => sum + violation ** 2, 0),
-      cost: constrainedCost(candidate, parameters, strategy),
+      cost: constrainedCost(parameters, strategy),
     };
+    scoreCache.set(key, result);
+    return result;
   };
   const initialScore = score(optimized);
   const finalScore = constrainedStrategies[strategy]({ model: optimized, parameters, evaluate: score, score: initialScore, iterations: options.iterations ?? 40, initialStep: options.initialStep ?? 2, minimumStep: options.minimumStep ?? .01 });

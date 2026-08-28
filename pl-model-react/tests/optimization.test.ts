@@ -11,6 +11,21 @@ const model = (): ForecastModel => ({
 });
 
 describe('目標最適化提案', () => {
+  it('探索中に同じ水準ベクトルを重複評価しない', () => {
+    const constrained = model();
+    constrained.series[0].periods[0] = { ...constrained.series[0].periods[0], annualGrowthRate: 0, range: { min: 0, max: 1 } };
+    const evaluatedVectors: string[] = [];
+    const evaluate = (candidate: ForecastModel) => {
+      const vector = candidate.series.flatMap((series) => series.periods.map((period) => period.annualGrowthRate)).join(',');
+      evaluatedVectors.push(vector);
+      return [{ id: 'growth', label: '成長率', value: candidate.series[0].periods[0].annualGrowthRate, target: 10, direction: 'min' as const, unit: '%' }];
+    };
+
+    createConstrainedOptimizationProposal(constrained, evaluate, { iterations: 20, includeExpansionPlan: false });
+
+    expect(evaluatedVectors).toEqual([...new Set(evaluatedVectors)]);
+  });
+
   it('達成可能な目標をハード制約として満たした後で変更量を最小化する', () => {
     const constrained = model();
     constrained.series[0].periods[0] = { ...constrained.series[0].periods[0], startYear: 2026, endYear: 2026, annualGrowthRate: 0, range: { min: 0, max: 20 } };
