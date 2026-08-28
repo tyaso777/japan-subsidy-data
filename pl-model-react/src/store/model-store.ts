@@ -12,17 +12,21 @@ import {
 } from '../domain/forecast-engine';
 import type { BalanceSheetRecord, HistoricalPlInput, ProgramConfiguration } from '../domain/types';
 import type { MoneyDisplayUnit } from '../domain/value-units';
-import { calculatePl } from '../domain/financials';
+import { calculatePl, combinePlSeries, subtractPlSeries } from '../domain/financials';
 import { defaultForecastRange, normalizeForecastRanges } from '../domain/forecast-range';
 import { optimizeForecastRangesFromActuals, type HistoricalRangeOptimizationOptions, type HistoricalRangeOptimizationResult } from '../domain/historical-range-optimization';
 import { forecastRangeCalibrationFingerprint, type ForecastRangeCalibration } from '../domain/forecast-range-calibration';
 import type { ActualsImportResult } from '../domain/actuals-import';
 
 export type BusinessScope = 'base' | 'subsidy';
+export type HistoricalPlInputMode = 'base' | 'company';
+export type HistoricalPlScope = BusinessScope | 'company';
 export type ModelSnapshot = {
   program: ProgramConfiguration;
   actuals: {
     balanceSheets: BalanceSheetRecord[];
+    plInputMode: HistoricalPlInputMode;
+    companyPl: HistoricalPlInput[];
     basePl: HistoricalPlInput[];
     subsidyPl: HistoricalPlInput[];
     metricInputs: Record<string, number>;
@@ -44,7 +48,8 @@ type ModelActions = {
   updatePeriodEnd: (index: number, year: number) => void;
   updateHistoricalBoundary: (boundary: 'startYear' | 'endYear', year: number) => void;
   updateBalanceSheet: (yearIndex: number, field: string, value: number) => void;
-  updateHistoricalPl: (scope: BusinessScope, yearIndex: number, field: keyof HistoricalPlInput, value: number) => void;
+  setHistoricalPlInputMode: (mode: HistoricalPlInputMode) => void;
+  updateHistoricalPl: (scope: HistoricalPlScope, yearIndex: number, field: keyof HistoricalPlInput, value: number) => void;
   updateMetricActual: (metricId: string, value: number) => void;
   updateMetricTarget: (metricId: string, value: number | null) => void;
   importHistoricalActuals: (imported: ActualsImportResult) => void;
@@ -127,7 +132,7 @@ function resizeHistoricalRecords<T extends object>(records: T[], previous: Histo
 
 export function createInitialModelSnapshot(programInput?: unknown, initialActuals: InitialActualsMode = 'sample'): ModelSnapshot {
   const program = normalizeProgram(programInput ?? createDefaultProgram());
-  const actuals = initialActuals !== 'empty' ? {
+  const sourceActuals = initialActuals !== 'empty' ? {
     balanceSheets: structuredClone(balanceSheets),
     basePl: structuredClone(baseHistoricalPl),
     subsidyPl: initialActuals === 'sample-no-subsidy-history'
@@ -140,7 +145,14 @@ export function createInitialModelSnapshot(programInput?: unknown, initialActual
     subsidyPl: subsidyHistoricalPl.map(emptyRecordLike),
     metricInputs: {},
   };
+  const actuals = { ...sourceActuals, plInputMode: 'base' as const, companyPl: combinePlSeries(sourceActuals.basePl, sourceActuals.subsidyPl) };
   return { program, actuals, forecast: defaultForecast(program, actuals.basePl, actuals.subsidyPl), caseSettings: { metricTargets: {} } };
+}
+
+function synchronizeHistoricalPlActuals(actuals: ModelSnapshot['actuals']): ModelSnapshot['actuals'] {
+  return actuals.plInputMode === 'company'
+    ? { ...actuals, basePl: subtractPlSeries(actuals.companyPl, actuals.subsidyPl) }
+    : { ...actuals, companyPl: combinePlSeries(actuals.basePl, actuals.subsidyPl) };
 }
 
 export function createModelStore(program?: unknown, options?: { initialActuals?: InitialActualsMode }): StoreApi<ModelStore> {
@@ -202,6 +214,7 @@ export function createModelStore(program?: unknown, options?: { initialActuals?:
           actuals: {
             ...snapshot.actuals,
             balanceSheets: resizeHistoricalRecords(snapshot.actuals.balanceSheets, historical, nextHistorical),
+            companyPl: resizeHistoricalRecords(snapshot.actuals.companyPl, historical, nextHistorical),
             basePl: resizeHistoricalRecords(snapshot.actuals.basePl, historical, nextHistorical),
             subsidyPl: resizeHistoricalRecords(snapshot.actuals.subsidyPl, historical, nextHistorical),
           },
@@ -218,18 +231,23 @@ export function createModelStore(program?: unknown, options?: { initialActuals?:
           },
         }));
       },
+      setHistoricalPlInputMode: (plInputMode) => {
+        if (get().actuals.plInputMode === plInputMode) return;
+        applyMutation((snapshot) => ({ ...snapshot, actuals: { ...snapshot.actuals, plInputMode } }));
+      },
       updateHistoricalPl: (scope, yearIndex, field, value) => {
-        const currentRecords = scope === 'base' ? get().actuals.basePl : get().actuals.subsidyPl;
+        const currentRecords = scope === 'company' ? get().actuals.companyPl : scope === 'base' ? get().actuals.basePl : get().actuals.subsidyPl;
         if (currentRecords[yearIndex]?.[field] === value) return;
         applyMutation((snapshot) => {
-          const records = scope === 'base' ? snapshot.actuals.basePl : snapshot.actuals.subsidyPl;
+          const records = scope === 'company' ? snapshot.actuals.companyPl : scope === 'base' ? snapshot.actuals.basePl : snapshot.actuals.subsidyPl;
           const updated = records.map((record, index) => index === yearIndex ? { ...record, [field]: value } : record);
+          const changed = {
+            ...snapshot.actuals,
+            ...(scope === 'company' ? { companyPl: updated } : scope === 'base' ? { basePl: updated } : { subsidyPl: updated }),
+          };
           return {
             ...snapshot,
-            actuals: {
-              ...snapshot.actuals,
-              ...(scope === 'base' ? { basePl: updated } : { subsidyPl: updated }),
-            },
+            actuals: synchronizeHistoricalPlActuals(changed),
           };
         });
       },
@@ -279,8 +297,11 @@ export function createModelStore(program?: unknown, options?: { initialActuals?:
           balanceSheets: selectYears(imported.actuals.balanceSheets),
           basePl: selectYears(imported.actuals.basePl),
           subsidyPl: selectYears(imported.actuals.subsidyPl),
+          plInputMode: 'base' as const,
+          companyPl: [] as HistoricalPlInput[],
           metricInputs: snapshot.actuals.metricInputs,
         };
+        actuals.companyPl = combinePlSeries(actuals.basePl, actuals.subsidyPl);
         const { forecastRangeCalibration: _calibration, ...caseSettings } = snapshot.caseSettings;
         return { ...snapshot, actuals, forecast: defaultForecast(snapshot.program, actuals.basePl, actuals.subsidyPl), caseSettings };
       }),
@@ -328,6 +349,7 @@ export function createModelStore(program?: unknown, options?: { initialActuals?:
         future.length = 0;
         const normalized = cloneSnapshot(snapshot);
         normalized.program = normalizeProgram(normalized.program);
+        normalized.actuals = synchronizeHistoricalPlActuals(normalized.actuals);
         normalized.forecast = normalizeForecastRanges(synchronizeForecastTimeline(normalized.forecast, normalized.program.timeline.periods));
         set({ ...normalized, isTransactionActive: false, canUndo: false, canRedo: false });
       },

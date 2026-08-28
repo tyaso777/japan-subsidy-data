@@ -8,12 +8,16 @@ describe('案件データ保存境界', () => {
     const state = store.getState();
     state.updateFinalYearSalesAllocation(65);
     state.updateMetricTarget('company-sales-growth', 35);
+    state.setHistoricalPlInputMode('company');
+    state.updateHistoricalPl('company', 2, 'sales', 1_500_000_000);
     state.optimizeForecastRangesFromActuals();
     const updated = store.getState();
     const json = serializeModelFile({ program: updated.program, actuals: updated.actuals, forecast: updated.forecast, caseSettings: updated.caseSettings });
     expect(json).not.toContain('"boundaryYear"');
     const restored = parseModelFile(json);
-    expect(restored.actuals.basePl[2].sales).toBe(1_000_000_000);
+    expect(restored.actuals.plInputMode).toBe('company');
+    expect(restored.actuals.companyPl[2].sales).toBe(1_500_000_000);
+    expect(restored.actuals.basePl[2].sales).toBe(1_400_000_000);
     expect(restored.forecast.series.length).toBeGreaterThan(0);
     expect(restored.forecast.finalYearSalesAllocation).toEqual({ finalYear: 2032, baseSharePercent: 65 });
     expect(restored.caseSettings.metricTargets).toEqual({ 'company-sales-growth': 35 });

@@ -169,6 +169,24 @@ test('期間・過去実績の財務表はワイド画面でも会計表の密�
   expect(rowBox?.height).toBeLessThanOrEqual(28);
 });
 
+test('過去P/Lの入力元を切り替えて未選択側を自動算出する', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: '案件JSONメニュー' }).click();
+  await page.getByRole('menuitem', { name: 'サンプルデータを読み込み（補助事業実績あり）' }).click();
+
+  await expect(page.getByRole('radio', { name: 'ベース事業P/Lを入力' })).toBeChecked();
+  await expect(page.getByRole('heading', { name: '全社 P/L（自動算出）' })).toBeVisible();
+  await page.getByRole('radio', { name: '全社P/Lを入力' }).check();
+
+  const companySales = page.getByLabel('全社 P/L 2025年 売上高');
+  await expect(companySales).toHaveValue('1100');
+  await companySales.fill('1500');
+  await companySales.blur();
+
+  await page.getByRole('radio', { name: 'ベース事業P/Lを入力' }).check();
+  await expect(page.getByLabel('ベース事業 P/L 2025年 売上高')).toHaveValue('1400');
+});
+
 test('狭い画面でも事業比較の長いタイトルがカード外へはみ出さない', async ({ page }) => {
   await page.setViewportSize({ width: 980, height: 900 });
   await page.goto('/');

@@ -54,3 +54,30 @@ export function combinePlInputs(...inputs: HistoricalPlInput[]): HistoricalPlInp
   const fields = Object.keys(inputs[0] ?? {}) as Array<keyof HistoricalPlInput>;
   return Object.fromEntries(fields.map((field) => [field, inputs.reduce((sum, input) => sum + input[field], 0)])) as HistoricalPlInput;
 }
+
+export function subtractPlInputs(company: HistoricalPlInput, subsidy: HistoricalPlInput): HistoricalPlInput {
+  const fields = Object.keys(company) as Array<keyof HistoricalPlInput>;
+  return Object.fromEntries(fields.map((field) => [field, company[field] - subsidy[field]])) as HistoricalPlInput;
+}
+
+export function combinePlSeries(base: HistoricalPlInput[], subsidy: HistoricalPlInput[]): HistoricalPlInput[] {
+  return base.map((record, index) => {
+    const counterpart = subsidy[index];
+    return Object.fromEntries((Object.keys(record) as Array<keyof HistoricalPlInput>).map((field) => {
+      const primary = record[field] as number | null | undefined;
+      const secondary = counterpart?.[field] as number | null | undefined;
+      return [field, primary === null || primary === undefined ? null : primary + (secondary ?? 0)];
+    })) as HistoricalPlInput;
+  });
+}
+
+export function subtractPlSeries(company: HistoricalPlInput[], subsidy: HistoricalPlInput[]): HistoricalPlInput[] {
+  return company.map((record, index) => {
+    const counterpart = subsidy[index];
+    return Object.fromEntries((Object.keys(record) as Array<keyof HistoricalPlInput>).map((field) => {
+      const primary = record[field] as number | null | undefined;
+      const secondary = counterpart?.[field] as number | null | undefined;
+      return [field, primary === null || primary === undefined ? null : primary - (secondary ?? 0)];
+    })) as HistoricalPlInput;
+  });
+}

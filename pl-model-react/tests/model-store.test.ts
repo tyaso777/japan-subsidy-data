@@ -8,6 +8,9 @@ describe('モデルストア', () => {
     expect(state.actuals.balanceSheets).toHaveLength(3);
     expect(state.actuals.basePl).toHaveLength(3);
     expect(state.actuals.subsidyPl).toHaveLength(3);
+    expect(state.actuals.companyPl).toHaveLength(3);
+    expect(state.actuals.plInputMode).toBe('base');
+    expect(state.actuals.companyPl[2].sales).toBe(1_100_000_000);
     expect(state.actuals.basePl[2].sales).toBe(1_000_000_000);
     expect(state.preferences.moneyUnit).toBe('millionYen');
     expect(state.program.timeline.periods[0].endYear).toBe(2028);
@@ -63,6 +66,28 @@ describe('モデルストア', () => {
       expect(series.periods[0]).toMatchObject({ startYear: 2026, endYear: 2029 });
       expect(series.periods[1]).toMatchObject({ startYear: 2030, endYear: 2033 });
     }
+  });
+
+  it('ベース入力時は全社P/Lを合算し、全社入力時はベースP/Lを差額で同期する', () => {
+    const store = createModelStore();
+
+    store.getState().updateHistoricalPl('base', 2, 'sales', 1_200_000_000);
+    expect(store.getState().actuals.companyPl[2].sales).toBe(1_300_000_000);
+
+    store.getState().setHistoricalPlInputMode('company');
+    store.getState().updateHistoricalPl('company', 2, 'sales', 1_500_000_000);
+    expect(store.getState().actuals.basePl[2].sales).toBe(1_400_000_000);
+
+    store.getState().updateHistoricalPl('subsidy', 2, 'sales', 200_000_000);
+    expect(store.getState().actuals.companyPl[2].sales).toBe(1_500_000_000);
+    expect(store.getState().actuals.basePl[2].sales).toBe(1_300_000_000);
+  });
+
+  it('案件未読込の空欄は自動算出側でも0に変換せず空欄のまま保つ', () => {
+    const store = createModelStore(undefined, { initialActuals: 'empty' });
+
+    expect(store.getState().actuals.basePl[0].sales).toBeNull();
+    expect(store.getState().actuals.companyPl[0].sales).toBeNull();
   });
 
   it('案件反映時に制度期間を正規化し全予測系列を同じ境界へ同期する', () => {

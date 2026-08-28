@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { programConfigurationSchema } from './program-schema';
 import type { ModelSnapshot } from '../store/model-store';
+import { combinePlSeries } from './financials';
 
 const historicalPlSchema = z.object({
   sales: z.number(), cogs: z.number(), cogsDepreciation: z.number(), employeeSalary: z.number(), employeeBonus: z.number(),
@@ -26,6 +27,8 @@ const snapshotSchema = z.object({
   program: programConfigurationSchema,
   actuals: z.object({
     balanceSheets: z.array(z.record(z.string(), z.number())),
+    plInputMode: z.enum(['base', 'company']).default('base'),
+    companyPl: z.array(historicalPlSchema).optional(),
     basePl: z.array(historicalPlSchema),
     subsidyPl: z.array(historicalPlSchema),
     metricInputs: z.record(z.string(), z.number()).default({}),
@@ -51,5 +54,12 @@ export function serializeModelFile(model: ModelSnapshot): string {
 }
 
 export function parseModelFile(json: string): ModelSnapshot {
-  return modelFileSchema.parse(JSON.parse(json)).model;
+  const parsed = modelFileSchema.parse(JSON.parse(json)).model;
+  return {
+    ...parsed,
+    actuals: {
+      ...parsed.actuals,
+      companyPl: parsed.actuals.companyPl ?? combinePlSeries(parsed.actuals.basePl, parsed.actuals.subsidyPl),
+    },
+  };
 }

@@ -66,6 +66,7 @@ export function FinancialTable<T extends object>({ testId, title, years, records
   const [clipboardStatus, setClipboardStatus] = useState('');
   const dragAnchor = useRef<GridCell | undefined>(undefined);
   const hasSupplementary = useMemo(() => rows.some((row) => row.supplementary), [rows]);
+  const hasEditableValues = Boolean(onChange || onValueChange);
   const yearColumnOffset = separateSubjectColumns ? 2 : 1;
   const visibleRows = useMemo(() => rows.filter((row) => row.supplementary ? showSupplementary : !(omitCalculated && row.calculated)), [omitCalculated, rows, showSupplementary]);
   const bounds = (selected: GridSelection) => ({
@@ -188,7 +189,7 @@ export function FinancialTable<T extends object>({ testId, title, years, records
   return <section className={cn('relative isolate border border-line bg-surface', compact && 'mx-auto w-full')} style={compact ? { maxWidth: `${compactMaxWidth}px` } : undefined} data-density={compact ? 'compact' : 'default'} data-testid={testId} onCopy={handleCopy} onPaste={handlePaste}>
     <StickySurface data-testid={`${testId}-sticky-header`} stickyTop={stickyHeaderTop} layer={stickyHeaderLayer} className="shadow-sm">
       <header className={cn('flex flex-wrap items-start justify-between gap-x-3.5 gap-y-1.5 border-t-[3px] border-navy', compact ? 'px-3 py-1.5' : 'px-3.5 pt-2.5 pb-2')}>
-        <div className="min-w-[180px] flex-1"><h3 className="m-0 text-[15px] font-bold">{title}</h3><p className="mt-0.5 text-[9px] text-muted-foreground">入力項目と自動計算項目・金額表示：{moneyUnitLabel(moneyUnit)}・ドラッグで範囲選択、Ctrl+C/VでExcel連携</p></div>
+        <div className="min-w-[180px] flex-1"><h3 className="m-0 text-[15px] font-bold">{title}</h3><p className="mt-0.5 text-[9px] text-muted-foreground">{hasEditableValues ? '入力項目と自動計算項目' : '入力した2つのP/Lから自動算出・読取専用'}・金額表示：{moneyUnitLabel(moneyUnit)}・ドラッグで範囲選択、Ctrl+C{hasEditableValues ? '/V' : ''}でExcel連携</p></div>
         <div data-testid={`${testId}-header-controls`} className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-2"><div className="shrink-0">{headerActions}</div>{clipboardStatus && <span role="status" className="text-[9px] font-bold text-teal">{clipboardStatus}</span>}{hasSupplementary && <Button className="shrink-0" variant="subtle" size="xs" onClick={() => setShowSupplementary((value) => !value)}>{showSupplementary ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}{showSupplementary ? '補足指標を隠す' : '補足指標を表示'}</Button>}<Button className="shrink-0" variant="subtle" size="xs" onClick={() => setOmitCalculated((value) => !value)}>
           {omitCalculated ? <Eye aria-hidden="true" /> : <EyeOff aria-hidden="true" />}
           {omitCalculated ? '自動計算項目を表示' : '自動計算項目を省略'}

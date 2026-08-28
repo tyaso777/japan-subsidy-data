@@ -21,11 +21,22 @@ describe('期間・過去実績', () => {
     expect(screen.getByLabelText('全社 B/S 2023年 資産総額')).toHaveClass('h-5', 'w-[min(72px,100%)]');
   });
 
-  it('ベース事業と補助事業をタブなしで同時表示する', () => {
+  it('入力するP/Lを選択し、未選択の全社P/Lを自動算出して下に表示する', async () => {
+    const user = userEvent.setup();
     render(<App />);
+    expect(screen.getByRole('radiogroup', { name: '過去P/Lの入力方式' })).toBeVisible();
+    expect(screen.getByRole('radio', { name: 'ベース事業P/Lを入力' })).toBeChecked();
     expect(screen.getByRole('heading', { name: 'ベース事業 P/L' })).toBeVisible();
     expect(screen.getByRole('heading', { name: '補助事業 P/L' })).toBeVisible();
-    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '全社 P/L（自動算出）' })).toBeVisible();
+    const derivedCompany = screen.getByTestId('historical-pl-company');
+    expect(derivedCompany).toHaveTextContent('1,100');
+    expect(within(derivedCompany).queryByLabelText('全社 P/L（自動算出） 2025年 売上高')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('radio', { name: '全社P/Lを入力' }));
+    expect(screen.getByRole('heading', { name: '全社 P/L' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'ベース事業 P/L（自動算出）' })).toBeVisible();
+    expect(within(screen.getByTestId('historical-pl-base')).queryByLabelText('ベース事業 P/L（自動算出） 2025年 売上高')).not.toBeInTheDocument();
   });
 
   it('各表の自動計算項目を独立して省略する', async () => {
