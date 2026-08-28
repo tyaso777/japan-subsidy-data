@@ -131,6 +131,26 @@ test('水準設定には通常操作だけを表示し、行別の詳細変動�
   await expect(page.getByLabel('補助事業期間 売上高 毎年固定増減')).toHaveCount(0);
 });
 
+test('Maxの入力途中にMinが書き換わらない', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('app-toolbar').getByRole('button', { name: '将来予測・PL' }).click();
+
+  const minimum = page.getByLabel('補助事業期間 売上高 最小値');
+  const maximum = page.getByLabel('補助事業期間 売上高 最大値');
+  await minimum.fill('30');
+  await minimum.blur();
+  await expect(minimum).toHaveValue('30');
+
+  await maximum.selectText();
+  await maximum.pressSequentially('4');
+  await expect(minimum).toHaveValue('30');
+  await maximum.pressSequentially('0');
+  await expect(minimum).toHaveValue('30');
+  await maximum.blur();
+  await expect(maximum).toHaveValue('40');
+  await expect(minimum).toHaveValue('30');
+});
+
 test('期間・過去実績の財務表はワイド画面でも会計表の密度を保つ', async ({ page }) => {
   await page.setViewportSize({ width: 1600, height: 1000 });
   await page.goto('/');

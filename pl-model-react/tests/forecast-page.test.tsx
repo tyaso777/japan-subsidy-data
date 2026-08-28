@@ -448,8 +448,12 @@ describe('将来予測・PL画面', () => {
     const max = screen.getByLabelText('補助事業期間 売上高 最大値');
     const slider = screen.getByRole('slider', { name: '補助事業期間 売上高 水準' });
     fireEvent.change(rate, { target: { value: '5.4093567' } });
+    fireEvent.focus(min);
     fireEvent.change(min, { target: { value: '5.11695' } });
+    fireEvent.blur(min);
+    fireEvent.focus(max);
     fireEvent.change(max, { target: { value: '5.70175' } });
+    fireEvent.blur(max);
 
     expect(rate).toHaveValue(5.41);
     expect(min).toHaveValue(5.12);
@@ -731,8 +735,8 @@ describe('将来予測・PL画面', () => {
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
     const min = screen.getByLabelText('補助事業期間 売上高 最小値');
     const max = screen.getByLabelText('補助事業期間 売上高 最大値');
-    await user.clear(min); await user.type(min, '10');
-    await user.clear(max); await user.type(max, '10');
+    await user.click(min); await user.keyboard('{Control>}a{/Control}10'); await user.tab();
+    await user.click(max); await user.keyboard('{Control>}a{/Control}10'); await user.tab();
     expect(min).toHaveValue(10);
     expect(max).toHaveValue(10);
   });

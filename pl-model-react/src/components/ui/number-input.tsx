@@ -10,10 +10,11 @@ export type NumberInputProps = Omit<ComponentProps<typeof Input>, 'type' | 'valu
   onEmpty?: () => void;
   onEditingStart?: () => void;
   onEditingEnd?: () => void;
+  commitOnBlur?: boolean;
 };
 
 /** 入力中だけ空文字を許し、空欄のまま確定したときに既定値（通常0）を補完する数値入力。 */
-export function NumberInput({ value, onValueChange, emptyValue = 0, onEmptyChange, onEmpty, onEditingStart, onEditingEnd, onKeyDown, ...props }: NumberInputProps) {
+export function NumberInput({ value, onValueChange, emptyValue = 0, onEmptyChange, onEmpty, onEditingStart, onEditingEnd, commitOnBlur = false, onKeyDown, ...props }: NumberInputProps) {
   const normalizedValue = Number.isFinite(value) ? Number(value) : emptyValue;
   const [draft, setDraft] = useState(normalizedValue === null ? '' : String(normalizedValue));
   const [editing, setEditing] = useState(false);
@@ -56,6 +57,7 @@ export function NumberInput({ value, onValueChange, emptyValue = 0, onEmptyChang
         onEmptyChange?.();
         return;
       }
+      if (commitOnBlur) return;
       const parsed = Number(nextDraft);
       if (Number.isFinite(parsed)) onValueChange(parsed);
     }}

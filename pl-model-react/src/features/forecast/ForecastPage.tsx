@@ -168,33 +168,23 @@ function SettingRow({ series, periodId, periodLabel, unit, variationOpen, onFore
     min: roundFinancialInputValue(range.min, rateKind, unit),
     max: roundFinancialInputValue(range.max, rateKind, unit),
   };
-  const maxBeforeMinWasEmptied = useRef<number | null>(null);
-  const minBeforeMaxWasEmptied = useRef<number | null>(null);
   const updateRangeMin = (inputValue: number) => {
-    const min = normalizeRate(inputValue);
-    const previousMax = maxBeforeMinWasEmptied.current ?? displayRange.max;
-    updateSetting({ range: { min, max: Math.max(previousMax, min) } });
+    const min = Math.min(normalizeRate(inputValue), displayRange.max);
+    updateSetting({ range: { min, max: displayRange.max } });
   };
   const updateRangeMax = (inputValue: number) => {
-    const max = normalizeRate(inputValue);
-    const previousMin = minBeforeMaxWasEmptied.current ?? displayRange.min;
-    updateSetting({ range: { min: Math.min(previousMin, max), max } });
+    const max = Math.max(normalizeRate(inputValue), displayRange.min);
+    updateSetting({ range: { min: displayRange.min, max } });
   };
-  const clearRangeMin = () => {
-    maxBeforeMinWasEmptied.current = displayRange.max;
-    updateSetting({ range: { min: 0, max: Math.max(displayRange.max, 0) } });
-  };
-  const clearRangeMax = () => {
-    minBeforeMaxWasEmptied.current = displayRange.min;
-    updateSetting({ range: { min: Math.min(displayRange.min, 0), max: 0 } });
-  };
+  const clearRangeMin = () => updateSetting({ range: { min: 0, max: Math.max(displayRange.max, 0) } });
+  const clearRangeMax = () => updateSetting({ range: { min: Math.min(displayRange.min, 0), max: 0 } });
   return <fieldset data-testid={`forecast-setting-row-${series.id}-${period.id}`} disabled={readOnly} className="m-0 min-w-0 border-0 border-t border-line px-1.5 py-1 [container-type:inline-size] first:border-t-0 disabled:opacity-55">
     <div data-testid="forecast-setting-row-header" className="mb-0.5 grid min-h-5 grid-cols-[minmax(0,1fr)_auto] items-center gap-1"><strong className="min-w-0 text-[11px] leading-tight">{series.label}</strong><span className="flex shrink-0 items-center gap-0.5"><NumberInput disabled={series.changePolicy === 'fixed'} data-position="item-name" aria-label={`${periodLabel} ${series.label} 年間変化`} value={annualGrowthRate} step="0.01" className="h-5 w-11 px-0.5 text-right text-[9px] font-bold text-orange" onEmptyChange={() => updateSetting({ annualGrowthRate: 0, range: { min: Math.min(range.min, 0), max: Math.max(range.max, 0) } })} onEditingStart={begin} onEditingEnd={commit} onValueChange={(inputValue) => { const value = normalizeRate(inputValue); updateSetting({ annualGrowthRate: value, range: { min: Math.min(range.min, value), max: Math.max(range.max, value) } }); }} /><small className="whitespace-nowrap text-[8px] text-orange">{linear ? 'pt/年' : '%/年'}</small></span></div>
     <div data-testid="forecast-setting-controls" className="forecast-setting-controls grid grid-cols-1 items-center gap-1.5">
       <div data-testid="forecast-level-slider-group" className="grid min-w-0 grid-cols-[38px_minmax(44px,1fr)_38px] items-center gap-1">
-        <NumberInput disabled={series.changePolicy === 'fixed'} aria-label={`${periodLabel} ${series.label} 最小値`} value={displayRange.min} step="0.01" className="h-5 px-1 text-right text-[9px]" onEmptyChange={clearRangeMin} onEditingStart={begin} onEditingEnd={() => { maxBeforeMinWasEmptied.current = null; commit(); }} onValueChange={updateRangeMin} />
+        <NumberInput disabled={series.changePolicy === 'fixed'} aria-label={`${periodLabel} ${series.label} 最小値`} value={displayRange.min} step="0.01" commitOnBlur className="h-5 px-1 text-right text-[9px]" onEmptyChange={clearRangeMin} onEditingStart={begin} onEditingEnd={commit} onValueChange={updateRangeMin} />
         <input aria-label={`${periodLabel} ${series.label} 水準`} type="range" min={displayRange.min} max={displayRange.max} step="0.01" value={Math.max(displayRange.min, Math.min(displayRange.max, annualGrowthRate))} disabled={displayRange.min === displayRange.max} onPointerDown={begin} onPointerUp={commit} onChange={(event) => updateSetting({ annualGrowthRate: normalizeRate(Number(event.target.value)) })} className="w-full accent-[#c75b24]" />
-        <NumberInput disabled={series.changePolicy === 'fixed'} aria-label={`${periodLabel} ${series.label} 最大値`} value={displayRange.max} step="0.01" className="h-5 px-1 text-right text-[9px]" onEmptyChange={clearRangeMax} onEditingStart={begin} onEditingEnd={() => { minBeforeMaxWasEmptied.current = null; commit(); }} onValueChange={updateRangeMax} />
+        <NumberInput disabled={series.changePolicy === 'fixed'} aria-label={`${periodLabel} ${series.label} 最大値`} value={displayRange.max} step="0.01" commitOnBlur className="h-5 px-1 text-right text-[9px]" onEmptyChange={clearRangeMax} onEditingStart={begin} onEditingEnd={commit} onValueChange={updateRangeMax} />
       </div>
       {variationOpen && <div data-testid="forecast-start-adjustment-group" className="grid grid-cols-2 gap-1 border-t border-dashed border-line pt-1"><label className="min-w-0 text-[7px] leading-none text-muted-foreground">開始時固定値<NumberInput aria-label={`${periodLabel} ${series.label} 開始時固定値`} title="未設定時は前年から通常計算" value={startValue} emptyValue={startValue === null ? null : 0} step="0.01" className="mt-0.5 h-5 w-full px-1 text-right text-[9px]" onEmptyChange={() => updateSetting({ startValue: 0 })} onEmpty={() => updateSetting({ startValue: null })} onEditingStart={begin} onEditingEnd={commit} onValueChange={(inputValue) => updateSetting({ startValue: fromDisplayFinancialValue(inputValue, series.valueKind, unit) })} /></label><label className="min-w-0 text-[7px] leading-none text-muted-foreground">開始時増減<NumberInput aria-label={`${periodLabel} ${series.label} 開始時増減`} title="固定値または通常計算値へ加算" value={adjustment} step="0.01" className="mt-0.5 h-5 w-full px-1 text-right text-[9px]" onEmptyChange={() => updateSetting({ startAdjustment: 0 })} onEditingStart={begin} onEditingEnd={commit} onValueChange={(inputValue) => updateSetting({ startAdjustment: fromDisplayFinancialValue(inputValue, series.valueKind, unit) })} /></label></div>}
     </div>
