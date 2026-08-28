@@ -12,6 +12,7 @@ const validFile = {
     { year: 2025, values: { assets: 1_200, capex: null } },
   ],
   profitAndLoss: {
+    inputMode: 'base',
     base: [
       { year: 2023, values: { sales: 900, cogs: 570, headcount: 110 } },
       { year: 2025, values: { sales: 1_000, cogs: 620, headcount: 118 } },
@@ -49,6 +50,35 @@ describe('AI向け過去実績インポート形式', () => {
     expect(imported.actuals.basePl[0].headcount).toBe(12.5);
   });
 
+  it('全社P/L入力では補助事業P/Lを差し引いてベース事業P/Lを導出する', () => {
+    const source = structuredClone(validFile) as any;
+    source.profitAndLoss = {
+      inputMode: 'company',
+      company: [
+        { year: 2023, values: { sales: 1_000, cogs: 650, headcount: 120 } },
+        { year: 2025, values: { sales: 1_300, cogs: 800, headcount: 140 } },
+      ],
+      subsidy: [
+        { year: 2023, values: { sales: 100, cogs: 80, headcount: 10 } },
+        { year: 2025, values: { sales: 300, cogs: 180, headcount: 22 } },
+      ],
+    };
+
+    const imported = parseActualsImportFile(JSON.stringify(source));
+
+    expect(imported.plInputMode).toBe('company');
+    expect(imported.actuals.companyPl[0].sales).toBe(1_000_000_000);
+    expect(imported.actuals.basePl[0].sales).toBe(900_000_000);
+    expect(imported.actuals.basePl[0].headcount).toBe(110);
+    expect(imported.actuals.basePl[2].cogs).toBe(620_000_000);
+  });
+
+  it('入力方式と異なるP/Lキーを拒否する', () => {
+    const source = structuredClone(validFile) as any;
+    source.profitAndLoss.company = source.profitAndLoss.base;
+    expect(() => parseActualsImportFile(JSON.stringify(source))).toThrow();
+  });
+
   it('年度の重複・降順・欠落を拒否する', () => {
     expect(() => parseActualsImportFile(JSON.stringify({ ...validFile, years: [2023, 2025] }))).toThrow(/連続/);
     expect(() => parseActualsImportFile(JSON.stringify({ ...validFile, years: [2024, 2023] }))).toThrow(/昇順/);
@@ -60,7 +90,7 @@ describe('AI向け過去実績インポート形式', () => {
     outside.balanceSheets[0].year = 2022;
     expect(() => parseActualsImportFile(JSON.stringify(outside))).toThrow(/対象年度/);
 
-    const unknown = structuredClone(validFile) as typeof validFile & { profitAndLoss: { base: Array<{ year: number; values: Record<string, number | null> }>; subsidy: never[] } };
+    const unknown = structuredClone(validFile) as typeof validFile & { profitAndLoss: { inputMode: 'base'; base: Array<{ year: number; values: Record<string, number | null> }>; subsidy: never[] } };
     unknown.profitAndLoss.base[0].values.operatingProfit = 100;
     expect(() => parseActualsImportFile(JSON.stringify(unknown))).toThrow();
   });
@@ -81,10 +111,27 @@ describe('AI向け過去実績インポート形式', () => {
     expect(state.actuals.balanceSheets).toHaveLength(3);
     expect(state.actuals.balanceSheets[0].assets).toBe(1_000_000_000);
     expect(state.actuals.basePl[2].sales).toBe(1_000_000_000);
+    expect(state.actuals.plInputMode).toBe('base');
     expect(state.forecast.series.find((series) => series.id === 'base-sales')).toMatchObject({ baseYear: 2025, baseValue: 1_000_000_000 });
     expect(state.canUndo).toBe(true);
 
     state.undo();
     expect(store.getState().actuals.basePl[2].sales).toBeNull();
+  });
+
+  it('全社P/L方式をストアへ反映して入力方式を維持する', () => {
+    const store = createModelStore(undefined, { initialActuals: 'empty' });
+    const source = structuredClone(validFile) as any;
+    source.profitAndLoss = {
+      inputMode: 'company',
+      company: [{ year: 2023, values: { sales: 1_000 } }, { year: 2025, values: { sales: 1_300 } }],
+      subsidy: [{ year: 2023, values: { sales: 100 } }, { year: 2025, values: { sales: 300 } }],
+    };
+
+    store.getState().importHistoricalActuals(parseActualsImportFile(JSON.stringify(source)));
+
+    expect(store.getState().actuals.plInputMode).toBe('company');
+    expect(store.getState().actuals.companyPl[0].sales).toBe(1_000_000_000);
+    expect(store.getState().actuals.basePl[0].sales).toBe(900_000_000);
   });
 });

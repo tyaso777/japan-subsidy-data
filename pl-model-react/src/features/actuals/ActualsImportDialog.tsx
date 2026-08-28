@@ -79,7 +79,8 @@ export function ActualsImportDialog() {
             <dt className="text-muted-foreground">資料に含まれる期間</dt><dd className="m-0">{preview.years[0]}年〜{preview.years.at(-1)}年（{preview.years.length}期）</dd>
             <dt className="text-muted-foreground">今回の取込対象</dt><dd className="m-0 font-bold">{historical.startYear}年〜{historical.endYear}年（{targetYears.length}期）</dd>
             <dt className="text-muted-foreground">資料の金額単位</dt><dd className="m-0 font-bold">{amountUnitLabels[preview.amountUnit]}</dd>
-            <dt className="text-muted-foreground">反映する入力値</dt><dd className="m-0">B/S {countValues(targetIndexes.map((index) => preview.actuals.balanceSheets[index]))}件・ベースP/L {countValues(targetIndexes.map((index) => preview.actuals.basePl[index]))}件・補助事業P/L {countValues(targetIndexes.map((index) => preview.actuals.subsidyPl[index]))}件</dd>
+            <dt className="text-muted-foreground">P/L入力方式</dt><dd className="m-0 font-bold">{preview.plInputMode === 'company' ? '全社P/L＋補助事業P/L' : 'ベース事業P/L＋補助事業P/L'}</dd>
+            <dt className="text-muted-foreground">反映する入力値</dt><dd className="m-0">B/S {countValues(targetIndexes.map((index) => preview.actuals.balanceSheets[index]))}件・{preview.plInputMode === 'company' ? '全社' : 'ベース事業'}P/L {countValues(targetIndexes.map((index) => preview.actuals[preview.plInputMode === 'company' ? 'companyPl' : 'basePl'][index]))}件・補助事業P/L {countValues(targetIndexes.map((index) => preview.actuals.subsidyPl[index]))}件</dd>
           </dl>
           {missingYears.length > 0 && <p className="m-0 text-[11px] font-bold text-orange">資料にない{missingYears.join('年・')}年は、未入力として取り込みます。</p>}
           {preview.unmappedItems.length > 0 && <div><strong>未対応科目</strong><ul className="mt-1 mb-0 pl-5">{preview.unmappedItems.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul></div>}

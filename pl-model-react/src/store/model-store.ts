@@ -297,11 +297,10 @@ export function createModelStore(program?: unknown, options?: { initialActuals?:
           balanceSheets: selectYears(imported.actuals.balanceSheets),
           basePl: selectYears(imported.actuals.basePl),
           subsidyPl: selectYears(imported.actuals.subsidyPl),
-          plInputMode: 'base' as const,
-          companyPl: [] as HistoricalPlInput[],
+          plInputMode: imported.plInputMode,
+          companyPl: selectYears(imported.actuals.companyPl),
           metricInputs: snapshot.actuals.metricInputs,
         };
-        actuals.companyPl = combinePlSeries(actuals.basePl, actuals.subsidyPl);
         const { forecastRangeCalibration: _calibration, ...caseSettings } = snapshot.caseSettings;
         return { ...snapshot, actuals, forecast: defaultForecast(snapshot.program, actuals.basePl, actuals.subsidyPl), caseSettings };
       }),

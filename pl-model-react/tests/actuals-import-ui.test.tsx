@@ -11,6 +11,7 @@ const importJson = JSON.stringify({
   years: [2022, 2023, 2024, 2025],
   balanceSheets: [{ year: 2022, values: { assets: 9_999 } }, { year: 2023, values: { assets: 1_050, cash: 180 } }],
   profitAndLoss: {
+    inputMode: 'base',
     base: [{ year: 2023, values: { sales: 900, cogs: 570, headcount: 110 } }],
     subsidy: [],
   },
@@ -51,6 +52,7 @@ describe('AIで過去実績を取り込む', () => {
     expect(within(dialog).getByText('2022年〜2025年（4期）')).toBeVisible();
     expect(within(dialog).getByText('2023年〜2025年（3期）')).toBeVisible();
     expect(within(dialog).getByText('百万円')).toBeVisible();
+    expect(within(dialog).getByText('ベース事業P/L＋補助事業P/L')).toBeVisible();
     expect(within(dialog).getByText('支払利息')).toBeVisible();
     expect(within(dialog).getByText('補助事業は資料に区分なし')).toBeVisible();
 

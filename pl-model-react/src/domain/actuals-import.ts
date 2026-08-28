@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { combinePlSeries, subtractPlSeries } from './financials';
 import type { BalanceSheetRecord, HistoricalPlInput } from './types';
 
 export const balanceSheetImportFields = [
@@ -32,16 +33,26 @@ const historicalPlRecordSchema = z.object({
   values: valuesSchema(historicalPlImportFields),
 }).strict();
 
+const profitAndLossSchema = z.discriminatedUnion('inputMode', [
+  z.object({
+    inputMode: z.literal('base'),
+    base: z.array(historicalPlRecordSchema).default([]),
+    subsidy: z.array(historicalPlRecordSchema).default([]),
+  }).strict(),
+  z.object({
+    inputMode: z.literal('company'),
+    company: z.array(historicalPlRecordSchema).default([]),
+    subsidy: z.array(historicalPlRecordSchema).default([]),
+  }).strict(),
+]);
+
 const actualsImportFileSchema = z.object({
   format: z.literal('pl-model-actuals'),
   version: z.literal('1'),
   amountUnit: z.enum(['yen', 'thousand-yen', 'million-yen']),
   years: z.array(z.number().int()).min(1),
   balanceSheets: z.array(balanceSheetRecordSchema).default([]),
-  profitAndLoss: z.object({
-    base: z.array(historicalPlRecordSchema).default([]),
-    subsidy: z.array(historicalPlRecordSchema).default([]),
-  }).strict(),
+  profitAndLoss: profitAndLossSchema,
   sourceFiles: z.array(z.string()).default([]),
   unmappedItems: z.array(z.string()).default([]),
   notes: z.array(z.string()).default([]),
@@ -57,7 +68,8 @@ const actualsImportFileSchema = z.object({
   }
 
   const targetYears = new Set(file.years);
-  const sections = [file.balanceSheets, file.profitAndLoss.base, file.profitAndLoss.subsidy];
+  const primaryPl = file.profitAndLoss.inputMode === 'company' ? file.profitAndLoss.company : file.profitAndLoss.base;
+  const sections = [file.balanceSheets, primaryPl, file.profitAndLoss.subsidy];
   sections.forEach((records, sectionIndex) => {
     const seen = new Set<number>();
     records.forEach((record, recordIndex) => {
@@ -71,8 +83,10 @@ const actualsImportFileSchema = z.object({
 export type ActualsImportResult = {
   years: number[];
   amountUnit: 'yen' | 'thousand-yen' | 'million-yen';
+  plInputMode: 'base' | 'company';
   actuals: {
     balanceSheets: BalanceSheetRecord[];
+    companyPl: HistoricalPlInput[];
     basePl: HistoricalPlInput[];
     subsidyPl: HistoricalPlInput[];
   };
@@ -105,17 +119,23 @@ export function parseActualsImportFile(json: string): ActualsImportResult {
   const file = actualsImportFileSchema.parse(JSON.parse(json));
   const multiplier = amountMultipliers[file.amountUnit];
   const balanceSheets = normalizeRecords(file.years, file.balanceSheets, balanceSheetImportFields, (_field, value) => value * multiplier) as BalanceSheetRecord[];
-  const normalizePl = (records: typeof file.profitAndLoss.base) => normalizeRecords(
+  const normalizePl = (records: Array<z.infer<typeof historicalPlRecordSchema>>) => normalizeRecords(
     file.years,
     records,
     historicalPlImportFields,
     (field, value) => nonMoneyPlFields.has(field) ? value : value * multiplier,
   ) as unknown as HistoricalPlInput[];
 
+  const subsidyPl = normalizePl(file.profitAndLoss.subsidy);
+  const primaryPl = normalizePl(file.profitAndLoss.inputMode === 'company' ? file.profitAndLoss.company : file.profitAndLoss.base);
+  const companyPl = file.profitAndLoss.inputMode === 'company' ? primaryPl : combinePlSeries(primaryPl, subsidyPl);
+  const basePl = file.profitAndLoss.inputMode === 'base' ? primaryPl : subtractPlSeries(primaryPl, subsidyPl);
+
   return {
     years: [...file.years],
     amountUnit: file.amountUnit,
-    actuals: { balanceSheets, basePl: normalizePl(file.profitAndLoss.base), subsidyPl: normalizePl(file.profitAndLoss.subsidy) },
+    plInputMode: file.profitAndLoss.inputMode,
+    actuals: { balanceSheets, companyPl, basePl, subsidyPl },
     sourceFiles: file.sourceFiles,
     unmappedItems: file.unmappedItems,
     notes: file.notes,
