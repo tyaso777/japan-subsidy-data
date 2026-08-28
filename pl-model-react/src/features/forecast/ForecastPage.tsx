@@ -59,7 +59,7 @@ function useCompactSettingsPanel(periodCount: number) {
   return { ref, compact };
 }
 
-function SyncedHorizontalScrollbar({ contentRef, contentKey }: { contentRef: RefObject<HTMLDivElement | null>; contentKey: string }) {
+function SyncedHorizontalScrollbar({ contentRef, contentKey, testId, ariaLabel }: { contentRef: RefObject<HTMLDivElement | null>; contentKey: string; testId: string; ariaLabel: string }) {
   const scrollbarRef = useRef<HTMLDivElement>(null);
   const [trackWidth, setTrackWidth] = useState(1);
   const [placement, setPlacement] = useState<{ left?: number; width?: number; visible: boolean }>({ visible: true });
@@ -98,7 +98,7 @@ function SyncedHorizontalScrollbar({ contentRef, contentKey }: { contentRef: Ref
       window.removeEventListener('scroll', update);
     };
   }, [contentKey, contentRef]);
-  return <div ref={scrollbarRef} data-testid="forecast-chart-horizontal-scrollbar" role="scrollbar" aria-label="チャート横スクロール" aria-orientation="horizontal" aria-hidden={!placement.visible} className={cn('fixed bottom-0 z-40 h-4 overflow-x-scroll border-y border-line bg-surface shadow-[0_-2px_6px_rgba(24,59,86,.12)] [scrollbar-gutter:stable]', !placement.visible && 'invisible')} style={{ left: placement.left, width: placement.width }}>
+  return <div ref={scrollbarRef} data-testid={testId} role="scrollbar" aria-label={ariaLabel} aria-orientation="horizontal" aria-hidden={!placement.visible} className={cn('fixed bottom-0 z-40 h-4 overflow-x-scroll border-y border-line bg-surface shadow-[0_-2px_6px_rgba(24,59,86,.12)] [scrollbar-gutter:stable]', !placement.visible && 'invisible')} style={{ left: placement.left, width: placement.width }}>
     <div aria-hidden="true" className="h-px" style={{ width: `${trackWidth}px` }} />
   </div>;
 }
@@ -206,6 +206,7 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
   const [metricsVisible, setMetricsVisible] = useState(true);
   const [showFixedSettings, setShowFixedSettings] = useState(true);
   const [chartDisplays, setChartDisplays] = useState<Record<ChartDisplay, boolean>>({ company: true, base: true, subsidy: true, comparison: true });
+  const settingsScrollContentRef = useRef<HTMLDivElement>(null);
   const chartScrollContentRef = useRef<HTMLDivElement>(null);
   const businessHeaderScrollRef = useRef<HTMLDivElement>(null);
   const [selectedLogicCode, setSelectedLogicCode] = useState('16');
@@ -400,16 +401,18 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
       <div data-testid="forecast-sticky-spacer" className="h-3 bg-canvas" aria-hidden="true" />
       </StickySurface>
     <div data-testid="forecast-layout" data-settings-visible={settingsVisible} data-metrics-visible={metricsVisible} className={cn('grid items-start gap-3', forecastLayoutColumns)}>
-      {settingsVisible && <StickyPanel
+      {settingsVisible && <><SyncedHorizontalScrollbar contentRef={settingsScrollContentRef} contentKey={`${scope}:${segments.map((segment) => segment.id).join(':')}:${variationOpen}`} testId="forecast-settings-horizontal-scrollbar" ariaLabel="水準設定横スクロール" /><StickyPanel
         ref={settingsPanel.ref}
         testIdPrefix="forecast-settings"
         stickyTop="var(--forecast-content-sticky-top)"
+        bottomGap={18}
         headerClassName="px-2.5 py-2.5"
         bodyClassName="px-2.5 pb-2.5"
+        bodyRef={settingsScrollContentRef}
         header={<div className="grid gap-1.5"><div className="flex items-start justify-between gap-2"><div><h3 className="m-0 text-base font-bold">水準設定</h3><p className="m-0 text-[10px] text-muted-foreground">{scopeLabels[scope]}・右端は開始時増減</p></div><span className="flex shrink-0 flex-col items-end gap-1"><span className="flex items-center gap-1"><Button variant="outline" size="sm" className="h-7 gap-1 px-2 text-[9px]" aria-label={variationOpen ? '変動設定を隠す' : '変動設定を表示'} aria-expanded={variationOpen} onClick={() => setVariationOverride(!variationOpen)}><ChevronDown className={cn('transition-transform', !variationOpen && '-rotate-90')} />変動設定</Button><Badge variant="outline">金額単位：{moneyUnitLabel(unit)}</Badge></span><Button variant="ghost" size="sm" className="h-6 gap-1 px-1.5 text-[9px] text-muted-foreground" aria-label={showFixedSettings ? '固定項目を隠す' : '固定項目を表示'} aria-pressed={!showFixedSettings} onClick={() => setShowFixedSettings((value) => !value)}>{showFixedSettings ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}{showFixedSettings ? '固定項目を隠す' : `固定項目を表示（${fixedSettingIds.size}件）`}</Button></span></div><div className="flex flex-wrap items-center justify-between gap-1">{calibrationStatus === 'current' ? newBusinessNeedsInitialValues ? <p role="alert" className="m-0 flex items-center gap-1 text-[9px] font-bold text-orange"><TriangleAlert className="size-3" aria-hidden="true" />補助事業を新規事業として設定しました。売上高・従業員数・役員数の開始値を入力してください</p> : <p className="m-0 flex items-center gap-1 text-[9px] font-bold text-teal"><CheckCircle2 className="size-3" aria-hidden="true" />{subsidyNewBusiness ? '新規事業として適正化済み' : '過去実績に適正化済み'}</p> : <p role="alert" className="m-0 flex items-center gap-1 text-[9px] font-bold text-orange"><TriangleAlert className="size-3" aria-hidden="true" />{calibrationStatus === 'stale' ? '過去実績の変更後、再適正化されていません' : '水準範囲は未適正化です'}</p>}<Button variant="outline" size="sm" className="h-7 gap-1 px-2 text-[9px]" onClick={requestRangeOptimization}><Sparkles aria-hidden="true" />過去実績から水準範囲を適正化</Button></div></div>}
       >
         <div data-testid="forecast-period-grid" className="grid min-w-0 gap-2" style={{ gridTemplateColumns: `repeat(${segments.length}, minmax(${settingsPeriodMinWidth(segments.length, variationOpen)}, 1fr))` }}>{segments.map((period, segmentIndex) => { const definitionLabel = program.definitions.periods.find((definition) => definition.id === period.definitionId)?.label ?? period.definitionId; const siblings = segments.filter((candidate) => candidate.definitionId === period.definitionId); const label = siblings.length > 1 ? `${definitionLabel}${siblings.indexOf(period) + 1}` : definitionLabel; return <section data-testid="forecast-period-column" key={period.id} className="min-w-0 bg-background"><StickySurface data-testid="forecast-period-header" stickyTop="0px" layer="panel" className="flex min-h-10 items-center justify-between gap-2 border-t-[3px] border-navy px-1.5 py-1 shadow-sm"><span className="flex min-w-0 items-center gap-2"><strong className="min-w-0 text-sm leading-tight">{label}</strong><span data-testid="forecast-period-years" className="shrink-0 whitespace-nowrap text-[10px] tabular-nums text-muted-foreground">{period.startYear}–{period.endYear}</span></span>{segmentIndex > 0 && segments[segmentIndex - 1].definitionId === period.definitionId && <Button variant="ghost" size="sm" className="h-6 shrink-0 px-1.5 text-[9px]" aria-label={`${period.startYear}年の期間分割を解除`} onClick={() => mergeForecastPeriod(period.id)}>解除</Button>}</StickySurface>{visibleSettings.map((series) => <SettingRow key={series.id} series={series} periodId={period.id} periodLabel={label} unit={unit} variationOpen={variationOpen} onForecastInputChange={optimization.invalidateProposal} readOnly={false} />)}</section>; })}</div>
-      </StickyPanel>}
+      </StickyPanel></>}
       <section className="min-w-0 border border-line bg-surface p-3">
           <TabsContent value="chart" className="mt-0">
             <StickySurface ref={chartDisplayLayer.ref} data-testid="forecast-chart-display-controls" stickyTop="var(--forecast-content-sticky-top)" layer="content" className="-mx-3 flex items-center justify-between gap-2 border-b border-line px-3 py-2 shadow-sm">
@@ -434,7 +437,7 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
                     {activeBusinessDisplays.map((item) => <header key={item} data-testid="forecast-business-sticky-header" className="flex items-center justify-between gap-2 border-t-2 border-navy px-0.5 py-1"><h3 className="m-0 text-sm font-bold">{chartDisplayLabels[item]}</h3><span className="text-[9px] text-muted-foreground">{charts.length}チャート</span></header>)}
                   </div>
                 </StickySurface>
-                <SyncedHorizontalScrollbar contentRef={chartScrollContentRef} contentKey={activeBusinessDisplays.join(':')} />
+                <SyncedHorizontalScrollbar contentRef={chartScrollContentRef} contentKey={activeBusinessDisplays.join(':')} testId="forecast-chart-horizontal-scrollbar" ariaLabel="チャート横スクロール" />
                 <div ref={chartScrollContentRef} data-testid="forecast-chart-scroll-content" className="overflow-x-auto pb-5">
                   <div data-testid="forecast-business-columns" data-orientation="horizontal" className="grid items-start gap-2 pb-1" style={{ gridTemplateColumns: businessOverview ? 'minmax(0, 1fr)' : `repeat(${activeBusinessDisplays.length}, minmax(220px, 1fr))` }}>
                     {activeBusinessDisplays.map((item) => <section key={item} data-testid="forecast-chart-section" data-scope={item} className="min-w-0 pt-1.5">

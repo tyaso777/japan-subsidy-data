@@ -110,6 +110,34 @@ test('中央を最下部までスクロールしても水準設定の期間見�
   }
 });
 
+test('水準設定の期間列が増えた場合は画面下部の横スクロールで全期間を操作できる', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('app-toolbar').getByRole('button', { name: '03 将来予測・PL' }).click();
+  await page.getByRole('button', { name: '2027年から期間を分割' }).click();
+
+  const body = page.getByTestId('forecast-settings-body');
+  const scrollbar = page.getByTestId('forecast-settings-horizontal-scrollbar');
+  await expect(page.getByTestId('forecast-period-column')).toHaveCount(3);
+  await expect(scrollbar).toBeVisible();
+  await expect(scrollbar).toHaveAttribute('aria-hidden', 'false');
+
+  const sizes = await body.evaluate((element) => ({ clientWidth: element.clientWidth, scrollWidth: element.scrollWidth }));
+  expect(sizes.scrollWidth).toBeGreaterThan(sizes.clientWidth);
+  const verticalSizes = await body.evaluate((element) => ({ clientHeight: element.clientHeight, scrollHeight: element.scrollHeight }));
+  expect(verticalSizes.scrollHeight).toBeGreaterThan(verticalSizes.clientHeight);
+  expect((await geometry(scrollbar)).position).toBe('fixed');
+
+  await body.evaluate((element) => { element.scrollTop = element.scrollHeight; });
+  await expect(scrollbar).toBeVisible();
+  await scrollbar.evaluate((element) => { element.scrollLeft = element.scrollWidth; element.dispatchEvent(new Event('scroll')); });
+  await expect.poll(() => body.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+  await expect.poll(async () => {
+    const bodyRect = await body.boundingBox();
+    const lastRect = await page.getByTestId('forecast-period-column').last().boundingBox();
+    return !!bodyRect && !!lastRect && lastRect.x + lastRect.width <= bodyRect.x + bodyRect.width + 1;
+  }).toBe(true);
+});
+
 test('次へで画面を切り替えるとページ先頭へ戻る', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));

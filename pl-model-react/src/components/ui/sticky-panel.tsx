@@ -11,6 +11,7 @@ type StickyPanelProps = Omit<ComponentPropsWithRef<'aside'>, 'children'> & {
   headerClassName?: string;
   bodyClassName?: string;
   bodyStyle?: CSSProperties;
+  bodyRef?: ComponentPropsWithRef<'div'>['ref'];
   scrollMode?: 'auto' | 'always';
   layer?: StickyLayer;
 };
@@ -24,6 +25,7 @@ export function StickyPanel({
   headerClassName,
   bodyClassName,
   bodyStyle,
+  bodyRef,
   scrollMode = 'auto',
   layer = 'panel',
   className,
@@ -45,6 +47,7 @@ export function StickyPanel({
         {header}
       </div>
       <div
+        ref={bodyRef}
         data-testid={`${testIdPrefix}-body`}
         className={cn(
           'min-h-0 overflow-x-hidden',
