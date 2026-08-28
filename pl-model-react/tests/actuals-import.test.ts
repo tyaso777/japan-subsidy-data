@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { parseActualsImportFile } from '../src/domain/actuals-import';
 import { createModelStore } from '../src/store/model-store';

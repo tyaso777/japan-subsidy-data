@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { createDefaultProgram, setPeriodEndYear } from '../src/domain/timeline';
 import { evaluateManagementMetric, inferMetricPeriodKind, resolveMetricTarget, resolveMetricTimePoints, validateMetricDefinition } from '../src/domain/metrics';

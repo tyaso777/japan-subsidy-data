@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { forecastRangeCalibrationStatus } from '../src/domain/forecast-range-calibration';
 import { createModelStore } from '../src/store/model-store';

@@ -5,9 +5,7 @@ import { App } from '../src/app/App';
 
 describe('ロジックマップ画面', () => {
   it('内部の計算順を見せずに共通数値定義と参照関係を表示する', async () => {
-    const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '04 ロジックマップ' }));
+    render(<App initialPage="logic" />);
     expect(screen.getByText(/制度テンプレートで定義され、すべての個別案件に共通して使用/)).toBeVisible();
 
     const map = screen.getByTestId('definition-logic-map');
@@ -22,8 +20,7 @@ describe('ロジックマップ画面', () => {
 
   it('PL項目を並べ、参照項目・設定値・影響先を選択して確認できる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '04 ロジックマップ' }));
+    render(<App initialPage="logic" />);
 
     const plMap = screen.getByTestId('pl-logic-map');
     expect(within(plMap).getByRole('button', { name: /^1売上高$/ })).toBeVisible();

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { strFromU8, unzipSync } from 'fflate';
 import { describe, expect, it } from 'vitest';
 import { buildCaseResultReport, createCaseResultHtml, createCaseResultXlsx } from '../src/domain/case-results-export';

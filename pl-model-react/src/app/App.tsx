@@ -16,12 +16,12 @@ import { DefinitionPage as ProgramDefinitionPage } from '../features/definition/
 import type { InitialActualsMode } from '../store/model-store';
 import { stickyStackOffset, useObservedHeight } from '../lib/sticky-stack';
 
-type Page = 'definition' | 'actuals' | 'forecast' | 'logic';
+export type Page = 'definition' | 'actuals' | 'forecast' | 'logic';
 type PageLink = { id: Page; label: string; legacyLabel: string; icon: ComponentType<{ className?: string }> };
 type PageGroup = { label: string; items: PageLink[] };
 
-function AppContent() {
-  const [page, setPage] = useState<Page>('actuals');
+function AppContent({ initialPage = 'actuals', initialForecastView = 'chart', renderForecastWorkspace = true }: { initialPage?: Page; initialForecastView?: 'chart' | 'table'; renderForecastWorkspace?: boolean }) {
+  const [page, setPage] = useState<Page>(initialPage);
   const [selectedLogicCode, setSelectedLogicCode] = useState('16');
   const appToolbar = useObservedHeight<HTMLDivElement>(57);
   const program = useModelStore((state) => state.program);
@@ -71,11 +71,11 @@ function AppContent() {
       })}</nav></div>)}</div><Select value={moneyUnit} onValueChange={setMoneyUnit}><SelectTrigger aria-label="金額表示単位" size="sm" className="w-28 bg-surface"><SelectValue /></SelectTrigger><SelectContent>{moneyDisplayUnits.map((unit) => <SelectItem key={unit.id} value={unit.id}>{unit.label}</SelectItem>)}</SelectContent></Select><ModelFileMenu /><div className="flex gap-1"><Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" aria-label="元に戻す Ctrl+Z" disabled={!canUndo} onClick={undo}><Undo2 /></Button></TooltipTrigger><TooltipContent>元に戻す Ctrl+Z</TooltipContent></Tooltip><Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" aria-label="やり直す Ctrl+Y" disabled={!canRedo} onClick={redo}><Redo2 /></Button></TooltipTrigger><TooltipContent>やり直す Ctrl+Y</TooltipContent></Tooltip></div></StickySurface>
     {page === 'definition' && <ProgramDefinitionPage />}
     {page === 'actuals' && <ActualsPage onNext={() => navigateToPage('forecast')} />}
-    {page === 'forecast' && <ForecastPage onOpenLogicMap={openLogicMap} />}
+    {page === 'forecast' && <ForecastPage initialView={initialForecastView} renderWorkspace={renderForecastWorkspace} onOpenLogicMap={openLogicMap} />}
     {page === 'logic' && <LogicMapPage initialSelectedCode={selectedLogicCode} />}
   </div></TooltipProvider>;
 }
 
-export function App({ initialActuals = import.meta.env.MODE === 'test' ? 'sample' : 'empty' }: { initialActuals?: InitialActualsMode }) {
-  return <ModelStoreProvider initialActuals={initialActuals}><AppContent /></ModelStoreProvider>;
+export function App({ initialActuals = import.meta.env.MODE === 'test' ? 'sample' : 'empty', initialPage = 'actuals', initialForecastView = 'chart', renderForecastWorkspace = true }: { initialActuals?: InitialActualsMode; initialPage?: Page; initialForecastView?: 'chart' | 'table'; renderForecastWorkspace?: boolean }) {
+  return <ModelStoreProvider initialActuals={initialActuals}><AppContent initialPage={initialPage} initialForecastView={initialForecastView} renderForecastWorkspace={renderForecastWorkspace} /></ModelStoreProvider>;
 }

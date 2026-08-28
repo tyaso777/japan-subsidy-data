@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { calculatePlSeries } from '../src/domain/financials';
 import { applyProgramNumericDefinitions } from '../src/domain/program-pl-definitions';

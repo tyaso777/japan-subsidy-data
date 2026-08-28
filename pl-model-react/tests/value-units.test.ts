@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { financialInputFractionDigits, formatFinancialValue, fromDisplayMoney, moneyUnitLabel, roundFinancialInputValue, toDisplayMoney } from '../src/domain/value-units';
 

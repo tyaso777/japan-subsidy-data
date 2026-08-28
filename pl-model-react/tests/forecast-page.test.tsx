@@ -6,8 +6,7 @@ import { App } from '../src/app/App';
 describe('将来予測・PL画面', () => {
   it('事業化報告期間は基準年度から報告3年目までを表示する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
 
     const headers = screen.getAllByTestId('forecast-period-header');
     expect(headers).toHaveLength(2);
@@ -19,8 +18,7 @@ describe('将来予測・PL画面', () => {
 
   it('水準範囲の未適正化を警告し、03画面から適正化できる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
 
     expect(screen.getByRole('alert')).toHaveTextContent('水準範囲は未適正化です');
     const optimize = screen.getByRole('button', { name: '過去実績から水準範囲を適正化' });
@@ -33,7 +31,7 @@ describe('将来予測・PL画面', () => {
 
   it('補助事業に有効な過去実績がない場合は自動で新規事業として適正化し、初年度固定値を要求する', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    render(<App renderForecastWorkspace={false} />);
     await user.click(screen.getByRole('button', { name: '02 期間・過去実績' }));
     for (const year of [2023, 2024, 2025]) {
       const sales = screen.getByLabelText(`補助事業 P/L ${year}年 売上高`);
@@ -60,8 +58,7 @@ describe('将来予測・PL画面', () => {
 
   it('適正化後に過去P/Lを変更すると再適正化の警告を出す', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('button', { name: '過去実績から水準範囲を適正化' }));
     await user.click(screen.getByRole('button', { name: '02 期間・過去実績' }));
     const sales = screen.getByLabelText('ベース事業 P/L 2025年 売上高');
@@ -75,8 +72,7 @@ describe('将来予測・PL画面', () => {
 
   it('左右パネルを個別に隠して中央表示を拡張する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
 
     const layout = screen.getByTestId('forecast-layout');
     const operationBar = screen.getByTestId('forecast-operation-bar');
@@ -98,8 +94,7 @@ describe('将来予測・PL画面', () => {
 
   it('最終年度の事業別配分率だけを設定し、売上高は最適化対象に保つ', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" initialForecastView="table" />);
 
     const allocation = screen.getByTestId('final-year-sales-allocation');
     const operationBar = screen.getByTestId('forecast-operation-bar');
@@ -155,8 +150,7 @@ describe('将来予測・PL画面', () => {
   }, 20_000);
   it('全水準とチャート・PL表を同じ画面で切り替え、事業比較はチャート内に表示する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" />);
 
     expect(screen.getByRole('heading', { name: '将来予測・調整水準' })).toBeVisible();
     expect(screen.getByText('金額単位：百万円')).toBeVisible();
@@ -191,8 +185,7 @@ describe('将来予測・PL画面', () => {
 
   it('全社・ベース・補助・事業比較を個別に表示し、1区分だけなら一覧表示にする', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" />);
 
     const display = screen.getByTestId('forecast-chart-sections');
     expect(screen.getByTestId('forecast-settings-panel')).toHaveStyle({ top: 'var(--forecast-content-sticky-top)' });
@@ -251,8 +244,7 @@ describe('将来予測・PL画面', () => {
 
   it('横並びチャートがあふれる場合だけ画面下部へスクロールバーを常時表示し、チャート領域と同期する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" />);
 
     const scrollbar = screen.getByTestId('forecast-chart-horizontal-scrollbar');
     const content = screen.getByTestId('forecast-chart-scroll-content');
@@ -283,8 +275,7 @@ describe('将来予測・PL画面', () => {
 
   it('チャート本体の高さを維持しながら見出しと余白を圧縮し、軸文字を読みやすくする', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" />);
 
     const chart = screen.getByRole('img', { name: '売上高・利益額 推移チャート' });
     const card = chart.closest('article');
@@ -296,8 +287,7 @@ describe('将来予測・PL画面', () => {
 
   it('成長率を編集すると同じカードの予測値へ即時反映しUndoできる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" />);
     const rate = screen.getByLabelText('補助事業期間 売上高 年間変化');
     const chart = screen.getByRole('img', { name: '売上高・利益額 推移チャート' });
     const before = chart.querySelector('[data-line-phase="forecast"]')?.getAttribute('points');
@@ -314,8 +304,7 @@ describe('将来予測・PL画面', () => {
 
   it('水準設定を対応するPL科目が上から現れる順に表示する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
 
     const firstPeriod = screen.getAllByTestId('forecast-period-column')[0];
     const labels = within(firstPeriod).getAllByTestId('forecast-setting-row-header').map((header) => header.querySelector('strong')?.textContent);
@@ -340,8 +329,7 @@ describe('将来予測・PL画面', () => {
 
   it('水準設定の数値入力は空欄と負号を入力途中として保持できる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     const rate = screen.getByLabelText('補助事業期間 売上高 年間変化');
 
     await user.clear(rate);
@@ -354,8 +342,7 @@ describe('将来予測・PL画面', () => {
 
   it('年間変化を消した瞬間に0として再計算し、空欄表示はフォーカス中だけ維持する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
     const rate = screen.getByLabelText('補助事業期間 売上高 年間変化');
     const firstYearGrowth = screen.getByLabelText('ベース事業 P/L 2026年 売上高成長率');
@@ -372,8 +359,7 @@ describe('将来予測・PL画面', () => {
 
   it('開始時増減を消した瞬間に0として再計算し、空欄表示はフォーカス中だけ維持する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
     const adjustment = screen.getByLabelText('補助事業期間 売上高 開始時増減');
     const firstYearSales = screen.getByLabelText('ベース事業 P/L 2026年 売上高');
@@ -393,8 +379,7 @@ describe('将来予測・PL画面', () => {
 
   it('開始時固定値を消した瞬間に0として再計算し、空欄表示はフォーカス中だけ維持する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
     const fixed = screen.getByLabelText('補助事業期間 売上高 開始時固定値');
     const adjustment = screen.getByLabelText('補助事業期間 売上高 開始時増減');
@@ -419,8 +404,7 @@ describe('将来予測・PL画面', () => {
 
   it('水準設定の最小値・最大値を消した瞬間に0として設定する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     const min = screen.getByLabelText('補助事業期間 売上高 最小値');
     const max = screen.getByLabelText('補助事業期間 売上高 最大値');
     const slider = screen.getByRole('slider', { name: '補助事業期間 売上高 水準' });
@@ -440,8 +424,7 @@ describe('将来予測・PL画面', () => {
 
   it('水準設定の率と範囲は内部精度を保ったまま小数点以下2桁で表示する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
 
     const rate = screen.getByLabelText('補助事業期間 売上高 年間変化');
     const min = screen.getByLabelText('補助事業期間 売上高 最小値');
@@ -465,8 +448,7 @@ describe('将来予測・PL画面', () => {
 
   it('Ctrl+1・2でベース・補助事業を切り替え、全社合算は編集対象にしない', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     const scopeShortcuts = screen.getByTestId('forecast-scope-shortcuts');
     expect(within(scopeShortcuts).queryByRole('button', { name: '全社合算' })).not.toBeInTheDocument();
     expect(scopeShortcuts).toHaveTextContent('Ctrl+1 / 2');
@@ -480,8 +462,7 @@ describe('将来予測・PL画面', () => {
 
   it('全社合算P/LはPL表の表示対象としてだけ選択できる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
 
     const tableScope = screen.getByLabelText('P/L表示対象');
@@ -497,8 +478,7 @@ describe('将来予測・PL画面', () => {
 
   it('Ctrl+4・5でチャート・PL表を切り替え、Ctrl+6は割り当てない', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" />);
 
     const chartTab = screen.getByRole('tab', { name: 'チャート' });
     const tableTab = screen.getByRole('tab', { name: 'PL表' });
@@ -521,8 +501,7 @@ describe('将来予測・PL画面', () => {
 
   it('チャート上の操作で期間を分割・解除し、左の設定列と境界線を同期する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" />);
 
     expect(screen.getAllByTestId('forecast-period-column')).toHaveLength(2);
     await user.click(screen.getByRole('button', { name: '2027年から期間を分割' }));
@@ -535,8 +514,7 @@ describe('将来予測・PL画面', () => {
 
   it('全体像を保ったまま経営指標をバレット表示し、一括編集へ切り替える', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     expect(screen.getByRole('heading', { name: '経営指標・目標' })).toBeVisible();
     expect(screen.getByTestId('metric-bullet-company-sales-growth')).toHaveTextContent('全社売上高成長率');
     const salesMetric = screen.getByTestId('metric-bullet-company-sales-growth');
@@ -574,8 +552,7 @@ describe('将来予測・PL画面', () => {
 
   it('PL表で選択した科目をコンパクトな導線から04ロジックマップで確認する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
     await user.click(within(screen.getByTestId('forecast-pl-table')).getByRole('button', { name: /うち減価償却費（原価）/ }));
     expect(screen.queryByTestId('forecast-logic-detail')).not.toBeInTheDocument();
@@ -588,8 +565,7 @@ describe('将来予測・PL画面', () => {
 
   it('最適化案の作成だけでは水準を変えず、適用率で段階反映する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     const rates = screen.getAllByLabelText(/年間変化$/) as HTMLInputElement[];
     const before = rates.map((rate) => rate.value);
     await user.click(screen.getByRole('button', { name: '目標を満たす水準案を作成' }));
@@ -610,8 +586,7 @@ describe('将来予測・PL画面', () => {
 
   it('水準案の作成後に水準設定を直接変更すると作成済み案と適用率を破棄する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('button', { name: '目標を満たす水準案を作成' }));
 
     expect(await screen.findByTestId('optimization-proposal', {}, { timeout: 30_000 })).toBeVisible();
@@ -627,8 +602,7 @@ describe('将来予測・PL画面', () => {
 
   it('最適化方法を最小変更・バランス・最少項目・優先順位から選択し、提案へ使用方式を表示する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
 
     const method = screen.getByRole('combobox', { name: '最適化方法' });
     expect(method).toHaveValue('minimum-change');
@@ -643,14 +617,13 @@ describe('将来予測・PL画面', () => {
   }, 15_000);
 
   it('水準案の計算中を表示し、適用率を変更一覧より先に操作できる', async () => {
-    render(<App />);
-    fireEvent.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     const createButton = screen.getByRole('button', { name: '目標を満たす水準案を作成' });
 
     fireEvent.click(createButton);
     expect(createButton).toBeDisabled();
     expect(createButton).toHaveAttribute('aria-busy', 'true');
-    expect(screen.getByRole('status')).toHaveTextContent('水準案を計算中');
+    expect(screen.getByText('水準案を計算中…')).toHaveAttribute('role', 'status');
     expect(screen.getByTestId('optimization-spinner')).toHaveClass('animate-spin', 'will-change-transform');
 
     const proposal = await screen.findByTestId('optimization-proposal', {}, { timeout: 15_000 });
@@ -661,8 +634,7 @@ describe('将来予測・PL画面', () => {
 
   it('水準外最適化は一度の実行で必要なMin・Maxを更新し、適用率で最適値へ動かせる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('button', { name: 'すべて編集' }));
     const target = screen.getByRole('spinbutton', { name: '全社売上高成長率 個社目標' });
     await user.clear(target);
@@ -705,8 +677,7 @@ describe('将来予測・PL画面', () => {
 
   it('最適化方向の適用率は、スクロール領域内でも掴める明示的なつまみを持つ', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('button', { name: '目標を満たす水準案を作成' }));
 
     await screen.findByTestId('optimization-proposal', {}, { timeout: 30_000 });
@@ -718,8 +689,7 @@ describe('将来予測・PL画面', () => {
 
   it('探索範囲を水準内最適化と水準外最適化から選択できる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
 
     const rangeMode = screen.getByRole('combobox', { name: '探索範囲' });
     expect(rangeMode).toHaveValue('within-levels');
@@ -731,8 +701,7 @@ describe('将来予測・PL画面', () => {
 
   it('水準と最小・最大を同じ行で変更し、同値も許容する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     const min = screen.getByLabelText('補助事業期間 売上高 最小値');
     const max = screen.getByLabelText('補助事業期間 売上高 最大値');
     await user.click(min); await user.keyboard('{Control>}a{/Control}10'); await user.tab();
@@ -743,8 +712,7 @@ describe('将来予測・PL画面', () => {
 
   it('実効税率もMin=Max=0の間だけロックし、範囲を広げると変動できる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     const min = screen.getByLabelText('補助事業期間 実効税率 最小値');
     const max = screen.getByLabelText('補助事業期間 実効税率 最大値');
     const slider = screen.getByLabelText('補助事業期間 実効税率 水準');
@@ -765,8 +733,7 @@ describe('将来予測・PL画面', () => {
 
   it('原価率は初期状態でMin=Max=0となり、範囲を広げるまで水準をロックする', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     expect(screen.getByLabelText('補助事業期間 原価率 最小値')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 原価率 最大値')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 原価率 水準')).toBeDisabled();
@@ -774,8 +741,7 @@ describe('将来予測・PL画面', () => {
 
   it('固定項目をまとめて隠し、変動可能な水準だけに絞り込める', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
 
     expect(screen.getByLabelText('補助事業期間 原価率 年間変化')).toBeVisible();
     expect(screen.getByLabelText('補助事業期間 売上高 年間変化')).toBeVisible();
@@ -789,8 +755,7 @@ describe('将来予測・PL画面', () => {
 
   it('補足比率も初期状態はMin=Max=0で固定し、範囲を入力するとスライダーを使える', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     const min = screen.getByLabelText('補助事業期間 特別損益の売上高比率 最小値');
     const max = screen.getByLabelText('補助事業期間 特別損益の売上高比率 最大値');
     const slider = screen.getByLabelText('補助事業期間 特別損益の売上高比率 水準');
@@ -808,8 +773,7 @@ describe('将来予測・PL画面', () => {
 
   it('固定額・単年・加速度の詳細編集UIを水準設定に表示しない', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     expect(screen.queryByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' })).not.toBeInTheDocument();
     expect(screen.queryByLabelText('補助事業期間 売上高 毎年固定増減')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('補助事業期間 売上高 成長加速度')).not.toBeInTheDocument();
@@ -818,8 +782,7 @@ describe('将来予測・PL画面', () => {
 
   it('将来PLの入力行・計算行を直接編集すると対応水準へ即時逆算する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" initialForecastView="table" />);
     const rate = screen.getByLabelText('補助事業期間 売上高 年間変化');
     const before = Number((rate as HTMLInputElement).value);
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
@@ -835,8 +798,7 @@ describe('将来予測・PL画面', () => {
 
   it('将来PLもExcelの複数セルを一括貼り付けできる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
     const sales2026 = screen.getByLabelText('ベース事業 P/L 2026年 売上高');
 
@@ -854,8 +816,7 @@ describe('将来予測・PL画面', () => {
 
   it('将来PLの科目列から数値列までドラッグしてExcel向けTSVへコピーできる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
 
     const table = screen.getByTestId('forecast-pl-table');
@@ -876,8 +837,7 @@ describe('将来予測・PL画面', () => {
 
   it('科目列を抑えて決算数値列へ表示幅を配分する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
 
     const table = screen.getByTestId('forecast-pl-table');
@@ -887,8 +847,7 @@ describe('将来予測・PL画面', () => {
 
   it('将来PLは内部計算値を表示時だけ単位別の桁数へ丸める', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
 
     expect(screen.getByLabelText('ベース事業 P/L 2028年 売上高')).toHaveValue(1259.7);
@@ -896,8 +855,7 @@ describe('将来予測・PL画面', () => {
 
   it('人数行の後に従業員・役員の1人当たり給与と成長率を表示する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
 
     const table = screen.getByTestId('forecast-pl-table');
@@ -914,8 +872,7 @@ describe('将来予測・PL画面', () => {
 
   it('将来PLでS番号の補足指標を独立して表示・非表示にできる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" initialForecastView="table" />);
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
     const table = screen.getByTestId('forecast-pl-table');
 
@@ -929,8 +886,7 @@ describe('将来予測・PL画面', () => {
 
   it('将来チャートは閲覧専用で、点をドラッグまたはキー操作できない', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" />);
     const chart = screen.getByRole('img', { name: '売上高・利益額 推移チャート' });
     expect(chart.closest('[data-testid="forecast-chart-card"]')).toHaveClass('bg-white');
     expect(within(chart).queryByRole('slider')).not.toBeInTheDocument();
@@ -955,8 +911,7 @@ describe('将来予測・PL画面', () => {
 
   it('縦軸を4区間で表示し、年度ホバーで全系列の値を確認・クリック固定できる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
+    render(<App initialPage="forecast" />);
 
     const chart = screen.getByRole('img', { name: '売上高・利益額 推移チャート' });
     expect(chart.querySelectorAll('[data-axis-tick="y"]')).toHaveLength(5);

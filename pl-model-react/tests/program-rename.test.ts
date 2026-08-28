@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { renameNumericDefinition } from '../src/domain/program-editor';
 import { createDefaultProgram } from '../src/domain/timeline';

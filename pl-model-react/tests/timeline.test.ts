@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { buildTimelineYearLabels, createDefaultProgram, normalizeProgram, resolveTimeline, setPeriodEndYear } from '../src/domain/timeline';
 

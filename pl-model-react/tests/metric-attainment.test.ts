@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { metricAttainmentColor, metricAttainmentScore } from '../src/domain/metric-attainment';
 

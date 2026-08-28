@@ -198,10 +198,10 @@ function buildTimeline(actuals: HistoricalPlInput[], model: ReturnType<typeof us
 }
 function useForecastModel() { return useModelStore((state) => state.forecast); }
 
-export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: string) => void }) {
+export function ForecastPage({ onOpenLogicMap, initialView = 'chart', renderWorkspace = true }: { onOpenLogicMap?: (code: string) => void; initialView?: ForecastView; renderWorkspace?: boolean }) {
   const [scope, setScope] = useState<EditableScope>('base');
   const [tableScope, setTableScope] = useState<Scope>('base');
-  const [view, setView] = useState<ForecastView>('chart');
+  const [view, setView] = useState<ForecastView>(initialView);
   const [settingsVisible, setSettingsVisible] = useState(true);
   const [metricsVisible, setMetricsVisible] = useState(true);
   const [showFixedSettings, setShowFixedSettings] = useState(true);
@@ -413,7 +413,7 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
       >
         <div data-testid="forecast-period-grid" className="grid min-w-0 gap-2" style={{ gridTemplateColumns: `repeat(${segments.length}, minmax(${settingsPeriodMinWidth(segments.length, variationOpen)}, 1fr))` }}>{segments.map((period, segmentIndex) => { const definitionLabel = program.definitions.periods.find((definition) => definition.id === period.definitionId)?.label ?? period.definitionId; const siblings = segments.filter((candidate) => candidate.definitionId === period.definitionId); const label = siblings.length > 1 ? `${definitionLabel}${siblings.indexOf(period) + 1}` : definitionLabel; return <section data-testid="forecast-period-column" key={period.id} className="min-w-0 bg-background"><StickySurface data-testid="forecast-period-header" stickyTop="0px" layer="panel" className="flex min-h-10 items-center justify-between gap-2 border-t-[3px] border-navy px-1.5 py-1 shadow-sm"><span className="flex min-w-0 items-center gap-2"><strong className="min-w-0 text-sm leading-tight">{label}</strong><span data-testid="forecast-period-years" className="shrink-0 whitespace-nowrap text-[10px] tabular-nums text-muted-foreground">{period.startYear}–{period.endYear}</span></span>{segmentIndex > 0 && segments[segmentIndex - 1].definitionId === period.definitionId && <Button variant="ghost" size="sm" className="h-6 shrink-0 px-1.5 text-[9px]" aria-label={`${period.startYear}年の期間分割を解除`} onClick={() => mergeForecastPeriod(period.id)}>解除</Button>}</StickySurface>{visibleSettings.map((series) => <SettingRow key={series.id} series={series} periodId={period.id} periodLabel={label} unit={unit} variationOpen={variationOpen} onForecastInputChange={optimization.invalidateProposal} readOnly={false} />)}</section>; })}</div>
       </StickyPanel></>}
-      <section className="min-w-0 border border-line bg-surface p-3">
+      {renderWorkspace ? <section className="min-w-0 border border-line bg-surface p-3">
           <TabsContent value="chart" className="mt-0">
             <StickySurface ref={chartDisplayLayer.ref} data-testid="forecast-chart-display-controls" stickyTop="var(--forecast-content-sticky-top)" layer="content" className="-mx-3 flex items-center justify-between gap-2 border-b border-line px-3 py-2 shadow-sm">
               <strong className="text-xs">表示区分</strong>
@@ -449,7 +449,7 @@ export function ForecastPage({ onOpenLogicMap }: { onOpenLogicMap?: (code: strin
             </div>
           </TabsContent>
           <TabsContent value="table" className="mt-0"><FinancialTable testId="forecast-pl-table" title={`${scopeLabels[tableScope]} P/L`} years={selected.years} yearLabels={yearLabels} records={selected.records} rows={forecastPlRows} moneyUnit={unit} editableFromIndex={baseActuals.length} stickyHeaderTop="var(--forecast-content-sticky-top)" stickyHeaderLayer="content" headerActions={<div aria-label="P/L表示対象" className="flex shrink-0 rounded-md bg-muted p-0.5">{(['company', 'base', 'subsidy'] as Scope[]).map((item) => <Button key={item} variant="ghost" size="xs" className={cn('h-6 shrink-0 px-1.5 text-[9px]', tableScope === item && 'bg-navy text-white hover:bg-navy/90 hover:text-white')} aria-pressed={tableScope === item} onClick={() => { setTableScope(item); if (item !== 'company') setScope(item); }}>{scopeLabels[item]}</Button>)}</div>} onRowSelect={(row) => setSelectedLogicCode(row.code)} onEditStart={beginTransaction} onEditEnd={commitTransaction} onValueChange={tableScope === 'company' ? undefined : (yearIndex, row, value) => applyForecastPlValues([{ yearIndex, row, value }])} onValuesChange={tableScope === 'company' ? undefined : applyForecastPlValues} /><div data-testid="forecast-logic-link" className="mt-2 flex min-w-0 items-center justify-between gap-2 rounded border border-line bg-soft px-3 py-2"><span className="min-w-0 truncate text-[10px] text-muted-foreground"><strong className="text-navy">{selectedLogic.displayCode} {selectedLogic.label}</strong> の計算式・参照元・影響先</span><Button variant="outline" size="sm" className="h-7 shrink-0 gap-1.5 text-[10px]" aria-label={`${selectedLogic.label}を04ロジックマップで確認`} onClick={() => onOpenLogicMap?.(selectedLogic.code)}><Workflow className="size-3.5" />計算ロジックで確認</Button></div></TabsContent>
-      </section>
+      </section> : <section data-testid="forecast-workspace-omitted" className="min-w-0" />}
       {metricsVisible && <MetricsPanel company={company} base={base} subsidy={subsidy} optimization={optimization} />}
     </div>
     </Tabs>

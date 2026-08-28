@@ -20,9 +20,7 @@ describe('AIで制度テンプレートを作成する', () => {
     const createObjectURL = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:program-template');
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
     vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined);
-    render(<App />);
-
-    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+    render(<App initialPage="definition" />);
     expect(screen.getByText((_text, element) => element?.tagName === 'P' && element.textContent?.includes('subsidy-program.js') === true)).toHaveTextContent('HTMLと同じ階層');
     await user.click(screen.getByRole('button', { name: 'AIで制度テンプレートを作る' }));
     await user.click(screen.getByRole('button', { name: 'AI作成用プロンプトをコピー' }));
@@ -55,8 +53,7 @@ describe('AIで制度テンプレートを作成する', () => {
 
   it('不正な生成JSONは反映しない', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+    render(<App initialPage="definition" />);
     await user.click(screen.getByRole('button', { name: 'AIで制度テンプレートを作る' }));
     const invalid = new File(['{}'], 'invalid.json', { type: 'application/json' });
     Object.defineProperty(invalid, 'text', { value: async () => '{}' });

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { evaluateFormula, FormulaError } from '../src/domain/formula-engine';
 

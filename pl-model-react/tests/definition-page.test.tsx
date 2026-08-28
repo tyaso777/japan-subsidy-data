@@ -6,8 +6,7 @@ import { App } from '../src/app/App';
 describe('制度定義画面', () => {
   it('共通数値定義を経営指標より前に表示し、区間と特別年を同じ追加UIで編集する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+    render(<App initialPage="definition" />);
     const numeric = screen.getByRole('heading', { name: '共通数値定義' });
     const metrics = screen.getByRole('heading', { name: '経営指標・目標' });
     expect(numeric.compareDocumentPosition(metrics) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
@@ -20,9 +19,7 @@ describe('制度定義画面', () => {
   });
 
   it('基準年度の境界は事業化報告期間の開始年に固定する', async () => {
-    const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+    render(<App initialPage="definition" />);
 
     expect(screen.getByLabelText('特別年2 呼称')).toHaveValue('基準年度');
     expect(screen.getByLabelText('特別年2 調整年数')).toBeDisabled();
@@ -35,8 +32,7 @@ describe('制度定義画面', () => {
 
   it('共通数値定義ごとにPL表示・挿入位置・同位置順・単位を設定できる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+    render(<App initialPage="definition" />);
 
     expect(screen.getByLabelText('付加価値額をPL表に表示')).toBeChecked();
     expect(screen.getByLabelText('付加価値額 挿入位置')).toHaveValue('23');
@@ -52,8 +48,7 @@ describe('制度定義画面', () => {
 
   it('共通数値定義の式変更を03のPL表へそのまま反映する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+    render(<App initialPage="definition" />);
     fireEvent.change(screen.getByLabelText('付加価値額 計算式'), { target: { value: '[営業利益][t]' } });
     await user.click(screen.getByRole('button', { name: '03 将来予測・PL' }));
     await user.click(screen.getByRole('tab', { name: 'PL表' }));
@@ -64,9 +59,7 @@ describe('制度定義画面', () => {
   });
 
   it('各定義ブロックのタイトルと追加操作を表示中は上部へ固定する', async () => {
-    const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+    render(<App initialPage="definition" />);
 
     const sections = [
       ['periods', '区間名の定義', '区間を追加'],
@@ -86,9 +79,7 @@ describe('制度定義画面', () => {
   });
 
   it('各定義ブロックを共通カードとして表示し、見出しと本文に十分な内側余白を持たせる', async () => {
-    const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+    render(<App initialPage="definition" />);
 
     for (const id of ['periods', 'special-years', 'numeric-definitions', 'management-metrics']) {
       const card = screen.getByTestId(`definition-section-${id}`);
@@ -107,8 +98,7 @@ describe('制度定義画面', () => {
 
   it('削除不可の過去実績も制度上の区間名として編集できる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+    render(<App initialPage="definition" />);
     const historicalName = screen.getByLabelText('過去実績区間 名称');
     await user.clear(historicalName);
     await user.type(historicalName, '直近実績期間');
@@ -118,8 +108,7 @@ describe('制度定義画面', () => {
 
   it('指標の時点追加・削除から期間種別を自動表示する', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+    render(<App initialPage="definition" />);
     const card = screen.getByTestId('metric-company-value-added-growth');
     expect(card).toHaveTextContent('2時点指標');
     await user.click(screen.getByRole('button', { name: '全社付加価値増加率の時点を追加' }));
@@ -130,9 +119,7 @@ describe('制度定義画面', () => {
   });
 
   it('制度JSONの直接編集を見せず制度定義ファイルへ一本化する', async () => {
-    const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+    render(<App initialPage="definition" />);
     expect(screen.queryByRole('button', { name: '制度JSONを編集' })).not.toBeInTheDocument();
     expect(screen.queryByLabelText('制度JSONソース')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: '制度定義ファイル' })).toBeVisible();
@@ -141,8 +128,7 @@ describe('制度定義画面', () => {
 
   it('制度で不要になった経営指標を削除できる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+    render(<App initialPage="definition" />);
     expect(screen.getByTestId('metric-latest-roa')).toBeVisible();
     await user.click(screen.getByRole('button', { name: '最新決算期のROAを削除' }));
     expect(screen.queryByTestId('metric-latest-roa')).not.toBeInTheDocument();
@@ -150,8 +136,7 @@ describe('制度定義画面', () => {
 
   it('共通数値の名称を確定時に変更し、利用中の式を壊さず追従させる', async () => {
     const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: '01 制度定義' }));
+    render(<App initialPage="definition" />);
     const name = screen.getByLabelText('数値定義2 名称');
     await user.clear(name);
     await user.type(name, '粗付加価値');

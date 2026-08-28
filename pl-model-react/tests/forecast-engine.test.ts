@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { applyFinalYearSalesAllocation, buildForecastPl, clearFinalYearSalesAllocation, fitForecastPlCell, fitForecastSeriesPoint, mergeForecastSegment, projectForecastSeries, projectSeries, splitForecastSegment, synchronizeForecastTimeline, type ForecastModel, type ForecastSeries } from '../src/domain/forecast-engine';
 import { calculatePl } from '../src/domain/financials';

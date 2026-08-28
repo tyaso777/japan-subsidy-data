@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { applyOptimizationExpansionPlan, applyOptimizationStrength, buildOptimizationTimelines, createConstrainedOptimizationProposal, createMetricOptimizationExpansionPlan, createMetricOptimizationProposal, createOptimizationExpansionPlan, createOptimizationProposal, inferOptimizationStrength } from '../src/domain/optimization';
 import { projectForecastSeries, type ForecastModel } from '../src/domain/forecast-engine';

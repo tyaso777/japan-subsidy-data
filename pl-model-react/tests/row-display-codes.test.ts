@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { balanceSheetRows, forecastPlRows, historicalPlRows } from '../src/domain/rows';
 

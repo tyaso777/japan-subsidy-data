@@ -9,10 +9,14 @@ class ResizeObserverMock {
 }
 
 globalThis.ResizeObserver = ResizeObserverMock;
-Element.prototype.hasPointerCapture = () => false;
-Element.prototype.setPointerCapture = () => {};
-Element.prototype.releasePointerCapture = () => {};
-Element.prototype.scrollIntoView = () => {};
-window.scrollTo = () => {};
+if (typeof Element !== 'undefined') {
+  Element.prototype.hasPointerCapture = () => false;
+  Element.prototype.setPointerCapture = () => {};
+  Element.prototype.releasePointerCapture = () => {};
+  Element.prototype.scrollIntoView = () => {};
+}
+if (typeof window !== 'undefined') window.scrollTo = () => {};
 
-afterEach(cleanup);
+afterEach(() => {
+  if (typeof document !== 'undefined') cleanup();
+});

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { hasUsableSubsidyHistory, optimizeForecastRangesFromActuals } from '../src/domain/historical-range-optimization';
 import { createModelStore } from '../src/store/model-store';

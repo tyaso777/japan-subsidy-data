@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { createModelStore } from '../src/store/model-store';
 import { parseModelFile, serializeModelFile } from '../src/domain/model-file';

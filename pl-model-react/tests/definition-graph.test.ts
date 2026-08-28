@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { DefinitionGraphError, evaluateNumericDefinitions, sortNumericDefinitions } from '../src/domain/definition-graph';
 

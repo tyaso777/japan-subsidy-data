@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { calculateHistoricalPl, calculatePlSeries, combinePlInputs } from '../src/domain/financials';
 import { baseHistoricalPl, subsidyHistoricalPl } from '../src/domain/sample-data';
