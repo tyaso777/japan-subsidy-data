@@ -21,7 +21,7 @@ export function resolveMetricTarget(metric: ManagementMetricDefinition, companyT
 }
 import type { BalanceSheetRecord, HistoricalPlCalculated } from './types';
 import { evaluateNumericDefinitions } from './definition-graph';
-import { evaluateFormula } from './formula-engine';
+import { compileFormula, type CompiledFormula } from './formula-engine';
 
 export class MetricDefinitionError extends Error {
   constructor(message: string) {
@@ -82,6 +82,60 @@ export type MetricEvaluation = {
   message?: string;
 };
 
+export type ManagementMetricPlan = {
+  metricId: string;
+  years: Record<string, number>;
+  formula?: CompiledFormula;
+  referencedActuals: ReadonlyArray<{ id: string; label: string }>;
+  requiresActualInput: boolean;
+  calculationUnavailable: boolean;
+  setupError?: string;
+};
+
+function createManagementMetricPlan(program: ProgramConfiguration, metric: ManagementMetricDefinition): ManagementMetricPlan {
+  let years: Record<string, number> = {};
+  try {
+    years = resolveMetricTimePoints(metric, program);
+    if (metric.calculationUnavailable || metric.requiresActualInput) {
+      return {
+        metricId: metric.id,
+        years,
+        referencedActuals: [],
+        requiresActualInput: Boolean(metric.requiresActualInput),
+        calculationUnavailable: Boolean(metric.calculationUnavailable),
+      };
+    }
+    validateMetricDefinition(metric);
+    const referencedActuals = program.definitions.managementMetrics
+      .filter((candidate) => candidate.requiresActualInput && metric.formula.includes(`[${candidate.label}]`))
+      .map(({ id, label }) => ({ id, label }));
+    return {
+      metricId: metric.id,
+      years,
+      formula: compileFormula(metric.formula),
+      referencedActuals,
+      requiresActualInput: false,
+      calculationUnavailable: false,
+    };
+  } catch (cause) {
+    return {
+      metricId: metric.id,
+      years,
+      referencedActuals: [],
+      requiresActualInput: Boolean(metric.requiresActualInput),
+      calculationUnavailable: Boolean(metric.calculationUnavailable),
+      setupError: cause instanceof Error ? cause.message : '指標の評価計画を作成できませんでした',
+    };
+  }
+}
+
+export function createManagementMetricPlans(
+  program: ProgramConfiguration,
+  metrics: ReadonlyArray<ManagementMetricDefinition>,
+): ReadonlyMap<string, ManagementMetricPlan> {
+  return new Map(metrics.map((metric) => [metric.id, createManagementMetricPlan(program, metric)]));
+}
+
 const recordFields: Record<string, keyof HistoricalPlCalculated> = {
   売上高: 'sales', 売上原価: 'cogs', 原価内減価償却費: 'cogsDepreciation', 売上総利益: 'grossProfit',
   販売費及び一般管理費: 'sga', 営業利益: 'operatingProfit', 従業員給与総額: 'employeePay', 従業員人件費: 'employeePay',
@@ -111,8 +165,20 @@ function pointValues(year: number, source: MetricDataSource): Record<string, Rec
   return result;
 }
 
-export function createManagementMetricEvaluator(program: ProgramConfiguration, source: MetricDataSource) {
+export function createManagementMetricEvaluator(
+  program: ProgramConfiguration,
+  source: MetricDataSource,
+  plans?: ReadonlyMap<string, ManagementMetricPlan>,
+) {
   const pointCache = new Map<number, { raw: Record<string, Record<string, number>>; common: Record<string, number> }>();
+  const planCache = new Map(plans ?? []);
+  const preparePlan = (metric: ManagementMetricDefinition) => {
+    const cached = planCache.get(metric.id);
+    if (cached) return cached;
+    const prepared = createManagementMetricPlan(program, metric);
+    planCache.set(metric.id, prepared);
+    return prepared;
+  };
   const preparePoint = (year: number) => {
     const cached = pointCache.get(year);
     if (cached) return cached;
@@ -127,16 +193,16 @@ export function createManagementMetricEvaluator(program: ProgramConfiguration, s
 
   return {
     evaluate(metric: ManagementMetricDefinition): MetricEvaluation {
-      const years = resolveMetricTimePoints(metric, program);
-      if (metric.calculationUnavailable) return { years, status: 'unavailable', message: 'PL・B/Sから計算できない指標です' };
-      if (metric.requiresActualInput) {
-        const actual = source.actualInputs?.[metric.id];
+      const plan = preparePlan(metric);
+      const { years } = plan;
+      if (plan.setupError) return { years, status: 'error', message: plan.setupError };
+      if (plan.calculationUnavailable) return { years, status: 'unavailable', message: 'PL・B/Sから計算できない指標です' };
+      if (plan.requiresActualInput) {
+        const actual = source.actualInputs?.[plan.metricId];
         return Number.isFinite(actual) ? { value: actual, years, status: 'ok' } : { years, status: 'missing-actual' };
       }
       try {
-        validateMetricDefinition(metric);
-        const referencedActuals = program.definitions.managementMetrics.filter((candidate) => candidate.requiresActualInput && metric.formula.includes(`[${candidate.label}]`));
-        const missingActual = referencedActuals.find((candidate) => !Number.isFinite(source.actualInputs?.[candidate.id]));
+        const missingActual = plan.referencedActuals.find((candidate) => !Number.isFinite(source.actualInputs?.[candidate.id]));
         if (missingActual) return { years, status: 'missing-actual', message: `${missingActual.label}が未入力です` };
         const values: Record<string, Record<string, number>> = {};
         for (const [point, year] of Object.entries(years)) {
@@ -144,9 +210,9 @@ export function createManagementMetricEvaluator(program: ProgramConfiguration, s
           const { raw, common } = preparePoint(year);
           for (const [label, pointMap] of Object.entries(raw)) values[label] = { ...(values[label] ?? {}), [point]: pointMap.t };
           for (const [label, value] of Object.entries(common)) values[label] = { ...(values[label] ?? {}), [point]: value };
-          for (const actual of referencedActuals) values[actual.label] = { ...(values[actual.label] ?? {}), [point]: source.actualInputs![actual.id] };
+          for (const actual of plan.referencedActuals) values[actual.label] = { ...(values[actual.label] ?? {}), [point]: source.actualInputs![actual.id] };
         }
-        return { value: evaluateFormula(metric.formula, { values, years }), years, status: 'ok' };
+        return { value: plan.formula!({ values, years }), years, status: 'ok' };
       } catch (cause) {
         return { years, status: 'error', message: cause instanceof Error ? cause.message : '指標を計算できませんでした' };
       }

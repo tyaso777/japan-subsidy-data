@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { createDefaultProgram, setPeriodEndYear } from '../src/domain/timeline';
-import { createManagementMetricEvaluator, evaluateManagementMetric, inferMetricPeriodKind, resolveMetricTarget, resolveMetricTimePoints, validateMetricDefinition } from '../src/domain/metrics';
+import { createManagementMetricEvaluator, createManagementMetricPlans, evaluateManagementMetric, inferMetricPeriodKind, resolveMetricTarget, resolveMetricTimePoints, validateMetricDefinition } from '../src/domain/metrics';
 import { calculatePlSeries } from '../src/domain/financials';
 import { balanceSheets, baseHistoricalPl } from '../src/domain/sample-data';
 import type { ManagementMetricDefinition } from '../src/domain/types';
@@ -79,6 +79,26 @@ describe('制度共通の経営指標定義', () => {
     expect(evaluator.evaluate({ ...metric(points), formula: '[付加価値額][B] / [付加価値額][A]' }).status).toBe('ok');
     expect(evaluator.evaluate({ ...metric(points), id: 'productivity', formula: '[労働生産性][B] / [労働生産性][A]' }).status).toBe('ok');
     expect(evaluator.stats()).toEqual({ preparedYears: 2 });
+  });
+
+  it('最適化候補をまたいで対象年度・検証済み数式・必要実績の評価計画を再利用する', () => {
+    const program = createDefaultProgram();
+    const records = new Map(calculatePlSeries(baseHistoricalPl).map((record, index) => [2023 + index, record]));
+    const definition = {
+      ...metric([
+        { id: 'A', anchor: { type: 'historicalEnd' as const }, offset: -1 },
+        { id: 'B', anchor: { type: 'historicalEnd' as const }, offset: 0 },
+      ]),
+      formula: '[付加価値額][B] / [付加価値額][A]',
+    };
+    const plans = createManagementMetricPlans(program, [definition]);
+    const first = createManagementMetricEvaluator(program, { records }, plans).evaluate(definition);
+
+    definition.formula = '[未定義][Z]';
+    const second = createManagementMetricEvaluator(program, { records }, plans).evaluate(definition);
+
+    expect(first.status).toBe('ok');
+    expect(second).toEqual(first);
   });
 
   it('実績入力を要求する固定参照指標は未入力を区別する', () => {

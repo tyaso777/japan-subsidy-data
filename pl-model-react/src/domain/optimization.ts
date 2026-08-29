@@ -1,7 +1,7 @@
 import type { ForecastModel, ForecastPeriod } from './forecast-engine';
 import { buildForecastPl, projectForecastSeries } from './forecast-engine';
 import { calculatePlSeries, combinePlInputs } from './financials';
-import { createManagementMetricEvaluator, resolveMetricTarget } from './metrics';
+import { createManagementMetricEvaluator, createManagementMetricPlans, resolveMetricTarget } from './metrics';
 import type { HistoricalPlCalculated, HistoricalPlInput, ProgramConfiguration } from './types';
 import { clampToForecastRange, defaultForecastRange, isForecastRangeLocked, normalizeForecastRanges } from './forecast-range';
 import { orderForecastSeriesByPl } from './forecast-series-order';
@@ -799,6 +799,9 @@ export function createOptimizationTimelineEvaluator(baseActuals: HistoricalPlInp
 
 function metricConstraintEvaluator(program: ProgramConfiguration, baseActuals: HistoricalPlInput[], subsidyActuals: HistoricalPlInput[], actualInputs: Record<string, number>, metricTargets: Record<string, number>) {
   const timelineEvaluator = createOptimizationTimelineEvaluator(baseActuals, subsidyActuals);
+  const adjustableMetrics = program.definitions.managementMetrics.filter((metric) => metric.enabled && metric.optimization === 'adjustable');
+  const metricPlans = createManagementMetricPlans(program, adjustableMetrics);
+  const targets = new Map(adjustableMetrics.map((metric) => [metric.id, resolveMetricTarget(metric, metricTargets[metric.id]).effectiveTarget]));
   return (candidate: ForecastModel): OptimizationConstraintMeasurement[] => {
     const timelines = timelineEvaluator.evaluate(candidate);
     const recordMaps = {
@@ -807,13 +810,13 @@ function metricConstraintEvaluator(program: ProgramConfiguration, baseActuals: H
       subsidy: new Map(timelines.subsidy.years.map((year, index) => [year, timelines.subsidy.records[index]])),
     };
     const metricEvaluators = {
-      company: createManagementMetricEvaluator(program, { records: recordMaps.company, actualInputs }),
-      base: createManagementMetricEvaluator(program, { records: recordMaps.base, actualInputs }),
-      subsidy: createManagementMetricEvaluator(program, { records: recordMaps.subsidy, actualInputs }),
+      company: createManagementMetricEvaluator(program, { records: recordMaps.company, actualInputs }, metricPlans),
+      base: createManagementMetricEvaluator(program, { records: recordMaps.base, actualInputs }, metricPlans),
+      subsidy: createManagementMetricEvaluator(program, { records: recordMaps.subsidy, actualInputs }, metricPlans),
     };
-    return program.definitions.managementMetrics.filter((metric) => metric.enabled && metric.optimization === 'adjustable').map((metric) => {
+    return adjustableMetrics.map((metric) => {
       const evaluation = metricEvaluators[metric.scope].evaluate(metric);
-      return { id: metric.id, label: metric.label, value: Number.isFinite(evaluation.value) ? evaluation.value : undefined, target: resolveMetricTarget(metric, metricTargets[metric.id]).effectiveTarget, direction: metric.direction, unit: metric.outputUnit };
+      return { id: metric.id, label: metric.label, value: Number.isFinite(evaluation.value) ? evaluation.value : undefined, target: targets.get(metric.id)!, direction: metric.direction, unit: metric.outputUnit };
     });
   };
 }
