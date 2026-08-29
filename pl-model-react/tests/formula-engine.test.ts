@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
-import { evaluateFormula, FormulaError } from '../src/domain/formula-engine';
+import { compileFormula, evaluateFormula, FormulaError } from '../src/domain/formula-engine';
 
 const context = {
   values: {
@@ -24,5 +24,16 @@ describe('安全な数式エンジン', () => {
     expect(() => evaluateFormula('[存在しない値][A]', context)).toThrow(FormulaError);
     expect(() => evaluateFormula('1 / 0', context)).toThrow('ゼロで除算');
     expect(() => evaluateFormula('globalThis.alert(1)', context)).toThrow(FormulaError);
+  });
+
+  it('同じ数式は一度だけコンパイルし、異なる入力コンテキストで再利用する', () => {
+    const source = '[営業利益][C] + [売上高][A] / 2';
+    const compiled = compileFormula(source);
+    expect(compileFormula(source)).toBe(compiled);
+    expect(compiled(context)).toBe(75);
+    expect(compiled({
+      values: { ...context.values, 営業利益: { ...context.values.営業利益, C: 30 } },
+      years: context.years,
+    })).toBe(80);
   });
 });

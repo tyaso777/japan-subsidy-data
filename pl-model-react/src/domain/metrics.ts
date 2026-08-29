@@ -111,29 +111,50 @@ function pointValues(year: number, source: MetricDataSource): Record<string, Rec
   return result;
 }
 
+export function createManagementMetricEvaluator(program: ProgramConfiguration, source: MetricDataSource) {
+  const pointCache = new Map<number, { raw: Record<string, Record<string, number>>; common: Record<string, number> }>();
+  const preparePoint = (year: number) => {
+    const cached = pointCache.get(year);
+    if (cached) return cached;
+    const raw = pointValues(year, source);
+    const prepared = {
+      raw,
+      common: evaluateNumericDefinitions(program.definitions.commonNumericDefinitions, { values: raw, years: { t: year } }),
+    };
+    pointCache.set(year, prepared);
+    return prepared;
+  };
+
+  return {
+    evaluate(metric: ManagementMetricDefinition): MetricEvaluation {
+      const years = resolveMetricTimePoints(metric, program);
+      if (metric.calculationUnavailable) return { years, status: 'unavailable', message: 'PL・B/Sから計算できない指標です' };
+      if (metric.requiresActualInput) {
+        const actual = source.actualInputs?.[metric.id];
+        return Number.isFinite(actual) ? { value: actual, years, status: 'ok' } : { years, status: 'missing-actual' };
+      }
+      try {
+        validateMetricDefinition(metric);
+        const referencedActuals = program.definitions.managementMetrics.filter((candidate) => candidate.requiresActualInput && metric.formula.includes(`[${candidate.label}]`));
+        const missingActual = referencedActuals.find((candidate) => !Number.isFinite(source.actualInputs?.[candidate.id]));
+        if (missingActual) return { years, status: 'missing-actual', message: `${missingActual.label}が未入力です` };
+        const values: Record<string, Record<string, number>> = {};
+        for (const [point, year] of Object.entries(years)) {
+          if (!source.records.has(year)) return { years, status: 'missing-record', message: `${year}年のデータがありません` };
+          const { raw, common } = preparePoint(year);
+          for (const [label, pointMap] of Object.entries(raw)) values[label] = { ...(values[label] ?? {}), [point]: pointMap.t };
+          for (const [label, value] of Object.entries(common)) values[label] = { ...(values[label] ?? {}), [point]: value };
+          for (const actual of referencedActuals) values[actual.label] = { ...(values[actual.label] ?? {}), [point]: source.actualInputs![actual.id] };
+        }
+        return { value: evaluateFormula(metric.formula, { values, years }), years, status: 'ok' };
+      } catch (cause) {
+        return { years, status: 'error', message: cause instanceof Error ? cause.message : '指標を計算できませんでした' };
+      }
+    },
+    stats: () => ({ preparedYears: pointCache.size }),
+  };
+}
+
 export function evaluateManagementMetric(metric: ManagementMetricDefinition, program: ProgramConfiguration, source: MetricDataSource): MetricEvaluation {
-  const years = resolveMetricTimePoints(metric, program);
-  if (metric.calculationUnavailable) return { years, status: 'unavailable', message: 'PL・B/Sから計算できない指標です' };
-  if (metric.requiresActualInput) {
-    const actual = source.actualInputs?.[metric.id];
-    return Number.isFinite(actual) ? { value: actual, years, status: 'ok' } : { years, status: 'missing-actual' };
-  }
-  try {
-    validateMetricDefinition(metric);
-    const referencedActuals = program.definitions.managementMetrics.filter((candidate) => candidate.requiresActualInput && metric.formula.includes(`[${candidate.label}]`));
-    const missingActual = referencedActuals.find((candidate) => !Number.isFinite(source.actualInputs?.[candidate.id]));
-    if (missingActual) return { years, status: 'missing-actual', message: `${missingActual.label}が未入力です` };
-    const values: Record<string, Record<string, number>> = {};
-    for (const [point, year] of Object.entries(years)) {
-      if (!source.records.has(year)) return { years, status: 'missing-record', message: `${year}年のデータがありません` };
-      const raw = pointValues(year, source);
-      const common = evaluateNumericDefinitions(program.definitions.commonNumericDefinitions, { values: raw, years: { t: year } });
-      for (const [label, pointMap] of Object.entries(raw)) values[label] = { ...(values[label] ?? {}), [point]: pointMap.t };
-      for (const [label, value] of Object.entries(common)) values[label] = { ...(values[label] ?? {}), [point]: value };
-      for (const actual of referencedActuals) values[actual.label] = { ...(values[actual.label] ?? {}), [point]: source.actualInputs![actual.id] };
-    }
-    return { value: evaluateFormula(metric.formula, { values, years }), years, status: 'ok' };
-  } catch (cause) {
-    return { years, status: 'error', message: cause instanceof Error ? cause.message : '指標を計算できませんでした' };
-  }
+  return createManagementMetricEvaluator(program, source).evaluate(metric);
 }

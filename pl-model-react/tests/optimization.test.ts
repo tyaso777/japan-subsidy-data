@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
-import { applyOptimizationExpansionPlan, applyOptimizationStrength, buildOptimizationTimelines, createConstrainedOptimizationProposal, createMetricOptimizationExpansionPlan, createMetricOptimizationProposal, createOptimizationExpansionPlan, createOptimizationProposal, inferOptimizationStrength } from '../src/domain/optimization';
+import { applyOptimizationExpansionPlan, applyOptimizationStrength, buildOptimizationTimelines, createConstrainedOptimizationProposal, createMetricOptimizationExpansionPlan, createMetricOptimizationProposal, createOptimizationExpansionPlan, createOptimizationProposal, createOptimizationTimelineEvaluator, inferOptimizationStrength } from '../src/domain/optimization';
 import { projectForecastSeries, type ForecastModel } from '../src/domain/forecast-engine';
 import { baseHistoricalPl, subsidyHistoricalPl } from '../src/domain/sample-data';
 import { createModelStore } from '../src/store/model-store';
@@ -11,6 +11,20 @@ const model = (): ForecastModel => ({
 });
 
 describe('目標最適化提案', () => {
+  it('変更された事業のPLだけを再計算し、全件再計算と同じ結果を返す', () => {
+    const state = createModelStore().getState();
+    const evaluator = createOptimizationTimelineEvaluator(state.actuals.basePl, state.actuals.subsidyPl);
+    const initial = evaluator.evaluate(state.forecast);
+    expect(initial).toEqual(buildOptimizationTimelines(state.forecast, state.actuals.basePl, state.actuals.subsidyPl));
+
+    const changed = structuredClone(state.forecast);
+    changed.series.find((series) => series.id === 'base-sales')!.periods[0].annualGrowthRate += 1;
+    const incrementallyEvaluated = evaluator.evaluate(changed);
+
+    expect(incrementallyEvaluated).toEqual(buildOptimizationTimelines(changed, state.actuals.basePl, state.actuals.subsidyPl));
+    expect(evaluator.stats()).toEqual({ baseBuilds: 2, subsidyBuilds: 1 });
+  });
+
   it('探索中に同じ水準ベクトルを重複評価しない', () => {
     const constrained = model();
     constrained.series[0].periods[0] = { ...constrained.series[0].periods[0], annualGrowthRate: 0, range: { min: 0, max: 1 } };

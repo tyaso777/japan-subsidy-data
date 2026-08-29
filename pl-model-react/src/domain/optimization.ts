@@ -1,7 +1,7 @@
 import type { ForecastModel, ForecastPeriod } from './forecast-engine';
 import { buildForecastPl, projectForecastSeries } from './forecast-engine';
 import { calculatePlSeries, combinePlInputs } from './financials';
-import { evaluateManagementMetric, resolveMetricTarget } from './metrics';
+import { createManagementMetricEvaluator, resolveMetricTarget } from './metrics';
 import type { HistoricalPlCalculated, HistoricalPlInput, ProgramConfiguration } from './types';
 import { clampToForecastRange, defaultForecastRange, isForecastRangeLocked, normalizeForecastRanges } from './forecast-range';
 import { orderForecastSeriesByPl } from './forecast-series-order';
@@ -732,25 +732,87 @@ export function inferOptimizationStrength(proposal: OptimizationProposal, model:
 
 type Timeline = { years: number[]; records: HistoricalPlCalculated[] };
 
-function timeline(actuals: HistoricalPlInput[], model: ForecastModel, scope: 'base' | 'subsidy'): Timeline {
+function timeline(actuals: HistoricalPlInput[], actualRecords: HistoricalPlCalculated[], model: ForecastModel, scope: 'base' | 'subsidy'): Timeline {
   const future = buildForecastPl(model, scope, actuals.at(-1)!);
   const years = [...actuals.map((_, index) => model.series[0].baseYear - actuals.length + index + 1), ...future.map((row) => row.year)];
-  return { years, records: [...calculatePlSeries(actuals), ...future.map((row) => row.calculated)] };
+  return { years, records: [...actualRecords, ...future.map((row) => row.calculated)] };
 }
 
 export function buildOptimizationTimelines(model: ForecastModel, baseActuals: HistoricalPlInput[], subsidyActuals: HistoricalPlInput[]) {
-  const base = timeline(baseActuals, model, 'base');
-  const subsidy = timeline(subsidyActuals, model, 'subsidy');
+  const base = timeline(baseActuals, calculatePlSeries(baseActuals), model, 'base');
+  const subsidy = timeline(subsidyActuals, calculatePlSeries(subsidyActuals), model, 'subsidy');
   const company = { years: base.years, records: calculatePlSeries(base.records.map((row, index) => combinePlInputs(row, subsidy.records[index]))) };
   return { company, base, subsidy };
 }
 
+function optimizationScopeKey(model: ForecastModel, scope: 'base' | 'subsidy') {
+  return JSON.stringify([
+    model.series[0]?.baseYear,
+    model.series.filter((series) => series.scope === scope).map((series) => [
+      series.id,
+      series.baseYear,
+      series.baseValue,
+      series.projectionMode,
+      series.periods.map((period) => [
+        period.id,
+        period.lineageId,
+        period.startYear,
+        period.endYear,
+        period.annualGrowthRate,
+        period.startValue,
+        period.startAdjustment,
+      ]),
+    ]),
+  ]);
+}
+
+export function createOptimizationTimelineEvaluator(baseActuals: HistoricalPlInput[], subsidyActuals: HistoricalPlInput[]) {
+  const actualRecords = {
+    base: calculatePlSeries(baseActuals),
+    subsidy: calculatePlSeries(subsidyActuals),
+  };
+  const scopeCache = {
+    base: new Map<string, Timeline>(),
+    subsidy: new Map<string, Timeline>(),
+  };
+  const buildCounts = { base: 0, subsidy: 0 };
+  const evaluateScope = (model: ForecastModel, scope: 'base' | 'subsidy') => {
+    const key = optimizationScopeKey(model, scope);
+    const cached = scopeCache[scope].get(key);
+    if (cached) return cached;
+    const actuals = scope === 'base' ? baseActuals : subsidyActuals;
+    const result = timeline(actuals, actualRecords[scope], model, scope);
+    scopeCache[scope].set(key, result);
+    buildCounts[scope] += 1;
+    return result;
+  };
+  return {
+    evaluate(model: ForecastModel) {
+      const base = evaluateScope(model, 'base');
+      const subsidy = evaluateScope(model, 'subsidy');
+      const company = { years: base.years, records: calculatePlSeries(base.records.map((row, index) => combinePlInputs(row, subsidy.records[index]))) };
+      return { company, base, subsidy };
+    },
+    stats: () => ({ baseBuilds: buildCounts.base, subsidyBuilds: buildCounts.subsidy }),
+  };
+}
+
 function metricConstraintEvaluator(program: ProgramConfiguration, baseActuals: HistoricalPlInput[], subsidyActuals: HistoricalPlInput[], actualInputs: Record<string, number>, metricTargets: Record<string, number>) {
+  const timelineEvaluator = createOptimizationTimelineEvaluator(baseActuals, subsidyActuals);
   return (candidate: ForecastModel): OptimizationConstraintMeasurement[] => {
-    const timelines = buildOptimizationTimelines(candidate, baseActuals, subsidyActuals);
+    const timelines = timelineEvaluator.evaluate(candidate);
+    const recordMaps = {
+      company: new Map(timelines.company.years.map((year, index) => [year, timelines.company.records[index]])),
+      base: new Map(timelines.base.years.map((year, index) => [year, timelines.base.records[index]])),
+      subsidy: new Map(timelines.subsidy.years.map((year, index) => [year, timelines.subsidy.records[index]])),
+    };
+    const metricEvaluators = {
+      company: createManagementMetricEvaluator(program, { records: recordMaps.company, actualInputs }),
+      base: createManagementMetricEvaluator(program, { records: recordMaps.base, actualInputs }),
+      subsidy: createManagementMetricEvaluator(program, { records: recordMaps.subsidy, actualInputs }),
+    };
     return program.definitions.managementMetrics.filter((metric) => metric.enabled && metric.optimization === 'adjustable').map((metric) => {
-      const selected = metric.scope === 'company' ? timelines.company : metric.scope === 'base' ? timelines.base : timelines.subsidy;
-      const evaluation = evaluateManagementMetric(metric, program, { records: new Map(selected.years.map((year, index) => [year, selected.records[index]])), actualInputs });
+      const evaluation = metricEvaluators[metric.scope].evaluate(metric);
       return { id: metric.id, label: metric.label, value: Number.isFinite(evaluation.value) ? evaluation.value : undefined, target: resolveMetricTarget(metric, metricTargets[metric.id]).effectiveTarget, direction: metric.direction, unit: metric.outputUnit };
     });
   };
