@@ -54,7 +54,7 @@ type ModelActions = {
   updateMetricTarget: (metricId: string, value: number | null) => void;
   importHistoricalActuals: (imported: ActualsImportResult) => void;
   optimizeForecastRangesFromActuals: (options?: HistoricalRangeOptimizationOptions) => HistoricalRangeOptimizationResult;
-  updateForecastPeriod: (seriesId: string, periodId: string, patch: Partial<Pick<ForecastPeriod, 'annualGrowthRate' | 'startValue' | 'startAdjustment' | 'range'>>) => void;
+  updateForecastPeriod: (seriesId: string, periodId: string, patch: Partial<Pick<ForecastPeriod, 'annualGrowthRate' | 'startValue' | 'startAdjustment' | 'range' | 'optimizationFixed'>>) => void;
   updateFinalYearSalesAllocation: (baseSharePercent: number) => void;
   clearFinalYearSalesAllocation: () => void;
   splitForecastAtYear: (year: number) => void;
@@ -81,7 +81,7 @@ function sameSnapshot(left: ModelSnapshot, right: ModelSnapshot): boolean {
 function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInput[], subsidyPl: HistoricalPlInput[]): ForecastModel {
   const baseYear = program.timeline.historical.endYear;
   const periods = (change: number, projectionMode: 'compound' | 'linear'): ForecastPeriod[] => program.timeline.periods.map((period) => ({
-    id: period.definitionId, startYear: period.startYear, endYear: period.endYear, annualGrowthRate: change, startValue: null, startAdjustment: 0, range: defaultForecastRange(projectionMode),
+    id: period.definitionId, startYear: period.startYear, endYear: period.endYear, annualGrowthRate: change, startValue: null, startAdjustment: 0, range: defaultForecastRange(projectionMode), optimizationFixed: false,
   }));
   const forScope = (scope: BusinessScope, latest: HistoricalPlInput, growth: { sales: number; headcount: number; pay: number }) => {
     const calculated = calculatePl(latest);

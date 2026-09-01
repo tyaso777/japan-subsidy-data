@@ -3,7 +3,7 @@ import { buildForecastPl, projectForecastSeries } from './forecast-engine';
 import { calculatePlSeries, combinePlInputs } from './financials';
 import { createManagementMetricEvaluator, createManagementMetricPlans, resolveMetricTarget } from './metrics';
 import type { HistoricalPlCalculated, HistoricalPlInput, ProgramConfiguration } from './types';
-import { clampToForecastRange, defaultForecastRange, isForecastRangeLocked, normalizeForecastRanges } from './forecast-range';
+import { clampToForecastRange, defaultForecastRange, isForecastPeriodOptimizationFixed, normalizeForecastRanges } from './forecast-range';
 import { orderForecastSeriesByPl } from './forecast-series-order';
 
 export type OptimizationChange = {
@@ -218,7 +218,7 @@ export function createOptimizationProposal(model: ForecastModel, objective: (can
   const movementWeight = options.movementWeight ?? 2;
   const parameters = orderForecastSeriesByPl(optimized.series).filter((series) => series.scope !== 'company' && series.changePolicy !== 'fixed').flatMap((series) => series.periods.flatMap((period) => {
     const configured = period.range ?? defaultForecastRange(series.projectionMode);
-    return isForecastRangeLocked(configured) ? [] : [{
+    return isForecastPeriodOptimizationFixed(period, series.projectionMode) ? [] : [{
       seriesId: series.id,
       periodId: period.id,
       period,
@@ -545,7 +545,7 @@ function* adaptiveOutsideLevelSteps(model: ForecastModel, initial: OptimizationP
   const preferredModel = normalizeForecastRanges(model);
   const preferredParameters = orderForecastSeriesByPl(preferredModel.series).filter((series) => series.scope !== 'company' && series.changePolicy !== 'fixed').flatMap((series) => series.periods.flatMap((period) => {
     const range = period.range ?? defaultForecastRange(series.projectionMode);
-    return isForecastRangeLocked(range) ? [] : [{ seriesId: series.id, periodId: period.id, baseline: period.annualGrowthRate, min: range.min, max: range.max }];
+    return isForecastPeriodOptimizationFixed(period, series.projectionMode) ? [] : [{ seriesId: series.id, periodId: period.id, baseline: period.annualGrowthRate, min: range.min, max: range.max }];
   }));
   if (preferredParameters.length === 0) return undefined;
   let working = initial;
@@ -556,14 +556,14 @@ function* adaptiveOutsideLevelSteps(model: ForecastModel, initial: OptimizationP
     const searchModel = structuredClone(preferredModel);
     searchModel.series.filter((series) => series.changePolicy !== 'fixed').forEach((series) => series.periods.forEach((period) => {
       const preferred = period.range ?? defaultForecastRange(series.projectionMode);
-      if (isForecastRangeLocked(preferred)) return;
+      if (isForecastPeriodOptimizationFixed(period, series.projectionMode)) return;
       const span = Math.max(preferred.max - preferred.min, .01);
       period.range = {
         min: series.projectionMode === 'compound' ? Math.max(-99.999999, preferred.min - span * factor) : preferred.min - span * factor,
         max: preferred.max + span * factor,
       };
     }));
-    const widestRange = Math.max(...searchModel.series.filter((series) => series.scope !== 'company' && series.changePolicy !== 'fixed').flatMap((series) => series.periods.filter((period) => !isForecastRangeLocked(period.range!)).map((period) => period.range!.max - period.range!.min)), 1);
+    const widestRange = Math.max(...searchModel.series.filter((series) => series.scope !== 'company' && series.changePolicy !== 'fixed').flatMap((series) => series.periods.filter((period) => !isForecastPeriodOptimizationFixed(period, series.projectionMode)).map((period) => period.range!.max - period.range!.min)), 1);
     working = createConstrainedOptimizationProposal(searchModel, evaluateConstraints, {
       ...options,
       preferredModel,
@@ -648,7 +648,7 @@ export function createConstrainedOptimizationProposal(model: ForecastModel, eval
   };
   const parameters = orderForecastSeriesByPl(optimized.series).filter((series) => series.scope !== 'company' && series.changePolicy !== 'fixed').flatMap((series) => series.periods.flatMap((period) => {
     const configured = period.range ?? defaultForecastRange(series.projectionMode);
-    if (isForecastRangeLocked(configured)) return [];
+    if (isForecastPeriodOptimizationFixed(period, series.projectionMode)) return [];
     const preferredSeries = options.preferredModel?.series.find((candidate) => candidate.id === series.id);
     const preferredPeriod = preferredSeries?.periods.find((candidate) => candidate.id === period.id);
     const preferred = preferredPeriod?.range ?? configured;

@@ -12,6 +12,7 @@ const historicalPlSchema = z.object({
 const forecastPeriodSchema = z.object({
   id: z.string(), startYear: z.number().int(), endYear: z.number().int(), annualGrowthRate: z.number(), startValue: z.number().nullable().optional().default(null), startAdjustment: z.number(),
   lineageId: z.string().optional(),
+  optimizationFixed: z.boolean().optional().default(false),
   range: z.object({ min: z.number(), max: z.number() }).refine((range) => range.min <= range.max, '最小値は最大値以下にしてください').optional(),
 }).strict();
 

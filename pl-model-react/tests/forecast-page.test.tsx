@@ -753,6 +753,27 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByRole('button', { name: '固定項目を表示' })).toBeVisible();
   });
 
+  it('範囲とは独立した固定チェックで最適化対象外と表示できる', async () => {
+    const user = userEvent.setup();
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
+
+    const fixed = screen.getByLabelText('補助事業期間 売上高 最適化で固定');
+    const row = fixed.closest('fieldset')!;
+    const min = screen.getByLabelText('補助事業期間 売上高 最小値');
+    const max = screen.getByLabelText('補助事業期間 売上高 最大値');
+
+    expect(fixed).not.toBeChecked();
+    await user.click(fixed);
+    expect(fixed).toBeChecked();
+    expect(row).toHaveAttribute('data-optimization-fixed', 'true');
+    expect(min).toBeEnabled();
+    expect(max).toBeEnabled();
+    expect(screen.getByLabelText('補助事業期間 売上高 水準')).toBeDisabled();
+
+    await user.click(screen.getByRole('button', { name: '固定項目を隠す' }));
+    expect(screen.queryByLabelText('補助事業期間 売上高 年間変化')).not.toBeInTheDocument();
+  });
+
   it('補足比率も初期状態はMin=Max=0で固定し、範囲を入力するとスライダーを使える', async () => {
     const user = userEvent.setup();
     render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);

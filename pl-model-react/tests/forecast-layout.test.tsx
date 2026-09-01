@@ -192,7 +192,7 @@ describe('将来予測画面のワイドレイアウト', () => {
     expect(within(row).getByTestId('forecast-setting-controls')).toHaveClass('forecast-setting-controls');
     expect(within(row).getByTestId('forecast-level-slider-group')).toHaveClass('grid-cols-[38px_minmax(44px,1fr)_38px]');
     within(row).getAllByLabelText(/補助事業期間 売上高 (最小値|最大値)/).forEach((input) => expect(input).toHaveClass('h-5'));
-    expect(within(row).getByTestId('forecast-start-adjustment-group')).toHaveClass('grid-cols-2', 'border-dashed');
+    expect(within(row).getByTestId('forecast-start-adjustment-group')).toHaveClass('grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)]', 'border-dashed');
     expect(screen.getByRole('button', { name: '変動設定を隠す' })).toHaveAttribute('aria-expanded', 'true');
     expect(within(row).queryByRole('button', { name: '補助事業期間 売上高 変動設定' })).not.toBeInTheDocument();
     expect(within(row).queryByRole('button', { name: '補助事業期間 売上高 詳細な変動設定' })).not.toBeInTheDocument();

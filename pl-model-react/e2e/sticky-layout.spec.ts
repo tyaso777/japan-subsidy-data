@@ -159,6 +159,27 @@ test('水準設定には通常操作だけを表示し、行別の詳細変動�
   await expect(page.getByLabel('補助事業期間 売上高 毎年固定増減')).toHaveCount(0);
 });
 
+test('固定チェックと開始時入力は狭い水準列の中に収まる', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/');
+  await page.getByTestId('app-toolbar').getByRole('button', { name: '将来予測・PL' }).click();
+
+  const fixed = page.getByLabel('補助事業期間 売上高 最適化で固定');
+  const group = fixed.locator('xpath=ancestor::*[@data-testid="forecast-start-adjustment-group"]');
+  const row = fixed.locator('xpath=ancestor::fieldset');
+  await expect(fixed).toBeVisible();
+  await expect.poll(async () => {
+    const groupBox = await group.boundingBox();
+    const rowBox = await row.boundingBox();
+    return !!groupBox && !!rowBox && groupBox.x >= rowBox.x && groupBox.x + groupBox.width <= rowBox.x + rowBox.width + 1;
+  }).toBe(true);
+
+  await fixed.check();
+  await expect(row).toHaveAttribute('data-optimization-fixed', 'true');
+  await expect(page.getByLabel('補助事業期間 売上高 最小値')).toBeEnabled();
+  await expect(page.getByLabel('補助事業期間 売上高 最大値')).toBeEnabled();
+});
+
 test('Maxの入力途中にMinが書き換わらない', async ({ page }) => {
   await page.goto('/');
   await page.getByTestId('app-toolbar').getByRole('button', { name: '将来予測・PL' }).click();

@@ -9,6 +9,8 @@ export type ForecastPeriod = {
   startValue?: number | null;
   startAdjustment: number;
   range?: { min: number; max: number };
+  /** true の期間は範囲を保持したまま目標最適化の変更対象から外す。 */
+  optimizationFixed?: boolean;
 };
 
 export type ForecastSegment = { id: string; definitionId: string; startYear: number; endYear: number };

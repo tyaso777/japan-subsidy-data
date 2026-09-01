@@ -1,4 +1,4 @@
-import type { ForecastModel, ForecastSeries } from './forecast-engine';
+import type { ForecastModel, ForecastPeriod, ForecastSeries } from './forecast-engine';
 
 export type ForecastRange = { min: number; max: number };
 
@@ -12,6 +12,10 @@ export function clampToForecastRange(value: number, range: ForecastRange): numbe
 
 export function isForecastRangeLocked(range: ForecastRange): boolean {
   return Math.abs(range.max - range.min) < 1e-12;
+}
+
+export function isForecastPeriodOptimizationFixed(period: Pick<ForecastPeriod, 'optimizationFixed' | 'range'>, projectionMode: ForecastSeries['projectionMode']): boolean {
+  return period.optimizationFixed === true || isForecastRangeLocked(period.range ?? defaultForecastRange(projectionMode));
 }
 
 export function normalizeForecastRanges(model: ForecastModel): ForecastModel {
