@@ -23,6 +23,7 @@ describe('AIで制度テンプレートを作成する', () => {
     render(<App initialPage="definition" />);
     expect(screen.getByText((_text, element) => element?.tagName === 'P' && element.textContent?.includes('subsidy-program.js') === true)).toHaveTextContent('HTMLと同じ階層');
     await user.click(screen.getByRole('button', { name: 'AIで制度テンプレートを作る' }));
+    expect(screen.queryByText(/コピーは1回だけです/)).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'AI作成用プロンプトをコピー' }));
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('# 制度テンプレートJSON作成プロンプト'));
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('## 具体例'));

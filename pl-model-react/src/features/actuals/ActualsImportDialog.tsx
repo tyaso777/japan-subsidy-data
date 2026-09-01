@@ -66,7 +66,6 @@ export function ActualsImportDialog() {
             }}><Copy />AI変換用プロンプトをコピー</Button>
           </div>
           {resourceMessage && <p role="status" className="m-0 text-[11px] font-bold text-teal">{resourceMessage}</p>}
-          <p className="m-0 text-[11px] leading-relaxed text-muted-foreground">コピーは1回だけです。プロンプトにJSON Schema、今回の対象年度、ファイル名、UTF-8 JSON形式を含みます。資料にない値は推測せずnull、自動計算項目は出力せず、対応できない科目はunmappedItemsへ残します。</p>
           <Button className="w-fit" onClick={() => inputRef.current?.click()}><Upload />生成されたJSONを選択</Button>
         </div>
         {error && <div role="alert" className="max-h-32 overflow-auto rounded-md border border-orange/40 bg-orange/5 p-3 text-xs text-orange">{error}</div>}

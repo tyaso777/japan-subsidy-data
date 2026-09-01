@@ -53,7 +53,6 @@ export function ProgramTemplateAiDialog() {
             }}><Copy />AI作成用プロンプトをコピー</Button>
           </div>
           {resourceMessage && <p role="status" className="m-0 text-[11px] font-bold text-teal">{resourceMessage}</p>}
-          <p className="m-0 text-[11px] leading-relaxed text-muted-foreground">コピーは1回だけです。プロンプトにJSON Schema、ファイル名、UTF-8 JSON形式を含みます。画面側でも参照ID・数式依存・期間整合を検証し、生成コードは実行しません。</p>
           <Button className="w-fit" onClick={() => inputRef.current?.click()}><Upload />生成されたJSONを選択</Button>
         </div>
         {error && <div role="alert" className="max-h-36 overflow-auto whitespace-pre-wrap rounded-md border border-orange/40 bg-orange/5 p-3 text-xs text-orange">{error}</div>}

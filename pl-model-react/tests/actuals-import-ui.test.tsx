@@ -30,6 +30,7 @@ describe('AIで過去実績を取り込む', () => {
     render(<App initialActuals="empty" />);
 
     await user.click(screen.getByRole('button', { name: 'AIで過去実績を取り込む' }));
+    expect(screen.queryByText(/コピーは1回だけです/)).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'AI変換用プロンプトをコピー' }));
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('# 過去実績JSON変換プロンプト'));
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('## 具体例'));
