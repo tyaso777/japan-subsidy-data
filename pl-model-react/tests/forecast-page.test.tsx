@@ -754,7 +754,7 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByRole('button', { name: '固定項目を表示' })).toBeVisible();
   });
 
-  it('範囲とは独立した固定チェックで最適化対象外と表示できる', async () => {
+  it('固定中も手動で水準を変更でき、最適化対象からだけ除外する', async () => {
     const user = userEvent.setup();
     render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
 
@@ -769,7 +769,11 @@ describe('将来予測・PL画面', () => {
     expect(row).toHaveAttribute('data-optimization-fixed', 'true');
     expect(min).toBeEnabled();
     expect(max).toBeEnabled();
-    expect(screen.getByLabelText('補助事業期間 売上高 水準')).toBeDisabled();
+    const slider = screen.getByLabelText('補助事業期間 売上高 水準');
+    expect(slider).toBeEnabled();
+    fireEvent.change(slider, { target: { value: '9' } });
+    expect(screen.getByLabelText('補助事業期間 売上高 年間変化')).toHaveValue(9);
+    expect(fixed).toBeChecked();
 
     await user.click(screen.getByRole('button', { name: '固定項目を隠す' }));
     expect(screen.queryByLabelText('補助事業期間 売上高 年間変化')).not.toBeInTheDocument();
@@ -807,6 +811,7 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByLabelText('補助事業期間 販管費内減価償却費率 最大値')).toHaveValue(10);
     expect(screen.getByLabelText('補助事業期間 販管費内減価償却費率 年間変化')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 販管費内減価償却費率 最適化で固定')).toBeChecked();
+    expect(screen.getByLabelText('補助事業期間 販管費内減価償却費率 水準')).toBeEnabled();
     expect(screen.getByLabelText('補助事業期間 研究開発費の売上高比率 最小値')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 研究開発費の売上高比率 最大値')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 研究開発費の売上高比率 最適化で固定')).toBeChecked();

@@ -178,6 +178,7 @@ test('固定チェックと開始時入力は狭い水準列の中に収まる',
   await expect(row).toHaveAttribute('data-optimization-fixed', 'true');
   await expect(page.getByLabel('補助事業期間 売上高 最小値')).toBeEnabled();
   await expect(page.getByLabel('補助事業期間 売上高 最大値')).toBeEnabled();
+  await expect(page.getByLabel('補助事業期間 売上高 水準')).toBeEnabled();
 });
 
 test('Maxの入力途中にMinが書き換わらない', async ({ page }) => {
