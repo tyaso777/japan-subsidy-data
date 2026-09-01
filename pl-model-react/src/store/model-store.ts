@@ -14,6 +14,7 @@ import type { BalanceSheetRecord, HistoricalPlInput, ProgramConfiguration } from
 import type { MoneyDisplayUnit } from '../domain/value-units';
 import { calculatePl, combinePlSeries, subtractPlSeries } from '../domain/financials';
 import { defaultForecastRange, normalizeForecastRanges } from '../domain/forecast-range';
+import { fixedSupplementaryRange } from '../domain/forecast-setting-defaults';
 import { optimizeForecastRangesFromActuals, type HistoricalRangeOptimizationOptions, type HistoricalRangeOptimizationResult } from '../domain/historical-range-optimization';
 import { forecastRangeCalibrationFingerprint, type ForecastRangeCalibration } from '../domain/forecast-range-calibration';
 import type { ActualsImportResult } from '../domain/actuals-import';
@@ -86,7 +87,15 @@ function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInpu
   const forScope = (scope: BusinessScope, latest: HistoricalPlInput, growth: { sales: number; headcount: number; pay: number }) => {
     const calculated = calculatePl(latest);
     const compound = (id: string, label: string, valueKind: import('../domain/value-units').ValueKind, baseValue: number, rate: number) => ({ id: `${scope}-${id}`, label, scope, valueKind, projectionMode: 'compound' as const, baseYear, baseValue, periods: periods(rate, 'compound') });
-    const linear = (id: string, label: string, baseValue: number, change = 0, changePolicy: 'adjustable' | 'fixed' = 'adjustable', initiallyLocked = false) => ({ id: `${scope}-${id}`, label, scope, valueKind: 'percent' as const, projectionMode: 'linear' as const, changePolicy, baseYear, baseValue, periods: periods(change, 'linear').map((period) => changePolicy === 'fixed' || initiallyLocked ? { ...period, annualGrowthRate: 0, range: { min: 0, max: 0 } } : period) });
+    const linear = (id: string, label: string, baseValue: number, change = 0, changePolicy: 'adjustable' | 'fixed' = 'adjustable', initiallyLocked = false) => ({ id: `${scope}-${id}`, label, scope, valueKind: 'percent' as const, projectionMode: 'linear' as const, changePolicy, baseYear, baseValue, periods: periods(change, 'linear').map((period) => {
+      const locked = changePolicy === 'fixed' || initiallyLocked;
+      return locked ? {
+        ...period,
+        annualGrowthRate: 0,
+        range: fixedSupplementaryRange(id) ?? { min: 0, max: 0 },
+        optimizationFixed: true,
+      } : period;
+    }) });
     return [
       compound('sales', '売上高', 'money', latest.sales, growth.sales),
       compound('headcount', '従業員数（就業時間換算）', 'fte', latest.headcount, growth.headcount),

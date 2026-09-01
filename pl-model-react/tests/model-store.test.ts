@@ -3,6 +3,25 @@ import { describe, expect, it } from 'vitest';
 import { createModelStore } from '../src/store/model-store';
 
 describe('モデルストア', () => {
+  it('固定する補足比率にも解除後に使える既定の探索範囲を持たせる', () => {
+    const forecast = createModelStore().getState().forecast;
+    const expectedRanges: Record<string, { min: number; max: number }> = {
+      cogsDepRate: { min: -10, max: 0 },
+      sgaDepRate: { min: -10, max: 0 },
+      researchDevelopmentRate: { min: 0, max: 0 },
+      otherSgaRate: { min: -10, max: 0 },
+    };
+
+    for (const scope of ['base', 'subsidy']) {
+      for (const [driver, range] of Object.entries(expectedRanges)) {
+        const series = forecast.series.find((item) => item.id === `${scope}-${driver}`)!;
+        expect(series.periods.every((period) => period.optimizationFixed === true)).toBe(true);
+        expect(series.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);
+        expect(series.periods.every((period) => period.range?.min === range.min && period.range.max === range.max)).toBe(true);
+      }
+    }
+  });
+
   it('B/S・2事業P/Lと期間を一つの状態として保持する', () => {
     const store = createModelStore();
     const state = store.getState();

@@ -217,4 +217,24 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     const cogs = result.forecast.series.find((series) => series.id === 'base-cogsRate')!;
     expect(cogs.changePolicy).toBe('adjustable');
   });
+
+  it('適正化後も固定補足比率の既定探索範囲を保持する', () => {
+    const state = createModelStore().getState();
+    const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
+    const expectedRanges: Record<string, { min: number; max: number }> = {
+      cogsDepRate: { min: -10, max: 0 },
+      sgaDepRate: { min: -10, max: 0 },
+      researchDevelopmentRate: { min: 0, max: 0 },
+      otherSgaRate: { min: -10, max: 0 },
+    };
+
+    for (const scope of ['base', 'subsidy']) {
+      for (const [driver, range] of Object.entries(expectedRanges)) {
+        const series = result.forecast.series.find((item) => item.id === `${scope}-${driver}`)!;
+        expect(series.periods.every((period) => period.optimizationFixed === true)).toBe(true);
+        expect(series.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);
+        expect(series.periods.every((period) => period.range?.min === range.min && period.range.max === range.max)).toBe(true);
+      }
+    }
+  });
 });

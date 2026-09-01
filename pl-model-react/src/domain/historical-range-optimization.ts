@@ -1,4 +1,5 @@
 import { calculatePlSeries } from './financials';
+import { fixedSupplementaryRange } from './forecast-setting-defaults';
 import type { ForecastModel, ForecastSeries } from './forecast-engine';
 import type { HistoricalPlCalculated, HistoricalPlInput, ProgramConfiguration } from './types';
 
@@ -197,7 +198,8 @@ export function optimizeForecastRangesFromActuals(
         period.annualGrowthRate = 0;
         period.startValue = index === 0 ? fixedLevel : null;
         period.startAdjustment = 0;
-        period.range = { min: 0, max: 0 };
+        period.range = fixedSupplementaryRange(driver) ?? { min: 0, max: 0 };
+        period.optimizationFixed = true;
         period.lineageId = undefined;
         updatedPeriods += 1;
       });

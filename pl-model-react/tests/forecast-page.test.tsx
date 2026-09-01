@@ -710,7 +710,7 @@ describe('将来予測・PL画面', () => {
     expect(max).toHaveValue(10);
   });
 
-  it('実効税率もMin=Max=0の間だけロックし、範囲を広げると変動できる', async () => {
+  it('実効税率は固定を解除し範囲を広げると変動できる', async () => {
     const user = userEvent.setup();
     render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     const min = screen.getByLabelText('補助事業期間 実効税率 最小値');
@@ -728,6 +728,7 @@ describe('将来予測・PL画面', () => {
     await user.clear(max);
     await user.type(max, '5');
     await user.tab();
+    await user.click(screen.getByLabelText('補助事業期間 実効税率 最適化で固定'));
     expect(slider).toBeEnabled();
   });
 
@@ -774,7 +775,7 @@ describe('将来予測・PL画面', () => {
     expect(screen.queryByLabelText('補助事業期間 売上高 年間変化')).not.toBeInTheDocument();
   });
 
-  it('補足比率も初期状態はMin=Max=0で固定し、範囲を入力するとスライダーを使える', async () => {
+  it('補足比率は固定を解除し範囲を広げるとスライダーを使える', async () => {
     const user = userEvent.setup();
     render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     const min = screen.getByLabelText('補助事業期間 特別損益の売上高比率 最小値');
@@ -789,7 +790,22 @@ describe('将来予測・PL画面', () => {
     await user.clear(max);
     await user.type(max, '5');
     await user.tab();
+    await user.click(screen.getByLabelText('補助事業期間 特別損益の売上高比率 最適化で固定'));
     expect(slider).toBeEnabled();
+  });
+
+  it('固定中の減価率とその他販管費率にも既定範囲を表示し、研究開発費率は0に保つ', () => {
+    render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
+
+    for (const label of ['原価内減価償却費率', '販管費内減価償却費率', 'その他販管費率']) {
+      expect(screen.getByLabelText(`補助事業期間 ${label} 最小値`)).toHaveValue(-10);
+      expect(screen.getByLabelText(`補助事業期間 ${label} 最大値`)).toHaveValue(0);
+      expect(screen.getByLabelText(`補助事業期間 ${label} 年間変化`)).toHaveValue(0);
+      expect(screen.getByLabelText(`補助事業期間 ${label} 最適化で固定`)).toBeChecked();
+    }
+    expect(screen.getByLabelText('補助事業期間 研究開発費の売上高比率 最小値')).toHaveValue(0);
+    expect(screen.getByLabelText('補助事業期間 研究開発費の売上高比率 最大値')).toHaveValue(0);
+    expect(screen.getByLabelText('補助事業期間 研究開発費の売上高比率 最適化で固定')).toBeChecked();
   });
 
   it('固定額・単年・加速度の詳細編集UIを水準設定に表示しない', async () => {

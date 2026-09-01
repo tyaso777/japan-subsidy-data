@@ -57,21 +57,36 @@
             "label": "付加価値額",
             "formula": "[営業利益][t] + [人件費][t] + [減価償却費][t]",
             "outputPoint": "t",
-            "plDisplay": { "enabled": true, "insertAfter": "23", "insertOrder": 1, "valueKind": "money" }
+            "plDisplay": {
+              "enabled": true,
+              "insertAfter": "23",
+              "insertOrder": 1,
+              "valueKind": "money"
+            }
           },
           {
             "id": "労働生産性",
             "label": "労働生産性",
             "formula": "[付加価値額][t] / [従業員数（就業時間換算）][t]",
             "outputPoint": "t",
-            "plDisplay": { "enabled": true, "insertAfter": "32", "insertOrder": 1, "valueKind": "moneyPerPerson" }
+            "plDisplay": {
+              "enabled": true,
+              "insertAfter": "32",
+              "insertOrder": 1,
+              "valueKind": "moneyPerPerson"
+            }
           },
           {
             "id": "EBITDA",
             "label": "EBITDA",
             "formula": "[営業利益][t] + [減価償却費][t]",
             "outputPoint": "t",
-            "plDisplay": { "enabled": true, "insertAfter": "32", "insertOrder": 2, "valueKind": "money" }
+            "plDisplay": {
+              "enabled": true,
+              "insertAfter": "32",
+              "insertOrder": 2,
+              "valueKind": "money"
+            }
           }
         ],
         "managementMetrics": [
@@ -746,7 +761,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -758,7 +774,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -779,10 +796,11 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": 0,
+                "min": -10,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -791,10 +809,11 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": 0,
+                "min": -10,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -815,10 +834,11 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": 0,
+                "min": -10,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -827,10 +847,11 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": 0,
+                "min": -10,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -854,7 +875,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -866,7 +888,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -887,10 +910,11 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": 0,
+                "min": -10,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -899,10 +923,11 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": 0,
+                "min": -10,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -961,7 +986,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -973,7 +999,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -997,7 +1024,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -1009,7 +1037,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -1033,7 +1062,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -1045,7 +1075,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -1069,7 +1100,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -1081,7 +1113,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -1105,7 +1138,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -1117,7 +1151,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -1281,7 +1316,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -1293,7 +1329,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -1314,10 +1351,11 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": 0,
+                "min": -10,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -1326,10 +1364,11 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": 0,
+                "min": -10,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -1350,10 +1389,11 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": 0,
+                "min": -10,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -1362,10 +1402,11 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": 0,
+                "min": -10,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -1389,7 +1430,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -1401,7 +1443,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -1422,10 +1465,11 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": 0,
+                "min": -10,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -1434,10 +1478,11 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": 0,
+                "min": -10,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -1496,7 +1541,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -1508,7 +1554,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -1532,7 +1579,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -1544,7 +1592,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -1568,7 +1617,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -1580,7 +1630,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -1604,7 +1655,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -1616,7 +1668,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
@@ -1640,7 +1693,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             },
             {
               "id": "report",
@@ -1652,7 +1706,8 @@
                 "min": 0,
                 "max": 0
               },
-              "startValue": null
+              "startValue": null,
+              "optimizationFixed": true
             }
           ]
         },
