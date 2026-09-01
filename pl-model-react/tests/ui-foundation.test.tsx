@@ -49,7 +49,8 @@ describe('共通UI基盤', () => {
     expect(within(toolbar).getByRole('navigation', { name: '個社案件' })).toBeVisible();
     expect(within(toolbar).getByRole('navigation', { name: '参考' })).toBeVisible();
     expect(within(toolbar).getByLabelText('金額表示単位')).toBeVisible();
-    expect(within(toolbar).getByRole('button', { name: '案件JSON' })).toBeVisible();
+    expect(within(toolbar).getByLabelText('現在の案件ファイル')).toHaveTextContent('案件JSON');
+    expect(within(toolbar).queryByRole('button', { name: '案件JSON' })).not.toBeInTheDocument();
     expect(within(toolbar).getByRole('button', { name: '元に戻す Ctrl+Z' })).toBeVisible();
     expect(within(toolbar).getByRole('button', { name: 'やり直す Ctrl+Y' })).toBeVisible();
   });

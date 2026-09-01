@@ -1,5 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react';
-import { ChevronDown, FileJson, FileSpreadsheet, FileText, Save, SaveAll } from 'lucide-react';
+import { ChevronDown, FileJson, FileSpreadsheet, FileText, FolderOpen, Save, SaveAll } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
@@ -145,10 +145,12 @@ export function ModelFileMenu() {
       if (file) void loadFile(file);
       event.target.value = '';
     }} />
-    <div className="flex items-stretch"><Button variant="outline" size="sm" className="max-w-38 rounded-r-none" onClick={() => void open()}><FileJson /><span className="truncate">{fileName ?? '案件JSON'}</span></Button><DropdownMenu>
+    <div className="flex items-stretch"><div aria-label="現在の案件ファイル" className="flex h-8 max-w-38 items-center gap-1.5 rounded-l-md border border-line bg-surface px-3 text-[11px] font-bold text-ink"><FileJson aria-hidden="true" className="size-3.5 shrink-0" /><span className="truncate">{fileName ?? '案件JSON'}</span></div><DropdownMenu>
       <DropdownMenuTrigger asChild><Button variant="outline" size="icon" className="h-8 w-7 rounded-l-none border-l-0" aria-label="案件JSONメニュー"><ChevronDown /></Button></DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>案件データ</DropdownMenuLabel>
+        <DropdownMenuItem onSelect={() => void open()}><FolderOpen />ファイルを読み込む</DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem disabled={!handleRef.current} onSelect={() => void overwrite()}><Save />上書き保存</DropdownMenuItem>
         <DropdownMenuItem onSelect={() => void saveAs()}><SaveAll />名前を付けて保存</DropdownMenuItem>
         <DropdownMenuLabel>サンプルデータ</DropdownMenuLabel>

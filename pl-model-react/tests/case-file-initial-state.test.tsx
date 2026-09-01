@@ -42,13 +42,18 @@ describe('案件JSONを読み込む前後の過去実績', () => {
     expect(sales).toHaveValue(900);
   });
 
-  it('案件JSON本体ボタンから直接ファイル選択を開く', async () => {
+  it('案件名表示からはファイル選択を開かず、案件メニューの明示操作から読み込む', async () => {
     const user = userEvent.setup();
     render(<App initialActuals="empty" />);
     const fileInput = screen.getByLabelText('案件JSONファイル');
     const click = vi.spyOn(fileInput as HTMLInputElement, 'click');
 
-    await user.click(screen.getByRole('button', { name: '案件JSON' }));
+    expect(screen.queryByRole('button', { name: '案件JSON' })).not.toBeInTheDocument();
+    expect(screen.getByLabelText('現在の案件ファイル')).toHaveTextContent('案件JSON');
+    expect(click).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: '案件JSONメニュー' }));
+    await user.click(screen.getByRole('menuitem', { name: 'ファイルを読み込む' }));
 
     expect(click).toHaveBeenCalledOnce();
     fireEvent.change(fileInput, { target: { files: [] } });
@@ -67,7 +72,7 @@ describe('案件JSONを読み込む前後の過去実績', () => {
 
     expect(assets).toHaveValue(1050);
     expect(sales).toHaveValue(900);
-    expect(screen.getByRole('button', { name: 'sample-case.json' })).toBeVisible();
+    expect(screen.getByLabelText('現在の案件ファイル')).toHaveTextContent('sample-case.json');
   });
 
   it('編集中にサンプルデータを読み込む前に確認し、キャンセル時は既存値を維持する', async () => {
@@ -105,7 +110,7 @@ describe('案件JSONを読み込む前後の過去実績', () => {
 
     expect(screen.getByLabelText('ベース事業 P/L 2025年 売上高')).toHaveValue(1000);
     expect(screen.getByLabelText('補助事業 P/L 2025年 売上高')).toHaveValue(0);
-    expect(screen.getByRole('button', { name: 'sample-case-no-subsidy-history.json' })).toBeVisible();
+    expect(screen.getByLabelText('現在の案件ファイル')).toHaveTextContent('sample-case-no-subsidy-history.json');
   });
 
   it('案件メニューから計算済みP/LをExcelとHTMLで出力する', async () => {
