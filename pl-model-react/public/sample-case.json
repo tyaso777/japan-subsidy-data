@@ -834,8 +834,8 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -10,
-                "max": 0
+                "min": 0,
+                "max": 10
               },
               "startValue": null,
               "optimizationFixed": true
@@ -847,8 +847,8 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -10,
-                "max": 0
+                "min": 0,
+                "max": 10
               },
               "startValue": null,
               "optimizationFixed": true
@@ -1389,8 +1389,8 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -10,
-                "max": 0
+                "min": 0,
+                "max": 10
               },
               "startValue": null,
               "optimizationFixed": true
@@ -1402,8 +1402,8 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -10,
-                "max": 0
+                "min": 0,
+                "max": 10
               },
               "startValue": null,
               "optimizationFixed": true

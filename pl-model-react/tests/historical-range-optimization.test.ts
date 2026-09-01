@@ -223,7 +223,7 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
     const expectedRanges: Record<string, { min: number; max: number }> = {
       cogsDepRate: { min: -10, max: 0 },
-      sgaDepRate: { min: -10, max: 0 },
+      sgaDepRate: { min: 0, max: 10 },
       researchDevelopmentRate: { min: 0, max: 0 },
       otherSgaRate: { min: -10, max: 0 },
     };

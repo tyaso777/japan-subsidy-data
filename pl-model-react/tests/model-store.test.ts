@@ -7,7 +7,7 @@ describe('モデルストア', () => {
     const forecast = createModelStore().getState().forecast;
     const expectedRanges: Record<string, { min: number; max: number }> = {
       cogsDepRate: { min: -10, max: 0 },
-      sgaDepRate: { min: -10, max: 0 },
+      sgaDepRate: { min: 0, max: 10 },
       researchDevelopmentRate: { min: 0, max: 0 },
       otherSgaRate: { min: -10, max: 0 },
     };

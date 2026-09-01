@@ -849,8 +849,8 @@
               "startValue": null,
               "startAdjustment": 0,
               "range": {
-                "min": -10,
-                "max": 0
+                "min": 0,
+                "max": 10
               },
               "optimizationFixed": true
             },
@@ -862,8 +862,8 @@
               "startValue": null,
               "startAdjustment": 0,
               "range": {
-                "min": -10,
-                "max": 0
+                "min": 0,
+                "max": 10
               },
               "optimizationFixed": true
             }
@@ -1404,8 +1404,8 @@
               "startValue": null,
               "startAdjustment": 0,
               "range": {
-                "min": -10,
-                "max": 0
+                "min": 0,
+                "max": 10
               },
               "optimizationFixed": true
             },
@@ -1417,8 +1417,8 @@
               "startValue": null,
               "startAdjustment": 0,
               "range": {
-                "min": -10,
-                "max": 0
+                "min": 0,
+                "max": 10
               },
               "optimizationFixed": true
             }

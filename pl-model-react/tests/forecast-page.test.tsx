@@ -797,12 +797,16 @@ describe('将来予測・PL画面', () => {
   it('固定中の減価率とその他販管費率にも既定範囲を表示し、研究開発費率は0に保つ', () => {
     render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
 
-    for (const label of ['原価内減価償却費率', '販管費内減価償却費率', 'その他販管費率']) {
+    for (const label of ['原価内減価償却費率', 'その他販管費率']) {
       expect(screen.getByLabelText(`補助事業期間 ${label} 最小値`)).toHaveValue(-10);
       expect(screen.getByLabelText(`補助事業期間 ${label} 最大値`)).toHaveValue(0);
       expect(screen.getByLabelText(`補助事業期間 ${label} 年間変化`)).toHaveValue(0);
       expect(screen.getByLabelText(`補助事業期間 ${label} 最適化で固定`)).toBeChecked();
     }
+    expect(screen.getByLabelText('補助事業期間 販管費内減価償却費率 最小値')).toHaveValue(0);
+    expect(screen.getByLabelText('補助事業期間 販管費内減価償却費率 最大値')).toHaveValue(10);
+    expect(screen.getByLabelText('補助事業期間 販管費内減価償却費率 年間変化')).toHaveValue(0);
+    expect(screen.getByLabelText('補助事業期間 販管費内減価償却費率 最適化で固定')).toBeChecked();
     expect(screen.getByLabelText('補助事業期間 研究開発費の売上高比率 最小値')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 研究開発費の売上高比率 最大値')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 研究開発費の売上高比率 最適化で固定')).toBeChecked();
