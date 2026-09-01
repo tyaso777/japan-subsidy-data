@@ -784,7 +784,11 @@ describe('将来予測・PL画面', () => {
     const slider = screen.getByLabelText('補助事業期間 売上高 水準');
     expect(slider).toBeEnabled();
     expect(slider).toHaveAttribute('data-visual-state', 'optimization-fixed');
-    expect(slider).toHaveClass('accent-[#98a2b3]');
+    expect(slider).toHaveClass('forecast-setting-slider--optimization-fixed');
+    expect(slider).toHaveStyle({
+      '--forecast-slider-fill': '#98a2b3',
+      '--forecast-slider-rest': '#e1e5e8',
+    });
     fireEvent.change(slider, { target: { value: '9' } });
     expect(screen.getByLabelText('補助事業期間 売上高 年間変化')).toHaveValue(9);
     expect(fixed).toBeChecked();

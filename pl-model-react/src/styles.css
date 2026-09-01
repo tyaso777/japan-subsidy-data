@@ -55,3 +55,59 @@
     width: 100%;
   }
 }
+
+@layer components {
+  .forecast-setting-slider {
+    height: 14px;
+    appearance: none;
+    border-radius: 999px;
+    background: linear-gradient(
+      to right,
+      var(--forecast-slider-fill) 0,
+      var(--forecast-slider-fill) var(--forecast-slider-progress),
+      var(--forecast-slider-rest) var(--forecast-slider-progress),
+      var(--forecast-slider-rest) 100%
+    ) center / 100% 4px no-repeat;
+  }
+
+  .forecast-setting-slider::-webkit-slider-runnable-track {
+    height: 14px;
+    background: transparent;
+  }
+
+  .forecast-setting-slider::-webkit-slider-thumb {
+    width: 14px;
+    height: 14px;
+    appearance: none;
+    border: 1px solid color-mix(in srgb, var(--forecast-slider-thumb) 80%, #17243b);
+    border-radius: 999px;
+    background: var(--forecast-slider-thumb);
+    box-shadow: 0 0 0 1px #ffffff;
+  }
+
+  .forecast-setting-slider::-moz-range-track {
+    height: 4px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+  }
+
+  .forecast-setting-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: 1px solid color-mix(in srgb, var(--forecast-slider-thumb) 80%, #17243b);
+    border-radius: 999px;
+    background: var(--forecast-slider-thumb);
+    box-shadow: 0 0 0 1px #ffffff;
+  }
+
+  .forecast-setting-slider:focus-visible {
+    outline: 2px solid #167d78;
+    outline-offset: 2px;
+  }
+
+  .forecast-setting-slider--optimization-fixed:hover,
+  .forecast-setting-slider--optimization-fixed:focus-visible {
+    --forecast-slider-thumb: #c75b24 !important;
+  }
+}
