@@ -13,7 +13,7 @@ describe('AIで制度テンプレートを作成する', () => {
     expect(() => parseProgramTemplateJson(example!)).not.toThrow();
   });
 
-  it('プロンプトと検証資料を提供し、生成JSONを確認して制度へ反映する', async () => {
+  it('Schema・出力ファイル名・形式を含む1つのプロンプトを提供し、生成JSONを確認して制度へ反映する', async () => {
     const user = userEvent.setup();
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } });
@@ -27,12 +27,16 @@ describe('AIで制度テンプレートを作成する', () => {
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('# 制度テンプレートJSON作成プロンプト'));
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('## 具体例'));
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('"commonNumericDefinitions"'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('## 準拠するJSON Schema'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('https://json-schema.org/draft/2020-12/schema'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('`program-template.json`'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('UTF-8のJSON'));
     expect(writeText).not.toHaveBeenCalledWith(expect.stringContaining('program-template-example.json'));
-    expect(await screen.findByText('プロンプトをコピーしました')).toBeVisible();
+    expect(await screen.findByText('Schemaと出力仕様を含むプロンプトをコピーしました')).toBeVisible();
 
-    await user.click(screen.getByRole('button', { name: '制度テンプレートSchemaをダウンロード' }));
+    expect(screen.queryByRole('button', { name: '制度テンプレートSchemaをダウンロード' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '現在のテンプレート例をダウンロード' })).not.toBeInTheDocument();
-    expect(createObjectURL).toHaveBeenCalledTimes(1);
+    expect(createObjectURL).not.toHaveBeenCalled();
 
     const generated = createDefaultProgram();
     generated.program.name = 'AI生成テスト制度';
