@@ -174,7 +174,7 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(period.annualGrowthRate).toBeGreaterThan(20);
   });
 
-  it('原価率は直近値を開始時固定値とし、実績水準の標準偏差の半分だけ改善方向へ動かす', () => {
+  it('原価率は直近値を開始時固定値とし、実績の相対変化から改善率の範囲を作る', () => {
     const state = createModelStore().getState();
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
     const cogs = result.forecast.series.find((series) => series.id === 'base-cogsRate')!;
@@ -184,9 +184,11 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(cogs.periods[0].startValue).toBeCloseTo(latest.cogs / latest.sales * 100);
     expect(cogs.periods.slice(1).every((period) => period.startValue === null)).toBe(true);
     const levels = state.actuals.basePl.map((row) => row.cogs / row.sales * 100);
-    const mean = levels.reduce((sum, value) => sum + value, 0) / levels.length;
-    const deviation = Math.sqrt(levels.reduce((sum, value) => sum + (value - mean) ** 2, 0) / levels.length);
-    expect(cogs.periods.every((period) => period.range?.min === Number((-deviation / 2).toFixed(2)) && period.range.max === 0)).toBe(true);
+    const changes = levels.slice(1).map((value, index) => (value / levels[index] - 1) * 100);
+    const rms = Math.sqrt(changes.reduce((sum, value) => sum + value ** 2, 0) / changes.length);
+    const allowance = Number(Math.min(10, Math.max(1, rms)).toFixed(2));
+    expect(cogs.projectionMode).toBe('relative');
+    expect(cogs.periods.every((period) => period.range?.min === -allowance && period.range.max === 0)).toBe(true);
     expect(cogs.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);
   });
 

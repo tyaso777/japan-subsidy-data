@@ -22,8 +22,8 @@ const fallbackRanges: Record<string, Record<Scope, Range>> = {
   sales: { base: { min: -3, max: 8 }, subsidy: { min: -5, max: 15 } },
   headcount: { base: { min: -3, max: 5 }, subsidy: { min: -3, max: 8 } },
   payPerPerson: { base: { min: 0, max: 6 }, subsidy: { min: 0, max: 6 } },
-  cogsRate: { base: { min: -2, max: 0 }, subsidy: { min: -2, max: 0 } },
-  otherSgaRate: { base: { min: -2, max: 0 }, subsidy: { min: -2, max: 0 } },
+  cogsRate: { base: { min: -10, max: 0 }, subsidy: { min: -10, max: 0 } },
+  otherSgaRate: { base: { min: -10, max: 0 }, subsidy: { min: -10, max: 0 } },
   officerPayPerPerson: { base: { min: 0, max: 6 }, subsidy: { min: 0, max: 6 } },
   officerCount: { base: { min: 0, max: 0 }, subsidy: { min: 0, max: 0 } },
 };
@@ -115,9 +115,10 @@ function cautiousRateRange(driver: string, rows: HistoricalPlCalculated[]): Rang
   if (!direction) return null;
   const values = valuesForDriver(driver, rows).filter(Number.isFinite);
   if (values.length < 2) return null;
-  const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
-  const deviation = Math.sqrt(values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length);
-  const allowance = roundSetting(deviation / 2);
+  const relativeChanges = values.slice(1).map((value, index) => values[index] ? (value / values[index] - 1) * 100 : Number.NaN).filter(Number.isFinite);
+  if (!relativeChanges.length) return null;
+  const rms = Math.sqrt(relativeChanges.reduce((sum, value) => sum + value ** 2, 0) / relativeChanges.length);
+  const allowance = roundSetting(Math.min(10, Math.max(1, rms)));
   return direction === 'down' ? { min: -allowance, max: 0 } : { min: 0, max: allowance };
 }
 

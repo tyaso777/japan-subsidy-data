@@ -60,6 +60,17 @@ describe('将来予測計算サービス', () => {
     expect(linear.map((point) => point.value)).toEqual([50, 83, 85]);
   });
 
+  it('比率の相対変化は現在水準に乗じ、同じ5%改善でも水準に応じてpt幅が変わる', () => {
+    const relative = (baseValue: number) => projectForecastSeries({
+      id: 'base-cogsRate', label: '原価率', scope: 'base', valueKind: 'percent', projectionMode: 'relative',
+      baseYear: 2025, baseValue,
+      periods: [{ id: 'A', startYear: 2026, endYear: 2027, annualGrowthRate: -5, startAdjustment: 0 }],
+    }).map((point) => point.value);
+
+    expect(relative(10)).toEqual([10, 9.5, 9.025]);
+    expect(relative(80)).toEqual([80, 76, 72.2]);
+  });
+
   it('事業化報告期間の初年で開始時固定値を優先し、翌年から成長させる', () => {
     const points = projectForecastSeries({
       id: 'subsidy-sales', label: '売上高', scope: 'subsidy', valueKind: 'money', projectionMode: 'compound',

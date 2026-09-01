@@ -8,11 +8,12 @@ describe('将来予測水準の正式な設定範囲', () => {
   it('初期モデルの全期間へ表示と同じ最小値・最大値を保存する', () => {
     const forecast = createModelStore().getState().forecast;
     const compound = forecast.series.find((series) => series.id === 'base-sales')!;
-    const linear = forecast.series.find((series) => series.id === 'base-cogsRate')!;
+    const relative = forecast.series.find((series) => series.id === 'base-cogsRate')!;
 
     expect(compound.periods.every((period) => period.range?.min === -10 && period.range.max === 50)).toBe(true);
-    expect(linear.periods.every((period) => period.range?.min === -1 && period.range.max === 0)).toBe(true);
-    expect(linear.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);
+    expect(relative.projectionMode).toBe('relative');
+    expect(relative.periods.every((period) => period.range?.min === -10 && period.range.max === 0)).toBe(true);
+    expect(relative.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);
     expect(forecast.series.flatMap((series) => series.periods).every((period) => period.range)).toBe(true);
   });
 

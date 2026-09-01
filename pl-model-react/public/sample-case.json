@@ -746,7 +746,7 @@
           "label": "原価率",
           "scope": "base",
           "valueKind": "percent",
-          "projectionMode": "linear",
+          "projectionMode": "relative",
           "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 62,
@@ -758,7 +758,7 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -1,
+                "min": -10,
                 "max": 0
               },
               "startValue": null,
@@ -771,7 +771,7 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -1,
+                "min": -10,
                 "max": 0
               },
               "startValue": null,
@@ -784,7 +784,7 @@
           "label": "原価内減価償却費の売上高比率",
           "scope": "base",
           "valueKind": "percent",
-          "projectionMode": "linear",
+          "projectionMode": "relative",
           "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 2.5,
@@ -797,7 +797,7 @@
               "startAdjustment": 0,
               "range": {
                 "min": 0,
-                "max": 1
+                "max": 10
               },
               "startValue": null,
               "optimizationFixed": true
@@ -810,7 +810,7 @@
               "startAdjustment": 0,
               "range": {
                 "min": 0,
-                "max": 1
+                "max": 10
               },
               "startValue": null,
               "optimizationFixed": true
@@ -822,7 +822,7 @@
           "label": "販管費内減価償却費の売上高比率",
           "scope": "base",
           "valueKind": "percent",
-          "projectionMode": "linear",
+          "projectionMode": "relative",
           "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 1.7000000000000002,
@@ -835,7 +835,7 @@
               "startAdjustment": 0,
               "range": {
                 "min": 0,
-                "max": 1
+                "max": 10
               },
               "startValue": null,
               "optimizationFixed": true
@@ -848,7 +848,7 @@
               "startAdjustment": 0,
               "range": {
                 "min": 0,
-                "max": 1
+                "max": 10
               },
               "startValue": null,
               "optimizationFixed": true
@@ -860,7 +860,7 @@
           "label": "研究開発費の売上高比率",
           "scope": "base",
           "valueKind": "percent",
-          "projectionMode": "linear",
+          "projectionMode": "relative",
           "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 1.7999999999999998,
@@ -898,7 +898,7 @@
           "label": "その他販管費率",
           "scope": "base",
           "valueKind": "percent",
-          "projectionMode": "linear",
+          "projectionMode": "relative",
           "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 7.6,
@@ -910,7 +910,7 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -1,
+                "min": -10,
                 "max": 0
               },
               "startValue": null,
@@ -923,7 +923,7 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -1,
+                "min": -10,
                 "max": 0
               },
               "startValue": null,
@@ -1301,7 +1301,7 @@
           "label": "原価率",
           "scope": "subsidy",
           "valueKind": "percent",
-          "projectionMode": "linear",
+          "projectionMode": "relative",
           "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 70,
@@ -1313,7 +1313,7 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -1,
+                "min": -10,
                 "max": 0
               },
               "startValue": null,
@@ -1326,7 +1326,7 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -1,
+                "min": -10,
                 "max": 0
               },
               "startValue": null,
@@ -1339,7 +1339,7 @@
           "label": "原価内減価償却費の売上高比率",
           "scope": "subsidy",
           "valueKind": "percent",
-          "projectionMode": "linear",
+          "projectionMode": "relative",
           "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 4,
@@ -1352,7 +1352,7 @@
               "startAdjustment": 0,
               "range": {
                 "min": 0,
-                "max": 1
+                "max": 10
               },
               "startValue": null,
               "optimizationFixed": true
@@ -1365,7 +1365,7 @@
               "startAdjustment": 0,
               "range": {
                 "min": 0,
-                "max": 1
+                "max": 10
               },
               "startValue": null,
               "optimizationFixed": true
@@ -1377,7 +1377,7 @@
           "label": "販管費内減価償却費の売上高比率",
           "scope": "subsidy",
           "valueKind": "percent",
-          "projectionMode": "linear",
+          "projectionMode": "relative",
           "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 2,
@@ -1390,7 +1390,7 @@
               "startAdjustment": 0,
               "range": {
                 "min": 0,
-                "max": 1
+                "max": 10
               },
               "startValue": null,
               "optimizationFixed": true
@@ -1403,7 +1403,7 @@
               "startAdjustment": 0,
               "range": {
                 "min": 0,
-                "max": 1
+                "max": 10
               },
               "startValue": null,
               "optimizationFixed": true
@@ -1415,7 +1415,7 @@
           "label": "研究開発費の売上高比率",
           "scope": "subsidy",
           "valueKind": "percent",
-          "projectionMode": "linear",
+          "projectionMode": "relative",
           "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 4,
@@ -1453,7 +1453,7 @@
           "label": "その他販管費率",
           "scope": "subsidy",
           "valueKind": "percent",
-          "projectionMode": "linear",
+          "projectionMode": "relative",
           "changePolicy": "adjustable",
           "baseYear": 2025,
           "baseValue": 8,
@@ -1465,7 +1465,7 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -1,
+                "min": -10,
                 "max": 0
               },
               "startValue": null,
@@ -1478,7 +1478,7 @@
               "annualGrowthRate": 0,
               "startAdjustment": 0,
               "range": {
-                "min": -1,
+                "min": -10,
                 "max": 0
               },
               "startValue": null,

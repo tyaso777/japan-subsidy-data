@@ -81,7 +81,7 @@ function sameSnapshot(left: ModelSnapshot, right: ModelSnapshot): boolean {
 
 function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInput[], subsidyPl: HistoricalPlInput[]): ForecastModel {
   const baseYear = program.timeline.historical.endYear;
-  const periods = (change: number, projectionMode: 'compound' | 'linear'): ForecastPeriod[] => program.timeline.periods.map((period) => ({
+  const periods = (change: number, projectionMode: 'compound' | 'linear' | 'relative'): ForecastPeriod[] => program.timeline.periods.map((period) => ({
     id: period.definitionId, startYear: period.startYear, endYear: period.endYear, annualGrowthRate: change, startValue: null, startAdjustment: 0, range: defaultForecastRange(projectionMode), optimizationFixed: false,
   }));
   const forScope = (scope: BusinessScope, latest: HistoricalPlInput, growth: { sales: number; headcount: number; pay: number }) => {
@@ -96,15 +96,24 @@ function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInpu
         optimizationFixed: true,
       } : period;
     }) });
+    const relative = (id: string, label: string, baseValue: number, change = 0, initiallyLocked = false) => ({
+      id: `${scope}-${id}`, label, scope, valueKind: 'percent' as const, projectionMode: 'relative' as const, changePolicy: 'adjustable' as const, baseYear, baseValue,
+      periods: periods(change, 'relative').map((period) => initiallyLocked ? {
+        ...period,
+        annualGrowthRate: 0,
+        range: fixedSupplementaryRange(id) ?? { min: 0, max: 0 },
+        optimizationFixed: true,
+      } : period),
+    });
     return [
       compound('sales', '売上高', 'money', latest.sales, growth.sales),
       compound('headcount', '従業員数（就業時間換算）', 'fte', latest.headcount, growth.headcount),
       compound('payPerPerson', '従業員1人当たり給与支給総額', 'moneyPerPerson', calculated.employeePayPerPerson, growth.pay),
-      linear('cogsRate', '原価率', latest.sales ? latest.cogs / latest.sales * 100 : 0, 0, 'adjustable', true),
-      linear('cogsDepRate', '原価内減価償却費の売上高比率', latest.sales ? latest.cogsDepreciation / latest.sales * 100 : 0, 0, 'adjustable', true),
-      linear('sgaDepRate', '販管費内減価償却費の売上高比率', latest.sales ? latest.sgaDepreciation / latest.sales * 100 : 0, 0, 'adjustable', true),
-      linear('researchDevelopmentRate', '研究開発費の売上高比率', latest.sales ? latest.researchDevelopment / latest.sales * 100 : 0, 0, 'adjustable', true),
-      linear('otherSgaRate', 'その他販管費率', latest.sales ? latest.otherSga / latest.sales * 100 : 0, 0, 'adjustable', true),
+      relative('cogsRate', '原価率', latest.sales ? latest.cogs / latest.sales * 100 : 0, 0, true),
+      relative('cogsDepRate', '原価内減価償却費の売上高比率', latest.sales ? latest.cogsDepreciation / latest.sales * 100 : 0, 0, true),
+      relative('sgaDepRate', '販管費内減価償却費の売上高比率', latest.sales ? latest.sgaDepreciation / latest.sales * 100 : 0, 0, true),
+      relative('researchDevelopmentRate', '研究開発費の売上高比率', latest.sales ? latest.researchDevelopment / latest.sales * 100 : 0, 0, true),
+      relative('otherSgaRate', 'その他販管費率', latest.sales ? latest.otherSga / latest.sales * 100 : 0, 0, true),
       compound('officerPayPerPerson', '役員1人当たり給与支給総額', 'moneyPerPerson', calculated.officerPayPerPerson, 2),
       linear('employeeSalaryShare', '従業員給与のうち給与割合', calculated.employeePay ? latest.employeeSalary / calculated.employeePay * 100 : 95, 0, 'adjustable', true),
       linear('officerCompensationShare', '役員給与のうち報酬割合', calculated.officerPay ? latest.officerCompensation / calculated.officerPay * 100 : 90, 0, 'adjustable', true),

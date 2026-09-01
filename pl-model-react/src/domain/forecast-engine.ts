@@ -21,7 +21,8 @@ export type ForecastSeries = {
   label: string;
   scope: 'company' | 'base' | 'subsidy';
   valueKind: import('./value-units').ValueKind;
-  projectionMode?: 'compound' | 'linear';
+  /** compound: 金額等の成長率、linear: 率へのpt加算、relative: 率の現在水準に対する相対変化率。 */
+  projectionMode?: 'compound' | 'linear' | 'relative';
   /** fixed は全期間で基準値を維持し、水準適正化・目標最適化の対象外とする。 */
   changePolicy?: 'adjustable' | 'fixed';
   baseYear: number;

@@ -3,7 +3,9 @@ import type { ForecastModel, ForecastPeriod, ForecastSeries } from './forecast-e
 export type ForecastRange = { min: number; max: number };
 
 export function defaultForecastRange(projectionMode: ForecastSeries['projectionMode']): ForecastRange {
-  return projectionMode === 'linear' ? { min: -20, max: 20 } : { min: -10, max: 50 };
+  if (projectionMode === 'linear') return { min: -20, max: 20 };
+  if (projectionMode === 'relative') return { min: -10, max: 10 };
+  return { min: -10, max: 50 };
 }
 
 export function clampToForecastRange(value: number, range: ForecastRange): number {

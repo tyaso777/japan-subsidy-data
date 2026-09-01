@@ -362,7 +362,7 @@ function constrainedCost(parameters: SearchParameter[], strategy: OptimizationSt
 
 function satisfiesForecastDomain(model: ForecastModel): boolean {
   return model.series.every((series) => {
-    if (series.projectionMode === 'compound' && series.periods.some((period) => period.annualGrowthRate <= -100)) return false;
+    if (series.projectionMode !== 'linear' && series.periods.some((period) => period.annualGrowthRate <= -100)) return false;
     if (!['money', 'fte', 'count', 'moneyPerPerson', 'index', 'multiple'].includes(series.valueKind)) return true;
     return projectForecastSeries(series).every((point) => Number.isFinite(point.value) && point.value >= 0);
   });
@@ -559,7 +559,7 @@ function* adaptiveOutsideLevelSteps(model: ForecastModel, initial: OptimizationP
       if (isForecastPeriodOptimizationFixed(period, series.projectionMode)) return;
       const span = Math.max(preferred.max - preferred.min, .01);
       period.range = {
-        min: series.projectionMode === 'compound' ? Math.max(-99.999999, preferred.min - span * factor) : preferred.min - span * factor,
+        min: series.projectionMode !== 'linear' ? Math.max(-99.999999, preferred.min - span * factor) : preferred.min - span * factor,
         max: preferred.max + span * factor,
       };
     }));
