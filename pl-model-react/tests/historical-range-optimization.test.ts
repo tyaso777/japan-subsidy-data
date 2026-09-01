@@ -229,7 +229,7 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     const expectedDirection: Record<string, 'down' | 'up' | 'locked'> = {
       cogsRate: 'down',
       cogsDepRate: 'up',
-      sgaDepRate: 'up',
+      sgaDepRate: 'down',
       researchDevelopmentRate: 'locked',
       otherSgaRate: 'down',
     };

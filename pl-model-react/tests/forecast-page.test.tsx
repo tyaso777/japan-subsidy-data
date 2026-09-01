@@ -829,8 +829,8 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByLabelText('補助事業期間 原価内減価償却費の売上高比率 最大値')).toHaveValue(10);
     expect(screen.getByLabelText('補助事業期間 原価内減価償却費の売上高比率 年間変化')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 原価内減価償却費の売上高比率 最適化で固定')).toBeChecked();
-    expect(screen.getByLabelText('補助事業期間 販管費内減価償却費の売上高比率 最小値')).toHaveValue(0);
-    expect(screen.getByLabelText('補助事業期間 販管費内減価償却費の売上高比率 最大値')).toHaveValue(10);
+    expect(screen.getByLabelText('補助事業期間 販管費内減価償却費の売上高比率 最小値')).toHaveValue(-10);
+    expect(screen.getByLabelText('補助事業期間 販管費内減価償却費の売上高比率 最大値')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 販管費内減価償却費の売上高比率 年間変化')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 販管費内減価償却費の売上高比率 最適化で固定')).toBeChecked();
     expect(screen.getByLabelText('補助事業期間 販管費内減価償却費の売上高比率 水準')).toBeEnabled();

@@ -48,7 +48,7 @@ const newBusinessOwnInitialValueDrivers = new Set(['sales', 'headcount', 'office
 const cautiousRateDirections: Record<string, 'down' | 'up'> = {
   cogsRate: 'down',
   cogsDepRate: 'up',
-  sgaDepRate: 'up',
+  sgaDepRate: 'down',
   otherSgaRate: 'down',
 };
 

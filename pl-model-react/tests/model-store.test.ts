@@ -8,7 +8,7 @@ describe('モデルストア', () => {
     const expectedRanges: Record<string, { min: number; max: number }> = {
       cogsRate: { min: -10, max: 0 },
       cogsDepRate: { min: 0, max: 10 },
-      sgaDepRate: { min: 0, max: 10 },
+      sgaDepRate: { min: -10, max: 0 },
       researchDevelopmentRate: { min: 0, max: 0 },
       otherSgaRate: { min: -10, max: 0 },
     };
