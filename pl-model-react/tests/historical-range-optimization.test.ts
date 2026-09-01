@@ -174,7 +174,7 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(period.annualGrowthRate).toBeGreaterThan(20);
   });
 
-  it('原価率は直近値を開始時固定値とし、年間変化の探索範囲を-10〜10にする', () => {
+  it('原価率は直近値を開始時固定値とし、実績水準の標準偏差の半分だけ改善方向へ動かす', () => {
     const state = createModelStore().getState();
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
     const cogs = result.forecast.series.find((series) => series.id === 'base-cogsRate')!;
@@ -183,7 +183,10 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(cogs.changePolicy).toBe('adjustable');
     expect(cogs.periods[0].startValue).toBeCloseTo(latest.cogs / latest.sales * 100);
     expect(cogs.periods.slice(1).every((period) => period.startValue === null)).toBe(true);
-    expect(cogs.periods.every((period) => period.range?.min === -10 && period.range.max === 10)).toBe(true);
+    const levels = state.actuals.basePl.map((row) => row.cogs / row.sales * 100);
+    const mean = levels.reduce((sum, value) => sum + value, 0) / levels.length;
+    const deviation = Math.sqrt(levels.reduce((sum, value) => sum + (value - mean) ** 2, 0) / levels.length);
+    expect(cogs.periods.every((period) => period.range?.min === Number((-deviation / 2).toFixed(2)) && period.range.max === 0)).toBe(true);
     expect(cogs.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);
   });
 
@@ -218,23 +221,25 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(cogs.changePolicy).toBe('adjustable');
   });
 
-  it('適正化後も固定補足比率の既定探索範囲を保持する', () => {
+  it('適正化後は費用比率の実績偏差に応じた控えめな探索方向を設定する', () => {
     const state = createModelStore().getState();
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
-    const expectedRanges: Record<string, { min: number; max: number }> = {
-      cogsRate: { min: -10, max: 10 },
-      cogsDepRate: { min: 0, max: 10 },
-      sgaDepRate: { min: 0, max: 10 },
-      researchDevelopmentRate: { min: 0, max: 0 },
-      otherSgaRate: { min: -10, max: 0 },
+    const expectedDirection: Record<string, 'down' | 'up' | 'locked'> = {
+      cogsRate: 'down',
+      cogsDepRate: 'up',
+      sgaDepRate: 'up',
+      researchDevelopmentRate: 'locked',
+      otherSgaRate: 'down',
     };
 
     for (const scope of ['base', 'subsidy']) {
-      for (const [driver, range] of Object.entries(expectedRanges)) {
+      for (const [driver, direction] of Object.entries(expectedDirection)) {
         const series = result.forecast.series.find((item) => item.id === `${scope}-${driver}`)!;
         expect(series.periods.every((period) => period.optimizationFixed === true)).toBe(true);
         expect(series.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);
-        expect(series.periods.every((period) => period.range?.min === range.min && period.range.max === range.max)).toBe(true);
+        if (direction === 'down') expect(series.periods.every((period) => period.range!.min <= 0 && period.range!.max === 0)).toBe(true);
+        if (direction === 'up') expect(series.periods.every((period) => period.range!.min === 0 && period.range!.max >= 0)).toBe(true);
+        if (direction === 'locked') expect(series.periods.every((period) => period.range!.min === 0 && period.range!.max === 0)).toBe(true);
       }
     }
   });

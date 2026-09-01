@@ -11,7 +11,7 @@ describe('将来予測水準の正式な設定範囲', () => {
     const linear = forecast.series.find((series) => series.id === 'base-cogsRate')!;
 
     expect(compound.periods.every((period) => period.range?.min === -10 && period.range.max === 50)).toBe(true);
-    expect(linear.periods.every((period) => period.range?.min === -10 && period.range.max === 10)).toBe(true);
+    expect(linear.periods.every((period) => period.range?.min === -1 && period.range.max === 0)).toBe(true);
     expect(linear.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);
     expect(forecast.series.flatMap((series) => series.periods).every((period) => period.range)).toBe(true);
   });

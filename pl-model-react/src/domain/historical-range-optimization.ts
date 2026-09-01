@@ -45,6 +45,13 @@ const initiallyLockedDrivers = new Set([
 // 新規の補助事業では、事業固有の絶対量をベース事業から転記しない。
 const newBusinessOwnInitialValueDrivers = new Set(['sales', 'headcount', 'officerCount']);
 
+const cautiousRateDirections: Record<string, 'down' | 'up'> = {
+  cogsRate: 'down',
+  cogsDepRate: 'up',
+  sgaDepRate: 'up',
+  otherSgaRate: 'down',
+};
+
 function driverId(series: ForecastSeries): string {
   return series.id.replace(`${series.scope}-`, '');
 }
@@ -101,6 +108,17 @@ function statisticalRange(values: number[]): (Range & { center: number }) | null
   const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
   const deviation = Math.sqrt(values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length);
   return { min: mean - 2 * deviation, max: mean + 2 * deviation, center: mean };
+}
+
+function cautiousRateRange(driver: string, rows: HistoricalPlCalculated[]): Range | null {
+  const direction = cautiousRateDirections[driver];
+  if (!direction) return null;
+  const values = valuesForDriver(driver, rows).filter(Number.isFinite);
+  if (values.length < 2) return null;
+  const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const deviation = Math.sqrt(values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length);
+  const allowance = roundSetting(deviation / 2);
+  return direction === 'down' ? { min: -allowance, max: 0 } : { min: 0, max: allowance };
 }
 
 export function hasUsableSubsidyHistory(rows: HistoricalPlInput[]): boolean {
@@ -194,11 +212,12 @@ export function optimizeForecastRangesFromActuals(
       const latestLevel = valuesForDriver(driver, source).at(-1);
       const fixedLevel = Number.isFinite(latestLevel) ? latestLevel! : series.baseValue;
       series.baseValue = fixedLevel;
+      const cautiousRange = cautiousRateRange(driver, source);
       series.periods.forEach((period, index) => {
         period.annualGrowthRate = 0;
         period.startValue = index === 0 ? fixedLevel : null;
         period.startAdjustment = 0;
-        period.range = fixedSupplementaryRange(driver) ?? { min: 0, max: 0 };
+        period.range = cautiousRange ?? fixedSupplementaryRange(driver) ?? { min: 0, max: 0 };
         period.optimizationFixed = true;
         period.lineageId = undefined;
         updatedPeriods += 1;

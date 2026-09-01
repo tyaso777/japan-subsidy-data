@@ -732,12 +732,12 @@ describe('将来予測・PL画面', () => {
     expect(slider).toBeEnabled();
   });
 
-  it('原価率と原価内減価償却費の売上高比率に既定の年間変化範囲を表示する', () => {
+  it('比率項目には過大でない既定の年間変化範囲を表示する', () => {
     render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
-    expect(screen.getByLabelText('補助事業期間 原価率 最小値')).toHaveValue(-10);
-    expect(screen.getByLabelText('補助事業期間 原価率 最大値')).toHaveValue(10);
+    expect(screen.getByLabelText('補助事業期間 原価率 最小値')).toHaveValue(-1);
+    expect(screen.getByLabelText('補助事業期間 原価率 最大値')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 原価内減価償却費の売上高比率 最小値')).toHaveValue(0);
-    expect(screen.getByLabelText('補助事業期間 原価内減価償却費の売上高比率 最大値')).toHaveValue(10);
+    expect(screen.getByLabelText('補助事業期間 原価内減価償却費の売上高比率 最大値')).toHaveValue(1);
   });
 
   it('固定項目をまとめて隠し、変動可能な水準だけに絞り込める', async () => {
@@ -802,17 +802,17 @@ describe('将来予測・PL画面', () => {
     render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
 
     for (const label of ['その他販管費率']) {
-      expect(screen.getByLabelText(`補助事業期間 ${label} 最小値`)).toHaveValue(-10);
+      expect(screen.getByLabelText(`補助事業期間 ${label} 最小値`)).toHaveValue(-1);
       expect(screen.getByLabelText(`補助事業期間 ${label} 最大値`)).toHaveValue(0);
       expect(screen.getByLabelText(`補助事業期間 ${label} 年間変化`)).toHaveValue(0);
       expect(screen.getByLabelText(`補助事業期間 ${label} 最適化で固定`)).toBeChecked();
     }
     expect(screen.getByLabelText('補助事業期間 原価内減価償却費の売上高比率 最小値')).toHaveValue(0);
-    expect(screen.getByLabelText('補助事業期間 原価内減価償却費の売上高比率 最大値')).toHaveValue(10);
+    expect(screen.getByLabelText('補助事業期間 原価内減価償却費の売上高比率 最大値')).toHaveValue(1);
     expect(screen.getByLabelText('補助事業期間 原価内減価償却費の売上高比率 年間変化')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 原価内減価償却費の売上高比率 最適化で固定')).toBeChecked();
     expect(screen.getByLabelText('補助事業期間 販管費内減価償却費の売上高比率 最小値')).toHaveValue(0);
-    expect(screen.getByLabelText('補助事業期間 販管費内減価償却費の売上高比率 最大値')).toHaveValue(10);
+    expect(screen.getByLabelText('補助事業期間 販管費内減価償却費の売上高比率 最大値')).toHaveValue(1);
     expect(screen.getByLabelText('補助事業期間 販管費内減価償却費の売上高比率 年間変化')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 販管費内減価償却費の売上高比率 最適化で固定')).toBeChecked();
     expect(screen.getByLabelText('補助事業期間 販管費内減価償却費の売上高比率 水準')).toBeEnabled();
