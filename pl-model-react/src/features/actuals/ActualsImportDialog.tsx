@@ -1,11 +1,11 @@
 import { useRef, useState, type ChangeEvent } from 'react';
-import { Bot, Copy, Download, FileJson2, Upload } from 'lucide-react';
+import { Bot, Copy, FileJson2, Upload } from 'lucide-react';
 import actualsImportPrompt from '../../assets/ai-actuals-import-prompt.md?raw';
 import actualsImportSchema from '../../assets/actuals-import.schema.json?raw';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { parseActualsImportFile, type ActualsImportResult } from '../../domain/actuals-import';
-import { copyText, downloadTextFile } from '../../lib/text-resource-actions';
+import { copyText } from '../../lib/text-resource-actions';
 import { useModelStore } from '../../store/model-store-context';
 
 const amountUnitLabels = { yen: '円', 'thousand-yen': '千円', 'million-yen': '百万円' } as const;
@@ -24,6 +24,7 @@ export function ActualsImportDialog() {
   const [error, setError] = useState<string>();
   const [resourceMessage, setResourceMessage] = useState<string>();
   const targetYears = Array.from({ length: historical.endYear - historical.startYear + 1 }, (_, index) => historical.startYear + index);
+  const completePrompt = `${actualsImportPrompt.trim()}\n\n## 今回の取込対象年度\n\n今回の取込対象年度は **${historical.startYear}年〜${historical.endYear}年（${targetYears.length}期）** です。元資料に対象外年度が含まれていても構いませんが、対象年度を必ずyearsと各レコードに含め、資料にない対象年度・項目は推測せずnullにしてください。\n\n## 準拠するJSON Schema\n\n以下のSchemaをこの依頼の一部として使用し、別ファイルの添付を要求しないでください。\n\n\u0060\u0060\u0060json\n${actualsImportSchema.trim()}\n\u0060\u0060\u0060\n`;
   const targetIndexes = preview ? targetYears.map((year) => preview.years.indexOf(year)).filter((index) => index >= 0) : [];
   const missingYears = preview ? targetYears.filter((year) => !preview.years.includes(year)) : [];
 
@@ -46,7 +47,7 @@ export function ActualsImportDialog() {
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>AIで過去実績を取り込む</DialogTitle>
-          <DialogDescription>既存のB/S・P/Lと下記ファイルをCopilot等へ渡し、生成された過去実績JSONを検証してから反映します。</DialogDescription>
+          <DialogDescription>既存のB/S・P/Lと、Schema・対象年度・出力仕様を内包した1つのプロンプトをCopilot等へ渡し、生成された過去実績JSONを検証してから反映します。</DialogDescription>
         </DialogHeader>
         <input ref={inputRef} className="hidden" aria-label="過去実績JSONファイル" type="file" accept="application/json,.json" onChange={(event: ChangeEvent<HTMLInputElement>) => {
           const file = event.target.files?.[0];
@@ -57,19 +58,15 @@ export function ActualsImportDialog() {
           <div className="flex flex-wrap items-center gap-2">
             <Button variant="outline" size="sm" aria-label="AI変換用プロンプトをコピー" onClick={async () => {
               try {
-                await copyText(actualsImportPrompt);
-                setResourceMessage('プロンプトをコピーしました');
+                await copyText(completePrompt);
+                setResourceMessage('Schema・対象年度・出力仕様を含むプロンプトをコピーしました');
               } catch {
                 setResourceMessage('プロンプトをコピーできませんでした');
               }
             }}><Copy />AI変換用プロンプトをコピー</Button>
-            <Button variant="outline" size="sm" aria-label="JSON Schemaをダウンロード" onClick={() => {
-              downloadTextFile('actuals-import.schema.json', actualsImportSchema, 'application/schema+json;charset=utf-8');
-              setResourceMessage('JSON Schemaをダウンロードしました');
-            }}><Download />JSON Schema</Button>
           </div>
           {resourceMessage && <p role="status" className="m-0 text-[11px] font-bold text-teal">{resourceMessage}</p>}
-          <p className="m-0 text-[11px] leading-relaxed text-muted-foreground">資料にない値は推測せずnull、自動計算項目は出力せず、対応できない科目はunmappedItemsへ残す仕様です。</p>
+          <p className="m-0 text-[11px] leading-relaxed text-muted-foreground">コピーは1回だけです。プロンプトにJSON Schema、今回の対象年度、ファイル名、UTF-8 JSON形式を含みます。資料にない値は推測せずnull、自動計算項目は出力せず、対応できない科目はunmappedItemsへ残します。</p>
           <Button className="w-fit" onClick={() => inputRef.current?.click()}><Upload />生成されたJSONを選択</Button>
         </div>
         {error && <div role="alert" className="max-h-32 overflow-auto rounded-md border border-orange/40 bg-orange/5 p-3 text-xs text-orange">{error}</div>}

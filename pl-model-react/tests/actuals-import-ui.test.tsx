@@ -20,7 +20,7 @@ const importJson = JSON.stringify({
 });
 
 describe('AIで過去実績を取り込む', () => {
-  it('プロンプトとSchemaを提供し、検証結果を確認してからB/S・P/Lへ反映する', async () => {
+  it('Schema・対象年度・出力仕様を含む1つのプロンプトを提供し、検証結果を確認してからB/S・P/Lへ反映する', async () => {
     const user = userEvent.setup();
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } });
@@ -33,13 +33,18 @@ describe('AIで過去実績を取り込む', () => {
     await user.click(screen.getByRole('button', { name: 'AI変換用プロンプトをコピー' }));
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('# 過去実績JSON変換プロンプト'));
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('## 具体例'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('## 準拠するJSON Schema'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('https://json-schema.org/draft/2020-12/schema'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('今回の取込対象年度は **2023年〜2025年（3期）**'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('`actuals-import.json`'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('UTF-8のJSON'));
     expect(writeText).not.toHaveBeenCalledWith(expect.stringContaining('actuals-import-template.json'));
-    expect(await screen.findByText('プロンプトをコピーしました')).toBeVisible();
+    expect(await screen.findByText('Schema・対象年度・出力仕様を含むプロンプトをコピーしました')).toBeVisible();
 
-    await user.click(screen.getByRole('button', { name: 'JSON Schemaをダウンロード' }));
-    expect(createObjectURL).toHaveBeenCalledWith(expect.any(Blob));
-    expect(anchorClick).toHaveBeenCalled();
-    expect(revokeObjectURL).toHaveBeenCalledWith('blob:actuals-import');
+    expect(screen.queryByRole('button', { name: 'JSON Schemaをダウンロード' })).not.toBeInTheDocument();
+    expect(createObjectURL).not.toHaveBeenCalled();
+    expect(anchorClick).not.toHaveBeenCalled();
+    expect(revokeObjectURL).not.toHaveBeenCalled();
     expect(screen.queryByRole('link', { name: /JSON Schema/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '入力テンプレートをダウンロード' })).not.toBeInTheDocument();
 
