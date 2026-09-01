@@ -895,6 +895,17 @@ describe('将来予測・PL画面', () => {
     expect(screen.getByLabelText('ベース事業 P/L 2026年 売上高')).toHaveClass('px-0.5');
   });
 
+  it('将来PLの科目名は科目番号の右側を行頭として折り返す', async () => {
+    const user = userEvent.setup();
+    render(<App initialPage="forecast" initialForecastView="table" />);
+    await user.click(screen.getByRole('tab', { name: 'PL表' }));
+
+    const table = screen.getByTestId('forecast-pl-table');
+    const subject = within(table).getByRole('button', { name: /28従業員1人当たり給与支給総額成長率/ });
+    expect(subject).toHaveClass('grid', 'grid-cols-[3.25rem_minmax(0,1fr)]', 'items-start');
+    expect(subject.querySelectorAll('span')[1]).toHaveClass('min-w-0');
+  });
+
   it('将来PLは内部計算値を表示時だけ単位別の桁数へ丸める', async () => {
     const user = userEvent.setup();
     render(<App initialPage="forecast" initialForecastView="table" />);
