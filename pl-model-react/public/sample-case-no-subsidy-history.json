@@ -795,7 +795,7 @@
         },
         {
           "id": "base-cogsDepRate",
-          "label": "原価内減価償却費率",
+          "label": "原価内減価償却費の売上高比率",
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
@@ -833,7 +833,7 @@
         },
         {
           "id": "base-sgaDepRate",
-          "label": "販管費内減価償却費率",
+          "label": "販管費内減価償却費の売上高比率",
           "scope": "base",
           "valueKind": "percent",
           "projectionMode": "linear",
@@ -1350,7 +1350,7 @@
         },
         {
           "id": "subsidy-cogsDepRate",
-          "label": "原価内減価償却費率",
+          "label": "原価内減価償却費の売上高比率",
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
@@ -1388,7 +1388,7 @@
         },
         {
           "id": "subsidy-sgaDepRate",
-          "label": "販管費内減価償却費率",
+          "label": "販管費内減価償却費の売上高比率",
           "scope": "subsidy",
           "valueKind": "percent",
           "projectionMode": "linear",
