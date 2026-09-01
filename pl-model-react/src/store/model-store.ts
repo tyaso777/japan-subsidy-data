@@ -87,15 +87,6 @@ function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInpu
   const forScope = (scope: BusinessScope, latest: HistoricalPlInput, growth: { sales: number; headcount: number; pay: number }) => {
     const calculated = calculatePl(latest);
     const compound = (id: string, label: string, valueKind: import('../domain/value-units').ValueKind, baseValue: number, rate: number) => ({ id: `${scope}-${id}`, label, scope, valueKind, projectionMode: 'compound' as const, baseYear, baseValue, periods: periods(rate, 'compound') });
-    const linear = (id: string, label: string, baseValue: number, change = 0, changePolicy: 'adjustable' | 'fixed' = 'adjustable', initiallyLocked = false) => ({ id: `${scope}-${id}`, label, scope, valueKind: 'percent' as const, projectionMode: 'linear' as const, changePolicy, baseYear, baseValue, periods: periods(change, 'linear').map((period) => {
-      const locked = changePolicy === 'fixed' || initiallyLocked;
-      return locked ? {
-        ...period,
-        annualGrowthRate: 0,
-        range: fixedSupplementaryRange(id) ?? { min: 0, max: 0 },
-        optimizationFixed: true,
-      } : period;
-    }) });
     const relative = (id: string, label: string, baseValue: number, change = 0, initiallyLocked = false) => ({
       id: `${scope}-${id}`, label, scope, valueKind: 'percent' as const, projectionMode: 'relative' as const, changePolicy: 'adjustable' as const, baseYear, baseValue,
       periods: periods(change, 'relative').map((period) => initiallyLocked ? {
@@ -115,11 +106,11 @@ function defaultForecast(program: ProgramConfiguration, basePl: HistoricalPlInpu
       relative('researchDevelopmentRate', '研究開発費の売上高比率', latest.sales ? latest.researchDevelopment / latest.sales * 100 : 0, 0, true),
       relative('otherSgaRate', 'その他販管費率', latest.sales ? latest.otherSga / latest.sales * 100 : 0, 0, true),
       compound('officerPayPerPerson', '役員1人当たり給与支給総額', 'moneyPerPerson', calculated.officerPayPerPerson, 2),
-      linear('employeeSalaryShare', '従業員給与のうち給与割合', calculated.employeePay ? latest.employeeSalary / calculated.employeePay * 100 : 95, 0, 'adjustable', true),
-      linear('officerCompensationShare', '役員給与のうち報酬割合', calculated.officerPay ? latest.officerCompensation / calculated.officerPay * 100 : 90, 0, 'adjustable', true),
-      linear('nonOperatingRate', '営業外損益の売上高比率', latest.sales ? latest.nonOperating / latest.sales * 100 : 0, 0, 'adjustable', true),
-      linear('extraordinaryRate', '特別損益の売上高比率', latest.sales ? latest.extraordinary / latest.sales * 100 : 0, 0, 'adjustable', true),
-      linear('taxRate', '実効税率', calculated.preTaxIncome > 0 ? Math.max(0, Math.min(100, (1 - latest.netIncome / calculated.preTaxIncome) * 100)) : 30, 0, 'adjustable', true),
+      relative('employeeSalaryShare', '従業員給与のうち給与割合', calculated.employeePay ? latest.employeeSalary / calculated.employeePay * 100 : 95, 0, true),
+      relative('officerCompensationShare', '役員給与のうち報酬割合', calculated.officerPay ? latest.officerCompensation / calculated.officerPay * 100 : 90, 0, true),
+      relative('nonOperatingRate', '営業外損益の売上高比率', latest.sales ? latest.nonOperating / latest.sales * 100 : 0, 0, true),
+      relative('extraordinaryRate', '特別損益の売上高比率', latest.sales ? latest.extraordinary / latest.sales * 100 : 0, 0, true),
+      relative('taxRate', '実効税率', calculated.preTaxIncome > 0 ? Math.max(0, Math.min(100, (1 - latest.netIncome / calculated.preTaxIncome) * 100)) : 30, 0, true),
       compound('officerCount', '役員数', 'count', latest.officerCount, 0),
     ];
   };

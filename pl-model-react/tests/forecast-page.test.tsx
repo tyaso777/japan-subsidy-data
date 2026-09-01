@@ -732,13 +732,24 @@ describe('将来予測・PL画面', () => {
     expect(slider).toBeEnabled();
   });
 
-  it('非負の費用率には水準比例の年間変化率を表示する', () => {
+  it('率の水準設定は構成比・符号付き比率・税率を含めて前年比で統一する', () => {
     render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
     expect(screen.getByLabelText('補助事業期間 原価率 最小値')).toHaveValue(-10);
     expect(screen.getByLabelText('補助事業期間 原価率 最大値')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 原価内減価償却費の売上高比率 最小値')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 原価内減価償却費の売上高比率 最大値')).toHaveValue(10);
     expect(screen.getByLabelText('補助事業期間 原価率 年間変化').closest('fieldset')).toHaveTextContent('%/年');
+    for (const label of [
+      '役員給与のうち報酬割合',
+      '従業員給与のうち給与割合',
+      '営業外損益の売上高比率',
+      '特別損益の売上高比率',
+      '実効税率',
+    ]) {
+      const row = screen.getByLabelText(`補助事業期間 ${label} 年間変化`).closest('fieldset');
+      expect(row).toHaveTextContent('%/年');
+      expect(row).not.toHaveTextContent('pt/年');
+    }
   });
 
   it('固定項目をまとめて隠し、変動可能な水準だけに絞り込める', async () => {

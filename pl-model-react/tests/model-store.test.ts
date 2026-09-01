@@ -26,6 +26,20 @@ describe('モデルストア', () => {
     }
   });
 
+  it('すべての率ドライバーを水準比例の前年比で保持する', () => {
+    const forecast = createModelStore().getState().forecast;
+    const rateDrivers = [
+      'cogsRate', 'cogsDepRate', 'sgaDepRate', 'researchDevelopmentRate', 'otherSgaRate',
+      'employeeSalaryShare', 'officerCompensationShare', 'nonOperatingRate', 'extraordinaryRate', 'taxRate',
+    ];
+
+    for (const scope of ['base', 'subsidy']) {
+      for (const driver of rateDrivers) {
+        expect(forecast.series.find((item) => item.id === `${scope}-${driver}`)?.projectionMode).toBe('relative');
+      }
+    }
+  });
+
   it('B/S・2事業P/Lと期間を一つの状態として保持する', () => {
     const store = createModelStore();
     const state = store.getState();
