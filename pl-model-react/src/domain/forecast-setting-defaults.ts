@@ -1,8 +1,8 @@
 export type ForecastSettingRange = { min: number; max: number };
 
 const fixedSupplementaryRanges: Record<string, ForecastSettingRange> = {
-  cogsRate: { min: 0, max: 0 },
-  cogsDepRate: { min: -10, max: 0 },
+  cogsRate: { min: -10, max: 10 },
+  cogsDepRate: { min: 0, max: 10 },
   sgaDepRate: { min: 0, max: 10 },
   researchDevelopmentRate: { min: 0, max: 0 },
   otherSgaRate: { min: -10, max: 0 },

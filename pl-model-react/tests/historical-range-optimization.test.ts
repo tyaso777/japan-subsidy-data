@@ -174,7 +174,7 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(period.annualGrowthRate).toBeGreaterThan(20);
   });
 
-  it('原価率は直近値を開始時固定値とし、Min=Max=0の間は年間変化をロックする', () => {
+  it('原価率は直近値を開始時固定値とし、年間変化の探索範囲を-10〜10にする', () => {
     const state = createModelStore().getState();
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
     const cogs = result.forecast.series.find((series) => series.id === 'base-cogsRate')!;
@@ -183,7 +183,7 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     expect(cogs.changePolicy).toBe('adjustable');
     expect(cogs.periods[0].startValue).toBeCloseTo(latest.cogs / latest.sales * 100);
     expect(cogs.periods.slice(1).every((period) => period.startValue === null)).toBe(true);
-    expect(cogs.periods.every((period) => period.range?.min === 0 && period.range.max === 0)).toBe(true);
+    expect(cogs.periods.every((period) => period.range?.min === -10 && period.range.max === 10)).toBe(true);
     expect(cogs.periods.every((period) => period.annualGrowthRate === 0)).toBe(true);
   });
 
@@ -222,7 +222,8 @@ describe('過去実績による将来予測水準範囲の適正化', () => {
     const state = createModelStore().getState();
     const result = optimizeForecastRangesFromActuals(state.forecast, state.program, state.actuals.basePl, state.actuals.subsidyPl);
     const expectedRanges: Record<string, { min: number; max: number }> = {
-      cogsDepRate: { min: -10, max: 0 },
+      cogsRate: { min: -10, max: 10 },
+      cogsDepRate: { min: 0, max: 10 },
       sgaDepRate: { min: 0, max: 10 },
       researchDevelopmentRate: { min: 0, max: 0 },
       otherSgaRate: { min: -10, max: 0 },

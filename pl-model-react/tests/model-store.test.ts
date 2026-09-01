@@ -6,7 +6,8 @@ describe('モデルストア', () => {
   it('固定する補足比率にも解除後に使える既定の探索範囲を持たせる', () => {
     const forecast = createModelStore().getState().forecast;
     const expectedRanges: Record<string, { min: number; max: number }> = {
-      cogsDepRate: { min: -10, max: 0 },
+      cogsRate: { min: -10, max: 10 },
+      cogsDepRate: { min: 0, max: 10 },
       sgaDepRate: { min: 0, max: 10 },
       researchDevelopmentRate: { min: 0, max: 0 },
       otherSgaRate: { min: -10, max: 0 },

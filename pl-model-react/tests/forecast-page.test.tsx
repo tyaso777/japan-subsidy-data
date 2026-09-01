@@ -732,12 +732,12 @@ describe('将来予測・PL画面', () => {
     expect(slider).toBeEnabled();
   });
 
-  it('原価率は初期状態でMin=Max=0となり、範囲を広げるまで水準をロックする', async () => {
-    const user = userEvent.setup();
+  it('原価率と原価内減価償却費率に既定の年間変化範囲を表示する', () => {
     render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
-    expect(screen.getByLabelText('補助事業期間 原価率 最小値')).toHaveValue(0);
-    expect(screen.getByLabelText('補助事業期間 原価率 最大値')).toHaveValue(0);
-    expect(screen.getByLabelText('補助事業期間 原価率 水準')).toBeDisabled();
+    expect(screen.getByLabelText('補助事業期間 原価率 最小値')).toHaveValue(-10);
+    expect(screen.getByLabelText('補助事業期間 原価率 最大値')).toHaveValue(10);
+    expect(screen.getByLabelText('補助事業期間 原価内減価償却費率 最小値')).toHaveValue(0);
+    expect(screen.getByLabelText('補助事業期間 原価内減価償却費率 最大値')).toHaveValue(10);
   });
 
   it('固定項目をまとめて隠し、変動可能な水準だけに絞り込める', async () => {
@@ -801,12 +801,16 @@ describe('将来予測・PL画面', () => {
   it('固定中の減価率とその他販管費率にも既定範囲を表示し、研究開発費率は0に保つ', () => {
     render(<App renderForecastWorkspace={false} initialPage="forecast" initialForecastView="table" />);
 
-    for (const label of ['原価内減価償却費率', 'その他販管費率']) {
+    for (const label of ['その他販管費率']) {
       expect(screen.getByLabelText(`補助事業期間 ${label} 最小値`)).toHaveValue(-10);
       expect(screen.getByLabelText(`補助事業期間 ${label} 最大値`)).toHaveValue(0);
       expect(screen.getByLabelText(`補助事業期間 ${label} 年間変化`)).toHaveValue(0);
       expect(screen.getByLabelText(`補助事業期間 ${label} 最適化で固定`)).toBeChecked();
     }
+    expect(screen.getByLabelText('補助事業期間 原価内減価償却費率 最小値')).toHaveValue(0);
+    expect(screen.getByLabelText('補助事業期間 原価内減価償却費率 最大値')).toHaveValue(10);
+    expect(screen.getByLabelText('補助事業期間 原価内減価償却費率 年間変化')).toHaveValue(0);
+    expect(screen.getByLabelText('補助事業期間 原価内減価償却費率 最適化で固定')).toBeChecked();
     expect(screen.getByLabelText('補助事業期間 販管費内減価償却費率 最小値')).toHaveValue(0);
     expect(screen.getByLabelText('補助事業期間 販管費内減価償却費率 最大値')).toHaveValue(10);
     expect(screen.getByLabelText('補助事業期間 販管費内減価償却費率 年間変化')).toHaveValue(0);
