@@ -42,6 +42,15 @@ npm run build
 
 ## 配布
 
+ビルドとテストの設定は分離しています。`npm run build` はアプリとVite設定のみを
+型チェックしてビルドし、テストコード・テスト用の型定義は読み込みません。
+`npm test` は `tsconfig.test.json` によるテストの型チェック後、`vitest.config.ts` で
+単体・コンポーネントテストを実行します。ブラウザテストの実行は `npm run test:ui`、
+アプリとテスト両方の型チェックは `npm run typecheck` です。
+
+依存パッケージは引き続き同じ `package.json` で管理しているため、この設定分離だけで
+`npm ci` のインストール対象が減るわけではありません。
+
 `npm run build` 後の `dist` フォルダをそのまま配布できます。
 
 - `dist/index.html`: React アプリ本体。Vite の資産は単一HTMLへ内包

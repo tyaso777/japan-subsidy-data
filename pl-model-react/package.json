@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "test": "vitest run",
+    "test": "npm run typecheck:test && vitest run",
     "test:ui": "playwright test",
     "test:watch": "vitest",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "tsc -b --pretty false && npm run typecheck:test",
+    "typecheck:test": "tsc -p tsconfig.test.json --pretty false"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
