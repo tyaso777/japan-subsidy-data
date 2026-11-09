@@ -16,6 +16,34 @@
 - 単位可変の指標: 労働生産性・給与・従業員数は、値だけでなく必ず対応する `*_unit` と組み合わせて使います。
 - 原文優先: PDF内の数値に不整合がある場合、無理に一つへ修正せず、原文値と検証注記を残しています。
 
+### ダッシュボードのCSV出力
+
+以下の項目も、軸や数値フィルターの選択にかかわらず常に出力します。
+
+| 列名 | 意味・単位 |
+|---|---|
+| `project_cost_million_yen_normalized` | 事業費（百万円） |
+| `subsidy_million_yen_normalized` | 補助金額（百万円） |
+| `self_funding_oku_yen` | 事業費－補助金額（億円）。自己負担額の近似で、自己資本による調達額を意味しません |
+| `subsidy_rate_pct` | 補助率（%） |
+| `sales_baseline_oku_yen` / `sales_target_oku_yen` | 基準時／目標時の全社売上高（億円） |
+| `sales_cagr_pct` | 全社年平均売上高成長率（%/年） |
+| `employees_base_value` / `employees_target_value` | 基準時／目標時の補助事業従業員数（人） |
+| `employees_increase_value` | 目標時－基準時の補助事業従業員数（人） |
+| `employee_pay_base_value_man_yen_per_person` / `employee_pay_target_value_man_yen_per_person` | 基準時／目標時の従業員1人当たり給与支給総額（万円/人） |
+| `employee_pay_annual_rate_pct` | 従業員給与の年平均上昇率（%/年） |
+| `industry` | 業種 |
+| `investment_component_count` | 識別できた投資単位数（件） |
+| `project_location_count` | 公式住所行に基づく事業実施場所数（か所）。都道府県数とは異なります |
+| `analysis_exclusion_reasons` | 未解決の重大な品質フラグコード（`|` 区切り） |
+| `*_analysis_status` | 指標別の分析可否。下記の16項目を出力 |
+
+分析可否の対象は `project_cost`、`subsidy`、`sales_values`、`sales_rate`、`labor_values`、`labor_rate`、`employee_pay_values`、`employee_pay_rate`、`officer_pay_values`、`officer_pay_rate`、`employees_values`、`employees_rate`、`employee_pay_total_increase`、`investment_sales_ratio`、`value_added_increase_estimated`、`value_added_subsidy_ratio_proxy` です。各接頭辞に `_analysis_status` を付けた列名で出力します。状態の意味は [分析用フラグと除外基準](analysis_quality_flags.md#3-指標別の分析可否) を参照してください。欠損は空欄のままとし、ゼロ補完しません。
+
+`public_metrics_dashboard.html` の `filtered_cases.csv` には、案件ID・公募回次・会社名・PDF URL、選択中の横軸と縦軸、有効な数値フィルターの対象列を出力します。さらに `investment_sales_ratio_pct`、付加価値の補正前粗近似・補正推計・補助金額に対する比率、本社都道府県・事業実施都道府県、分析除外推奨フラグを常に含めます。同じ列は重複させません。
+
+`investment_sales_ratio_pct` は全社売上高に対する投資額割合（近似、%）で、事業費÷基準時売上高×100（同じ金額単位に換算して計算）です。例えば `25` は25%です。算出できない場合は空欄です。公式指標の分母である直近決算期売上高と公開基準売上高が一致しない場合があります。CSVは画面上の表示換算前の値を出力するため、`*_million_yen_normalized` の単位は百万円です。
+
 ## 2. 売上系列の使い分け
 
 PDFには申請企業単体、連結、グループ、子会社、補助事業など複数の売上系列が併記される場合があります。
