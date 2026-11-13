@@ -21,6 +21,11 @@ const addedFields = [
 for (const file of ['./build_analysis_dashboard.py', '../html/public_metrics_dashboard.html', '../html/official_metrics_reference.html']) {
 const source = readFileSync(new URL(file, import.meta.url), 'utf8');
 const exportCode = source.slice(source.indexOf('function csvCell('), source.indexOf("if(document.body.classList.contains('reference-mode'))"));
+test(`${file}: every selectable axis and numeric filter has a Japanese header`, () => {
+  const metadata = source.slice(source.indexOf('const AXES='), source.indexOf('const COLOR_METRICS='));
+  const headers = runInNewContext(metadata + exportCode + ';[...Object.keys(AXES),...NUMERIC_FILTER_FIELDS.map(m=>m.field)].map(key=>[key,csvHeader(key,"ja")])');
+  for (const [key, label] of headers) assert.notEqual(label, key);
+});
 if (file === '../html/public_metrics_dashboard.html') {
   test('Published dashboard contains all added fields in actual case data', () => {
     const data = JSON.parse(source.match(/const DATA=(.*?);const BENCH=/s)[1]);
@@ -38,14 +43,15 @@ for (const axis of ['sales_increase_oku_yen_normalized', 'investment_sales_ratio
       { ...Object.fromEntries(addedFields.map((field, i) => [field, `value${i}`])), case_id: 'selected', investment_sales_ratio_pct: 25.125 },
       { case_id: 'missing', investment_sales_ratio_pct: null },
     ];
-    runInNewContext(exportCode + ';exportCsv();', {
+    const context = {
       Blob,
       URL: { createObjectURL(value) { blob = value; return 'blob:test'; }, revokeObjectURL() {} },
       document: { createElement() { return { click() {} }; } },
       numericFilters: [{ field: 'project_cost_million_yen_normalized' }], numericFilterActive: () => true,
       xmetric: { value: axis }, ymetric: { value: 'employee_pay_total_increase_estimated_oku' },
       centralFilterRows: () => rows,
-    });
+    };
+    runInNewContext(exportCode + ';exportCsv();', context);
     const [header, first, second] = (await blob.text()).trimEnd().split('\n');
     const keys = header.split(',');
     for (const field of addedFields) {
@@ -58,6 +64,16 @@ for (const axis of ['sales_increase_oku_yen_normalized', 'investment_sales_ratio
     assert.equal(first.split(',')[index], '25.125');
     assert.equal(second.split(',')[index], '');
     assert.equal(first.split(',')[0], 'selected');
+    const english = await blob.text();
+    runInNewContext(exportCode + ";exportCsv('ja');", context);
+    const japanese = await blob.text();
+    assert.equal(japanese.slice(japanese.indexOf('\n')), english.slice(english.indexOf('\n')), 'only headers change');
+    const japaneseKeys = japanese.split('\n')[0].split(',');
+    assert.equal(japaneseKeys.length, keys.length);
+    assert.equal(new Set(japaneseKeys).size, keys.length);
+    assert.ok(japaneseKeys.includes('事業費（百万円）'));
+    assert.ok(japaneseKeys.includes('全社売上高に対する投資額割合・近似（%）'));
+    assert.ok(japaneseKeys.every(key => !/^[a-z_]+$/.test(key)), 'all exported headers translated');
   });
 }
 }

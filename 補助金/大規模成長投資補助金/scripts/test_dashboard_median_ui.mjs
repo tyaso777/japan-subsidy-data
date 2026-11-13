@@ -30,6 +30,22 @@ test('Median filters show and apply independent comparisons at desktop and narro
       assert.equal(await page.locator('#count').textContent(), '0 / 381件');
       await select.selectOption('');
       assert.equal(await page.locator('#count').textContent(), '93 / 381件');
+      const csvTexts = [];
+      for (const [id, filename] of [['export', 'filtered_cases_ja.csv'], ['exportEnglish', 'filtered_cases.csv']]) {
+        const downloadEvent = page.waitForEvent('download');
+        await page.locator(`#${id}`).click();
+        const download = await downloadEvent;
+        assert.equal(download.suggestedFilename(), filename);
+        const stream = await download.createReadStream();
+        const chunks = [];
+        for await (const chunk of stream) chunks.push(chunk);
+        const buffer = Buffer.concat(chunks);
+        assert.equal(buffer.subarray(0, 3).toString('hex'), 'efbbbf', 'UTF-8 BOM for Excel');
+        csvTexts.push(buffer.toString('utf8'));
+      }
+      assert.ok(csvTexts[0].split('\n')[0].includes('事業費（百万円）'));
+      assert.ok(csvTexts[1].split('\n')[0].includes('project_cost_million_yen_normalized'));
+      assert.equal(csvTexts[0].slice(csvTexts[0].indexOf('\n')), csvTexts[1].slice(csvTexts[1].indexOf('\n')));
       assert.deepEqual(errors, []);
       console.log(`${width}px: ${labels.join(' / ')}`);
       await page.close();
