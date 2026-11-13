@@ -119,6 +119,16 @@
 
 ## 7. 再生成・検証
 
+### ダッシュボードの中央値フィルター
+
+中央値条件は、各案件の公募回に対応する公式中央値と独立に比較します。既存の「申請者中央値未満」「申請者中央値以上～採択者中央値未満」「採択者中央値以上」に加え、「申請者中央値以上」「採択者中央値未満」を選択できます。
+
+採択者中央値が申請者中央値を下回る場合も、各中央値との比較は有効です。中間区分は元の定義を維持するため、その回では0件になります。各条件の対象は重複する場合があり、件数の合計は全件数と一致しません。指標値や比較対象の中央値が欠損している案件は当該比較に含めませんが、「条件なし」には含めます。「条件なし」の件数には、他の有効な中央値条件などの絞り込みが反映されます。
+
+回帰テスト：`node --test scripts/test_dashboard_median_filters.mjs scripts/test_dashboard_csv_export.mjs`
+
+画面操作テスト：`node --test scripts/test_dashboard_median_ui.mjs`（既存の `pl-model-react` のPlaywright依存とMicrosoft Edgeを使用。1440px・768px幅で検証。）
+
 ```powershell
 python scripts/build_analysis_flags.py
 python scripts/validate_analysis_flags.py
